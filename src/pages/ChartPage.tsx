@@ -8,6 +8,8 @@ import DrawToolbar from "../sections/chart/draw/DrawToolbar";
 import type { Shape, ToolKind } from "../sections/chart/draw/types";
 import ZoomPanBar from "../sections/chart/ZoomPanBar";
 import MiniMap from "../sections/chart/MiniMap";
+import { exportWithHud } from "../sections/chart/export";
+import { encodeState, decodeState } from "../lib/urlState";
 
 export default function ChartPage() {
   const [address, setAddress] = React.useState<string>("");
@@ -56,6 +58,30 @@ export default function ChartPage() {
   React.useEffect(() => {
     if (data && data.length) setView({ start: 0, end: data.length });
   }, [data]);
+
+  // --- Permalink: beim Mount lesen, bei Änderungen schreiben ----------------
+  React.useEffect(() => {
+    // READ once on mount
+    const url = new URL(window.location.href);
+    const raw = url.searchParams.get("chart");
+    const st = decodeState<any>(raw);
+    if (st) {
+      if (st.address) setAddress(String(st.address));
+      if (st.tf) setTf(st.tf);
+      if (st.view) setView(st.view);
+      if (typeof st.snap === "boolean") setSnap(st.snap);
+      if (st.indState) setIndState(st.indState);
+      if (Array.isArray(st.shapes)) setShapes(st.shapes);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  React.useEffect(() => {
+    // WRITE on state change (replaceState, kein History-Spam)
+    const state = { address, tf, view, snap, indState, shapes };
+    const url = new URL(window.location.href);
+    url.searchParams.set("chart", encodeState(state));
+    window.history.replaceState(null, "", url.toString());
+  }, [address, tf, view, snap, indState, shapes]);
 
   // persist drawings
   React.useEffect(() => {
@@ -117,15 +143,43 @@ export default function ChartPage() {
     pushHistory(shapes);
     setShapes(next);
   };
-  const onExportPNG = () => {
-    const dataUrl = canvasRef.current?.exportPNG();
+  // Export PNG with HUD (Header + Branding)
+  const onExportPngHud = () => {
+    const host = document.querySelector("canvas");
+    if (!(host instanceof HTMLCanvasElement)) return;
+    const dataUrl = exportWithHud(host, {
+      title: address ? `CA ${address.slice(0,6)}…${address.slice(-6)}` : "Sparkfined Chart",
+      timeframe: tf,
+      rangeText,
+      brand: "$CRYPTOBER",
+      theme: "dark",
+    });
     if (!dataUrl) return;
     const a = document.createElement("a");
     a.href = dataUrl;
-    a.download = `chart-${Date.now()}.png`;
+    a.download = `chart-hud-${Date.now()}.png`;
     document.body.appendChild(a);
     a.click();
     a.remove();
+  };
+  const onCopyPngHud = async () => {
+    const host = document.querySelector("canvas");
+    if (!(host instanceof HTMLCanvasElement)) return;
+    const dataUrl = exportWithHud(host, {
+      title: address ? `CA ${address.slice(0,6)}…${address.slice(-6)}` : "Sparkfined Chart",
+      timeframe: tf,
+      rangeText,
+      brand: "$CRYPTOBER",
+      theme: "dark",
+    });
+    const blob = await (await fetch(dataUrl)).blob();
+    // Clipboard API (sicherer Kontext required: https)
+    if (navigator.clipboard && (window as any).ClipboardItem) {
+      await navigator.clipboard.write([new (window as any).ClipboardItem({ [blob.type]: blob })]);
+      alert("Screenshot (HUD) in die Zwischenablage kopiert.");
+    } else {
+      alert("Clipboard-API nicht verfügbar – bitte Datei herunterladen.");
+    }
   };
   // Session Export/Import (JSON)
   const onExportJSON = () => {
@@ -209,9 +263,8 @@ export default function ChartPage() {
         rangeText={rangeText}
       />
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        <button onClick={onExportPNG} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">
-          Export PNG
-        </button>
+        <button onClick={onExportPngHud} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">Export PNG (HUD)</button>
+        <button onClick={onCopyPngHud}  className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">Copy PNG (HUD)</button>
         <button onClick={onExportJSON} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">
           Export Session (JSON)
         </button>
