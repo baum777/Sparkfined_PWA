@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Blade Runner × TradingView × Notion Design Tokens */
+  :root {
+    --color-brand: 255 98 0;
+    --color-accent: 0 255 102;
+    --color-cyan: 0 229 255;
+    --color-bg: 10 10 10;
+    --color-surface: 18 18 18;
+    --color-text: 230 238 242;
+    
+    /* Motion */
+    --duration-fast: 140ms;
+    --duration-base: 180ms;
+    --duration-slow: 220ms;
+    --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+    
+    /* Glow effects */
+    --glow-accent: 0 0 10px rgba(0, 255, 102, 0.22);
+    --glow-brand: 0 0 12px rgba(255, 98, 0, 0.18);
+    --glow-cyan: 0 0 8px rgba(0, 229, 255, 0.2);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-bg text-text-primary font-sans;
+    @apply overflow-x-hidden;
+    position: relative;
+  }
+  
+  /* Subtle noise overlay (cyberpunk texture) */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.3;
+  }
+  
+  /* Optional: VHS scanlines (ultra-subtle) */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(0, 255, 102, 0.01) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.08;
+  }
+  
+  /* Ensure content is above noise/scanlines */
+  #root {
+    position: relative;
+    z-index: 2;
+  }
+  
+  /* Typography refinements */
+  h1, h2, h3 {
+    @apply font-display tracking-tight;
+    line-height: 1.15;
+  }
+  
+  p {
+    line-height: 1.45;
+  }
+  
+  code, pre {
+    @apply font-mono;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Focus rings (neon precision) */
+  *:focus-visible {
+    outline: 2px solid rgb(var(--color-accent));
+    outline-offset: 2px;
+    box-shadow: var(--glow-accent);
+  }
+  
+  /* Smooth scrolling with reduced motion support */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+@layer components {
+  /* Button Primitives */
+  .btn-primary {
+    @apply px-6 py-3 bg-brand-gradient text-white font-semibold rounded-md;
+    @apply transition-all duration-180 ease-soft-out;
+    @apply hover:shadow-glow-brand hover:brightness-110;
+    @apply active:scale-[0.98];
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 bg-surface text-text-primary font-semibold rounded-md;
+    @apply border border-border-accent/20;
+    @apply transition-all duration-180 ease-soft-out;
+    @apply hover:border-accent hover:shadow-glow-accent;
+    @apply active:scale-[0.98];
+  }
+  
+  .btn-ghost {
+    @apply px-4 py-2 bg-transparent text-text-secondary font-medium rounded-md;
+    @apply border border-border;
+    @apply transition-all duration-180 ease-soft-out;
+    @apply hover:bg-surface-hover hover:text-text-primary;
+    @apply active:scale-[0.98];
+  }
+
+  /* Card Component */
+  .card {
+    @apply bg-surface rounded-lg border border-border shadow-card-subtle;
+    @apply p-6 backdrop-blur-sm;
+    @apply transition-all duration-220 ease-soft-out;
+  }
+  
+  .card-interactive {
+    @apply card cursor-pointer;
+    @apply hover:border-accent/30 hover:shadow-glow-accent;
+    @apply hover:-translate-y-0.5;
+  }
+  
+  /* Input Primitives */
+  .input {
+    @apply w-full px-4 py-3 rounded-md;
+    @apply bg-surface border border-border;
+    @apply text-text-primary placeholder:text-text-tertiary;
+    @apply font-mono text-sm;
+    @apply transition-all duration-180 ease-soft-out;
+    @apply focus:outline-none focus:border-accent focus:shadow-glow-accent;
+  }
+  
+  /* Glow Utilities */
+  .glow-accent {
+    @apply shadow-glow-accent;
+  }
+  
+  .glow-brand {
+    @apply shadow-glow-brand;
+  }
+  
+  .glow-cyan {
+    @apply shadow-glow-cyan;
+  }
+  
+  /* Chart-specific utilities */
+  .candle-bull {
+    @apply text-bull fill-bull;
+  }
+  
+  .candle-bear {
+    @apply text-bear fill-bear;
+  }
+}

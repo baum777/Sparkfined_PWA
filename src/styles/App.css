@@ -1,0 +1,107 @@
+/* Sparkfined TA-PWA: Blade Runner × TradingView × Notion */
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Refined Micro-Interactions */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(0, 255, 102, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(0, 255, 102, 0.3);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 220ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.animate-slide-up {
+  animation: slide-up 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Offline mode indicator (subtle neon warning) */
+body.offline-mode {
+  /* Optional: Add accent glow to indicate offline state */
+}
+
+/* Custom scrollbar (cyberpunk aesthetic) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2A2A2A;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00FF66;
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
+}
+
+/* Loading skeleton shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #121212 0%,
+    #1A1A1A 50%,
+    #121212 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

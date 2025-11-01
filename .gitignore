@@ -1,0 +1,18 @@
+# Node/Next/PWA
+node_modules/
+.next/
+out/
+dist/
+.cache/
+.vscode/
+.vercel/
+.turbo/
+coverage/
+*.log
+# Env/Secrets
+.env
+.env.*
+!.env.example
+# OS
+.DS_Store
+Thumbs.db
