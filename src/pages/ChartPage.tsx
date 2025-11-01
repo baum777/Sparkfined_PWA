@@ -1,6 +1,6 @@
 import React from "react";
 import ChartHeader from "../sections/chart/ChartHeader";
-import CandlesCanvas from "../sections/chart/CandlesCanvas";
+import CandlesCanvas, { type CanvasHandle } from "../sections/chart/CandlesCanvas";
 import { fetchOhlc, type OhlcPoint } from "../sections/chart/marketOhlc";
 import IndicatorBar, { type IndicatorState } from "../sections/chart/IndicatorBar";
 import { sma, ema, vwap } from "../sections/chart/indicators";
@@ -22,6 +22,8 @@ export default function ChartPage() {
   });
   const [undo, setUndo] = React.useState<Shape[][]>([]);
   const [redo, setRedo] = React.useState<Shape[][]>([]);
+  const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const canvasRef = React.useRef<CanvasHandle | null>(null);
 
   const load = React.useCallback(async () => {
     if (!address.trim()) { setData(null); setError(null); return; }
@@ -60,6 +62,14 @@ export default function ChartPage() {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") {
         e.preventDefault(); doRedo(); return;
       }
+      if (e.key === "Delete" || e.key === "Backspace") {
+        if (selectedId) {
+          e.preventDefault();
+          pushHistory(shapes);
+          setShapes(shapes.filter(s => s.id !== selectedId));
+          setSelectedId(null);
+        }
+      }
       if (e.key === "Escape") setTool("cursor");
       if (e.key.toLowerCase() === "h") setTool("hline");
       if (e.key.toLowerCase() === "t") setTool("trend");
@@ -67,7 +77,7 @@ export default function ChartPage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [selectedId, shapes]);
 
   const pushHistory = (prev: Shape[]) => {
     setUndo(u => [prev, ...u].slice(0, 100));
@@ -98,6 +108,16 @@ export default function ChartPage() {
     pushHistory(shapes);
     setShapes(next);
   };
+  const onExportPNG = () => {
+    const dataUrl = canvasRef.current?.exportPNG();
+    if (!dataUrl) return;
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `chart-${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
@@ -119,9 +139,16 @@ export default function ChartPage() {
         canRedo={redo.length>0}
         onClear={clearAll}
       />
+      <div className="mt-2">
+        <button onClick={onExportPNG} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">
+          Export PNG
+        </button>
+        {selectedId && <span className="ml-3 text-xs text-zinc-500">Ausgewählt: {selectedId.slice(0,8)}… (Entf zum Löschen)</span>}
+      </div>
       <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-2">
         {error && <div className="m-2 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
         <CandlesCanvas
+          ref={canvasRef}
           points={data || []}
           loading={loading}
           indicators={inds}
@@ -129,6 +156,8 @@ export default function ChartPage() {
           tool={tool}
           shapes={shapes}
           onShapesChange={onShapesChange}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
         />
         {!address && (
           <div className="p-4 text-sm text-zinc-500">

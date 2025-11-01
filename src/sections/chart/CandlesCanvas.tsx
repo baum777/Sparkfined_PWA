@@ -1,6 +1,7 @@
 import React from "react";
 import { fmtNum, fmtTime } from "../../lib/format";
 import type { Shape, ToolKind } from "./draw/types";
+import { dist, distPointToSegment } from "./draw/hit";
 
 export type OhlcPoint = { t: number; o: number; h: number; l: number; c: number; v?: number };
 
@@ -10,12 +11,11 @@ export type IndicatorSets = {
   vwap?: Array<number | undefined>;
 };
 
-export default function CandlesCanvas({
-  points, loading, indicators, onHoverIndex,
-  tool = "cursor",
-  shapes = [],
-  onShapesChange
-}: {
+export type CanvasHandle = {
+  exportPNG: () => string; // returns dataURL
+};
+
+const CandlesCanvas = React.forwardRef<CanvasHandle, {
   points: OhlcPoint[];
   loading: boolean;
   indicators?: IndicatorSets;
@@ -23,15 +23,20 @@ export default function CandlesCanvas({
   tool?: ToolKind;
   shapes?: Shape[];
   onShapesChange?: (next: Shape[]) => void;
-}) {
-  const ref = React.useRef<HTMLCanvasElement | null>(null);
+  selectedId?: string | null;
+  onSelect?: (id: string | null) => void;
+}>(({
+  points, loading, indicators, onHoverIndex, tool = "cursor", shapes = [], onShapesChange, selectedId, onSelect
+}, ref) => {
+  const refCanvas = React.useRef<HTMLCanvasElement | null>(null);
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
   const [hover, setHover] = React.useState<{ x: number; y: number } | null>(null);
   const [hoverIdx, setHoverIdx] = React.useState<number | null>(null);
   const layoutRef = React.useRef<{ X0:number; X1:number; Y0:number; Y1:number; min:number; max:number; n:number } | null>(null);
+  const [drag, setDrag] = React.useState<null | { id:string; handle:"line"|"a"|"b"; start:{x:number;y:number}; shape:Shape }>(null);
 
   React.useEffect(() => {
-    const el = ref.current; if (!el) return;
+    const el = refCanvas.current; if (!el) return;
     const ctx = el.getContext("2d"); if (!ctx) return;
     const DPR = Math.max(1, window.devicePixelRatio || 1);
     const Wcss = el.clientWidth;
@@ -177,23 +182,95 @@ export default function CandlesCanvas({
       });
       ctx.setLineDash([]);
     };
-    // Persisted shapes
+    // Persisted shapes + Selection/Handles
     shapes.forEach(s => {
-      if (s.kind === "hline") drawH(pxY(s.price));
-      if (s.kind === "trend") drawTrend(pxX(s.a.idx), pxY(s.a.price), pxX(s.b.idx), pxY(s.b.price));
-      if (s.kind === "fib")   drawFib({ x:pxX(s.a.idx), y:pxY(s.a.price) }, { x:pxX(s.b.idx), y:pxY(s.b.price) });
+      const sel = s.id === selectedId;
+      if (s.kind === "hline") {
+        const y = pxY(s.price);
+        drawH(y, sel ? "#60A5FA" : "#94A3B8");
+        if (sel) {
+          // Handle rechts
+          const hx = X1 - 8, hy = y;
+          ctx.fillStyle = "#60A5FA";
+          ctx.fillRect(hx-4, hy-4, 8, 8);
+        }
+      }
+      if (s.kind === "trend") {
+        const ax = pxX(s.a.idx), ay = pxY(s.a.price);
+        const bx = pxX(s.b.idx), by = pxY(s.b.price);
+        drawTrend(ax, ay, bx, by, sel ? "#F59E0B" : "#A8A29E");
+        if (sel) {
+          ctx.fillStyle = "#F59E0B";
+          ctx.beginPath(); ctx.arc(ax, ay, 5, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(bx, by, 5, 0, Math.PI*2); ctx.fill();
+        }
+      }
+      if (s.kind === "fib") {
+        const a = { x:pxX(s.a.idx), y:pxY(s.a.price) };
+        const b = { x:pxX(s.b.idx), y:pxY(s.b.price) };
+        drawFib(a, b);
+        if (sel) {
+          ctx.fillStyle = "#C084FC";
+          ctx.beginPath(); ctx.arc(a.x, a.y, 5, 0, Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(b.x, b.y, 5, 0, Math.PI*2); ctx.fill();
+        }
+      }
     });
-  }, [points, hover, indicators, hoverIdx, shapes]);
+  }, [points, hover, indicators, hoverIdx, shapes, selectedId]);
 
   // Pointer events & resize
   React.useEffect(() => {
-    const el = ref.current; if (!el) return;
+    const el = refCanvas.current; if (!el) return;
     const onMove = (e: MouseEvent) => {
       const rect = el.getBoundingClientRect();
       const pt = { x: e.clientX - rect.left, y: e.clientY - rect.top };
       setHover(pt);
+      // Dragging
+      if (drag && layoutRef.current && onShapesChange) {
+        const L = layoutRef.current;
+        const mx = pt.x, my = pt.y;
+        const dx = mx - drag.start.x;
+        const dy = my - drag.start.y;
+        // translate px delta ? data space
+        const idxDelta = Math.round(dx / Math.max(1, (L.X1 - L.X0)) * L.n);
+        const priceDelta = -dy / Math.max(1, (L.Y1 - L.Y0)) * (L.max - L.min);
+        const s = drag.shape;
+        let next: Shape | null = null;
+        if (s.kind === "hline") {
+          next = { ...s, price: s.price + priceDelta, updatedAt: Date.now() };
+        } else if (s.kind === "trend") {
+          if (drag.handle === "a") next = { ...s, a: { idx: clampIdx(s.a.idx + idxDelta, L.n), price: s.a.price + priceDelta }, updatedAt: Date.now() };
+          else if (drag.handle === "b") next = { ...s, b: { idx: clampIdx(s.b.idx + idxDelta, L.n), price: s.b.price + priceDelta }, updatedAt: Date.now() };
+          else next = { ...s, a: { idx: clampIdx(s.a.idx + idxDelta, L.n), price: s.a.price + priceDelta }, b: { idx: clampIdx(s.b.idx + idxDelta, L.n), price: s.b.price + priceDelta }, updatedAt: Date.now() };
+        } else if (s.kind === "fib") {
+          if (drag.handle === "a") next = { ...s, a: { idx: clampIdx(s.a.idx + idxDelta, L.n), price: s.a.price + priceDelta }, updatedAt: Date.now() };
+          else if (drag.handle === "b") next = { ...s, b: { idx: clampIdx(s.b.idx + idxDelta, L.n), price: s.b.price + priceDelta }, updatedAt: Date.now() };
+          else next = { ...s, a: { idx: clampIdx(s.a.idx + idxDelta, L.n), price: s.a.price + priceDelta }, b: { idx: clampIdx(s.b.idx + idxDelta, L.n), price: s.b.price + priceDelta }, updatedAt: Date.now() };
+        }
+        if (next) {
+          onShapesChange([next, ...shapes.filter(x => x.id !== next!.id)]);
+          setDrag({ ...drag, start: { x: mx, y: my }, shape: next });
+        }
+      }
     };
     const onLeave = () => setHover(null);
+    const onDown = (e: MouseEvent) => {
+      if (!layoutRef.current) return;
+      const L = layoutRef.current;
+      const rect = el.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      // Selection / Drag start (if cursor mode)
+      if (tool === "cursor") {
+        // hit-test handles first
+        const hit = hitTest(mx, my, L, shapes);
+        if (onSelect) onSelect(hit?.id ?? null);
+        if (hit && onShapesChange) {
+          const base = shapes.find(s => s.id === hit.id)!;
+          setDrag({ id: hit.id, handle: hit.handle, start: { x: mx, y: my }, shape: base });
+        }
+        return;
+      }
+    };
     const onClick = (e: MouseEvent) => {
       if (tool === "cursor" || !layoutRef.current || !onShapesChange) return;
       const L = layoutRef.current;
@@ -234,29 +311,81 @@ export default function CandlesCanvas({
         return;
       }
     };
+    const onUp = () => setDrag(null);
     const ro = new ResizeObserver(() => { setHover((h)=>h?{...h}:h); }); // redraw on resize
     el.addEventListener("mousemove", onMove);
     el.addEventListener("mouseleave", onLeave);
+    el.addEventListener("mousedown", onDown);
     el.addEventListener("click", onClick);
+    window.addEventListener("mouseup", onUp);
     ro.observe(el);
     return () => {
       el.removeEventListener("mousemove", onMove);
       el.removeEventListener("mouseleave", onLeave);
+      el.removeEventListener("mousedown", onDown);
       el.removeEventListener("click", onClick);
+      window.removeEventListener("mouseup", onUp);
       ro.disconnect();
     };
-  }, [tool, shapes, onShapesChange]);
+  }, [tool, shapes, onShapesChange, drag, onSelect, selectedId]);
 
   // bubble index up (for external UI if needed)
   React.useEffect(() => {
     onHoverIndex?.(hover ? hoverIdx : null);
   }, [hover, hoverIdx, onHoverIndex]);
 
+  // expose PNG export
+  React.useImperativeHandle(ref, () => ({
+    exportPNG() {
+      const el = refCanvas.current;
+      if (!el) return "";
+      return el.toDataURL("image/png");
+    }
+  }), []);
+
   return (
     <div className="relative">
-      <canvas ref={ref} className="block w-full rounded-xl bg-zinc-950" />
+      <canvas ref={refCanvas} className="block w-full rounded-xl bg-zinc-950" />
       <div ref={overlayRef} className="pointer-events-none absolute" />
-      {loading && <div className="absolute inset-0 grid place-items-center text-sm text-zinc-400">Lade Daten…</div>}
+      {loading && <div className="absolute inset-0 grid place-items-center text-sm text-zinc-400">Lade Daten?</div>}
     </div>
   );
+});
+
+CandlesCanvas.displayName = "CandlesCanvas";
+export default CandlesCanvas;
+
+// --- helpers ----------------------------------------------------------------
+function clampIdx(i:number, n:number) { return Math.max(0, Math.min(n-1, i)); }
+
+function hitTest(mx:number, my:number, L:{X0:number;X1:number;Y0:number;Y1:number;min:number;max:number;n:number}, shapes:Shape[]) {
+  // return closest hit within tolerance: handles first, then line body
+  const tol = 8; // px handle; 6-10px is fine
+  const pxX = (idx:number) => L.X0 + (idx * (L.X1 - L.X0) / Math.max(1, L.n));
+  const pxY = (price:number) => L.Y1 - ((price - L.min) * (L.Y1 - L.Y0) / Math.max(1e-12, (L.max - L.min)));
+  let best: null | { id:string; handle:"line"|"a"|"b"; d:number } = null;
+  for (const s of shapes) {
+    if (s.kind === "hline") {
+      const y = pxY(s.price);
+      // handle at right
+      const dHandle = Math.max(Math.abs((L.X1-8) - mx), Math.abs(y - my));
+      if (dHandle <= tol) { best = { id:s.id, handle:"line", d: dHandle }; continue; }
+      // near line
+      if (Math.abs(y - my) <= 6) {
+        const d = Math.abs(y - my);
+        if (!best || d < best.d) best = { id:s.id, handle:"line", d };
+      }
+    }
+    if (s.kind === "trend" || s.kind === "fib") {
+      const ax = pxX(s.a.idx), ay = pxY(s.a.price);
+      const bx = pxX(s.b.idx), by = pxY(s.b.price);
+      // handles
+      if (dist({x:mx,y:my},{x:ax,y:ay}) <= tol) { best = { id:s.id, handle:"a", d:0 }; continue; }
+      if (dist({x:mx,y:my},{x:bx,y:by}) <= tol) { best = { id:s.id, handle:"b", d:0 }; continue; }
+      // line body
+      const d = distPointToSegment({x:mx,y:my},{x:ax,y:ay},{x:bx,y:by});
+      if (d <= 6 && (!best || d < best.d)) best = { id:s.id, handle:"line", d };
+    }
+  }
+  return best;
 }
