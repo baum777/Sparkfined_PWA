@@ -20,6 +20,12 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
       }
     }
   })
+
+  // Listen for controllerchange - reload when new SW takes over
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    console.log('[PWA] controllerchange → reload')
+    setTimeout(() => location.reload(), 250)
+  })
 }
 
 // Track online/offline status
