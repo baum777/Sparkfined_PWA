@@ -174,7 +174,7 @@ export default function SettingsPage() {
           </button>
         </div>
         <div className="mt-2 text-[11px] text-zinc-500">
-          Version: {import.meta.env.VITE_APP_VERSION ?? "dev"} · Build: {import.meta.env.MODE}
+          Version: {import.meta.env.VITE_APP_VERSION ?? "dev"} · Build: {import.meta.env.MODE} · VAPID pub: {import.meta.env.VITE_VAPID_PUBLIC_KEY ? "set" : "missing"}
         </div>
       </div>
     </div>
