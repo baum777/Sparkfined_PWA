@@ -1,7 +1,7 @@
 import React from "react";
 import { fmtNum, fmtTime } from "../../lib/format";
 import type { Shape, ToolKind } from "./draw/types";
-import { dist, distPointToSegment } from "./draw/hit";
+import { dist, distPointToSegment, snapPriceToOhlc } from "./draw/hit";
 
 export type OhlcPoint = { t: number; o: number; h: number; l: number; c: number; v?: number };
 
@@ -25,15 +25,19 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
   onShapesChange?: (next: Shape[]) => void;
   selectedId?: string | null;
   onSelect?: (id: string | null) => void;
+  view: { start: number; end: number };
+  onViewChange: (v: { start: number; end: number }) => void;
+  snap?: boolean;
 }>(({
-  points, loading, indicators, onHoverIndex, tool = "cursor", shapes = [], onShapesChange, selectedId, onSelect
+  points, loading, indicators, onHoverIndex, tool = "cursor", shapes = [], onShapesChange, selectedId, onSelect, view, onViewChange, snap = true
 }, ref) => {
   const refCanvas = React.useRef<HTMLCanvasElement | null>(null);
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
   const [hover, setHover] = React.useState<{ x: number; y: number } | null>(null);
   const [hoverIdx, setHoverIdx] = React.useState<number | null>(null);
-  const layoutRef = React.useRef<{ X0:number; X1:number; Y0:number; Y1:number; min:number; max:number; n:number } | null>(null);
+  const layoutRef = React.useRef<{ X0:number; X1:number; Y0:number; Y1:number; min:number; max:number; n:number; start:number; end:number } | null>(null);
   const [drag, setDrag] = React.useState<null | { id:string; handle:"line"|"a"|"b"; start:{x:number;y:number}; shape:Shape }>(null);
+  const [panning, setPanning] = React.useState<null | { start:{x:number;y:number}; view:{start:number;end:number} }>(null);
 
   React.useEffect(() => {
     const el = refCanvas.current; if (!el) return;
@@ -56,7 +60,11 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
     ctx.strokeStyle = "rgba(255,255,255,0.06)";
     ctx.lineWidth = 1;
     for (let i=1;i<6;i++){ const y = padT + ( (H - padT - padB)/6 )*i; ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(W-padR,y); ctx.stroke(); }
-    if (!points?.length) {
+    const N = points?.length || 0;
+    const start = Math.max(0, Math.min(view.start, Math.max(0, N - 1)));
+    const end   = Math.max(start + 1, Math.min(view.end, N));
+    const slice = points.slice(start, end);
+    if (!slice.length) {
       // empty guide
       ctx.fillStyle = "rgba(255,255,255,0.35)";
       ctx.font = "12px ui-sans-serif, system-ui";
@@ -64,13 +72,13 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
       return;
     }
     // Scales
-    const min = Math.min(...points.map(p=>p.l));
-    const max = Math.max(...points.map(p=>p.h));
+    const min = Math.min(...slice.map(p=>p.l));
+    const max = Math.max(...slice.map(p=>p.h));
     const span = Math.max(1e-12, max - min);
     const X0 = padL, X1 = W - padR, Y0 = padT, Y1 = H - padB;
-    const n = points.length;
+    const n = slice.length;
     const cw = Math.max(2, ((X1 - X0) / n) * 0.7);
-    layoutRef.current = { X0, X1, Y0, Y1, min, max, n };
+    layoutRef.current = { X0, X1, Y0, Y1, min, max, n, start, end };
     // Y labels (right)
     ctx.fillStyle = "rgba(255,255,255,0.6)";
     ctx.font = "11px ui-sans-serif, system-ui";
@@ -80,7 +88,7 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
       ctx.fillText(fmtNum(val), 6, y+3);
     }
     // Candles
-    points.forEach((p, i) => {
+    slice.forEach((p, i) => {
       const x = X0 + (i * (X1 - X0) / n);
       const yo = Y1 - ((p.o - min) * (Y1 - Y0) / span);
       const yc = Y1 - ((p.c - min) * (Y1 - Y0) / span);
@@ -105,7 +113,7 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
       ctx.beginPath();
       let started = false;
       for (let i = 0; i < n; i++) {
-        const v = series[i];
+        const v = series[i + start];
         if (typeof v !== "number" || Number.isNaN(v)) continue;
         const x = X0 + (i * (X1 - X0) / n);
         const y = Y1 - ((v - min) * (Y1 - Y0) / span);
@@ -122,10 +130,11 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
       const { x: mx, y: my } = hover;
       // find nearest index
       const ratio = (mx - X0) / Math.max(1, (X1 - X0));
-      const idx = Math.min(n - 1, Math.max(0, Math.round(ratio * n)));
+      const idxLocal = Math.min(n - 1, Math.max(0, Math.round(ratio * n)));
+      const idx = start + idxLocal;
       if (idx !== hoverIdx) setHoverIdx(idx);
       const p = points[idx];
-      const cx = X0 + (idx * (X1 - X0) / n);
+      const cx = X0 + (idxLocal * (X1 - X0) / n);
       const cy = Y1 - ((p.c - min) * (Y1 - Y0) / span);
       ctx.strokeStyle = "rgba(255,255,255,0.25)";
       ctx.setLineDash([4,4]);
@@ -161,7 +170,10 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
     }
     // --- Drawings layer -----------------------------------------------------
     const pxY = (price:number) => Y1 - ((price - min) * (Y1 - Y0) / (Math.max(1e-12, max - min)));
-    const pxX = (idx:number) => X0 + (idx * (X1 - X0) / Math.max(1, n));
+    const pxX = (idx:number) => {
+      const iLocal = (idx - start);
+      return X0 + (iLocal * (X1 - X0) / Math.max(1, n));
+    };
     const drawH = (y:number, color="#60A5FA") => { // blue-400
       ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.setLineDash([6,4]);
       ctx.beginPath(); ctx.moveTo(X0, y); ctx.lineTo(X1, y); ctx.stroke(); ctx.setLineDash([]);
@@ -216,7 +228,7 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
         }
       }
     });
-  }, [points, hover, indicators, hoverIdx, shapes, selectedId]);
+  }, [points, hover, indicators, hoverIdx, shapes, selectedId, view]);
 
   // Pointer events & resize
   React.useEffect(() => {
@@ -225,6 +237,16 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
       const rect = el.getBoundingClientRect();
       const pt = { x: e.clientX - rect.left, y: e.clientY - rect.top };
       setHover(pt);
+      if (panning && layoutRef.current) {
+        const L = layoutRef.current;
+        const dx = pt.x - panning.start.x;
+        const bars = Math.round(dx / Math.max(1, (L.X1 - L.X0)) * L.n);
+        const N = (L.end - L.start);
+        const newStart = Math.max(0, panning.view.start - bars);
+        const maxStart = Math.max(0, (points.length - N));
+        const clampedStart = Math.min(newStart, maxStart);
+        onViewChange({ start: clampedStart, end: clampedStart + N });
+      }
       // Dragging
       if (drag && layoutRef.current && onShapesChange) {
         const L = layoutRef.current;
@@ -234,18 +256,35 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
         // translate px delta ? data space
         const idxDelta = Math.round(dx / Math.max(1, (L.X1 - L.X0)) * L.n);
         const priceDelta = -dy / Math.max(1, (L.Y1 - L.Y0)) * (L.max - L.min);
-        const s = drag.shape;
+        let s = drag.shape;
         let next: Shape | null = null;
         if (s.kind === "hline") {
-          next = { ...s, price: s.price + priceDelta, updatedAt: Date.now() };
+          let newPrice = s.price + priceDelta;
+          if (snap) {
+            const idx = clampIdx(Math.round((mx - L.X0) / Math.max(1, (L.X1 - L.X0)) * L.n) + L.start, points.length);
+            newPrice = snapPriceToOhlc(idx, newPrice, points as any).price;
+          }
+          next = { ...s, price: newPrice, updatedAt: Date.now() };
         } else if (s.kind === "trend") {
-          if (drag.handle === "a") next = { ...s, a: { idx: clampIdx(s.a.idx + idxDelta, L.n), price: s.a.price + priceDelta }, updatedAt: Date.now() };
-          else if (drag.handle === "b") next = { ...s, b: { idx: clampIdx(s.b.idx + idxDelta, L.n), price: s.b.price + priceDelta }, updatedAt: Date.now() };
-          else next = { ...s, a: { idx: clampIdx(s.a.idx + idxDelta, L.n), price: s.a.price + priceDelta }, b: { idx: clampIdx(s.b.idx + idxDelta, L.n), price: s.b.price + priceDelta }, updatedAt: Date.now() };
+          const mut = (pt:{idx:number;price:number}) => {
+            let idx = clampIdx(pt.idx + idxDelta, points.length);
+            let price = pt.price + priceDelta;
+            if (snap) { const sres = snapPriceToOhlc(idx, price, points as any); idx = sres.idx; price = sres.price; }
+            return { idx, price };
+          };
+          if (drag.handle === "a") next = { ...s, a: mut(s.a), updatedAt: Date.now() };
+          else if (drag.handle === "b") next = { ...s, b: mut(s.b), updatedAt: Date.now() };
+          else next = { ...s, a: mut(s.a), b: mut(s.b), updatedAt: Date.now() };
         } else if (s.kind === "fib") {
-          if (drag.handle === "a") next = { ...s, a: { idx: clampIdx(s.a.idx + idxDelta, L.n), price: s.a.price + priceDelta }, updatedAt: Date.now() };
-          else if (drag.handle === "b") next = { ...s, b: { idx: clampIdx(s.b.idx + idxDelta, L.n), price: s.b.price + priceDelta }, updatedAt: Date.now() };
-          else next = { ...s, a: { idx: clampIdx(s.a.idx + idxDelta, L.n), price: s.a.price + priceDelta }, b: { idx: clampIdx(s.b.idx + idxDelta, L.n), price: s.b.price + priceDelta }, updatedAt: Date.now() };
+          const mut = (pt:{idx:number;price:number}) => {
+            let idx = clampIdx(pt.idx + idxDelta, points.length);
+            let price = pt.price + priceDelta;
+            if (snap) { const sres = snapPriceToOhlc(idx, price, points as any); idx = sres.idx; price = sres.price; }
+            return { idx, price };
+          };
+          if (drag.handle === "a") next = { ...s, a: mut(s.a), updatedAt: Date.now() };
+          else if (drag.handle === "b") next = { ...s, b: mut(s.b), updatedAt: Date.now() };
+          else next = { ...s, a: mut(s.a), b: mut(s.b), updatedAt: Date.now() };
         }
         if (next) {
           onShapesChange([next, ...shapes.filter(x => x.id !== next!.id)]);
@@ -259,6 +298,11 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
       const L = layoutRef.current;
       const rect = el.getBoundingClientRect();
       const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      // Start pan with Shift+Drag (cursor mode)
+      if (tool === "cursor" && e.shiftKey) {
+        setPanning({ start: { x: mx, y: my }, view });
+        return;
+      }
       // Selection / Drag start (if cursor mode)
       if (tool === "cursor") {
         // hit-test handles first
@@ -311,13 +355,32 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
         return;
       }
     };
-    const onUp = () => setDrag(null);
+    const onUp = () => { setDrag(null); setPanning(null); };
+    const onWheel = (e: WheelEvent) => {
+      if (!layoutRef.current) return;
+      e.preventDefault();
+      const L = layoutRef.current;
+      const rect = el.getBoundingClientRect();
+      const mx = (e.clientX ?? rect.left + rect.width/2) - rect.left;
+      const ratio = (mx - L.X0) / Math.max(1, (L.X1 - L.X0));
+      const centerLocal = Math.min(L.n - 1, Math.max(0, Math.round(ratio * L.n)));
+      const center = L.start + centerLocal;
+      const N = Math.max(20, L.end - L.start);
+      const factor = e.deltaY < 0 ? 0.9 : 1.1;
+      const newN = Math.max(20, Math.min(points.length, Math.round(N * factor)));
+      let start = Math.round(center - newN / 2);
+      let end = start + newN;
+      if (start < 0) { start = 0; end = newN; }
+      if (end > points.length) { end = points.length; start = end - newN; }
+      onViewChange({ start, end });
+    };
     const ro = new ResizeObserver(() => { setHover((h)=>h?{...h}:h); }); // redraw on resize
     el.addEventListener("mousemove", onMove);
     el.addEventListener("mouseleave", onLeave);
     el.addEventListener("mousedown", onDown);
     el.addEventListener("click", onClick);
     window.addEventListener("mouseup", onUp);
+    el.addEventListener("wheel", onWheel, { passive: false });
     ro.observe(el);
     return () => {
       el.removeEventListener("mousemove", onMove);
@@ -325,9 +388,10 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
       el.removeEventListener("mousedown", onDown);
       el.removeEventListener("click", onClick);
       window.removeEventListener("mouseup", onUp);
+      el.removeEventListener("wheel", onWheel as any);
       ro.disconnect();
     };
-  }, [tool, shapes, onShapesChange, drag, onSelect, selectedId]);
+  }, [tool, shapes, onShapesChange, drag, onSelect, panning, view, points.length, onViewChange, selectedId, snap]);
 
   // bubble index up (for external UI if needed)
   React.useEffect(() => {
@@ -343,9 +407,13 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
     }
   }), []);
 
+  const cursor =
+    tool !== "cursor" ? "crosshair" :
+    panning ? "grabbing" : "grab";
+
   return (
     <div className="relative">
-      <canvas ref={refCanvas} className="block w-full rounded-xl bg-zinc-950" />
+      <canvas ref={refCanvas} className={`block w-full rounded-xl bg-zinc-950 ${cursor === "grabbing" ? "cursor-grabbing" : cursor === "crosshair" ? "cursor-crosshair" : "cursor-grab"}`} />
       <div ref={overlayRef} className="pointer-events-none absolute" />
       {loading && <div className="absolute inset-0 grid place-items-center text-sm text-zinc-400">Lade Daten?</div>}
     </div>
