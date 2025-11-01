@@ -5,33 +5,53 @@ type Req = {
   provider: "openai" | "anthropic" | "xai";
   model?: string;
   system?: string;
-  user: string;
+  user?: string;
+  templateId?: "v1/analyze_bullets" | "v1/journal_condense";
+  vars?: Record<string, unknown>;
+  maxOutputTokens?: number;
+  maxCostUsd?: number;
 };
 
 export default async function handler(req: Request) {
   if (req.method !== "POST") return json({ ok:false, error:"POST only" }, 405);
   try {
-    const { provider, model, system, user } = (await req.json()) as Req;
-    if (!provider || !user) return json({ ok:false, error:"provider + user required" }, 400);
+    const envCap = Number(process.env.AI_MAX_COST_USD || "0") || undefined;
+    const cacheTtlSec = Number(process.env.AI_CACHE_TTL_SEC || "0") || 0;
+    const { provider, model, system, user, templateId, vars, maxOutputTokens, maxCostUsd } = (await req.json()) as Req;
+    if (!provider) return json({ ok:false, error:"provider required" }, 400);
+    const prompt = user ?? (templateId ? render(templateId, vars || {}) : null);
+    if (!prompt) return json({ ok:false, error:"user or templateId required" }, 400);
+    const caps = { maxCostUsd: Math.min(...[maxOrInf(maxCostUsd), maxOrInf(envCap)].filter(n=>Number.isFinite(n))) };
+    // Preflight: grobe Kostenabschätzung (chars/4 ≈ tokens)
+    const est = estimatePromptCost(provider, model, prompt.system, prompt.user);
+    if (caps.maxCostUsd && est.inCostUsd > caps.maxCostUsd) {
+      return json({ ok:false, error:`prompt cost (${est.inCostUsd.toFixed(4)}$) exceeds cap (${caps.maxCostUsd}$)` }, 200);
+    }
+    // Soft cache (best-effort; Edge-isolate, optional)
+    const cacheKey = await keyFor(provider, model, prompt.system, prompt.user);
+    const cached = cacheTtlSec ? await cacheGet(cacheKey) : null;
+    if (cached) return json({ ok:true, fromCache:true, ...cached }, 200);
     const start = Date.now();
-    const out = await route(provider, model, system, user);
+    const out = await route(provider, model, prompt.system, prompt.user, clampTokens(maxOutputTokens));
     const ms = Date.now() - start;
-    return json({ ok:true, ms, ...out });
+    const payload = { ms, ...out };
+    if (cacheTtlSec) await cacheSet(cacheKey, payload, cacheTtlSec);
+    return json({ ok:true, ...payload });
   } catch (e:any) {
     return json({ ok:false, error: String(e?.message ?? e) }, 200);
   }
 }
 
-async function route(p: Req["provider"], model?: string, system?: string, user?: string){
+async function route(p: Req["provider"], model?: string, system?: string, user?: string, maxOutputTokens?: number){
   switch (p) {
-    case "openai":    return callOpenAI(model ?? "gpt-4.1-mini", system, user!);
-    case "anthropic": return callAnthropic(model ?? "claude-3-5-sonnet-latest", system, user!);
-    case "xai":       return callXAI(model ?? "grok-2-mini", system, user!);
+    case "openai":    return callOpenAI(model ?? "gpt-4.1-mini", system, user!, maxOutputTokens);
+    case "anthropic": return callAnthropic(model ?? "claude-3-5-sonnet-latest", system, user!, maxOutputTokens);
+    case "xai":       return callXAI(model ?? "grok-2-mini", system, user!, maxOutputTokens);
     default: throw new Error("unknown provider");
   }
 }
 
-async function callOpenAI(model: string, system: string|undefined, user: string){
+async function callOpenAI(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
   const key = process.env.OPENAI_API_KEY;
   if (!key) throw new Error("OPENAI_API_KEY missing");
   const r = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -39,6 +59,7 @@ async function callOpenAI(model: string, system: string|undefined, user: string)
     headers: { "content-type":"application/json", "authorization": `Bearer ${key}` },
     body: JSON.stringify({
       model, temperature: 0.2,
+      max_tokens: maxOutputTokens ?? 800,
       messages: [
         ...(system ? [{ role:"system", content: system }] : []),
         { role:"user", content: user }
@@ -64,7 +85,7 @@ function estimateOpenaiCost(model:string, usage:any){
   return ((inTok/1000)*price.in + (outTok/1000)*price.out);
 }
 
-async function callAnthropic(model: string, system: string|undefined, user: string){
+async function callAnthropic(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("ANTHROPIC_API_KEY missing");
   const r = await fetch("https://api.anthropic.com/v1/messages", {
@@ -75,7 +96,7 @@ async function callAnthropic(model: string, system: string|undefined, user: stri
       "anthropic-version":"2023-06-01"
     },
     body: JSON.stringify({
-      model, max_tokens: 800, temperature: 0.2,
+      model, max_tokens: maxOutputTokens ?? 800, temperature: 0.2,
       system: system || undefined,
       messages: [{ role:"user", content: user }]
     })
@@ -98,7 +119,7 @@ function estimateAnthropicCost(model:string, usage:any){
   return ((inTok/1000)*price.in + (outTok/1000)*price.out);
 }
 
-async function callXAI(model: string, system: string|undefined, user: string){
+async function callXAI(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
   const key = process.env.XAI_API_KEY;
   if (!key) throw new Error("XAI_API_KEY missing");
   const r = await fetch("https://api.x.ai/v1/chat/completions", {
@@ -106,6 +127,7 @@ async function callXAI(model: string, system: string|undefined, user: string){
     headers: { "content-type":"application/json", "authorization": `Bearer ${key}` },
     body: JSON.stringify({
       model, temperature: 0.2,
+      max_tokens: maxOutputTokens ?? 800,
       messages: [
         ...(system ? [{ role:"system", content: system }] : []),
         { role:"user", content: user }
@@ -124,3 +146,68 @@ async function callXAI(model: string, system: string|undefined, user: string){
 }
 
 const json = (obj:any, status=200)=> new Response(JSON.stringify(obj), { status, headers:{ "content-type":"application/json" }});
+
+// ---- helpers: templates, pricing, preflight, cache
+function render(templateId: "v1/analyze_bullets"|"v1/journal_condense", vars:Record<string,unknown>){
+  // inline light renderer to avoid ESM import in Edge tool
+  const T:any = {
+    "v1/analyze_bullets": (v:any)=>({
+      system: "Du bist ein präziser, knapper TA-Assistent. Antworte in deutsch mit Bulletpoints. Keine Floskeln, keine Disclaimer.",
+      user: [
+        `CA: ${v.address} · TF: ${v.tf}`,
+        `KPIs:`,
+        `- lastClose=${v.metrics?.lastClose}`,
+        `- change24h=${v.metrics?.change24h}%`,
+        `- volatility24hσ=${v.metrics ? (v.metrics.volStdev*100).toFixed(2) : "n/a"}%`,
+        `- ATR14=${v.metrics?.atr14} · HiLo24h=${v.metrics?.hiLoPerc}% · Vol24h=${v.metrics?.volumeSum}`,
+        `Signals:`,
+        (v.matrixRows || []).map((r:any)=>`${r.id}: ${r.values.map((s:number)=>s>0?"Bull":s<0?"Bear":"Flat").join(", ")}`).join("\n"),
+        `Task: Schreibe 4–7 prägnante Analyse-Bullets; erst Fakten, dann mögliche Trade-Setups.`
+      ].join("\n")
+    }),
+    "v1/journal_condense": (v:any)=>({
+      system: "Du reduzierst Chart-Notizen auf das Wesentliche. Antworte in deutsch als 4–6 kurze Spiegelstriche: Kontext, Beobachtung, Hypothese, Plan, Risiko, Nächste Aktion.",
+      user: [v.title?`Titel: ${v.title}`:"", v.address?`CA: ${v.address}`:"", v.tf?`TF: ${v.tf}`:"", v.body?`Notiz:\n${v.body}`:""].filter(Boolean).join("\n")
+    })
+  };
+  return T[templateId](vars);
+}
+
+function maxOrInf(n?: number){ return Number.isFinite(n!) && n!>0 ? n! : Number.POSITIVE_INFINITY; }
+
+function pricePer1k(provider:string, model?:string){
+  if (provider==="anthropic") {
+    const mini = /haiku|mini/i.test(model||"");
+    return { in: mini?0.00025:0.003, out: mini?0.00125:0.015 };
+  }
+  if (provider==="openai") {
+    const mini = /mini|small/i.test(model||"");
+    return { in: mini?0.00015:0.005, out: mini?0.0006:0.015 };
+  }
+  // xAI: unknown → treat as low
+  return { in: 0.00015, out: 0.0006 };
+}
+function estimatePromptCost(provider:string, model:string|undefined, system?:string, user?:string){
+  const chars = (system?.length||0) + (user?.length||0);
+  const tokens = Math.ceil(chars/4);
+  const price = pricePer1k(provider, model);
+  return { inTokens: tokens, inCostUsd: (tokens/1000)*price.in };
+}
+function clampTokens(maxOutput?: number){ return Math.max(64, Math.min(4000, maxOutput ?? 800)); }
+
+// soft cache (best-effort while isolate lives)
+const CACHE = new Map<string, { v:any; exp:number }>();
+async function keyFor(p:any,m:any,s:any,u:any){
+  const json = JSON.stringify([p,m,s,u]);
+  const enc = new TextEncoder().encode(json);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+async function cacheGet(k:string){
+  const itm = CACHE.get(k); if (!itm) return null;
+  if (Date.now()>itm.exp){ CACHE.delete(k); return null; }
+  return itm.v;
+}
+async function cacheSet(k:string, v:any, ttlSec:number){
+  CACHE.set(k, { v, exp: Date.now()+ttlSec*1000 });
+}

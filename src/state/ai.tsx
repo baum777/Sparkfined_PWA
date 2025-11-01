@@ -4,9 +4,16 @@ export type AIProvider = "openai" | "anthropic" | "xai";
 export type AISettings = {
   provider: AIProvider;
   model?: string;
+  maxOutputTokens?: number;     // server hint
+  maxCostUsd?: number;          // server guard
 };
 const KEY = "sparkfined.ai.settings.v1";
-const DEFAULTS: AISettings = { provider: "anthropic", model: "claude-3-5-sonnet-latest" };
+const DEFAULTS: AISettings = {
+  provider: "anthropic",
+  model: "claude-3-5-sonnet-latest",
+  maxOutputTokens: 800,
+  maxCostUsd: 0.15
+};
 
 function read(): AISettings {
   try { return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(KEY) || "{}")) }; }

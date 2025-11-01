@@ -149,6 +149,25 @@ export default function SettingsPage() {
                    value={ai.model || ""} onChange={(e)=>setAI({ model: e.target.value || undefined })}/>
           </label>
         </div>
+        <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-4">
+          <label className="inline-flex items-center gap-2">
+            maxOutputTokens
+            <input type="number" min={64} max={4000}
+                   className="w-28 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+                   value={ai.maxOutputTokens ?? 800}
+                   onChange={(e)=>setAI({ maxOutputTokens: Number(e.target.value) })}/>
+          </label>
+          <label className="inline-flex items-center gap-2">
+            maxCostUsd / Call
+            <input type="number" min={0.01} step={0.01}
+                   className="w-28 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+                   value={ai.maxCostUsd ?? 0.15}
+                   onChange={(e)=>setAI({ maxCostUsd: Number(e.target.value) })}/>
+          </label>
+        </div>
+        <div className="mt-1 text-[11px] text-zinc-500">
+          Server setzt zusätzlich eine globale Obergrenze via <code>AI_MAX_COST_USD</code>.
+        </div>
         <div className="mt-2 text-[11px] text-zinc-500">Keys bleiben serverseitig (.env). Der Client sendet nur Provider/Model + Prompt.</div>
       </div>
 

@@ -29,28 +29,21 @@ export default function AnalyzePage() {
 
   const metrics = React.useMemo(()=> data ? kpis(data as any, tf) : null, [data, tf]);
   const matrix  = React.useMemo(()=> data ? signalMatrix(data as any) : null, [data]);
-  const { loading: aiLoading, result: aiResult, run: runAssist } = useAssist();
+  const { loading: aiLoading, result: aiResult, runTemplate } = useAssist();
 
-  const makePrompt = () => {
-    if (!metrics || !matrix) return "";
-    const rows = matrix.rows.map(r => `${r.id}: ${r.values.map(v => v>0?"Bull":v<0?"Bear":"Flat").join(", ")}`).join("\n");
-    return [
-      `CA: ${address} · TF: ${tf}`,
-      `KPIs:`,
-      `- lastClose=${metrics.lastClose}`,
-      `- change24h=${metrics.change24h}%`,
-      `- volatility24hσ=${(metrics.volStdev*100).toFixed(2)}%`,
-      `- ATR14=${metrics.atr14} · HiLo24h=${metrics.hiLoPerc}% · Vol24h=${metrics.volumeSum}`,
-      `Signals:`,
-      rows,
-      `Task: Schreibe 4–7 prägnante Analyse-Bullets (deutsch), erst Fakten, dann mögliche Trade-Setups (Entry/Invalidation/TP-Zonen), keine Übertreibungen, keine Finanzberatung.`
-    ].join("\n");
-  };
   const runAI = () => {
-    const sys = "Du bist ein präziser, knapper TA-Assistent. Antworte in deutsch mit Bulletpoints. Keine Floskeln, kein Disclaimer.";
-    const user = makePrompt();
-    if (!user) return;
-    runAssist(sys, user);
+    if (!metrics || !matrix) return;
+    runTemplate("v1/analyze_bullets", {
+      address, tf, metrics,
+      matrixRows: matrix.rows
+    });
+  };
+  const insertIntoJournal = async () => {
+    if (!aiResult?.text) return;
+    // Broadcast — Journal hört zu und fügt ein
+    window.dispatchEvent(new CustomEvent("journal:insert", { detail: { text: aiResult.text }}));
+    await navigator.clipboard.writeText(aiResult.text);
+    alert("AI-Bullets in Zwischenablage + an Journal gesendet");
   };
 
   const exportJSON = () => {
@@ -125,7 +118,10 @@ export default function AnalyzePage() {
           <div className="mt-4 rounded-xl border border-emerald-900 bg-emerald-950/20 p-3">
             <div className="mb-2 flex items-center justify-between">
               <div className="text-sm text-emerald-200">AI-Assist: Analyse-Bullets</div>
-              <button className={btn} onClick={runAI} disabled={aiLoading}>{aiLoading?"Generiere…":"Generieren"}</button>
+              <div className="flex items-center gap-2">
+                <button className={btn} onClick={runAI} disabled={aiLoading}>{aiLoading?"Generiere…":"Generieren"}</button>
+                <button className={btn} onClick={insertIntoJournal} disabled={!aiResult?.text}>In Journal einfügen</button>
+              </div>
             </div>
             {aiResult?.text
               ? <pre className="whitespace-pre-wrap rounded border border-emerald-800/60 bg-black/30 p-3 text-[12px] text-emerald-100">{aiResult.text}</pre>
