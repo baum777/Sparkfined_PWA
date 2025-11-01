@@ -13,7 +13,7 @@ export function exportWithHud(srcCanvas: HTMLCanvasElement, opts: HudOptions = {
   const out = document.createElement("canvas");
   out.width = W;
   out.height = H;
-  const ctx = out.getContext("2d")!;
+  const ctx = out.getContext("2d", { alpha: false })!; // schneller Blit, kein Alpha
 
   const dark = (opts.theme ?? "dark") === "dark";
   // Hintergrund/HUD-Balken

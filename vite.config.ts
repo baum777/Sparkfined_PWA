@@ -1,12 +1,13 @@
-import { defineConfig } from 'vite'
+import { defineConfig, splitVendorChunkPlugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: '/',
   plugins: [
     react(),
+    splitVendorChunkPlugin(),
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
@@ -103,6 +104,26 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'dist'
+    outDir: 'dist',
+    target: 'es2020',
+    sourcemap: mode === 'development',
+    minify: 'esbuild',
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // libs auf eigene Chunks (bessere Caching-Trennung)
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'vendor-react';
+            if (id.includes('workbox')) return 'vendor-workbox';
+            if (id.includes('dexie')) return 'vendor-dexie';
+            return 'vendor';
+          }
+          if (id.includes('/sections/chart/')) return 'chart';
+          if (id.includes('/sections/analyze/')) return 'analyze';
+          return undefined;
+        },
+      },
+    },
   }
-})
+}))

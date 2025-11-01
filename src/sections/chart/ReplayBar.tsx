@@ -29,10 +29,10 @@ export default function ReplayBar({
           <button key={s} className={`rounded-lg px-2 py-1 text-[11px] ${speed===s ? "border border-emerald-700 bg-emerald-900/30 text-emerald-100" : "border border-zinc-700 hover:bg-zinc-800"}`} onClick={()=>onSpeed(s)}>{s}x</button>
         ))}
       </div>
-      <button className={btn} onClick={()=>onStep(-1,1)}>←</button>
-      <button className={btn} onClick={()=>onStep(1,1)}>→</button>
-      <button className={btn} onClick={()=>onStep(-1,10)}>Shift←</button>
-      <button className={btn} onClick={()=>onStep(1,10)}>Shift→</button>
+      <button className={btn} onClick={()=>onStep(-1,1)} aria-label="Step back 1">←</button>
+      <button className={btn} onClick={()=>onStep(1,1)} aria-label="Step forward 1">→</button>
+      <button className={btn} onClick={()=>onStep(-1,10)} aria-label="Step back 10">Shift←</button>
+      <button className={btn} onClick={()=>onStep(1,10)} aria-label="Step forward 10">Shift→</button>
       <span className="mx-2 text-zinc-600">•</span>
       <button className={btn} onClick={()=>onAddBookmark()}>+ Bookmark</button>
       {bookmarks.length>0 && (

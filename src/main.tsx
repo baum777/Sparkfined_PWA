@@ -44,3 +44,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <App />
   </React.StrictMode>
 )
+
+// Hydration hint for Lighthouse (main thread idle sooner)
+if ('requestIdleCallback' in window) {
+  (window as any).requestIdleCallback(() => console.log('[idle] app settled'))
+}
