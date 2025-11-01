@@ -7,6 +7,7 @@ import { sma, ema, vwap } from "../sections/chart/indicators";
 import DrawToolbar from "../sections/chart/draw/DrawToolbar";
 import type { Shape, ToolKind } from "../sections/chart/draw/types";
 import ZoomPanBar from "../sections/chart/ZoomPanBar";
+import MiniMap from "../sections/chart/MiniMap";
 
 export default function ChartPage() {
   const [address, setAddress] = React.useState<string>("");
@@ -27,6 +28,7 @@ export default function ChartPage() {
   const canvasRef = React.useRef<CanvasHandle | null>(null);
   const [snap, setSnap] = React.useState<boolean>(true);
   const [view, setView] = React.useState<{ start: number; end: number }>({ start: 0, end: 0 });
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const load = React.useCallback(async () => {
     if (!address.trim()) { setData(null); setError(null); return; }
@@ -125,6 +127,35 @@ export default function ChartPage() {
     a.click();
     a.remove();
   };
+  // Session Export/Import (JSON)
+  const onExportJSON = () => {
+    const payload = {
+      ts: new Date().toISOString(),
+      address, tf,
+      view, snap,
+      indState,
+      shapes
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sparkfined-session-${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+  const onImportJSON = async (file: File) => {
+    const text = await file.text();
+    const json = JSON.parse(text);
+    if (json.address) setAddress(String(json.address));
+    if (json.tf) setTf(json.tf);
+    if (json.view) setView(json.view);
+    if (typeof json.snap === "boolean") setSnap(json.snap);
+    if (json.indState) setIndState(json.indState);
+    if (Array.isArray(json.shapes)) setShapes(json.shapes);
+  };
   // Zoom/Pan helpers (10% steps)
   const zoomStep = (factor: number) => {
     if (!data || !data.length) return;
@@ -177,13 +208,29 @@ export default function ChartPage() {
         onToggleSnap={() => setSnap(s => !s)}
         rangeText={rangeText}
       />
-      <div className="mt-2">
+      <div className="mt-2 flex flex-wrap items-center gap-2">
         <button onClick={onExportPNG} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">
           Export PNG
         </button>
+        <button onClick={onExportJSON} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">
+          Export Session (JSON)
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json"
+          className="hidden"
+          onChange={(e) => { const f = e.currentTarget.files?.[0]; if (f) onImportJSON(f); e.currentTarget.value = ""; }}
+        />
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800"
+        >
+          Import Session (JSON)
+        </button>
         {selectedId && (
           <>
-            <span className="ml-3 text-xs text-zinc-500">Ausgewählt: {selectedId.slice(0,8)}…</span>
+            <span className="ml-1 text-xs text-zinc-500">Ausgewählt: {selectedId.slice(0,8)}…</span>
             <button
               onClick={() => { pushHistory(shapes); setShapes(shapes.filter(s => s.id !== selectedId)); setSelectedId(null); }}
               className="ml-2 rounded-lg border border-rose-800 px-2 py-1 text-xs text-rose-100 hover:bg-rose-900/30"
@@ -192,6 +239,10 @@ export default function ChartPage() {
             </button>
           </>
         )}
+      </div>
+      {/* Mini-Map Navigator */}
+      <div className="mt-3">
+        <MiniMap points={data || []} view={view} onViewChange={setView} />
       </div>
       <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-2">
         {error && <div className="m-2 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
