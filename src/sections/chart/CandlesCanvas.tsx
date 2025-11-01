@@ -426,6 +426,8 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
     <div className="relative">
       <canvas ref={refCanvas} className={`block w-full rounded-xl bg-zinc-950 ${cursor === "grabbing" ? "cursor-grabbing" : cursor === "crosshair" ? "cursor-crosshair" : "cursor-grab"}`} />
       <div ref={overlayRef} className="pointer-events-none absolute" />
+      {/** external HUD overlay (ReplayHud, etc.) */}
+      {hud && <div className="pointer-events-none absolute inset-0">{hud}</div>}
       {loading && <div className="absolute inset-0 grid place-items-center text-sm text-zinc-400">Lade Daten?</div>}
     </div>
   );
