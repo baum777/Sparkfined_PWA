@@ -2,10 +2,12 @@ import React from "react";
 import { useSettings, type ThemeMode } from "../state/settings";
 import { KEYS, exportAppData, downloadJson, importAppData, clearNs, clearCaches, pokeServiceWorker, type NamespaceKey } from "../lib/datastore";
 import { useTelemetry } from "../state/telemetry";
+import { useAISettings } from "../state/ai";
 
 export default function SettingsPage() {
   const { settings, setSettings } = useSettings();
   const { flags, setFlags, buffer, drain } = useTelemetry();
+  const { ai, setAI } = useAISettings();
   const [busy, setBusy] = React.useState<string | null>(null);
   const [msg, setMsg] = React.useState<string | null>(null);
   const [pick, setPick] = React.useState<Record<NamespaceKey, boolean>>(() => {
@@ -125,6 +127,29 @@ export default function SettingsPage() {
             Factory Reset
           </button>
         </div>
+      </div>
+
+      {/* AI */}
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">AI</h2>
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+          <label className="inline-flex items-center gap-2">
+            Provider
+            <select className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+                    value={ai.provider} onChange={(e)=>setAI({ provider: e.target.value as any })}>
+              <option value="anthropic">Anthropic</option>
+              <option value="openai">OpenAI</option>
+              <option value="xai">xAI</option>
+            </select>
+          </label>
+          <label className="inline-flex items-center gap-2">
+            Model
+            <input className="w-48 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+                   placeholder="(optional override)"
+                   value={ai.model || ""} onChange={(e)=>setAI({ model: e.target.value || undefined })}/>
+          </label>
+        </div>
+        <div className="mt-2 text-[11px] text-zinc-500">Keys bleiben serverseitig (.env). Der Client sendet nur Provider/Model + Prompt.</div>
       </div>
 
       {/* Monitoring & Tokens */}
