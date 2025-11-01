@@ -281,6 +281,25 @@ export default function ChartPage() {
       alert("Clipboard-API nicht verfügbar – bitte Datei herunterladen.");
     }
   };
+  // Quick Add to Journal: Snapshot + Permalink
+  const onSaveToJournal = async () => {
+    const host = document.querySelector("canvas");
+    if (!(host instanceof HTMLCanvasElement)) return;
+    const dataUrl = exportWithHud(host, {
+      title: address ? `CA ${address.slice(0,6)}…${address.slice(-6)}` : "Sparkfined Chart",
+      timeframe: tf,
+      rangeText,
+      brand: "$CRYPTOBER",
+      theme: "dark",
+    });
+    const url = new URL(window.location.href);
+    const state = { address, tf, view, snap, indState, shapes };
+    url.searchParams.set("chart", encodeState(state));
+    const permalink = url.toString();
+    // broadcast draft payload for Journal page to pick up (lightweight bus)
+    window.dispatchEvent(new CustomEvent("journal:draft", { detail: { screenshotDataUrl: dataUrl, permalink, address, tf } }));
+    alert("Journal-Entwurf vorbereitet. Wechsle zum Journal-Tab, der Entwurf ist vorausgefüllt.");
+  };
   // Session Export/Import (JSON)
   const onExportJSON = () => {
     const payload = {
@@ -377,6 +396,7 @@ export default function ChartPage() {
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <button onClick={onExportPngHud} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">Export PNG (HUD)</button>
         <button onClick={onCopyPngHud}  className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">Copy PNG (HUD)</button>
+        <button onClick={onSaveToJournal} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">→ Journal (Snapshot)</button>
         <button onClick={onExportJSON} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">
           Export Session (JSON)
         </button>
