@@ -3,6 +3,7 @@ import { useJournal } from "../sections/journal/useJournal";
 import JournalEditor from "../sections/journal/JournalEditor";
 import JournalList from "../sections/journal/JournalList";
 import type { JournalNote } from "../sections/journal/types";
+import { useAssist } from "../sections/ai/useAssist";
 
 export default function JournalPage() {
   const { notes, create, update, remove } = useJournal();
@@ -13,6 +14,19 @@ export default function JournalPage() {
   const current = openId ? notes.find(n => n.id === openId) : null;
 
   const btn = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
+  const { loading: aiLoading, result: aiResult, run: runAssist } = useAssist();
+
+  const runAIOnDraft = () => {
+    const sys = "Du reduzierst Chart-Notizen auf das Wesentliche (deutsch). Schreibe 4–6 kurze Spiegelstriche: Kontext, Beobachtung, Hypothese, Plan, Risiko, Nächste Aktion.";
+    const ctx = [
+      draft.title ? `Titel: ${draft.title}` : "",
+      draft.address ? `CA: ${draft.address}` : "",
+      draft.tf ? `TF: ${draft.tf}` : "",
+      draft.body ? `Notiz:\n${draft.body}` : "",
+    ].filter(Boolean).join("\n");
+    if (!ctx) return;
+    runAssist(sys, ctx);
+  };
 
   const onSave = () => {
     if (openId && current) {
@@ -60,6 +74,16 @@ export default function JournalPage() {
       </div>
 
       <JournalEditor draft={draft} onChange={setDraft} onSave={onSave} />
+      <div className="mt-3 rounded-xl border border-emerald-900 bg-emerald-950/20 p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-sm text-emerald-200">AI-Assist: Notiz straffen</div>
+          <button className={btn} onClick={runAIOnDraft} disabled={aiLoading}>{aiLoading?"Verdichte…":"Verdichten"}</button>
+        </div>
+        {aiResult?.text
+          ? <pre className="whitespace-pre-wrap rounded border border-emerald-800/60 bg-black/30 p-3 text-[12px] text-emerald-100">{aiResult.text}</pre>
+          : <div className="text-[12px] text-emerald-300/70">Lass dir prägnante Bullet-Notizen aus deinem Entwurf vorschlagen.</div>
+        }
+      </div>
 
       <div className="mt-4">
         <JournalList
