@@ -40,7 +40,13 @@ export default function ChartPage() {
         <CandlesCanvas points={data || []} loading={loading} />
         {!address && (
           <div className="p-4 text-sm text-zinc-500">
-            Tipp: Füge eine Solana Contract Address (CA) ein und klicke <em>Load</em>.
+            Tipp: Füge eine Solana Contract Address (CA) ein und klicke <em>Load</em>.  
+            Hotkeys: <kbd>1</kbd>=1m <kbd>2</kbd>=5m <kbd>3</kbd>=15m <kbd>4</kbd>=1h <kbd>5</kbd>=4h <kbd>6</kbd>=1d, <kbd>Enter</kbd>=Load
+          </div>
+        )}
+        {!!address && (!data || data.length===0) && !loading && !error && (
+          <div className="p-4 text-sm text-zinc-500">
+            Keine OHLC-Daten für diese Adresse / Timeframe gefunden. Prüfe Address/TF oder versuche einen anderen Zeitraum.
           </div>
         )}
       </div>
