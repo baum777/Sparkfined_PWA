@@ -18,12 +18,18 @@
     "skipLibCheck": true,
     "types": [
       "vitest/globals",
-      "@testing-library/jest-dom"
+      "@testing-library/jest-dom",
+      "node"
     ],
-    "allowJs": false
+    "allowJs": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": [
     "src",
+    "api",
     "tests",
     "vite.config.ts",
     "vitest.config.ts",

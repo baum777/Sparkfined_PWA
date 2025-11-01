@@ -85,7 +85,7 @@ export default function AnalyzePage() {
 
     // Step 2 & 3: Run OCR using data URL
     const [ocrResult] = await Promise.all([
-      extractChartText(imageDataUrl).catch((err) => {
+      extractChartText(imageDataUrl).catch((err): null => {
         console.error('OCR failed:', err)
         return null
       }),
@@ -147,11 +147,11 @@ export default function AnalyzePage() {
 
     // Step 1: Fetch market data in parallel
     const [dexData, pumpfunData] = await Promise.all([
-      getDexscreenerTokenCached(ca).catch((err) => {
+      getDexscreenerTokenCached(ca).catch((err): null => {
         console.error('Dexscreener failed:', err)
         return null
       }),
-      getPumpfunData(ca).catch((err) => {
+      getPumpfunData(ca).catch((err): null => {
         console.error('Pump.fun failed:', err)
         return null
       }),
