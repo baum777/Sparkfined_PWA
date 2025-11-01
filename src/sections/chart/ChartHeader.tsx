@@ -11,6 +11,19 @@ export default function ChartHeader({
   loading: boolean;
 }) {
   const tfs: Array<typeof timeframe> = ["1m","5m","15m","1h","4h","1d"];
+  // Hotkeys: 1=1m, 2=5m, 3=15m, 4=1h, 5=4h, 6=1d; Enter=Load
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.target && (e.target as HTMLElement).tagName === "INPUT") {
+        if (e.key === "Enter") onLoad();
+        return;
+      }
+      const map: Record<string, typeof timeframe> = { "1":"1m","2":"5m","3":"15m","4":"1h","5":"4h","6":"1d" };
+      if (map[e.key]) { onTimeframe(map[e.key]); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onLoad, onTimeframe]);
   return (
     <div className="flex flex-wrap items-center gap-3">
       <input
