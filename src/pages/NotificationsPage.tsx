@@ -31,26 +31,30 @@ export default function NotificationsPage() {
                   const sub = await subscribePush(VAPID);
                   if (sub) {
                     setSubState("on");
-                    // optional persist
-                    fetch("/api/push/subscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub })}).catch(()=>{});
+                    // persist
+                    fetch("/api/push/subscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub, userId: "anon" })});
                   }
                 } catch(e:any){
                   setSubState(e?.message==="permission-denied" ? "denied" : "error");
                   setLastErr(String(e?.message ?? e));
                 }
               }}>Subscribe Push</button>
-              <button className={btn} onClick={async()=>{ await unsubscribePush(); setSubState("off"); }}>Unsubscribe</button>
               <button className={btn} onClick={async()=>{
                 const sub = await currentSubscription();
                 if (!sub) { alert("Keine Subscription"); return; }
                 await fetch("/api/push/test-send", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub }) });
-                alert("Test-Push gesendet (siehe System-Notification).");
               }}>Test Push</button>
+              <button className={btn} onClick={async()=>{
+                const sub = await currentSubscription();
+                if (!sub) return;
+                await fetch("/api/push/unsubscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) });
+                await unsubscribePush(); setSubState("off");
+              }}>Hard Unsubscribe</button>
             </>
           ) : (
             <span className="text-[11px] text-rose-300">VITE_VAPID_PUBLIC_KEY fehlt</span>
           )}
-          <button className={btn} onClick={()=>addManualTrigger(undefined, "Probe")}>Test-Trigger</button>
+          <button className={btn} onClick={()=>addManualTrigger(Date.now(), { ruleId: "test", address: "test", title: "Test Trigger" })}>Test-Trigger</button>
         </div>
       </div>
       {lastErr && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-2 text-[12px] text-rose-200">Push-Fehler: {lastErr}</div>}
@@ -85,7 +89,7 @@ export default function NotificationsPage() {
                 </td>
                 <td className="px-2 py-1">{r.lastTriggerAt ? new Date(r.lastTriggerAt).toLocaleString() : "–"}</td>
                 <td className="px-2 py-1 text-right">
-                  <button className="mr-2 rounded border border-cyan-700 px-2 py-0.5 text-[11px] text-cyan-100 hover:bg-cyan-900/20" onClick={()=>addManualTrigger(r.id, "Probe")}>Probe</button>
+                  <button className="mr-2 rounded border border-cyan-700 px-2 py-0.5 text-[11px] text-cyan-100 hover:bg-cyan-900/20" onClick={()=>addManualTrigger(Date.now(), { ruleId: r.id, address: r.address || "test", tf: r.tf, title: `Alert: ${r.kind}`, body: `Test probe for ${r.kind}` })}>Probe</button>
                   <button className="rounded border border-rose-900 px-2 py-0.5 text-[11px] text-rose-100 hover:bg-rose-900/20" onClick={()=>remove(r.id)}>Löschen</button>
                 </td>
               </tr>

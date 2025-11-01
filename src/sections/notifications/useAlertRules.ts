@@ -58,9 +58,23 @@ export function useAlertRules() {
     setRules(rs => rs.map(r => r.id === id ? { ...r, ...patch, updatedAt: Date.now() } : r));
   const remove = (id: string) => setRules(rs => rs.filter(r => r.id !== id));
   const clearTriggers = () => setTriggers([]);
-  const addManualTrigger = (ruleId?: string, note?: string) => {
-    const t: AlertTrigger = { id: crypto.randomUUID(), ruleId, kind: "manual", t: Date.now(), note };
-    setTriggers(ts => [t, ...ts].slice(0, 500));
+  const addManualTrigger = (t:number, payload:any) => {
+    setTriggers(ts => [{ ts:t, ...payload }, ...ts].slice(0, 2000));
+    // zus?tzlich serverseitig dispatchen
+    try {
+      fetch("/api/alerts/dispatch", {
+        method:"POST",
+        headers:{ "content-type":"application/json" },
+        body: JSON.stringify({
+          ruleId: payload?.ruleId || "manual",
+          address: payload?.address || payload?.ca || "unknown",
+          tf: payload?.tf || "15m",
+          title: payload?.title || "Alert ausgel?st",
+          body: payload?.body || `Rule ${payload?.ruleId || "manual"}@${payload?.address || ""}`,
+          url: "/notifications"
+        })
+      }).catch(()=>{});
+    } catch {}
   };
 
   return { rules, upsert, create, update, remove, triggers, clearTriggers, addManualTrigger };
