@@ -1,9 +1,11 @@
 import React from "react";
 import { useSettings, type ThemeMode } from "../state/settings";
 import { KEYS, exportAppData, downloadJson, importAppData, clearNs, clearCaches, pokeServiceWorker, type NamespaceKey } from "../lib/datastore";
+import { useTelemetry } from "../state/telemetry";
 
 export default function SettingsPage() {
   const { settings, setSettings } = useSettings();
+  const { flags, setFlags, buffer, drain } = useTelemetry();
   const [busy, setBusy] = React.useState<string | null>(null);
   const [msg, setMsg] = React.useState<string | null>(null);
   const [pick, setPick] = React.useState<Record<NamespaceKey, boolean>>(() => {
@@ -122,6 +124,27 @@ export default function SettingsPage() {
             }}>
             Factory Reset
           </button>
+        </div>
+      </div>
+
+      {/* Monitoring & Tokens */}
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Monitoring & Tokens</h2>
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+        <div className="mb-2 grid grid-cols-2 gap-2 md:grid-cols-3">
+          <label className="inline-flex items-center gap-2"><input type="checkbox" checked={flags.enabled} onChange={e=>setFlags({enabled: e.target.checked})}/> Enabled</label>
+          <label className="inline-flex items-center gap-2"><input type="checkbox" checked={flags.includeNetwork} onChange={e=>setFlags({includeNetwork: e.target.checked})}/> API Timings</label>
+          <label className="inline-flex items-center gap-2"><input type="checkbox" checked={flags.includeCanvas} onChange={e=>setFlags({includeCanvas: e.target.checked})}/> Canvas/FPS</label>
+          <label className="inline-flex items-center gap-2"><input type="checkbox" checked={flags.includeUser} onChange={e=>setFlags({includeUser: e.target.checked})}/> User Events</label>
+          <label className="inline-flex items-center gap-2"><input type="checkbox" checked={flags.tokenOverlay} onChange={e=>setFlags({tokenOverlay: e.target.checked})}/> Token-Overlay</label>
+          <div className="inline-flex items-center gap-2">
+            Sampling
+            <input type="number" min={0} max={1} step={0.05} value={flags.sampling} onChange={e=>setFlags({sampling: Number(e.target.value)})}
+                   className="w-20 rounded border border-zinc-700 bg-zinc-900 px-1 py-0.5 text-xs text-zinc-200"/>
+          </div>
+        </div>
+        <div className="mt-2 flex items-center gap-2">
+          <button className="rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800" onClick={drain}>Jetzt senden ({buffer.length})</button>
+          <span className="text-zinc-500">Batch alle 15s & beim Tab-Wechsel</span>
         </div>
       </div>
 
