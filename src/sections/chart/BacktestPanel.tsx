@@ -2,20 +2,26 @@ import React from "react";
 import type { BacktestResult, BacktestHit } from "./backtest";
 
 export default function BacktestPanel({
-  rulesCount, onRun, result, onJump
+  rulesCount, onRun, result, onJump, onServerRun, serverMs
 }: {
   rulesCount: number;
   onRun: () => void;
   result?: BacktestResult | null;
   onJump: (t:number) => void;
+  onServerRun?: () => void;
+  serverMs?: number | null;
 }) {
   const btn = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
   return (
     <div className="mt-3 rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
       <div className="mb-2 flex items-center justify-between">
         <div className="text-sm text-zinc-200">Backtesting</div>
-        <button className={btn} onClick={onRun}>Run Backtest ({rulesCount} Regeln)</button>
+        <div className="flex items-center gap-2">
+          <button className={btn} onClick={onRun}>Local ({rulesCount})</button>
+          {onServerRun && <button className={btn} onClick={onServerRun}>Server</button>}
+        </div>
       </div>
+      {serverMs!=null && <div className="mb-1 text-[11px] text-zinc-500">Server: {serverMs} ms</div>}
       {result && (
         <>
           <div className="mb-2 text-xs text-zinc-400">
