@@ -10,6 +10,7 @@ import ZoomPanBar from "../sections/chart/ZoomPanBar";
 import MiniMap from "../sections/chart/MiniMap";
 import { exportWithHud } from "../sections/chart/export";
 import { encodeState, decodeState } from "../lib/urlState";
+import { encodeToken, decodeToken } from "../lib/shortlink";
 import ReplayBar from "../sections/chart/ReplayBar";
 import { useReplay } from "../sections/chart/replay/useReplay";
 import type { Bookmark } from "../sections/chart/replay/types";
@@ -47,6 +48,7 @@ export default function ChartPage() {
   });
   const { events, addBookmarkEvent, clearEvents } = useEvents();
   const [btResult, setBtResult] = React.useState<BacktestResult | null>(null);
+  const [btServerMs, setBtServerMs] = React.useState<number | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const load = React.useCallback(async () => {
@@ -80,17 +82,32 @@ export default function ChartPage() {
 
   // --- Permalink: beim Mount lesen, bei Änderungen schreiben ----------------
   React.useEffect(() => {
-    // READ once on mount
+    // READ once on mount - shortlink has priority
     const url = new URL(window.location.href);
-    const raw = url.searchParams.get("chart");
-    const st = decodeState<any>(raw);
-    if (st) {
-      if (st.address) setAddress(String(st.address));
-      if (st.tf) setTf(st.tf);
-      if (st.view) setView(st.view);
-      if (typeof st.snap === "boolean") setSnap(st.snap);
-      if (st.indState) setIndState(st.indState);
-      if (Array.isArray(st.shapes)) setShapes(st.shapes);
+    const tok = url.searchParams.get("short");
+    if (tok) {
+      const obj = decodeToken(tok) as any;
+      if (obj && obj.chart) {
+        try {
+          if (obj.chart.address) setAddress(String(obj.chart.address));
+          if (obj.chart.tf) setTf(obj.chart.tf);
+          if (obj.chart.view) setView(obj.chart.view);
+          if (typeof obj.chart.snap === "boolean") setSnap(obj.chart.snap);
+          if (obj.chart.indState) setIndState(obj.chart.indState);
+          if (Array.isArray(obj.chart.shapes)) setShapes(obj.chart.shapes);
+        } catch {}
+      }
+    } else {
+      const raw = url.searchParams.get("chart");
+      const st = decodeState<any>(raw);
+      if (st) {
+        if (st.address) setAddress(String(st.address));
+        if (st.tf) setTf(st.tf);
+        if (st.view) setView(st.view);
+        if (typeof st.snap === "boolean") setSnap(st.snap);
+        if (st.indState) setIndState(st.indState);
+        if (Array.isArray(st.shapes)) setShapes(st.shapes);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -176,6 +193,22 @@ export default function ChartPage() {
     setBtResult(res);
     // push events to timeline for playback
     res.hits.forEach(h => addBookmarkEvent(h.t, { ruleId:h.ruleId, kind:h.kind, c:h.c }));
+  };
+
+  const runBtServer = async () => {
+    if (!data?.length) return;
+    const rules = readRules();
+    const t0 = performance.now();
+    const res = await fetch("/api/backtest", {
+      method:"POST",
+      headers:{ "content-type":"application/json" },
+      body: JSON.stringify({ ohlc: data, rules, fromIdx: view.start, toIdx: view.end, tf })
+    }).then(r=>r.json()).catch(():null=>null);
+    const t1 = performance.now();
+    if (!res || !res.ok) { alert("Server Backtest Fehler"); return; }
+    setBtServerMs(res.ms ?? Math.round(t1 - t0));
+    setBtResult({ hits: res.hits, perRule: res.perRule });
+    res.hits.forEach((h:any) => addBookmarkEvent(h.t, { ruleId:h.ruleId, kind:h.kind, c:h.c }));
   };
 
   // persist drawings
@@ -283,6 +316,13 @@ export default function ChartPage() {
     } else {
       alert("Clipboard-API nicht verfügbar – bitte Datei herunterladen.");
     }
+  };
+  const onCopyShortlink = async () => {
+    const state = { address, tf, view, snap, indState, shapes };
+    const token = encodeToken({ chart: state });
+    const url = `${location.origin}/chart?short=${token}`;
+    await navigator.clipboard.writeText(url);
+    alert("Shortlink kopiert");
   };
   // Quick Add to Journal: Snapshot + Permalink
   const onSaveToJournal = async () => {
@@ -399,6 +439,7 @@ export default function ChartPage() {
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <button onClick={onExportPngHud} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">Export PNG (HUD)</button>
         <button onClick={onCopyPngHud}  className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">Copy PNG (HUD)</button>
+        <button onClick={onCopyShortlink} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">Copy Shortlink</button>
         <button onClick={onSaveToJournal} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">→ Journal (Snapshot)</button>
         <button onClick={onExportJSON} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">
           Export Session (JSON)
@@ -449,6 +490,8 @@ export default function ChartPage() {
         onRun={runBt}
         result={btResult}
         onJump={onJumpTimestamp}
+        onServerRun={runBtServer}
+        serverMs={btServerMs}
       />
       <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-2">
         {error && <div className="m-2 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}

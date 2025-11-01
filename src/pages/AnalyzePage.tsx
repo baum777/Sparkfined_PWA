@@ -3,6 +3,7 @@ import { fetchOhlc, type OhlcPoint } from "../sections/chart/marketOhlc";
 import { kpis, signalMatrix } from "../sections/analyze/analytics";
 import Heatmap from "../sections/analyze/Heatmap";
 import { encodeState } from "../lib/urlState";
+import { encodeToken } from "../lib/shortlink";
 
 export default function AnalyzePage() {
   const [address, setAddress] = React.useState<string>("");
@@ -49,6 +50,12 @@ export default function AnalyzePage() {
     const st = encodeState({ address, tf });
     return `${location.origin}/chart?chart=${st}`;
   }, [address, tf]);
+  const shortlink = React.useMemo(()=> {
+    try {
+      const token = encodeToken({ chart: { address, tf }});
+      return `${location.origin}/chart?short=${token}`;
+    } catch { return null; }
+  }, [address, tf]);
 
   const ctrl = "rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm text-zinc-200";
   const btn  = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
@@ -62,6 +69,7 @@ export default function AnalyzePage() {
         </select>
         <button className={btn} onClick={load} disabled={loading || !address}>{loading?"Lade…":"Analysieren"}</button>
         <a className={btn} href={permalink} target="_blank" rel="noreferrer">→ Chart</a>
+        {shortlink && <button className={btn} onClick={()=>navigator.clipboard.writeText(shortlink!)}>Copy Shortlink</button>}
         <button className={btn} onClick={exportJSON} disabled={!data}>Export JSON</button>
         <button className={btn} onClick={exportCSV}  disabled={!data}>Export CSV</button>
       </div>
