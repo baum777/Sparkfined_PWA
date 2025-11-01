@@ -3,6 +3,7 @@ import { useAlertRules } from "../sections/notifications/useAlertRules";
 import RuleEditor from "../sections/notifications/RuleEditor";
 import { useTelemetry } from "../state/telemetry";
 import { subscribePush, unsubscribePush, currentSubscription } from "../lib/push";
+import RuleWizard from "../sections/notifications/RuleWizard";
 
 export default function NotificationsPage() {
   const { rules, create, update, remove, triggers, clearTriggers, addManualTrigger } = useAlertRules();
@@ -58,6 +59,11 @@ export default function NotificationsPage() {
         </div>
       </div>
       {lastErr && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-2 text-[12px] text-rose-200">Push-Fehler: {lastErr}</div>}
+
+      {/* Preset Wizard */}
+      <div className="mb-4">
+        <RuleWizard onCreate={(r)=>{ const nr = create(r); enqueue({ id:crypto.randomUUID(), ts:Date.now(), type:"user.rule.create", attrs:{ id:nr.id, kind:nr.kind } } as any); }} />
+      </div>
 
       <RuleEditor draft={draft} onChange={setDraft} onSave={()=>{ const r = create(draft); enqueue({ id: crypto.randomUUID(), ts: Date.now(), type: "user.rule.create", attrs: { id: r.id, kind: r.kind } } as any); setDraft({}); }} />
 
