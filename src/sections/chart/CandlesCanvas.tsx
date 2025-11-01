@@ -1,5 +1,6 @@
 import React from "react";
 import { fmtNum, fmtTime } from "../../lib/format";
+import type { Shape, ToolKind } from "./draw/types";
 
 export type OhlcPoint = { t: number; o: number; h: number; l: number; c: number; v?: number };
 
@@ -10,17 +11,24 @@ export type IndicatorSets = {
 };
 
 export default function CandlesCanvas({
-  points, loading, indicators, onHoverIndex
+  points, loading, indicators, onHoverIndex,
+  tool = "cursor",
+  shapes = [],
+  onShapesChange
 }: {
   points: OhlcPoint[];
   loading: boolean;
   indicators?: IndicatorSets;
   onHoverIndex?: (idx: number | null) => void;
+  tool?: ToolKind;
+  shapes?: Shape[];
+  onShapesChange?: (next: Shape[]) => void;
 }) {
   const ref = React.useRef<HTMLCanvasElement | null>(null);
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
   const [hover, setHover] = React.useState<{ x: number; y: number } | null>(null);
   const [hoverIdx, setHoverIdx] = React.useState<number | null>(null);
+  const layoutRef = React.useRef<{ X0:number; X1:number; Y0:number; Y1:number; min:number; max:number; n:number } | null>(null);
 
   React.useEffect(() => {
     const el = ref.current; if (!el) return;
@@ -57,6 +65,7 @@ export default function CandlesCanvas({
     const X0 = padL, X1 = W - padR, Y0 = padT, Y1 = H - padB;
     const n = points.length;
     const cw = Math.max(2, ((X1 - X0) / n) * 0.7);
+    layoutRef.current = { X0, X1, Y0, Y1, min, max, n };
     // Y labels (right)
     ctx.fillStyle = "rgba(255,255,255,0.6)";
     ctx.font = "11px ui-sans-serif, system-ui";
@@ -145,7 +154,36 @@ export default function CandlesCanvas({
       const overlay = overlayRef.current;
       if (overlay) overlay.style.display = "none";
     }
-  }, [points, hover, indicators, hoverIdx]);
+    // --- Drawings layer -----------------------------------------------------
+    const pxY = (price:number) => Y1 - ((price - min) * (Y1 - Y0) / (Math.max(1e-12, max - min)));
+    const pxX = (idx:number) => X0 + (idx * (X1 - X0) / Math.max(1, n));
+    const drawH = (y:number, color="#60A5FA") => { // blue-400
+      ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.setLineDash([6,4]);
+      ctx.beginPath(); ctx.moveTo(X0, y); ctx.lineTo(X1, y); ctx.stroke(); ctx.setLineDash([]);
+    };
+    const drawTrend = (ax:number, ay:number, bx:number, by:number, color="#F59E0B") => { // amber-500
+      ctx.strokeStyle = color; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+    };
+    const drawFib = (a:{x:number,y:number}, b:{x:number,y:number}) => {
+      const top = Math.min(a.y, b.y), bot = Math.max(a.y, b.y);
+      const levels = [0, 0.236, 0.382, 0.5, 0.618, 1];
+      ctx.lineWidth = 1;
+      levels.forEach((lv,i) => {
+        const y = bot - (bot - top) * lv;
+        ctx.strokeStyle = i===3 ? "#E879F9" : "#C084FC"; // magenta highlight at 0.5
+        ctx.setLineDash(i===3 ? [8,4] : [4,4]);
+        ctx.beginPath(); ctx.moveTo(X0, y); ctx.lineTo(X1, y); ctx.stroke();
+      });
+      ctx.setLineDash([]);
+    };
+    // Persisted shapes
+    shapes.forEach(s => {
+      if (s.kind === "hline") drawH(pxY(s.price));
+      if (s.kind === "trend") drawTrend(pxX(s.a.idx), pxY(s.a.price), pxX(s.b.idx), pxY(s.b.price));
+      if (s.kind === "fib")   drawFib({ x:pxX(s.a.idx), y:pxY(s.a.price) }, { x:pxX(s.b.idx), y:pxY(s.b.price) });
+    });
+  }, [points, hover, indicators, hoverIdx, shapes]);
 
   // Pointer events & resize
   React.useEffect(() => {
@@ -156,16 +194,58 @@ export default function CandlesCanvas({
       setHover(pt);
     };
     const onLeave = () => setHover(null);
+    const onClick = (e: MouseEvent) => {
+      if (tool === "cursor" || !layoutRef.current || !onShapesChange) return;
+      const L = layoutRef.current;
+      const rect = el.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const idx = Math.round((mx - L.X0) / Math.max(1, (L.X1 - L.X0)) * L.n);
+      const price = L.max - ((my - L.Y0) / Math.max(1, (L.Y1 - L.Y0))) * (L.max - L.min);
+      const now = Date.now();
+      if (tool === "hline") {
+        const h = { id: crypto.randomUUID(), kind: "hline" as const, price, createdAt: now, updatedAt: now };
+        onShapesChange([h, ...shapes]);
+        return;
+      }
+      if (tool === "trend") {
+        // if last draft is trend with missing 'b', complete it; else start new
+        const last = shapes.find(s => (s as any)._draft === true && s.kind === "trend") as any;
+        if (last) {
+          const done = { ...last, b: { idx, price }, updatedAt: now };
+          delete done._draft;
+          onShapesChange([done, ...shapes.filter(s => s.id !== last.id)]);
+        } else {
+          const draft: any = { id: crypto.randomUUID(), kind: "trend", a: { idx, price }, b: { idx, price }, createdAt: now, updatedAt: now, _draft: true };
+          onShapesChange([draft, ...shapes]);
+        }
+        return;
+      }
+      if (tool === "fib") {
+        const last = shapes.find(s => (s as any)._draft === true && s.kind === "fib") as any;
+        if (last) {
+          const done = { ...last, b: { idx, price }, updatedAt: now };
+          delete done._draft;
+          onShapesChange([done, ...shapes.filter(s => s.id !== last.id)]);
+        } else {
+          const draft: any = { id: crypto.randomUUID(), kind: "fib", a: { idx, price }, b: { idx, price }, createdAt: now, updatedAt: now, _draft: true };
+          onShapesChange([draft, ...shapes]);
+        }
+        return;
+      }
+    };
     const ro = new ResizeObserver(() => { setHover((h)=>h?{...h}:h); }); // redraw on resize
     el.addEventListener("mousemove", onMove);
     el.addEventListener("mouseleave", onLeave);
+    el.addEventListener("click", onClick);
     ro.observe(el);
     return () => {
       el.removeEventListener("mousemove", onMove);
       el.removeEventListener("mouseleave", onLeave);
+      el.removeEventListener("click", onClick);
       ro.disconnect();
     };
-  }, []);
+  }, [tool, shapes, onShapesChange]);
 
   // bubble index up (for external UI if needed)
   React.useEffect(() => {
