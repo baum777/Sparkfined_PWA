@@ -9,6 +9,7 @@ import JournalPage from './pages/JournalPage'
 import ReplayPage from './pages/ReplayPage'
 import AccessPage from './pages/AccessPage'
 import SettingsPage from './pages/SettingsPage'
+import NotificationsPage from './pages/NotificationsPage'
 import './styles/App.css'
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
               <Route path="/replay" element={<ReplayPage />} />
               <Route path="/access" element={<AccessPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
             </Routes>
           </Layout>
         </AccessProvider>
