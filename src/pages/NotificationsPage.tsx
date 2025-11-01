@@ -2,11 +2,15 @@ import React from "react";
 import { useAlertRules } from "../sections/notifications/useAlertRules";
 import RuleEditor from "../sections/notifications/RuleEditor";
 import { useTelemetry } from "../state/telemetry";
+import { subscribePush, unsubscribePush, currentSubscription } from "../lib/push";
 
 export default function NotificationsPage() {
   const { rules, create, update, remove, triggers, clearTriggers, addManualTrigger } = useAlertRules();
   const { enqueue } = useTelemetry();
   const [draft, setDraft] = React.useState<any>({});
+  const [subState, setSubState] = React.useState<"idle"|"on"|"off"|"denied"|"error">("idle");
+  const [lastErr, setLastErr] = React.useState<string| null>(null);
+  const VAPID = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
   const btn  = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
 
   const askPermission = async () => {
@@ -18,10 +22,38 @@ export default function NotificationsPage() {
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div className="text-lg font-semibold text-zinc-100">Alert Center</div>
         <div className="flex items-center gap-2">
-          <button className={btn} onClick={askPermission}>Browser-Benachrichtigung aktivieren</button>
+          <button className={btn} onClick={askPermission}>Browser-Benachrichtigung</button>
+          {VAPID ? (
+            <>
+              <button className={btn} onClick={async()=>{
+                setLastErr(null);
+                try {
+                  const sub = await subscribePush(VAPID);
+                  if (sub) {
+                    setSubState("on");
+                    // optional persist
+                    fetch("/api/push/subscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub })}).catch(()=>{});
+                  }
+                } catch(e:any){
+                  setSubState(e?.message==="permission-denied" ? "denied" : "error");
+                  setLastErr(String(e?.message ?? e));
+                }
+              }}>Subscribe Push</button>
+              <button className={btn} onClick={async()=>{ await unsubscribePush(); setSubState("off"); }}>Unsubscribe</button>
+              <button className={btn} onClick={async()=>{
+                const sub = await currentSubscription();
+                if (!sub) { alert("Keine Subscription"); return; }
+                await fetch("/api/push/test-send", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub }) });
+                alert("Test-Push gesendet (siehe System-Notification).");
+              }}>Test Push</button>
+            </>
+          ) : (
+            <span className="text-[11px] text-rose-300">VITE_VAPID_PUBLIC_KEY fehlt</span>
+          )}
           <button className={btn} onClick={()=>addManualTrigger(undefined, "Probe")}>Test-Trigger</button>
         </div>
       </div>
+      {lastErr && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-2 text-[12px] text-rose-200">Push-Fehler: {lastErr}</div>}
 
       <RuleEditor draft={draft} onChange={setDraft} onSave={()=>{ const r = create(draft); enqueue({ id: crypto.randomUUID(), ts: Date.now(), type: "user.rule.create", attrs: { id: r.id, kind: r.kind } } as any); setDraft({}); }} />
 
