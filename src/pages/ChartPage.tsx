@@ -6,6 +6,7 @@ import IndicatorBar, { type IndicatorState } from "../sections/chart/IndicatorBa
 import { sma, ema, vwap } from "../sections/chart/indicators";
 import DrawToolbar from "../sections/chart/draw/DrawToolbar";
 import type { Shape, ToolKind } from "../sections/chart/draw/types";
+import ZoomPanBar from "../sections/chart/ZoomPanBar";
 
 export default function ChartPage() {
   const [address, setAddress] = React.useState<string>("");
@@ -24,6 +25,8 @@ export default function ChartPage() {
   const [redo, setRedo] = React.useState<Shape[][]>([]);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const canvasRef = React.useRef<CanvasHandle | null>(null);
+  const [snap, setSnap] = React.useState<boolean>(true);
+  const [view, setView] = React.useState<{ start: number; end: number }>({ start: 0, end: 0 });
 
   const load = React.useCallback(async () => {
     if (!address.trim()) { setData(null); setError(null); return; }
@@ -47,6 +50,10 @@ export default function ChartPage() {
     if (indState.vwap)  next.vwap  = vwap(data);
     setInds(next);
   }, [data, indState]);
+  // Reset view to full range when data loads
+  React.useEffect(() => {
+    if (data && data.length) setView({ start: 0, end: data.length });
+  }, [data]);
 
   // persist drawings
   React.useEffect(() => {
@@ -118,6 +125,29 @@ export default function ChartPage() {
     a.click();
     a.remove();
   };
+  // Zoom/Pan helpers (10% steps)
+  const zoomStep = (factor: number) => {
+    if (!data || !data.length) return;
+    const len = Math.max(20, view.end - view.start);
+    const center = view.start + len / 2;
+    const newLen = Math.max(20, Math.min(data.length, Math.round(len * factor)));
+    let start = Math.round(center - newLen / 2);
+    let end = start + newLen;
+    if (start < 0) { start = 0; end = newLen; }
+    if (end > data.length) { end = data.length; start = end - newLen; }
+    setView({ start, end });
+  };
+  const onZoomIn  = () => zoomStep(0.85);
+  const onZoomOut = () => zoomStep(1.15);
+  const onReset   = () => { if (data) setView({ start: 0, end: data.length }); };
+  const rangeText = React.useMemo(() => {
+    if (!data || !data.length) return "";
+    const a = data[Math.max(0, Math.min(view.start, data.length - 1))]?.t;
+    const b = data[Math.max(0, Math.min(view.end - 1, data.length - 1))]?.t;
+    if (!a || !b) return "";
+    const fmt = new Intl.DateTimeFormat(undefined, { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+    return `${fmt.format(new Date(a))} – ${fmt.format(new Date(b))} (${view.end - view.start} bars)`;
+  }, [data, view]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
@@ -139,11 +169,29 @@ export default function ChartPage() {
         canRedo={redo.length>0}
         onClear={clearAll}
       />
+      <ZoomPanBar
+        onZoomIn={onZoomIn}
+        onZoomOut={onZoomOut}
+        onReset={onReset}
+        snap={snap}
+        onToggleSnap={() => setSnap(s => !s)}
+        rangeText={rangeText}
+      />
       <div className="mt-2">
         <button onClick={onExportPNG} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">
           Export PNG
         </button>
-        {selectedId && <span className="ml-3 text-xs text-zinc-500">Ausgewählt: {selectedId.slice(0,8)}… (Entf zum Löschen)</span>}
+        {selectedId && (
+          <>
+            <span className="ml-3 text-xs text-zinc-500">Ausgewählt: {selectedId.slice(0,8)}…</span>
+            <button
+              onClick={() => { pushHistory(shapes); setShapes(shapes.filter(s => s.id !== selectedId)); setSelectedId(null); }}
+              className="ml-2 rounded-lg border border-rose-800 px-2 py-1 text-xs text-rose-100 hover:bg-rose-900/30"
+            >
+              Löschen
+            </button>
+          </>
+        )}
       </div>
       <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-2">
         {error && <div className="m-2 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
@@ -158,6 +206,9 @@ export default function ChartPage() {
           onShapesChange={onShapesChange}
           selectedId={selectedId}
           onSelect={setSelectedId}
+          view={view}
+          onViewChange={setView}
+          snap={snap}
         />
         {!address && (
           <div className="p-4 text-sm text-zinc-500">

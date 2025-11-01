@@ -16,3 +16,16 @@ export function distPointToSegment(p:{x:number;y:number}, a:{x:number;y:number},
   const proj = { x: a.x + t*vx, y: a.y + t*vy };
   return dist(p, proj);
 }
+
+// Snap helpers
+export function snapPriceToOhlc(idx:number, price:number, points:{h:number;l:number;o:number;c:number}[]) {
+  const p = points[idx];
+  if (!p) return { idx, price };
+  const candidates = [p.o, p.h, p.l, p.c];
+  let best = candidates[0], d = Math.abs(price - candidates[0]);
+  for (let i=1;i<candidates.length;i++){
+    const di = Math.abs(price - candidates[i]);
+    if (di < d) { d = di; best = candidates[i]; }
+  }
+  return { idx, price: best };
+}
