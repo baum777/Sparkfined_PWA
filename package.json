@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b tsconfig.build.json && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
@@ -18,19 +18,28 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@heroicons/react": "^2.1.0",
+    "@solana/spl-token": "^0.4.0",
+    "@solana/web3.js": "^1.95.0",
+    "@streamflow/stream": "^6.3.0",
+    "@vercel/node": "^3.0.0",
+    "dexie": "^3.2.0",
+    "openai": "^4.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0",
+    "tesseract.js": "^5.0.0",
     "vite-plugin-pwa": "^0.20.0",
     "workbox-window": "^7.1.0"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^9.9.0",
     "@eslint/js": "^9.9.0",
-    "typescript-eslint": "^7.18.0",
+    "typescript-eslint": "^8.0.0",
     "eslint-plugin-react": "^7.35.0",
     "prettier": "^3.3.3",
     "typescript": "^5.6.2",
