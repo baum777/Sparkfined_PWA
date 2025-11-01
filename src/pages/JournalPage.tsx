@@ -16,6 +16,16 @@ export default function JournalPage() {
   const btn = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
   const { loading: aiLoading, result: aiResult, run: runAssist } = useAssist();
 
+  React.useEffect(() => {
+    const onIns = (e:any) => {
+      const t = e?.detail?.text as string;
+      if (!t) return;
+      setDraft(d => ({ ...d, body: (d.body ? (d.body + "\n\n") : "") + t }));
+    };
+    window.addEventListener("journal:insert" as any, onIns as any);
+    return () => window.removeEventListener("journal:insert" as any, onIns as any);
+  }, []);
+
   const runAIOnDraft = () => {
     const sys = "Du reduzierst Chart-Notizen auf das Wesentliche (deutsch). Schreibe 4–6 kurze Spiegelstriche: Kontext, Beobachtung, Hypothese, Plan, Risiko, Nächste Aktion.";
     const ctx = [
@@ -26,6 +36,10 @@ export default function JournalPage() {
     ].filter(Boolean).join("\n");
     if (!ctx) return;
     runAssist(sys, ctx);
+  };
+  const insertAI = () => {
+    if (!aiResult?.text) return;
+    setDraft(d => ({ ...d, body: (d.body ? (d.body + "\n\n") : "") + aiResult.text }));
   };
 
   const onSave = () => {
@@ -83,6 +97,9 @@ export default function JournalPage() {
           ? <pre className="whitespace-pre-wrap rounded border border-emerald-800/60 bg-black/30 p-3 text-[12px] text-emerald-100">{aiResult.text}</pre>
           : <div className="text-[12px] text-emerald-300/70">Lass dir prägnante Bullet-Notizen aus deinem Entwurf vorschlagen.</div>
         }
+        <div className="mt-2">
+          <button className={btn} onClick={insertAI} disabled={!aiResult?.text}>In diesen Entwurf übernehmen</button>
+        </div>
       </div>
 
       <div className="mt-4">
