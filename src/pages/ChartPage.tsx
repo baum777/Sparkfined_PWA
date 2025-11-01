@@ -16,6 +16,8 @@ import type { Bookmark } from "../sections/chart/replay/types";
 import ReplayHud from "../sections/chart/replay/ReplayHud";
 import Timeline from "../sections/chart/Timeline";
 import { useEvents } from "../sections/chart/events/useEvents";
+import { runBacktest, type BacktestResult, type AlertRule } from "../sections/chart/backtest";
+import BacktestPanel from "../sections/chart/BacktestPanel";
 
 export default function ChartPage() {
   const [address, setAddress] = React.useState<string>("");
@@ -40,6 +42,7 @@ export default function ChartPage() {
     try { return JSON.parse(localStorage.getItem("sparkfined.bookmarks.v1") || "[]"); } catch { return []; }
   });
   const { events, addBookmarkEvent, clearEvents } = useEvents();
+  const [btResult, setBtResult] = React.useState<BacktestResult | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const load = React.useCallback(async () => {
@@ -141,6 +144,29 @@ export default function ChartPage() {
     addBookmarkEvent(b.t, { label });
   };
   const deleteBookmark = (id: string) => setBookmarks(bs => bs.filter(b => b.id !== id));
+
+  // Collect alert rules from localStorage (client-side rules built earlier)
+  const alertKey = "sparkfined.alerts.v1";
+  const readRules = (): AlertRule[] => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(alertKey) || "[]");
+      // Normalize minimal subset needed for backtest
+      return (raw as any[]).map((r, idx) => {
+        if (r.kind === "price-cross") return { id: r.id || `pc-${idx}`, kind:"price-cross", op:r.op || ">", value:Number(r.value) } as AlertRule;
+        if (r.kind === "pct-change-24h") return { id: r.id || `pct-${idx}`, kind:"pct-change-24h", op:r.op || ">", value:Number(r.value) } as AlertRule;
+        return null;
+      }).filter(Boolean) as AlertRule[];
+    } catch { return []; }
+  };
+
+  const runBt = () => {
+    if (!data?.length) return;
+    const rules = readRules();
+    const res = runBacktest({ ohlc: data, rules, fromIdx: view.start, toIdx: view.end });
+    setBtResult(res);
+    // push events to timeline for playback
+    res.hits.forEach(h => addBookmarkEvent(h.t, { ruleId:h.ruleId, kind:h.kind, c:h.c }));
+  };
 
   // persist drawings
   React.useEffect(() => {
@@ -383,6 +409,13 @@ export default function ChartPage() {
           <button onClick={clearEvents} className="rounded-lg border border-zinc-700 px-2 py-1 text-[11px] text-zinc-300 hover:bg-zinc-800">Events leeren</button>
         </div>
       </div>
+      {/* Backtesting Panel */}
+      <BacktestPanel
+        rulesCount={readRules().length}
+        onRun={runBt}
+        result={btResult}
+        onJump={onJumpTimestamp}
+      />
       <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-2">
         {error && <div className="m-2 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
         <CandlesCanvas
