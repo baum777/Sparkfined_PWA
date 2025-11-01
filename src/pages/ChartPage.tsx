@@ -13,6 +13,9 @@ import { encodeState, decodeState } from "../lib/urlState";
 import ReplayBar from "../sections/chart/ReplayBar";
 import { useReplay } from "../sections/chart/replay/useReplay";
 import type { Bookmark } from "../sections/chart/replay/types";
+import ReplayHud from "../sections/chart/replay/ReplayHud";
+import Timeline from "../sections/chart/Timeline";
+import { useEvents } from "../sections/chart/events/useEvents";
 
 export default function ChartPage() {
   const [address, setAddress] = React.useState<string>("");
@@ -36,6 +39,7 @@ export default function ChartPage() {
   const [bookmarks, setBookmarks] = React.useState<Bookmark[]>(() => {
     try { return JSON.parse(localStorage.getItem("sparkfined.bookmarks.v1") || "[]"); } catch { return []; }
   });
+  const { events, addBookmarkEvent, clearEvents } = useEvents();
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const load = React.useCallback(async () => {
@@ -134,6 +138,7 @@ export default function ChartPage() {
     const idx = Math.floor(replay.state.cursor);
     const b = { id: crypto.randomUUID(), t: data[idx].t, label, createdAt: Date.now() };
     setBookmarks(bs => [b, ...bs].slice(0, 100));
+    addBookmarkEvent(b.t, { label });
   };
   const deleteBookmark = (id: string) => setBookmarks(bs => bs.filter(b => b.id !== id));
 
@@ -371,6 +376,13 @@ export default function ChartPage() {
       <div className="mt-3">
         <MiniMap points={data || []} view={view} onViewChange={setView} />
       </div>
+      {/* Event Timeline (Alerts, Bookmarks) */}
+      <div className="mt-3">
+        <Timeline points={data || []} view={view} events={events} onJump={onJumpTimestamp} />
+        <div className="mt-1">
+          <button onClick={clearEvents} className="rounded-lg border border-zinc-700 px-2 py-1 text-[11px] text-zinc-300 hover:bg-zinc-800">Events leeren</button>
+        </div>
+      </div>
       <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-2">
         {error && <div className="m-2 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
         <CandlesCanvas
@@ -388,6 +400,18 @@ export default function ChartPage() {
           onViewChange={setView}
           snap={snap}
           replayCursor={Math.floor(replay.state.cursor)}
+          hud={
+            data && data.length
+              ? <ReplayHud
+                  playing={replay.state.isPlaying}
+                  speed={replay.state.speed}
+                  cursor={Math.floor(replay.state.cursor)}
+                  total={data.length}
+                  point={data[Math.floor(replay.state.cursor)]}
+                  title={address ? `CA ${address.slice(0,6)}…${address.slice(-6)} · TF ${tf}` : undefined}
+                />
+              : null
+          }
         />
         {!address && (
           <div className="p-4 text-sm text-zinc-500">
