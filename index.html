@@ -9,6 +9,14 @@
     <meta name="theme-color" content="#0fb34c" />
     <meta name="description" content="Sparkfined Technical Analysis Progressive Web App" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <!-- Preconnect/Prefetch: API & Fonts -->
+    <link rel="preconnect" href="https://api.dexscreener.com" crossorigin>
+    <link rel="dns-prefetch" href="https://api.dexscreener.com">
+    <!-- Minimal font-display swap to avoid CLS -->
+    <style>
+      @font-face{font-family:system-ui;src:local("system-ui");font-display:swap}
+      html{scroll-behavior:smooth}
+    </style>
     <title>Sparkfined TA PWA</title>
   </head>
   <body>
