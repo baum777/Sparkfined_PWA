@@ -49,6 +49,8 @@ export default function ChartPage() {
   const { events, addBookmarkEvent, clearEvents } = useEvents();
   const [btResult, setBtResult] = React.useState<BacktestResult | null>(null);
   const [btServerMs, setBtServerMs] = React.useState<number | null>(null);
+  const [btPage, setBtPage] = React.useState(0);
+  const [btHasMore, setBtHasMore] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const load = React.useCallback(async () => {
@@ -195,19 +197,25 @@ export default function ChartPage() {
     res.hits.forEach(h => addBookmarkEvent(h.t, { ruleId:h.ruleId, kind:h.kind, c:h.c }));
   };
 
-  const runBtServer = async () => {
+  const runBtServer = async (opts?: { page?: number }) => {
     if (!data?.length) return;
     const rules = readRules();
     const t0 = performance.now();
     const res = await fetch("/api/backtest", {
       method:"POST",
       headers:{ "content-type":"application/json" },
-      body: JSON.stringify({ ohlc: data, rules, fromIdx: view.start, toIdx: view.end, tf })
+      body: JSON.stringify({
+        ohlc: data, rules,
+        fromIdx: view.start, toIdx: view.end,
+        tf, page: opts?.page ?? 0, pageSize: 500
+      })
     }).then(r=>r.json()).catch(():null=>null);
     const t1 = performance.now();
     if (!res || !res.ok) { alert("Server Backtest Fehler"); return; }
     setBtServerMs(res.ms ?? Math.round(t1 - t0));
     setBtResult({ hits: res.hits, perRule: res.perRule });
+    setBtPage(res.page ?? 0);
+    setBtHasMore(!!res.hasMore);
     res.hits.forEach((h:any) => addBookmarkEvent(h.t, { ruleId:h.ruleId, kind:h.kind, c:h.c }));
   };
 
@@ -490,8 +498,14 @@ export default function ChartPage() {
         onRun={runBt}
         result={btResult}
         onJump={onJumpTimestamp}
-        onServerRun={runBtServer}
+        onServerRun={()=>runBtServer({ page: 0 })}
         serverMs={btServerMs}
+        paging={{
+          page: btPage,
+          hasMore: btHasMore,
+          next: () => runBtServer({ page: btPage + 1 }),
+          prev: () => runBtServer({ page: Math.max(0, btPage - 1) }),
+        }}
       />
       <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-2">
         {error && <div className="m-2 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
