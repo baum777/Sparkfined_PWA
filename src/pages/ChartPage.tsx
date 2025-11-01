@@ -18,8 +18,10 @@ import Timeline from "../sections/chart/Timeline";
 import { useEvents } from "../sections/chart/events/useEvents";
 import { runBacktest, type BacktestResult, type AlertRule } from "../sections/chart/backtest";
 import BacktestPanel from "../sections/chart/BacktestPanel";
+import { useSettings } from "../state/settings";
 
 export default function ChartPage() {
+  const { settings } = useSettings();
   const [address, setAddress] = React.useState<string>("");
   const [tf, setTf] = React.useState<"1m"|"5m"|"15m"|"1h"|"4h"|"1d">("15m");
   const [data, setData] = React.useState<OhlcPoint[] | null>(null);
@@ -36,7 +38,7 @@ export default function ChartPage() {
   const [redo, setRedo] = React.useState<Shape[][]>([]);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const canvasRef = React.useRef<CanvasHandle | null>(null);
-  const [snap, setSnap] = React.useState<boolean>(true);
+  const [snap, setSnap] = React.useState<boolean>(settings.snapDefault);
   const [view, setView] = React.useState<{ start: number; end: number }>({ start: 0, end: 0 });
   const [bookmarks, setBookmarks] = React.useState<Bookmark[]>(() => {
     try { return JSON.parse(localStorage.getItem("sparkfined.bookmarks.v1") || "[]"); } catch { return []; }
@@ -100,6 +102,11 @@ export default function ChartPage() {
 
   // --- Replay ---------------------------------------------------------------
   const replay = useReplay(data || []);
+  // apply default replay speed from settings
+  React.useEffect(() => {
+    replay.setSpeed(settings.replaySpeed);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.replaySpeed]);
   // Match view to replay cursor when playing
   React.useEffect(() => {
     if (!data?.length || !replay.state.isPlaying) return;
@@ -399,16 +406,20 @@ export default function ChartPage() {
         )}
       </div>
       {/* Mini-Map Navigator */}
-      <div className="mt-3">
-        <MiniMap points={data || []} view={view} onViewChange={setView} />
-      </div>
-      {/* Event Timeline (Alerts, Bookmarks) */}
-      <div className="mt-3">
-        <Timeline points={data || []} view={view} events={events} onJump={onJumpTimestamp} />
-        <div className="mt-1">
-          <button onClick={clearEvents} className="rounded-lg border border-zinc-700 px-2 py-1 text-[11px] text-zinc-300 hover:bg-zinc-800">Events leeren</button>
+      {settings.showMinimap && (
+        <div className="mt-3">
+          <MiniMap points={data || []} view={view} onViewChange={setView} />
         </div>
-      </div>
+      )}
+      {/* Event Timeline (Alerts, Bookmarks) */}
+      {settings.showTimeline && (
+        <div className="mt-3">
+          <Timeline points={data || []} view={view} events={events} onJump={onJumpTimestamp} />
+          <div className="mt-1">
+            <button onClick={clearEvents} className="rounded-lg border border-zinc-700 px-2 py-1 text-[11px] text-zinc-300 hover:bg-zinc-800">Events leeren</button>
+          </div>
+        </div>
+      )}
       {/* Backtesting Panel */}
       <BacktestPanel
         rulesCount={readRules().length}
@@ -434,7 +445,7 @@ export default function ChartPage() {
           snap={snap}
           replayCursor={Math.floor(replay.state.cursor)}
           hud={
-            data && data.length
+            settings.showHud && data && data.length
               ? <ReplayHud
                   playing={replay.state.isPlaying}
                   speed={replay.state.speed}
