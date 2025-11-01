@@ -10,6 +10,9 @@ import ZoomPanBar from "../sections/chart/ZoomPanBar";
 import MiniMap from "../sections/chart/MiniMap";
 import { exportWithHud } from "../sections/chart/export";
 import { encodeState, decodeState } from "../lib/urlState";
+import ReplayBar from "../sections/chart/ReplayBar";
+import { useReplay } from "../sections/chart/replay/useReplay";
+import type { Bookmark } from "../sections/chart/replay/types";
 
 export default function ChartPage() {
   const [address, setAddress] = React.useState<string>("");
@@ -30,6 +33,9 @@ export default function ChartPage() {
   const canvasRef = React.useRef<CanvasHandle | null>(null);
   const [snap, setSnap] = React.useState<boolean>(true);
   const [view, setView] = React.useState<{ start: number; end: number }>({ start: 0, end: 0 });
+  const [bookmarks, setBookmarks] = React.useState<Bookmark[]>(() => {
+    try { return JSON.parse(localStorage.getItem("sparkfined.bookmarks.v1") || "[]"); } catch { return []; }
+  });
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const load = React.useCallback(async () => {
@@ -58,6 +64,8 @@ export default function ChartPage() {
   React.useEffect(() => {
     if (data && data.length) setView({ start: 0, end: data.length });
   }, [data]);
+  // Persist bookmarks
+  React.useEffect(() => { localStorage.setItem("sparkfined.bookmarks.v1", JSON.stringify(bookmarks)); }, [bookmarks]);
 
   // --- Permalink: beim Mount lesen, bei Änderungen schreiben ----------------
   React.useEffect(() => {
@@ -83,14 +91,68 @@ export default function ChartPage() {
     window.history.replaceState(null, "", url.toString());
   }, [address, tf, view, snap, indState, shapes]);
 
+  // --- Replay ---------------------------------------------------------------
+  const replay = useReplay(data || []);
+  // Match view to replay cursor when playing
+  React.useEffect(() => {
+    if (!data?.length || !replay.state.isPlaying) return;
+    const cursor = Math.floor(replay.state.cursor);
+    const span = Math.max(20, view.end - view.start);
+    if (cursor < view.start + 5 || cursor > view.end - 5) {
+      const start = Math.max(0, Math.min(cursor - Math.floor(span*0.7), Math.max(0, data.length - span)));
+      setView({ start, end: start + span });
+    }
+  }, [replay.state.cursor, replay.state.isPlaying, data?.length]);
+
+  const onStep = (dir: -1|1, size = 1) => {
+    if (!data?.length) return;
+    const next = Math.max(0, Math.min(data.length - 1, Math.floor(replay.state.cursor) + dir * size));
+    replay.setCursor(next);
+    // optional: view follow when paused
+    if (!replay.state.isPlaying) {
+      const span = Math.max(20, view.end - view.start);
+      if (next < view.start + 5 || next > view.end - 5) {
+        const start = Math.max(0, Math.min(next - Math.floor(span*0.5), Math.max(0, data.length - span)));
+        setView({ start, end: start + span });
+      }
+    }
+  };
+
+  const onJumpTimestamp = (t: number) => {
+    if (!data?.length) return;
+    const idx = data.findIndex(p => p.t === t);
+    if (idx >= 0) {
+      replay.setCursor(idx);
+      const span = Math.max(20, view.end - view.start);
+      const start = Math.max(0, Math.min(idx - Math.floor(span*0.5), Math.max(0, data.length - span)));
+      setView({ start, end: start + span });
+    }
+  };
+
+  const addBookmark = (label?: string) => {
+    if (!data?.length) return;
+    const idx = Math.floor(replay.state.cursor);
+    const b = { id: crypto.randomUUID(), t: data[idx].t, label, createdAt: Date.now() };
+    setBookmarks(bs => [b, ...bs].slice(0, 100));
+  };
+  const deleteBookmark = (id: string) => setBookmarks(bs => bs.filter(b => b.id !== id));
+
   // persist drawings
   React.useEffect(() => {
     localStorage.setItem("sparkfined.draw.v1", JSON.stringify(shapes));
   }, [shapes]);
 
-  // hotkeys for tools / undo-redo
+  // hotkeys for tools / undo-redo / replay
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Jump-to-Bookmark (1..6)
+      if (!isNaN(Number(e.key)) && Number(e.key) >= 1 && Number(e.key) <= 6 && bookmarks[Number(e.key)-1]) {
+        onJumpTimestamp(bookmarks[Number(e.key)-1].t);
+        return;
+      }
+      if (e.key === "ArrowLeft") { e.preventDefault(); onStep(-1, e.shiftKey ? 10 : 1); }
+      if (e.key === "ArrowRight"){ e.preventDefault(); onStep( 1, e.shiftKey ? 10 : 1); }
+      if (e.code === "Space") { e.preventDefault(); replay.state.isPlaying ? replay.stop() : replay.start(); }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
         e.preventDefault(); doUndo(); return;
       }
@@ -112,7 +174,7 @@ export default function ChartPage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [selectedId, shapes]);
+  }, [selectedId, shapes, bookmarks, replay.state.isPlaying]);
 
   const pushHistory = (prev: Shape[]) => {
     setUndo(u => [prev, ...u].slice(0, 100));
@@ -262,6 +324,18 @@ export default function ChartPage() {
         onToggleSnap={() => setSnap(s => !s)}
         rangeText={rangeText}
       />
+      <ReplayBar
+        isPlaying={replay.state.isPlaying}
+        speed={replay.state.speed}
+        onPlay={()=>replay.start(Math.max(view.start, Math.min(view.end-1, Math.floor(replay.state.cursor))))}
+        onPause={replay.stop}
+        onSpeed={replay.setSpeed}
+        onStep={onStep}
+        onJump={onJumpTimestamp}
+        bookmarks={bookmarks}
+        onAddBookmark={addBookmark}
+        onDeleteBookmark={deleteBookmark}
+      />
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <button onClick={onExportPngHud} className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">Export PNG (HUD)</button>
         <button onClick={onCopyPngHud}  className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800">Copy PNG (HUD)</button>
@@ -313,6 +387,7 @@ export default function ChartPage() {
           view={view}
           onViewChange={setView}
           snap={snap}
+          replayCursor={Math.floor(replay.state.cursor)}
         />
         {!address && (
           <div className="p-4 text-sm text-zinc-500">

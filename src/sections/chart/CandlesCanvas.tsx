@@ -28,8 +28,9 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
   view: { start: number; end: number };
   onViewChange: (v: { start: number; end: number }) => void;
   snap?: boolean;
+  replayCursor?: number;
 }>(({
-  points, loading, indicators, onHoverIndex, tool = "cursor", shapes = [], onShapesChange, selectedId, onSelect, view, onViewChange, snap = true
+  points, loading, indicators, onHoverIndex, tool = "cursor", shapes = [], onShapesChange, selectedId, onSelect, view, onViewChange, snap = true, replayCursor
 }, ref) => {
   const refCanvas = React.useRef<HTMLCanvasElement | null>(null);
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
@@ -168,6 +169,15 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
       const overlay = overlayRef.current;
       if (overlay) overlay.style.display = "none";
     }
+    // Replay Cursor marker (falls aktiv)
+    if (typeof replayCursor === "number" && replayCursor >= start && replayCursor < end) {
+      const iLocal = replayCursor - start;
+      const cx = X0 + (iLocal * (X1 - X0) / n);
+      ctx.strokeStyle = "rgba(16,185,129,0.7)"; // emerald
+      ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(cx, Y0); ctx.lineTo(cx, Y1); ctx.stroke();
+      ctx.setLineDash([]);
+    }
     // --- Drawings layer -----------------------------------------------------
     const pxY = (price:number) => Y1 - ((price - min) * (Y1 - Y0) / (Math.max(1e-12, max - min)));
     const pxX = (idx:number) => {
@@ -228,7 +238,7 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
         }
       }
     });
-  }, [points, hover, indicators, hoverIdx, shapes, selectedId, view]);
+  }, [points, hover, indicators, hoverIdx, shapes, selectedId, view, replayCursor]);
 
   // Pointer events & resize
   React.useEffect(() => {
