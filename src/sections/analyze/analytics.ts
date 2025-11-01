@@ -1,4 +1,5 @@
 export type Ohlc = { t:number;o:number;h:number;l:number;c:number; v?:number };
+import { MS, tfMinutes, type TF } from "../../lib/timeframe";
 
 export function pct(a:number, b:number){ return b === 0 ? 0 : ((a - b) / b) * 100; }
 export function mean(arr:number[]){ return arr.length ? arr.reduce((s,x)=>s+x,0)/arr.length : 0; }
@@ -21,22 +22,27 @@ export function atr(data:Ohlc[], n=14){
   return m;
 }
 
-export function kpis(data:Ohlc[]){
+export function kpis(data:Ohlc[], tf: TF){
   if (!data.length) return {
     lastClose: 0, change24h: 0, volStdev: 0, atr14: 0, hiLoPerc: 0, volumeSum: 0,
   };
   const last = data[data.length-1];
-  // 24h window heuristik: ~96 bars ≈ 24h @15m (wird in späterer Phase TF-basiert dynamisch)
-  const win = Math.min(data.length-1, 96);
-  const base = data[data.length-1-win]?.c ?? data[0].c;
+  // Präzises 24h-Fenster: über Timestamp nach hinten wandern
+  const cutoff = last.t - MS.day;
+  let j = data.length-1;
+  while (j>0 && data[j].t >= cutoff) j--;
+  const base = data[Math.max(0, j)]?.c ?? data[0].c;
   const change24h = pct(last.c, base);
   const rets = returnsClose(data);
-  const volStdev = stdev(rets.slice(-win)) * Math.sqrt(96); // annualisierungssurrogat pro 24h-fenster
+  // σ in 24h-Fenster, skaliert auf 24h je TF (barsPer24 = 24h / tf)
+  const barsPer24 = Math.max(1, Math.floor((MS.day / (tfMinutes(tf)*MS.min))));
+  const volStdev = stdev(rets.slice(-barsPer24)) * Math.sqrt(barsPer24);
   const atr14 = atr(data, 14);
-  const minL = Math.min(...data.slice(-win).map(d=>d.l));
-  const maxH = Math.max(...data.slice(-win).map(d=>d.h));
+  const recent = sliceByTime(data, MS.day);
+  const minL = Math.min(...recent.map(d=>d.l));
+  const maxH = Math.max(...recent.map(d=>d.h));
   const hiLoPerc = pct(maxH, minL);
-  const volumeSum = data.slice(-win).reduce((s,d)=> s + (Number((d as any).v||0)), 0);
+  const volumeSum = recent.reduce((s,d)=> s + (Number((d as any).v||0)), 0);
   return { lastClose: last.c, change24h, volStdev, atr14, hiLoPerc, volumeSum };
 }
 
@@ -93,4 +99,14 @@ function vecSignal(price:number[], ind:(number|undefined)[]){
   const v = ind[i];
   if (v === undefined) return 0;
   return price[i] > v ? +1 : price[i] < v ? -1 : 0;
+}
+
+// slice letzte periodMs relativ zu letztem Punkt
+export function sliceByTime<T extends {t:number}>(arr:T[], periodMs:number): T[] {
+  if (!arr.length) return [];
+  const end = arr[arr.length-1].t;
+  const startTs = end - periodMs;
+  let i = arr.length-1;
+  while (i>0 && arr[i].t >= startTs) i--;
+  return arr.slice(Math.max(0,i), arr.length);
 }

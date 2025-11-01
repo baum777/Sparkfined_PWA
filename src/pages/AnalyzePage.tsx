@@ -4,10 +4,11 @@ import { kpis, signalMatrix } from "../sections/analyze/analytics";
 import Heatmap from "../sections/analyze/Heatmap";
 import { encodeState } from "../lib/urlState";
 import { encodeToken } from "../lib/shortlink";
+import type { TF } from "../lib/timeframe";
 
 export default function AnalyzePage() {
   const [address, setAddress] = React.useState<string>("");
-  const [tf, setTf] = React.useState<"1m"|"5m"|"15m"|"1h"|"4h"|"1d">("15m");
+  const [tf, setTf] = React.useState<TF>("15m");
   const [data, setData] = React.useState<OhlcPoint[]|null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string| null>(null);
@@ -25,7 +26,7 @@ export default function AnalyzePage() {
     }
   };
 
-  const metrics = React.useMemo(()=> data ? kpis(data as any) : null, [data]);
+  const metrics = React.useMemo(()=> data ? kpis(data as any, tf) : null, [data, tf]);
   const matrix  = React.useMemo(()=> data ? signalMatrix(data as any) : null, [data]);
 
   const exportJSON = () => {

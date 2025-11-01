@@ -2,7 +2,7 @@ import React from "react";
 import type { BacktestResult, BacktestHit } from "./backtest";
 
 export default function BacktestPanel({
-  rulesCount, onRun, result, onJump, onServerRun, serverMs
+  rulesCount, onRun, result, onJump, onServerRun, serverMs, paging
 }: {
   rulesCount: number;
   onRun: () => void;
@@ -10,6 +10,7 @@ export default function BacktestPanel({
   onJump: (t:number) => void;
   onServerRun?: () => void;
   serverMs?: number | null;
+  paging?: { page:number; hasMore:boolean; next:()=>void; prev:()=>void };
 }) {
   const btn = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
   return (
@@ -22,6 +23,13 @@ export default function BacktestPanel({
         </div>
       </div>
       {serverMs!=null && <div className="mb-1 text-[11px] text-zinc-500">Server: {serverMs} ms</div>}
+      {paging && (
+        <div className="mb-1 flex items-center gap-2 text-[11px] text-zinc-400">
+          <button className={btn} onClick={paging.prev} disabled={paging.page<=0}>◀ Prev</button>
+          <div>Page {paging.page+1}</div>
+          <button className={btn} onClick={paging.next} disabled={!paging.hasMore}>Next ▶</button>
+        </div>
+      )}
       {result && (
         <>
           <div className="mb-2 text-xs text-zinc-400">
