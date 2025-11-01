@@ -19,9 +19,11 @@ import { useEvents } from "../sections/chart/events/useEvents";
 import { runBacktest, type BacktestResult, type AlertRule } from "../sections/chart/backtest";
 import BacktestPanel from "../sections/chart/BacktestPanel";
 import { useSettings } from "../state/settings";
+import { useTelemetry } from "../state/telemetry";
 
 export default function ChartPage() {
   const { settings } = useSettings();
+  const { enqueue } = useTelemetry();
   const [address, setAddress] = React.useState<string>("");
   const [tf, setTf] = React.useState<"1m"|"5m"|"15m"|"1h"|"4h"|"1d">("15m");
   const [data, setData] = React.useState<OhlcPoint[] | null>(null);
@@ -149,6 +151,7 @@ export default function ChartPage() {
     const b = { id: crypto.randomUUID(), t: data[idx].t, label, createdAt: Date.now() };
     setBookmarks(bs => [b, ...bs].slice(0, 100));
     addBookmarkEvent(b.t, { label });
+    enqueue({ id: crypto.randomUUID(), ts: Date.now(), type: "user.bookmark.add", attrs: { t: b.t, label } } as any);
   };
   const deleteBookmark = (id: string) => setBookmarks(bs => bs.filter(b => b.id !== id));
 

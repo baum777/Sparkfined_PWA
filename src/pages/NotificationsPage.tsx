@@ -1,9 +1,11 @@
 import React from "react";
 import { useAlertRules } from "../sections/notifications/useAlertRules";
 import RuleEditor from "../sections/notifications/RuleEditor";
+import { useTelemetry } from "../state/telemetry";
 
 export default function NotificationsPage() {
   const { rules, create, update, remove, triggers, clearTriggers, addManualTrigger } = useAlertRules();
+  const { enqueue } = useTelemetry();
   const [draft, setDraft] = React.useState<any>({});
   const btn  = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
 
@@ -21,7 +23,7 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      <RuleEditor draft={draft} onChange={setDraft} onSave={()=>{ create(draft); setDraft({}); }} />
+      <RuleEditor draft={draft} onChange={setDraft} onSave={()=>{ const r = create(draft); enqueue({ id: crypto.randomUUID(), ts: Date.now(), type: "user.rule.create", attrs: { id: r.id, kind: r.kind } } as any); setDraft({}); }} />
 
       <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
         <div className="mb-2 text-sm text-zinc-200">Regeln</div>
