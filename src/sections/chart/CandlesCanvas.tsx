@@ -29,8 +29,9 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
   onViewChange: (v: { start: number; end: number }) => void;
   snap?: boolean;
   replayCursor?: number;
+  hud?: React.ReactNode;
 }>(({
-  points, loading, indicators, onHoverIndex, tool = "cursor", shapes = [], onShapesChange, selectedId, onSelect, view, onViewChange, snap = true, replayCursor
+  points, loading, indicators, onHoverIndex, tool = "cursor", shapes = [], onShapesChange, selectedId, onSelect, view, onViewChange, snap = true, replayCursor, hud
 }, ref) => {
   const refCanvas = React.useRef<HTMLCanvasElement | null>(null);
   const overlayRef = React.useRef<HTMLDivElement | null>(null);
