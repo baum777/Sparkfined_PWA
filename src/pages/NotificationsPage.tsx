@@ -43,6 +43,12 @@ export default function NotificationsPage() {
     const r = await fetch("/api/rules/eval-cron").then(r=>r.json()).catch(()=>null);
     alert(r?.ok ? `Eval: groups=${r.groups} evaluated=${r.evaluated} dispatched=${r.dispatched}` : "Eval failed");
   };
+  const exportIdeas = async ()=>{
+    const blob = await fetch("/api/ideas/export").then(r=>r.blob());
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = `ideas-case-studies.md`; a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const askPermission = async () => {
     try { if ("Notification" in window) await Notification.requestPermission(); } catch {}
@@ -117,6 +123,49 @@ export default function NotificationsPage() {
               </div>
               <div className="text-zinc-400">{r.address} · {r.tf}</div>
               <div className="text-zinc-500">id: {r.id.slice(0,8)}… · {new Date(r.updatedAt).toLocaleString()}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Ideas */}
+      <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-sm text-zinc-200">Trade-Ideas</div>
+          <div className="flex items-center gap-2">
+            <button className={btn} onClick={loadSrv}>Aktualisieren</button>
+            <button className={btn} onClick={exportIdeas}>Als Case-Study (MD) exportieren</button>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          {ideas.map(it=>(
+            <div key={it.id} className="rounded border border-zinc-800 bg-black/30 p-2 text-[12px]">
+              <div className="flex items-center justify-between">
+                <div className="font-medium">{it.title}</div>
+                <span className="text-zinc-500">{it.status}</span>
+              </div>
+              <div className="text-zinc-400">{it.address} · {it.tf} · {it.side}</div>
+              <div className="text-zinc-500">Rule: {it.links.ruleId?.slice(0,8) ?? "—"} · Journal: {it.links.journalId?.slice(0,8) ?? "—"}</div>
+              {it.status!=="closed" ? (
+                <div className="mt-2 flex items-center gap-2">
+                  <button className={btn} onClick={async()=>{
+                    const p = Number(prompt("Exit-Preis eingeben:",""));
+                    if (!p) return;
+                    const r = await fetch("/api/ideas/close",{ method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: it.id, exitPrice: p })}).then(r=>r.json()).catch(()=>null);
+                    alert(r?.ok ? "Idea geschlossen" : "Fehler beim Schließen");
+                    await loadSrv();
+                  }}>Schließen</button>
+                  <button className={btn} onClick={async()=>{
+                    const note = prompt("Kurze Outcome-Notiz:","") || "";
+                    await fetch("/api/ideas",{ method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: it.id, outcome:{ note } })});
+                    await loadSrv();
+                  }}>Outcome-Notiz</button>
+                </div>
+              ) : (
+                <div className="mt-2 text-emerald-300">
+                  Exit: {it.outcome?.exitPrice ?? "—"} · P/L: {typeof it.outcome?.pnlPct==="number" ? `${it.outcome!.pnlPct!.toFixed(2)}%` : "n/a"}
+                </div>
+              )}
             </div>
           ))}
         </div>
