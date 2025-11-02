@@ -171,6 +171,31 @@ export default function SettingsPage() {
         <div className="mt-2 text-[11px] text-zinc-500">Keys bleiben serverseitig (.env). Der Client sendet nur Provider/Model + Prompt.</div>
       </div>
 
+      {/* Risk & Playbook Defaults */}
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Risk & Playbook Defaults</h2>
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+        <div className="mb-2 text-[12px] text-zinc-400">
+          Setze Standard-Balance und Preset, die im Analyze/Ideas-Playbook vorgefüllt werden.
+        </div>
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+          <label className="flex items-center gap-2">Default-Balance
+            <input className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs"
+                   type="number" min={100} step={50}
+                   value={settings.defaultBalance||1000}
+                   onChange={e=>setSettings({ defaultBalance: Number(e.target.value||0) })}/>
+          </label>
+          <label className="flex items-center gap-2">Default-Preset
+            <select className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs"
+                    value={settings.defaultPlaybookId||"bal-15"}
+                    onChange={e=>setSettings({ defaultPlaybookId: e.target.value })}>
+              <option value="cons-1">Conservative · 1% · ATR×1.5</option>
+              <option value="bal-15">Balanced · 1.5% · ATR×2</option>
+              <option value="agg-2">Aggressive · 2% · ATR×2.5</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
       {/* Monitoring & Tokens */}
       <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Monitoring & Tokens</h2>
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">

@@ -146,6 +146,12 @@ export default function NotificationsPage() {
               </div>
               <div className="text-zinc-400">{it.address} · {it.tf} · {it.side}</div>
               <div className="text-zinc-500">Rule: {it.links.ruleId?.slice(0,8) ?? "—"} · Journal: {it.links.journalId?.slice(0,8) ?? "—"}</div>
+              {it.risk ? (
+                <div className="mt-2 rounded border border-emerald-800/50 bg-emerald-950/20 p-2 text-emerald-200">
+                  Stop {it.risk.stopPrice} · Size {it.risk.sizeUnits?.toFixed(2)}u · Risk {it.risk.riskAmount?.toFixed(2)}
+                  <div className="text-[11px]">Targets: {(it.risk.rrTargets||[]).map((t,i)=>`${it.risk!.rrList![i]}R→${t.toFixed(6)}`).join(" · ")}</div>
+                </div>
+              ) : null}
               {it.status!=="closed" ? (
                 <div className="mt-2 flex items-center gap-2">
                   <button className={btn} onClick={async()=>{
@@ -166,6 +172,27 @@ export default function NotificationsPage() {
                   Exit: {it.outcome?.exitPrice ?? "—"} · P/L: {typeof it.outcome?.pnlPct==="number" ? `${it.outcome!.pnlPct!.toFixed(2)}%` : "n/a"}
                 </div>
               )}
+              {/* Inline apply Playbook to existing idea (uses lastClose/ATR from current Dashboard metrics not wired here) */}
+              <div className="mt-3">
+                <PlaybookCard
+                  entry={undefined /* set from detail drawer when available */}
+                  atr={undefined   /* set from detail drawer when available */}
+                  onApply={async (res)=>{
+                    const payload = {
+                      id: it.id,
+                      risk: {
+                        balance: res.balance, riskPct: res.pb.riskPct, atrMult: res.pb.atrMult,
+                        entryPrice: res.rrTargets[0] - res.rrList[0]*(res.rrTargets[0]- (res.rrTargets[0]- (res.rrList[0]*(res.rrTargets[0]-0)))), /* placeholder */
+                        stopPrice: res.stopPrice, sizeUnits: res.sizeUnits, riskAmount: res.riskAmount,
+                        rrTargets: res.rrTargets, rrList: res.rrList, kellyLitePct: res.kellyLitePct
+                      },
+                      targets: res.rrTargets
+                    };
+                    await fetch("/api/ideas", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify(payload) });
+                    await loadSrv();
+                  }}
+                />
+              </div>
             </div>
           ))}
         </div>

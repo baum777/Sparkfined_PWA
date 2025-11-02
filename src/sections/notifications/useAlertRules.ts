@@ -75,6 +75,22 @@ export function useAlertRules() {
         })
       }).catch(()=>{});
     } catch {}
+    // optional: falls Idea-ID bekannt ? Event an Idea anh?ngen
+    if (payload?.ideaId) {
+      try {
+        fetch("/api/ideas/attach-trigger", {
+          method:"POST", headers:{ "content-type":"application/json" },
+          body: JSON.stringify({
+            ideaId: payload.ideaId,
+            ruleId: payload.ruleId,
+            address: payload.address,
+            tf: payload.tf,
+            price: payload.price,
+            ts: t
+          })
+        });
+      } catch {}
+    }
   };
 
   return { rules, upsert, create, update, remove, triggers, clearTriggers, addManualTrigger };
