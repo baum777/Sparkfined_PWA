@@ -11,6 +11,8 @@ import MiniMap from "../sections/chart/MiniMap";
 import { exportWithHud } from "../sections/chart/export";
 import { encodeState, decodeState } from "../lib/urlState";
 import { encodeToken, decodeToken } from "../lib/shortlink";
+import { decodeRuleToken, type TestRulePayload } from "../lib/ruleToken";
+import TestOverlay, { type Hit as TestHit } from "../sections/chart/TestOverlay";
 import ReplayBar from "../sections/chart/ReplayBar";
 import { useReplay } from "../sections/chart/replay/useReplay";
 import type { Bookmark } from "../sections/chart/replay/types";
@@ -51,6 +53,8 @@ export default function ChartPage() {
   const [btServerMs, setBtServerMs] = React.useState<number | null>(null);
   const [btPage, setBtPage] = React.useState(0);
   const [btHasMore, setBtHasMore] = React.useState(false);
+  const [testHits, setTestHits] = React.useState<TestHit[]>([]);
+  const [testActive, setTestActive] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
   const load = React.useCallback(async () => {
@@ -87,7 +91,17 @@ export default function ChartPage() {
     // READ once on mount - shortlink has priority
     const url = new URL(window.location.href);
     const tok = url.searchParams.get("short");
-    if (tok) {
+    // A) Test-Modus: ?test=<token> hat höchste Priorität
+    const testTok = url.searchParams.get("test");
+    if (testTok) {
+      const payload = decodeRuleToken(testTok) as TestRulePayload | null;
+      if (payload) {
+        setAddress(payload.address || "");
+        setTf((payload.tf as any) || "15m");
+        // wir deferen den eigentlichen Test-Run, bis Daten geladen sind (unten)
+        (window as any).__PENDING_TEST_RULE__ = payload;
+      }
+    } else if (tok) {
       const obj = decodeToken(tok) as any;
       if (obj && obj.chart) {
         try {
@@ -195,6 +209,39 @@ export default function ChartPage() {
     setBtResult(res);
     // push events to timeline for playback
     res.hits.forEach(h => addBookmarkEvent(h.t, { ruleId:h.ruleId, kind:h.kind, c:h.c }));
+  };
+
+  // Wenn Daten geladen & pending Test vorhanden → Backtest (Server) mit Single-Rule ausführen
+  React.useEffect(() => {
+    const pending = (window as any).__PENDING_TEST_RULE__ as TestRulePayload | undefined;
+    if (!pending || !data?.length) return;
+    (async () => {
+      const body = {
+        ohlc: data,
+        rules: [pending.rule],
+        fromIdx: 0,
+        toIdx: data.length,
+        tf
+      };
+      const res = await fetch("/api/backtest", {
+        method:"POST",
+        headers:{ "content-type":"application/json" },
+        body: JSON.stringify(body)
+      }).then(r=>r.json()).catch(()=>null);
+      if (res?.ok) {
+        setTestHits(res.hits || []);
+        setTestActive(true);
+        // Optional: Marker in Timeline einstreuen
+        (res.hits || []).forEach((h:any) => addBookmarkEvent(h.t, { ruleId:h.ruleId, kind:h.kind, c:h.c, test:true }));
+      }
+      (window as any).__PENDING_TEST_RULE__ = undefined;
+    })();
+  }, [data, tf]); // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  const clearTest = () => {
+    setTestHits([]);
+    setTestActive(false);
+    // Optional: Test-Bookmarks entfernen, falls du dafür ein Flag gesetzt hast
   };
 
   const runBtServer = async (opts?: { page?: number }) => {
@@ -507,6 +554,7 @@ export default function ChartPage() {
           prev: () => runBtServer({ page: Math.max(0, btPage - 1) }),
         }}
       />
+      {testActive && <TestOverlay hits={testHits} onClear={clearTest} />}
       <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-2">
         {error && <div className="m-2 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
         <CandlesCanvas
