@@ -18,10 +18,11 @@ export function useAssist() {
         ...(ai.maxCostUsd ? { maxCostUsd: ai.maxCostUsd } : {})
       });
       setResult(res);
-      // Track token usage
+      // Track token usage with fallback estimation
       const tokens = res?.usage?.total_tokens ?? res?.usage?.totalTokens ?? 0;
-      if (tokens > 0) {
-        aiCtx.addTokens(tokens);
+      const estTokens = tokens > 0 ? tokens : Math.ceil((res?.text?.length ?? 0) / 4); // ~4 chars ? 1 token
+      if (estTokens > 0) {
+        aiCtx.addTokens(estTokens);
       }
       // broadcast for token overlay (approx if no server usage)
       const observed = `${system}\n\n${user}\n\n${res?.text ?? ""}`;
@@ -41,10 +42,11 @@ export function useAssist() {
         ...(ai.maxCostUsd ? { maxCostUsd: ai.maxCostUsd } : {})
       });
       setResult(res);
-      // Track token usage
+      // Track token usage with fallback estimation
       const tokens = res?.usage?.total_tokens ?? res?.usage?.totalTokens ?? 0;
-      if (tokens > 0) {
-        aiCtx.addTokens(tokens);
+      const estTokens = tokens > 0 ? tokens : Math.ceil((res?.text?.length ?? 0) / 4); // ~4 chars ? 1 token
+      if (estTokens > 0) {
+        aiCtx.addTokens(estTokens);
       }
       // Set active context if ideaId or journalId present in vars
       if (vars.ideaId || vars.journalId) {
