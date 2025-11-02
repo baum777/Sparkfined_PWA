@@ -17,10 +17,14 @@ export default function NotificationsPage() {
 
   // --- Server Rules Panel (minimal)
   const [srvRules, setSrvRules] = React.useState<ServerRule[]>([]);
+  const [ideas, setIdeas] = React.useState<any[]>([]);
   const [address] = React.useState(""); // default address für upload
   const loadSrv = async ()=> {
     const r = await fetch("/api/rules").then(r=>r.json()).catch(()=>null);
     setSrvRules(r?.rules ?? []);
+    // Load ideas too
+    const iRes = await fetch("/api/ideas").then(r=>r.json()).catch(()=>null);
+    setIdeas(iRes?.ideas ?? []);
   };
   const uploadAll = async ()=> {
     for (const r of rules){
@@ -152,6 +156,19 @@ export default function NotificationsPage() {
                   <div className="text-[11px]">Targets: {(it.risk.rrTargets||[]).map((t,i)=>`${it.risk!.rrList![i]}R→${t.toFixed(6)}`).join(" · ")}</div>
                 </div>
               ) : null}
+              <div className="mt-1 flex gap-2">
+                <button className={btn} onClick={async()=>{
+                  const blob = await fetch(`/api/ideas/export-pack?id=${it.id}`).then(r=>r.blob());
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a"); a.href=url; a.download=`execution-pack-${it.id}.md`; a.click();
+                  URL.revokeObjectURL(url);
+                }}>Export Pack (MD)</button>
+                <button className={btn} onClick={()=>{
+                  const chartURL=`${location.origin}/chart?idea=${it.id}`;
+                  navigator.clipboard.writeText(chartURL);
+                  alert("Chart-Link kopiert!");
+                }}>Copy Chart Link</button>
+              </div>
               {it.status!=="closed" ? (
                 <div className="mt-2 flex items-center gap-2">
                   <button className={btn} onClick={async()=>{
