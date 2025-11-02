@@ -1,9 +1,11 @@
 import React from "react";
 import { aiAssist, type AssistResult } from "../../lib/aiClient";
 import { useAISettings } from "../../state/ai";
+import { useAIContext } from "../../state/aiContext";
 
 export function useAssist() {
   const { ai } = useAISettings();
+  const aiCtx = useAIContext();
   const [loading, setLoading] = React.useState(false);
   const [result, setResult]   = React.useState<AssistResult | null>(null);
   const run = async (system: string, user: string) => {
@@ -16,6 +18,11 @@ export function useAssist() {
         ...(ai.maxCostUsd ? { maxCostUsd: ai.maxCostUsd } : {})
       });
       setResult(res);
+      // Track token usage
+      const tokens = res?.usage?.total_tokens ?? res?.usage?.totalTokens ?? 0;
+      if (tokens > 0) {
+        aiCtx.addTokens(tokens);
+      }
       // broadcast for token overlay (approx if no server usage)
       const observed = `${system}\n\n${user}\n\n${res?.text ?? ""}`;
       window.dispatchEvent(new CustomEvent("token:observe", { detail: { text: observed }}));
@@ -34,6 +41,15 @@ export function useAssist() {
         ...(ai.maxCostUsd ? { maxCostUsd: ai.maxCostUsd } : {})
       });
       setResult(res);
+      // Track token usage
+      const tokens = res?.usage?.total_tokens ?? res?.usage?.totalTokens ?? 0;
+      if (tokens > 0) {
+        aiCtx.addTokens(tokens);
+      }
+      // Set active context if ideaId or journalId present in vars
+      if (vars.ideaId || vars.journalId) {
+        aiCtx.setActive(vars.ideaId, vars.journalId);
+      }
       window.dispatchEvent(new CustomEvent("token:observe", { detail: { text: JSON.stringify(vars).slice(0,4000) + (res?.text ?? "") }}));
       return res;
     } finally { setLoading(false); }

@@ -3,6 +3,7 @@ import { useSettings, type ThemeMode } from "../state/settings";
 import { KEYS, exportAppData, downloadJson, importAppData, clearNs, clearCaches, pokeServiceWorker, type NamespaceKey } from "../lib/datastore";
 import { useTelemetry } from "../state/telemetry";
 import { useAISettings } from "../state/ai";
+import { useAIContext } from "../state/aiContext";
 
 export default function SettingsPage() {
   const { settings, setSettings } = useSettings();
@@ -171,6 +172,12 @@ export default function SettingsPage() {
         <div className="mt-2 text-[11px] text-zinc-500">Keys bleiben serverseitig (.env). Der Client sendet nur Provider/Model + Prompt.</div>
       </div>
 
+      {/* Token Budget */}
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">AI Token Budget</h2>
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+        <AIStats/>
+      </div>
+
       {/* Risk & Playbook Defaults */}
       <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Risk & Playbook Defaults</h2>
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
@@ -246,6 +253,38 @@ export default function SettingsPage() {
           Version: {import.meta.env.VITE_APP_VERSION ?? "dev"} · Build: {import.meta.env.MODE} · VAPID pub: {import.meta.env.VITE_VAPID_PUBLIC_KEY ? "set" : "missing"}
         </div>
       </div>
+    </div>
+  );
+}
+
+function AIStats() {
+  const ctx = useAIContext();
+  const pct = (ctx.tokenUsed / ctx.tokenBudget) * 100;
+  const progressColor = pct > 90 ? "bg-rose-500" : pct > 70 ? "bg-amber-500" : "bg-emerald-500";
+  
+  return (
+    <div>
+      <div className="mb-2 flex items-center justify-between">
+        <div>Used Tokens: {ctx.tokenUsed.toLocaleString()} / {ctx.tokenBudget.toLocaleString()}</div>
+        <div className="text-zinc-500">{pct.toFixed(1)}%</div>
+      </div>
+      <div className="relative h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+        <div 
+          className={`h-full transition-all duration-300 ${progressColor}`}
+          style={{ width: `${Math.min(100, pct)}%` }}
+        />
+      </div>
+      {ctx.activeIdeaId && (
+        <div className="mt-2 text-[11px] text-zinc-500">
+          Active Context: Idea {ctx.activeIdeaId.slice(0, 8)}...
+        </div>
+      )}
+      <button 
+        className="mt-2 rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800" 
+        onClick={() => ctx.reset()}
+      >
+        Reset Counter
+      </button>
     </div>
   );
 }
