@@ -44,3 +44,9 @@ export async function kvLRange(key:string, start:number, stop:number): Promise<a
   const j = await r.json();
   return (j?.result||[]).map((s:string)=>{ try{return JSON.parse(s);}catch{return s;} });
 }
+
+export async function kvSMembers(key:string): Promise<string[]> {
+  const r = await fetch(`${base()}/SMEMBERS/${encodeURIComponent(key)}`, { headers:headers() });
+  const j = await r.json();
+  return j?.result ?? [];
+}

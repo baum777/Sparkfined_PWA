@@ -4,6 +4,7 @@ import RuleEditor from "../sections/notifications/RuleEditor";
 import { useTelemetry } from "../state/telemetry";
 import { subscribePush, unsubscribePush, currentSubscription } from "../lib/push";
 import RuleWizard from "../sections/notifications/RuleWizard";
+import type { ServerRule } from "../lib/serverRules";
 
 export default function NotificationsPage() {
   const { rules, create, update, remove, triggers, clearTriggers, addManualTrigger } = useAlertRules();
@@ -13,6 +14,35 @@ export default function NotificationsPage() {
   const [lastErr, setLastErr] = React.useState<string| null>(null);
   const VAPID = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
   const btn  = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
+
+  // --- Server Rules Panel (minimal)
+  const [srvRules, setSrvRules] = React.useState<ServerRule[]>([]);
+  const [address] = React.useState(""); // default address für upload
+  const loadSrv = async ()=> {
+    const r = await fetch("/api/rules").then(r=>r.json()).catch(()=>null);
+    setSrvRules(r?.rules ?? []);
+  };
+  const uploadAll = async ()=> {
+    for (const r of rules){
+      await fetch("/api/rules", {
+        method:"POST", headers:{ "content-type":"application/json" },
+        body: JSON.stringify({ address: r.address || address || "", tf: r.tf || "15m", rule: r, active: true })
+      });
+    }
+    await loadSrv();
+  };
+  const toggleAct = async (id:string, active:boolean)=> {
+    const curr = srvRules.find(x=>x.id===id); if (!curr) return;
+    await fetch("/api/rules", {
+      method:"POST", headers:{ "content-type":"application/json" },
+      body: JSON.stringify({ ...curr, active })
+    });
+    await loadSrv();
+  };
+  const evalNow = async ()=> {
+    const r = await fetch("/api/rules/eval-cron").then(r=>r.json()).catch(()=>null);
+    alert(r?.ok ? `Eval: groups=${r.groups} evaluated=${r.evaluated} dispatched=${r.dispatched}` : "Eval failed");
+  };
 
   const askPermission = async () => {
     try { if ("Notification" in window) await Notification.requestPermission(); } catch {}
@@ -63,6 +93,33 @@ export default function NotificationsPage() {
       {/* Preset Wizard */}
       <div className="mb-4">
         <RuleWizard onCreate={(r)=>{ const nr = create(r); enqueue({ id:crypto.randomUUID(), ts:Date.now(), type:"user.rule.create", attrs:{ id:nr.id, kind:nr.kind } } as any); }} />
+      </div>
+
+      {/* Server Rules */}
+      <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-sm text-zinc-200">Server-Rules (persistiert)</div>
+          <div className="flex items-center gap-2">
+            <button className={btn} onClick={loadSrv}>Laden</button>
+            <button className={btn} onClick={uploadAll}>Alle lokalen Regeln hochladen</button>
+            <button className={btn} onClick={evalNow}>Jetzt evaluieren</button>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          {srvRules.map(r=>(
+            <div key={r.id} className="rounded border border-zinc-800 bg-black/30 p-2 text-[12px] text-zinc-200">
+              <div className="flex items-center justify-between">
+                <div className="font-medium">{r.rule.kind}</div>
+                <label className="inline-flex items-center gap-1">
+                  <input type="checkbox" checked={r.active} onChange={e=>toggleAct(r.id, e.target.checked)} />
+                  aktiv
+                </label>
+              </div>
+              <div className="text-zinc-400">{r.address} · {r.tf}</div>
+              <div className="text-zinc-500">id: {r.id.slice(0,8)}… · {new Date(r.updatedAt).toLocaleString()}</div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <RuleEditor draft={draft} onChange={setDraft} onSave={()=>{ const r = create(draft); enqueue({ id: crypto.randomUUID(), ts: Date.now(), type: "user.rule.create", attrs: { id: r.id, kind: r.kind } } as any); setDraft({}); }} />
