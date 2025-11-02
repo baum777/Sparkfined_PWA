@@ -24,4 +24,18 @@ export type Idea = {
     watchAdded?: boolean;   // Watchlist Sync
     aiDraftAttached?: boolean;
   }
+  outcome?: {
+    exitPrice?: number;
+    entryPrice?: number;
+    pnlAbs?: number;        // quote currency
+    pnlPct?: number;        // %
+    durationMs?: number;    // exitAt - createdAt
+    exitAt?: number;        // ts
+    note?: string;          // short summary
+  };
+  timeline?: Array<{
+    ts: number;             // epoch ms
+    type: "created"|"note"|"rule_trigger"|"manual_update"|"closed";
+    meta?: Record<string, any>;
+  }>;
 };

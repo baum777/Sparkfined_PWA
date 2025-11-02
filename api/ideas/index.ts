@@ -18,21 +18,25 @@ export default async function handler(req: Request){
     const b = await req.json();
     if (b?.delete && b?.id){ await kvDel(`idea:${userId}:${b.id}`); return json({ ok:true, deleted:b.id }); }
     const id = b?.id || crypto.randomUUID();
+    const prev = await kvGet<Idea>(`idea:${userId}:${id}`);
     const rec: Idea = {
       id,
       userId,
-      address: b.address,
-      tf: b.tf,
-      side: b.side ?? "long",
-      title: b.title || "Idea",
-      thesis: b.thesis || "",
-      entry: numOr(b.entry), invalidation: numOr(b.invalidation),
-      targets: Array.isArray(b.targets)? b.targets.map(Number).slice(0,6):[],
-      status: (b.status as any) || "draft",
-      createdAt: b.createdAt || now(),
+      address: b.address ?? prev?.address,
+      tf: b.tf ?? prev?.tf,
+      side: (b.side ?? prev?.side) || "long",
+      title: b.title ?? prev?.title ?? "Idea",
+      thesis: b.thesis ?? prev?.thesis ?? "",
+      entry: numOr(b.entry ?? prev?.entry),
+      invalidation: numOr(b.invalidation ?? prev?.invalidation),
+      targets: Array.isArray(b.targets) ? b.targets.map(Number).slice(0,6) : (prev?.targets ?? []),
+      status: (b.status as any) || prev?.status || "draft",
+      createdAt: prev?.createdAt || b.createdAt || now(),
       updatedAt: now(),
-      links: b.links || {},
-      flags: b.flags || {}
+      links: { ...(prev?.links||{}), ...(b.links||{}) },
+      flags: { ...(prev?.flags||{}), ...(b.flags||{}) },
+      outcome: { ...(prev?.outcome||{}), ...(b.outcome||{}) },
+      timeline: mergeTimeline(prev?.timeline, b.timeline)
     };
     if (!rec.address || !rec.tf) return json({ ok:false, error:"address & tf required" }, 400);
     await kvSet(`idea:${userId}:${id}`, rec);
@@ -42,3 +46,10 @@ export default async function handler(req: Request){
   return json({ ok:false, error:"GET or POST only" }, 405);
 }
 function numOr(x:any){ const n = Number(x); return Number.isFinite(n)?n:undefined; }
+function mergeTimeline(a?: any[], b?: any[]){
+  const arr = [...(a||[])];
+  if (Array.isArray(b) && b.length) arr.push(...b);
+  // sort by ts asc, cap length
+  arr.sort((x,y)=> (x.ts||0)-(y.ts||0));
+  return arr.slice(-1000);
+}

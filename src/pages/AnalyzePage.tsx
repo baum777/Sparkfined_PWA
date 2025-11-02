@@ -46,6 +46,53 @@ export default function AnalyzePage() {
     alert("AI-Bullets in Zwischenablage + an Journal gesendet.\nTipp: In Journal „AI-Analyse an Notiz anhängen" klicken, um zu speichern.");
   };
 
+  // One-Click Idea: erstellt Idea + ServerRule + Journal + (optional) Watchlist + hängt AI an
+  const createIdeaPacket = async () => {
+    if (!address || !metrics) { alert("Adresse/KPIs fehlen"); return; }
+    // 1) ServerRule (price-cross als Beispiel) — später Wizardwert übernehmen
+    const rulePayload = {
+      address, tf,
+      rule: { id: crypto.randomUUID(), kind:"price-cross", op:">", value: metrics.lastClose },
+      active: true
+    };
+    const ruleRes = await fetch("/api/rules", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify(rulePayload) }).then(r=>r.json()).catch(()=>null);
+    const ruleId = ruleRes?.id || ruleRes?.rule?.id;
+    // 2) Journal Seed
+    const seedText = [
+      `# ${address} · ${tf}`,
+      `These: ${metrics.change24h>0?"Momentum long":"Reversion / Range"}`,
+      `Entry≈ ${metrics.lastClose} · Invalidation≈ TBD · ATR14=${metrics.atr14}`,
+      `Hi/Lo24h=${metrics.hiLoPerc}% · Vol24h=${metrics.volumeSum}`
+    ].join("\n");
+    const jRes = await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ title:`Idea ${address.slice(0,4)}…`, body: seedText, address, tf, ruleId }) }).then(r=>r.json()).catch(()=>null);
+    const journalId = jRes?.note?.id;
+    // 3) AI Draft (optional)
+    let aiText: string | undefined;
+    try {
+      const out = await runTemplate("v1/analyze_bullets", { address, tf, metrics, matrixRows: matrix?.rows || [] });
+      aiText = out?.text;
+      if (aiText) {
+        await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: journalId, body: seedText + "\n\n" + aiText, address, tf, ruleId }) });
+      }
+    } catch {}
+    // 4) Idea Objekt
+    const idea = {
+      address, tf, side: "long", title: `Idea ${address.slice(0,4)}…`,
+      thesis: "Kompakte These ergänzen",
+      entry: metrics.lastClose, invalidation: undefined, targets: [],
+      status: "active", links: { ruleId, journalId }, flags: { watchAdded:false, aiDraftAttached: !!aiText }
+    };
+    const iRes = await fetch("/api/ideas", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ ...idea, timeline:[{ ts: Date.now(), type:"created", meta:{ source:"one-click" }}] }) }).then(r=>r.json()).catch(()=>null);
+    // 5) Watchlist add (localStorage)
+    try {
+      const wl = JSON.parse(localStorage.getItem("sparkfined.watchlist.v1") || "[]");
+      if (!wl.find((x:any)=>x.address===address)) wl.push({ address, addedAt: Date.now() });
+      localStorage.setItem("sparkfined.watchlist.v1", JSON.stringify(wl));
+      await fetch("/api/ideas", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: iRes?.idea?.id, ...idea, flags:{ ...idea.flags, watchAdded:true } }) });
+    } catch {}
+    alert("Trade-Idea Paket angelegt (Rule + Journal + Idea + Watchlist).");
+  };
+
   const exportJSON = () => {
     const payload = { address, tf, metrics, data };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type:"application/json" });
@@ -133,6 +180,9 @@ export default function AnalyzePage() {
                 {aiResult.costUsd!=null ? ` ~${aiResult.costUsd.toFixed(4)} $` : " cost n/a"}
               </div>
             )}
+            <div className="mt-3">
+              <button className={btn} onClick={createIdeaPacket}>One-Click Trade-Idea anlegen</button>
+            </div>
           </div>
           {/* Sample window info */}
           <div className="mt-2 text-[11px] text-zinc-500">Samples: {data.length} · TF: {tf}</div>
