@@ -11,18 +11,32 @@ export default defineConfig(({ mode }) => ({
     splitVendorChunkPlugin(),
     process.env.ANALYZE ? visualizer({ open: true, gzipSize: true, filename: 'dist/stats.html' }) : undefined,
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      devOptions: { enabled: true },
       manifest: {
-        name: 'Sparkfined TA-PWA',
+        name: 'Sparkfined Trading',
         short_name: 'Sparkfined',
         description: 'Technical Analysis Progressive Web App',
-        theme_color: '#1e293b',
-        background_color: '#0f172a',
+        theme_color: '#0A0E27',
+        background_color: '#0A0E27',
         display: 'standalone',
-        orientation: 'portrait',
+        orientation: 'any',
+        categories: ['finance', 'productivity'],
         scope: '/',
         start_url: '/',
+        shortcuts: [
+          {
+            name: 'Quick Chart',
+            url: '/chart',
+            icons: [{ src: '/pwa-192x192.png', sizes: '96x96', type: 'image/png' }]
+          },
+          {
+            name: 'Watchlist',
+            url: '/watchlist',
+            icons: [{ src: '/pwa-192x192.png', sizes: '96x96', type: 'image/png' }]
+          }
+        ],
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -44,6 +58,21 @@ export default defineConfig(({ mode }) => ({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
+          // CoinGecko API - Stale-While-Revalidate for fast perceived performance
+          {
+            urlPattern: /^https:\/\/api\.coingecko\.com\//,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'price-api-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 300 // 5 minutes
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
           // Dexscreener API - Stale-While-Revalidate for fast perceived performance
           {
             urlPattern: /^https:\/\/api\.dexscreener\.com\/.*/i,
@@ -72,6 +101,18 @@ export default defineConfig(({ mode }) => ({
               },
             },
           },
+          // Images - Cache First for performance
+          {
+            urlPattern: /\.(png|jpg|jpeg|svg|gif)/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'image-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 86400 * 30 // 30 days
+              },
+            },
+          },
           // CDN assets (fonts, icons, etc.)
           {
             urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,
@@ -85,9 +126,6 @@ export default defineConfig(({ mode }) => ({
             },
           },
         ],
-      },
-      devOptions: {
-        enabled: false, // Disable SW in dev for easier debugging
       },
     })
   ].filter(Boolean),

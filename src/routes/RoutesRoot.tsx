@@ -12,6 +12,8 @@ const ReplayPage = lazy(() => import("../pages/ReplayPage"));
 const AccessPage = lazy(() => import("../pages/AccessPage"));
 const SettingsPage = lazy(() => import("../pages/SettingsPage"));
 const NotificationsPage = lazy(() => import("../pages/NotificationsPage"));
+const WatchlistPage = lazy(() => import("../pages/WatchlistPage"));
+const ConstellationPage = lazy(() => import("../pages/ConstellationPage"));
 
 function Fallback() {
   return <div className="p-6 text-zinc-400">Lade…</div>;
@@ -32,6 +34,8 @@ export default function RoutesRoot() {
               <Route path="/access" element={<AccessPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/watchlist" element={<WatchlistPage />} />
+              <Route path="/constellation" element={<ConstellationPage />} />
               <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
             </Routes>
           </Suspense>
