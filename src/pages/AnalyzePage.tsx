@@ -43,7 +43,7 @@ export default function AnalyzePage() {
     // Broadcast — Journal hört zu und fügt ein
     window.dispatchEvent(new CustomEvent("journal:insert", { detail: { text: aiResult.text }}));
     await navigator.clipboard.writeText(aiResult.text);
-    alert("AI-Bullets in Zwischenablage + an Journal gesendet");
+    alert("AI-Bullets in Zwischenablage + an Journal gesendet.\nTipp: In Journal „AI-Analyse an Notiz anhängen" klicken, um zu speichern.");
   };
 
   const exportJSON = () => {
