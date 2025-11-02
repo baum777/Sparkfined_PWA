@@ -1,6 +1,7 @@
 import { defineConfig, splitVendorChunkPlugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -8,6 +9,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     splitVendorChunkPlugin(),
+    process.env.ANALYZE ? visualizer({ open: true, gzipSize: true, filename: 'dist/stats.html' }) : undefined,
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
@@ -88,7 +90,7 @@ export default defineConfig(({ mode }) => ({
         enabled: false, // Disable SW in dev for easier debugging
       },
     })
-  ],
+  ].filter(Boolean),
   resolve: {
     alias: {
       '@': '/src'
