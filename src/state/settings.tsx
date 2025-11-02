@@ -8,6 +8,8 @@ export type Settings = {
   showHud: boolean;
   showTimeline: boolean;
   showMinimap: boolean;
+  defaultBalance?: number;
+  defaultPlaybookId?: string;
 };
 
 const KEY = "sparkfined.settings.v1";
@@ -18,6 +20,8 @@ const DEFAULTS: Settings = {
   showHud: true,
   showTimeline: true,
   showMinimap: true,
+  defaultBalance: 1000,
+  defaultPlaybookId: "bal-15",
 };
 
 function read(): Settings {

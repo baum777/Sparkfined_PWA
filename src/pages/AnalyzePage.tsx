@@ -6,6 +6,7 @@ import { encodeState } from "../lib/urlState";
 import { encodeToken } from "../lib/shortlink";
 import type { TF } from "../lib/timeframe";
 import { useAssist } from "../sections/ai/useAssist";
+import PlaybookCard from "../sections/ideas/Playbook";
 
 export default function AnalyzePage() {
   const [address, setAddress] = React.useState<string>("");
@@ -183,6 +184,36 @@ export default function AnalyzePage() {
             <div className="mt-3">
               <button className={btn} onClick={createIdeaPacket}>One-Click Trade-Idea anlegen</button>
             </div>
+          </div>
+
+          {/* Playbook Presets */}
+          <div className="mt-4">
+            <PlaybookCard
+              entry={metrics?.lastClose}
+              atr={metrics?.atr14}
+              onApply={async (res)=>{
+                // write Playbook snapshot into (latest) Idea or create lightweight idea if none exists
+                const payload = {
+                  address, tf,
+                  risk: {
+                    balance: res.balance,
+                    riskPct: res.pb.riskPct,
+                    atrMult: res.pb.atrMult,
+                    entryPrice: metrics?.lastClose,
+                    stopPrice: res.stopPrice,
+                    sizeUnits: res.sizeUnits,
+                    riskAmount: res.riskAmount,
+                    rrTargets: res.rrTargets,
+                    rrList: res.rrList,
+                    kellyLitePct: res.kellyLitePct
+                  },
+                  entry: metrics?.lastClose,
+                  targets: res.rrTargets
+                };
+                await fetch("/api/ideas", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify(payload) });
+                alert("Playbook angewendet und in Idea gespeichert.");
+              }}
+            />
           </div>
           {/* Sample window info */}
           <div className="mt-2 text-[11px] text-zinc-500">Samples: {data.length} · TF: {tf}</div>

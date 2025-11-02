@@ -38,4 +38,17 @@ export type Idea = {
     type: "created"|"note"|"rule_trigger"|"manual_update"|"closed";
     meta?: Record<string, any>;
   }>;
+  // --- Playbook/Risk snapshot (persisted at apply time)
+  risk?: {
+    balance?: number;
+    riskPct?: number;
+    atrMult?: number;
+    entryPrice?: number;
+    stopPrice?: number;
+    sizeUnits?: number;
+    riskAmount?: number;
+    rrTargets?: number[];
+    rrList?: number[];
+    kellyLitePct?: number;
+  };
 };
