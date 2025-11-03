@@ -1,62 +1,126 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { Providers } from "../../src/config/providers";
+/**
+ * OHLC API Endpoint
+ * Fetches candlestick data for charts
+ * Sparkfined PWA Trading Platform
+ */
 
-type Ohlc = { t: number; o: number; h: number; l: number; c: number; v?: number };
+import { VercelRequest, VercelResponse } from '@vercel/node'
 
-async function fetchJSON<T>(url: string, init: RequestInit = {}, timeoutMs = 5000): Promise<T> {
-  const ctrl = new AbortController();
-  const t = setTimeout(()=>ctrl.abort(), timeoutMs);
-  try {
-    const res = await fetch(url, { ...init, signal: ctrl.signal });
-    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-    return await res.json() as T;
-  } finally { clearTimeout(t); }
-}
+// Simple cache
+const cache = new Map<string, { data: any; timestamp: number }>()
+const CACHE_TTL = 300000 // 5 minutes
 
-// Try DexPaprika first — adjust paths as plan dictates; otherwise fall back to Dexscreener stub
-async function fromDexPaprika(address: string, tf: string): Promise<Ohlc[] | null> {
-  const base = (Providers.dexpaprika?.base || "").replace(/\/+$/, "");
-  if (!base) return null;
-  const headers = Providers.dexpaprika.headers?.() || {};
-  const candidates = [
-    `/v1/ohlc/${encodeURIComponent(address)}?tf=${encodeURIComponent(tf)}`,
-    `/ohlc/${encodeURIComponent(address)}?tf=${encodeURIComponent(tf)}`
-  ];
-  for (const path of candidates) {
-    try {
-      const url = `${base}${path}`;
-      const res: any = await fetchJSON(url, { headers }, 5000);
-      const arr = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
-      const out = arr.map((row: any) => {
-        if (Array.isArray(row)) {
-          const [t,o,h,l,c,v] = row;
-          return { t:Number(t), o:Number(o), h:Number(h), l:Number(l), c:Number(c), v: v!=null?Number(v):undefined };
-        }
-        return {
-          t: Number(row.t ?? row.time ?? row.timestamp),
-          o: Number(row.o ?? row.open),
-          h: Number(row.h ?? row.high),
-          l: Number(row.l ?? row.low),
-          c: Number(row.c ?? row.close),
-          v: row.v!=null?Number(row.v):undefined
-        };
-      }).filter((x: Ohlc) => Number.isFinite(x.t) && Number.isFinite(x.o) && Number.isFinite(x.h) && Number.isFinite(x.l) && Number.isFinite(x.c));
-      if (out.length) return out;
-    } catch { /* try next */ }
+/**
+ * Generate mock OHLCV data
+ * In production, replace with actual API calls to Binance/CoinGecko
+ */
+function generateMockOHLC(symbol: string, interval: string, limit: number) {
+  const now = Date.now()
+  const intervalMs = parseInterval(interval)
+  const data = []
+
+  let basePrice = 100 + Math.random() * 900
+  
+  for (let i = limit - 1; i >= 0; i--) {
+    const timestamp = now - (i * intervalMs)
+    const volatility = basePrice * 0.02
+    
+    const open = basePrice
+    const close = open + (Math.random() - 0.5) * volatility * 2
+    const high = Math.max(open, close) + Math.random() * volatility
+    const low = Math.min(open, close) - Math.random() * volatility
+    const volume = Math.random() * 1000000
+
+    data.push({
+      timestamp,
+      open: parseFloat(open.toFixed(2)),
+      high: parseFloat(high.toFixed(2)),
+      low: parseFloat(low.toFixed(2)),
+      close: parseFloat(close.toFixed(2)),
+      volume: parseFloat(volume.toFixed(2))
+    })
+
+    basePrice = close
   }
-  return null;
+
+  return data
 }
 
-// Fallback: Dexscreener does not guarantee OHLC via public endpoints → return empty to keep UI responsive
-async function fromDexscreener(_address: string, _tf: string): Promise<Ohlc[] | null> {
-  return [];
+function parseInterval(interval: string): number {
+  const unit = interval.slice(-1)
+  const value = parseInt(interval.slice(0, -1))
+
+  switch (unit) {
+    case 'm': return value * 60 * 1000
+    case 'h': return value * 60 * 60 * 1000
+    case 'd': return value * 24 * 60 * 60 * 1000
+    case 'w': return value * 7 * 24 * 60 * 60 * 1000
+    default: return 60 * 60 * 1000 // default 1h
+  }
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const address = String(req.query.address || "");
-  const tf = String(req.query.tf || "15m");
-  if (!address) return res.status(400).json({ error: "Missing address" });
-  let ohlc = await fromDexPaprika(address, tf);
-  if (!ohlc) ohlc = await fromDexscreener(address, tf);
-  return res.status(200).json({ ts: new Date().toISOString(), tf, ohlc: ohlc ?? [] });
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse
+) {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end()
+  }
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  try {
+    const { symbol, interval = '1h', limit = '500' } = req.query
+
+    if (!symbol || typeof symbol !== 'string') {
+      return res.status(400).json({ error: 'Symbol is required' })
+    }
+
+    const limitNum = parseInt(limit as string)
+    if (isNaN(limitNum) || limitNum < 1 || limitNum > 1000) {
+      return res.status(400).json({ error: 'Invalid limit (1-1000)' })
+    }
+
+    // Check cache
+    const cacheKey = `ohlc:${symbol}:${interval}:${limitNum}`
+    const cached = cache.get(cacheKey)
+
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      res.setHeader('X-Cache', 'HIT')
+      return res.status(200).json(cached.data)
+    }
+
+    // Generate/fetch data
+    const data = generateMockOHLC(symbol, interval as string, limitNum)
+
+    // Cache the result
+    cache.set(cacheKey, {
+      data,
+      timestamp: Date.now()
+    })
+
+    // Clean up old cache
+    if (cache.size > 100) {
+      const entries = Array.from(cache.entries())
+      entries.sort((a, b) => a[1].timestamp - b[1].timestamp)
+      entries.slice(0, 50).forEach(([key]) => cache.delete(key))
+    }
+
+    res.setHeader('X-Cache', 'MISS')
+    return res.status(200).json(data)
+
+  } catch (error) {
+    console.error('[OHLC API] Error:', error)
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    })
+  }
 }

@@ -11,18 +11,33 @@ export default defineConfig(({ mode }) => ({
     splitVendorChunkPlugin(),
     process.env.ANALYZE ? visualizer({ open: true, gzipSize: true, filename: 'dist/stats.html' }) : undefined,
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Sparkfined TA-PWA',
+        name: 'Sparkfined Trading',
         short_name: 'Sparkfined',
-        description: 'Technical Analysis Progressive Web App',
-        theme_color: '#1e293b',
-        background_color: '#0f172a',
+        description: 'Progressive Web App for Technical Analysis & Trading',
+        theme_color: '#0A0E27',
+        background_color: '#0A0E27',
         display: 'standalone',
-        orientation: 'portrait',
+        orientation: 'any',
         scope: '/',
         start_url: '/',
+        categories: ['finance', 'productivity'],
+        shortcuts: [
+          {
+            name: 'Quick Chart',
+            url: '/chart',
+            description: 'Open chart analysis',
+            icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Watchlist',
+            url: '/watchlist',
+            description: 'Open watchlist',
+            icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }]
+          }
+        ],
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -40,10 +55,24 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-        // Pre-cache app shell for instant offline access
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
+          // CoinGecko API - Real-time price data
+          {
+            urlPattern: /^https:\/\/api\.coingecko\.com\/.*/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'price-api-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 300, // 5 minutes for fresh price data
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
           // Dexscreener API - Stale-While-Revalidate for fast perceived performance
           {
             urlPattern: /^https:\/\/api\.dexscreener\.com\/.*/i,
@@ -59,6 +88,19 @@ export default defineConfig(({ mode }) => ({
               },
             },
           },
+          // Binance API - Chart data
+          {
+            urlPattern: /^https:\/\/api\.binance\.com\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'binance-api-cache',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 600, // 10 minutes
+              },
+            },
+          },
           // Other external APIs
           {
             urlPattern: /^https:\/\/api\.*/i,
@@ -69,6 +111,18 @@ export default defineConfig(({ mode }) => ({
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 300, // 5 minutes
+              },
+            },
+          },
+          // Images - CacheFirst for performance
+          {
+            urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'image-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 2592000, // 30 days
               },
             },
           },
@@ -87,7 +141,7 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       devOptions: {
-        enabled: false, // Disable SW in dev for easier debugging
+        enabled: true, // Enable SW in dev for testing
       },
     })
   ].filter(Boolean),
