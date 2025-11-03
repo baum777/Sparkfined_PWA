@@ -5,6 +5,7 @@ import { useTelemetry } from "../state/telemetry";
 import { subscribePush, unsubscribePush, currentSubscription } from "../lib/push";
 import RuleWizard from "../sections/notifications/RuleWizard";
 import type { ServerRule } from "../lib/serverRules";
+import PlaybookCard from "../sections/ideas/Playbook";
 
 export default function NotificationsPage() {
   const { rules, create, update, remove, triggers, clearTriggers, addManualTrigger } = useAlertRules();
@@ -20,10 +21,10 @@ export default function NotificationsPage() {
   const [ideas, setIdeas] = React.useState<any[]>([]);
   const [address] = React.useState(""); // default address für upload
   const loadSrv = async ()=> {
-    const r = await fetch("/api/rules").then(r=>r.json()).catch(()=>null);
+    const r = await fetch("/api/rules").then((r): any=>r.json()).catch((): any=>null);
     setSrvRules(r?.rules ?? []);
     // Load ideas too
-    const iRes = await fetch("/api/ideas").then(r=>r.json()).catch(()=>null);
+    const iRes = await fetch("/api/ideas").then((r): any=>r.json()).catch((): any=>null);
     setIdeas(iRes?.ideas ?? []);
   };
   const uploadAll = async ()=> {
@@ -44,7 +45,7 @@ export default function NotificationsPage() {
     await loadSrv();
   };
   const evalNow = async ()=> {
-    const r = await fetch("/api/rules/eval-cron").then(r=>r.json()).catch(()=>null);
+    const r = await fetch("/api/rules/eval-cron").then((r): any=>r.json()).catch((): any=>null);
     alert(r?.ok ? `Eval: groups=${r.groups} evaluated=${r.evaluated} dispatched=${r.dispatched}` : "Eval failed");
   };
   const exportIdeas = async ()=>{
@@ -153,12 +154,12 @@ export default function NotificationsPage() {
               {it.risk ? (
                 <div className="mt-2 rounded border border-emerald-800/50 bg-emerald-950/20 p-2 text-emerald-200">
                   Stop {it.risk.stopPrice} · Size {it.risk.sizeUnits?.toFixed(2)}u · Risk {it.risk.riskAmount?.toFixed(2)}
-                  <div className="text-[11px]">Targets: {(it.risk.rrTargets||[]).map((t,i)=>`${it.risk!.rrList![i]}R→${t.toFixed(6)}`).join(" · ")}</div>
+                  <div className="text-[11px]">Targets: {(it.risk.rrTargets||[]).map((t: number,i: number)=>`${it.risk!.rrList![i]}R→${t.toFixed(6)}`).join(" · ")}</div>
                 </div>
               ) : null}
               <div className="mt-1 flex gap-2">
                 <button className={btn} onClick={async()=>{
-                  const blob = await fetch(`/api/ideas/export-pack?id=${it.id}`).then(r=>r.blob());
+                  const blob = await fetch(`/api/ideas/export-pack?id=${it.id}`).then((r): any=>r.blob());
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement("a"); a.href=url; a.download=`execution-pack-${it.id}.md`; a.click();
                   URL.revokeObjectURL(url);
@@ -174,7 +175,7 @@ export default function NotificationsPage() {
                   <button className={btn} onClick={async()=>{
                     const p = Number(prompt("Exit-Preis eingeben:",""));
                     if (!p) return;
-                    const r = await fetch("/api/ideas/close",{ method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: it.id, exitPrice: p })}).then(r=>r.json()).catch(()=>null);
+                    const r = await fetch("/api/ideas/close",{ method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: it.id, exitPrice: p })}).then((r): any=>r.json()).catch((): any=>null);
                     alert(r?.ok ? "Idea geschlossen" : "Fehler beim Schließen");
                     await loadSrv();
                   }}>Schließen</button>

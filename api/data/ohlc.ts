@@ -15,7 +15,7 @@ export default async function handler(req: Request){
     const dp = await fetch(`${base}/v1/ohlc?ca=${encodeURIComponent(address)}&tf=${encodeURIComponent(tf)}&limit=${limit}`, {
       headers: key ? { "x-api-key": key } : undefined,
       cache: "no-store"
-    }).then(r=>r.ok?r.json():null).catch(()=>null);
+    }).then((r): any=>r.ok?r.json():null).catch((): any=>null);
     if (dp?.ok && Array.isArray(dp.data)) return json({ ok:true, data: normalize(dp.data) });
     // Fallback: Dexscreener (wenn keine OHLC verfügbar → leer)
     return json({ ok:true, data: [] });
