@@ -11,18 +11,49 @@ export default defineConfig(({ mode }) => ({
     splitVendorChunkPlugin(),
     process.env.ANALYZE ? visualizer({ open: true, gzipSize: true, filename: 'dist/stats.html' }) : undefined,
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Sparkfined TA-PWA',
+        name: 'Sparkfined Trading',
         short_name: 'Sparkfined',
-        description: 'Technical Analysis Progressive Web App',
-        theme_color: '#1e293b',
-        background_color: '#0f172a',
+        description: 'Advanced Trading Platform - Real-Time Charts, Watchlists & Technical Analysis',
+        theme_color: '#0A0E27',
+        background_color: '#0A0E27',
         display: 'standalone',
-        orientation: 'portrait',
+        orientation: 'any',
         scope: '/',
         start_url: '/',
+        categories: ['finance', 'productivity', 'utilities'],
+        shortcuts: [
+          {
+            name: 'Quick Chart',
+            short_name: 'Chart',
+            description: 'Open chart analysis',
+            url: '/chart',
+            icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Watchlist',
+            short_name: 'Watch',
+            description: 'View watchlist',
+            url: '/',
+            icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Journal',
+            short_name: 'Journal',
+            description: 'Trading journal',
+            url: '/journal',
+            icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Analyze',
+            short_name: 'Analyze',
+            description: 'Market analysis',
+            url: '/analyze',
+            icons: [{ src: '/pwa-192x192.png', sizes: '192x192' }]
+          }
+        ],
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -35,6 +66,11 @@ export default defineConfig(({ mode }) => ({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
+          },
+          {
+            src: 'apple-touch-icon.png',
+            sizes: '180x180',
+            type: 'image/png'
           }
         ]
       },
@@ -43,32 +79,58 @@ export default defineConfig(({ mode }) => ({
         // Pre-cache app shell for instant offline access
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/],
+        // Increase max size for bundled assets
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
         runtimeCaching: [
-          // Dexscreener API - Stale-While-Revalidate for fast perceived performance
+          // Price APIs - Stale-While-Revalidate for fast perceived performance
           {
-            urlPattern: /^https:\/\/api\.dexscreener\.com\/.*/i,
+            urlPattern: /^https:\/\/api\.(coingecko|binance|dexscreener)\.com\/.*/i,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'dexscreener-cache',
+              cacheName: 'price-api-cache',
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 86400, // 24 hours
+                maxAgeSeconds: 300, // 5 minutes for price data
               },
               cacheableResponse: {
                 statuses: [0, 200],
               },
             },
           },
-          // Other external APIs
+          // Chart data - Network First with fallback
           {
-            urlPattern: /^https:\/\/api\.*/i,
+            urlPattern: /^https:\/\/.*\/(klines|ohlcv|candles).*/i,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'api-cache',
-              networkTimeoutSeconds: 5,
+              cacheName: 'chart-data-cache',
+              networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 300, // 5 minutes
+                maxAgeSeconds: 900, // 15 minutes
+              },
+            },
+          },
+          // Token metadata - Cache First for performance
+          {
+            urlPattern: /^https:\/\/.*\/(token|metadata|info).*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'token-metadata-cache',
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 86400, // 24 hours
+              },
+            },
+          },
+          // Images - Cache First with long expiration
+          {
+            urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'image-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 86400 * 30, // 30 days
               },
             },
           },
@@ -87,7 +149,8 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       devOptions: {
-        enabled: false, // Disable SW in dev for easier debugging
+        enabled: true, // Enable SW in dev for testing
+        type: 'module',
       },
     })
   ].filter(Boolean),

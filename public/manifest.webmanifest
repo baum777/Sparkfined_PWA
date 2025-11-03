@@ -1,19 +1,84 @@
 {
-  "name": "Sparkfined TA PWA",
+  "name": "Sparkfined Trading",
   "short_name": "Sparkfined",
+  "description": "Advanced Trading Platform - Real-Time Charts, Watchlists & Technical Analysis",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0fb34c",
+  "orientation": "any",
+  "background_color": "#0A0E27",
+  "theme_color": "#0A0E27",
+  "categories": ["finance", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Quick Chart",
+      "short_name": "Chart",
+      "description": "Open chart analysis",
+      "url": "/chart",
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Watchlist",
+      "short_name": "Watch",
+      "description": "View watchlist",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Journal",
+      "short_name": "Journal",
+      "description": "Trading journal",
+      "url": "/journal",
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Analyze",
+      "short_name": "Analyze",
+      "description": "Market analysis",
+      "url": "/analyze",
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
   "icons": [
     {
       "src": "/pwa-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/pwa-512x512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png"
     },
     {
