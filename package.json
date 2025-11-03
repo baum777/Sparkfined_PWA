@@ -23,7 +23,6 @@
     "@heroicons/react": "^2.1.0",
     "@solana/spl-token": "^0.4.0",
     "@solana/web3.js": "^1.95.0",
-    "@streamflow/stream": "^6.3.0",
     "@vercel/node": "^3.0.0",
     "dexie": "^3.2.0",
     "openai": "^4.0.0",
@@ -33,7 +32,8 @@
     "tesseract.js": "^5.0.0",
     "vite-plugin-pwa": "^0.20.0",
     "web-push": "^3.6.7",
-    "workbox-window": "^7.1.0"
+    "workbox-window": "^7.1.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

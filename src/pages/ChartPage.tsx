@@ -227,7 +227,7 @@ export default function ChartPage() {
         method:"POST",
         headers:{ "content-type":"application/json" },
         body: JSON.stringify(body)
-      }).then(r=>r.json()).catch(()=>null);
+      }).then((r): any=>r.json()).catch((): any=>null);
       if (res?.ok) {
         setTestHits(res.hits || []);
         setTestActive(true);
@@ -256,7 +256,7 @@ export default function ChartPage() {
         fromIdx: view.start, toIdx: view.end,
         tf, page: opts?.page ?? 0, pageSize: 500
       })
-    }).then(r=>r.json()).catch(():null=>null);
+    }).then((r): any=>r.json()).catch((): any=>null);
     const t1 = performance.now();
     if (!res || !res.ok) { alert("Server Backtest Fehler"); return; }
     setBtServerMs(res.ms ?? Math.round(t1 - t0));

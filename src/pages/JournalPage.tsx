@@ -53,16 +53,16 @@ export default function JournalPage() {
       ruleId: note?.ruleId ?? draft.ruleId ?? undefined,
       tags: note?.tags ?? draft.tags ?? []
     };
-    const res = await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify(payload) }).then(r=>r.json()).catch(()=>null);
+    const res = await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify(payload) }).then((r): any=>r.json()).catch((): any=>null);
     if (res?.ok) { setDraft(res.note); await loadServer(); }
   };
   const loadServer = async ()=> {
-    const res = await fetch("/api/journal").then(r=>r.json()).catch(()=>null);
+    const res = await fetch("/api/journal").then((r): any=>r.json()).catch((): any=>null);
     setServerNotes(res?.notes ?? []);
   };
   const delServer = async (id:string)=> {
     if (!confirm("Diese Notiz l\u00f6schen?")) return;
-    const res = await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ delete:true, id }) }).then(r=>r.json()).catch(()=>null);
+    const res = await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ delete:true, id }) }).then((r): any=>r.json()).catch((): any=>null);
     if (res?.ok) await loadServer();
   };
   const attachAI = async () => {
@@ -116,7 +116,7 @@ export default function JournalPage() {
         </div>
       </div>
 
-      <JournalEditor draft={draft} onChange={setDraft} onSave={()=>saveServer()} />
+      <JournalEditor draft={draft} onChange={(d: any)=>setDraft(d)} onSave={()=>saveServer()} />
       <div className="mt-3 rounded-xl border border-emerald-900 bg-emerald-950/20 p-3">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-sm text-emerald-200">AI-Assist: Notiz straffen</div>
@@ -163,7 +163,7 @@ export default function JournalPage() {
       <div className="mt-4">
         <JournalList
           notes={notes}
-          onOpen={(id)=>{ const n = notes.find(x=>x.id===id); if (!n) return; setOpenId(id); setDraft(n); }}
+          onOpen={(id)=>{ const n = notes.find(x=>x.id===id); if (!n) return; setOpenId(id); setDraft(n as any); }}
           onDelete={remove}
           filter={{ q: search, tag }}
         />
