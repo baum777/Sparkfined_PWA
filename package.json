@@ -23,7 +23,6 @@
     "@heroicons/react": "^2.1.0",
     "@solana/spl-token": "^0.4.0",
     "@solana/web3.js": "^1.95.0",
-    "@streamflow/stream": "^6.3.0",
     "@vercel/node": "^3.0.0",
     "dexie": "^3.2.0",
     "openai": "^4.0.0",
