@@ -1,6 +1,7 @@
 import React from "react";
 import PerfSampler from "../../sections/telemetry/PerfSampler";
 import TokenOverlay from "../../sections/telemetry/TokenOverlay";
+import QuestHook from "../../components/QuestHook";
 import { useTelemetry } from "../../state/telemetry";
 
 export default function GlobalInstruments() {
@@ -9,6 +10,7 @@ export default function GlobalInstruments() {
     <>
       <PerfSampler />
       {flags.tokenOverlay && <TokenOverlay />}
+      <QuestHook />
     </>
   );
 }

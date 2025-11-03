@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparkfined - Manifest WAGMI. Build Together.</title>
+  <meta name="description" content="Community > Jeets. Real Utility > Hype. Join the Sparkfined Trading PWA Quest.">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  
+  <!-- Design System Colors & Fonts -->
+  <style>
+    :root {
+      --bg-primary: #0A0E27;
+      --bg-secondary: #151A36;
+      --accent-purple: #8B5CF6;
+      --accent-cyan: #06B6D4;
+      --accent-green: #10B981;
+      --danger: #EF4444;
+      --text-primary: #F3F4F6;
+      --text-secondary: #9CA3AF;
+      --border: rgba(139, 92, 246, 0.2);
+      --glow: rgba(6, 182, 212, 0.5);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* HERO SECTION */
+    .hero-section {
+      min-height: 100vh;
+      background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+      opacity: 0.1;
+      animation: rotate 30s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: bold;
+      background: linear-gradient(45deg, var(--accent-purple), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.3s;
+      font-size: 0.9rem;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-cyan);
+    }
+
+    .hero-content {
+      padding: 4rem 0;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      background: linear-gradient(180deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-divider {
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan), var(--accent-green));
+      margin: 2rem auto;
+      border-radius: 2px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 4rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary, .btn-secondary {
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    /* UPDATE INDICATORS */
+    .update-indicators {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .update-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+
+    .update-item.active {
+      opacity: 1;
+    }
+
+    .update-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .update-item.active:nth-child(1) .update-dot {
+      background: var(--accent-green);
+      box-shadow: 0 0 20px var(--accent-green);
+    }
+
+    .update-item.active:nth-child(2) .update-dot {
+      background: var(--accent-cyan);
+      box-shadow: 0 0 20px var(--accent-cyan);
+      animation: pulse 2s infinite;
+    }
+
+    .update-item span {
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .update-item small {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    /* ROADMAP SECTION */
+    .roadmap-section {
+      padding: 6rem 0;
+      background: var(--bg-secondary);
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(2rem, 4vw, 2.5rem);
+      margin-bottom: 3rem;
+      font-weight: 800;
+    }
+
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      font-size: 1.125rem;
+    }
+
+    .roadmap-timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .timeline-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .timeline-item:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-purple);
+    }
+
+    .timeline-item.active {
+      border-color: var(--accent-purple);
+      background: rgba(139, 92, 246, 0.05);
+    }
+
+    .timeline-marker {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .timeline-item h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-item p {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .timeline-item ul {
+      list-style: none;
+    }
+
+    .timeline-item li {
+      padding: 0.25rem 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .timeline-item li::before {
+      content: '→ ';
+      color: var(--accent-cyan);
+    }
+
+    .progress-bar {
+      background: rgba(255, 255, 255, 0.1);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 1rem;
+      transition: width 0.5s ease;
+    }
+
+    .progress-label {
+      font-size: 0.75rem;
+      color: var(--bg-primary);
+      font-weight: 600;
+    }
+
+    /* TOKEN LOCK SECTION */
+    .token-lock-section {
+      padding: 6rem 0;
+      background: var(--bg-primary);
+    }
+
+    .lock-phases {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .phase-card {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.05));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .phase-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2);
+    }
+
+    .phase-header {
+      padding: 1.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .phase-badge {
+      font-size: 2rem;
+    }
+
+    .phase-header h3 {
+      flex: 1;
+      font-size: 1.25rem;
+    }
+
+    .phase-label {
+      font-size: 0.875rem;
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .phase-content {
+      padding: 1.5rem;
+    }
+
+    .phase-stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .phase-stat:last-child {
+      border-bottom: none;
+    }
+
+    .phase-stat span {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .phase-stat strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* CALCULATOR */
+    .calculator-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+
+    .calculator-container h3 {
+      margin-bottom: 1.5rem;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+
+    .calculator-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 0.75rem;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .calculator-result {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+    }
+
+    .result-row span {
+      color: var(--text-secondary);
+    }
+
+    .result-row strong {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    .btn-gradient {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .btn-gradient:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3);
+    }
+
+    /* NFT SECTION */
+    .nft-section {
+      padding: 6rem 0;
+      background: var(--bg-secondary);
+    }
+
+    .nft-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .nft-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .nft-badge-3d {
+      width: 300px;
+      height: 300px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .badge-glow {
+      position: absolute;
+      inset: -20px;
+      background: radial-gradient(circle, var(--accent-purple), transparent);
+      filter: blur(30px);
+      opacity: 0.5;
+      animation: pulse 3s infinite;
+    }
+
+    .badge-content {
+      position: relative;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      width: 200px;
+      height: 200px;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transform: perspective(1000px) rotateY(15deg) rotateX(10deg);
+      transition: transform 0.3s;
+    }
+
+    .badge-content:hover {
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+    }
+
+    .badge-number {
+      font-size: 2rem;
+      font-weight: 900;
+      color: white;
+    }
+
+    .badge-title {
+      font-size: 1rem;
+      letter-spacing: 0.2em;
+      color: white;
+      opacity: 0.9;
+    }
+
+    .nft-info h3 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .nft-counter {
+      margin-bottom: 2rem;
+    }
+
+    .counter-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .counter-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--accent-green);
+      margin-left: 0.5rem;
+    }
+
+    .counter-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+
+    .counter-fill {
+      height: 100%;
+      background: var(--accent-green);
+      transition: width 0.5s ease;
+    }
+
+    .nft-requirements, .nft-benefits {
+      margin-bottom: 1.5rem;
+    }
+
+    .nft-requirements h4, .nft-benefits h4 {
+      margin-bottom: 0.75rem;
+      color: var(--accent-purple);
+      font-size: 1.125rem;
+    }
+
+    .nft-requirements ul, .nft-benefits ul {
+      list-style: none;
+    }
+
+    .nft-requirements li, .nft-benefits li {
+      padding: 0.25rem 0;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .btn-mint {
+      padding: 1rem 3rem;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.125rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    .btn-mint:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+    }
+
+    /* DISTRIBUTION SECTION */
+    .distribution-section {
+      padding: 6rem 0;
+      background: var(--bg-primary);
+    }
+
+    .distribution-chart {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+      align-items: flex-end;
+    }
+
+    .distribution-item {
+      text-align: center;
+    }
+
+    .distribution-bar {
+      background: linear-gradient(180deg, var(--accent-purple), var(--accent-cyan));
+      border-radius: 8px 8px 0 0;
+      margin: 0 auto 1rem;
+      width: 80px;
+      position: relative;
+      transition: all 0.3s;
+    }
+
+    .distribution-bar:hover {
+      transform: scaleY(1.05);
+    }
+
+    .bar-label {
+      position: absolute;
+      top: -2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+
+    .distribution-item h4 {
+      margin-bottom: 0.75rem;
+      font-size: 1.125rem;
+    }
+
+    .distribution-item ul {
+      list-style: none;
+      text-align: left;
+    }
+
+    .distribution-item li {
+      padding: 0.25rem 0;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .distribution-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-outline {
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      transform: translateY(-2px);
+    }
+
+    /* MANIFESTO SECTION */
+    .manifesto-section {
+      padding: 6rem 0;
+      background: var(--bg-secondary);
+    }
+
+    .manifesto-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      gap: 3rem;
+    }
+
+    .manifesto-block {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .manifesto-block h3 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+      color: var(--accent-purple);
+    }
+
+    .manifesto-item {
+      margin-bottom: 1.5rem;
+    }
+
+    .manifesto-item strong {
+      display: block;
+      color: var(--accent-cyan);
+      margin-bottom: 0.5rem;
+      font-size: 1.125rem;
+    }
+
+    .manifesto-item p {
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .manifesto-block ul {
+      list-style: none;
+    }
+
+    .manifesto-block li {
+      padding: 0.5rem 0;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .manifesto-block li strong {
+      color: var(--accent-cyan);
+    }
+
+    .manifesto-block p {
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    /* FOOTER CTA */
+    .footer-cta {
+      padding: 6rem 0;
+      background: var(--bg-primary);
+      text-align: center;
+    }
+
+    .footer-cta h2 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      margin-bottom: 2rem;
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 4rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary-large, .btn-secondary-large {
+      padding: 1.25rem 2.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1.125rem;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary-large {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      color: white;
+      border: none;
+    }
+
+    .btn-primary-large:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-secondary-large {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary-large:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .footer-stats {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      flex-wrap: wrap;
+      padding-top: 3rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .hero-actions .btn-primary,
+      .hero-actions .btn-secondary {
+        width: 100%;
+      }
+      
+      .update-indicators {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .nft-showcase {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .nft-badge-3d {
+        width: 250px;
+        height: 250px;
+      }
+
+      .badge-content {
+        width: 180px;
+        height: 180px;
+      }
+      
+      .lock-phases {
+        grid-template-columns: 1fr;
+      }
+      
+      .calculator-inputs {
+        grid-template-columns: 1fr;
+      }
+
+      .distribution-chart {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .footer-stats {
+        gap: 2rem;
+      }
+
+      .footer-actions {
+        flex-direction: column;
+      }
+
+      .footer-actions .btn-primary-large,
+      .footer-actions .btn-secondary-large {
+        width: 100%;
+      }
+    }
+
+    /* ANIMATIONS */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes glow {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* UTILITIES */
+    .text-gradient {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .glow-effect {
+      box-shadow: 0 0 30px var(--glow);
+    }
+
+    /* SCROLL BEHAVIOR */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="container">
+      <nav class="nav-header">
+        <div class="logo">
+          <span class="logo-text">✨ Sparkfined</span>
+        </div>
+        <div class="nav-links">
+          <a href="#roadmap">Roadmap</a>
+          <a href="#token-lock">Token Lock</a>
+          <a href="#manifesto">Manifesto</a>
+          <a href="https://github.com/baum777/Sparkfined_PWA" target="_blank">GitHub</a>
+        </div>
+      </nav>
+      
+      <div class="hero-content">
+        <h1 class="hero-title">
+          MANIFEST WAGMI.<br>
+          BUILD TOGETHER.<br>
+          REWARD HONESTY.
+        </h1>
+        <div class="hero-divider"></div>
+        <p class="hero-subtitle">
+          Community > Jeets. Real Utility > Hype. We Build Different.
+        </p>
+        
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="scrollToTokenLock()">
+            🔒 Lock & Access
+          </button>
+          <button class="btn-secondary" onclick="scrollToManifesto()">
+            📖 Read Manifesto
+          </button>
+        </div>
+        
+        <div class="update-indicators">
+          <div class="update-item active">
+            <span class="update-dot"></span>
+            <span>MAINLAUNCH</span>
+            <small>Live Now</small>
+          </div>
+          <div class="update-item active">
+            <span class="update-dot"></span>
+            <span>FIRST UPDATE</span>
+            <small>Token Lock Live</small>
+          </div>
+          <div class="update-item">
+            <span class="update-dot"></span>
+            <span>SECOND UPDATE</span>
+            <small>Coming Soon</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 UPDATES ROADMAP -->
+  <section id="roadmap" class="roadmap-section">
+    <div class="container">
+      <h2 class="section-title">THE 3 UPDATES ROADMAP</h2>
+      
+      <div class="roadmap-timeline">
+        <div class="timeline-item active">
+          <div class="timeline-marker">🟢</div>
+          <h3>MAINLAUNCH</h3>
+          <p>Early Birds Test Phase</p>
+          <ul>
+            <li>Public Space Launch</li>
+            <li>Core Trading Features</li>
+            <li>Community Building</li>
+          </ul>
+        </div>
+        
+        <div class="timeline-item active">
+          <div class="timeline-marker">🔵</div>
+          <h3>FIRST UPDATE</h3>
+          <p>Token Lock + NFT Collection</p>
+          <ul>
+            <li>333 Genesis NFTs</li>
+            <li>Whitelist via Token Lock</li>
+            <li>Access Gates Active</li>
+          </ul>
+        </div>
+        
+        <div class="timeline-item">
+          <div class="timeline-marker">⚡</div>
+          <h3>SECOND UPDATE</h3>
+          <p>Community AI Journal</p>
+          <ul>
+            <li>AI Trade Analysis</li>
+            <li>Community Governance</li>
+            <li>Iterative Development</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 47%">
+          <span class="progress-label">47% to Second Update</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOKEN LOCK MECHANICS -->
+  <section id="token-lock" class="token-lock-section">
+    <div class="container">
+      <h2 class="section-title">TOKEN LOCK MECHANICS</h2>
+      
+      <div class="lock-phases">
+        <div class="phase-card">
+          <div class="phase-header">
+            <span class="phase-badge">🏆</span>
+            <h3>PHASE 1</h3>
+            <span class="phase-label">Elite Founder</span>
+          </div>
+          <div class="phase-content">
+            <div class="phase-stat">
+              <span>Rank</span>
+              <strong>1-10</strong>
+            </div>
+            <div class="phase-stat">
+              <span>Lock Amount</span>
+              <strong>5.5M-10M $SPARK</strong>
+            </div>
+            <div class="phase-stat">
+              <span>Vesting</span>
+              <strong>100% over 73 days</strong>
+            </div>
+            <div class="phase-stat">
+              <span>NFT System</span>
+              <strong>Dual NFT</strong>
+            </div>
+          </div>
+        </div>
+        
+        <div class="phase-card">
+          <div class="phase-header">
+            <span class="phase-badge">⭐</span>
+            <h3>PHASE 2</h3>
+            <span class="phase-label">Pioneer</span>
+          </div>
+          <div class="phase-content">
+            <div class="phase-stat">
+              <span>Rank</span>
+              <strong>11-1000</strong>
+            </div>
+            <div class="phase-stat">
+              <span>Lock Amount</span>
+              <strong>260K-2.06M $SPARK</strong>
+            </div>
+            <div class="phase-stat">
+              <span>Vesting</span>
+              <strong>65% @ 30d, 35% forever</strong>
+            </div>
+            <div class="phase-stat">
+              <span>NFT System</span>
+              <strong>Single NFT</strong>
+            </div>
+          </div>
+        </div>
+        
+        <div class="phase-card">
+          <div class="phase-header">
+            <span class="phase-badge">🎯</span>
+            <h3>PHASE 3</h3>
+            <span class="phase-label">Member</span>
+          </div>
+          <div class="phase-content">
+            <div class="phase-stat">
+              <span>Rank</span>
+              <strong>1001+</strong>
+            </div>
+            <div class="phase-stat">
+              <span>Lock Amount</span>
+              <strong>325K $SPARK flat</strong>
+            </div>
+            <div class="phase-stat">
+              <span>Vesting</span>
+              <strong>Keep or Close</strong>
+            </div>
+            <div class="phase-stat">
+              <span>Requirement</span>
+              <strong>MCAP > $500K</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Token Lock Calculator -->
+      <div class="calculator-container">
+        <h3>Calculate Your Lock Requirement</h3>
+        <div class="calculator-inputs">
+          <div class="input-group">
+            <label>Your Rank</label>
+            <input type="number" id="rank-input" value="100" min="1">
+          </div>
+          <div class="input-group">
+            <label>Current MCAP ($)</label>
+            <input type="number" id="mcap-input" value="450000" min="0">
+          </div>
+        </div>
+        <div class="calculator-result">
+          <div class="result-row">
+            <span>Phase:</span>
+            <strong id="phase-result">Phase 2</strong>
+          </div>
+          <div class="result-row">
+            <span>Required Lock:</span>
+            <strong id="amount-result">1,898,000 $SPARK</strong>
+          </div>
+          <div class="result-row">
+            <span>Vesting:</span>
+            <strong id="vesting-result">65% @ 30d, 35% forever</strong>
+          </div>
+        </div>
+        <button class="btn-gradient" onclick="window.location.href='/'">Lock Tokens & Claim Access</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- NFT BADGE COLLECTION -->
+  <section class="nft-section">
+    <div class="container">
+      <h2 class="section-title">GENESIS FOUNDER BADGE</h2>
+      
+      <div class="nft-showcase">
+        <div class="nft-visual">
+          <div class="nft-badge-3d">
+            <div class="badge-glow"></div>
+            <div class="badge-content">
+              <span class="badge-number">#127</span>
+              <span class="badge-title">FOUNDER</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="nft-info">
+          <h3>LIMITED EDITION: 333 GENESIS BADGES</h3>
+          <div class="nft-counter">
+            <span class="counter-label">Minted:</span>
+            <span class="counter-value">127 / 333</span>
+            <div class="counter-bar">
+              <div class="counter-fill" style="width: 38%"></div>
+            </div>
+          </div>
+          
+          <div class="nft-requirements">
+            <h4>Requirements:</h4>
+            <ul>
+              <li>✓ Active Token Lock (Any Phase)</li>
+              <li>✓ Early Adopter (First 333)</li>
+              <li>✓ 0.05 ETH Mint Fee</li>
+            </ul>
+          </div>
+          
+          <div class="nft-benefits">
+            <h4>Benefits:</h4>
+            <ul>
+              <li>• Governance Rights</li>
+              <li>• Fee Share (30% Chart Healthcare)</li>
+              <li>• Priority Features</li>
+              <li>• Exclusive Discord Role</li>
+            </ul>
+          </div>
+          
+          <button class="btn-mint" onclick="window.location.href='/'">🔥 Mint Your Badge</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREATOR FEE DISTRIBUTION -->
+  <section class="distribution-section">
+    <div class="container">
+      <h2 class="section-title">CREATOR FEE DISTRIBUTION</h2>
+      <p class="section-subtitle">Community-Controlled Treasury Model</p>
+      
+      <div class="distribution-chart">
+        <div class="distribution-item">
+          <div class="distribution-bar" style="height: 150px">
+            <span class="bar-label">30%</span>
+          </div>
+          <h4>Chart Healthcare</h4>
+          <ul>
+            <li>Floor Support</li>
+            <li>Buy-back Strategies</li>
+            <li>Supply Control</li>
+          </ul>
+        </div>
+        
+        <div class="distribution-item">
+          <div class="distribution-bar" style="height: 150px">
+            <span class="bar-label">30%</span>
+          </div>
+          <h4>Growth & Marketing</h4>
+          <ul>
+            <li>Community Boosts</li>
+            <li>Engagement Rewards</li>
+            <li>Partnerships</li>
+          </ul>
+        </div>
+        
+        <div class="distribution-item">
+          <div class="distribution-bar" style="height: 125px">
+            <span class="bar-label">25%</span>
+          </div>
+          <h4>Dev-Ops</h4>
+          <ul>
+            <li>API Development</li>
+            <li>Tool Maintenance</li>
+            <li>Infrastructure</li>
+          </ul>
+        </div>
+        
+        <div class="distribution-item">
+          <div class="distribution-bar" style="height: 75px">
+            <span class="bar-label">15%</span>
+          </div>
+          <h4>Baum</h4>
+          <ul>
+            <li>Core Development</li>
+            <li>Vision & Strategy</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="distribution-actions">
+        <button class="btn-outline">View On-Chain</button>
+        <button class="btn-outline">Propose Changes</button>
+        <button class="btn-outline">Vote</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section id="manifesto" class="manifesto-section">
+    <div class="container">
+      <h2 class="section-title">SPARKFINED MANIFESTO</h2>
+      
+      <div class="manifesto-content">
+        <div class="manifesto-block">
+          <h3>We Build Different</h3>
+          <div class="manifesto-item">
+            <strong>Community > Jeets</strong>
+            <p>Real builders stay. Paper hands leave. We reward loyalty.</p>
+          </div>
+          <div class="manifesto-item">
+            <strong>Honesty & Realness Get Rewarded</strong>
+            <p>No fake pumps. No empty hype. Real utility, real growth.</p>
+          </div>
+          <div class="manifesto-item">
+            <strong>WAGMI Together</strong>
+            <p>Your success is our success. Lock tokens, build together, share rewards.</p>
+          </div>
+        </div>
+        
+        <div class="manifesto-block">
+          <h3>The Vision</h3>
+          <ul>
+            <li><strong>Mainlaunch:</strong> Test & Learn Together</li>
+            <li><strong>First Update:</strong> Lock & Commit Together</li>
+            <li><strong>Second Update:</strong> Build & Grow Together</li>
+          </ul>
+        </div>
+        
+        <div class="manifesto-block">
+          <h3>The Promise</h3>
+          <p>
+            Every locked token is a vote for the future.<br>
+            Every NFT is proof of belief.<br>
+            Every feature is community-driven.<br><br>
+            
+            We're not just building a trading tool.<br>
+            <strong>We're manifesting a movement.</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER CTA -->
+  <footer class="footer-cta">
+    <div class="container">
+      <h2>Ready to Shape the Future of Trading?</h2>
+      <div class="footer-actions">
+        <button class="btn-primary-large" onclick="scrollToTokenLock()">
+          🚀 Join Quest Now
+        </button>
+        <a href="https://discord.gg/sparkfined" class="btn-secondary-large">
+          💬 Join Discord
+        </a>
+      </div>
+      
+      <div class="footer-stats">
+        <div class="stat">
+          <span class="stat-value">$2.4M</span>
+          <span class="stat-label">DEX Vault TVL</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">1,247</span>
+          <span class="stat-label">Active Locks</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">127/333</span>
+          <span class="stat-label">Genesis NFTs</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Token Lock Calculator
+    function calculateTokenLock() {
+      const rank = parseInt(document.getElementById('rank-input').value) || 0;
+      const mcap = parseInt(document.getElementById('mcap-input').value) || 0;
+      
+      let phase, amount, vesting;
+      
+      if (rank <= 10 && rank > 0) {
+        phase = 1;
+        amount = 10000000 - (rank - 1) * 500000;
+        vesting = "100% over 73 days";
+      } else if (rank <= 1000) {
+        phase = 2;
+        amount = Math.floor(2060000 - (rank - 11) * 1800);
+        vesting = "65% @ 30d, 35% forever";
+      } else if (mcap >= 500000) {
+        phase = 3;
+        amount = 325000;
+        vesting = "Keep or Close";
+      } else {
+        phase = 0;
+        amount = 0;
+        vesting = "Phase 3 not available (MCAP < $500k)";
+      }
+      
+      document.getElementById('phase-result').textContent = phase > 0 ? `Phase ${phase}` : 'Not Available';
+      document.getElementById('amount-result').textContent = `${amount.toLocaleString()} $SPARK`;
+      document.getElementById('vesting-result').textContent = vesting;
+    }
+
+    // Auto-calculate on input change
+    document.getElementById('rank-input')?.addEventListener('input', calculateTokenLock);
+    document.getElementById('mcap-input')?.addEventListener('input', calculateTokenLock);
+
+    // Initial calculation
+    calculateTokenLock();
+
+    // Smooth scroll
+    function scrollToTokenLock() {
+      document.getElementById('token-lock').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function scrollToManifesto() {
+      document.getElementById('manifesto').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Animate on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe all sections
+    document.querySelectorAll('section').forEach(section => {
+      section.style.opacity = '0';
+      section.style.transform = 'translateY(30px)';
+      section.style.transition = 'all 0.6s ease-out';
+      observer.observe(section);
+    });
+
+    // Live update NFT counter (simulated)
+    setInterval(() => {
+      const nftCount = document.querySelector('.counter-value');
+      if (nftCount) {
+        const currentText = nftCount.textContent;
+        const current = parseInt(currentText.split('/')[0]);
+        if (Math.random() > 0.95 && current < 333) {
+          const newCount = current + 1;
+          nftCount.textContent = `${newCount} / 333`;
+          const percentage = Math.floor((newCount / 333) * 100);
+          document.querySelector('.counter-fill').style.width = `${percentage}%`;
+        }
+      }
+    }, 10000);
+  </script>
+
+</body>
+</html>
