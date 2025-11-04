@@ -61,7 +61,8 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
 
     // Check for horizontal scroll
     const hasHorizontalScroll = await page.evaluate(() => {
-      return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+      const doc = document.documentElement;
+      return doc.scrollWidth > doc.clientWidth;
     });
 
     expect(hasHorizontalScroll).toBe(false);
@@ -118,7 +119,7 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
       const isVisible = await target.isVisible();
       if (isVisible) {
         const boundingBox = await target.boundingBox();
-        if (boundingBox) {
+        if (boundingBox && boundingBox.width > 0 && boundingBox.height > 0) {
           // WCAG 2.1 AA: Touch targets should be at least 44x44 CSS pixels
           expect(boundingBox.width).toBeGreaterThanOrEqual(44);
           expect(boundingBox.height).toBeGreaterThanOrEqual(44);
