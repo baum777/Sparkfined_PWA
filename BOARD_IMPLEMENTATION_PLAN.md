@@ -2154,8 +2154,104 @@ export default function Feed() {
 
 **Dann weiter mit:**
 - **Thema 15:** Offline Strategy (Service Worker, Cache, Background Sync)
-- **Thema 16:** A11y Final Pass (Focus, ARIA, Screen Reader)
+- **Thema 16:** A11y Final Pass (11 erweiterte Checks — siehe unten)
 - **Moralis Cortex:** First Update (AI-Features)
+
+---
+
+## Phase E: Offline & A11y (10-15h)
+
+### E1: Offline Strategy (3-4h)
+
+**Ziel:** Service Worker mit Cache-Strategien, Background Sync
+
+**Anpassung:** `vite.config.ts` (vite-plugin-pwa bereits vorhanden)
+
+```typescript
+import { VitePWA } from 'vite-plugin-pwa';
+
+export default defineConfig({
+  plugins: [
+    VitePWA({
+      registerType: 'autoUpdate',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https?:\/\/.*\/api\/board\/.*/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'board-api-cache',
+              networkTimeoutSeconds: 10,
+              expiration: { maxEntries: 50, maxAgeSeconds: 30 },
+            },
+          },
+          {
+            urlPattern: /^https?:\/\/.*\/api\/(moralis|dexpaprika)\/.*/,
+            handler: 'NetworkFirst',
+            options: { cacheName: 'external-api-cache', networkTimeoutSeconds: 5 },
+          },
+        ],
+      },
+    }),
+  ],
+});
+```
+
+### E2: A11y Final Pass — 11 Checks (7-11h)
+
+**Check 1-6:** Basis (Focus, ARIA, Keyboard, Screen Reader, Contrast, Touch)
+**Check 7:** Automated Tests (Playwright + axe-core) — 2-3h
+**Check 8:** Text Scaling (200% Zoom, rem statt px) — 1-2h
+**Check 9:** Chart A11y (ARIA-Table, Keyboard-Nav) — 8-12h
+**Check 10:** Form Validation (Inline + Summary) — 2-3h
+**Check 11:** High Contrast Mode (@media prefers-contrast) — 1h
+
+**Automated Test Setup:**
+
+```bash
+npm install --save-dev @axe-core/playwright
+```
+
+**Neue Datei:** `tests/a11y/board.spec.ts`
+
+```typescript
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+test('Board has no WCAG AA violations', async ({ page }) => {
+  await page.goto('/');
+  const results = await new AxeBuilder({ page }).withTags(['wcag2aa']).analyze();
+  expect(results.violations).toEqual([]);
+});
+```
+
+---
+
+## Finale Zusammenfassung
+
+**Phase A-E Komplett:**
+- **A:** Foundation (Design Tokens, Typography, Primitives, Icons) — 4-6h
+- **B:** Board Layout (Grid, Zones, KPI Tiles, Quick Actions) — 8-10h
+- **C:** Interaction (Feed Items, States, Navigation, Motion) — 6-8h
+- **D:** Data & API (Integration, Schema, Hooks) — 6-8h
+- **E:** Offline & A11y (Service Worker, 11 A11y-Checks) — 10-15h
+
+**Total: 34-47h (~4-6 Tage FTE)**
+
+**Deliverables:**
+- ✅ 16 Themen abgeschlossen (Foundation → A11y)
+- ✅ Responsive Board (Mobile/Tablet/Desktop)
+- ✅ 11 KPIs + Feed + Quick Actions
+- ✅ Offline-fähig (Service Worker, IndexedDB)
+- ✅ WCAG 2.1 AA compliant (11 A11y-Checks)
+- ✅ API-Integration (Moralis → Dexpaprika → Dexscreener)
+
+**Next Steps:**
+1. **Phase A starten:** Design Tokens + Primitives
+2. **Phase B-D:** Board Layout + Data
+3. **Phase E:** Offline + A11y Tests
+4. **First Update:** Moralis Cortex (AI-Features)
 
 ---
 
