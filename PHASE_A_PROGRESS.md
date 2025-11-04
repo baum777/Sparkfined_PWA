@@ -78,17 +78,13 @@ import Input from '@/components/ui/Input';
 ## ✅ A4: Icon System (Completed)
 
 **Files Created:**
-- `src/lib/icons.ts` — Icon exports (Heroicons fallback)
+- `src/lib/icons.ts` — Icon exports (Lucide React ✅)
 
-**TODO:**
-- [ ] Install lucide-react: `npm install lucide-react`
-- [ ] Uncomment lucide exports in `src/lib/icons.ts`
-- [ ] Remove Heroicons fallback
-
-**Current Status:**
-- Using @heroicons/react as temporary fallback
-- 15+ icons exported (Search, Bell, Settings, Plus, etc.)
-- Tree-shakeable imports
+**Status:**
+- ✅ lucide-react installed
+- ✅ 40+ icons exported (Search, Bell, Settings, Plus, Sparkles, etc.)
+- ✅ Tree-shakeable imports
+- ✅ Select.tsx updated (using Lucide icons)
 
 **Usage Example:**
 ```tsx
@@ -167,8 +163,8 @@ const handleOled = (mode: 'on' | 'off') => {
    - Layout toggle (sharp vs. rounded)
    
 2. **Install Dependencies:**
-   - `npm install lucide-react` (Icon System)
-   - Download JetBrains Mono font (see `public/fonts/README.md`)
+   - ✅ `lucide-react` installed
+   - ⏳ Download JetBrains Mono font (optional, see `public/fonts/README.md`)
 
 3. **Move to Phase B: Board Layout**
    - Grid & Breakpoints (Mobile/Tablet/Desktop)
