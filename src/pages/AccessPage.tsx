@@ -8,16 +8,37 @@
  * - Leaderboard: Top 333 OG locks
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import AccessStatusCard from '../components/access/AccessStatusCard'
 import LockCalculator from '../components/access/LockCalculator'
 import HoldCheck from '../components/access/HoldCheck'
 import LeaderboardList from '../components/access/LeaderboardList'
+import AccessExplainer from '../components/onboarding/AccessExplainer'
+import { updateOnboardingState } from '../lib/onboarding'
 
 type TabType = 'status' | 'lock' | 'hold' | 'leaderboard'
 
 export default function AccessPage() {
   const [activeTab, setActiveTab] = useState<TabType>('status')
+
+  // Track Access Page visit for onboarding
+  useEffect(() => {
+    updateOnboardingState({ accessPageVisited: true })
+  }, [])
+
+  // Listen for tab switch events from AccessExplainer
+  useEffect(() => {
+    const handleSwitchToLock = () => setActiveTab('lock')
+    const handleSwitchToHold = () => setActiveTab('hold')
+
+    window.addEventListener('switch-to-lock-tab', handleSwitchToLock)
+    window.addEventListener('switch-to-hold-tab', handleSwitchToHold)
+
+    return () => {
+      window.removeEventListener('switch-to-lock-tab', handleSwitchToLock)
+      window.removeEventListener('switch-to-hold-tab', handleSwitchToHold)
+    }
+  }, [])
 
   const tabs: { id: TabType; label: string; icon: string }[] = [
     { id: 'status', label: 'Status', icon: '🎫' },
@@ -28,6 +49,9 @@ export default function AccessPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8">
+      {/* Access Explainer Modal */}
+      <AccessExplainer />
+
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">

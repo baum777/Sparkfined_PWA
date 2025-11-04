@@ -3,6 +3,8 @@ import { TelemetryProvider } from './state/telemetry'
 import { AIProviderState } from './state/ai'
 import RoutesRoot from './routes/RoutesRoot'
 import GlobalInstruments from './pages/_layout/GlobalInstruments'
+import WelcomeTour from './components/onboarding/WelcomeTour'
+import PWAInstallPrompt from './components/onboarding/PWAInstallPrompt'
 import './styles/App.css'
 
 function App() {
@@ -12,6 +14,10 @@ function App() {
         <AIProviderState>
           <RoutesRoot />
           <GlobalInstruments />
+          
+          {/* Onboarding Components */}
+          <WelcomeTour />
+          <PWAInstallPrompt />
         </AIProviderState>
       </SettingsProvider>
     </TelemetryProvider>

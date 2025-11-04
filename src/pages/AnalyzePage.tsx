@@ -7,6 +7,7 @@ import { encodeToken } from "../lib/shortlink";
 import type { TF } from "../lib/timeframe";
 import { useAssist } from "../sections/ai/useAssist";
 import PlaybookCard from "../sections/ideas/Playbook";
+import { getOnboardingState, updateOnboardingState } from "../lib/onboarding";
 
 export default function AnalyzePage() {
   const [address, setAddress] = React.useState<string>("");
@@ -21,6 +22,19 @@ export default function AnalyzePage() {
     try {
       const d = await fetchOhlc({ address, tf });
       setData(d);
+      
+      // Track first analyze for onboarding (PWA install timing)
+      const state = getOnboardingState();
+      if (!state.firstAnalyzeTimestamp) {
+        updateOnboardingState({
+          firstAnalyzeTimestamp: Date.now(),
+          analyzeCount: 1,
+        });
+      } else {
+        updateOnboardingState({
+          analyzeCount: state.analyzeCount + 1,
+        });
+      }
     } catch (e:any) {
       setError(e?.message || "Fehler beim Laden");
     } finally {
