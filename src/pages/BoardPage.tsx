@@ -20,17 +20,17 @@ import Feed from '@/components/board/Feed';
 
 export default function BoardPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 px-3 py-4 md:px-6 lg:px-8">
+    <div className="min-h-screen bg-zinc-950 px-3 py-4 md:px-6 lg:px-8 animate-fade-in">
       {/* Container with max-width */}
       <div className="mx-auto max-w-7xl">
         
         {/* Overview Zone (Full-width, all breakpoints) */}
-        <section aria-label="Overview KPIs">
+        <section aria-label="Overview KPIs" className="animate-slide-up">
           <Overview />
         </section>
         
         {/* Main Grid (Mobile: 1col, Tablet: 2col, Desktop: 3col) */}
-        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-6 lg:grid-cols-[5fr_3fr_4fr] lg:gap-8">
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-6 lg:grid-cols-[5fr_3fr_4fr] lg:gap-8 stagger">
           
           {/* Focus Zone (Left, "Now Stream") */}
           <section aria-label="Now Stream" className="lg:col-span-1">

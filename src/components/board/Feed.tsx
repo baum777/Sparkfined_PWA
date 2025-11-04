@@ -9,7 +9,9 @@
  */
 
 import { useState } from 'react';
-import { Bell, Save, Download, AlertTriangle } from '@/lib/icons';
+import FeedItem from './FeedItem';
+import StateView from '../ui/StateView';
+import { FeedItemSkeleton } from '../ui/Skeleton';
 
 interface FeedEvent {
   id: string;
@@ -21,6 +23,7 @@ interface FeedEvent {
 
 export default function Feed() {
   const [filter, setFilter] = useState<'all' | 'alerts' | 'journal'>('all');
+  const [isLoading, setIsLoading] = useState(false); // For testing: change to true to see loading state
   
   // Mock data (will be replaced with IndexedDB + API)
   const events: FeedEvent[] = [
@@ -28,31 +31,17 @@ export default function Feed() {
     { id: '2', type: 'analysis', text: 'SOL 15m → Journal gespeichert', timestamp: Date.now() - 300000, unread: false },
     { id: '3', type: 'export', text: 'CSV exported (247 rows)', timestamp: Date.now() - 600000, unread: false },
   ];
-  
-  // Icon mapping
-  const iconMap = {
-    alert: Bell,
-    analysis: Save,
-    journal: Save,
-    export: Download,
-    error: AlertTriangle,
-  };
-  
+
   const filters = [
     { id: 'all', label: 'All' },
     { id: 'alerts', label: 'Alerts' },
     { id: 'journal', label: 'Journal' },
   ];
   
-  // Relative time helper
-  const getRelativeTime = (ts: number) => {
-    const diff = Date.now() - ts;
-    const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return 'now';
-    if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-    return `${Math.floor(hours / 24)}d ago`;
+  const handleFeedItemClick = (event: FeedEvent) => {
+    // TODO: Navigate based on event type
+    console.log('Feed item clicked:', event.id, event.type);
+    // Example: if (event.type === 'alert') navigate('/notifications');
   };
   
   return (
@@ -81,34 +70,34 @@ export default function Feed() {
       
       {/* Feed Items */}
       <div className="space-y-0">
-        {events.length > 0 ? (
-          events.map((event) => {
-            const Icon = iconMap[event.type];
-            const iconColor = event.unread 
-              ? event.type === 'error' ? 'text-rose-500' : 'text-emerald-500'
-              : 'text-zinc-600';
-            
-            return (
-              <div
-                key={event.id}
-                className={`flex items-start gap-3 border-b border-zinc-800/50 px-3 py-2 transition-colors cursor-pointer hover:bg-zinc-900/50 ${
-                  event.unread ? 'border-l-2 border-l-emerald-500' : ''
-                }`}
-              >
-                <Icon size={20} className={iconColor} />
-                <div className="flex-1">
-                  <p className={`text-sm line-clamp-2 ${event.unread ? 'text-zinc-200' : 'text-zinc-400'}`}>
-                    {event.text}
-                  </p>
-                </div>
-                <span className="font-mono text-xs text-zinc-600">
-                  {getRelativeTime(event.timestamp)}
-                </span>
-              </div>
-            );
-          })
+        {isLoading ? (
+          // Loading state
+          <>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <FeedItemSkeleton key={i} />
+            ))}
+          </>
+        ) : events.length > 0 ? (
+          // Data state
+          events.map((event) => (
+            <FeedItem
+              key={event.id}
+              id={event.id}
+              type={event.type}
+              text={event.text}
+              timestamp={event.timestamp}
+              unread={event.unread}
+              onClick={() => handleFeedItemClick(event)}
+            />
+          ))
         ) : (
-          <p className="py-8 text-center text-sm text-zinc-500">Keine Aktivität</p>
+          // Empty state
+          <StateView
+            type="empty"
+            title="Keine Aktivität"
+            description="Deine letzten Aktionen werden hier angezeigt"
+            compact
+          />
         )}
       </div>
       

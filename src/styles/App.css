@@ -1,6 +1,7 @@
 /* Import Design Tokens */
 @import './tokens.css';
 @import './fonts.css';
+@import './motion.css';
 
 /* Sparkfined TA-PWA: Blade Runner × TradingView × Notion */
 

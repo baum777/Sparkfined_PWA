@@ -17,6 +17,8 @@
  */
 
 import { TrendingUp, TrendingDown, Bell, Wifi, Clock, AlertTriangle } from '@/lib/icons';
+import StateView from '../ui/StateView';
+import { KPITileSkeleton } from '../ui/Skeleton';
 
 interface KPITileProps {
   type: 'numeric' | 'count' | 'status' | 'timestamp';
@@ -64,8 +66,7 @@ export default function KPITile({
   if (loading) {
     return (
       <div className="border-b border-zinc-800 bg-zinc-900 p-3 md:rounded-lg md:border">
-        <div className="h-4 w-16 animate-pulse rounded bg-zinc-800" />
-        <div className="mt-2 h-8 w-24 animate-pulse rounded bg-zinc-800" />
+        <KPITileSkeleton />
       </div>
     );
   }
@@ -73,12 +74,14 @@ export default function KPITile({
   // Error State
   if (error) {
     return (
-      <div className="border-b border-zinc-800 bg-zinc-900 p-3 md:rounded-lg md:border">
-        <p className="text-xs font-medium text-zinc-500">{label}</p>
-        <div className="mt-2 flex items-center gap-2">
-          <AlertTriangle size={16} className="text-rose-500" />
-          <p className="text-2xl font-semibold text-zinc-600">N/A</p>
-        </div>
+      <div className="border-b border-zinc-800 bg-rose-950/20 p-3 md:rounded-lg md:border md:border-rose-800/50">
+        <StateView
+          type="error"
+          description="Failed to load"
+          actionLabel={onClick ? "Retry" : undefined}
+          onAction={onClick}
+          compact
+        />
       </div>
     );
   }
