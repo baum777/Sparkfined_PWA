@@ -1,0 +1,266 @@
+/**
+ * Motion & Transitions
+ * 
+ * Animations:
+ * - Fade-in (opacity)
+ * - Slide-up (transform + opacity)
+ * - Scale (transform + opacity)
+ * - Stagger (delay-based)
+ * 
+ * Page Transitions:
+ * - Route transitions (fade + slide)
+ * - Modal transitions (scale + fade)
+ * 
+ * Respects:
+ * - prefers-reduced-motion
+ * - Design tokens (duration, easing)
+ */
+
+/* === Keyframes === */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* === Utility Classes === */
+
+.animate-fade-in {
+  animation: fade-in var(--duration-medium) var(--ease-in-out) forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up var(--duration-medium) var(--ease-out) forwards;
+}
+
+.animate-slide-down {
+  animation: slide-down var(--duration-medium) var(--ease-out) forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in var(--duration-short) var(--ease-out) forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* === Stagger Effects (for lists) === */
+
+.stagger > * {
+  opacity: 0;
+  animation: slide-up var(--duration-medium) var(--ease-out) forwards;
+}
+
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 50ms; }
+.stagger > *:nth-child(3) { animation-delay: 100ms; }
+.stagger > *:nth-child(4) { animation-delay: 150ms; }
+.stagger > *:nth-child(5) { animation-delay: 200ms; }
+.stagger > *:nth-child(6) { animation-delay: 250ms; }
+.stagger > *:nth-child(7) { animation-delay: 300ms; }
+.stagger > *:nth-child(8) { animation-delay: 350ms; }
+.stagger > *:nth-child(9) { animation-delay: 400ms; }
+.stagger > *:nth-child(10) { animation-delay: 450ms; }
+
+/* === Page Transitions === */
+
+.page-enter {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--duration-long) var(--ease-out),
+              transform var(--duration-long) var(--ease-out);
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity var(--duration-medium) var(--ease-in),
+              transform var(--duration-medium) var(--ease-in);
+}
+
+/* === Modal Transitions === */
+
+.modal-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.modal-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity var(--duration-medium) var(--ease-out),
+              transform var(--duration-medium) var(--ease-out);
+}
+
+.modal-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.modal-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity var(--duration-short) var(--ease-in),
+              transform var(--duration-short) var(--ease-in);
+}
+
+/* === Backdrop Transitions === */
+
+.backdrop-enter {
+  opacity: 0;
+}
+
+.backdrop-enter-active {
+  opacity: 1;
+  transition: opacity var(--duration-medium) var(--ease-out);
+}
+
+.backdrop-exit {
+  opacity: 1;
+}
+
+.backdrop-exit-active {
+  opacity: 0;
+  transition: opacity var(--duration-medium) var(--ease-in);
+}
+
+/* === Reduced Motion Override === */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-slide-down,
+  .animate-scale-in,
+  .stagger > * {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
+
+/* === Hover Transitions === */
+
+.hover-lift {
+  transition: transform var(--duration-short) var(--ease-out),
+              box-shadow var(--duration-short) var(--ease-out);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.hover-lift:active {
+  transform: translateY(0);
+}
+
+/* === Focus Animations === */
+
+.focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color var(--duration-short) var(--ease-in-out);
+}
+
+.focus-ring:focus-visible {
+  outline-color: var(--color-emerald);
+}
+
+/* === Loading Spinner === */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* === Pulse (for loading states) === */
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

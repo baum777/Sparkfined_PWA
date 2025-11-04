@@ -1,0 +1,31 @@
+/* JetBrains Mono — Latin Subset */
+
+/**
+ * Option 1: Local (self-hosted) — Recommended for production
+ * Download from: https://www.jetbrains.com/lp/mono/
+ * Place file at: public/fonts/jetbrains-mono-latin.woff2
+ * 
+ * Option 2: Google Fonts CDN (fallback, slower but works immediately)
+ * Currently using Google Fonts as fallback until local file is added
+ */
+
+/* Local font (priority if file exists) */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Medium weight (optional) */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-medium-latin.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Google Fonts Fallback (loads if local not found) */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');

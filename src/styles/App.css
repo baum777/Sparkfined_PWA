@@ -1,8 +1,30 @@
+/* Import Design Tokens */
+@import './tokens.css';
+@import './fonts.css';
+@import './motion.css';
+@import './high-contrast.css';
+
 /* Sparkfined TA-PWA: Blade Runner × TradingView × Notion */
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: var(--leading-sm);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 #root {
   width: 100%;
   min-height: 100vh;
+}
+
+/* Utility classes */
+.font-mono {
+  font-family: var(--font-mono);
 }
 
 /* Refined Micro-Interactions */

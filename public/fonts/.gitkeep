@@ -1,0 +1,32 @@
+# Font Directory
+
+This directory is for self-hosted fonts.
+
+## Current Status
+
+**JetBrains Mono:** Using Google Fonts CDN as fallback (see `src/styles/fonts.css`)
+
+## To use local fonts (recommended for production):
+
+1. Download JetBrains Mono from: https://www.jetbrains.com/lp/mono/
+2. Extract ZIP file
+3. Copy these files to this directory:
+   - `jetbrains-mono-latin.woff2` (Regular weight)
+   - `jetbrains-mono-medium-latin.woff2` (Medium weight, optional)
+
+## Creating Latin Subset (smaller file size)
+
+Use online subsetter: https://everythingfonts.com/subsetter
+- Upload JetBrains Mono TTF
+- Select: Latin (Basic Latin + Latin-1 Supplement)
+- Export as WOFF2
+- Result: ~30 KB instead of ~150 KB
+
+## Test if font is working
+
+Open DevTools → Network tab → Filter "font" → Refresh page
+- You should see `jetbrains-mono-latin.woff2` loading
+- Or `JetBrains+Mono` from Google Fonts CDN (fallback)
+
+In Elements tab, inspect a `.font-mono` element:
+- Computed font-family should show "JetBrains Mono"
