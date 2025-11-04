@@ -1,0 +1,246 @@
+/**
+ * High Contrast Mode
+ * 
+ * Enhances visibility for users with:
+ * - Low vision
+ * - Color blindness
+ * - High ambient light conditions
+ * 
+ * Activated by:
+ * - Windows High Contrast Mode
+ * - prefers-contrast: high media query
+ * - Manual toggle (future)
+ * 
+ * Features:
+ * - Stronger borders and outlines
+ * - Higher color contrast ratios
+ * - Simplified color palette
+ * - Bolder text weights
+ */
+
+/* === High Contrast Mode (Auto-detect) === */
+
+@media (prefers-contrast: high) {
+  :root {
+    /* Stronger colors */
+    --color-emerald: #00ff00; /* Brighter green */
+    --color-rose: #ff0000; /* Pure red */
+    --color-amber: #ffaa00; /* Brighter amber */
+    --color-cyan: #00ffff; /* Bright cyan */
+    
+    /* Higher contrast text */
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #e0e0e0;
+    --color-text-tertiary: #cccccc;
+    
+    /* Stronger borders */
+    --color-border: #ffffff;
+    --color-border-secondary: #cccccc;
+  }
+  
+  /* === Borders === */
+  
+  * {
+    /* Ensure all interactive elements have visible borders */
+    border-width: 2px !important;
+  }
+  
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role="button"] {
+    border: 2px solid var(--color-border) !important;
+  }
+  
+  /* === Focus Indicators === */
+  
+  *:focus-visible {
+    outline: 3px solid var(--color-emerald) !important;
+    outline-offset: 2px !important;
+  }
+  
+  /* === Text === */
+  
+  body {
+    font-weight: 500 !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700 !important;
+  }
+  
+  /* === Backgrounds === */
+  
+  .bg-zinc-900,
+  .bg-zinc-800,
+  .bg-zinc-950 {
+    background-color: #000000 !important;
+  }
+  
+  .bg-zinc-700,
+  .bg-zinc-600 {
+    background-color: #333333 !important;
+  }
+  
+  /* === Interactive Elements === */
+  
+  button:hover,
+  a:hover,
+  [role="button"]:hover {
+    background-color: #333333 !important;
+    border-color: var(--color-emerald) !important;
+  }
+  
+  button:active,
+  a:active,
+  [role="button"]:active {
+    background-color: #1a1a1a !important;
+  }
+  
+  button:disabled,
+  [disabled] {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+  }
+  
+  /* === Status Colors === */
+  
+  .text-emerald-500,
+  .text-emerald-400,
+  .bg-emerald-500 {
+    color: var(--color-emerald) !important;
+    background-color: transparent !important;
+    border-color: var(--color-emerald) !important;
+  }
+  
+  .text-rose-500,
+  .text-rose-400,
+  .bg-rose-500 {
+    color: var(--color-rose) !important;
+    background-color: transparent !important;
+    border-color: var(--color-rose) !important;
+  }
+  
+  .text-amber-500,
+  .text-amber-400,
+  .bg-amber-500 {
+    color: var(--color-amber) !important;
+    background-color: transparent !important;
+    border-color: var(--color-amber) !important;
+  }
+  
+  /* === Icons === */
+  
+  svg {
+    stroke-width: 2.5 !important;
+  }
+  
+  /* === Shadows (Remove) === */
+  
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  /* === Images === */
+  
+  img {
+    border: 2px solid var(--color-border) !important;
+  }
+}
+
+/* === Windows High Contrast Mode === */
+
+@media screen and (-ms-high-contrast: active) {
+  /* Use system colors */
+  * {
+    background-color: Window !important;
+    color: WindowText !important;
+    border-color: WindowText !important;
+  }
+  
+  a,
+  button,
+  [role="button"] {
+    color: LinkText !important;
+  }
+  
+  a:hover,
+  button:hover,
+  [role="button"]:hover {
+    color: HighlightText !important;
+    background-color: Highlight !important;
+  }
+  
+  *:focus-visible {
+    outline: 3px solid Highlight !important;
+  }
+}
+
+/* === Manual High Contrast Toggle === */
+
+[data-contrast="high"] {
+  /* Same styles as prefers-contrast: high */
+  /* Users can toggle this via Settings */
+  
+  /* Stronger colors */
+  --color-emerald: #00ff00;
+  --color-rose: #ff0000;
+  --color-amber: #ffaa00;
+  --color-cyan: #00ffff;
+  
+  /* Higher contrast text */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e0e0e0;
+  --color-text-tertiary: #cccccc;
+  
+  /* Stronger borders */
+  --color-border: #ffffff;
+  --color-border-secondary: #cccccc;
+}
+
+[data-contrast="high"] * {
+  border-width: 2px !important;
+}
+
+[data-contrast="high"] button,
+[data-contrast="high"] a,
+[data-contrast="high"] input,
+[data-contrast="high"] select,
+[data-contrast="high"] textarea,
+[data-contrast="high"] [role="button"] {
+  border: 2px solid var(--color-border) !important;
+}
+
+[data-contrast="high"] *:focus-visible {
+  outline: 3px solid var(--color-emerald) !important;
+  outline-offset: 2px !important;
+}
+
+[data-contrast="high"] body {
+  font-weight: 500 !important;
+}
+
+[data-contrast="high"] svg {
+  stroke-width: 2.5 !important;
+}
+
+[data-contrast="high"] * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/**
+ * Usage:
+ * 
+ * // Auto-detect (no code required)
+ * // Browser applies styles when user enables high contrast mode
+ * 
+ * // Manual toggle (future Settings page)
+ * document.body.setAttribute('data-contrast', 'high');
+ * 
+ * // Remove manual toggle
+ * document.body.removeAttribute('data-contrast');
+ */

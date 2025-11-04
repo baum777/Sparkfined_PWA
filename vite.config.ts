@@ -11,8 +11,9 @@ export default defineConfig(({ mode }) => ({
     splitVendorChunkPlugin(),
     process.env.ANALYZE ? visualizer({ open: true, gzipSize: true, filename: 'dist/stats.html' }) : undefined,
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      injectRegister: 'auto',
       manifest: {
         name: 'Sparkfined TA-PWA',
         short_name: 'Sparkfined',
@@ -44,6 +45,27 @@ export default defineConfig(({ mode }) => ({
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
+          // Board API - Stale-While-Revalidate (KPIs, Feed)
+          {
+            urlPattern: /^\/api\/board\/(kpis|feed)/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'board-api-cache',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60, // 1 minute (fresh data preferred)
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+              backgroundSync: {
+                name: 'board-api-sync',
+                options: {
+                  maxRetentionTime: 24 * 60, // Retry for up to 24 hours (in minutes)
+                },
+              },
+            },
+          },
           // Dexscreener API - Stale-While-Revalidate for fast perceived performance
           {
             urlPattern: /^https:\/\/api\.dexscreener\.com\/.*/i,
@@ -53,6 +75,22 @@ export default defineConfig(({ mode }) => ({
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 86400, // 24 hours
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          // Moralis/Dexpaprika APIs - Network First (prefer fresh data)
+          {
+            urlPattern: /^\/api\/(moralis|dexpaprika|data)\/.*/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'token-api-cache',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 300, // 5 minutes
               },
               cacheableResponse: {
                 statuses: [0, 200],
