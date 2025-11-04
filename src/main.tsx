@@ -2,6 +2,10 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './styles/index.css'
+import { initializeLayoutToggles } from './lib/layout-toggle'
+
+// Initialize layout toggles BEFORE React render
+initializeLayoutToggles()
 
 // Service Worker Registration - Manual Update Flow
 // SW is registered via vite-plugin-pwa with registerType: 'prompt'
