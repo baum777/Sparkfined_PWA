@@ -2,12 +2,13 @@
  * Overview Zone — KPI Tiles
  * 
  * Displays 4-7 KPI tiles:
- * - Mobile: 2 visible by default, "Show more" for rest
+ * - Mobile: 4 visible by default, "Show more" for rest
  * - Desktop: All visible in horizontal grid
  */
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from '@/lib/icons';
+import KPITile from './KPITile';
 
 export default function Overview() {
   const [showAll, setShowAll] = useState(false);
@@ -15,22 +16,68 @@ export default function Overview() {
   // Mock KPI data (will be replaced with real data from hooks)
   const kpis = {
     visible: [
-      { id: 'pnl', label: 'Heute P&L', value: '+€247.50', trend: '+12.5%', color: 'emerald' },
-      { id: 'alerts', label: 'Active Alerts', value: '3', trend: undefined, color: 'zinc' },
-      { id: 'sentiment', label: 'Sentiment', value: '72/100', trend: '↑ +8 vs. 7d', color: 'emerald' },
-      { id: 'sync', label: 'Sync Status', value: 'Online', trend: '2m ago', color: 'emerald' },
+      { 
+        id: 'pnl', 
+        type: 'numeric' as const,
+        label: 'Heute P&L', 
+        value: '+€247.50', 
+        trend: '+12.5%', 
+        direction: 'up' as const,
+        icon: 'trending' as const,
+      },
+      { 
+        id: 'alerts', 
+        type: 'count' as const,
+        label: 'Active Alerts', 
+        value: '3', 
+        trend: undefined, 
+        direction: 'neutral' as const,
+        icon: 'bell' as const,
+      },
+      { 
+        id: 'sentiment', 
+        type: 'numeric' as const,
+        label: 'Sentiment', 
+        value: '72/100', 
+        trend: '↑ +8 vs. 7d', 
+        direction: 'up' as const,
+      },
+      { 
+        id: 'sync', 
+        type: 'status' as const,
+        label: 'Sync Status', 
+        value: 'Online', 
+        trend: '2m ago', 
+        direction: 'up' as const,
+        icon: 'wifi' as const,
+      },
     ],
     collapsed: [
-      { id: 'risk', label: 'Risk Score', value: '78/100', trend: undefined, color: 'emerald' },
-      { id: 'charts', label: 'Active Charts', value: '2', trend: undefined, color: 'zinc' },
-      { id: 'journal', label: 'Journal (heute)', value: '3', trend: undefined, color: 'zinc' },
+      { 
+        id: 'risk', 
+        type: 'numeric' as const,
+        label: 'Risk Score', 
+        value: '78/100', 
+        trend: undefined, 
+        direction: 'up' as const,
+      },
+      { 
+        id: 'charts', 
+        type: 'count' as const,
+        label: 'Active Charts', 
+        value: '2', 
+        trend: undefined, 
+        direction: 'neutral' as const,
+      },
+      { 
+        id: 'journal', 
+        type: 'count' as const,
+        label: 'Journal (heute)', 
+        value: '3', 
+        trend: undefined, 
+        direction: 'neutral' as const,
+      },
     ],
-  };
-  
-  const colorMap = {
-    emerald: 'text-emerald-500',
-    rose: 'text-rose-500',
-    zinc: 'text-zinc-100',
   };
   
   return (
@@ -38,21 +85,15 @@ export default function Overview() {
       {/* Visible KPIs (Mobile: 4, Desktop: All) */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         {kpis.visible.map((kpi) => (
-          <div
+          <KPITile
             key={kpi.id}
-            className="border-b border-zinc-800 bg-zinc-900 p-3 md:rounded-lg md:border"
-            style={{ borderRadius: 'var(--radius-md)' }}
-          >
-            <p className="text-xs font-medium text-zinc-500">{kpi.label}</p>
-            <div className="mt-2 flex items-end justify-between">
-              <p className={`text-2xl font-semibold ${colorMap[kpi.color as keyof typeof colorMap]}`}>
-                {kpi.value}
-              </p>
-              {kpi.trend && (
-                <span className="text-xs text-zinc-500">{kpi.trend}</span>
-              )}
-            </div>
-          </div>
+            type={kpi.type}
+            label={kpi.label}
+            value={kpi.value}
+            trend={kpi.trend}
+            direction={kpi.direction}
+            icon={kpi.icon}
+          />
         ))}
       </div>
       
@@ -60,17 +101,14 @@ export default function Overview() {
       {showAll && (
         <div className="mt-3 grid grid-cols-2 gap-3 md:hidden">
           {kpis.collapsed.map((kpi) => (
-            <div
+            <KPITile
               key={kpi.id}
-              className="border-b border-zinc-800 bg-zinc-900 p-3"
-            >
-              <p className="text-xs font-medium text-zinc-500">{kpi.label}</p>
-              <div className="mt-2">
-                <p className={`text-2xl font-semibold ${colorMap[kpi.color as keyof typeof colorMap]}`}>
-                  {kpi.value}
-                </p>
-              </div>
-            </div>
+              type={kpi.type}
+              label={kpi.label}
+              value={kpi.value}
+              trend={kpi.trend}
+              direction={kpi.direction}
+            />
           ))}
         </div>
       )}

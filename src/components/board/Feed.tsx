@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { Bell } from '@/lib/icons';
+import { Bell, Save, Download, AlertTriangle } from '@/lib/icons';
 
 interface FeedEvent {
   id: string;
@@ -28,6 +28,15 @@ export default function Feed() {
     { id: '2', type: 'analysis', text: 'SOL 15m → Journal gespeichert', timestamp: Date.now() - 300000, unread: false },
     { id: '3', type: 'export', text: 'CSV exported (247 rows)', timestamp: Date.now() - 600000, unread: false },
   ];
+  
+  // Icon mapping
+  const iconMap = {
+    alert: Bell,
+    analysis: Save,
+    journal: Save,
+    export: Download,
+    error: AlertTriangle,
+  };
   
   const filters = [
     { id: 'all', label: 'All' },
@@ -73,24 +82,31 @@ export default function Feed() {
       {/* Feed Items */}
       <div className="space-y-0">
         {events.length > 0 ? (
-          events.map((event) => (
-            <div
-              key={event.id}
-              className={`flex items-start gap-3 border-b border-zinc-800/50 px-3 py-2 transition-colors hover:bg-zinc-900/50 ${
-                event.unread ? 'border-l-2 border-l-emerald-500' : ''
-              }`}
-            >
-              <Bell size={20} className={event.unread ? 'text-emerald-500' : 'text-zinc-600'} />
-              <div className="flex-1">
-                <p className={`text-sm line-clamp-2 ${event.unread ? 'text-zinc-200' : 'text-zinc-400'}`}>
-                  {event.text}
-                </p>
+          events.map((event) => {
+            const Icon = iconMap[event.type];
+            const iconColor = event.unread 
+              ? event.type === 'error' ? 'text-rose-500' : 'text-emerald-500'
+              : 'text-zinc-600';
+            
+            return (
+              <div
+                key={event.id}
+                className={`flex items-start gap-3 border-b border-zinc-800/50 px-3 py-2 transition-colors cursor-pointer hover:bg-zinc-900/50 ${
+                  event.unread ? 'border-l-2 border-l-emerald-500' : ''
+                }`}
+              >
+                <Icon size={20} className={iconColor} />
+                <div className="flex-1">
+                  <p className={`text-sm line-clamp-2 ${event.unread ? 'text-zinc-200' : 'text-zinc-400'}`}>
+                    {event.text}
+                  </p>
+                </div>
+                <span className="font-mono text-xs text-zinc-600">
+                  {getRelativeTime(event.timestamp)}
+                </span>
               </div>
-              <span className="font-mono text-xs text-zinc-600">
-                {getRelativeTime(event.timestamp)}
-              </span>
-            </div>
-          ))
+            );
+          })
         ) : (
           <p className="py-8 text-center text-sm text-zinc-500">Keine Aktivität</p>
         )}

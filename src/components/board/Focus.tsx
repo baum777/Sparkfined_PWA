@@ -7,7 +7,7 @@
  * - Last journal entry
  */
 
-import { Search } from '@/lib/icons';
+import { Search, BarChart3, FileText } from '@/lib/icons';
 
 interface ActivityCard {
   id: string;
@@ -25,9 +25,15 @@ export default function Focus() {
     { id: '3', type: 'journal', title: 'Trade Entry #42', subtitle: 'ETHUSD Scalp', timestamp: '1h ago' },
   ];
   
-  // Icon placeholder (will be replaced with actual icons)
-  const getIcon = (type: string) => {
-    return Search; // Placeholder, will use BarChart3, FileText, etc.
+  // Icon mapping
+  const iconMap = {
+    analysis: Search,
+    chart: BarChart3,
+    journal: FileText,
+  };
+  
+  const getIcon = (type: 'chart' | 'analysis' | 'journal') => {
+    return iconMap[type];
   };
   
   return (
