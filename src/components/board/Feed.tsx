@@ -12,6 +12,7 @@ import { useState } from 'react';
 import FeedItem from './FeedItem';
 import StateView from '../ui/StateView';
 import { FeedItemSkeleton } from '../ui/Skeleton';
+import useBoardFeed from '@/hooks/useBoardFeed';
 
 interface FeedEvent {
   id: string;
@@ -23,14 +24,19 @@ interface FeedEvent {
 
 export default function Feed() {
   const [filter, setFilter] = useState<'all' | 'alerts' | 'journal'>('all');
-  const [isLoading, setIsLoading] = useState(false); // For testing: change to true to see loading state
-  
-  // Mock data (will be replaced with IndexedDB + API)
-  const events: FeedEvent[] = [
-    { id: '1', type: 'alert', text: 'BTC > $50k erreicht', timestamp: Date.now() - 120000, unread: true },
-    { id: '2', type: 'analysis', text: 'SOL 15m → Journal gespeichert', timestamp: Date.now() - 300000, unread: false },
-    { id: '3', type: 'export', text: 'CSV exported (247 rows)', timestamp: Date.now() - 600000, unread: false },
-  ];
+  const { 
+    data: events, 
+    loading, 
+    error, 
+    hasMore, 
+    loadMore, 
+    refresh 
+  } = useBoardFeed({
+    type: filter,
+    limit: 20,
+    autoRefresh: true,
+    refreshInterval: 10000, // 10s
+  });
 
   const filters = [
     { id: 'all', label: 'All' },
@@ -70,13 +76,23 @@ export default function Feed() {
       
       {/* Feed Items */}
       <div className="space-y-0">
-        {isLoading ? (
-          // Loading state
+        {loading && events.length === 0 ? (
+          // Loading state (initial load)
           <>
             {Array.from({ length: 5 }).map((_, i) => (
               <FeedItemSkeleton key={i} />
             ))}
           </>
+        ) : error ? (
+          // Error state
+          <StateView
+            type="error"
+            title="Failed to load feed"
+            description={error}
+            actionLabel="Retry"
+            onAction={refresh}
+            compact
+          />
         ) : events.length > 0 ? (
           // Data state
           events.map((event) => (
@@ -102,9 +118,13 @@ export default function Feed() {
       </div>
       
       {/* Load More */}
-      {events.length > 0 && (
-        <button className="mt-3 w-full py-2 text-sm text-zinc-500 transition-colors hover:text-zinc-300">
-          Load more
+      {hasMore && events.length > 0 && (
+        <button 
+          onClick={loadMore}
+          disabled={loading}
+          className="mt-3 w-full py-2 text-sm text-zinc-500 transition-colors hover:text-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? 'Loading...' : 'Load more'}
         </button>
       )}
     </div>

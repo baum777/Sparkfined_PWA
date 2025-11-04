@@ -9,11 +9,51 @@
 import { useState } from 'react';
 import { ChevronDown, ChevronUp } from '@/lib/icons';
 import KPITile from './KPITile';
+import useBoardKPIs from '@/hooks/useBoardKPIs';
+import StateView from '../ui/StateView';
 
 export default function Overview() {
   const [showAll, setShowAll] = useState(false);
+  const { data: kpiData, loading, error, refresh } = useBoardKPIs({
+    autoRefresh: true,
+    refreshInterval: 30000, // 30s
+  });
   
-  // Mock KPI data (will be replaced with real data from hooks)
+  // Handle error retry
+  const handleRetry = () => {
+    refresh();
+  };
+  
+  // Loading state
+  if (loading && !kpiData) {
+    return (
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="border-b border-zinc-800 bg-zinc-900 p-3 md:rounded-lg md:border">
+            <div className="h-4 w-16 animate-pulse rounded bg-zinc-800" />
+            <div className="mt-2 h-8 w-24 animate-pulse rounded bg-zinc-800" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  
+  // Error state
+  if (error || !kpiData) {
+    return (
+      <div className="rounded-lg border border-rose-800/50 bg-rose-950/20 p-6">
+        <StateView
+          type="error"
+          title="Failed to load KPIs"
+          description={error || 'Unable to fetch board data'}
+          actionLabel="Retry"
+          onAction={handleRetry}
+        />
+      </div>
+    );
+  }
+  
+  // Mock KPI data structure for compatibility (will be removed once API returns correct format)
   const kpis = {
     visible: [
       { 
