@@ -5,6 +5,7 @@ import UpdateBanner from "../components/UpdateBanner";
 import { AccessProvider } from "../store/AccessProvider";
 
 // Route-level code splitting (reduziert initial bundle)
+const BoardPage = lazy(() => import("../pages/BoardPage"));
 const AnalyzePage = lazy(() => import("../pages/AnalyzePage"));
 const ChartPage = lazy(() => import("../pages/ChartPage"));
 const JournalPage = lazy(() => import("../pages/JournalPage"));
@@ -25,7 +26,8 @@ export default function RoutesRoot() {
         <Layout>
           <Suspense fallback={<Fallback />}>
             <Routes>
-              <Route path="/" element={<AnalyzePage />} />
+              <Route path="/" element={<BoardPage />} />
+              <Route path="/analyze" element={<AnalyzePage />} />
               <Route path="/chart" element={<ChartPage />} />
               <Route path="/journal" element={<JournalPage />} />
               <Route path="/replay" element={<ReplayPage />} />
