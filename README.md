@@ -26,6 +26,8 @@ pnpm dev # or npm run dev
 Define environment in `.env.local` (non-committed). See `.env.example` for all variables.  
 Client flags must start with `VITE_` to be exposed.
 
+📖 **Detailed guide:** See [docs/API_KEY_MANAGEMENT.md](docs/API_KEY_MANAGEMENT.md) for complete API key setup and security best practices.
+
 ## PWA
 - Manifest `public/manifest.webmanifest`
 - Icons in `public/`
