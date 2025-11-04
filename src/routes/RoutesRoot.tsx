@@ -5,6 +5,7 @@ import UpdateBanner from "../components/UpdateBanner";
 import { AccessProvider } from "../store/AccessProvider";
 
 // Route-level code splitting (reduziert initial bundle)
+const LandingPage = lazy(() => import("../pages/LandingPage"));
 const BoardPage = lazy(() => import("../pages/BoardPage"));
 const AnalyzePage = lazy(() => import("../pages/AnalyzePage"));
 const ChartPage = lazy(() => import("../pages/ChartPage"));
@@ -23,21 +24,55 @@ export default function RoutesRoot() {
     <BrowserRouter>
       <AccessProvider>
         <UpdateBanner />
-        <Layout>
-          <Suspense fallback={<Fallback />}>
-            <Routes>
-              <Route path="/" element={<BoardPage />} />
-              <Route path="/analyze" element={<AnalyzePage />} />
-              <Route path="/chart" element={<ChartPage />} />
-              <Route path="/journal" element={<JournalPage />} />
-              <Route path="/replay" element={<ReplayPage />} />
-              <Route path="/access" element={<AccessPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
-            </Routes>
-          </Suspense>
-        </Layout>
+        <Suspense fallback={<Fallback />}>
+          <Routes>
+            {/* Landing Page - No Layout (standalone) */}
+            <Route path="/landing" element={<LandingPage />} />
+            
+            {/* App Routes - With Layout */}
+            <Route path="/" element={
+              <Layout>
+                <BoardPage />
+              </Layout>
+            } />
+            <Route path="/analyze" element={
+              <Layout>
+                <AnalyzePage />
+              </Layout>
+            } />
+            <Route path="/chart" element={
+              <Layout>
+                <ChartPage />
+              </Layout>
+            } />
+            <Route path="/journal" element={
+              <Layout>
+                <JournalPage />
+              </Layout>
+            } />
+            <Route path="/replay" element={
+              <Layout>
+                <ReplayPage />
+              </Layout>
+            } />
+            <Route path="/access" element={
+              <Layout>
+                <AccessPage />
+              </Layout>
+            } />
+            <Route path="/settings" element={
+              <Layout>
+                <SettingsPage />
+              </Layout>
+            } />
+            <Route path="/notifications" element={
+              <Layout>
+                <NotificationsPage />
+              </Layout>
+            } />
+            <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
+          </Routes>
+        </Suspense>
       </AccessProvider>
     </BrowserRouter>
   );
