@@ -46,25 +46,29 @@ import { Search, Bell, TrendingUp } from '@/lib/icons';
 
 ---
 
-## ⏳ Optional: JetBrains Mono Font
+## ✅ JetBrains Mono Font
 
-**Status:** Not installed (optional)
+**Status:** ✅ Active (via Google Fonts CDN fallback)
 
-**Why Optional:**
-- App fallbacks to system monospace font
-- No critical functionality depends on it
-- Only affects visual styling (CA display, Journal code blocks)
+**Current Setup:**
+- Using Google Fonts CDN as immediate fallback
+- Font loads automatically (no manual download needed)
+- Works immediately in all `.font-mono` elements
 
-**How to Install (if desired):**
-1. Download from: https://www.jetbrains.com/lp/mono/
-2. Extract ZIP
-3. Copy `jetbrains-mono-latin.woff2` to `public/fonts/`
-4. See `public/fonts/README.md` for details
+**How it Works:**
+1. CSS tries to load local font from `/fonts/jetbrains-mono-latin.woff2`
+2. If not found → Falls back to Google Fonts CDN
+3. If CDN fails → Falls back to Fira Code / system monospace
 
-**Without Font:**
-- Contract Addresses: Uses Fira Code or system monospace
-- Journal Code Blocks: Uses system monospace
-- Numeric Values: Uses system monospace
+**For Production (optional):**
+- Self-host font for faster load + offline support
+- See `public/fonts/README.md` for download instructions
+- Local file will take priority over CDN if present
+
+**Test Font:**
+- Visit `/font-test` page (or create it from `src/pages/FontTestPage.tsx`)
+- Inspect any `.font-mono` element in DevTools
+- Network tab should show font loading (Google Fonts)
 
 ---
 
