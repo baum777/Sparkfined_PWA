@@ -80,6 +80,7 @@ export default function WelcomeTour() {
   if (!visible) return null
 
   const screen = TOUR_SCREENS[currentScreen]
+  if (!screen) return null // Safety check
 
   return (
     <div

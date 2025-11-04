@@ -89,7 +89,9 @@ export default function AnalyzePage() {
       if (aiText) {
         await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: journalId, body: seedText + "\n\n" + aiText, address, tf, ruleId }) });
       }
-    } catch {}
+    } catch {
+      // Ignore AI errors, continue without AI draft
+    }
     // 4) Idea Objekt
     const idea = {
       address, tf, side: "long", title: `Idea ${address.slice(0,4)}…`,
@@ -104,7 +106,9 @@ export default function AnalyzePage() {
       if (!wl.find((x:any)=>x.address===address)) wl.push({ address, addedAt: Date.now() });
       localStorage.setItem("sparkfined.watchlist.v1", JSON.stringify(wl));
       await fetch("/api/ideas", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: iRes?.idea?.id, ...idea, flags:{ ...idea.flags, watchAdded:true } }) });
-    } catch {}
+    } catch {
+      // Ignore watchlist errors
+    }
     alert("Trade-Idea Paket angelegt (Rule + Journal + Idea + Watchlist).");
   };
 

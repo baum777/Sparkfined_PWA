@@ -13,6 +13,7 @@ export interface OnboardingState {
   // Feature Discovery
   demoCompleted: boolean
   featuresDiscovered: string[]
+  pagesVisited: string[]
   
   // Access System
   accessExplainerSeen: boolean
@@ -32,6 +33,7 @@ export interface OnboardingState {
   // Analytics
   tourCompletionRate?: number
   skipCount: number
+  analyzeCount: number
 }
 
 const DEFAULT_STATE: OnboardingState = {
@@ -40,6 +42,7 @@ const DEFAULT_STATE: OnboardingState = {
   currentStep: 0,
   demoCompleted: false,
   featuresDiscovered: [],
+  pagesVisited: [],
   accessExplainerSeen: false,
   accessPageVisited: false,
   pwaInstallPrompted: false,
@@ -49,6 +52,7 @@ const DEFAULT_STATE: OnboardingState = {
   firstVisitTimestamp: Date.now(),
   lastActiveTimestamp: Date.now(),
   skipCount: 0,
+  analyzeCount: 0,
 }
 
 const STORAGE_KEY = 'sparkfined_onboarding_state'
