@@ -1,0 +1,142 @@
+{
+  "action_graph_update": {
+    "nodes": [
+      {
+        "id": "node_abc123",
+        "type": "signal.detected",
+        "ts_utc": "2025-11-05T14:30:00.000Z",
+        "refs": {
+          "signal_id": "sig_xyz789"
+        },
+        "payload": {
+          "pattern": "momentum",
+          "confidence": 0.78,
+          "price": 142.5,
+          "direction": "long"
+        },
+        "tags": [
+          "signal",
+          "pattern/momentum",
+          "chain/solana",
+          "confidence/78"
+        ],
+        "confidence": 0.78
+      },
+      {
+        "id": "node_def456",
+        "type": "trade.plan.created",
+        "ts_utc": "2025-11-05T14:30:05.000Z",
+        "refs": {
+          "signal_id": "sig_xyz789",
+          "plan_id": "plan_qwe321",
+          "prev_node_id": "node_abc123"
+        },
+        "payload": {
+          "entry_price": 142.5,
+          "stop": 131.1,
+          "rr": 2.45,
+          "expectancy": 0.88
+        },
+        "tags": [
+          "plan",
+          "rr/2.5",
+          "generated"
+        ],
+        "confidence": 1.0
+      }
+    ],
+    "edges": [
+      ["node_abc123", "node_def456", "CAUSES"]
+    ]
+  },
+  "signals": [
+    {
+      "id": "sig_xyz789",
+      "timestamp_utc": "2025-11-05T14:30:00.000Z",
+      "market": {
+        "chain": "solana",
+        "symbol": "SOL/USDC",
+        "venue": "raydium"
+      },
+      "regime": {
+        "trend": "up",
+        "vol": "mid",
+        "liquidity": "high",
+        "session": "nyc"
+      },
+      "features": {
+        "price": 142.5,
+        "atr": 7.6,
+        "rsi": 58,
+        "ema_fast": 141.2,
+        "ema_slow": 140.0,
+        "onchain": {
+          "holders_delta": 120,
+          "liquidity_usd": 2500000,
+          "top10_share": 0.28,
+          "mint_age_days": 180
+        },
+        "risk_flags": []
+      },
+      "pattern": "momentum",
+      "confidence": 0.78,
+      "direction": "long",
+      "thesis": "Strong momentum continuation in up trend with mid volatility. Entry zone: 141.20-143.00. EMA fast above slow, RSI neutral, liquidity healthy."
+    }
+  ],
+  "trade_plans": [
+    {
+      "id": "plan_qwe321",
+      "signal_id": "sig_xyz789",
+      "entry": {
+        "type": "limit",
+        "price": 142.5,
+        "valid_for": "30m",
+        "slippage_tolerance": 0.5
+      },
+      "risk": {
+        "stop": 131.1,
+        "risk_pct_equity": 1.0,
+        "pos_size_units": 8.77,
+        "max_loss_usd": 100
+      },
+      "targets": [
+        {
+          "tp": 1,
+          "price": 147.6,
+          "share": 0.3
+        },
+        {
+          "tp": 2,
+          "price": 153.85,
+          "share": 0.4
+        },
+        {
+          "tp": 3,
+          "price": 168.6,
+          "share": 0.3
+        }
+      ],
+      "metrics": {
+        "rr": 2.45,
+        "expectancy": 0.88,
+        "win_prob": 0.78,
+        "time_horizon": "2h-8h"
+      },
+      "checklist": [
+        "regime_ok",
+        "position_size_ok",
+        "rugcheck_ok",
+        "liquidity_ok",
+        "slippage_ok"
+      ],
+      "notes": "Generated from momentum signal with 78% confidence. Risk 1% of equity ($100). Partial exits at TP1 (30%), TP2 (40%), TP3 (30%).",
+      "status": "pending",
+      "created_at": "2025-11-05T14:30:05.000Z",
+      "expires_at": "2025-11-05T15:00:05.000Z"
+    }
+  ],
+  "lessons": [],
+  "explanation": "Detected momentum signal with 78% confidence in uptrending market with mid volatility and high liquidity during NYC session. Generated trade plan with 2.45R risk/reward ratio. Entry at 142.5 with stop at 131.1. All risk checks passed - ready for execution.",
+  "warnings": []
+}
