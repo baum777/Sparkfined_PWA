@@ -14,6 +14,8 @@ const ReplayPage = lazy(() => import("../pages/ReplayPage"));
 const AccessPage = lazy(() => import("../pages/AccessPage"));
 const SettingsPage = lazy(() => import("../pages/SettingsPage"));
 const NotificationsPage = lazy(() => import("../pages/NotificationsPage"));
+const SignalsPage = lazy(() => import("../pages/SignalsPage"));
+const LessonsPage = lazy(() => import("../pages/LessonsPage"));
 
 function Fallback() {
   return <div className="p-6 text-zinc-400">Lade…</div>;
@@ -68,6 +70,16 @@ export default function RoutesRoot() {
             <Route path="/notifications" element={
               <Layout>
                 <NotificationsPage />
+              </Layout>
+            } />
+            <Route path="/signals" element={
+              <Layout>
+                <SignalsPage />
+              </Layout>
+            } />
+            <Route path="/lessons" element={
+              <Layout>
+                <LessonsPage />
               </Layout>
             } />
             <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
