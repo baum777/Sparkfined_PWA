@@ -1,0 +1,27 @@
+# Sparkfined PWA - Robots.txt
+# https://developers.google.com/search/docs/crawling-indexing/robots/intro
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://your-domain.vercel.app/sitemap.xml
+
+# Disallow admin/internal routes (if any)
+# Disallow: /admin/
+# Disallow: /_internal/
+
+# Allow public pages
+Allow: /
+Allow: /landing
+Allow: /board
+Allow: /chart
+Allow: /analyze
+Allow: /journal
+Allow: /notifications
+Allow: /lessons
+Allow: /signals
+Allow: /access
+Allow: /settings
+
+# Note: Update Sitemap URL after deploying to custom domain
