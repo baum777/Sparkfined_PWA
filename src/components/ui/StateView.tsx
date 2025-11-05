@@ -23,6 +23,7 @@ interface StateViewProps {
   actionLabel?: string;
   onAction?: () => void;
   compact?: boolean; // Für kleinere Bereiche (z.B. KPI Tiles)
+  icon?: React.ReactNode; // Custom icon override
 }
 
 export default function StateView({
@@ -32,6 +33,7 @@ export default function StateView({
   actionLabel,
   onAction,
   compact = false,
+  icon,
 }: StateViewProps) {
   const config = {
     loading: {
@@ -76,10 +78,14 @@ export default function StateView({
       aria-atomic="true"
     >
       {/* Icon */}
-      <Icon
-        size={compact ? 32 : 48}
-        className={`${iconColor} ${animate ? 'animate-spin' : ''} mb-3`}
-      />
+      {icon ? (
+        <div className="mb-3">{icon}</div>
+      ) : (
+        <Icon
+          size={compact ? 32 : 48}
+          className={`${iconColor} ${animate ? 'animate-spin' : ''} mb-3`}
+        />
+      )}
       
       {/* Title */}
       <h3 className={`font-semibold text-zinc-200 ${compact ? 'text-sm' : 'text-base'} mb-1`}>
