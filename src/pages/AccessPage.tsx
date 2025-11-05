@@ -27,7 +27,7 @@ export default function AccessPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8">
+    <div className="min-h-screen bg-slate-950 text-white p-4 pb-20 md:p-8 md:pb-8">
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">

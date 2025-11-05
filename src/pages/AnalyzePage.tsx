@@ -127,7 +127,7 @@ export default function AnalyzePage() {
   const btn  = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
+    <div className="mx-auto max-w-6xl px-4 py-4 pb-20 md:py-6 md:pb-6">
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <input className={ctrl} placeholder="Contract Address (CA)" value={address} onChange={e=>setAddress(e.target.value)} />
         <select className={ctrl} value={tf} onChange={e=>setTf(e.target.value as any)}>

@@ -452,7 +452,7 @@ export default function ChartPage() {
   }, [data, view]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
+    <div className="mx-auto max-w-6xl px-4 py-4 pb-20 md:py-6 md:pb-6">
       <ChartHeader
         value={address}
         onChange={setAddress}
