@@ -10,7 +10,7 @@
  */
 
 import { NavLink } from 'react-router-dom';
-import { Home, BarChart3, FileText, Settings } from '@/lib/icons';
+import { Home, BarChart3, FileText, Activity } from '@/lib/icons';
 import type { LucideIcon } from 'lucide-react';
 
 interface NavItem {
@@ -22,8 +22,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/', label: 'Board', Icon: Home },
   { path: '/analyze', label: 'Analyze', Icon: BarChart3 },
+  { path: '/chart', label: 'Chart', Icon: Activity },
   { path: '/journal', label: 'Journal', Icon: FileText },
-  { path: '/settings', label: 'Settings', Icon: Settings },
 ];
 
 export default function BottomNav() {
