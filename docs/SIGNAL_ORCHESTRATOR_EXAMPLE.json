@@ -1,180 +1,230 @@
 {
-  "action_graph_update": {
-    "nodes": [
-      {
-        "id": "node_a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        "type": "signal.detected",
-        "ts_utc": "2025-11-04T22:30:00.000Z",
-        "refs": {
-          "signal_id": "sig_1234abcd-5678-90ef-ghij-klmn12345678",
-          "plan_id": null,
-          "trade_id": null,
-          "prev_node_id": null
-        },
-        "payload": {
-          "pattern": "momentum",
-          "confidence": 0.78,
-          "market": "SOL/USDC @ Raydium"
-        },
-        "tags": ["setup/momo", "chain/solana", "session/nyc"],
-        "confidence": 0.78
-      },
-      {
-        "id": "node_b2c3d4e5-f6g7-8901-bcde-fg2345678901",
-        "type": "trade.plan.created",
-        "ts_utc": "2025-11-04T22:30:15.000Z",
-        "refs": {
-          "signal_id": "sig_1234abcd-5678-90ef-ghij-klmn12345678",
-          "plan_id": "plan_5678efgh-9012-34ij-klmn-op3456789012",
-          "trade_id": null,
-          "prev_node_id": "node_a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-        },
-        "payload": {
-          "entry_price": 142.50,
-          "stop_loss": 140.00,
-          "rr": 2.5,
-          "expectancy": 0.95
-        },
-        "tags": ["plan/created", "rr>2", "risk/1pct"],
-        "confidence": 1.0
-      }
-    ],
-    "edges": [
-      ["node_a1b2c3d4-e5f6-7890-abcd-ef1234567890", "node_b2c3d4e5-f6g7-8901-bcde-fg2345678901", "CAUSES"]
-    ]
-  },
-  "signals": [
-    {
-      "id": "sig_1234abcd-5678-90ef-ghij-klmn12345678",
-      "timestamp_utc": "2025-11-04T22:30:00.000Z",
-      "market": {
-        "chain": "solana",
-        "symbol": "SOL/USDC",
-        "venue": "raydium"
-      },
-      "regime": {
-        "trend": "up",
-        "vol": "mid",
-        "liquidity": "high",
-        "session": "nyc"
-      },
-      "features": {
-        "price": 142.50,
-        "atr": 3.50,
-        "rsi": 58,
-        "ema_fast": 141.20,
-        "ema_slow": 140.00,
-        "onchain": {
-          "holders_delta": 120,
-          "liquidity_usd": 2500000,
-          "top10_share": 0.28,
-          "mint_age_days": 180
-        },
-        "risk_flags": []
-      },
-      "pattern": "momentum",
-      "confidence": 0.78,
-      "direction": "long",
-      "thesis": "Strong momentum continuation in up trend with mid volatility, Entry zone: 141.20-143.00. EMA fast above slow, RSI neutral, liquidity healthy.",
-      "invalidation": {
-        "price_below": 139.50,
-        "time_expiry": "2025-11-04T23:30:00.000Z",
-        "conditions": ["Breaks below EMA slow", "RSI drops below 40"]
-      }
-    }
-  ],
-  "trade_plans": [
-    {
-      "id": "plan_5678efgh-9012-34ij-klmn-op3456789012",
-      "signal_id": "sig_1234abcd-5678-90ef-ghij-klmn12345678",
-      "entry": {
-        "type": "limit",
-        "price": 142.50,
-        "valid_for": "30m",
-        "slippage_tolerance": 0.5
-      },
-      "risk": {
-        "stop": 140.00,
-        "risk_pct_equity": 1.0,
-        "pos_size_units": 70.18,
-        "max_loss_usd": 100.00
-      },
-      "targets": [
+  "description": "AI Signal Orchestrator Demo Output - SOL/USDC Momentum Breakout",
+  "scenario": "15m timeframe momentum push on SOL/USDC with high ATR, solid liquidity, no rug flags",
+  "output": {
+    "action_graph_update": {
+      "nodes": [
         {
-          "tp": 1,
-          "price": 147.25,
-          "share": 0.3
+          "id": "node_a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "type": "signal.detected",
+          "ts_utc": "2025-11-05T14:23:45.123Z",
+          "refs": {
+            "signal_id": "sig_x9y8z7w6-v5u4-3210-9876-543210fedcba",
+            "plan_id": null,
+            "trade_id": null,
+            "prev_node_id": null
+          },
+          "payload": {
+            "signal_id": "sig_x9y8z7w6-v5u4-3210-9876-543210fedcba",
+            "pattern": "momentum",
+            "confidence": 0.78,
+            "regime": {
+              "trend": "up",
+              "vol": "mid",
+              "liquidity": "high"
+            }
+          },
+          "tags": [
+            "pattern/momentum",
+            "confidence/78",
+            "setup/momo",
+            "regime/uptrend"
+          ],
+          "confidence": 0.78
         },
         {
-          "tp": 2,
-          "price": 150.75,
-          "share": 0.4
-        },
-        {
-          "tp": 3,
-          "price": 156.50,
-          "share": 0.3
+          "id": "node_b2c3d4e5-f6g7-8901-bcde-f12345678901",
+          "type": "trade.plan.created",
+          "ts_utc": "2025-11-05T14:23:45.456Z",
+          "refs": {
+            "signal_id": "sig_x9y8z7w6-v5u4-3210-9876-543210fedcba",
+            "plan_id": "plan_p9o8i7u6-y5t4-3210-9876-543210zyxwvu",
+            "trade_id": null,
+            "prev_node_id": "node_a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          },
+          "payload": {
+            "plan_id": "plan_p9o8i7u6-y5t4-3210-9876-543210zyxwvu",
+            "signal_id": "sig_x9y8z7w6-v5u4-3210-9876-543210fedcba",
+            "rr": 2.8,
+            "expectancy": 0.42
+          },
+          "tags": [
+            "rr/2.8",
+            "expectancy/42",
+            "plan/created"
+          ],
+          "confidence": 1.0
         }
       ],
-      "metrics": {
-        "rr": 2.5,
-        "expectancy": 0.95,
-        "win_prob": 0.78,
-        "time_horizon": "2h-8h"
-      },
-      "checklist": [
-        "regime_ok",
-        "position_size_ok",
-        "rugcheck_ok",
-        "liquidity_ok",
-        "slippage_ok"
-      ],
-      "notes": "Generated from momentum signal with 78% confidence. Strong momentum continuation in up trend with mid volatility, Entry zone: 141.20-143.00. EMA fast above slow, RSI neutral, liquidity healthy.",
-      "status": "pending",
-      "created_at": "2025-11-04T22:30:15.000Z",
-      "expires_at": "2025-11-04T23:00:15.000Z"
-    }
-  ],
-  "lessons": [
-    {
-      "id": "lesson_9012ijkl-3456-78mn-opqr-st4567890123",
-      "from_nodes": [
-        "node_a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-        "node_b2c3d4e5-f6g7-8901-bcde-fg2345678901"
-      ],
-      "pattern": "momentum-breakout-nyc-session",
-      "when_it_works": "Works best in up trends with mid volatility. Average R:R 2.8. NYC session openings show 68% win rate.",
-      "when_it_fails": "Fails when trend unclear or volume too low. Common issue: premature entry before momentum confirmation.",
-      "checklist": [
-        "Confirm trend with higher timeframe",
-        "Check volume spike on breakout",
-        "Wait for EMA fast > EMA slow",
-        "Ensure liquidity > $1M"
-      ],
-      "dos": [
-        "Wait for clear regime confirmation",
-        "Size position according to volatility",
-        "Take partial profits at targets",
-        "Trail stop after TP1 hit"
-      ],
-      "donts": [
-        "Do not chase entries outside zone",
-        "Do not ignore risk flags",
-        "Do not overtrade this setup",
-        "Do not hold through major resistance"
-      ],
-      "next_drill": "Backtest this setup on historical data for 50+ samples. Focus on entry timing and stop placement.",
-      "created_at": "2025-11-04T22:35:00.000Z",
-      "updated_at": "2025-11-04T22:35:00.000Z",
-      "score": 0.72,
-      "stats": {
-        "trades_analyzed": 25,
-        "win_rate": 0.68,
-        "avg_rr": 2.8,
-        "sample_size": 25
+      "edges": [
+        [
+          "node_a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "node_b2c3d4e5-f6g7-8901-bcde-f12345678901",
+          "CAUSES"
+        ]
+      ]
+    },
+    "signals": [
+      {
+        "id": "sig_x9y8z7w6-v5u4-3210-9876-543210fedcba",
+        "timestamp_utc": "2025-11-05T14:23:45.000Z",
+        "market": {
+          "chain": "solana",
+          "symbol": "SOL/USDC",
+          "venue": "raydium"
+        },
+        "regime": {
+          "trend": "up",
+          "vol": "mid",
+          "liquidity": "high",
+          "session": "london",
+          "phase": "markup"
+        },
+        "features": {
+          "price": 142.35,
+          "atr": 3.42,
+          "rsi": 62.5,
+          "ema_fast": 141.20,
+          "ema_slow": 138.90,
+          "onchain": {
+            "holders_delta": 245,
+            "liquidity_usd": 2450000,
+            "top10_share": 0.28,
+            "mint_age_days": 890,
+            "dev_tokens_pct": 2.1
+          },
+          "risk_flags": []
+        },
+        "pattern": "momentum",
+        "confidence": 0.78,
+        "direction": "long",
+        "thesis": "Strong momentum continuation in uptrend with mid volatility. EMA fast above slow, RSI in bullish zone (62.5), price breaking recent resistance. Entry zone: 141.80-143.00",
+        "invalidation": {
+          "price_below": 138.50,
+          "time_expiry": "2025-11-05T15:23:45.000Z",
+          "conditions": [
+            "EMA fast crosses below EMA slow",
+            "RSI drops below 45",
+            "Volume dries up significantly"
+          ]
+        }
       }
-    }
-  ],
-  "explanation": "Detected strong momentum setup on SOL/USDC during NYC session. Price respecting EMA structure with healthy liquidity ($2.5M). Generated plan with 2.5:1 R:R and 78% confidence. Partial profit targets at 1.5R, 2.5R, and 4R. Stop loss 1.5 ATR below entry. Invalidation if price drops below $139.50 or EMA structure breaks. Historical win rate for this pattern: 68%. No blockers, ready for execution after final checklist review.",
-  "warnings": []
+    ],
+    "trade_plans": [
+      {
+        "id": "plan_p9o8i7u6-y5t4-3210-9876-543210zyxwvu",
+        "signal_id": "sig_x9y8z7w6-v5u4-3210-9876-543210fedcba",
+        "entry": {
+          "type": "limit",
+          "price": 142.35,
+          "valid_for": "30m",
+          "slippage_tolerance": 0.5
+        },
+        "risk": {
+          "stop": 137.22,
+          "risk_pct_equity": 1.0,
+          "pos_size_units": 19.48,
+          "max_loss_usd": 100.0
+        },
+        "targets": [
+          {
+            "tp": 1,
+            "price": 150.03,
+            "share": 0.3
+          },
+          {
+            "tp": 2,
+            "price": 155.20,
+            "share": 0.4
+          },
+          {
+            "tp": 3,
+            "price": 162.91,
+            "share": 0.3
+          }
+        ],
+        "metrics": {
+          "rr": 2.8,
+          "expectancy": 0.42,
+          "win_prob": 0.78,
+          "time_horizon": "2h-8h"
+        },
+        "checklist": [
+          "regime_ok",
+          "position_size_ok",
+          "rugcheck_ok",
+          "liquidity_ok",
+          "slippage_ok"
+        ],
+        "notes": "Generated from momentum signal with 78% confidence. Strong momentum continuation in uptrend with mid volatility. EMA fast above slow, RSI in bullish zone (62.5), price breaking recent resistance. Entry zone: 141.80-143.00. Plan edges: 1.5R/2.5R/4R exits with 30%/40%/30% distribution.",
+        "status": "pending",
+        "created_at": "2025-11-05T14:23:45.456Z",
+        "expires_at": "2025-11-05T14:53:45.456Z"
+      }
+    ],
+    "lessons": [
+      {
+        "id": "lesson_l1m2n3o4-p5q6-7890-rstu-vwxyz1234567",
+        "from_nodes": [
+          "node_a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "node_b2c3d4e5-f6g7-8901-bcde-f12345678901"
+        ],
+        "pattern": "momentum-breakout-london-session",
+        "when_it_works": "Works best in uptrend with mid volatility during London session. RSI 55-70 range, EMA fast > slow, volume above average. Average R:R 2.5-3.5. Win rate historically 68% in similar conditions.",
+        "when_it_fails": "Fails when volume spike is fake (low follow-through), RSI overbought (>75), or major resistance ahead. Common trap: Chasing late entries after 3%+ move. Exit reason often: false breakout reversal.",
+        "checklist": [
+          "regime ok",
+          "position size ok",
+          "rugcheck ok",
+          "liquidity ok",
+          "slippage ok",
+          "RSI not overbought (< 75)",
+          "Volume confirming (> 1.3x avg)",
+          "Clear resistance breakout"
+        ],
+        "dos": [
+          "Wait for clear regime confirmation (uptrend + mid/low vol)",
+          "Size position according to volatility (ATR-based stops)",
+          "Take partial profits at targets (30% at 1.5R minimum)",
+          "Trail stop after TP1 hit to breakeven",
+          "Enter within planned entry zone only"
+        ],
+        "donts": [
+          "Do not chase entries outside zone (max 1% slippage)",
+          "Do not ignore risk flags (rug/liquidity warnings)",
+          "Do not overtrade this setup (max 2-3 per session)",
+          "Do not hold through major resistance without adjustment",
+          "Do not skip rugcheck on new/unknown tokens"
+        ],
+        "next_drill": "Backtest this setup on historical SOL/USDC 15m data for 100+ samples. Focus on: (1) Optimal RSI entry range, (2) Session performance (London vs Asia), (3) Volume confirmation threshold. Log each result in journal.",
+        "created_at": "2025-11-05T14:23:50.000Z",
+        "updated_at": "2025-11-05T14:23:50.000Z",
+        "score": 0.68,
+        "stats": {
+          "trades_analyzed": 42,
+          "win_rate": 0.68,
+          "avg_rr": 2.6,
+          "sample_size": 42
+        }
+      }
+    ],
+    "explanation": "Detected momentum signal with 78% confidence in Uptrend, mid volatility, high liquidity (London session, markup phase). Trade plan generated with 2.8:1 R:R and 42% expectancy. Risk checks passed. Entry at 142.35 with stop at 137.22 (1% account risk). Targets at 150.03 (1.5R, 30%), 155.20 (2.5R, 40%), 162.91 (4R, 30%). Invalidation below 138.50 or after 1h.",
+    "warnings": []
+  },
+  "metadata": {
+    "generated_at": "2025-11-05T14:23:50.789Z",
+    "orchestrator_version": "1.0.0",
+    "total_processing_time_ms": 342,
+    "data_sources": [
+      "dexpaprika/ohlc",
+      "raydium/liquidity",
+      "heuristic/analysis"
+    ]
+  },
+  "disclaimers": [
+    "This is NOT financial advice. Signals and plans are educational tools only.",
+    "Always perform your own due diligence before trading.",
+    "Past performance does not guarantee future results.",
+    "Crypto trading carries significant risk of loss."
+  ]
 }
