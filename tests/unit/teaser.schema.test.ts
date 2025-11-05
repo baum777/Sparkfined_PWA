@@ -21,7 +21,7 @@ describe('Teaser Schema', () => {
 
     // TODO: Implement zod validation when schema is added
     expect(validTeaser.sr_levels).toHaveLength(2);
-    expect(validTeaser.stop_loss).toBeLessThan(validTeaser.sr_levels[0].price);
+    expect(validTeaser.stop_loss).toBeLessThan(validTeaser.sr_levels[0]?.price ?? 0);
   });
 
   it.skip('rejects invalid teaser structure', () => {

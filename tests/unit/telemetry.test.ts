@@ -16,8 +16,8 @@ describe('Telemetry Service', () => {
 
     const dump = Telemetry.dump();
     expect(dump.events.length).toBeGreaterThan(0);
-    expect(dump.events[0].name).toBe(TelemetryEvents.AI_TEASER_MS);
-    expect(dump.events[0].value).toBe(1200);
+    expect(dump.events[0]?.name).toBe(TelemetryEvents.AI_TEASER_MS);
+    expect(dump.events[0]?.value).toBe(1200);
   });
 
   it('calculates performance statistics', () => {

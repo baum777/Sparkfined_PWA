@@ -143,7 +143,7 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
           
           // Check if elements are siblings and overlap
           if (
-            elements[i].parentElement === elements[j].parentElement &&
+            elements[i]?.parentElement === elements[j]?.parentElement &&
             rect1.left < rect2.right &&
             rect1.right > rect2.left &&
             rect1.top < rect2.bottom &&
