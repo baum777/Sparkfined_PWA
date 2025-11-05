@@ -32,8 +32,8 @@ export default function SettingsPage() {
     <button onClick={()=>onChange(!checked)} className={`rounded px-2 py-1 text-sm border ${checked?"border-emerald-700 bg-emerald-900/30 text-emerald-100":"border-zinc-700 text-zinc-200 hover:bg-zinc-800"}`}>{checked?"ON":"OFF"}</button>;
 
   return (
-    <div className="mx-auto max-w-3xl p-6">
-      <h1 className="mb-4 text-lg font-semibold text-zinc-100">Einstellungen</h1>
+    <div className="mx-auto max-w-3xl p-4 pb-20 md:p-6 md:pb-6">
+      <h1 className="mb-4 text-lg font-semibold text-zinc-100 md:text-xl">Einstellungen</h1>
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
         <Row label="Theme">
           <Select value={settings.theme} onChange={(e)=>setSettings({theme:e.target.value as ThemeMode})}>
@@ -249,8 +249,11 @@ export default function SettingsPage() {
             Caches leeren
           </button>
         </div>
-        <div className="mt-2 text-[11px] text-zinc-500">
-          Version: {import.meta.env.VITE_APP_VERSION ?? "dev"} · Build: {import.meta.env.MODE} · VAPID pub: {import.meta.env.VITE_VAPID_PUBLIC_KEY ? "set" : "missing"}
+        <div className="mt-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-[11px] text-zinc-500">
+          <div className="mb-1 text-xs font-medium text-zinc-400">App Info</div>
+          <div>Version: <span className="text-zinc-300">{import.meta.env.VITE_APP_VERSION ?? "dev"}</span></div>
+          <div>Build: <span className="text-zinc-300">{import.meta.env.MODE}</span></div>
+          <div>VAPID: <span className={import.meta.env.VITE_VAPID_PUBLIC_KEY ? "text-emerald-400" : "text-amber-400"}>{import.meta.env.VITE_VAPID_PUBLIC_KEY ? "configured" : "missing"}</span></div>
         </div>
       </div>
     </div>
