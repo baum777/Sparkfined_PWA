@@ -11,7 +11,11 @@ interface LeaderboardEntry {
   timestamp: number
 }
 
-export default function LeaderboardList() {
+interface LeaderboardListProps {
+  onNavigate?: (tab: 'status' | 'lock' | 'hold' | 'leaderboard') => void
+}
+
+export default function LeaderboardList({ onNavigate }: LeaderboardListProps) {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -86,9 +90,9 @@ export default function LeaderboardList() {
 
       {/* Leaderboard Table */}
       {loading && (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex flex-col items-center justify-center space-y-4 py-16">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400" />
-          <p className="ml-4 text-slate-400">Loading leaderboard...</p>
+          <p className="text-slate-400 text-center">Loading leaderboard...</p>
         </div>
       )}
 
@@ -151,9 +155,15 @@ export default function LeaderboardList() {
         <div className="bg-slate-900 rounded-lg p-12 border border-slate-800 text-center">
           <div className="text-6xl mb-4">📊</div>
           <h4 className="text-xl font-semibold mb-2">No Locks Yet</h4>
-          <p className="text-slate-400">
+          <p className="text-slate-400 mb-6">
             Be the first to lock tokens and claim rank #1!
           </p>
+          <button 
+            onClick={() => onNavigate?.('lock')}
+            className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors"
+          >
+            Calculate Lock Amount
+          </button>
         </div>
       )}
     </div>

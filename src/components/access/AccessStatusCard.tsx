@@ -9,7 +9,11 @@
 
 import { useAccessStatus } from '../../store/AccessProvider'
 
-export default function AccessStatusCard() {
+interface AccessStatusCardProps {
+  onNavigate?: (tab: 'status' | 'lock' | 'hold' | 'leaderboard') => void
+}
+
+export default function AccessStatusCard({ onNavigate }: AccessStatusCardProps) {
   const {
     status,
     details,
@@ -25,10 +29,10 @@ export default function AccessStatusCard() {
 
   if (loading) {
     return (
-      <div className="bg-slate-900 rounded-lg p-6 border border-slate-800">
-        <div className="flex items-center space-x-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400" />
-          <p className="text-slate-400">Checking access status...</p>
+      <div className="bg-slate-900 rounded-lg p-8 border border-slate-800">
+        <div className="flex flex-col items-center justify-center space-y-4 py-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400" />
+          <p className="text-slate-400 text-center">Checking access status...</p>
         </div>
       </div>
     )
@@ -150,7 +154,10 @@ export default function AccessStatusCard() {
             <p className="text-sm text-slate-400 mb-4">
               Lock tokens based on MCAP to get a rank. Top 333 get a soulbound NFT with lifetime access.
             </p>
-            <button className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors">
+            <button 
+              onClick={() => onNavigate?.('lock')}
+              className="w-full px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors"
+            >
               Calculate Lock Amount
             </button>
           </div>
@@ -162,7 +169,10 @@ export default function AccessStatusCard() {
             <p className="text-sm text-slate-400 mb-4">
               Hold at least 100,000 tokens in your wallet to get access. No locking required.
             </p>
-            <button className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors">
+            <button 
+              onClick={() => onNavigate?.('hold')}
+              className="w-full px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors"
+            >
               Check Your Balance
             </button>
           </div>
