@@ -167,7 +167,6 @@ export default function LessonsPage() {
           <StateView
             type="empty"
             description="No lessons yet. Trade more to accumulate wisdom!"
-            icon={<BookOpen size={48} className="text-zinc-700" />}
           />
         ) : (
           <div className="space-y-4">

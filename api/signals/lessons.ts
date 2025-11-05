@@ -14,7 +14,7 @@
 export const config = { runtime: 'edge' }
 
 import type { Lesson } from '@/types/signal'
-import { getAllLessons, getLessonsByPattern, getTopLessons } from '@/lib/signalDb'
+import { getLessonsByPattern, getTopLessons } from '@/lib/signalDb'
 
 export default async function handler(req: Request) {
   // Only allow GET

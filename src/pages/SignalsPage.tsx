@@ -146,7 +146,6 @@ export default function SignalsPage() {
           <StateView
             type="empty"
             description="No signals match your filters"
-            icon={<AlertCircle size={48} className="text-zinc-700" />}
           />
         ) : (
           <div className="space-y-3">

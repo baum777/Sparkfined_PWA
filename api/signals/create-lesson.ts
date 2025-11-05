@@ -12,7 +12,7 @@
 
 export const config = { runtime: 'edge' }
 
-import type { Lesson, TradeOutcome } from '@/types/signal'
+import type { TradeOutcome } from '@/types/signal'
 import {
   getTradePlanById,
   getSignalById,

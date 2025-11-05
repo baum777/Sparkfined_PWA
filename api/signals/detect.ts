@@ -194,9 +194,10 @@ export default async function handler(req: Request) {
     ]
 
     // 9. Create edges (signal → plan)
-    const edges: SignalOrchestratorOutput['action_graph_update']['edges'] = [
-      [nodes[0].id, nodes[1].id, 'CAUSES'],
-    ]
+    const edges: SignalOrchestratorOutput['action_graph_update']['edges'] = []
+    if (nodes[0] && nodes[1]) {
+      edges.push([nodes[0].id, nodes[1].id, 'CAUSES'])
+    }
 
     // 10. Build explanation
     const explanation = `Detected ${signal.pattern} signal with ${(signal.confidence * 100).toFixed(0)}% confidence in ${describeRegime(regime)}. Trade plan generated with ${plan.metrics.rr.toFixed(1)}:1 R:R and ${(plan.metrics.expectancy * 100).toFixed(0)}% expectancy. ${riskCheck.passed ? 'Risk checks passed.' : `Risk warnings: ${riskCheck.warnings.join(', ')}`}`
@@ -209,7 +210,7 @@ export default async function handler(req: Request) {
       nodes,
       edges,
       explanation,
-      riskCheck.warnings
+      riskCheck.warnings || []
     )
 
     return new Response(JSON.stringify(output), {
