@@ -14,31 +14,8 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       injectRegister: 'auto',
-      manifest: {
-        name: 'Sparkfined TA-PWA',
-        short_name: 'Sparkfined',
-        description: 'Technical Analysis Progressive Web App',
-        theme_color: '#1e293b',
-        background_color: '#0f172a',
-        display: 'standalone',
-        orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
-        icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
-        ]
-      },
+      manifest: false, // Use public/manifest.webmanifest instead of inline config
+      manifestFilename: 'manifest.webmanifest',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         // Pre-cache app shell for instant offline access
