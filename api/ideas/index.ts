@@ -30,7 +30,7 @@ export default async function handler(req: Request){
       entry: numOr(b.entry ?? prev?.entry),
       invalidation: numOr(b.invalidation ?? prev?.invalidation),
       targets: Array.isArray(b.targets) ? b.targets.map(Number).slice(0,6) : (prev?.targets ?? []),
-      status: (b.status as any) || prev?.status || "draft",
+      status: b.status || prev?.status || "draft",
       createdAt: prev?.createdAt || b.createdAt || now(),
       updatedAt: now(),
       links: { ...(prev?.links||{}), ...(b.links||{}) },

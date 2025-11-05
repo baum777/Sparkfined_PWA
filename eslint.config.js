@@ -5,7 +5,7 @@ import react from "eslint-plugin-react";
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**", "*.config.js", "*.config.ts", "scripts/**"]
+    ignores: ["dist/**", "node_modules/**", "*.config.js", "*.config.ts", "scripts/**", "public/push/**"]
   },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked.map(config => ({
