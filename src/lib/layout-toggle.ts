@@ -66,5 +66,7 @@ export function initializeLayoutToggles() {
   setLayoutStyle(layoutStyle);
   setOledMode(oledMode);
   
-  console.log('[Layout Toggle] Initialized:', { layoutStyle, oledMode });
+  if (import.meta.env.DEV) {
+    console.log('[Layout Toggle] Initialized:', { layoutStyle, oledMode });
+  }
 }

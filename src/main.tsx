@@ -16,10 +16,10 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     if (event.data) {
       switch (event.data.type) {
         case 'CACHE_UPDATED':
-          console.log('📦 Cache updated:', event.data.url)
+          if (import.meta.env.DEV) console.log('📦 Cache updated:', event.data.url)
           break
         case 'SW_ACTIVATED':
-          console.log('✅ Service Worker activated')
+          if (import.meta.env.DEV) console.log('✅ Service Worker activated')
           break
       }
     }
@@ -27,19 +27,19 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 
   // Listen for controllerchange - reload when new SW takes over
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    console.log('[PWA] controllerchange → reload')
+    if (import.meta.env.DEV) console.log('[PWA] controllerchange → reload')
     setTimeout(() => location.reload(), 250)
   })
 }
 
 // Track online/offline status
 window.addEventListener('online', () => {
-  console.log('🌐 Back online')
+  if (import.meta.env.DEV) console.log('🌐 Back online')
   document.body.classList.remove('offline-mode')
 })
 
 window.addEventListener('offline', () => {
-  console.log('📴 Offline mode')
+  if (import.meta.env.DEV) console.log('📴 Offline mode')
   document.body.classList.add('offline-mode')
 })
 
@@ -51,5 +51,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 // Hydration hint for Lighthouse (main thread idle sooner)
 if ('requestIdleCallback' in window) {
-  (window as any).requestIdleCallback(() => console.log('[idle] app settled'))
+  (window as any).requestIdleCallback(() => {
+    if (import.meta.env.DEV) console.log('[idle] app settled')
+  })
 }
