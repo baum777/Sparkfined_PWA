@@ -80,7 +80,14 @@ export default function JournalEditor({
 async function blobToDataUrl(b: Blob): Promise<string> {
   return new Promise((res, rej) => {
     const r = new FileReader();
-    r.onload = () => res(String(r.result));
+    r.onload = () => {
+      const result = r.result;
+      if (typeof result === 'string') {
+        res(result);
+      } else {
+        res('');
+      }
+    };
     r.onerror = rej;
     r.readAsDataURL(b);
   });

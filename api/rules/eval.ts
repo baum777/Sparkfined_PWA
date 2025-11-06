@@ -24,7 +24,11 @@ function json(obj:any, status=200){ return new Response(JSON.stringify(obj), { s
 
 function evalRule(rule: Rule, d: Ohlc[]){
   const n = d.length-1;
-  const p = d[n]; const prev = d[n-1];
+  const p = d[n];
+  const prev = d[n-1];
+  // Guard: Ensure we have current and previous data
+  if (!p || !prev) return false;
+  
   switch(rule.kind){
     case "price-cross": {
       const cond = rule.op === ">" ? p.c > rule.value : p.c < rule.value;
@@ -55,22 +59,26 @@ function evalRule(rule: Rule, d: Ohlc[]){
     case "sma50-200-cross": {
       const sma50 = sma(d.map(x=>x.c), 50);
       const sma200 = sma(d.map(x=>x.c), 200);
-      const now = sma50[n] - sma200[n];
-      const before = sma50[n-1] - sma200[n-1];
+      const now = (sma50[n] ?? 0) - (sma200[n] ?? 0);
+      const before = (sma50[n-1] ?? 0) - (sma200[n-1] ?? 0);
       return rule.typ==="golden" ? (now>0 && before<=0) : (now<0 && before>=0);
     }
   }
 }
 function find24hBase(d: Ohlc[], i: number){
-  const cutoff = d[i].t - 86_400_000;
-  let j = i; while (j>0 && d[j].t >= cutoff) j--;
-  return d[Math.max(0,j)]?.c ?? d[0].c;
+  const current = d[i];
+  if (!current) return d[0]?.c ?? 0;
+  const cutoff = current.t - 86_400_000;
+  let j = i; while (j>0 && d[j]?.t && d[j].t >= cutoff) j--;
+  return d[Math.max(0,j)]?.c ?? d[0]?.c ?? 0;
 }
 function atrHiLo(d: Ohlc[], period:number){
   const n = d.length; const m = Math.max(1, Math.min(period, n-1));
   let trSum = 0; let hi = -Infinity, lo = Infinity;
   for (let i=n-m;i<n;i++){
-    const x = d[i]; const prev = d[i-1] ?? x;
+    const x = d[i];
+    if (!x) continue; // Skip if data point missing
+    const prev = d[i-1] ?? x;
     const tr = Math.max(x.h - x.l, Math.abs(x.h - prev.c), Math.abs(x.l - prev.c));
     trSum += tr; hi = Math.max(hi, x.h); lo = Math.min(lo, x.l);
   }
@@ -80,7 +88,14 @@ function calcVwap(d: Ohlc[]){
   // einfache Session-VWAP Schätzung
   let pv=0, vv=0, pvPrev=0, vvPrev=0;
   const n = d.length-1;
-  for(let i=0;i<=n;i++){ const x = d[i]; const tp = (x.h+x.l+x.c)/3; const v = Number(x.v||1); if(i<n){ pvPrev += tp*v; vvPrev += v; } pv += tp*v; vv += v; }
+  for(let i=0;i<=n;i++){ 
+    const x = d[i];
+    if (!x) continue; // Skip if missing
+    const tp = ((x.h ?? 0) + (x.l ?? 0) + (x.c ?? 0))/3;
+    const v = Number(x.v||1); 
+    if(i<n){ pvPrev += tp*v; vvPrev += v; } 
+    pv += tp*v; vv += v; 
+  }
   return { vwap: pv/Math.max(1,vv), prevVwap: pvPrev/Math.max(1,vvPrev) };
 }
 function sma(arr:number[], len:number){

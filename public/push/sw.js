@@ -1,11 +1,13 @@
 /* Minimaler Push-SW mit eigenem Scope (/push/) – kollidiert nicht mit Workbox PWA-SW */
-/* eslint-disable no-restricted-globals */
-self.addEventListener("install", (e) => { self.skipWaiting(); });
-self.addEventListener("activate", (e) => { self.clients.claim(); });
+ 
+self.addEventListener("install", () => { self.skipWaiting(); });
+self.addEventListener("activate", () => { self.clients.claim(); });
 
 self.addEventListener("push", (event) => {
   let data = {};
-  try { data = event.data?.json?.() ?? JSON.parse(event.data?.text?.() ?? "{}"); } catch {}
+  try { data = event.data?.json?.() ?? JSON.parse(event.data?.text?.() ?? "{}"); } catch (err) {
+    console.error('[SW] Failed to parse push data:', err);
+  }
   const title = data.title || "Sparkfined Alert";
   const body  = data.body  || "Signal erhalten.";
   const tag   = data.tag   || "sparkfined";

@@ -30,6 +30,7 @@ export default async function handler(req: Request) {
 
     for (let i=start;i<end;i++){
       const p = body.ohlc[i];
+      if (!p) continue; // Skip missing data points
       for (const r of body.rules){
         if (!perRule[r.id]) perRule[r.id] = { count:0 };
         if (r.kind === "price-cross") {
@@ -65,11 +66,13 @@ export default async function handler(req: Request) {
 
 function find24hBase(d: Ohlc[], i: number){
   if (!d.length) return 0;
-  const endTs = d[i].t;
+  const current = d[i];
+  if (!current) return d[0]?.c ?? 0;
+  const endTs = current.t;
   const cutoff = endTs - 86_400_000;
   let j = i;
-  while (j>0 && d[j].t >= cutoff) j--;
-  return d[Math.max(0,j)]?.c ?? d[0].c;
+  while (j>0 && d[j]?.t && d[j].t >= cutoff) j--;
+  return d[Math.max(0,j)]?.c ?? d[0]?.c ?? 0;
 }
 const round2 = (n:number)=> Math.round(n*100)/100;
 const hit = (r:any, i:number, t:number, c:number, meta:any)=>({ ruleId:r.id, kind:r.kind, i, t, c, meta });

@@ -136,6 +136,7 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
       const idx = start + idxLocal;
       if (idx !== hoverIdx) setHoverIdx(idx);
       const p = points[idx];
+      if (!p) return; // Guard: ensure point exists
       const cx = X0 + (idxLocal * (X1 - X0) / n);
       const cy = Y1 - ((p.c - min) * (Y1 - Y0) / span);
       ctx.strokeStyle = "rgba(255,255,255,0.25)";
@@ -157,8 +158,8 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
         const vwapV = indicators?.vwap?.[idx];
         overlay.innerHTML = `
           <div class="rounded-md border border-zinc-700 bg-zinc-900/95 px-2 py-1 text-xs text-zinc-200 shadow">
-            <div>${fmtTime(p.t)}</div>
-            <div>O ${fmtNum(p.o)} H ${fmtNum(p.h)} L ${fmtNum(p.l)} C ${fmtNum(p.c)}</div>
+            <div>${fmtTime(p.t ?? 0)}</div>
+            <div>O ${fmtNum(p.o ?? 0)} H ${fmtNum(p.h ?? 0)} L ${fmtNum(p.l ?? 0)} C ${fmtNum(p.c ?? 0)}</div>
             <div class="mt-0.5">
               ${smaV != null ? `<span class="text-cyan-200">SMA20</span> ${fmtNum(smaV)}&nbsp;` : ""}
               ${emaV != null ? `<span class="text-amber-300">EMA20</span> ${fmtNum(emaV)}&nbsp;` : ""}
@@ -267,20 +268,20 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
         // translate px delta ? data space
         const idxDelta = Math.round(dx / Math.max(1, (L.X1 - L.X0)) * L.n);
         const priceDelta = -dy / Math.max(1, (L.Y1 - L.Y0)) * (L.max - L.min);
-        let s = drag.shape;
+        const s = drag.shape;
         let next: Shape | null = null;
         if (s.kind === "hline") {
           let newPrice = s.price + priceDelta;
           if (snap) {
             const idx = clampIdx(Math.round((mx - L.X0) / Math.max(1, (L.X1 - L.X0)) * L.n) + L.start, points.length);
-            newPrice = snapPriceToOhlc(idx, newPrice, points as any).price;
+            newPrice = snapPriceToOhlc(idx, newPrice, points as any).price ?? newPrice;
           }
           next = { ...s, price: newPrice, updatedAt: Date.now() };
         } else if (s.kind === "trend") {
           const mut = (pt:{idx:number;price:number}) => {
             let idx = clampIdx(pt.idx + idxDelta, points.length);
             let price = pt.price + priceDelta;
-            if (snap) { const sres = snapPriceToOhlc(idx, price, points as any); idx = sres.idx; price = sres.price; }
+            if (snap) { const sres = snapPriceToOhlc(idx, price, points as any); idx = sres.idx; price = sres.price ?? price; }
             return { idx, price };
           };
           if (drag.handle === "a") next = { ...s, a: mut(s.a), updatedAt: Date.now() };
@@ -290,7 +291,7 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
           const mut = (pt:{idx:number;price:number}) => {
             let idx = clampIdx(pt.idx + idxDelta, points.length);
             let price = pt.price + priceDelta;
-            if (snap) { const sres = snapPriceToOhlc(idx, price, points as any); idx = sres.idx; price = sres.price; }
+            if (snap) { const sres = snapPriceToOhlc(idx, price, points as any); idx = sres.idx; price = sres.price ?? price; }
             return { idx, price };
           };
           if (drag.handle === "a") next = { ...s, a: mut(s.a), updatedAt: Date.now() };
@@ -298,7 +299,7 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
           else next = { ...s, a: mut(s.a), b: mut(s.b), updatedAt: Date.now() };
         }
         if (next) {
-          onShapesChange([next, ...shapes.filter(x => x.id !== next!.id)]);
+          onShapesChange([next, ...shapes.filter(x => x.id !== next.id)]);
           setDrag({ ...drag, start: { x: mx, y: my }, shape: next });
         }
       }

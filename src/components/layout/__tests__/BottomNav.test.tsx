@@ -11,9 +11,10 @@ describe('BottomNav', () => {
       </BrowserRouter>
     )
 
+    expect(screen.getByText('Board')).toBeTruthy()
     expect(screen.getByText('Analyze')).toBeTruthy()
     expect(screen.getByText('Journal')).toBeTruthy()
-    expect(screen.getByText('Replay')).toBeTruthy()
+    expect(screen.getByText('Settings')).toBeTruthy()
   })
 
   it('has correct accessibility attributes', () => {
@@ -25,7 +26,7 @@ describe('BottomNav', () => {
 
     const nav = screen.getByRole('navigation')
     expect(nav).toBeTruthy()
-    expect(nav.getAttribute('aria-label')).toBe('Bottom navigation')
+    expect(nav.getAttribute('aria-label')).toBe('Main navigation')
   })
 
   it('renders navigation links with correct paths', () => {
@@ -35,12 +36,14 @@ describe('BottomNav', () => {
       </BrowserRouter>
     )
 
-    const analyzeLink = screen.getByLabelText('Analyze')
-    const journalLink = screen.getByLabelText('Journal')
-    const replayLink = screen.getByLabelText('Replay')
+    const boardLink = screen.getByRole('link', { name: /board/i })
+    const analyzeLink = screen.getByRole('link', { name: /analyze/i })
+    const journalLink = screen.getByRole('link', { name: /journal/i })
+    const settingsLink = screen.getByRole('link', { name: /settings/i })
 
-    expect(analyzeLink.getAttribute('href')).toBe('/')
+    expect(boardLink.getAttribute('href')).toBe('/')
+    expect(analyzeLink.getAttribute('href')).toBe('/analyze')
     expect(journalLink.getAttribute('href')).toBe('/journal')
-    expect(replayLink.getAttribute('href')).toBe('/replay')
+    expect(settingsLink.getAttribute('href')).toBe('/settings')
   })
 })

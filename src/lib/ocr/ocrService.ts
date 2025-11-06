@@ -107,7 +107,7 @@ function parseIndicators(text: string): OCRResult['indicators'] {
 
   // RSI pattern: "RSI: 72" or "RSI 72" or "RSI(14): 72"
   const rsiMatch = text.match(/RSI[:\s\(]*(\d+)/i)
-  if (rsiMatch) {
+  if (rsiMatch && rsiMatch[1]) {
     indicators.rsi = parseInt(rsiMatch[1], 10)
   }
 
@@ -124,6 +124,7 @@ function parseIndicators(text: string): OCRResult['indicators'] {
   const emaMatches = text.matchAll(/EMA[\s\(]*(\d+)[\s\)]*:?\s*([\d,.]+)/gi)
   const emaValues: number[] = []
   for (const match of emaMatches) {
+    if (!match[2]) continue;
     const value = parseFloat(match[2].replace(/,/g, ''))
     if (!isNaN(value)) {
       emaValues.push(value)
@@ -137,6 +138,7 @@ function parseIndicators(text: string): OCRResult['indicators'] {
   const smaMatches = text.matchAll(/SMA[\s\(]*(\d+)[\s\)]*:?\s*([\d,.]+)/gi)
   const smaValues: number[] = []
   for (const match of smaMatches) {
+    if (!match[2]) continue;
     const value = parseFloat(match[2].replace(/,/g, ''))
     if (!isNaN(value)) {
       smaValues.push(value)
@@ -148,7 +150,7 @@ function parseIndicators(text: string): OCRResult['indicators'] {
 
   // Price: "Price: $42,850.00" or "$42850"
   const priceMatch = text.match(/[\$]?([\d,]+\.?\d*)/i)
-  if (priceMatch) {
+  if (priceMatch && priceMatch[1]) {
     const price = parseFloat(priceMatch[1].replace(/,/g, ''))
     if (!isNaN(price) && price > 0) {
       indicators.price = price
@@ -157,7 +159,7 @@ function parseIndicators(text: string): OCRResult['indicators'] {
 
   // Volume: "Volume: 1.2M" or "Vol: 1,234,567"
   const volumeMatch = text.match(/vol(?:ume)?[:\s]*([\d,.]+\s*[KMB]?)/i)
-  if (volumeMatch) {
+  if (volumeMatch && volumeMatch[1]) {
     indicators.volume = volumeMatch[1].trim()
   }
 
@@ -208,7 +210,10 @@ export async function preprocessImage(imageFile: File): Promise<Blob> {
 
       // Convert to grayscale and increase contrast
       for (let i = 0; i < data.length; i += 4) {
-        const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114
+        const r = data[i] ?? 0;
+        const g = data[i + 1] ?? 0;
+        const b = data[i + 2] ?? 0;
+        const gray = r * 0.299 + g * 0.587 + b * 0.114
         const contrast = 1.5 // Increase contrast
         const enhanced = ((gray - 128) * contrast + 128)
 

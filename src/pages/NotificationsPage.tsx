@@ -56,7 +56,11 @@ export default function NotificationsPage() {
   };
 
   const askPermission = async () => {
-    try { if ("Notification" in window) await Notification.requestPermission(); } catch {}
+    try { 
+      if ("Notification" in window) await Notification.requestPermission(); 
+    } catch (err) {
+      console.error('Failed to request notification permission:', err);
+    }
   };
 
   return (
@@ -200,7 +204,7 @@ export default function NotificationsPage() {
                       id: it.id,
                       risk: {
                         balance: res.balance, riskPct: res.pb.riskPct, atrMult: res.pb.atrMult,
-                        entryPrice: res.rrTargets[0] - res.rrList[0]*(res.rrTargets[0]- (res.rrTargets[0]- (res.rrList[0]*(res.rrTargets[0]-0)))), /* placeholder */
+                        entryPrice: (res.rrTargets[0] ?? 0) - (res.rrList[0] ?? 0)*((res.rrTargets[0] ?? 0)- ((res.rrTargets[0] ?? 0)- ((res.rrList[0] ?? 0)*((res.rrTargets[0] ?? 0)-0)))), /* placeholder */
                         stopPrice: res.stopPrice, sizeUnits: res.sizeUnits, riskAmount: res.riskAmount,
                         rrTargets: res.rrTargets, rrList: res.rrList, kellyLitePct: res.kellyLitePct
                       },

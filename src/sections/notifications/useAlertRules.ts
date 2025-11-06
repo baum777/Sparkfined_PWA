@@ -26,7 +26,11 @@ export function useAlertRules() {
       }
       // optional browser notification
       if (Notification?.permission === "granted") {
-        try { new Notification(`Alert: ${trig.kind}`, { body: `t=${new Date(trig.t).toLocaleString()}  c=${trig.c ?? "-"}` }); } catch {}
+        try { 
+          new Notification(`Alert: ${trig.kind}`, { body: `t=${new Date(trig.t).toLocaleString()}  c=${trig.c ?? "-"}` }); 
+        } catch (err) {
+          console.error('Failed to show notification:', err);
+        }
       }
     };
     window.addEventListener("alerts:trigger" as any, onEvt as any);
@@ -73,8 +77,12 @@ export function useAlertRules() {
           body: payload?.body || `Rule ${payload?.ruleId || "manual"}@${payload?.address || ""}`,
           url: "/notifications"
         })
-      }).catch(()=>{});
-    } catch {}
+      }).catch((err) => {
+        console.error('Failed to dispatch alert:', err);
+      });
+    } catch (err) {
+      console.error('Failed to add manual trigger:', err);
+    }
     // optional: falls Idea-ID bekannt ? Event an Idea anh?ngen
     if (payload?.ideaId) {
       try {
@@ -89,7 +97,9 @@ export function useAlertRules() {
             ts: t
           })
         });
-      } catch {}
+      } catch (err) {
+        console.error('Failed to attach trigger to idea:', err);
+      }
     }
   };
 

@@ -12,7 +12,7 @@ export default async function handler(req: Request){
   const { ideaId, ruleId, address, tf, price, ts=Date.now(), meta={} } = b||{};
   if (!ideaId && !ruleId) return json({ ok:false, error:"ideaId or ruleId required" },400);
   // 1) Idee suchen (by id, else by rule link)
-  let id = ideaId;
+  const id = ideaId;
   if (!id && ruleId){
     // naive Scan: in echten Systemen Index halten (ideas:byRule:<ruleId>)
     // hier: wir lesen nur diese eine Idee direkt (Client sollte id haben). Fallback: error.

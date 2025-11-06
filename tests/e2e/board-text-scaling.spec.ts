@@ -18,7 +18,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Board Page - Text Scaling (200% Zoom)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5173/');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
   });
 
@@ -164,7 +164,7 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
 
 test.describe('Board Page - Browser Zoom', () => {
   test('should support browser zoom controls', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
 
     // Simulate browser zoom via CSS zoom property

@@ -41,7 +41,11 @@ export default function MiniMap({
     for (let i=0;i<points.length;i++){
       const x = (i / Math.max(1, points.length - 1)) * (W-2) + 1;
       const y = (1 - (points[i].c - min)/span) * (H-2) + 1;
-      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+      if (i===0) {
+        ctx.moveTo(x,y);
+      } else {
+        ctx.lineTo(x,y);
+      }
     }
     ctx.stroke();
     // selection window
