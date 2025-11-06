@@ -181,7 +181,9 @@ export default function ChartPage() {
   const addBookmark = (label?: string) => {
     if (!data?.length) return;
     const idx = Math.floor(replay.state.cursor);
-    const b = { id: crypto.randomUUID(), t: data[idx].t, label, createdAt: Date.now() };
+    const point = data[idx];
+    if (!point) return;
+    const b = { id: crypto.randomUUID(), t: point.t, label, createdAt: Date.now() };
     setBookmarks(bs => [b, ...bs].slice(0, 100));
     addBookmarkEvent(b.t, { label });
     enqueue({ id: crypto.randomUUID(), ts: Date.now(), type: "user.bookmark.add", attrs: { t: b.t, label } } as any);
@@ -275,8 +277,10 @@ export default function ChartPage() {
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       // Jump-to-Bookmark (1..6)
-      if (!isNaN(Number(e.key)) && Number(e.key) >= 1 && Number(e.key) <= 6 && bookmarks[Number(e.key)-1]) {
-        onJumpTimestamp(bookmarks[Number(e.key)-1].t);
+      const keyNum = Number(e.key);
+      const bookmark = bookmarks[keyNum - 1];
+      if (!isNaN(keyNum) && keyNum >= 1 && keyNum <= 6 && bookmark) {
+        onJumpTimestamp(bookmark.t);
         return;
       }
       if (e.key === "ArrowLeft") { e.preventDefault(); onStep(-1, e.shiftKey ? 10 : 1); return; }
@@ -320,16 +324,22 @@ export default function ChartPage() {
   const doUndo = () => {
     setUndo(u => {
       if (!u.length) return u;
-      setRedo(r => [shapes, ...r].slice(0, 100));
-      setShapes(u[0]);
+      const prevShapes = u[0];
+      if (prevShapes) {
+        setRedo(r => [shapes, ...r].slice(0, 100));
+        setShapes(prevShapes);
+      }
       return u.slice(1);
     });
   };
   const doRedo = () => {
     setRedo(r => {
       if (!r.length) return r;
-      setUndo(u => [shapes, ...u].slice(0, 100));
-      setShapes(r[0]);
+      const nextShapes = r[0];
+      if (nextShapes) {
+        setUndo(u => [shapes, ...u].slice(0, 100));
+        setShapes(nextShapes);
+      }
       return r.slice(1);
     });
   };

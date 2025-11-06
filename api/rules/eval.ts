@@ -89,9 +89,9 @@ function calcVwap(d: Ohlc[]){
   let pv=0, vv=0, pvPrev=0, vvPrev=0;
   const n = d.length-1;
   for(let i=0;i<=n;i++){ 
-    const x = d[i]; 
+    const x = d[i];
     if (!x) continue; // Skip if missing
-    const tp = (x.h+x.l+x.c)/3; 
+    const tp = ((x.h ?? 0) + (x.l ?? 0) + (x.c ?? 0))/3;
     const v = Number(x.v||1); 
     if(i<n){ pvPrev += tp*v; vvPrev += v; } 
     pv += tp*v; vv += v; 
