@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import UpdateBanner from "../components/UpdateBanner";
 import { AccessProvider } from "../store/AccessProvider";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 // Route-level code splitting (reduziert initial bundle)
 const LandingPage = lazy(() => import("../pages/LandingPage"));
@@ -18,16 +19,24 @@ const SignalsPage = lazy(() => import("../pages/SignalsPage"));
 const LessonsPage = lazy(() => import("../pages/LessonsPage"));
 
 function Fallback() {
-  return <div className="p-6 text-zinc-400">Lade…</div>;
+  return (
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-700 border-t-emerald-500 mb-4"></div>
+        <p className="text-slate-300 text-lg">Lade…</p>
+      </div>
+    </div>
+  );
 }
 
 export default function RoutesRoot() {
   return (
-    <BrowserRouter>
-      <AccessProvider>
-        <UpdateBanner />
-        <Suspense fallback={<Fallback />}>
-          <Routes>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AccessProvider>
+          <UpdateBanner />
+          <Suspense fallback={<Fallback />}>
+            <Routes>
             {/* Landing Page - No Layout (standalone) */}
             <Route path="/landing" element={<LandingPage />} />
             
@@ -83,9 +92,10 @@ export default function RoutesRoot() {
               </Layout>
             } />
             <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
-          </Routes>
-        </Suspense>
-      </AccessProvider>
-    </BrowserRouter>
+            </Routes>
+          </Suspense>
+        </AccessProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
