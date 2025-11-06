@@ -6,9 +6,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0A0F1E",
   "theme_color": "#0A0F1E",
-  "categories": ["finance", "productivity", "utilities"],
+  "background_color": "#0A0F1E",
   "icons": [
     {
       "src": "/icons/icon-1024.png",
@@ -43,6 +42,12 @@
     {
       "src": "/icons/icon-180.png",
       "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-167.png",
+      "sizes": "167x167",
       "type": "image/png",
       "purpose": "any maskable"
     },
