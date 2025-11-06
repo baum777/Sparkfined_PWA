@@ -16,6 +16,7 @@ This directory contains all essential documentation for the Sparkfined PWA proje
 - **[DEPLOY_GUIDE.md](./DEPLOY_GUIDE.md)** - Complete step-by-step deployment guide for Vercel
 - **[POST_DEPLOY_VERIFICATION.md](./POST_DEPLOY_VERIFICATION.md)** - Post-deployment testing checklist (30-45 min)
 - **[PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md)** - Pre-deployment production readiness checklist
+- **[ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md)** - Complete guide to all 60+ environment variables
 
 ### Optimization & Monitoring
 - **[LIGHTHOUSE_OPTIMIZATION.md](./LIGHTHOUSE_OPTIMIZATION.md)** - Performance optimization guide for 100/100 Lighthouse scores
