@@ -41,7 +41,9 @@ export default function PerfSampler(): null {
         });
       });
       obs.observe({ entryTypes: ["resource"] });
-    } catch {}
+    } catch (err) {
+      console.error('Failed to initialize PerformanceObserver:', err);
+    }
     return () => obs?.disconnect();
   }, [flags.includeNetwork, enqueue]);
 

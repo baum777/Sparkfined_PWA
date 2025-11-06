@@ -267,7 +267,7 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
         // translate px delta ? data space
         const idxDelta = Math.round(dx / Math.max(1, (L.X1 - L.X0)) * L.n);
         const priceDelta = -dy / Math.max(1, (L.Y1 - L.Y0)) * (L.max - L.min);
-        let s = drag.shape;
+        const s = drag.shape;
         let next: Shape | null = null;
         if (s.kind === "hline") {
           let newPrice = s.price + priceDelta;
@@ -298,7 +298,7 @@ const CandlesCanvas = React.forwardRef<CanvasHandle, {
           else next = { ...s, a: mut(s.a), b: mut(s.b), updatedAt: Date.now() };
         }
         if (next) {
-          onShapesChange([next, ...shapes.filter(x => x.id !== next!.id)]);
+          onShapesChange([next, ...shapes.filter(x => x.id !== next.id)]);
           setDrag({ ...drag, start: { x: mx, y: my }, shape: next });
         }
       }

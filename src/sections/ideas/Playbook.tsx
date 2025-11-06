@@ -21,7 +21,7 @@ export default function PlaybookCard({
   const disabled = !(entry && atr);
   const preview = React.useMemo(()=>{
     if (disabled) return null;
-    const out = calcRisk({ balance, entry: entry!, atr: atr!, playbook: pb });
+    const out = calcRisk({ balance, entry: entry, atr: atr, playbook: pb });
     return out;
   }, [balance, entry, atr, pb, disabled]);
   return (

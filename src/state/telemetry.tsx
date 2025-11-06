@@ -48,7 +48,11 @@ function readBuffer(): TelemetryEvent[] {
   try { return JSON.parse(sessionStorage.getItem(BUF_KEY) || "[]"); } catch { return []; }
 }
 function writeBuffer(buf: TelemetryEvent[]) {
-  try { sessionStorage.setItem(BUF_KEY, JSON.stringify(buf)); } catch {}
+  try { 
+    sessionStorage.setItem(BUF_KEY, JSON.stringify(buf)); 
+  } catch (err) {
+    console.error('Failed to write telemetry buffer:', err);
+  }
 }
 
 export function TelemetryProvider({ children }: { children: React.ReactNode }) {

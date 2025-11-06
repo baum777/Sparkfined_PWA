@@ -94,7 +94,7 @@ export default function ChartPage() {
     // A) Test-Modus: ?test=<token> hat höchste Priorität
     const testTok = url.searchParams.get("test");
     if (testTok) {
-      const payload = decodeRuleToken(testTok) as TestRulePayload | null;
+      const payload = decodeRuleToken(testTok);
       if (payload) {
         setAddress(payload.address || "");
         setTf((payload.tf as any) || "15m");
@@ -111,7 +111,9 @@ export default function ChartPage() {
           if (typeof obj.chart.snap === "boolean") setSnap(obj.chart.snap);
           if (obj.chart.indState) setIndState(obj.chart.indState);
           if (Array.isArray(obj.chart.shapes)) setShapes(obj.chart.shapes);
-        } catch {}
+        } catch (err) {
+          console.error('Failed to parse saved chart state:', err);
+        }
       }
     } else {
       const raw = url.searchParams.get("chart");
@@ -125,8 +127,7 @@ export default function ChartPage() {
         if (Array.isArray(st.shapes)) setShapes(st.shapes);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // Only run once on mount
   React.useEffect(() => {
     // WRITE on state change (replaceState, kein History-Spam)
     const state = { address, tf, view, snap, indState, shapes };
@@ -140,8 +141,7 @@ export default function ChartPage() {
   // apply default replay speed from settings
   React.useEffect(() => {
     replay.setSpeed(settings.replaySpeed);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.replaySpeed]);
+  }, [settings.replaySpeed, replay]);
   // Match view to replay cursor when playing
   React.useEffect(() => {
     if (!data?.length || !replay.state.isPlaying) return;
@@ -151,7 +151,7 @@ export default function ChartPage() {
       const start = Math.max(0, Math.min(cursor - Math.floor(span*0.7), Math.max(0, data.length - span)));
       setView({ start, end: start + span });
     }
-  }, [replay.state.cursor, replay.state.isPlaying, data?.length]);
+  }, [replay.state.cursor, replay.state.isPlaying, data?.length, view.start, view.end]);
 
   const onStep = (dir: -1|1, size = 1) => {
     if (!data?.length) return;
@@ -236,7 +236,7 @@ export default function ChartPage() {
       }
       (window as any).__PENDING_TEST_RULE__ = undefined;
     })();
-  }, [data, tf]); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, tf, addBookmarkEvent]); // Include callback in deps
 
   const clearTest = () => {
     setTestHits([]);
@@ -279,9 +279,17 @@ export default function ChartPage() {
         onJumpTimestamp(bookmarks[Number(e.key)-1].t);
         return;
       }
-      if (e.key === "ArrowLeft") { e.preventDefault(); onStep(-1, e.shiftKey ? 10 : 1); }
-      if (e.key === "ArrowRight"){ e.preventDefault(); onStep( 1, e.shiftKey ? 10 : 1); }
-      if (e.code === "Space") { e.preventDefault(); replay.state.isPlaying ? replay.stop() : replay.start(); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); onStep(-1, e.shiftKey ? 10 : 1); return; }
+      if (e.key === "ArrowRight"){ e.preventDefault(); onStep( 1, e.shiftKey ? 10 : 1); return; }
+      if (e.code === "Space") { 
+        e.preventDefault(); 
+        if (replay.state.isPlaying) {
+          replay.stop();
+        } else {
+          replay.start();
+        }
+        return; 
+      }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
         e.preventDefault(); doUndo(); return;
       }

@@ -165,7 +165,7 @@ async function fetchMoralisPrice(
 /**
  * Fetch pair/liquidity data from Moralis (EVM only)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function fetchMoralisPair(
   pairAddress: string,
   chain: ChainId,
@@ -221,7 +221,7 @@ function normalizeMoralisResponse(
   raw: MoralisPriceResponse,
   address: string,
   chain: ChainId,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   pairData: any,
   latency: number,
   cached: boolean
@@ -290,7 +290,7 @@ function normalizeMoralisResponse(
  */
 function calculateConfidence(
   data: MoralisPriceResponse,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   pairData: any
 ): number {
   let score = 0.5 // Base score

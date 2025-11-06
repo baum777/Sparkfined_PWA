@@ -5,7 +5,23 @@ import react from "eslint-plugin-react";
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**", "*.config.js", "*.config.ts", "scripts/**"]
+    ignores: ["dist/**", "node_modules/**", "*.config.js", "*.config.ts", "scripts/**", "wireframes/**"]
+  },
+  // Service Worker files (public/push/sw.js)
+  {
+    files: ["public/**/*.js"],
+    languageOptions: {
+      globals: {
+        self: "readonly",
+        clients: "readonly",
+        caches: "readonly",
+        registration: "readonly",
+        addEventListener: "readonly",
+        fetch: "readonly",
+        console: "readonly"
+      },
+      sourceType: "script"
+    }
   },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked.map(config => ({

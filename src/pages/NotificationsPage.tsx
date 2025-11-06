@@ -56,7 +56,11 @@ export default function NotificationsPage() {
   };
 
   const askPermission = async () => {
-    try { if ("Notification" in window) await Notification.requestPermission(); } catch {}
+    try { 
+      if ("Notification" in window) await Notification.requestPermission(); 
+    } catch (err) {
+      console.error('Failed to request notification permission:', err);
+    }
   };
 
   return (
