@@ -1,3 +1,6 @@
+/* Google Fonts Fallback (must be first) */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
 /* JetBrains Mono — Latin Subset */
 
 /**
@@ -26,6 +29,3 @@
   font-style: normal;
   font-display: swap;
 }
-
-/* Google Fonts Fallback (loads if local not found) */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
