@@ -8,7 +8,7 @@ import { initializeLayoutToggles } from './lib/layout-toggle'
 initializeLayoutToggles()
 
 // Service Worker Registration - Manual Update Flow
-// SW is registered via vite-plugin-pwa with registerType: 'prompt'
+// SW is registered via vite-plugin-pwa with registerType: 'autoUpdate'
 // Update handling is done via UpdateBanner component
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   // Listen for SW messages (e.g., cache status, SKIP_WAITING)
@@ -16,19 +16,27 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     if (event.data) {
       switch (event.data.type) {
         case 'CACHE_UPDATED':
-          if (import.meta.env.DEV) console.log('📦 Cache updated:', event.data.url)
+          console.log('📦 Cache updated:', event.data.url)
           break
         case 'SW_ACTIVATED':
-          if (import.meta.env.DEV) console.log('✅ Service Worker activated')
+          console.log('✅ Service Worker activated')
           break
       }
     }
   })
 
   // Listen for controllerchange - reload when new SW takes over
+  let refreshing = false
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (import.meta.env.DEV) console.log('[PWA] controllerchange → reload')
+    if (refreshing) return
+    console.log('[PWA] controllerchange → reload')
+    refreshing = true
     setTimeout(() => location.reload(), 250)
+  })
+
+  // Catch service worker errors
+  navigator.serviceWorker.ready.catch((error) => {
+    console.error('[PWA] Service worker registration failed:', error)
   })
 }
 

@@ -21,6 +21,7 @@ body {
 #root {
   width: 100%;
   min-height: 100vh;
+  background-color: rgb(var(--color-bg));
 }
 
 /* Utility classes */
