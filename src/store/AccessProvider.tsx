@@ -46,9 +46,27 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
     setError(null)
 
     try {
-      const response = await fetch(`${ACCESS_CONFIG.API_BASE}/access/status?wallet=${wallet}`)
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+
+      const response = await fetch(`${ACCESS_CONFIG.API_BASE}/access/status?wallet=${wallet}`, {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
       
+      clearTimeout(timeoutId)
+
       if (!response.ok) {
+        // Don't throw for 404 or other client errors - just set status to 'none'
+        if (response.status === 404) {
+          setStatus('none')
+          setDetails(null)
+          setLoading(false)
+          return
+        }
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
 
@@ -56,29 +74,45 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
       
       const accessDetails: AccessDetails = {
         status: data.status,
-        rank: data.details.rank,
-        nftMint: data.details.nftMint,
-        tokenBalance: data.details.tokenBalance,
-        hasNFT: !!data.details.nftMint,
-        meetsHoldRequirement: data.details.tokenBalance >= ACCESS_CONFIG.HOLD_REQUIREMENT,
-        note: data.details.note,
+        rank: data.details?.rank ?? 0,
+        nftMint: data.details?.nftMint ?? null,
+        tokenBalance: data.details?.tokenBalance ?? 0,
+        hasNFT: !!data.details?.nftMint,
+        meetsHoldRequirement: (data.details?.tokenBalance ?? 0) >= ACCESS_CONFIG.HOLD_REQUIREMENT,
+        note: data.details?.note ?? null,
       }
 
       setStatus(data.status)
       setDetails(accessDetails)
       
       // Persist to localStorage
-      localStorage.setItem('sparkfiend_access_status', JSON.stringify({
-        status: data.status,
-        details: accessDetails,
-        timestamp: Date.now(),
-      }))
+      try {
+        localStorage.setItem('sparkfiend_access_status', JSON.stringify({
+          status: data.status,
+          details: accessDetails,
+          timestamp: Date.now(),
+        }))
+      } catch (storageErr) {
+        // localStorage might be disabled or full - don't fail the whole operation
+        console.warn('Failed to save access status to localStorage:', storageErr)
+      }
 
     } catch (err) {
-      console.error('Error checking access status:', err)
-      setError(err instanceof Error ? err.message : 'Failed to check status')
-      setStatus('none')
-      setDetails(null)
+      // Handle AbortError (timeout) gracefully
+      if (err instanceof Error && err.name === 'AbortError') {
+        console.warn('Access status check timed out')
+        setError('Request timeout - using cached status if available')
+      } else {
+        console.error('Error checking access status:', err)
+        setError(err instanceof Error ? err.message : 'Failed to check status')
+      }
+      
+      // Don't reset status to 'none' if we have cached data - keep using cache
+      // Only set to 'none' if we truly don't have any data
+      if (!localStorage.getItem('sparkfiend_access_status')) {
+        setStatus('none')
+        setDetails(null)
+      }
     } finally {
       setLoading(false)
     }
@@ -129,22 +163,44 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
 
   /**
    * Load cached status from localStorage on mount
+   * This ensures the app can render even if API is unavailable
    */
   useEffect(() => {
-    const cached = localStorage.getItem('sparkfiend_access_status')
-    if (cached) {
-      try {
-        const { status: cachedStatus, details: cachedDetails, timestamp } = JSON.parse(cached)
-        
-        // Only use cache if less than 5 minutes old
-        const cacheAge = Date.now() - timestamp
-        if (cacheAge < 5 * 60 * 1000) {
-          setStatus(cachedStatus)
-          setDetails(cachedDetails)
-          console.log('[AccessProvider] Loaded cached status:', cachedStatus)
+    try {
+      const cached = localStorage.getItem('sparkfiend_access_status')
+      if (cached) {
+        try {
+          const { status: cachedStatus, details: cachedDetails, timestamp } = JSON.parse(cached)
+          
+          // Use cache if less than 5 minutes old, or if older but still valid (grace period)
+          const cacheAge = Date.now() - timestamp
+          const maxAge = 5 * 60 * 1000 // 5 minutes
+          const gracePeriod = 24 * 60 * 60 * 1000 // 24 hours grace period for stale data
+          
+          if (cacheAge < maxAge || cacheAge < gracePeriod) {
+            setStatus(cachedStatus)
+            setDetails(cachedDetails)
+            if (import.meta.env.DEV) {
+              console.log('[AccessProvider] Loaded cached status:', cachedStatus, `(age: ${Math.round(cacheAge / 1000)}s)`)
+            }
+          } else {
+            // Cache too old, clear it
+            localStorage.removeItem('sparkfiend_access_status')
+          }
+        } catch (err) {
+          console.error('Error parsing cached access status:', err)
+          // Clear corrupted cache
+          try {
+            localStorage.removeItem('sparkfiend_access_status')
+          } catch {
+            // Ignore errors when clearing
+          }
         }
-      } catch (err) {
-        console.error('Error parsing cached access status:', err)
+      }
+    } catch (err) {
+      // localStorage might be disabled - that's okay, just continue without cache
+      if (import.meta.env.DEV) {
+        console.warn('[AccessProvider] localStorage not available:', err)
       }
     }
   }, [])
