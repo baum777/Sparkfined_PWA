@@ -358,11 +358,21 @@ This project is proprietary software. Unauthorized copying, distribution, or use
 
 ---
 
+## 📚 Documentation
+
+Comprehensive documentation is available in the `/docs` directory:
+
+- **[Documentation Index](./docs/README.md)** - Complete guide to all documentation
+- **[Deployment Guide](./docs/DEPLOY_GUIDE.md)** - Step-by-step Vercel deployment
+- **[Final Project Report](./docs/FINAL_PROJECT_REPORT.md)** - Complete project summary
+- **[Lighthouse Optimization](./docs/LIGHTHOUSE_OPTIMIZATION.md)** - Performance optimization guide
+
 ## 📞 Support
 
 - **Issues:** File bugs via GitHub Issues (private repo)
 - **Discussions:** GitHub Discussions for feature requests
-- **Documentation:** See `/docs` and `/wireframes` directories
+- **Documentation:** See `/docs` directory for comprehensive guides
+- **Wireframes:** UI/UX specifications in `/wireframes` directory
 - **Deployment Logs:** Check Vercel dashboard for production status
 
 ---
