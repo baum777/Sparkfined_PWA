@@ -1,61 +1,55 @@
 import { NavLink } from 'react-router-dom'
-import { ChartBarIcon, BookOpenIcon, PlayIcon, PresentationChartLineIcon } from '@heroicons/react/24/outline'
+import { Home, BarChart3, FileText, Settings } from '@/lib/icons'
+import type { LucideIcon } from 'lucide-react'
 
-const navItems = [
-  { path: '/', label: 'Analyze', icon: ChartBarIcon },
-  { path: '/chart', label: 'Chart', icon: PresentationChartLineIcon },
-  { path: '/journal', label: 'Journal', icon: BookOpenIcon },
-  { path: '/replay', label: 'Replay', icon: PlayIcon },
+interface NavItem {
+  path: string
+  label: string
+  Icon: LucideIcon
+}
+
+const navItems: NavItem[] = [
+  { path: '/', label: 'Board', Icon: Home },
+  { path: '/analyze', label: 'Analyze', Icon: BarChart3 },
+  { path: '/journal', label: 'Journal', Icon: FileText },
+  { path: '/settings', label: 'Settings', Icon: Settings },
 ]
 
 export default function BottomNav() {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-bg-elevated/90 backdrop-blur-md border-t border-border shadow-card-elevated"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-800 bg-zinc-900/95 backdrop-blur-sm lg:hidden"
       role="navigation"
-      aria-label="Bottom navigation"
+      aria-label="Main navigation"
     >
-      <div className="container mx-auto px-4">
-        <div className="flex justify-around">
-          {navItems.map(({ path, label, icon: Icon }) => (
+      <div className="mx-auto max-w-7xl px-2">
+        <div className="grid grid-cols-4 gap-1">
+          {navItems.map(({ path, label, Icon }) => (
             <NavLink
               key={path}
               to={path}
               className={({ isActive }) =>
-                `relative flex flex-col items-center justify-center py-3 px-4 min-w-[80px] transition-all duration-180 ease-soft-out group ${
-                  isActive 
-                    ? 'text-accent' 
-                    : 'text-text-tertiary hover:text-text-primary'
+                `flex flex-col items-center gap-1 py-3 px-2 transition-colors relative ${
+                  isActive
+                    ? 'text-emerald-500'
+                    : 'text-zinc-500 hover:text-zinc-300 active:text-zinc-400'
                 }`
               }
-              aria-label={label}
+              style={({ isActive }) => ({
+                borderTop: isActive ? '2px solid var(--color-brand)' : undefined,
+                transition: 'all var(--duration-short) var(--ease-in-out)',
+              })}
             >
               {({ isActive }) => (
                 <>
-                  {/* Monoline Icon with neon glow on active */}
-                  <div className={`relative transition-all duration-180 ${isActive ? 'glow-accent' : ''}`}>
-                    <Icon className="w-6 h-6 mb-1" aria-hidden="true" strokeWidth={1.5} />
-                    
-                    {/* Active indicator: subtle top accent line */}
-                    {isActive && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-accent rounded-full glow-accent" />
-                    )}
-                  </div>
-                  
-                  <span className="text-xs font-sans font-medium tracking-wide">
-                    {label}
-                  </span>
-                  
-                  {/* Hover glow effect */}
-                  <div className="absolute inset-0 bg-accent/5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-180" />
+                  <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
+                  <span className="text-xs font-medium">{label}</span>
                 </>
               )}
             </NavLink>
           ))}
         </div>
       </div>
-      {/* Safe area padding for iOS */}
-      <div className="h-[env(safe-area-inset-bottom)]" />
     </nav>
   )
 }
