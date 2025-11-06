@@ -19,8 +19,10 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         // Pre-cache app shell for instant offline access
-        navigateFallback: '/offline.html',
-        navigateFallbackDenylist: [/^\/api/],
+        // CRITICAL FIX: Use index.html as fallback instead of offline.html
+        // offline.html should only be shown when truly offline, not on errors
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api/, /^\/_next/, /^\/static/],
         runtimeCaching: [
           // Board API - Stale-While-Revalidate (KPIs, Feed)
           {

@@ -23,8 +23,13 @@ const OLED_KEY = 'oled_mode';
  * Default: 'rounded'
  */
 export function getLayoutStyle(): LayoutStyle {
-  const stored = localStorage.getItem(LAYOUT_KEY);
-  return (stored === 'sharp' ? 'sharp' : 'rounded') as LayoutStyle;
+  try {
+    const stored = localStorage.getItem(LAYOUT_KEY);
+    return (stored === 'sharp' ? 'sharp' : 'rounded') as LayoutStyle;
+  } catch (error) {
+    // localStorage might not be available (SSR, private mode, etc.)
+    return 'rounded';
+  }
 }
 
 /**
@@ -32,8 +37,14 @@ export function getLayoutStyle(): LayoutStyle {
  * Updates data-layout attribute on body
  */
 export function setLayoutStyle(style: LayoutStyle) {
-  localStorage.setItem(LAYOUT_KEY, style);
-  document.body.setAttribute('data-layout', style);
+  try {
+    localStorage.setItem(LAYOUT_KEY, style);
+  } catch (error) {
+    // localStorage might not be available - continue anyway
+  }
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.setAttribute('data-layout', style);
+  }
 }
 
 /**
@@ -41,8 +52,13 @@ export function setLayoutStyle(style: LayoutStyle) {
  * Default: 'off'
  */
 export function getOledMode(): OledMode {
-  const stored = localStorage.getItem(OLED_KEY);
-  return (stored === 'on' ? 'on' : 'off') as OledMode;
+  try {
+    const stored = localStorage.getItem(OLED_KEY);
+    return (stored === 'on' ? 'on' : 'off') as OledMode;
+  } catch (error) {
+    // localStorage might not be available (SSR, private mode, etc.)
+    return 'off';
+  }
 }
 
 /**
@@ -50,8 +66,14 @@ export function getOledMode(): OledMode {
  * Updates data-oled attribute on body
  */
 export function setOledMode(mode: OledMode) {
-  localStorage.setItem(OLED_KEY, mode);
-  document.body.setAttribute('data-oled', mode === 'on' ? 'true' : 'false');
+  try {
+    localStorage.setItem(OLED_KEY, mode);
+  } catch (error) {
+    // localStorage might not be available - continue anyway
+  }
+  if (typeof document !== 'undefined' && document.body) {
+    document.body.setAttribute('data-oled', mode === 'on' ? 'true' : 'false');
+  }
 }
 
 /**
@@ -60,13 +82,23 @@ export function setOledMode(mode: OledMode) {
  * Call this in main.tsx BEFORE React render
  */
 export function initializeLayoutToggles() {
-  const layoutStyle = getLayoutStyle();
-  const oledMode = getOledMode();
-  
-  setLayoutStyle(layoutStyle);
-  setOledMode(oledMode);
-  
-  if (import.meta.env.DEV) {
-    console.log('[Layout Toggle] Initialized:', { layoutStyle, oledMode });
+  // Check if we're in a browser environment
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return; // SSR or non-browser environment
+  }
+
+  try {
+    const layoutStyle = getLayoutStyle();
+    const oledMode = getOledMode();
+    
+    setLayoutStyle(layoutStyle);
+    setOledMode(oledMode);
+    
+    if (import.meta.env.DEV) {
+      console.log('[Layout Toggle] Initialized:', { layoutStyle, oledMode });
+    }
+  } catch (error) {
+    // Don't block app initialization if layout toggle fails
+    console.warn('[Layout Toggle] Initialization failed:', error);
   }
 }

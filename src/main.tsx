@@ -5,7 +5,13 @@ import './styles/index.css'
 import { initializeLayoutToggles } from './lib/layout-toggle'
 
 // Initialize layout toggles BEFORE React render
-initializeLayoutToggles()
+// Wrap in try-catch to prevent blocking app initialization
+try {
+  initializeLayoutToggles()
+} catch (error) {
+  console.warn('[main.tsx] Layout toggle initialization failed:', error)
+  // Continue anyway - app should still work
+}
 
 // Service Worker Registration - Manual Update Flow
 // SW is registered via vite-plugin-pwa with registerType: 'autoUpdate'
@@ -51,11 +57,26 @@ window.addEventListener('offline', () => {
   document.body.classList.add('offline-mode')
 })
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-)
+// Ensure root element exists before rendering
+const rootElement = document.getElementById('root')
+if (!rootElement) {
+  console.error('[main.tsx] Root element not found!')
+  // Create root element if it doesn't exist (shouldn't happen, but safety check)
+  const newRoot = document.createElement('div')
+  newRoot.id = 'root'
+  document.body.appendChild(newRoot)
+  ReactDOM.createRoot(newRoot).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  )
+} else {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  )
+}
 
 // Hydration hint for Lighthouse (main thread idle sooner)
 if ('requestIdleCallback' in window) {
