@@ -29,11 +29,17 @@ describe('API Proxy Integration', () => {
   });
 
   it('handles timeout correctly', async () => {
-    // Timeout test (not awaiting slow promise, just demonstrating timeout logic)
-    void new Promise(resolve => setTimeout(resolve, 2000));
+    // Mock a slow fetch that will timeout
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (() => 
+      new Promise(resolve => setTimeout(resolve, 2000))
+    ) as typeof fetch;
 
     await expect(
       fetchWithTimeout('http://example.com', {}, 100, 0)
     ).rejects.toThrow();
+
+    // Restore
+    globalThis.fetch = originalFetch;
   });
 });
