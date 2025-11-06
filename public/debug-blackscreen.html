@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Black Screen Debug Tool</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0a0a0a;
+      color: #e6eef2;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .section {
+      background: #121212;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    h1, h2 {
+      color: #0fb34c;
+      margin-top: 0;
+    }
+    button {
+      background: #0fb34c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 5px;
+    }
+    button:hover {
+      background: #059669;
+    }
+    button.danger {
+      background: #ef4444;
+    }
+    button.danger:hover {
+      background: #dc2626;
+    }
+    .result {
+      background: #1a1a1a;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .success { color: #0fb34c; }
+    .error { color: #ef4444; }
+    .warning { color: #fbbf24; }
+    .info { color: #60a5fa; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Black Screen Debug Tool</h1>
+  <p>Dieses Tool hilft bei der Diagnose des Black Screen Problems auf Vercel.</p>
+
+  <div class="section">
+    <h2>1. Service Worker Status</h2>
+    <button onclick="checkServiceWorker()">Service Worker prüfen</button>
+    <button class="danger" onclick="clearServiceWorker()">Service Worker löschen</button>
+    <div id="sw-result" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>2. Cache Status</h2>
+    <button onclick="checkCache()">Cache prüfen</button>
+    <button class="danger" onclick="clearCache()">Alle Caches löschen</button>
+    <div id="cache-result" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>3. React Root Status</h2>
+    <button onclick="checkReact()">React prüfen</button>
+    <div id="react-result" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>4. Network Requests</h2>
+    <button onclick="checkNetwork()">Asset-Status prüfen</button>
+    <div id="network-result" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>5. Environment Variables</h2>
+    <button onclick="checkEnv()">Env-Vars prüfen</button>
+    <div id="env-result" class="result"></div>
+  </div>
+
+  <div class="section">
+    <h2>6. Vollständiger Reset</h2>
+    <button class="danger" onclick="fullReset()">Alles löschen & Neuladen</button>
+    <div id="reset-result" class="result"></div>
+  </div>
+
+  <script>
+    async function checkServiceWorker() {
+      const result = document.getElementById('sw-result');
+      result.innerHTML = '<span class="info">Prüfe Service Worker...</span>';
+      
+      try {
+        if (!('serviceWorker' in navigator)) {
+          result.innerHTML = '<span class="error">❌ Service Worker nicht unterstützt</span>';
+          return;
+        }
+
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        const controller = navigator.serviceWorker.controller;
+        
+        let output = '';
+        output += `<span class="info">Service Worker Support: ✅</span>\n`;
+        output += `Registrierungen: ${registrations.length}\n`;
+        output += `Controller: ${controller ? '✅ Aktiv' : '❌ Kein Controller'}\n\n`;
+
+        if (controller) {
+          output += `Controller URL: ${controller.scriptURL}\n`;
+          output += `Controller State: ${controller.state}\n`;
+        }
+
+        if (registrations.length > 0) {
+          output += `\nRegistrierte Service Workers:\n`;
+          registrations.forEach((reg, i) => {
+            output += `\n[${i + 1}] Scope: ${reg.scope}\n`;
+            if (reg.active) {
+              output += `    Active: ${reg.active.scriptURL}\n`;
+              output += `    State: ${reg.active.state}\n`;
+            }
+            if (reg.installing) {
+              output += `    Installing: ${reg.installing.scriptURL}\n`;
+            }
+            if (reg.waiting) {
+              output += `    Waiting: ${reg.waiting.scriptURL}\n`;
+            }
+          });
+        } else {
+          output += `\n<span class="success">✅ Keine Service Worker registriert</span>`;
+        }
+
+        result.innerHTML = output;
+      } catch (error) {
+        result.innerHTML = `<span class="error">Fehler: ${error.message}</span>`;
+      }
+    }
+
+    async function clearServiceWorker() {
+      const result = document.getElementById('sw-result');
+      result.innerHTML = '<span class="warning">Lösche Service Worker...</span>';
+      
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        let output = '';
+        
+        if (registrations.length === 0) {
+          output = '<span class="info">Keine Service Worker zum Löschen gefunden</span>';
+        } else {
+          for (const reg of registrations) {
+            const unregistered = await reg.unregister();
+            output += `Service Worker gelöscht: ${reg.scope} (${unregistered ? '✅' : '❌'})\n`;
+          }
+          output += '\n<span class="success">✅ Service Worker gelöscht. Seite wird neu geladen...</span>';
+          setTimeout(() => location.reload(), 2000);
+        }
+        
+        result.innerHTML = output;
+      } catch (error) {
+        result.innerHTML = `<span class="error">Fehler: ${error.message}</span>`;
+      }
+    }
+
+    async function checkCache() {
+      const result = document.getElementById('cache-result');
+      result.innerHTML = '<span class="info">Prüfe Cache...</span>';
+      
+      try {
+        if (!('caches' in window)) {
+          result.innerHTML = '<span class="error">❌ Cache API nicht unterstützt</span>';
+          return;
+        }
+
+        const cacheNames = await caches.keys();
+        let output = '';
+        output += `Cache-Stores gefunden: ${cacheNames.length}\n\n`;
+
+        if (cacheNames.length === 0) {
+          output += '<span class="success">✅ Keine Caches gefunden</span>';
+        } else {
+          for (const name of cacheNames) {
+            const cache = await caches.open(name);
+            const keys = await cache.keys();
+            output += `[${name}]\n`;
+            output += `  Einträge: ${keys.length}\n`;
+            if (keys.length > 0 && keys.length <= 10) {
+              keys.forEach(key => {
+                output += `    - ${key.url}\n`;
+              });
+            } else if (keys.length > 10) {
+              output += `    (${keys.length} Einträge, erste 10:)\n`;
+              keys.slice(0, 10).forEach(key => {
+                output += `    - ${key.url}\n`;
+              });
+            }
+            output += '\n';
+          }
+        }
+
+        result.innerHTML = output;
+      } catch (error) {
+        result.innerHTML = `<span class="error">Fehler: ${error.message}</span>`;
+      }
+    }
+
+    async function clearCache() {
+      const result = document.getElementById('cache-result');
+      result.innerHTML = '<span class="warning">Lösche alle Caches...</span>';
+      
+      try {
+        const cacheNames = await caches.keys();
+        let output = '';
+        
+        if (cacheNames.length === 0) {
+          output = '<span class="info">Keine Caches zum Löschen gefunden</span>';
+        } else {
+          for (const name of cacheNames) {
+            const deleted = await caches.delete(name);
+            output += `Cache gelöscht: ${name} (${deleted ? '✅' : '❌'})\n`;
+          }
+          output += '\n<span class="success">✅ Alle Caches gelöscht. Seite wird neu geladen...</span>';
+          setTimeout(() => location.reload(), 2000);
+        }
+        
+        result.innerHTML = output;
+      } catch (error) {
+        result.innerHTML = `<span class="error">Fehler: ${error.message}</span>`;
+      }
+    }
+
+    function checkReact() {
+      const result = document.getElementById('react-result');
+      result.innerHTML = '<span class="info">Prüfe React...</span>';
+      
+      try {
+        const root = document.getElementById('root');
+        let output = '';
+        
+        if (!root) {
+          output = '<span class="error">❌ #root Element nicht gefunden</span>';
+        } else {
+          output += `<span class="success">✅ #root Element gefunden</span>\n`;
+          output += `InnerHTML Länge: ${root.innerHTML.length} Zeichen\n`;
+          output += `Child Elements: ${root.children.length}\n`;
+          output += `Classes: ${root.className || '(keine)'}\n\n`;
+          
+          if (root.children.length > 0) {
+            output += 'Child Elements:\n';
+            Array.from(root.children).forEach((child, i) => {
+              output += `  [${i + 1}] ${child.tagName} (${child.className || 'keine Klasse'})\n`;
+            });
+          } else {
+            output += '<span class="warning">⚠️ Keine Child Elements - React hat möglicherweise nicht gerendert</span>';
+          }
+        }
+
+        // Prüfe ob React DevTools verfügbar
+        if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+          output += '\n<span class="success">✅ React DevTools erkannt</span>';
+        } else {
+          output += '\n<span class="info">ℹ️ React DevTools nicht erkannt (normal wenn nicht installiert)</span>';
+        }
+
+        result.innerHTML = output;
+      } catch (error) {
+        result.innerHTML = `<span class="error">Fehler: ${error.message}</span>`;
+      }
+    }
+
+    function checkNetwork() {
+      const result = document.getElementById('network-result');
+      result.innerHTML = '<span class="info">Prüfe Network-Status...</span>';
+      
+      try {
+        const entries = performance.getEntriesByType('resource');
+        const jsFiles = entries.filter(e => e.name.endsWith('.js'));
+        const cssFiles = entries.filter(e => e.name.endsWith('.css'));
+        
+        let output = '';
+        output += `Total Resources: ${entries.length}\n`;
+        output += `JavaScript Files: ${jsFiles.length}\n`;
+        output += `CSS Files: ${cssFiles.length}\n\n`;
+
+        const failed = entries.filter(e => {
+          const name = e.name.toLowerCase();
+          return (name.includes('.js') || name.includes('.css')) && 
+                 (e.transferSize === 0 || e.duration === 0);
+        });
+
+        if (failed.length > 0) {
+          output += '<span class="error">❌ Möglicherweise fehlgeschlagene Requests:</span>\n';
+          failed.forEach(e => {
+            output += `  - ${e.name}\n`;
+            output += `    Size: ${e.transferSize}, Duration: ${e.duration}ms\n`;
+          });
+        } else {
+          output += '<span class="success">✅ Alle Assets scheinen geladen zu sein</span>\n';
+        }
+
+        output += '\nWichtigste Assets:\n';
+        const mainAssets = entries
+          .filter(e => {
+            const name = e.name.toLowerCase();
+            return name.includes('main') || name.includes('index') || name.includes('app');
+          })
+          .slice(0, 10);
+        
+        mainAssets.forEach(e => {
+          const status = e.transferSize > 0 ? '✅' : '❌';
+          output += `  ${status} ${e.name}\n`;
+          output += `    Size: ${(e.transferSize / 1024).toFixed(2)} KB, Time: ${e.duration.toFixed(2)}ms\n`;
+        });
+
+        result.innerHTML = output;
+      } catch (error) {
+        result.innerHTML = `<span class="error">Fehler: ${error.message}</span>`;
+      }
+    }
+
+    function checkEnv() {
+      const result = document.getElementById('env-result');
+      result.innerHTML = '<span class="info">Prüfe Environment...</span>';
+      
+      try {
+        let output = '';
+        output += `User Agent: ${navigator.userAgent}\n`;
+        output += `URL: ${window.location.href}\n`;
+        output += `Origin: ${window.location.origin}\n`;
+        output += `Protocol: ${window.location.protocol}\n\n`;
+
+        output += 'Vercel Environment:\n';
+        output += `  VERCEL: ${window.location.hostname.includes('vercel') ? '✅ Ja' : '❌ Nein'}\n`;
+        output += `  Hostname: ${window.location.hostname}\n\n`;
+
+        output += 'Browser Features:\n';
+        output += `  Service Worker: ${'serviceWorker' in navigator ? '✅' : '❌'}\n`;
+        output += `  Cache API: ${'caches' in window ? '✅' : '❌'}\n`;
+        output += `  IndexedDB: ${'indexedDB' in window ? '✅' : '❌'}\n`;
+        output += `  LocalStorage: ${(() => {
+          try {
+            localStorage.setItem('test', 'test');
+            localStorage.removeItem('test');
+            return '✅';
+          } catch {
+            return '❌';
+          }
+        })()}\n`;
+
+        result.innerHTML = output;
+      } catch (error) {
+        result.innerHTML = `<span class="error">Fehler: ${error.message}</span>`;
+      }
+    }
+
+    async function fullReset() {
+      const result = document.getElementById('reset-result');
+      result.innerHTML = '<span class="warning">Führe vollständigen Reset durch...</span>';
+      
+      try {
+        let output = '';
+        
+        // Service Worker löschen
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const reg of registrations) {
+          await reg.unregister();
+          output += `Service Worker gelöscht: ${reg.scope}\n`;
+        }
+
+        // Caches löschen
+        const cacheNames = await caches.keys();
+        for (const name of cacheNames) {
+          await caches.delete(name);
+          output += `Cache gelöscht: ${name}\n`;
+        }
+
+        // LocalStorage löschen
+        try {
+          localStorage.clear();
+          output += 'LocalStorage gelöscht\n';
+        } catch (e) {
+          output += `LocalStorage Fehler: ${e.message}\n`;
+        }
+
+        // SessionStorage löschen
+        try {
+          sessionStorage.clear();
+          output += 'SessionStorage gelöscht\n';
+        } catch (e) {
+          output += `SessionStorage Fehler: ${e.message}\n`;
+        }
+
+        output += '\n<span class="success">✅ Vollständiger Reset abgeschlossen. Seite wird neu geladen...</span>';
+        result.innerHTML = output;
+        
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+      } catch (error) {
+        result.innerHTML = `<span class="error">Fehler: ${error.message}</span>`;
+      }
+    }
+
+    // Auto-check beim Laden
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        checkServiceWorker();
+        checkReact();
+        checkEnv();
+      }, 500);
+    });
+  </script>
+</body>
+</html>
