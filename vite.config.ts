@@ -12,14 +12,14 @@ export default defineConfig(({ mode }) => ({
     process.env.ANALYZE ? visualizer({ open: true, gzipSize: true, filename: 'dist/stats.html' }) as unknown as PluginOption : undefined,
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'icons/*', 'offline.html'],
       injectRegister: 'auto',
       manifest: false, // Use public/manifest.webmanifest instead of inline config
       manifestFilename: 'manifest.webmanifest',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         // Pre-cache app shell for instant offline access
-        navigateFallback: '/index.html',
+        navigateFallback: '/offline.html',
         navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
           // Board API - Stale-While-Revalidate (KPIs, Feed)
