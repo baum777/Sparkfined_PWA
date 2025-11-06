@@ -36,12 +36,15 @@ export function interpolateGhostCursor(
   if (keyframes.length === 0) return null;
 
   // If time is before first keyframe, return first keyframe position
-  if (time <= keyframes[0].time) {
-    return { x: keyframes[0].x, y: keyframes[0].y };
+  const first = keyframes[0];
+  if (!first) return null;
+  if (time <= first.time) {
+    return { x: first.x, y: first.y };
   }
 
   // If time is after last keyframe, return last keyframe position
   const last = keyframes[keyframes.length - 1];
+  if (!last) return null;
   if (time >= last.time) {
     return { x: last.x, y: last.y };
   }
@@ -51,15 +54,18 @@ export function interpolateGhostCursor(
   let after = keyframes[keyframes.length - 1];
 
   for (let i = 0; i < keyframes.length - 1; i++) {
-    if (keyframes[i].time <= time && keyframes[i + 1].time >= time) {
-      before = keyframes[i];
-      after = keyframes[i + 1];
+    const current = keyframes[i];
+    const next = keyframes[i + 1];
+    if (current && next && current.time <= time && next.time >= time) {
+      before = current;
+      after = next;
       break;
     }
   }
 
   // Linear interpolation
-  if (before.time === after.time) return before;
+  if (!before || !after) return null;
+  if (before.time === after.time) return { x: before.x, y: before.y };
 
   const t = (time - before.time) / (after.time - before.time);
   return {

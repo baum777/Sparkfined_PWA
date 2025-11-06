@@ -35,6 +35,7 @@ export function runBacktest(input: BacktestInput): BacktestResult {
   const win24 = 96;
   for (let i=start;i<end;i++){
     const p = ohlc[i];
+    if (!p) continue; // Skip missing data
     for (const r of rules){
       if (!perRule[r.id]) perRule[r.id] = { count:0 };
       if (r.kind === "price-cross") {
