@@ -19,8 +19,10 @@ wireframes/
 *.md
 !README.md
 
-# Scripts
-scripts/
+# Scripts (exclude dev/test scripts, but keep bundle checker)
+scripts/*.sh
+scripts/*.ps1
+scripts/verify*.mjs
 verify-deployment.sh
 verify_all.ps1
 

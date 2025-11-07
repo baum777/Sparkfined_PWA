@@ -13,6 +13,8 @@
  */
 
 /* Local font (priority if file exists) */
+/* Commented out until local font files are added to public/fonts/ directory */
+/*
 @font-face {
   font-family: 'JetBrains Mono';
   src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
@@ -20,8 +22,11 @@
   font-style: normal;
   font-display: swap;
 }
+*/
 
 /* Medium weight (optional) */
+/* Commented out until local font files are added to public/fonts/ directory */
+/*
 @font-face {
   font-family: 'JetBrains Mono';
   src: url('/fonts/jetbrains-mono-medium-latin.woff2') format('woff2');
@@ -29,3 +34,4 @@
   font-style: normal;
   font-display: swap;
 }
+*/
