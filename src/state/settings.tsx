@@ -1,4 +1,5 @@
 import React from "react";
+import { getJSON, setJSON } from "@/lib/safeStorage";
 
 export type ThemeMode = "system" | "dark" | "light";
 export type Settings = {
@@ -25,10 +26,9 @@ const DEFAULTS: Settings = {
 };
 
 function read(): Settings {
-  try { return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(KEY) || "{}")) }; }
-  catch { return DEFAULTS; }
+  return getJSON(KEY, DEFAULTS);
 }
-function write(s: Settings) { localStorage.setItem(KEY, JSON.stringify(s)); }
+function write(s: Settings) { setJSON(KEY, s); }
 
 type Ctx = { settings: Settings; setSettings: (next: Partial<Settings>) => void };
 const SettingsCtx = React.createContext<Ctx | null>(null);
@@ -41,6 +41,9 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   // apply theme to <html>
   React.useEffect(() => {
+    // Guard against SSR/non-browser environments
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    
     const root = document.documentElement;
     const apply = (mode: ThemeMode) => {
       const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
