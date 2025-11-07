@@ -1,8 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "strictNullChecks": true
-  },
   "exclude": [
     "tests",
     "**/*.test.ts",
