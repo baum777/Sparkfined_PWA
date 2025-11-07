@@ -69,7 +69,7 @@ function find24hBase(d: Ohlc[], i: number){
   const current = d[i];
   if (!current) return d[0]?.c ?? 0;
   const cutoff = current.t - 86_400_000;
-  let j = i; while (j>0 && d[j]?.t && d[j].t >= cutoff) j--;
+  let j = i; while (j>0 && d[j] && d[j]!.t >= cutoff) j--;
   return d[Math.max(0,j)]?.c ?? d[0]?.c ?? 0;
 }
 function atrHiLo(d: Ohlc[], period:number){
@@ -102,8 +102,8 @@ function sma(arr:number[], len:number){
   const out = Array(arr.length).fill(NaN);
   let sum = 0;
   for (let i=0;i<arr.length;i++){
-    sum += arr[i];
-    if (i>=len) sum -= arr[i-len];
+    sum += arr[i] ?? 0;
+    if (i>=len) sum -= arr[i-len] ?? 0;
     if (i>=len-1) out[i] = sum / len;
   }
   return out;

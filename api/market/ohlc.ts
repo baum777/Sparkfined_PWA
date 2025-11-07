@@ -17,7 +17,8 @@ async function fetchJSON<T>(url: string, init: RequestInit = {}, timeoutMs = 500
 async function fromDexPaprika(address: string, tf: string): Promise<Ohlc[] | null> {
   const base = (Providers.dexpaprika?.base || "").replace(/\/+$/, "");
   if (!base) return null;
-  const headers = Providers.dexpaprika.headers?.() || {};
+  const rawHeaders = Providers.dexpaprika.headers?.();
+  const headers: Record<string, string> = rawHeaders && Object.keys(rawHeaders).length > 0 ? rawHeaders : undefined as any;
   const candidates = [
     `/v1/ohlc/${encodeURIComponent(address)}?tf=${encodeURIComponent(tf)}`,
     `/ohlc/${encodeURIComponent(address)}?tf=${encodeURIComponent(tf)}`
@@ -25,7 +26,7 @@ async function fromDexPaprika(address: string, tf: string): Promise<Ohlc[] | nul
   for (const path of candidates) {
     try {
       const url = `${base}${path}`;
-      const res: any = await fetchJSON(url, { headers }, 5000);
+      const res: any = await fetchJSON(url, headers ? { headers } : {}, 5000);
       const arr = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
       const out = arr.map((row: any) => {
         if (Array.isArray(row)) {

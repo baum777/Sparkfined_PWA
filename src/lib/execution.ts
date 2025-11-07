@@ -66,8 +66,8 @@ export function buildLadder(idea: Idea, config: LadderConfig): Ladder {
   const items: LadderItem[] = targets.map((target, idx) => ({
     idx,
     target: target.toFixed(8),
-    units: ((totalUnits * dist[idx]) / 100).toFixed(2),
-    pct: dist[idx],
+    units: ((totalUnits * (dist[idx] ?? 0)) / 100).toFixed(2),
+    pct: dist[idx] ?? 0,
   }));
   
   return { config, items, totalUnits };
