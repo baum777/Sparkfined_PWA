@@ -32,8 +32,22 @@ const secondaryNavItems: NavItem[] = [
 ];
 
 export default function Sidebar() {
+  // Map labels to tour step IDs
+  const getTourId = (label: string) => {
+    const idMap: Record<string, string> = {
+      'Board': 'board-link',
+      'Analyze': 'analyze-link',
+      'Chart': 'chart-link',
+      'Journal': 'journal-link',
+      'Alerts': 'notifications-link',
+      'Settings': 'settings-link',
+    };
+    return idMap[label] || '';
+  };
+
   return (
     <aside
+      id="main-navigation"
       className="fixed left-0 top-0 hidden h-screen w-20 flex-col border-r border-zinc-800 bg-zinc-900 py-6 lg:flex"
       role="navigation"
       aria-label="Primary navigation"
@@ -44,6 +58,7 @@ export default function Sidebar() {
           <NavLink
             key={path}
             to={path}
+            id={getTourId(label)}
             className={({ isActive }) =>
               `flex flex-col items-center gap-1 rounded-lg py-3 px-2 transition-all ${
                 isActive
@@ -73,6 +88,7 @@ export default function Sidebar() {
           <NavLink
             key={path}
             to={path}
+            id={getTourId(label)}
             className={({ isActive }) =>
               `flex flex-col items-center gap-1 rounded-lg py-3 px-2 transition-all ${
                 isActive
