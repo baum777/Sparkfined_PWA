@@ -43,12 +43,15 @@ pnpm build      # ✅ Success
 **Problem:** E2E tests existed but weren't run in CI/deployment.
 
 **Fix:**
-- Updated `@package.json#L11` to include E2E in build:
+- Created separate `build:ci` script for CI/deployment:
   ```json
-  "build": "tsc -b && vite build && pnpm test:e2e && pnpm check:size"
+  "build": "tsc -b && vite build && pnpm check:size"      // Fast local build
+  "build:ci": "pnpm build && pnpm test:e2e"               // CI build with E2E
   ```
-- Added `build:fast` for local dev (no E2E)
-- Playwright webserver configured in `@playwright.config.ts`
+- Playwright uses `build:fast` to avoid circular dependency
+- E2E runs in separate step (not inline) to prevent timeout
+
+**Why separated:** Running E2E in build created circular dependency (Playwright → build → E2E → Playwright)
 
 **Coverage:** 7 E2E specs:
 - Board A11y (axe-core integration)
