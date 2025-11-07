@@ -17,6 +17,10 @@ export default defineConfig(({ mode }) => ({
       manifest: false, // Use public/manifest.webmanifest instead of inline config
       manifestFilename: 'manifest.webmanifest',
       workbox: {
+        // STEP A: Service Worker Cache-Sanity
+        cleanupOutdatedCaches: true, // Remove old precaches automatically
+        skipWaiting: true, // Activate new SW immediately (don't wait for tab close)
+        clientsClaim: true, // New SW takes control of all tabs immediately
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         // Pre-cache app shell for instant offline access
         // CRITICAL FIX: Use index.html as fallback instead of offline.html
