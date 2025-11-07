@@ -8,6 +8,7 @@ import { initializeLayoutToggles } from './lib/layout-toggle'
 import { AppErrorBoundary } from '@/app/AppErrorBoundary'
 import { logError } from '@/lib/log-error'
 import { validateEnv } from '@/lib/env'
+import { autoCheckAssets } from '@/lib/debug-assets'
 
 // STEP B: Early ENV validation (non-fatal, logs warnings only)
 try {
@@ -143,4 +144,9 @@ if ('requestIdleCallback' in window) {
   (window as any).requestIdleCallback(() => {
     if (import.meta.env.DEV) console.log('[idle] app settled')
   })
+}
+
+// CRITICAL FIX: Auto-check assets in preview/prod to diagnose load failures
+if (import.meta.env.PROD) {
+  autoCheckAssets()
 }
