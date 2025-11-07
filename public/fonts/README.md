@@ -3,7 +3,8 @@
 ## Current Status
 
 **✅ Google Fonts CDN active** (immediate fallback, works now)  
-**⏳ Local font file:** Not yet added (optional for production)
+**⏳ Local font file:** Not yet added (optional for production)  
+**✅ Build Fix:** Local @font-face declarations commented out in `src/styles/fonts.css` to prevent build errors
 
 ## Test Font Rendering
 
@@ -64,10 +65,14 @@ For even smaller file size (~30 KB instead of ~150 KB):
 
 ### Verify Local Font Works
 
-1. **Place file:** `public/fonts/jetbrains-mono-latin.woff2`
-2. **Hard refresh:** Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
-3. **DevTools → Network:** Filter "font" → Should see local file loading
-4. **DevTools → Elements:** Inspect `.font-mono` → font-family should be "JetBrains Mono"
+1. **Place font files:** 
+   - `public/fonts/jetbrains-mono-latin.woff2`
+   - `public/fonts/jetbrains-mono-medium-latin.woff2` (optional)
+2. **Uncomment @font-face declarations:** In `src/styles/fonts.css`, remove the `/*` and `*/` around the `@font-face` blocks
+3. **Rebuild:** Run `pnpm run build` to verify no build errors
+4. **Hard refresh:** Cmd+Shift+R (Mac) or Ctrl+Shift+R (Windows)
+5. **DevTools → Network:** Filter "font" → Should see local file loading
+6. **DevTools → Elements:** Inspect `.font-mono` → font-family should be "JetBrains Mono"
 
 If local file loads, Google Fonts CDN won't be used anymore (local has priority).
 
