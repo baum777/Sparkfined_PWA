@@ -3,7 +3,7 @@ export const config = { runtime: "edge" };
 export default async function handler(req: Request) {
   if (req.method !== "POST") return new Response("POST only", { status:405 });
   try {
-    const { payload, path="/chart" } = await req.json() as any;
+    const { payload, path="/chart" } = await req.json();
     if (!payload || typeof payload !== "object") return json({ ok:false, error:"payload required" }, 400);
     const token = encode(payload);
     const url = new URL(req.url);

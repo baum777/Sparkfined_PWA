@@ -25,7 +25,6 @@ export function rafBatch<T extends (...a:any[])=>any>(fn:T){
     scheduled=true;
     requestAnimationFrame(()=>{
       scheduled=false;
-      // @ts-ignore
       fn(...lastArgs);
     });
   };

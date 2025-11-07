@@ -19,7 +19,8 @@ export default function ChartHeader({
         return;
       }
       const map: Record<string, typeof timeframe> = { "1":"1m","2":"5m","3":"15m","4":"1h","5":"4h","6":"1d" };
-      if (map[e.key]) { onTimeframe(map[e.key]); }
+      const newTimeframe = map[e.key];
+      if (newTimeframe) { onTimeframe(newTimeframe); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

@@ -75,7 +75,9 @@ export default function AnalyzePage() {
       if (aiText) {
         await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: journalId, body: seedText + "\n\n" + aiText, address, tf, ruleId }) });
       }
-    } catch {}
+    } catch (err) {
+      console.error('Failed to insert AI into journal:', err);
+    }
     // 4) Idea Objekt
     const idea = {
       address, tf, side: "long", title: `Idea ${address.slice(0,4)}…`,
@@ -90,7 +92,9 @@ export default function AnalyzePage() {
       if (!wl.find((x:any)=>x.address===address)) wl.push({ address, addedAt: Date.now() });
       localStorage.setItem("sparkfined.watchlist.v1", JSON.stringify(wl));
       await fetch("/api/ideas", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: iRes?.idea?.id, ...idea, flags:{ ...idea.flags, watchAdded:true } }) });
-    } catch {}
+    } catch (err) {
+      console.error('Failed to add to watchlist:', err);
+    }
     alert("Trade-Idea Paket angelegt (Rule + Journal + Idea + Watchlist).");
   };
 
@@ -127,7 +131,7 @@ export default function AnalyzePage() {
   const btn  = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
+    <div className="mx-auto max-w-6xl px-4 py-4 pb-20 md:py-6 md:pb-6">
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <input className={ctrl} placeholder="Contract Address (CA)" value={address} onChange={e=>setAddress(e.target.value)} />
         <select className={ctrl} value={tf} onChange={e=>setTf(e.target.value as any)}>
@@ -135,7 +139,7 @@ export default function AnalyzePage() {
         </select>
         <button className={btn} onClick={load} disabled={loading || !address}>{loading?"Lade…":"Analysieren"}</button>
         <a className={btn} href={permalink} target="_blank" rel="noreferrer">→ Chart</a>
-        {shortlink && <button className={btn} onClick={()=>navigator.clipboard.writeText(shortlink!)}>Copy Shortlink</button>}
+        {shortlink && <button className={btn} onClick={()=>navigator.clipboard.writeText(shortlink)}>Copy Shortlink</button>}
         <button className={btn} onClick={exportJSON} disabled={!data}>Export JSON</button>
         <button className={btn} onClick={exportCSV}  disabled={!data}>Export CSV</button>
       </div>

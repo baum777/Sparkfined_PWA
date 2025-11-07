@@ -11,7 +11,7 @@
  */
 
 import { useState } from 'react'
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
+import { ChevronDown, ChevronUp } from '@/lib/icons'
 import type { AnalysisResult, AITeaserAnalysis } from '@/types/analysis'
 
 interface ResultCardProps {
@@ -195,9 +195,9 @@ export default function ResultCard({
             Advanced Details
           </h4>
           {showAdvanced ? (
-            <ChevronUpIcon className="w-5 h-5 text-text-tertiary" />
+            <ChevronUp className="w-5 h-5 text-text-tertiary" />
           ) : (
-            <ChevronDownIcon className="w-5 h-5 text-text-tertiary" />
+            <ChevronDown className="w-5 h-5 text-text-tertiary" />
           )}
         </button>
 

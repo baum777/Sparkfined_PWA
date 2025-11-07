@@ -18,7 +18,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Board Page - Text Scaling (200% Zoom)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5173/');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
   });
 
@@ -138,12 +138,15 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
       const elements = Array.from(document.querySelectorAll('*'));
       for (let i = 0; i < elements.length; i++) {
         for (let j = i + 1; j < elements.length; j++) {
-          const rect1 = elements[i].getBoundingClientRect();
-          const rect2 = elements[j].getBoundingClientRect();
+          const elem1 = elements[i];
+          const elem2 = elements[j];
+          if (!elem1 || !elem2) continue;
+          const rect1 = elem1.getBoundingClientRect();
+          const rect2 = elem2.getBoundingClientRect();
           
           // Check if elements are siblings and overlap
           if (
-            elements[i].parentElement === elements[j].parentElement &&
+            elem1.parentElement === elem2.parentElement &&
             rect1.left < rect2.right &&
             rect1.right > rect2.left &&
             rect1.top < rect2.bottom &&
@@ -164,7 +167,7 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
 
 test.describe('Board Page - Browser Zoom', () => {
   test('should support browser zoom controls', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
 
     // Simulate browser zoom via CSS zoom property

@@ -18,7 +18,7 @@ import AxeBuilder from '@axe-core/playwright';
 test.describe('Board Page - Accessibility', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to Board page
-    await page.goto('http://localhost:5173/');
+    await page.goto('/');
     
     // Wait for page to be interactive
     await page.waitForLoadState('networkidle');
@@ -136,7 +136,7 @@ test.describe('Board Page - Accessibility', () => {
 
 test.describe('Board Components - Accessibility', () => {
   test('KPI Tiles should be keyboard accessible', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
 
     // Find clickable KPI tiles
@@ -157,7 +157,7 @@ test.describe('Board Components - Accessibility', () => {
   });
 
   test('Feed filters should be keyboard accessible', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
 
     // Find filter buttons
@@ -181,7 +181,7 @@ test.describe('Board Components - Accessibility', () => {
   });
 
   test('Bottom navigation should be keyboard accessible', async ({ page }) => {
-    await page.goto('http://localhost:5173/');
+    await page.goto('/');
     await page.waitForLoadState('networkidle');
 
     // Mobile viewport

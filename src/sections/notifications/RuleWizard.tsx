@@ -14,7 +14,7 @@ export default function RuleWizard({ onCreate }: { onCreate: (rule:any)=>void })
     // Defaults setzen, wenn Preset wechselt
     const init: Record<string, any> = {};
     preset.fields.forEach(f => {
-      // @ts-ignore
+      // @ts-expect-error - Dynamic field key assignment from preset config
       if (f.default!=null) init[f.key] = f.default;
     });
     setValues(init);
@@ -56,7 +56,6 @@ export default function RuleWizard({ onCreate }: { onCreate: (rule:any)=>void })
       <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
         {preset.fields.map(f => {
           if (f.type === "select") {
-            // @ts-ignore
             const val = values[f.key] ?? f.default;
             return (
               <label key={f.key} className="flex items-center gap-2">
@@ -68,13 +67,11 @@ export default function RuleWizard({ onCreate }: { onCreate: (rule:any)=>void })
             );
           } else {
             // number
-            // @ts-ignore
             const val = values[f.key] ?? "";
             return (
               <label key={f.key} className="flex items-center gap-2">
                 {f.label}
                 <input type="number" className={ctrl}
-                       // @ts-ignore
                        min={f.min} max={f.max} step={f.step} placeholder={f.placeholder}
                        value={val}
                        onChange={(e)=>set(f.key, e.target.value ? Number(e.target.value) : "")}/>

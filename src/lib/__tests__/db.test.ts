@@ -16,7 +16,7 @@ const mockIndexedDB = () => {
             add: (_data: unknown) => ({
               onsuccess: null,
               onerror: null,
-              result: stores[name].length + 1,
+              result: (stores[name]?.length ?? 0) + 1,
             }),
             getAll: () => ({
               onsuccess: null,

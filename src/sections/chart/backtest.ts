@@ -35,6 +35,7 @@ export function runBacktest(input: BacktestInput): BacktestResult {
   const win24 = 96;
   for (let i=start;i<end;i++){
     const p = ohlc[i];
+    if (!p) continue; // Skip missing data
     for (const r of rules){
       if (!perRule[r.id]) perRule[r.id] = { count:0 };
       if (r.kind === "price-cross") {
@@ -43,7 +44,7 @@ export function runBacktest(input: BacktestInput): BacktestResult {
         const prevState = prev[key] ?? !cond; // force edge on first true
         if (cond && !prevState) {
           hits.push({ ruleId:r.id, kind:r.kind, i, t:p.t, c:p.c, meta:{ op:r.op, value:r.value } });
-          perRule[r.id].count++;
+          perRule[r.id]!.count++;
         }
         prev[key] = cond;
       } else if (r.kind === "pct-change-24h") {
@@ -55,7 +56,7 @@ export function runBacktest(input: BacktestInput): BacktestResult {
         const prevState = prev[key] ?? !cond;
         if (cond && !prevState) {
           hits.push({ ruleId:r.id, kind:r.kind, i, t:p.t, c:p.c, meta:{ op:r.op, value:r.value, pct:round2(pct) } });
-          perRule[r.id].count++;
+          perRule[r.id]!.count++;
         }
         prev[key] = cond;
       }

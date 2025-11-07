@@ -22,10 +22,14 @@ export function snapPriceToOhlc(idx:number, price:number, points:{h:number;l:num
   const p = points[idx];
   if (!p) return { idx, price };
   const candidates = [p.o, p.h, p.l, p.c];
-  let best = candidates[0], d = Math.abs(price - candidates[0]);
+  let best = candidates[0] ?? price;
+  let d = Math.abs(price - best);
   for (let i=1;i<candidates.length;i++){
-    const di = Math.abs(price - candidates[i]);
-    if (di < d) { d = di; best = candidates[i]; }
+    const candidate = candidates[i];
+    if (candidate !== undefined) {
+      const di = Math.abs(price - candidate);
+      if (di < d) { d = di; best = candidate; }
+    }
   }
   return { idx, price: best };
 }

@@ -56,11 +56,15 @@ export default function NotificationsPage() {
   };
 
   const askPermission = async () => {
-    try { if ("Notification" in window) await Notification.requestPermission(); } catch {}
+    try { 
+      if ("Notification" in window) await Notification.requestPermission(); 
+    } catch (err) {
+      console.error('Failed to request notification permission:', err);
+    }
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
+    <div className="mx-auto max-w-6xl px-4 py-4 pb-20 md:py-6 md:pb-6">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div className="text-lg font-semibold text-zinc-100">Alert Center</div>
         <div className="flex items-center gap-2">
@@ -200,7 +204,7 @@ export default function NotificationsPage() {
                       id: it.id,
                       risk: {
                         balance: res.balance, riskPct: res.pb.riskPct, atrMult: res.pb.atrMult,
-                        entryPrice: res.rrTargets[0] - res.rrList[0]*(res.rrTargets[0]- (res.rrTargets[0]- (res.rrList[0]*(res.rrTargets[0]-0)))), /* placeholder */
+                        entryPrice: (res.rrTargets[0] ?? 0) - (res.rrList[0] ?? 0)*((res.rrTargets[0] ?? 0)- ((res.rrTargets[0] ?? 0)- ((res.rrList[0] ?? 0)*((res.rrTargets[0] ?? 0)-0)))), /* placeholder */
                         stopPrice: res.stopPrice, sizeUnits: res.sizeUnits, riskAmount: res.riskAmount,
                         rrTargets: res.rrTargets, rrList: res.rrList, kellyLitePct: res.kellyLitePct
                       },

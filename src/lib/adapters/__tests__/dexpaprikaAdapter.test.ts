@@ -11,7 +11,7 @@
  * @module lib/adapters/__tests__/dexpaprikaAdapter.test
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import type { DexPaprikaTokenResponse } from '../../../types/market'
@@ -112,8 +112,8 @@ describe('DexPaprika Adapter', () => {
 
       // Pairs
       expect(snapshot.pairs).toHaveLength(1)
-      expect(snapshot.pairs![0].dex).toBe('Raydium')
-      expect(snapshot.pairs![0].liquidity).toBe(25000000)
+      expect(snapshot.pairs?.[0]?.dex).toBe('Raydium')
+      expect(snapshot.pairs?.[0]?.liquidity).toBe(25000000)
 
       // Metadata
       expect(snapshot.metadata.provider).toBe('dexpaprika')

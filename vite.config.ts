@@ -9,41 +9,20 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     splitVendorChunkPlugin(),
-    process.env.ANALYZE ? visualizer({ open: true, gzipSize: true, filename: 'dist/stats.html' }) as PluginOption : undefined,
+    process.env.ANALYZE ? visualizer({ open: true, gzipSize: true, filename: 'dist/stats.html' }) as unknown as PluginOption : undefined,
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'icons/*', 'offline.html'],
       injectRegister: 'auto',
-      manifest: {
-        name: 'Sparkfined TA-PWA',
-        short_name: 'Sparkfined',
-        description: 'Technical Analysis Progressive Web App',
-        theme_color: '#1e293b',
-        background_color: '#0f172a',
-        display: 'standalone',
-        orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
-        icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
-        ]
-      },
+      manifest: false, // Use public/manifest.webmanifest instead of inline config
+      manifestFilename: 'manifest.webmanifest',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         // Pre-cache app shell for instant offline access
+        // CRITICAL FIX: Use index.html as fallback instead of offline.html
+        // offline.html should only be shown when truly offline, not on errors
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api/],
+        navigateFallbackDenylist: [/^\/api/, /^\/_next/, /^\/static/],
         runtimeCaching: [
           // Board API - Stale-While-Revalidate (KPIs, Feed)
           {

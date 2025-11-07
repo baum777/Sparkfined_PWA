@@ -5,10 +5,16 @@ import './styles/index.css'
 import { initializeLayoutToggles } from './lib/layout-toggle'
 
 // Initialize layout toggles BEFORE React render
-initializeLayoutToggles()
+// Wrap in try-catch to prevent blocking app initialization
+try {
+  initializeLayoutToggles()
+} catch (error) {
+  console.warn('[main.tsx] Layout toggle initialization failed:', error)
+  // Continue anyway - app should still work
+}
 
 // Service Worker Registration - Manual Update Flow
-// SW is registered via vite-plugin-pwa with registerType: 'prompt'
+// SW is registered via vite-plugin-pwa with registerType: 'autoUpdate'
 // Update handling is done via UpdateBanner component
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   // Listen for SW messages (e.g., cache status, SKIP_WAITING)
@@ -26,30 +32,55 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   })
 
   // Listen for controllerchange - reload when new SW takes over
+  let refreshing = false
   navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return
     console.log('[PWA] controllerchange → reload')
+    refreshing = true
     setTimeout(() => location.reload(), 250)
+  })
+
+  // Catch service worker errors
+  navigator.serviceWorker.ready.catch((error) => {
+    console.error('[PWA] Service worker registration failed:', error)
   })
 }
 
 // Track online/offline status
 window.addEventListener('online', () => {
-  console.log('🌐 Back online')
+  if (import.meta.env.DEV) console.log('🌐 Back online')
   document.body.classList.remove('offline-mode')
 })
 
 window.addEventListener('offline', () => {
-  console.log('📴 Offline mode')
+  if (import.meta.env.DEV) console.log('📴 Offline mode')
   document.body.classList.add('offline-mode')
 })
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-)
+// Ensure root element exists before rendering
+const rootElement = document.getElementById('root')
+if (!rootElement) {
+  console.error('[main.tsx] Root element not found!')
+  // Create root element if it doesn't exist (shouldn't happen, but safety check)
+  const newRoot = document.createElement('div')
+  newRoot.id = 'root'
+  document.body.appendChild(newRoot)
+  ReactDOM.createRoot(newRoot).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  )
+} else {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  )
+}
 
 // Hydration hint for Lighthouse (main thread idle sooner)
 if ('requestIdleCallback' in window) {
-  (window as any).requestIdleCallback(() => console.log('[idle] app settled'))
+  (window as any).requestIdleCallback(() => {
+    if (import.meta.env.DEV) console.log('[idle] app settled')
+  })
 }

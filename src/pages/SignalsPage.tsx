@@ -72,7 +72,7 @@ export default function SignalsPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl p-4 space-y-4">
+      <div className="mx-auto max-w-5xl p-4 pb-20 md:pb-6 space-y-4">
         {/* Stats Overview */}
         <div className="grid grid-cols-4 gap-2">
           <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
