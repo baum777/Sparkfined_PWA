@@ -16,6 +16,9 @@ export default defineConfig(({ mode }) => ({
       injectRegister: 'auto',
       manifest: false, // Use public/manifest.webmanifest instead of inline config
       manifestFilename: 'manifest.webmanifest',
+      // CRITICAL FIX: Explicit versioning for cache invalidation
+      // This ensures SW updates trigger cache refresh on new deploys
+      strategies: 'generateSW',
       workbox: {
         // STEP A: Service Worker Cache-Sanity
         cleanupOutdatedCaches: true, // Remove old precaches automatically
@@ -27,6 +30,9 @@ export default defineConfig(({ mode }) => ({
         // offline.html should only be shown when truly offline, not on errors
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/, /^\/_next/, /^\/static/],
+        // CRITICAL FIX: Ensure assets are not cached incorrectly
+        // Don't cache assets that might change (SW handles versioning via hashes)
+        dontCacheBustURLsMatching: /^\/assets\/.*-[a-zA-Z0-9]{8}\.(js|css)$/,
         runtimeCaching: [
           // Board API - Stale-While-Revalidate (KPIs, Feed)
           {
