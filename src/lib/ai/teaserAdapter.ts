@@ -301,7 +301,7 @@ function parseAIResponse(content: string, provider: AIProvider): AITeaserAnalysi
   try {
     // Try to extract JSON from markdown code blocks if present
     const jsonMatch = content.match(/```(?:json)?\s*(\{[\s\S]*\})\s*```/)
-    const jsonStr = jsonMatch ? jsonMatch[1] : content
+    const jsonStr = jsonMatch?.[1] ?? content
 
     const parsed = JSON.parse(jsonStr)
 

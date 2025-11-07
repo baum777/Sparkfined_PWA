@@ -271,7 +271,7 @@ describe('Market Orchestrator', () => {
       const successEvents = events.filter((e) => e.type === 'provider_success')
 
       expect(successEvents.length).toBeGreaterThan(0)
-      expect(successEvents[0].provider).toBe('dexpaprika')
+      expect(successEvents[0]?.provider).toBe('dexpaprika')
     })
 
     it('should log provider failure events', async () => {
@@ -312,7 +312,7 @@ describe('Market Orchestrator', () => {
       const failureEvents = events.filter((e) => e.type === 'provider_failure')
 
       expect(failureEvents.length).toBeGreaterThan(0)
-      expect(failureEvents[0].provider).toBe('dexpaprika')
+      expect(failureEvents[0]?.provider).toBe('dexpaprika')
     })
 
     it('should log provider switch events when fallback is used', async () => {
@@ -353,7 +353,7 @@ describe('Market Orchestrator', () => {
       const switchEvents = events.filter((e) => e.type === 'provider_switch')
 
       expect(switchEvents.length).toBeGreaterThan(0)
-      expect(switchEvents[0].provider).toBe('dexscreener')
+      expect(switchEvents[0]?.provider).toBe('dexscreener')
     })
   })
 

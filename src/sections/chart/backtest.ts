@@ -44,7 +44,7 @@ export function runBacktest(input: BacktestInput): BacktestResult {
         const prevState = prev[key] ?? !cond; // force edge on first true
         if (cond && !prevState) {
           hits.push({ ruleId:r.id, kind:r.kind, i, t:p.t, c:p.c, meta:{ op:r.op, value:r.value } });
-          perRule[r.id].count++;
+          perRule[r.id]!.count++;
         }
         prev[key] = cond;
       } else if (r.kind === "pct-change-24h") {
@@ -56,7 +56,7 @@ export function runBacktest(input: BacktestInput): BacktestResult {
         const prevState = prev[key] ?? !cond;
         if (cond && !prevState) {
           hits.push({ ruleId:r.id, kind:r.kind, i, t:p.t, c:p.c, meta:{ op:r.op, value:r.value, pct:round2(pct) } });
-          perRule[r.id].count++;
+          perRule[r.id]!.count++;
         }
         prev[key] = cond;
       }
