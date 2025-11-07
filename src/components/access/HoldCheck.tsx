@@ -4,7 +4,11 @@
 
 import { useState } from 'react'
 
-export default function HoldCheck() {
+interface HoldCheckProps {
+  onNavigate?: (tab: 'status' | 'lock' | 'hold' | 'leaderboard') => void
+}
+
+export default function HoldCheck({ onNavigate }: HoldCheckProps) {
   const [checking, setChecking] = useState(false)
   const [result, setResult] = useState<{
     balance: number
@@ -95,13 +99,21 @@ export default function HoldCheck() {
           </div>
 
           {!result.hasAccess && (
-            <div className="p-4 bg-slate-900/50 rounded-lg">
-              <p className="text-sm text-slate-400 mb-3">
-                You're {(100000 - result.balance).toLocaleString()} tokens short.
-              </p>
+            <div className="p-4 bg-slate-900/50 rounded-lg space-y-3">
               <p className="text-sm text-slate-400">
-                💡 <strong>Alternative:</strong> Lock tokens to get an OG NFT instead (goes to Lock tab).
+                You're <strong className="text-red-400">{(100000 - result.balance).toLocaleString()} tokens</strong> short.
               </p>
+              <div className="pt-2 border-t border-slate-800">
+                <p className="text-sm text-slate-400 mb-2">
+                  💡 <strong>Alternative:</strong> Lock tokens to get an OG NFT with lifetime access.
+                </p>
+                <button 
+                  onClick={() => onNavigate?.('lock')}
+                  className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  Go to Lock Calculator
+                </button>
+              </div>
             </div>
           )}
 

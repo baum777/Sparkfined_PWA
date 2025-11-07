@@ -24,7 +24,10 @@ export default async function handler(req: Request) {
   const rec = await kvGet<Idea>(`idea:${userId}:${id}`);
   if (!rec) return json({ ok: false, error: "idea not found" }, 404);
   
-  const ladder = buildLadder(rec, LADDERS[0]);
+  const ladderConfig = LADDERS[0];
+  if (!ladderConfig) return json({ ok: false, error: "No ladder config available" }, 500);
+  
+  const ladder = buildLadder(rec, ladderConfig);
   
   const md = [
     `# Execution Pack · ${rec.title}`,

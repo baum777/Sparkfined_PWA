@@ -45,7 +45,7 @@ export default function ReplayBar({
           ))}
         </div>
       )}
-      {bookmarks.length>0 && <button className="rounded-lg border border-rose-800 px-2 py-1 text-[11px] text-rose-100 hover:bg-rose-900/30" onClick={()=>onDeleteBookmark(bookmarks[0].id)}>Del First</button>}
+      {bookmarks.length>0 && <button className="rounded-lg border border-rose-800 px-2 py-1 text-[11px] text-rose-100 hover:bg-rose-900/30" onClick={()=>onDeleteBookmark(bookmarks[0]!.id)}>Del First</button>}
     </div>
   );
 }

@@ -8,7 +8,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b tsconfig.build.json && vite build",
+    "build": "tsc -b tsconfig.build.json && vite build && pnpm check:size",
+    "build:ci": "pnpm build && pnpm test:e2e",
+    "build:fast": "tsc -b tsconfig.build.json && vite build",
     "preview": "vite preview",
     "analyze": "cross-env ANALYZE=true vite build",
     "lighthouse": "npx lighthouse http://localhost:4173 --view --only-categories=performance,pwa,best-practices,accessibility",
@@ -17,7 +19,8 @@
     "format": "prettier . --write",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check:size": "node scripts/check-bundle-size.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.0",
@@ -54,6 +57,7 @@
     "autoprefixer": "^10.4.21",
     "cross-env": "^7.0.3",
     "eslint": "^9.9.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.35.0",
     "jsdom": "^24.1.0",
     "prettier": "^3.3.3",

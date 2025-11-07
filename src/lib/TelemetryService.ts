@@ -79,9 +79,9 @@ class TelemetryServiceClass {
 
     return {
       count: filtered.length,
-      median: filtered[Math.floor(filtered.length / 2)],
-      p95: filtered[p95Index],
-      max: filtered[filtered.length - 1],
+      median: filtered[Math.floor(filtered.length / 2)] ?? 0,
+      p95: filtered[p95Index] ?? 0,
+      max: filtered[filtered.length - 1] ?? 0,
     };
   }
 

@@ -33,11 +33,12 @@ export default async function handler(req: Request) {
       if (!p) continue; // Skip missing data points
       for (const r of body.rules){
         if (!perRule[r.id]) perRule[r.id] = { count:0 };
+        const ruleStats = perRule[r.id]!; // Safe after initialization check
         if (r.kind === "price-cross") {
           const cond = r.op === ">" ? (p.c > r.value) : (p.c < r.value);
           const key = r.id;
           const prevState = prev[key] ?? !cond;
-          if (cond && !prevState) { hits.push(hit(r, i, p.t, p.c, { op:r.op, value:r.value })); perRule[r.id].count++; }
+          if (cond && !prevState) { hits.push(hit(r, i, p.t, p.c, { op:r.op, value:r.value })); ruleStats.count++; }
           prev[key] = cond;
         } else if (r.kind === "pct-change-24h") {
           const base = find24hBase(body.ohlc, i);
@@ -45,7 +46,7 @@ export default async function handler(req: Request) {
           const cond = r.op === ">" ? (pct > r.value) : (pct < r.value);
           const key = r.id;
           const prevState = prev[key] ?? !cond;
-          if (cond && !prevState) { hits.push(hit(r, i, p.t, p.c, { op:r.op, value:r.value, pct:round2(pct) })); perRule[r.id].count++; }
+          if (cond && !prevState) { hits.push(hit(r, i, p.t, p.c, { op:r.op, value:r.value, pct:round2(pct) })); ruleStats.count++; }
           prev[key] = cond;
         }
       }
@@ -71,7 +72,7 @@ function find24hBase(d: Ohlc[], i: number){
   const endTs = current.t;
   const cutoff = endTs - 86_400_000;
   let j = i;
-  while (j>0 && d[j]?.t && d[j].t >= cutoff) j--;
+  while (j>0 && d[j] && d[j]!.t >= cutoff) j--;
   return d[Math.max(0,j)]?.c ?? d[0]?.c ?? 0;
 }
 const round2 = (n:number)=> Math.round(n*100)/100;
