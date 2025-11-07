@@ -357,7 +357,7 @@ export function extractLesson(
 
   // Build when_it_fails
   const when_it_fails = losses.length > 0
-    ? `Fails when ${signal.regime.trend === 'side' ? 'trend unclear' : 'countertrend'}. Common issue: ${losses[0].exit_reason}.`
+    ? `Fails when ${signal.regime.trend === 'side' ? 'trend unclear' : 'countertrend'}. Common issue: ${losses[0]?.exit_reason ?? 'unknown'}.`
     : 'No failures yet - maintain vigilance.'
 
   // Build checklist from plan
