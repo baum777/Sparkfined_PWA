@@ -302,7 +302,7 @@
 
 | Metrik | Ziel | Tracking |
 |--------|------|----------|
-| **Waitlist-Signups** | +50 | Airtable/Supabase |
+| **Waitlist-Signups** | +50 | Airtable |
 | **QR-Code-Scans** | 30+ | Bitly/QR-Analytics |
 | **Social-Shares** | 10+ | Twitter-Mentions |
 | **Discord-Joins** | 20+ | Discord-Server-Stats |

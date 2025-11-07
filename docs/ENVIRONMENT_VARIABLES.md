@@ -116,9 +116,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 #### Database
 | Variable | Description | Provider |
 |----------|-------------|----------|
-| `DATABASE_URL` | PostgreSQL connection string | Vercel Postgres, Neon, Supabase |
-| `SUPABASE_URL` | Supabase project URL | [supabase.com](https://supabase.com/) |
-| `SUPABASE_SERVICE_KEY` | Supabase service role key | Same dashboard |
+| `DATABASE_URL` | PostgreSQL connection string | Vercel Postgres, Neon |
 
 ### 8. Analytics & Monitoring
 

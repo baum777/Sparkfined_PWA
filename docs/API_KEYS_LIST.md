@@ -79,9 +79,7 @@
 
 | API-Key | Umgebungsvariable | Beschreibung | Wo bekommen? |
 |---------|-------------------|--------------|--------------|
-| **Database URL** | `DATABASE_URL` | PostgreSQL-Verbindungsstring | Vercel Postgres, Neon, Supabase |
-| **Supabase URL** | `SUPABASE_URL` | Supabase-Projekt-URL | [supabase.com](https://supabase.com/) |
-| **Supabase Service Key** | `SUPABASE_SERVICE_KEY` | Supabase Service-Role-Key | Gleiches Dashboard |
+| **Database URL** | `DATABASE_URL` | PostgreSQL-Verbindungsstring | Vercel Postgres, Neon |
 
 ### Analytics & Monitoring
 
@@ -187,7 +185,6 @@ SENTRY_PROJECT=your-project
 | **Sentry** | [sentry.io](https://sentry.io/) | Error-Tracking |
 | **Helius** | [helius.xyz](https://helius.xyz/) | Solana RPC |
 | **QuickNode** | [quicknode.com](https://www.quicknode.com/) | Solana RPC |
-| **Supabase** | [supabase.com](https://supabase.com/) | Datenbank |
 | **Umami** | [umami.is](https://umami.is/) | Analytics (self-hosted) |
 
 ---

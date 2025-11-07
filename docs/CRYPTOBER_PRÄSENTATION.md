@@ -920,7 +920,7 @@ trackEvent('pwa_installed');
 ### 3. Beta-Waitlist-Backend
 
 **Stack:**
-- 💾 **Database:** Airtable (schnelles Setup) oder Supabase (scalable)
+- 💾 **Database:** Airtable (schnelles Setup)
 - 📧 **Email:** Resend oder SendGrid (Transactional Emails)
 - 🔗 **API:** Vercel Edge Function
 

@@ -1,5 +1,5 @@
 // Optionaler Stub zum Persistieren – aktuell NO-OP (dev-freundlich).
-// Später: Upstash/Supabase/KV integrieren.
+// Später: Upstash/KV integrieren.
 export const config = { runtime: "edge" };
 import { kvSAdd, kvSet } from "../../src/lib/kv";
 import { sha256Url } from "../../src/lib/sha";
