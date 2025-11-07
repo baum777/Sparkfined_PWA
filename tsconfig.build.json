@@ -1,9 +1,29 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "strictNullChecks": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+    "types": ["vite/client"]
+  },
+  "include": ["src", "api"],
   "exclude": [
-    "tests",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/__tests__"
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/__tests__/**",
+    "e2e/**",
+    "playwright.config.*",
+    "vitest.setup.*",
+    "scripts/**",
+    "vite.config.*"
   ]
 }

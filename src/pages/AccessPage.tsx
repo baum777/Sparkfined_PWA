@@ -34,8 +34,7 @@ export default function AccessPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 pb-24">
-    <div className="min-h-screen bg-slate-950 text-white p-4 pb-20 md:p-8 md:pb-8">
+    <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 pb-24 md:pb-8">
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
         <div className="flex items-center gap-3 mb-3">
@@ -60,13 +59,13 @@ export default function AccessPage() {
               key={tab.id}
               onClick={() => navigateToTab(tab.id)}
               className={`
-                px-4 py-3 font-medium transition-all duration-200
-                ${
-                  activeTab === tab.id
-                    ? 'text-green-400 border-b-2 border-green-400'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                }
-              `}
+                  px-4 py-3 font-medium transition-all duration-200
+                  ${
+                    activeTab === tab.id
+                      ? 'text-green-400 border-b-2 border-green-400'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                  }
+                `}
               aria-current={activeTab === tab.id ? 'page' : undefined}
             >
               <span className="mr-2">{tab.icon}</span>
@@ -82,13 +81,13 @@ export default function AccessPage() {
               key={tab.id}
               onClick={() => navigateToTab(tab.id)}
               className={`
-                flex-shrink-0 px-4 py-3 font-medium transition-all duration-200 rounded-t-lg
-                ${
-                  activeTab === tab.id
-                    ? 'text-green-400 bg-slate-800 border-b-2 border-green-400'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
-                }
-              `}
+                  flex-shrink-0 px-4 py-3 font-medium transition-all duration-200 rounded-t-lg
+                  ${
+                    activeTab === tab.id
+                      ? 'text-green-400 bg-slate-800 border-b-2 border-green-400'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800/30'
+                  }
+                `}
               aria-current={activeTab === tab.id ? 'page' : undefined}
             >
               <span className="mr-2">{tab.icon}</span>
