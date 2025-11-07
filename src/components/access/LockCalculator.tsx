@@ -7,7 +7,11 @@
 
 import { useState } from 'react'
 
-export default function LockCalculator() {
+interface LockCalculatorProps {
+  onNavigate?: (tab: 'status' | 'lock' | 'hold' | 'leaderboard') => void
+}
+
+export default function LockCalculator({ onNavigate }: LockCalculatorProps) {
   const [mcap, setMcap] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -52,9 +56,9 @@ export default function LockCalculator() {
         )}
 
         {loading && (
-          <div className="flex items-center justify-center py-8">
+          <div className="flex flex-col items-center justify-center space-y-4 py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400" />
-            <p className="ml-4 text-slate-400">Fetching from Pyth oracle...</p>
+            <p className="text-slate-400 text-center">Fetching from Pyth oracle...</p>
           </div>
         )}
 
@@ -124,10 +128,20 @@ export default function LockCalculator() {
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-blue-900/20 border border-blue-500/50 rounded-lg">
-            <p className="text-sm text-blue-300">
-              💡 <strong>Pro Tip:</strong> MCAP is dynamic and updated via Pyth oracle. Lock early to secure a better rank!
-            </p>
+          <div className="mt-6 space-y-3">
+            <div className="p-4 bg-blue-900/20 border border-blue-500/50 rounded-lg">
+              <p className="text-sm text-blue-300">
+                💡 <strong>Pro Tip:</strong> MCAP is dynamic and updated via Pyth oracle. Lock early to secure a better rank!
+              </p>
+            </div>
+            
+            <button 
+              onClick={() => onNavigate?.('leaderboard')}
+              className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <span>🏆</span>
+              <span>View Leaderboard</span>
+            </button>
           </div>
 
           <button className="w-full mt-6 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors">
