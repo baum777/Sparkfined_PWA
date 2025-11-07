@@ -36,8 +36,6 @@ export const ACCESS_CONFIG = {
 // Server-only config (not exposed to client)
 export const SERVER_CONFIG = {
   SOLANA_KEYPAIR_JSON: process.env.SOLANA_KEYPAIR_JSON,
-  SUPABASE_URL: process.env.SUPABASE_URL,
-  SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY,
   STREAMFLOW_API_BASE: process.env.STREAMFLOW_API_BASE || 'https://api.streamflow.finance',
   STREAMFLOW_API_KEY: process.env.STREAMFLOW_API_KEY,
 }

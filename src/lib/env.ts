@@ -5,8 +5,6 @@
  */
 
 export interface EnvConfig {
-  VITE_SUPABASE_URL?: string;
-  VITE_SUPABASE_ANON_KEY?: string;
   VITE_VERCEL_ENV?: string;
   // Add other critical ENV vars as needed
 }
@@ -21,8 +19,6 @@ export function getEnv(): EnvConfig {
   }
   
   return {
-    VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-    VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
     VITE_VERCEL_ENV: import.meta.env.VITE_VERCEL_ENV,
   };
 }
@@ -36,15 +32,7 @@ export function getMissingEnvVars(): string[] {
   const missing: string[] = [];
   
   // Optional vars - only warn in preview/prod
-  const isPreview = env.VITE_VERCEL_ENV === 'preview';
-  const isProd = import.meta.env.PROD;
-  
-  if ((isPreview || isProd) && !env.VITE_SUPABASE_URL) {
-    missing.push('VITE_SUPABASE_URL');
-  }
-  if ((isPreview || isProd) && !env.VITE_SUPABASE_ANON_KEY) {
-    missing.push('VITE_SUPABASE_ANON_KEY');
-  }
+  // (Currently no critical ENV vars to check)
   
   return missing;
 }
