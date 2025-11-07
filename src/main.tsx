@@ -7,6 +7,14 @@ import 'driver.js/dist/driver.css'
 import { initializeLayoutToggles } from './lib/layout-toggle'
 import { AppErrorBoundary } from '@/app/AppErrorBoundary'
 import { logError } from '@/lib/log-error'
+import { validateEnv } from '@/lib/env'
+
+// STEP B: Early ENV validation (non-fatal, logs warnings only)
+try {
+  validateEnv()
+} catch (error) {
+  console.warn('[main.tsx] ENV validation failed:', error)
+}
 
 // Initialize layout toggles BEFORE React render
 // Wrap in try-catch to prevent blocking app initialization
@@ -69,16 +77,18 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     })
 }
 
-// Track online/offline status
-window.addEventListener('online', () => {
-  if (import.meta.env.DEV) console.log('🌐 Back online')
-  document.body.classList.remove('offline-mode')
-})
+// Track online/offline status (browser-only)
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    if (import.meta.env.DEV) console.log('🌐 Back online')
+    document.body.classList.remove('offline-mode')
+  })
 
-window.addEventListener('offline', () => {
-  if (import.meta.env.DEV) console.log('📴 Offline mode')
-  document.body.classList.add('offline-mode')
-})
+  window.addEventListener('offline', () => {
+    if (import.meta.env.DEV) console.log('📴 Offline mode')
+    document.body.classList.add('offline-mode')
+  })
+}
 
 // Ensure root element exists before rendering
 const rootElement = document.getElementById('root')

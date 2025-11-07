@@ -1,4 +1,5 @@
 import React from "react";
+import { getJSON, setJSON, isStorageAvailable } from "@/lib/safeStorage";
 
 export type TelemetryFlags = {
   enabled: boolean;         // global on/off
@@ -27,11 +28,10 @@ const DEFAULTS: TelemetryFlags = {
 };
 
 function readFlags(): TelemetryFlags {
-  try { return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(KEY) || "{}")) }; }
-  catch { return DEFAULTS; }
+  return getJSON(KEY, DEFAULTS);
 }
 function writeFlags(v: TelemetryFlags) {
-  localStorage.setItem(KEY, JSON.stringify(v));
+  setJSON(KEY, v);
 }
 
 type Ctx = {
@@ -45,13 +45,20 @@ const TelemetryCtx = React.createContext<Ctx | null>(null);
 
 const BUF_KEY = "sparkfined.telemetry.buffer.v1";
 function readBuffer(): TelemetryEvent[] {
-  try { return JSON.parse(sessionStorage.getItem(BUF_KEY) || "[]"); } catch { return []; }
+  if (!isStorageAvailable()) return [];
+  try { 
+    const raw = sessionStorage.getItem(BUF_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { 
+    return []; 
+  }
 }
 function writeBuffer(buf: TelemetryEvent[]) {
+  if (!isStorageAvailable()) return;
   try { 
     sessionStorage.setItem(BUF_KEY, JSON.stringify(buf)); 
   } catch (err) {
-    console.error('Failed to write telemetry buffer:', err);
+    console.warn('[telemetry] Failed to write buffer:', err);
   }
 }
 
@@ -81,8 +88,10 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
     setBuffer([]);
   };
 
-  // periodic drain & on visibility change
+  // periodic drain & on visibility change (browser-only)
   React.useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    
     const iv = setInterval(drain, 15000);
     const onHide = () => document.visibilityState === "hidden" && drain();
     document.addEventListener("visibilitychange", onHide);

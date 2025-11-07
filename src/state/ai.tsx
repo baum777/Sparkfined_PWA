@@ -1,4 +1,5 @@
 import React from "react";
+import { getJSON, setJSON } from "@/lib/safeStorage";
 
 export type AIProvider = "openai" | "anthropic" | "xai";
 export type AISettings = {
@@ -16,10 +17,9 @@ const DEFAULTS: AISettings = {
 };
 
 function read(): AISettings {
-  try { return { ...DEFAULTS, ...(JSON.parse(localStorage.getItem(KEY) || "{}")) }; }
-  catch { return DEFAULTS; }
+  return getJSON(KEY, DEFAULTS);
 }
-function write(s: AISettings){ localStorage.setItem(KEY, JSON.stringify(s)); }
+function write(s: AISettings){ setJSON(KEY, s); }
 
 type Ctx = { ai: AISettings; setAI: (p: Partial<AISettings>) => void };
 const Ctx = React.createContext<Ctx | null>(null);
