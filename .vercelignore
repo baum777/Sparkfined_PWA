@@ -1,0 +1,28 @@
+# Vercel Ignore
+# Files to exclude from Vercel deployments
+
+# Tests
+tests/
+test-results/
+coverage/
+*.test.ts
+*.test.tsx
+*.spec.ts
+
+# Development
+.env.local
+.env.development
+
+# Docs & Planning
+docs/
+wireframes/
+*.md
+!README.md
+
+# Scripts
+scripts/
+verify-deployment.sh
+verify_all.ps1
+
+# Archives
+*.zip

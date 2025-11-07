@@ -89,7 +89,7 @@ function getMockPumpfunData(ca: string): PumpfunTokenData {
   return {
     name: `MockToken ${ca.slice(0, 4)}`,
     symbol: `MOCK${ca.slice(0, 3).toUpperCase()}`,
-    liquidity,
+    liquidity: liquidity ?? 100000,
     launchDate: mockDate.toISOString(),
     bondingCurve: (hash % 100) / 100, // 0-1
     creatorAddress: `creator_${ca.slice(-8)}`,

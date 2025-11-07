@@ -14,8 +14,8 @@ export default function PlaybookCard({
   })=>void;
 }) {
   const [balance, setBalance] = React.useState<number>(defaultBalance);
-  const [pbId, setPbId] = React.useState<string>(PLAYBOOKS[1].id);
-  const pb = React.useMemo(()=> PLAYBOOKS.find(p=>p.id===pbId)!, [pbId]);
+  const [pbId, setPbId] = React.useState<string>(PLAYBOOKS[1]?.id ?? PLAYBOOKS[0]?.id ?? '');
+  const pb = React.useMemo(()=> PLAYBOOKS.find(p=>p.id===pbId) ?? PLAYBOOKS[0]!, [pbId]);
   const btn = "rounded border border-zinc-700 px-2 py-1 text-xs hover:bg-zinc-800";
   const ctrl = "rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200";
   const disabled = !(entry && atr);
