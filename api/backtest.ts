@@ -71,7 +71,7 @@ function find24hBase(d: Ohlc[], i: number){
   const endTs = current.t;
   const cutoff = endTs - 86_400_000;
   let j = i;
-  while (j>0 && d[j]?.t && d[j].t >= cutoff) j--;
+  while (j>0 && d[j] && d[j]!.t >= cutoff) j--;
   return d[Math.max(0,j)]?.c ?? d[0]?.c ?? 0;
 }
 const round2 = (n:number)=> Math.round(n*100)/100;
