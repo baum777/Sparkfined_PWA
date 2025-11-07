@@ -40,16 +40,26 @@ Run these commands before pushing:
 pnpm typecheck
 
 # 2. Build (must succeed)
-pnpm build:fast
+pnpm build        # Fast build without E2E
 
 # 3. Linter (warnings OK, errors must be fixed)
 pnpm lint
 
-# 4. E2E tests (optional locally, runs in CI)
-pnpm test:e2e
+# 4. E2E tests (recommended before deploy)
+pnpm test:e2e     # Runs in CI via build:ci
+
+# 5. Full CI build (optional locally)
+pnpm build:ci     # Same as Vercel runs
 ```
 
 ### Vercel Build Checks
+
+**Important:** Use `build:ci` in Vercel (not `build`)
+
+Update Vercel build command to:
+```bash
+pnpm build:ci
+```
 
 Ensure these pass in Vercel CI:
 
