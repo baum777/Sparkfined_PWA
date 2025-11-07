@@ -15,11 +15,12 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { awaitStableUI } from './utils/wait';
 
 test.describe('Board Page - Text Scaling (200% Zoom)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await awaitStableUI(page);
   });
 
   test('should support 200% zoom without content loss', async ({ page }) => {
@@ -38,12 +39,14 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
 
     // Wait for reflow
     await page.waitForTimeout(500);
+    await awaitStableUI(page);
 
     // Check that main content is visible
     const mainContent = page.locator('main, [role="main"], body > div');
     await expect(mainContent).toBeVisible();
 
     // Check that KPI tiles are visible
+    await page.waitForSelector('section[aria-label="Overview KPIs"]', { state: 'visible' });
     const kpiTiles = page.locator('section[aria-label="Overview KPIs"]');
     await expect(kpiTiles).toBeVisible();
 
@@ -58,6 +61,7 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
     // Zoom to 200% (simulate by halving viewport)
     await page.setViewportSize({ width: 640, height: 360 });
     await page.waitForTimeout(500);
+    await awaitStableUI(page);
 
     // Check for horizontal scroll
     const hasHorizontalScroll = await page.evaluate(() => {
@@ -74,6 +78,7 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
     // Zoom to 200%
     await page.setViewportSize({ width: 640, height: 360 });
     await page.waitForTimeout(500);
+    await awaitStableUI(page);
 
     // Test KPI tile clickability (if interactive)
     const clickableElements = await page.locator('[role="button"], button, a').all();
@@ -132,6 +137,7 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.setViewportSize({ width: 640, height: 360 });
     await page.waitForTimeout(500);
+    await awaitStableUI(page);
 
     // Check for overlapping elements
     const hasOverlap = await page.evaluate(() => {
