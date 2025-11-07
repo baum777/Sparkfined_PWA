@@ -53,13 +53,6 @@
 
 ## 🔧 Optional (für erweiterte Features)
 
-### Alert-System (Redis)
-
-| API-Key | Umgebungsvariable | Beschreibung | Wo bekommen? |
-|---------|-------------------|--------------|--------------|
-| **Upstash Redis REST URL** | `UPSTASH_REDIS_REST_URL` | Redis-REST-URL für Alert-Worker | [upstash.com](https://upstash.com/) |
-| **Upstash Redis REST Token** | `UPSTASH_REDIS_REST_TOKEN` | Redis-REST-Token | Gleiches Dashboard |
-
 ### Blockchain (Solana)
 
 | API-Key | Umgebungsvariable | Beschreibung | Wo bekommen? |
@@ -67,30 +60,6 @@
 | **Solana RPC URL** | `VITE_SOLANA_RPC_URL` | Solana RPC-Endpoint (Frontend) | [Helius](https://helius.xyz/), [QuickNode](https://www.quicknode.com/) |
 | **Solana RPC URL** | `SOLANA_RPC_URL` | Solana RPC-Endpoint (Backend) | Gleiche Anbieter |
 | **Solana Keypair JSON** | `SOLANA_KEYPAIR_JSON` | Server-Keypair für Signing | Generieren mit Solana CLI |
-
-### Token Vesting (StreamFlow)
-
-| API-Key | Umgebungsvariable | Beschreibung | Wo bekommen? |
-|---------|-------------------|--------------|--------------|
-| **StreamFlow API Key** | `STREAMFLOW_API_KEY` | API-Key für Token-Vesting | [streamflow.finance](https://streamflow.finance) |
-| **StreamFlow API Base** | `STREAMFLOW_API_BASE` | API-Basis-URL (Standard: `https://api.streamflow.finance`) | - |
-
-### Datenbank (optional)
-
-| API-Key | Umgebungsvariable | Beschreibung | Wo bekommen? |
-|---------|-------------------|--------------|--------------|
-| **Database URL** | `DATABASE_URL` | PostgreSQL-Verbindungsstring | Vercel Postgres, Neon |
-
-### Analytics & Monitoring
-
-| API-Key | Umgebungsvariable | Beschreibung | Wo bekommen? |
-|---------|-------------------|--------------|--------------|
-| **Sentry DSN** | `VITE_SENTRY_DSN` | Sentry DSN für Error-Tracking (Frontend) | [sentry.io](https://sentry.io/) |
-| **Sentry Auth Token** | `SENTRY_AUTH_TOKEN` | Sentry Auth-Token | Gleiches Dashboard |
-| **Sentry Org** | `SENTRY_ORG` | Sentry-Organisations-Slug | Gleiches Dashboard |
-| **Sentry Project** | `SENTRY_PROJECT` | Sentry-Projekt-Slug | Gleiches Dashboard |
-| **Umami Website ID** | `VITE_UMAMI_WEBSITE_ID` | Umami-Website-ID für Analytics | [umami.is](https://umami.is/) |
-| **Umami Script URL** | `VITE_UMAMI_SRC` | Umami-Script-URL (self-hosted) | Eigene Umami-Instanz |
 
 ---
 
@@ -157,19 +126,10 @@ VAPID_CONTACT=mailto:admin@example.com
 ```bash
 # Alle oben genannten PLUS:
 
-# Alert-System
-UPSTASH_REDIS_REST_URL=https://...
-UPSTASH_REDIS_REST_TOKEN=...
-
 # Solana (für Access-System)
 VITE_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
 SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
-
-# Analytics
-VITE_SENTRY_DSN=https://...
-SENTRY_AUTH_TOKEN=...
-SENTRY_ORG=your-org
-SENTRY_PROJECT=your-project
+SOLANA_KEYPAIR_JSON=[...]
 ```
 
 ---
@@ -181,11 +141,8 @@ SENTRY_PROJECT=your-project
 | **Moralis** | [admin.moralis.io](https://admin.moralis.io/) | Blockchain-Daten-API |
 | **OpenAI** | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) | AI-API |
 | **Anthropic** | [console.anthropic.com](https://console.anthropic.com/) | Claude AI-API |
-| **Upstash Redis** | [upstash.com](https://upstash.com/) | Redis für Alerts |
-| **Sentry** | [sentry.io](https://sentry.io/) | Error-Tracking |
 | **Helius** | [helius.xyz](https://helius.xyz/) | Solana RPC |
 | **QuickNode** | [quicknode.com](https://www.quicknode.com/) | Solana RPC |
-| **Umami** | [umami.is](https://umami.is/) | Analytics (self-hosted) |
 
 ---
 
@@ -242,9 +199,7 @@ curl https://your-app.vercel.app/api/health
 - `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` (für Push)
 
 ### Tier 3 (Optional)
-- `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` (für Alerts)
-- `VITE_SENTRY_DSN` (für Error-Tracking)
-- `SOLANA_RPC_URL` (für Blockchain-Features)
+- `SOLANA_RPC_URL` + `SOLANA_KEYPAIR_JSON` (für Blockchain-Features)
 
 ---
 

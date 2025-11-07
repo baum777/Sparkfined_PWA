@@ -98,43 +98,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `VAPID_SUBJECT` | Contact email | Set to `mailto:your-email@example.com` |
 | `VAPID_CONTACT` | Alternative contact | Same as subject |
 
-### 6. Redis (Alert System)
-
-| Variable | Description | Where to Get |
-|----------|-------------|--------------|
-| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL | [upstash.com](https://upstash.com/) |
-| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token | Same dashboard |
-
-### 7. Additional Integrations (Optional)
-
-#### StreamFlow (Token Vesting)
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `STREAMFLOW_API_BASE` | `https://api.streamflow.finance` | StreamFlow API base URL |
-| `STREAMFLOW_API_KEY` | - | StreamFlow API key |
-
-#### Database
-| Variable | Description | Provider |
-|----------|-------------|----------|
-| `DATABASE_URL` | PostgreSQL connection string | Vercel Postgres, Neon |
-
-### 8. Analytics & Monitoring
-
-#### Sentry (Error Tracking)
-| Variable | Description | Where to Get |
-|----------|-------------|--------------|
-| `VITE_SENTRY_DSN` | Sentry DSN (frontend) | [sentry.io](https://sentry.io/) project settings |
-| `SENTRY_AUTH_TOKEN` | Sentry auth token | Same dashboard |
-| `SENTRY_ORG` | Sentry organization slug | Same dashboard |
-| `SENTRY_PROJECT` | Sentry project slug | Same dashboard |
-
-#### Umami (Analytics)
-| Variable | Description | Where to Get |
-|----------|-------------|--------------|
-| `VITE_UMAMI_WEBSITE_ID` | Umami website ID | [umami.is](https://umami.is/) dashboard |
-| `VITE_UMAMI_SRC` | Umami script URL | Your self-hosted instance |
-
-### 9. Feature Flags
+### 6. Feature Flags
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -144,7 +108,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `VITE_ORDERFLOW_PROVIDER` | `none` | Order flow data provider |
 | `VITE_WALLETFLOW_PROVIDER` | `none` | Wallet flow data provider |
 
-### 10. Performance Budgets (Advanced)
+### 7. Performance Budgets (Advanced)
 
 | Variable | Default (ms) | Description |
 |----------|--------------|-------------|
@@ -156,7 +120,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `PERF_BUDGET_JOURNAL_GRID_MS` | `250` | Journal grid render |
 | `PERF_BUDGET_EXPORT_ZIP_P95_MS` | `800` | Export ZIP P95 |
 
-### 11. External APIs (Auto-configured)
+### 8. External APIs (Auto-configured)
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -197,9 +161,8 @@ VITE_VAPID_PUBLIC_KEY=xxx
 
 **Tier 3 (Optional):**
 ```bash
-UPSTASH_REDIS_REST_URL=xxx  # For alert worker
-UPSTASH_REDIS_REST_TOKEN=xxx
-VITE_SENTRY_DSN=xxx  # For error tracking
+SOLANA_RPC_URL=xxx  # For blockchain features
+SOLANA_KEYPAIR_JSON=xxx  # For server-side signing
 ```
 
 ---
