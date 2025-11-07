@@ -21,6 +21,9 @@ try {
 // SW is registered via vite-plugin-pwa with registerType: 'autoUpdate'
 // Update handling is done via UpdateBanner component
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  // STEP A: Enhanced SW lifecycle logging (preview-only)
+  const isPreview = (import.meta as any).env?.VERCEL_ENV === 'preview'
+  
   // Listen for SW messages (e.g., cache status, SKIP_WAITING)
   navigator.serviceWorker.addEventListener('message', (event) => {
     if (event.data) {
@@ -44,10 +47,26 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     setTimeout(() => location.reload(), 250)
   })
 
-  // Catch service worker errors
-  navigator.serviceWorker.ready.catch((error) => {
-    console.error('[PWA] Service worker registration failed:', error)
-  })
+  // STEP A: Log SW registration state (preview-only)
+  navigator.serviceWorker.ready
+    .then((registration) => {
+      if (isPreview) {
+        console.log('[PWA] SW ready:', {
+          scope: registration.scope,
+          active: !!registration.active,
+          waiting: !!registration.waiting,
+          installing: !!registration.installing,
+        })
+      }
+      
+      // Check for waiting SW (update available)
+      if (registration.waiting && isPreview) {
+        console.warn('[PWA] Update available (waiting SW detected)')
+      }
+    })
+    .catch((error) => {
+      console.error('[PWA] Service worker registration failed:', error)
+    })
 }
 
 // Track online/offline status
