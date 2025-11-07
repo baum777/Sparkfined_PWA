@@ -2,6 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './styles/index.css'
+import './styles/driver-override.css'
+import 'driver.js/dist/driver.css'
 import { initializeLayoutToggles } from './lib/layout-toggle'
 
 // Initialize layout toggles BEFORE React render

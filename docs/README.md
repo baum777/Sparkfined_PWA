@@ -73,6 +73,13 @@ Historische und phasen-spezifische Dokumentation wurde in **[archive/](./archive
 → 1. [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md) (ENV-Vars konfigurieren)  
 → 2. [DEPLOY_GUIDE.md](./DEPLOY_GUIDE.md) (Deployment)
 
+**...das Onboarding-System verstehen**
+→ 1. [ONBOARDING_STRATEGY.md](./ONBOARDING_STRATEGY.md) (Strategie & Konzept)  
+→ 2. [ONBOARDING_IMPLEMENTATION_COMPLETE.md](./ONBOARDING_IMPLEMENTATION_COMPLETE.md) (Implementation Details)
+
+**...Onboarding-Features hinzufügen**
+→ [ONBOARDING_QUICK_START.md](./ONBOARDING_QUICK_START.md) (Developer Guide)
+
 **...wissen, welche Features geplant sind**
 → [PROJEKT_ÜBERSICHT.md#geplante-features](./PROJEKT_ÜBERSICHT.md#geplante-features) (Roadmap)
 
@@ -86,18 +93,21 @@ Historische und phasen-spezifische Dokumentation wurde in **[archive/](./archive
 
 ## 📊 Dokument-Übersicht
 
-### Aktive Dokumentation (8 Dateien)
+### Aktive Dokumentation (12 Dateien)
 ```
 docs/
-├── README.md                              # Diese Datei (Navigations-Guide)
-├── PROJEKT_ÜBERSICHT.md                   # ⭐ HAUPTDOKUMENTATION
-├── API_KEYS_LIST.md                       # API-Keys Liste
-├── ENVIRONMENT_VARIABLES.md               # ENV-Vars Guide
-├── DEPLOY_GUIDE.md                        # Deployment-Anleitung
-├── CORTEX_INTEGRATION_PLAN.md             # Geplant: AI Features
-├── SIGNAL_ORCHESTRATOR_INTEGRATION.md     # Geplant: Learning Architect
-├── SIGNAL_UI_INTEGRATION.md               # Geplant: UI Integration
-└── SIGNAL_ORCHESTRATOR_EXAMPLE.json       # Beispiel-Daten
+├── README.md                                # Diese Datei (Navigations-Guide)
+├── PROJEKT_ÜBERSICHT.md                     # ⭐ HAUPTDOKUMENTATION
+├── API_KEYS_LIST.md                         # API-Keys Liste
+├── ENVIRONMENT_VARIABLES.md                 # ENV-Vars Guide
+├── DEPLOY_GUIDE.md                          # Deployment-Anleitung
+├── ONBOARDING_STRATEGY.md                   # ⭐ Onboarding-Strategie
+├── ONBOARDING_IMPLEMENTATION_COMPLETE.md    # ✅ Implementation Details
+├── ONBOARDING_QUICK_START.md                # 🚀 Developer Quick Start
+├── CORTEX_INTEGRATION_PLAN.md               # Geplant: AI Features
+├── SIGNAL_ORCHESTRATOR_INTEGRATION.md       # Geplant: Learning Architect
+├── SIGNAL_UI_INTEGRATION.md                 # Geplant: UI Integration
+└── SIGNAL_ORCHESTRATOR_EXAMPLE.json         # Beispiel-Daten
 ```
 
 ### Archivierte Dokumentation (27 Dateien)

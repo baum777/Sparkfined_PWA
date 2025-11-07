@@ -1,0 +1,111 @@
+/**
+ * Driver.js Theme Override - Sparkfined Dark Theme
+ */
+
+/* Popover Background */
+.driver-popover {
+  background: #18181b !important; /* zinc-900 */
+  color: #f4f4f5 !important; /* zinc-100 */
+  border: 1px solid #27272a !important; /* zinc-800 */
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5) !important;
+}
+
+/* Title */
+.driver-popover-title {
+  color: #f4f4f5 !important; /* zinc-100 */
+  font-weight: 600 !important;
+  font-size: 1.125rem !important;
+}
+
+/* Description */
+.driver-popover-description {
+  color: #d4d4d8 !important; /* zinc-300 */
+  line-height: 1.5 !important;
+}
+
+/* Progress Text */
+.driver-popover-progress-text {
+  color: #71717a !important; /* zinc-500 */
+  font-size: 0.875rem !important;
+}
+
+/* Buttons */
+.driver-popover-next-btn,
+.driver-popover-prev-btn,
+.driver-popover-close-btn {
+  transition: all 150ms ease-in-out !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  font-weight: 500 !important;
+}
+
+/* Next/Done Button */
+.driver-popover-next-btn {
+  background: #10b981 !important; /* emerald-500 */
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+}
+
+.driver-popover-next-btn:hover {
+  background: #059669 !important; /* emerald-600 */
+  transform: scale(1.05) !important;
+}
+
+.driver-popover-next-btn:active {
+  transform: scale(0.98) !important;
+}
+
+/* Previous Button */
+.driver-popover-prev-btn {
+  background: #27272a !important; /* zinc-800 */
+  color: #f4f4f5 !important; /* zinc-100 */
+  border: 1px solid #3f3f46 !important; /* zinc-700 */
+}
+
+.driver-popover-prev-btn:hover {
+  background: #3f3f46 !important; /* zinc-700 */
+  border-color: #52525b !important; /* zinc-600 */
+}
+
+/* Close Button */
+.driver-popover-close-btn {
+  background: transparent !important;
+  color: #a1a1aa !important; /* zinc-400 */
+  border: none !important;
+}
+
+.driver-popover-close-btn:hover {
+  color: #f4f4f5 !important; /* zinc-100 */
+  background: #27272a !important; /* zinc-800 */
+}
+
+/* Arrow */
+.driver-popover-arrow-side-left.driver-popover-arrow,
+.driver-popover-arrow-side-right.driver-popover-arrow,
+.driver-popover-arrow-side-top.driver-popover-arrow,
+.driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-color: #18181b !important; /* zinc-900 */
+}
+
+/* Overlay */
+.driver-overlay {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Highlighted element */
+.driver-active-element {
+  outline: 2px solid #10b981 !important; /* emerald-500 */
+  outline-offset: 4px !important;
+}
+
+/* Keyboard shortcuts in description */
+.driver-popover-description kbd {
+  background: #27272a;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.875em;
+  border: 1px solid #3f3f46;
+}

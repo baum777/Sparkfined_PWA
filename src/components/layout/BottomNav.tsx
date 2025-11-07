@@ -16,8 +16,20 @@ const navItems: NavItem[] = [
 ]
 
 export default function BottomNav() {
+  // Map labels to tour step IDs
+  const getTourId = (label: string) => {
+    const idMap: Record<string, string> = {
+      'Board': 'board-link',
+      'Analyze': 'analyze-link',
+      'Journal': 'journal-link',
+      'Settings': 'settings-link',
+    };
+    return idMap[label] || '';
+  };
+
   return (
     <nav
+      id="main-navigation"
       className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-800 bg-zinc-900/95 backdrop-blur-sm lg:hidden"
       role="navigation"
       aria-label="Main navigation"
@@ -28,6 +40,7 @@ export default function BottomNav() {
             <NavLink
               key={path}
               to={path}
+              id={getTourId(label)}
               className={({ isActive }) =>
                 `flex flex-col items-center gap-1 py-3 px-2 transition-colors relative ${
                   isActive
