@@ -125,7 +125,8 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist',
     target: 'es2020',
-    sourcemap: mode === 'development',
+    // Enable sourcemaps only in Vercel preview (and keep dev behavior)
+    sourcemap: process.env.VERCEL_ENV === 'preview' || mode === 'development',
     minify: 'esbuild',
     chunkSizeWarningLimit: 900,
     rollupOptions: {

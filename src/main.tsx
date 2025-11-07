@@ -5,6 +5,8 @@ import './styles/index.css'
 import './styles/driver-override.css'
 import 'driver.js/dist/driver.css'
 import { initializeLayoutToggles } from './lib/layout-toggle'
+import { AppErrorBoundary } from '@/app/AppErrorBoundary'
+import { logError } from '@/lib/log-error'
 
 // Initialize layout toggles BEFORE React render
 // Wrap in try-catch to prevent blocking app initialization
@@ -67,15 +69,42 @@ if (!rootElement) {
   const newRoot = document.createElement('div')
   newRoot.id = 'root'
   document.body.appendChild(newRoot)
-  ReactDOM.createRoot(newRoot).render(
+  const root = ReactDOM.createRoot(newRoot, {
+    onRecoverableError(error, info) {
+      if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
+        logError('RecoverableError', error, info)
+      }
+    }
+  })
+  // global listeners only in preview
+  if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
+    window.addEventListener('error', (e) => logError('window.error', (e as ErrorEvent).error || (e as any).message))
+    window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e as PromiseRejectionEvent).reason))
+  }
+  root.render(
     <React.StrictMode>
-      <App />
+      <AppErrorBoundary>
+        <App />
+      </AppErrorBoundary>
     </React.StrictMode>
   )
 } else {
-  ReactDOM.createRoot(rootElement).render(
+  const root = ReactDOM.createRoot(rootElement, {
+    onRecoverableError(error, info) {
+      if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
+        logError('RecoverableError', error, info)
+      }
+    }
+  })
+  if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
+    window.addEventListener('error', (e) => logError('window.error', (e as ErrorEvent).error || (e as any).message))
+    window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e as PromiseRejectionEvent).reason))
+  }
+  root.render(
     <React.StrictMode>
-      <App />
+      <AppErrorBoundary>
+        <App />
+      </AppErrorBoundary>
     </React.StrictMode>
   )
 }
