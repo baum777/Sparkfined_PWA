@@ -8,9 +8,9 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b tsconfig.build.json && vite build && pnpm check:size",
-    "build:ci": "pnpm build && pnpm test:e2e",
-    "build:fast": "tsc -b tsconfig.build.json && vite build",
+    "build": "tsc -b tsconfig.build.json && vite build",
+    "build:local": "pnpm build && pnpm check:size",
+    "build:ci": "pnpm build:local && pnpm test:e2e",
     "preview": "vite preview",
     "analyze": "cross-env ANALYZE=true vite build",
     "lighthouse": "npx lighthouse http://localhost:4173 --view --only-categories=performance,pwa,best-practices,accessibility",

@@ -126,17 +126,18 @@ Die beschriebenen Änderungen (`build:ci`, `build:fast`, `.vercelignore`) wurden
 
 ## 🚀 Vercel Deployment — Aktueller Status
 
-### ✅ Build Command (optimal)
+### ✅ Build Command (updated)
 ```bash
 # Vercel Settings → Build Command
 pnpm build
 ```
 
-**Warum keine Änderung nötig?**
-- Build ist schnell (~1.6s)
-- Keine Circular Dependencies
-- E2E Tests sollten NICHT im Production Build laufen
-- Separate CI/CD Pipeline ist Best Practice
+**Build Scripts explained:**
+- `pnpm build` → Production build (no size checks, fast ~1.6s)
+- `pnpm build:local` → Local build with bundle size verification
+- `pnpm build:ci` → CI build with size checks + E2E tests
+
+**Fixed:** Removed `check:size` from production build to avoid missing script errors in Vercel
 
 ### ✅ Environment Variables
 **Production:**

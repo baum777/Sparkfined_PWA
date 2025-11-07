@@ -57,12 +57,15 @@ VITE_VAPID_PUBLIC_KEY=your_vapid_public_key_here
 ### Step 2: Build Settings (Already Configured) ✅
 
 **Framework Preset:** Vite  
-**Build Command:** `pnpm build`  
+**Build Command:** `pnpm build` ✅  
 **Output Directory:** `dist`  
 **Install Command:** `pnpm install`  
 **Node Version:** 20.x (from engines in package.json)
 
-> ⚠️ **Do NOT change these!** They are already optimal.
+> ℹ️ **Build Scripts:**
+> - `pnpm build` — Production build (fast, no checks)
+> - `pnpm build:local` — Dev build with bundle size checks
+> - `pnpm build:ci` — Full CI build with tests
 
 ---
 
