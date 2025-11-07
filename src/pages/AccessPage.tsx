@@ -35,7 +35,6 @@ export default function AccessPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 pb-24">
-    <div className="min-h-screen bg-slate-950 text-white p-4 pb-20 md:p-8 md:pb-8">
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
         <div className="flex items-center gap-3 mb-3">

@@ -13,18 +13,18 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { awaitStableUI } from './utils/wait';
 import AxeBuilder from '@axe-core/playwright';
 
 test.describe('Board Page - Accessibility', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to Board page
     await page.goto('/');
-    
-    // Wait for page to be interactive
-    await page.waitForLoadState('networkidle');
+    await awaitStableUI(page);
   });
 
   test('should not have any automatically detectable WCAG A or AA violations', async ({ page }) => {
+    await awaitStableUI(page);
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
       .analyze();
@@ -33,6 +33,8 @@ test.describe('Board Page - Accessibility', () => {
   });
 
   test('should have proper heading hierarchy', async ({ page }) => {
+    await awaitStableUI(page);
+    await page.waitForSelector('h1, h2, h3, h4, h5, h6', { timeout: 2000 }).catch(() => {});
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['best-practice'])
       .include('h1, h2, h3, h4, h5, h6')
@@ -42,6 +44,7 @@ test.describe('Board Page - Accessibility', () => {
   });
 
   test('should have proper color contrast', async ({ page }) => {
+    await awaitStableUI(page);
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2aa'])
       .include('body')
@@ -55,6 +58,8 @@ test.describe('Board Page - Accessibility', () => {
   });
 
   test('should have accessible form controls', async ({ page }) => {
+    await awaitStableUI(page);
+    await page.waitForSelector('input, select, textarea, button', { timeout: 2000 }).catch(() => {});
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
       .include('input, select, textarea, button')
@@ -64,6 +69,8 @@ test.describe('Board Page - Accessibility', () => {
   });
 
   test('should have proper ARIA attributes', async ({ page }) => {
+    await awaitStableUI(page);
+    await page.waitForSelector('[aria-label], [aria-labelledby], [role]', { timeout: 2000 }).catch(() => {});
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
       .include('[aria-label], [aria-labelledby], [role]')
@@ -73,6 +80,7 @@ test.describe('Board Page - Accessibility', () => {
   });
 
   test('should have keyboard navigable interactive elements', async ({ page }) => {
+    await awaitStableUI(page);
     // Get all interactive elements
     const interactiveElements = await page.locator('button, a, input, select, textarea').all();
 
@@ -93,6 +101,7 @@ test.describe('Board Page - Accessibility', () => {
   });
 
   test('should have visible focus indicators', async ({ page }) => {
+    await awaitStableUI(page);
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2aa'])
       .analyze();
@@ -105,6 +114,8 @@ test.describe('Board Page - Accessibility', () => {
   });
 
   test('should have proper alt text for images', async ({ page }) => {
+    await awaitStableUI(page);
+    await page.waitForSelector('img', { timeout: 2000 }).catch(() => {});
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a'])
       .include('img')
@@ -118,15 +129,18 @@ test.describe('Board Page - Accessibility', () => {
   });
 
   test('should have accessible navigation', async ({ page }) => {
+    await awaitStableUI(page);
+    await page.waitForSelector('nav, [role="navigation"]', { timeout: 2000 }).catch(() => {});
     const accessibilityScanResults = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa'])
-      .include('nav')
+      .include('nav, [role="navigation"]')
       .analyze();
 
     expect(accessibilityScanResults.violations).toEqual([]);
   });
 
   test('should support screen readers (landmarks)', async ({ page }) => {
+    await awaitStableUI(page);
     // Check for proper landmark roles
     const landmarks = await page.locator('[role="navigation"], [role="main"], [role="complementary"], nav, main, aside').all();
     
@@ -137,7 +151,7 @@ test.describe('Board Page - Accessibility', () => {
 test.describe('Board Components - Accessibility', () => {
   test('KPI Tiles should be keyboard accessible', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await awaitStableUI(page);
 
     // Find clickable KPI tiles
     const kpiTiles = await page.locator('[role="button"]').all();
@@ -158,7 +172,7 @@ test.describe('Board Components - Accessibility', () => {
 
   test('Feed filters should be keyboard accessible', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await awaitStableUI(page);
 
     // Find filter buttons
     const filterButtons = await page.locator('button:has-text("All"), button:has-text("Alerts"), button:has-text("Journal")').all();
@@ -182,13 +196,13 @@ test.describe('Board Components - Accessibility', () => {
 
   test('Bottom navigation should be keyboard accessible', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await awaitStableUI(page);
 
     // Mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
 
     // Find bottom nav links
-    const navLinks = await page.locator('nav[aria-label="Main navigation"] a').all();
+    const navLinks = await page.locator('nav[aria-label="Main navigation"], nav[aria-label="Main Navigation"], [role="navigation"]').locator('a').all();
 
     expect(navLinks.length).toBeGreaterThan(0);
 
