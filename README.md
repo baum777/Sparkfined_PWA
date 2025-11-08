@@ -353,7 +353,7 @@ pnpm test:e2e -- board-a11y
 | **Cumulative Layout Shift** | < 0.1 | ✅ 0.05 |
 | **Lighthouse Score** | 90+ (all categories) | ✅ 95+ (projected) |
 
-**Latest:** All phases 0-7 complete (2025-11-05) | See `docs/FINAL_PROJECT_REPORT.md` for details
+**Latest:** Alpha release (2025-11-08) | Community-driven development | See `/docs` for details
 
 ---
 
@@ -365,7 +365,7 @@ pnpm test:e2e -- board-a11y
 - [x] Interaction & States (Navigation, motion, skeletons)
 - [x] Data & API (Endpoints, hooks, IndexedDB)
 - [x] Offline & A11y (Service worker, WCAG 2.1 AA)
-- [x] PWA Production Ready (66 precached entries, 14 icons, offline page)
+- [x] PWA Core Features Complete (66 precached entries, 14 icons, offline page)
 - [x] Icon Showcase Page (Visual display at `/icons` route)
 
 ### 🚧 Upcoming

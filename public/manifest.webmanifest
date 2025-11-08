@@ -1,7 +1,7 @@
 {
   "name": "Sparkfined",
   "short_name": "Sparkfined",
-  "description": "Crypto trading analytics PWA with charting, signals, and offline-first UX.",
+  "description": "Community-first crypto trading arsenal. Built with traders, for traders. Alpha version.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
