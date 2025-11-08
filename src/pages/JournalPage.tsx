@@ -2,6 +2,7 @@ import React from "react";
 import { useJournal } from "../sections/journal/useJournal";
 import JournalEditor from "../sections/journal/JournalEditor";
 import JournalList from "../sections/journal/JournalList";
+import JournalStats from "../sections/journal/JournalStats";
 import type { JournalNote } from "../lib/journal";
 import { useAssist } from "../sections/ai/useAssist";
 
@@ -114,6 +115,11 @@ export default function JournalPage() {
           />
           <button className={btn} onClick={()=>{ setDraft({}); setOpenId(null); }}>Neu</button>
         </div>
+      </div>
+
+      {/* Trading-Statistiken */}
+      <div className="mb-3">
+        <JournalStats notes={notes} />
       </div>
 
       <JournalEditor draft={draft} onChange={(d: any)=>setDraft(d)} onSave={()=>saveServer()} />

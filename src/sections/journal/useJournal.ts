@@ -22,6 +22,21 @@ export function useJournal() {
       permalink: partial.permalink,
       address: partial.address,
       tf: partial.tf,
+      ruleId: partial.ruleId,
+      // Trading-Felder
+      status: partial.status,
+      entryPrice: partial.entryPrice,
+      exitPrice: partial.exitPrice,
+      positionSize: partial.positionSize,
+      stopLoss: partial.stopLoss,
+      takeProfit: partial.takeProfit,
+      pnl: partial.pnl,
+      pnlPercent: partial.pnlPercent,
+      riskRewardRatio: partial.riskRewardRatio,
+      setup: partial.setup,
+      aiAttachedAt: partial.aiAttachedAt,
+      enteredAt: partial.enteredAt,
+      exitedAt: partial.exitedAt,
     };
     setNotes(s => [n, ...s]);
     return n;

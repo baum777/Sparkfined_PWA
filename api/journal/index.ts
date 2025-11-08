@@ -33,11 +33,26 @@ export default async function handler(req: Request){
       updatedAt: now(),
       title: b?.title || "",
       body: String(b?.body ?? ""),
-      address: b?.address || "",
+      address: b?.address || undefined,
       tf: b?.tf || undefined,
       ruleId: b?.ruleId || undefined,
       tags: Array.isArray(b?.tags) ? b.tags.slice(0,20) : [],
-      aiAttachedAt: b?.aiAttachedAt || undefined
+      screenshotDataUrl: b?.screenshotDataUrl || undefined,
+      permalink: b?.permalink || undefined,
+      // Trading-spezifische Felder
+      status: b?.status || undefined,
+      entryPrice: typeof b?.entryPrice === "number" ? b.entryPrice : undefined,
+      exitPrice: typeof b?.exitPrice === "number" ? b.exitPrice : undefined,
+      positionSize: typeof b?.positionSize === "number" ? b.positionSize : undefined,
+      stopLoss: typeof b?.stopLoss === "number" ? b.stopLoss : undefined,
+      takeProfit: typeof b?.takeProfit === "number" ? b.takeProfit : undefined,
+      pnl: typeof b?.pnl === "number" ? b.pnl : undefined,
+      pnlPercent: typeof b?.pnlPercent === "number" ? b.pnlPercent : undefined,
+      riskRewardRatio: typeof b?.riskRewardRatio === "number" ? b.riskRewardRatio : undefined,
+      setup: b?.setup || undefined,
+      aiAttachedAt: b?.aiAttachedAt || undefined,
+      enteredAt: b?.enteredAt || undefined,
+      exitedAt: b?.exitedAt || undefined
     };
     await kvSet(`journal:${userId}:${id}`, rec);
     await kvSAdd(`journal:byUser:${userId}`, id);
