@@ -1,17 +1,16 @@
 # ⚡ Sparkfined
 
-**Next-Generation Crypto Trading Command Center**  
-A Progressive Web App for technical analysis, charting, journaling, and intelligent alerts.
+**Community-First Crypto Trading Arsenal**  
+Built with the community, for traders. Combining long-term vision with degen execution speed.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.3-61dafb?logo=react)](https://reactjs.org/)
 [![PWA](https://img.shields.io/badge/PWA-Ready-success?logo=pwa)](https://web.dev/progressive-web-apps/)
 [![Vite](https://img.shields.io/badge/Vite-6.0-646cff?logo=vite)](https://vitejs.dev/)
-[![License](https://img.shields.io/badge/License-Private-red)]()
-[![Status](https://img.shields.io/badge/Status-Launch--Ready-brightgreen)]()
-[![Lighthouse](https://img.shields.io/badge/Lighthouse-95+-success)]()
+[![Status](https://img.shields.io/badge/Status-Alpha-yellow)]()
+[![Community](https://img.shields.io/badge/Community-Join%20on%20X-1DA1F2?logo=x)](https://x.com/i/communities/1983364279647555809)
 
-> **🚀 Status:** Production-ready | All 8 phases (0-7) complete | Lighthouse 95+ projected
+> **🚧 Status:** Alpha (Active Development) | Community-driven roadmap | Building a holistic trading tool together
 
 ---
 
