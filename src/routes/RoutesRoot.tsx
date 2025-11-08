@@ -4,6 +4,7 @@ import Layout from "../components/layout/Layout";
 import UpdateBanner from "../components/UpdateBanner";
 import { AccessProvider } from "../store/AccessProvider";
 import ErrorBoundary from "../components/ErrorBoundary";
+import { SwipeNavGate } from "../components/navigation/SwipeNavGate";
 
 // Route-level code splitting (reduziert initial bundle)
 const LandingPage = lazy(() => import("../pages/LandingPage"));
@@ -34,6 +35,8 @@ export default function RoutesRoot() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
+        {/* Swipe Navigation Gate - Runs hook safely within Router context */}
+        <SwipeNavGate />
         <AccessProvider>
           <UpdateBanner />
           <Suspense fallback={<Fallback />}>
