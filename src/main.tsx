@@ -9,6 +9,10 @@ import { AppErrorBoundary } from '@/app/AppErrorBoundary'
 import { logError } from '@/lib/log-error'
 import { validateEnv } from '@/lib/env'
 import { autoCheckAssets } from '@/lib/debug-assets'
+import { installGlobalErrorHooks } from '@/diagnostics/crash-report'
+
+// CRITICAL: Install global error hooks FIRST (before any other code)
+installGlobalErrorHooks()
 
 // STEP B: Early ENV validation (non-fatal, logs warnings only)
 try {

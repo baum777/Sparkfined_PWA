@@ -135,8 +135,9 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: 'dist',
     target: 'es2020',
-    // Enable sourcemaps only in Vercel preview (and keep dev behavior)
-    sourcemap: process.env.VERCEL_ENV === 'preview' || mode === 'development',
+    // CRITICAL FIX: Always enable sourcemaps in production for crash diagnosis
+    // This helps trace errors to original source in production builds
+    sourcemap: true,
     minify: 'esbuild',
     chunkSizeWarningLimit: 900,
     rollupOptions: {
