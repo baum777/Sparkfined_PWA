@@ -10,6 +10,7 @@
 
 import { createWorker, type Worker } from 'tesseract.js'
 import type { OCRResult } from '@/types/analysis'
+import { ENV } from '@/config/env'
 
 // Singleton worker instance
 let workerInstance: Worker | null = null
@@ -23,13 +24,13 @@ async function getWorker(): Promise<Worker> {
     return workerInstance
   }
 
-  const worker = await createWorker('eng', 1, {
-    logger: (m) => {
-      if (import.meta.env.VITE_ENABLE_DEBUG === 'true') {
-        console.log('[OCR]', m)
-      }
-    },
-  })
+    const worker = await createWorker('eng', 1, {
+      logger: (m) => {
+        if (ENV.ENABLE_DEBUG || ENV.DEBUG_FLAG) {
+          console.log('[OCR]', m)
+        }
+      },
+    })
 
   // Optimize for chart text recognition
   await worker.setParameters({

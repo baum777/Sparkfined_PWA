@@ -8,6 +8,8 @@
  * @module orderflow
  */
 
+import { ENV } from '@/config/env'
+
 export type OrderflowDirection = 'inflow' | 'outflow' | 'neutral'
 export type OrderflowStrength = 0 | 1 | 2 // 0=weak, 1=moderate, 2=strong
 
@@ -39,7 +41,7 @@ export async function getOrderflowSnapshot(
 
   // Alpha placeholder: always return neutral
   // Future: Call external API based on ORDERFLOW_PROVIDER env var
-  const provider = import.meta.env.VITE_ORDERFLOW_PROVIDER || 'none'
+    const provider = ENV.ORDERFLOW_PROVIDER || 'none'
   
   if (provider !== 'none') {
     console.info('[orderflow] Provider configured but not implemented:', provider)
@@ -61,7 +63,7 @@ export async function getOrderflowSnapshot(
  * Check if orderflow provider is configured
  */
 export function isOrderflowEnabled(): boolean {
-  const provider = import.meta.env.VITE_ORDERFLOW_PROVIDER || 'none'
+  const provider = ENV.ORDERFLOW_PROVIDER || 'none'
   return provider !== 'none'
 }
 

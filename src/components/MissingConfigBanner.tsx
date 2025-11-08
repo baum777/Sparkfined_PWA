@@ -3,18 +3,15 @@
  * Shows prominent warning when required API keys are missing
  */
 
-import { useState, useEffect } from 'react'
-import { validateEnv, type EnvValidationResult } from '../lib/validateEnv'
+import { useEffect, useState } from 'react'
 import { X, AlertTriangle, ExternalLink } from 'lucide-react'
+import { ENV, getEnvSummary } from '@/config/env'
 
 export default function MissingConfigBanner() {
-  const [validation, setValidation] = useState<EnvValidationResult | null>(null)
   const [dismissed, setDismissed] = useState(false)
+  const summary = getEnvSummary()
 
   useEffect(() => {
-    const result = validateEnv()
-    setValidation(result)
-
     // Check if user dismissed in this session
     const wasDismissed = sessionStorage.getItem('config-banner-dismissed')
     if (wasDismissed) {
@@ -27,8 +24,10 @@ export default function MissingConfigBanner() {
     sessionStorage.setItem('config-banner-dismissed', 'true')
   }
 
-  // Don't show if valid or dismissed
-  if (!validation || validation.isValid || dismissed) {
+  const requiredMissing = !ENV.MORALIS_API_KEY || summary.missing.length > 0
+  const optionalMissing = summary.warnings.length > 0
+
+  if ((!requiredMissing && !optionalMissing) || dismissed) {
     return null
   }
 
@@ -49,28 +48,32 @@ export default function MissingConfigBanner() {
             </p>
             
             {/* Missing keys */}
-            {validation.missing.length > 0 && (
+            {summary.missing.length > 0 && (
               <div className="mb-2">
                 <p className="text-xs text-amber-300 font-medium mb-1">Required:</p>
                 <ul className="text-xs text-amber-200 space-y-0.5">
-                  {validation.missing.map((item, i) => (
-                    <li key={i} className="pl-2">• {item}</li>
+                  {summary.missing.map((item, i) => (
+                    <li key={i} className="pl-2">
+                      • {item.key}: {item.description}
+                    </li>
                   ))}
                 </ul>
               </div>
             )}
 
             {/* Warnings (optional keys) */}
-            {validation.warnings.length > 0 && (
+            {summary.warnings.length > 0 && (
               <div>
                 <p className="text-xs text-amber-300/80 font-medium mb-1">Optional (degraded features):</p>
                 <ul className="text-xs text-amber-200/80 space-y-0.5">
-                  {validation.warnings.slice(0, 2).map((item, i) => (
-                    <li key={i} className="pl-2">• {item}</li>
+                  {summary.warnings.slice(0, 2).map((item, i) => (
+                    <li key={i} className="pl-2">
+                      • {item.key}: {item.description}
+                    </li>
                   ))}
-                  {validation.warnings.length > 2 && (
+                  {summary.warnings.length > 2 && (
                     <li className="pl-2 text-amber-300/60">
-                      ... and {validation.warnings.length - 2} more
+                      ... and {summary.warnings.length - 2} more
                     </li>
                   )}
                 </ul>

@@ -8,6 +8,8 @@
  * @module walletFlow
  */
 
+import { ENV } from '@/config/env'
+
 export type WalletAccumulation = 'accum' | 'dist' | 'neutral'
 export type WalletTier = 'whale' | 'shark' | 'dolphin' | 'shrimp' | 'unknown'
 
@@ -46,7 +48,7 @@ export async function getAccumulationHint(
 
   // Alpha placeholder: always return neutral
   // Future: Call external API based on WALLETFLOW_PROVIDER env var
-  const provider = import.meta.env.VITE_WALLETFLOW_PROVIDER || 'none'
+    const provider = ENV.WALLETFLOW_PROVIDER || 'none'
   
   if (provider !== 'none') {
     console.info('[walletFlow] Provider configured but not implemented:', provider)
@@ -81,7 +83,7 @@ export async function getSmartMoneyHint(
  * Check if wallet flow provider is configured
  */
 export function isWalletFlowEnabled(): boolean {
-  const provider = import.meta.env.VITE_WALLETFLOW_PROVIDER || 'none'
+  const provider = ENV.WALLETFLOW_PROVIDER || 'none'
   return provider !== 'none'
 }
 

@@ -8,7 +8,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { initializeLayoutToggles } from './lib/layout-toggle'
 import { AppErrorBoundary } from '@/app/AppErrorBoundary'
 import { logError } from '@/lib/log-error'
-import { validateEnv } from '@/lib/env'
+import { ENV, validateEnv } from '@/lib/env'
 import { autoCheckAssets } from '@/lib/debug-assets'
 import { installGlobalErrorHooks } from '@/diagnostics/crash-report'
 import { installBootguard } from '@/diagnostics/bootguard'
@@ -38,9 +38,9 @@ try {
 // Service Worker Registration - Manual Update Flow
 // SW is registered via vite-plugin-pwa with registerType: 'autoUpdate'
 // Update handling is done via UpdateBanner component
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
+if ('serviceWorker' in navigator && ENV.PROD) {
   // STEP A: Enhanced SW lifecycle logging (preview-only)
-  const isPreview = (import.meta as any).env?.VERCEL_ENV === 'preview'
+  const isPreview = ENV.VERCEL_ENV === 'preview'
   
   // Listen for SW messages (e.g., cache status, SKIP_WAITING)
   navigator.serviceWorker.addEventListener('message', (event) => {
@@ -90,12 +90,12 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 // Track online/offline status (browser-only)
 if (typeof window !== 'undefined') {
   window.addEventListener('online', () => {
-    if (import.meta.env.DEV) console.log('🌐 Back online')
+    if (ENV.DEV) console.log('🌐 Back online')
     document.body.classList.remove('offline-mode')
   })
 
   window.addEventListener('offline', () => {
-    if (import.meta.env.DEV) console.log('📴 Offline mode')
+    if (ENV.DEV) console.log('📴 Offline mode')
     document.body.classList.add('offline-mode')
   })
 }
@@ -110,56 +110,64 @@ if (!rootElement) {
   document.body.appendChild(newRoot)
   const root = ReactDOM.createRoot(newRoot, {
     onRecoverableError(error, info) {
-      if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
+      if (ENV.VERCEL_ENV === 'preview') {
         logError('RecoverableError', error, info)
       }
     }
   })
   // global listeners only in preview
-  if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
-    window.addEventListener('error', (e) => logError('window.error', (e as ErrorEvent).error || (e as any).message))
-    window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e as PromiseRejectionEvent).reason))
-  }
-    root.render(
-      <React.StrictMode>
-        <BrowserRouter>
-          <AppErrorBoundary>
-            <App />
-          </AppErrorBoundary>
-        </BrowserRouter>
-      </React.StrictMode>
+  if (ENV.VERCEL_ENV === 'preview') {
+    window.addEventListener('error', (e) =>
+      logError('window.error', (e as ErrorEvent).error || (e as any).message)
     )
+    window.addEventListener('unhandledrejection', (e) =>
+      logError('unhandledrejection', (e as PromiseRejectionEvent).reason)
+    )
+  }
+  root.render(
+    <React.StrictMode>
+      <BrowserRouter>
+        <AppErrorBoundary>
+          <App />
+        </AppErrorBoundary>
+      </BrowserRouter>
+    </React.StrictMode>
+  )
 } else {
   const root = ReactDOM.createRoot(rootElement, {
     onRecoverableError(error, info) {
-      if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
+      if (ENV.VERCEL_ENV === 'preview') {
         logError('RecoverableError', error, info)
       }
     }
   })
-  if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
-    window.addEventListener('error', (e) => logError('window.error', (e as ErrorEvent).error || (e as any).message))
-    window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e as PromiseRejectionEvent).reason))
-  }
-    root.render(
-      <React.StrictMode>
-        <BrowserRouter>
-          <AppErrorBoundary>
-            <App />
-          </AppErrorBoundary>
-        </BrowserRouter>
-      </React.StrictMode>
+  if (ENV.VERCEL_ENV === 'preview') {
+    window.addEventListener('error', (e) =>
+      logError('window.error', (e as ErrorEvent).error || (e as any).message)
     )
+    window.addEventListener('unhandledrejection', (e) =>
+      logError('unhandledrejection', (e as PromiseRejectionEvent).reason)
+    )
+  }
+  root.render(
+    <React.StrictMode>
+      <BrowserRouter>
+        <AppErrorBoundary>
+          <App />
+        </AppErrorBoundary>
+      </BrowserRouter>
+    </React.StrictMode>
+  )
 }
 
 // Hydration hint for Lighthouse (main thread idle sooner)
 if ('requestIdleCallback' in window) {
   (window as any).requestIdleCallback(() => {
-    if (import.meta.env.DEV) console.log('[idle] app settled')
+    if (ENV.DEV) console.log('[idle] app settled')
   })
 }
 
 // CRITICAL FIX: Auto-check assets in preview/prod to diagnose load failures
-if (import.meta.env.PROD) {
+if (ENV.PROD) {
   autoCheckAssets()
 }

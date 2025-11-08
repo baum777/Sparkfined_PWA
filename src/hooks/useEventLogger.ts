@@ -1,6 +1,7 @@
 // Event logging hook for tracking user actions
 import { useCallback, useEffect } from 'react'
 import { logEvent, getSessionId, startNewSession, incrementMetric } from '@/lib/db'
+import { ENV } from '@/config/env'
 
 // Key event types for Beta telemetry
 export const EventTypes = {
@@ -100,7 +101,7 @@ export function useEventLogger() {
       }
       
       // Console log in dev mode
-      if (import.meta.env.DEV || import.meta.env.VITE_ENABLE_DEBUG === 'true') {
+      if (ENV.DEV || ENV.ENABLE_DEBUG) {
         console.log(`[📊 Event] ${type}`, data)
       }
     } catch (error) {

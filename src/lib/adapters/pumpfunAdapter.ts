@@ -8,9 +8,10 @@
  */
 
 import type { PumpfunTokenData } from '@/types/analysis'
+import { ENV } from '@/config/env'
 
-const PUMPFUN_API_BASE = import.meta.env.PUMPFUN_API_BASE || 'https://api.pump.fun'
-const PUMPFUN_API_TIMEOUT = Number(import.meta.env.PUMPFUN_API_TIMEOUT || 5000)
+const PUMPFUN_API_BASE = ENV.PUMPFUN_API_BASE || 'https://api.pump.fun'
+const PUMPFUN_API_TIMEOUT = ENV.PUMPFUN_API_TIMEOUT || 5000
 const IS_BETA = true // Set to false in Alpha phase
 
 /**

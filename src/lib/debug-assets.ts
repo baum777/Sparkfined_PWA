@@ -5,6 +5,8 @@
  * Usage: Call in main.tsx or App.tsx (only in preview/production)
  */
 
+import { ENV } from '@/config/env';
+
 export interface AssetCheckResult {
   url: string;
   status: 'ok' | 'failed' | 'timeout';
@@ -53,8 +55,8 @@ export async function checkAsset(url: string, timeout = 5000): Promise<AssetChec
  * Returns array of results, logs to console in preview mode
  */
 export async function checkCriticalAssets(baseUrl = ''): Promise<AssetCheckResult[]> {
-  const isPreview = (import.meta as any).env?.VERCEL_ENV === 'preview';
-  const isProd = import.meta.env.PROD;
+  const isPreview = ENV.VERCEL_ENV === 'preview';
+  const isProd = ENV.PROD;
 
   if (!isPreview && !isProd) {
     // Skip in dev mode
@@ -100,8 +102,8 @@ export async function checkCriticalAssets(baseUrl = ''): Promise<AssetCheckResul
 export function autoCheckAssets() {
   if (typeof window === 'undefined') return;
 
-  const isPreview = (import.meta as any).env?.VERCEL_ENV === 'preview';
-  const isProd = import.meta.env.PROD;
+  const isPreview = ENV.VERCEL_ENV === 'preview';
+  const isProd = ENV.PROD;
 
   if (!isPreview && !isProd) return;
 

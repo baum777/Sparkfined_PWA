@@ -20,14 +20,15 @@ import type {
   AdapterResponse,
   ChainId,
 } from '../../types/market'
+import { ENV } from '@/config/env'
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
 const DEFAULT_CONFIG: AdapterConfig = {
-  baseUrl: import.meta.env.VITE_MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2',
-  apiKey: import.meta.env.VITE_MORALIS_API_KEY || '',
+  baseUrl: ENV.MORALIS_BASE_URL || 'https://deep-index.moralis.io/api/v2.2',
+  apiKey: ENV.MORALIS_API_KEY || '',
   timeout: 6000, // 6s timeout (Moralis can be slower)
   retries: 2,
   cacheTtl: 10 * 60 * 1000, // 10 min cache TTL

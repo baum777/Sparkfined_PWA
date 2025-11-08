@@ -6,6 +6,7 @@ import { subscribePush, unsubscribePush, currentSubscription } from "../lib/push
 import RuleWizard from "../sections/notifications/RuleWizard";
 import type { ServerRule } from "../lib/serverRules";
 import PlaybookCard from "../sections/ideas/Playbook";
+import { ENV } from '@/config/env';
 
 export default function NotificationsPage() {
   const { rules, create, update, remove, triggers, clearTriggers, addManualTrigger } = useAlertRules();
@@ -13,7 +14,7 @@ export default function NotificationsPage() {
   const [draft, setDraft] = React.useState<any>({});
   const [subState, setSubState] = React.useState<"idle"|"on"|"off"|"denied"|"error">("idle");
   const [lastErr, setLastErr] = React.useState<string| null>(null);
-  const VAPID = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
+  const VAPID = (ENV.VAPID_PUBLIC_KEY || undefined) as string | undefined;
   const btn  = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
 
   // --- Server Rules Panel (minimal)

@@ -1,11 +1,13 @@
+import { ENV } from '@/config/env'
+
 /**
  * Centralized Logger
  * Wraps console statements with env-based filtering
  * Only logs in development mode unless VITE_DEBUG=true
  */
 
-const isDev = import.meta.env.DEV
-const isDebugEnabled = import.meta.env.VITE_DEBUG === 'true' || import.meta.env.VITE_ENABLE_DEBUG === 'true'
+const isDev = ENV.DEV
+const isDebugEnabled = ENV.DEBUG_FLAG || ENV.ENABLE_DEBUG
 
 const shouldLog = isDev || isDebugEnabled
 

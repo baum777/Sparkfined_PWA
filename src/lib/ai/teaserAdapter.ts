@@ -19,6 +19,7 @@ import type {
   HeuristicAnalysis,
 } from '@/types/analysis'
 import { calculateHeuristic, heuristicToTeaser } from '@/lib/analysis/heuristicEngine'
+import { ENV } from '@/config/env'
 
 export type AIProvider = 'none' | 'openai' | 'grok' | 'anthropic'
 
@@ -31,10 +32,10 @@ export interface TeaserPayload {
   heuristic?: HeuristicAnalysis
 }
 
-const AI_PROVIDER = (import.meta.env.ANALYSIS_AI_PROVIDER || 'none') as AIProvider
-const OPENAI_API_KEY = import.meta.env.OPENAI_API_KEY || ''
-const GROK_API_KEY = import.meta.env.GROK_API_KEY || ''
-const ANTHROPIC_API_KEY = import.meta.env.ANTHROPIC_API_KEY || ''
+const AI_PROVIDER = ENV.ANALYSIS_AI_PROVIDER
+const OPENAI_API_KEY = ENV.OPENAI_API_KEY
+const GROK_API_KEY = ENV.GROK_API_KEY
+const ANTHROPIC_API_KEY = ENV.ANTHROPIC_API_KEY
 
 /**
  * Main entry point for AI teaser analysis

@@ -7,6 +7,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import type { AccessStatus, AccessDetails } from '../types/access'
 import { ACCESS_CONFIG } from '../config/access'
+import { ENV } from '@/config/env'
 
 interface AccessContextValue {
   // Status
@@ -171,17 +172,22 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
       if (cached) {
         try {
           const { status: cachedStatus, details: cachedDetails, timestamp } = JSON.parse(cached)
-          
+
           // Use cache if less than 5 minutes old, or if older but still valid (grace period)
           const cacheAge = Date.now() - timestamp
           const maxAge = 5 * 60 * 1000 // 5 minutes
           const gracePeriod = 24 * 60 * 60 * 1000 // 24 hours grace period for stale data
-          
+
           if (cacheAge < maxAge || cacheAge < gracePeriod) {
             setStatus(cachedStatus)
             setDetails(cachedDetails)
-            if (import.meta.env.DEV) {
-              console.log('[AccessProvider] Loaded cached status:', cachedStatus, `(age: ${Math.round(cacheAge / 1000)}s)`)
+
+            if (ENV.DEV) {
+              console.log(
+                '[AccessProvider] Loaded cached status:',
+                cachedStatus,
+                `(age: ${Math.round(cacheAge / 1000)}s)`
+              )
             }
           } else {
             // Cache too old, clear it
@@ -199,7 +205,7 @@ export function AccessProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (err) {
       // localStorage might be disabled - that's okay, just continue without cache
-      if (import.meta.env.DEV) {
+      if (ENV.DEV) {
         console.warn('[AccessProvider] localStorage not available:', err)
       }
     }

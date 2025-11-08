@@ -6,6 +6,8 @@
  * Provides better error messages for boot-time crashes
  */
 
+import { ENV } from '@/config/env'
+
 export interface BootError {
   type: 'error' | 'unhandledrejection';
   message: string;
@@ -69,7 +71,7 @@ export function installBootguard() {
     captureError('unhandledrejection', event.reason);
   });
   
-  if (import.meta.env.DEV) {
+    if (ENV.DEV) {
     console.log('[bootguard] Boot guard installed ✅');
   }
 }

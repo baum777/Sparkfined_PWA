@@ -8,9 +8,10 @@
  */
 
 import type { DexscreenerTokenData } from '@/types/analysis'
+import { ENV } from '@/config/env'
 
-const DEX_API_BASE = import.meta.env.DEX_API_BASE || 'https://api.dexscreener.com'
-const DEX_API_TIMEOUT = Number(import.meta.env.DEX_API_TIMEOUT || 5000)
+const DEX_API_BASE = ENV.DEX_API_BASE || 'https://api.dexscreener.com'
+const DEX_API_TIMEOUT = ENV.DEX_API_TIMEOUT || 5000
 
 /**
  * Fetch token data from Dexscreener API

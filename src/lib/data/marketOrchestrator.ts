@@ -22,6 +22,7 @@ import { getDexPaprikaSnapshot } from '../adapters/dexpaprikaAdapter'
 import { getMoralisSnapshot } from '../adapters/moralisAdapter'
 import { getDexscreenerToken } from '../adapters/dexscreenerAdapter'
 import { getPumpfunData } from '../adapters/pumpfunAdapter'
+import { ENV } from '@/config/env'
 
 // ============================================================================
 // CONFIGURATION
@@ -39,8 +40,8 @@ interface OrchestratorConfig {
  * Load configuration from environment variables
  */
 function loadConfig(): OrchestratorConfig {
-  const primary = (import.meta.env.VITE_DATA_PRIMARY || 'dexpaprika') as ProviderId
-  const fallbacksStr = import.meta.env.VITE_DATA_FALLBACKS || 'dexscreener,pumpfun'
+  const primary = (ENV.DATA_PRIMARY_PROVIDER || 'dexpaprika') as ProviderId
+  const fallbacksStr = ENV.DATA_FALLBACK_PROVIDERS || 'dexscreener,pumpfun'
   const fallbacks = fallbacksStr.split(',').map((f: string) => f.trim()) as ProviderId[]
 
   return {
@@ -48,7 +49,7 @@ function loadConfig(): OrchestratorConfig {
     fallbacks,
     timeout: 8000, // 8s global timeout
     maxRetries: 2,
-    enableTelemetry: import.meta.env.VITE_ENABLE_METRICS !== 'false',
+    enableTelemetry: ENV.ENABLE_METRICS,
   }
 }
 
@@ -87,7 +88,7 @@ function logTelemetry(event: Omit<TelemetryEvent, 'timestamp'>) {
   }
 
   // Log to console in dev mode
-  if (import.meta.env.DEV) {
+  if (ENV.DEV) {
     console.log('[MarketOrchestrator]', fullEvent)
   }
 }
@@ -393,7 +394,7 @@ export async function getMarketSnapshot(
     }
 
     // Log failure and try next provider
-    if (import.meta.env.DEV) {
+    if (ENV.DEV) {
       console.warn(`[MarketOrchestrator] ${provider} failed: ${result.error}`)
     }
   }

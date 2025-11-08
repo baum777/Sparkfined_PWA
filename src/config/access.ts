@@ -4,24 +4,32 @@
  * Centralized config for Sparkfiend Access Pass system
  */
 
+import { ENV } from '@/config/env'
+
 export const ACCESS_CONFIG = {
   // OG Pass Settings
   OG_SLOTS: 333,
-  OG_SYMBOL: (typeof process !== 'undefined' && process.env?.ACCESS_OG_SYMBOL) || import.meta.env?.VITE_ACCESS_OG_SYMBOL || 'OGPASS',
+  OG_SYMBOL:
+    (typeof process !== 'undefined' && process.env?.ACCESS_OG_SYMBOL) ||
+    ENV.ACCESS_OG_SYMBOL,
   OG_COLLECTION_NAME: 'Sparkfiend OG Pass',
   
   // Hold Requirements
   HOLD_REQUIREMENT: 100_000, // 100k tokens
   
   // Solana Network
-  NETWORK: (import.meta.env?.VITE_SOLANA_NETWORK || 'devnet') as 'devnet' | 'mainnet-beta',
-  RPC_URL: import.meta.env?.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com',
+  NETWORK: ENV.SOLANA_NETWORK,
+  RPC_URL: ENV.SOLANA_RPC_URL,
   
   // Token Mint (replace with actual mint address)
-  TOKEN_MINT: (typeof process !== 'undefined' && process.env?.ACCESS_TOKEN_MINT) || import.meta.env?.VITE_ACCESS_TOKEN_MINT || 'So11111111111111111111111111111111111111112', // SOL for testing
+  TOKEN_MINT:
+    (typeof process !== 'undefined' && process.env?.ACCESS_TOKEN_MINT) ||
+    ENV.ACCESS_TOKEN_MINT,
   
   // Metaplex
-  COLLECTION_MINT: (typeof process !== 'undefined' && process.env?.METAPLEX_COLLECTION_MINT) || import.meta.env?.VITE_METAPLEX_COLLECTION_MINT || undefined,
+  COLLECTION_MINT:
+    (typeof process !== 'undefined' && process.env?.METAPLEX_COLLECTION_MINT) ||
+    (ENV.METAPLEX_COLLECTION_MINT || undefined),
   
   // API Endpoints
   API_BASE: '/api',

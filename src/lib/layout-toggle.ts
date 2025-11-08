@@ -12,6 +12,8 @@
  * setOledMode('on');
  */
 
+import { ENV } from '@/config/env';
+
 export type LayoutStyle = 'rounded' | 'sharp';
 export type OledMode = 'on' | 'off';
 
@@ -94,7 +96,7 @@ export function initializeLayoutToggles() {
     setLayoutStyle(layoutStyle);
     setOledMode(oledMode);
     
-    if (import.meta.env.DEV) {
+      if (ENV.DEV) {
       console.log('[Layout Toggle] Initialized:', { layoutStyle, oledMode });
     }
   } catch (error) {

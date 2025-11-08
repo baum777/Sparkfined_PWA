@@ -1,4 +1,5 @@
 import React, { Component, ReactNode } from 'react'
+import { ENV } from '@/config/env'
 
 interface Props {
   children: ReactNode
@@ -32,12 +33,12 @@ class ErrorBoundary extends Component<Props, State> {
     console.error('Component Stack:', errorInfo.componentStack)
     console.groupEnd()
 
-    // Store error info for display
-    this.setState({ errorInfo })
+      // Store error info for display
+      this.setState({ errorInfo })
 
-    // Try to send to error tracking service (if configured)
-    if (import.meta.env.PROD && typeof window !== 'undefined') {
-      // You can add Sentry or other error tracking here
+      // Try to send to error tracking service (if configured)
+      if (ENV.PROD && typeof window !== 'undefined') {
+        // You can add Sentry or other error tracking here
       // Example: Sentry.captureException(error, { contexts: { react: errorInfo } })
     }
   }
@@ -95,7 +96,7 @@ class ErrorBoundary extends Component<Props, State> {
             {(this.state.error || this.state.errorInfo) && (
               <details className="mt-6 text-left bg-slate-900 rounded-lg p-4">
                 <summary className="cursor-pointer text-sm text-slate-400 hover:text-slate-300 mb-2">
-                  Fehlerdetails anzeigen {import.meta.env.DEV ? '(Dev Mode)' : ''}
+                  Fehlerdetails anzeigen {ENV.DEV ? '(Dev Mode)' : ''}
                 </summary>
                 <div className="mt-2 space-y-4">
                   {this.state.error && (

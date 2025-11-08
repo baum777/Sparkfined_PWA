@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/check-env.mjs",
     "build": "tsc -b tsconfig.build.json && vite build",
     "build:local": "pnpm build && pnpm check:size",
     "build:ci": "pnpm build:local && pnpm test:e2e",

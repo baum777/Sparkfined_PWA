@@ -3,6 +3,8 @@
  * Feature flags and provider configuration management
  */
 
+import { ENV } from '@/config/env';
+
 export type DataProvider = 'dexpaprika' | 'moralis' | 'mock';
 export type AIProvider = 'none' | 'openai' | 'grok' | 'anthropic';
 
@@ -17,9 +19,9 @@ export interface ProviderConfig {
  * @returns ProviderConfig with defaults
  */
 export function pickProvider(): ProviderConfig {
-  const primary = (import.meta.env.VITE_DATA_PRIMARY || 'dexpaprika') as DataProvider;
-  const secondary = (import.meta.env.VITE_DATA_SECONDARY || 'moralis') as DataProvider | 'none';
-  const ai = (import.meta.env.VITE_ANALYSIS_AI_PROVIDER || 'none') as AIProvider;
+  const primary = (ENV.DATA_PRIMARY_PROVIDER || 'dexpaprika') as DataProvider;
+  const secondary = (ENV.DATA_SECONDARY_PROVIDER || 'moralis') as DataProvider | 'none';
+  const ai = ENV.ANALYSIS_AI_PROVIDER as AIProvider;
 
   return {
     primary,
@@ -32,7 +34,7 @@ export function pickProvider(): ProviderConfig {
  * Check if AI teaser is enabled
  */
 export function isAITeaserEnabled(): boolean {
-  return import.meta.env.VITE_ENABLE_AI_TEASER === 'true';
+  return ENV.ENABLE_AI_TEASER;
 }
 
 /**
@@ -40,12 +42,12 @@ export function isAITeaserEnabled(): boolean {
  */
 export function getPerformanceBudgets() {
   return {
-    startMs: Number(import.meta.env.PERF_BUDGET_START_MS) || 1000,
-    apiMedianMs: Number(import.meta.env.PERF_BUDGET_API_MEDIAN_MS) || 500,
-    aiTeaserP95Ms: Number(import.meta.env.PERF_BUDGET_AI_TEASER_P95_MS) || 2000,
-    replayOpenP95Ms: Number(import.meta.env.PERF_BUDGET_REPLAY_OPEN_P95_MS) || 350,
-    journalSaveMs: Number(import.meta.env.PERF_BUDGET_JOURNAL_SAVE_MS) || 60,
-    journalGridMs: Number(import.meta.env.PERF_BUDGET_JOURNAL_GRID_MS) || 250,
-    exportZipP95Ms: Number(import.meta.env.PERF_BUDGET_EXPORT_ZIP_P95_MS) || 800,
+    startMs: ENV.PERF_BUDGET_START_MS,
+    apiMedianMs: ENV.PERF_BUDGET_API_MEDIAN_MS,
+    aiTeaserP95Ms: ENV.PERF_BUDGET_AI_TEASER_P95_MS,
+    replayOpenP95Ms: ENV.PERF_BUDGET_REPLAY_OPEN_P95_MS,
+    journalSaveMs: ENV.PERF_BUDGET_JOURNAL_SAVE_MS,
+    journalGridMs: ENV.PERF_BUDGET_JOURNAL_GRID_MS,
+    exportZipP95Ms: ENV.PERF_BUDGET_EXPORT_ZIP_P95_MS,
   };
 }

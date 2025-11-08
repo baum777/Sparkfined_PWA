@@ -20,13 +20,14 @@ import type {
   AdapterResponse,
   ChainId,
 } from '../../types/market'
+import { ENV } from '@/config/env'
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
 const DEFAULT_CONFIG: AdapterConfig = {
-  baseUrl: import.meta.env.VITE_DEXPAPRIKA_BASE || 'https://api.dexpaprika.com',
+  baseUrl: ENV.DEXPAPRIKA_BASE_URL || 'https://api.dexpaprika.com',
   timeout: 5000, // 5s timeout
   retries: 2,
   cacheTtl: 15 * 60 * 1000, // 15 min cache TTL

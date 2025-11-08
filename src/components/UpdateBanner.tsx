@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from 'react'
 import { setupSwUpdater, applyUpdate } from '../lib/swUpdater'
+import { ENV } from '@/config/env'
 
 export default function UpdateBanner() {
   const [showBanner, setShowBanner] = useState(false)
@@ -15,7 +16,7 @@ export default function UpdateBanner() {
 
   useEffect(() => {
     // Only run in production and if SW is supported
-    if (!('serviceWorker' in navigator) || !import.meta.env.PROD) {
+    if (!('serviceWorker' in navigator) || !ENV.PROD) {
       return
     }
 

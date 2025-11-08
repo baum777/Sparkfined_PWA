@@ -4,6 +4,7 @@ import { KEYS, exportAppData, downloadJson, importAppData, clearNs, clearCaches,
 import { useTelemetry } from "../state/telemetry";
 import { useAISettings } from "../state/ai";
 import { useAIContext } from "../state/aiContext";
+import { ENV } from '@/config/env';
 
 export default function SettingsPage() {
   const { settings, setSettings } = useSettings();
@@ -251,9 +252,9 @@ export default function SettingsPage() {
         </div>
         <div className="mt-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-[11px] text-zinc-500">
           <div className="mb-1 text-xs font-medium text-zinc-400">App Info</div>
-          <div>Version: <span className="text-zinc-300">{import.meta.env.VITE_APP_VERSION ?? "dev"}</span></div>
-          <div>Build: <span className="text-zinc-300">{import.meta.env.MODE}</span></div>
-          <div>VAPID: <span className={import.meta.env.VITE_VAPID_PUBLIC_KEY ? "text-emerald-400" : "text-amber-400"}>{import.meta.env.VITE_VAPID_PUBLIC_KEY ? "configured" : "missing"}</span></div>
+          <div>Version: <span className="text-zinc-300">{ENV.APP_VERSION || "dev"}</span></div>
+          <div>Build: <span className="text-zinc-300">{ENV.MODE}</span></div>
+          <div>VAPID: <span className={ENV.VAPID_PUBLIC_KEY ? "text-emerald-400" : "text-amber-400"}>{ENV.VAPID_PUBLIC_KEY ? "configured" : "missing"}</span></div>
         </div>
       </div>
     </div>
