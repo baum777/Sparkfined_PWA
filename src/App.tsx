@@ -6,13 +6,9 @@ import GlobalInstruments from './pages/_layout/GlobalInstruments'
 import Sidebar from './components/layout/Sidebar'
 import BottomNav from './components/BottomNav'
 import MissingConfigBanner from './components/MissingConfigBanner'
-import useSwipeNavigation from './hooks/useSwipeNavigation'
 import './styles/App.css'
 
 function App() {
-  // Enable swipe navigation globally (can be disabled per-page if needed)
-  useSwipeNavigation({ enabled: true });
-  
   return (
     <TelemetryProvider>
       <SettingsProvider>
