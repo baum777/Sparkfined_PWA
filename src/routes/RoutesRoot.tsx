@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import UpdateBanner from "../components/UpdateBanner";
 import { AccessProvider } from "../store/AccessProvider";
@@ -34,13 +34,13 @@ function Fallback() {
 export default function RoutesRoot() {
   return (
     <ErrorBoundary>
-      <BrowserRouter>
-        {/* Swipe Navigation Gate - Runs hook safely within Router context */}
-        <SwipeNavGate />
-        <AccessProvider>
-          <UpdateBanner />
-          <Suspense fallback={<Fallback />}>
-            <Routes>
+      {/* Läuft jetzt im Router-Kontext, da main.tsx wrappt */}
+      {/* Swipe Navigation Gate - Runs hook safely within Router context */}
+      <SwipeNavGate />
+      <AccessProvider>
+        <UpdateBanner />
+        <Suspense fallback={<Fallback />}>
+          <Routes>
             {/* Landing Page - No Layout (standalone) */}
             <Route path="/landing" element={<LandingPage />} />
             
@@ -97,10 +97,9 @@ export default function RoutesRoot() {
             } />
             <Route path="/icons" element={<IconShowcase />} />
             <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
-            </Routes>
-          </Suspense>
-        </AccessProvider>
-      </BrowserRouter>
+          </Routes>
+        </Suspense>
+      </AccessProvider>
     </ErrorBoundary>
   );
 }

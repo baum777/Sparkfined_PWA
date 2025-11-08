@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import './styles/index.css'
 import './styles/driver-override.css'
@@ -121,9 +122,11 @@ if (!rootElement) {
   }
   root.render(
     <React.StrictMode>
-      <AppErrorBoundary>
-        <App />
-      </AppErrorBoundary>
+      <BrowserRouter>
+        <AppErrorBoundary>
+          <App />
+        </AppErrorBoundary>
+      </BrowserRouter>
     </React.StrictMode>
   )
 } else {
@@ -140,9 +143,11 @@ if (!rootElement) {
   }
   root.render(
     <React.StrictMode>
-      <AppErrorBoundary>
-        <App />
-      </AppErrorBoundary>
+      <BrowserRouter>
+        <AppErrorBoundary>
+          <App />
+        </AppErrorBoundary>
+      </BrowserRouter>
     </React.StrictMode>
   )
 }
