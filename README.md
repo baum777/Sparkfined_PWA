@@ -16,17 +16,17 @@ Built with the community, for traders. Combining long-term vision with degen exe
 
 ## 🎯 What is Sparkfined?
 
-Sparkfined is a **professional-grade Progressive Web App** built for crypto traders who demand more than basic charting tools. It combines:
+Your **all-in-one crypto trading arsenal** — built for traders who never stop learning and need an edge in volatile markets.
 
-- **Advanced Technical Analysis** with 30+ indicators and drawing tools
-- **AI-Powered Insights** via OpenAI/Anthropic integration
-- **Smart Alert System** with server-side rule evaluation
-- **Comprehensive Trading Journal** with AI compression
-- **Chart Replay Mode** for backtesting strategies
-- **Board Command Center** for at-a-glance market overview
-- **Offline-First Architecture** with full PWA capabilities
+From beginners to degens, Sparkfined combines:
 
-All wrapped in a **blazing-fast, mobile-first** interface that works seamlessly across devices.
+- **Advanced Charting & Analysis** with 30+ indicators and AI insights
+- **Smart Alerts & Automation** with backtesting and server-side rules
+- **Trading Journal & Community Ideas** to learn and improve together
+
+**Community-driven roadmap.** Free for 24 hours, then unlock with token-lock (no subscriptions).
+
+Offline-first PWA — always ready, even when the network isn't.
 
 ---
 
