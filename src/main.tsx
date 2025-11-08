@@ -4,6 +4,7 @@ import App from './App'
 import './styles/index.css'
 import './styles/driver-override.css'
 import 'driver.js/dist/driver.css'
+import { BrowserRouter } from 'react-router-dom'
 import { initializeLayoutToggles } from './lib/layout-toggle'
 import { AppErrorBoundary } from '@/app/AppErrorBoundary'
 import { logError } from '@/lib/log-error'
@@ -119,13 +120,15 @@ if (!rootElement) {
     window.addEventListener('error', (e) => logError('window.error', (e as ErrorEvent).error || (e as any).message))
     window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e as PromiseRejectionEvent).reason))
   }
-  root.render(
-    <React.StrictMode>
-      <AppErrorBoundary>
-        <App />
-      </AppErrorBoundary>
-    </React.StrictMode>
-  )
+    root.render(
+      <React.StrictMode>
+        <BrowserRouter>
+          <AppErrorBoundary>
+            <App />
+          </AppErrorBoundary>
+        </BrowserRouter>
+      </React.StrictMode>
+    )
 } else {
   const root = ReactDOM.createRoot(rootElement, {
     onRecoverableError(error, info) {
@@ -138,13 +141,15 @@ if (!rootElement) {
     window.addEventListener('error', (e) => logError('window.error', (e as ErrorEvent).error || (e as any).message))
     window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e as PromiseRejectionEvent).reason))
   }
-  root.render(
-    <React.StrictMode>
-      <AppErrorBoundary>
-        <App />
-      </AppErrorBoundary>
-    </React.StrictMode>
-  )
+    root.render(
+      <React.StrictMode>
+        <BrowserRouter>
+          <AppErrorBoundary>
+            <App />
+          </AppErrorBoundary>
+        </BrowserRouter>
+      </React.StrictMode>
+    )
 }
 
 // Hydration hint for Lighthouse (main thread idle sooner)

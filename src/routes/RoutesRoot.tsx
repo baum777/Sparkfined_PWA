@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import UpdateBanner from "../components/UpdateBanner";
 import { AccessProvider } from "../store/AccessProvider";
@@ -32,10 +32,9 @@ function Fallback() {
 }
 
 export default function RoutesRoot() {
-  return (
-    <ErrorBoundary>
-      <BrowserRouter>
-        {/* Swipe Navigation Gate - Runs hook safely within Router context */}
+    return (
+      <ErrorBoundary>
+        {/* Läuft jetzt im Router-Kontext, da main.tsx wrappt */}
         <SwipeNavGate />
         <AccessProvider>
           <UpdateBanner />
@@ -100,7 +99,6 @@ export default function RoutesRoot() {
             </Routes>
           </Suspense>
         </AccessProvider>
-      </BrowserRouter>
-    </ErrorBoundary>
-  );
+      </ErrorBoundary>
+    );
 }
