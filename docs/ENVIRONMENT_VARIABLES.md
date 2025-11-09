@@ -45,6 +45,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `MORALIS_BASE` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL | - |
 | `VITE_MORALIS_API_KEY` | - | Moralis key (frontend, optional) | Same as above |
 | `VITE_MORALIS_BASE` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL (frontend) | - |
+| `MORALIS_WEBHOOK_SECRET` | - | HMAC secret to verify Moralis Streams webhooks | Set manually (deploy env only) |
 
 #### DexPaprika API
 | Variable | Default | Description | Where to Get |

@@ -42,6 +42,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 
 export const config = { runtime: 'edge' }
 
+const JSON_HEADERS = { 'Content-Type': 'application/json' } as const
+
 // Types for Moralis Streams payload
 interface MoralisStreamPayload {
   confirmed: boolean
@@ -96,23 +98,116 @@ interface WebhookResponse {
  * Verify Moralis webhook signature
  * Prevents unauthorized webhook calls
  */
-function verifySignature(req: Request): boolean {
-  const signature = req.headers.get('x-signature')
-  const secret = process.env.MORALIS_WEBHOOK_SECRET
+async function verifySignature(req: Request): Promise<Response | null> {
+  const secret = process.env.MORALIS_WEBHOOK_SECRET?.trim()
+  const env = process.env.NODE_ENV ?? 'production'
+  const isProd = env === 'production'
 
   if (!secret) {
-    console.warn('[Webhook] MORALIS_WEBHOOK_SECRET not set, skipping verification')
-    return true // Allow in dev/testing
+    if (!isProd) {
+      console.warn('[Webhook] MORALIS_WEBHOOK_SECRET not set – allowing request in non-production environment')
+      return null
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: 'Webhook verification disabled',
+      }),
+      {
+        status: 503,
+        headers: JSON_HEADERS,
+      }
+    )
   }
 
+  const signature = req.headers.get('x-signature')
   if (!signature) {
     console.error('[Webhook] Missing x-signature header')
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: 'Missing signature',
+      }),
+      {
+        status: 401,
+        headers: JSON_HEADERS,
+      }
+    )
+  }
+
+  try {
+    const rawBody = await req.clone().text()
+    const isValid = await verifyHmacSignature(secret, rawBody, signature)
+
+    if (!isValid) {
+      console.error('[Webhook] Invalid Moralis signature')
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Invalid signature',
+        }),
+        {
+          status: 401,
+          headers: JSON_HEADERS,
+        }
+      )
+    }
+  } catch (error) {
+    console.error('[Webhook] Failed to verify signature:', error)
+    return new Response(
+      JSON.stringify({
+        success: false,
+        message: 'Signature verification failed',
+      }),
+      {
+        status: 401,
+        headers: JSON_HEADERS,
+      }
+    )
+  }
+
+  return null
+}
+
+async function verifyHmacSignature(secret: string, payload: string, signatureHex: string): Promise<boolean> {
+  const encoder = new TextEncoder()
+  const keyData = encoder.encode(secret)
+  const payloadData = encoder.encode(payload)
+  const cleanedSignature = signatureHex.trim().toLowerCase().replace(/^0x/, '')
+
+  let signatureBytes: Uint8Array
+  try {
+    signatureBytes = hexToUint8Array(cleanedSignature)
+  } catch {
     return false
   }
 
-  // TODO: Implement HMAC verification when Moralis provides signing method
-  // For now, check if signature exists (basic security)
-  return signature.length > 0
+  const key = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign', 'verify']
+  )
+
+  return crypto.subtle.verify('HMAC', key, signatureBytes, payloadData)
+}
+
+function hexToUint8Array(hex: string): Uint8Array {
+  if (hex.length % 2 !== 0) {
+    throw new Error('Invalid hex string length')
+  }
+
+  const array = new Uint8Array(hex.length / 2)
+  for (let i = 0; i < array.length; i++) {
+    const byte = parseInt(hex.substr(i * 2, 2), 16)
+    if (Number.isNaN(byte)) {
+      throw new Error('Invalid hex byte')
+    }
+    array[i] = byte
+  }
+  return array
 }
 
 /**
@@ -267,30 +362,22 @@ async function createTempEntry(transaction: {
 export default async function handler(req: Request): Promise<Response> {
   // Only allow POST
   if (req.method !== 'POST') {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        message: 'Method not allowed',
-      }),
-      {
-        status: 405,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Method not allowed',
+        }),
+        {
+          status: 405,
+          headers: JSON_HEADERS,
+        }
+      )
   }
 
   // Verify signature
-  if (!verifySignature(req)) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        message: 'Invalid signature',
-      }),
-      {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+  const signatureError = await verifySignature(req)
+  if (signatureError) {
+    return signatureError
   }
 
   try {
@@ -313,7 +400,7 @@ export default async function handler(req: Request): Promise<Response> {
         }),
         {
           status: 200,
-          headers: { 'Content-Type': 'application/json' },
+          headers: JSON_HEADERS,
         }
       )
     }
@@ -329,7 +416,7 @@ export default async function handler(req: Request): Promise<Response> {
         }),
         {
           status: 200,
-          headers: { 'Content-Type': 'application/json' },
+          headers: JSON_HEADERS,
         }
       )
     }
@@ -368,7 +455,7 @@ export default async function handler(req: Request): Promise<Response> {
       } as WebhookResponse),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: JSON_HEADERS,
       }
     )
   } catch (error) {
@@ -381,7 +468,7 @@ export default async function handler(req: Request): Promise<Response> {
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: JSON_HEADERS,
       }
     )
   }

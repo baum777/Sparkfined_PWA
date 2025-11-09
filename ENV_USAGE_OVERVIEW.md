@@ -21,6 +21,7 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
 | `VITE_MORALIS_BASE` | Basis-URL für Moralis API-Calls vom Frontend. |
 | `MORALIS_API_KEY` | Backend-Zugriff auf Moralis für Server-seitige API-Calls. |
 | `MORALIS_BASE` | Basis-URL für Moralis API-Calls vom Backend. |
+| `MORALIS_WEBHOOK_SECRET` | Verifiziert eingehende Moralis Streams Webhooks (HMAC). |
 | `VITE_DEXPAPRIKA_BASE` | Frontend-Zugriff auf DexPaprika API (alternative Datenquelle). |
 | `DEXPAPRIKA_API_KEY` | Backend-Zugriff auf DexPaprika API mit Authentifizierung. |
 | `DEXPAPRIKA_BASE` | Basis-URL für DexPaprika API-Calls vom Backend. |
@@ -134,9 +135,9 @@ Diese Variablen werden automatisch von Vercel gesetzt:
 
 ## 📊 Zusammenfassung
 
- - **Total:** 54 ENV-Variablen
+ - **Total:** 55 ENV-Variablen
  - **Zwingend erforderlich:** 2 (VITE_APP_VERSION + mind. 1 Datenanbieter)
- - **Empfohlen:** 14 (AI, Data Proxies & Push Notifications)
+ - **Empfohlen:** 15 (AI, Data/Alerts Proxies & Push Notifications)
  - **Optional:** 38 (Blockchain, Performance, Debug, etc.)
 - **Auto-konfiguriert:** 4 (Vercel)
 
