@@ -54,7 +54,7 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
 
 ---
 
-## 🤖 AI Features (6)
+## 🤖 AI Features (7)
 
 | Variable | Verwendungszweck |
 |----------|------------------|
@@ -63,6 +63,7 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
 | `XAI_API_KEY` | Backend-Zugriff auf xAI/Grok als alternative AI-Engine. |
 | `AI_MAX_COST_USD` | Maximale Kosten pro AI-Request in USD zur Kostenkontrolle. |
 | `AI_CACHE_TTL_SEC` | Time-to-Live für AI-Response-Cache in Sekunden. |
+| `AI_PROXY_SECRET` | Gemeinsames Secret zur Authentifizierung der internen AI-Proxy-Endpunkte. |
 | `ANALYSIS_AI_PROVIDER` | Wählt den aktiven AI-Provider (openai/anthropic/xai/none). |
 
 ---
@@ -131,10 +132,10 @@ Diese Variablen werden automatisch von Vercel gesetzt:
 
 ## 📊 Zusammenfassung
 
-- **Total:** 51 ENV-Variablen
-- **Zwingend erforderlich:** 2 (VITE_APP_VERSION + mind. 1 Datenanbieter)
-- **Empfohlen:** 11 (AI + Push Notifications)
-- **Optional:** 38 (Blockchain, Performance, Debug, etc.)
+ - **Total:** 52 ENV-Variablen
+ - **Zwingend erforderlich:** 2 (VITE_APP_VERSION + mind. 1 Datenanbieter)
+ - **Empfohlen:** 12 (AI + Push Notifications)
+ - **Optional:** 38 (Blockchain, Performance, Debug, etc.)
 - **Auto-konfiguriert:** 4 (Vercel)
 
 ---

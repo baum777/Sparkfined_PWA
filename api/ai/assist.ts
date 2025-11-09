@@ -1,6 +1,8 @@
 // Server-side Router: OpenAI / Anthropic / xAI
 export const config = { runtime: "edge" };
 
+const json = (obj:any, status=200)=> new Response(JSON.stringify(obj), { status, headers:{ "content-type":"application/json" }});
+
 type Req = {
   provider: "openai" | "anthropic" | "xai";
   model?: string;
@@ -14,6 +16,8 @@ type Req = {
 
 export default async function handler(req: Request) {
   if (req.method !== "POST") return json({ ok:false, error:"POST only" }, 405);
+  const authError = ensureAiProxyAuthorized(req);
+  if (authError) return authError;
   try {
     const envCap = Number(process.env.AI_MAX_COST_USD || "0") || undefined;
     const cacheTtlSec = Number(process.env.AI_CACHE_TTL_SEC || "0") || 0;
@@ -145,7 +149,36 @@ async function callXAI(model: string, system: string|undefined, user: string, ma
   };
 }
 
-const json = (obj:any, status=200)=> new Response(JSON.stringify(obj), { status, headers:{ "content-type":"application/json" }});
+function ensureAiProxyAuthorized(req: Request): Response | null {
+  const secret = process.env.AI_PROXY_SECRET?.trim();
+  const env = process.env.NODE_ENV ?? "production";
+  const isProd = env === "production";
+
+  if (!secret) {
+    if (!isProd) {
+      console.warn("[ai/assist] AI_PROXY_SECRET not set – allowing request in non-production environment");
+      return null;
+    }
+    console.error("[ai/assist] AI_PROXY_SECRET missing – blocking AI proxy request");
+    return json({ ok:false, error:"AI proxy disabled" }, 503);
+  }
+
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader) {
+    return json({ ok:false, error:"Unauthorized" }, 401);
+  }
+
+  const [scheme, token] = authHeader.split(" ");
+  if (!token || scheme.toLowerCase() !== "bearer") {
+    return json({ ok:false, error:"Unauthorized" }, 401);
+  }
+
+  if (token.trim() !== secret) {
+    return json({ ok:false, error:"Unauthorized" }, 403);
+  }
+
+  return null;
+}
 
 // ---- helpers: templates, pricing, preflight, cache
 function render(templateId: "v1/analyze_bullets"|"v1/journal_condense", vars:Record<string,unknown>){

@@ -69,6 +69,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `XAI_API_KEY` | - | xAI/Grok API key | Contact xAI |
 | `AI_MAX_COST_USD` | `0.25` | Max cost per AI call (USD) | Set manually |
 | `AI_CACHE_TTL_SEC` | `3600` | AI response cache duration (seconds) | Set manually |
+| `AI_PROXY_SECRET` | - | Shared secret to authorize backend AI proxy endpoints | Set manually (deploy env only) |
 | `ANALYSIS_AI_PROVIDER` | `none` | AI provider: `none` \| `openai` \| `anthropic` | Set manually |
 | `VITE_ENABLE_AI_TEASER` | `false` | Enable AI teaser features | Set manually |
 

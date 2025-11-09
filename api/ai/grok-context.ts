@@ -31,6 +31,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 
 export const config = { runtime: 'edge' }
 
+const JSON_HEADERS = { 'Content-Type': 'application/json' } as const
+
 // Types
 interface GrokContextRequest {
   ticker: string
@@ -282,10 +284,13 @@ export default async function handler(req: Request): Promise<Response> {
       }),
       {
         status: 405,
-        headers: { 'Content-Type': 'application/json' },
+        headers: JSON_HEADERS,
       }
     )
   }
+
+  const authError = ensureAiProxyAuthorized(req)
+  if (authError) return authError
 
   try {
     // Parse request body
@@ -300,7 +305,7 @@ export default async function handler(req: Request): Promise<Response> {
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: JSON_HEADERS,
         }
       )
     }
@@ -330,7 +335,7 @@ export default async function handler(req: Request): Promise<Response> {
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: JSON_HEADERS,
     })
   } catch (error) {
     console.error('[Grok] Error:', error)
@@ -342,8 +347,75 @@ export default async function handler(req: Request): Promise<Response> {
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: JSON_HEADERS,
       }
     )
   }
+}
+
+function ensureAiProxyAuthorized(req: Request): Response | null {
+  const secret = process.env.AI_PROXY_SECRET?.trim()
+  const env = process.env.NODE_ENV ?? 'production'
+  const isProd = env === 'production'
+
+  if (!secret) {
+    if (!isProd) {
+      console.warn('[ai/grok-context] AI_PROXY_SECRET not set – allowing request in non-production environment')
+      return null
+    }
+    console.error('[ai/grok-context] AI_PROXY_SECRET missing – blocking AI proxy request')
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'AI proxy disabled',
+      }),
+      {
+        status: 503,
+        headers: JSON_HEADERS,
+      }
+    )
+  }
+
+  const authHeader = req.headers.get('authorization')
+  if (!authHeader) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Unauthorized',
+      }),
+      {
+        status: 401,
+        headers: JSON_HEADERS,
+      }
+    )
+  }
+
+  const [scheme, token] = authHeader.split(' ')
+  if (!token || scheme.toLowerCase() !== 'bearer') {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Unauthorized',
+      }),
+      {
+        status: 401,
+        headers: JSON_HEADERS,
+      }
+    )
+  }
+
+  if (token.trim() !== secret) {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Unauthorized',
+      }),
+      {
+        status: 403,
+        headers: JSON_HEADERS,
+      }
+    )
+  }
+
+  return null
 }
