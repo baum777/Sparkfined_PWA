@@ -1,3 +1,9 @@
+/**
+ * BLOCK 3: Enhanced export with chart state
+ */
+
+import type { ChartState, ChartSnapshot } from '@/types/journal'
+
 export type HudOptions = {
   title?: string;          // z.B. CA oder Token-Name
   timeframe?: string;      // 1m/5m/...
@@ -44,4 +50,65 @@ export function exportWithHud(srcCanvas: HTMLCanvasElement, opts: HudOptions = {
     ctx.fillText(opts.brand, W - 12 - w, H - 12);
   }
   return out.toDataURL("image/png");
+}
+
+// ============================================================================
+// BLOCK 3: Chart State Export (for Journal Integration)
+// ============================================================================
+
+/**
+ * Export complete chart state for journal entry
+ * Includes both screenshot and reconstructable state
+ */
+export function exportChartSnapshot(
+  canvas: HTMLCanvasElement,
+  chartConfig: {
+    address: string
+    timeframe: string
+    view: { start: number; end: number }
+    indicators: Array<{ type: string; params: Record<string, number>; enabled: boolean }>
+    shapes?: Array<any>
+  },
+  hudOptions?: HudOptions
+): ChartSnapshot {
+  // Generate screenshot with HUD
+  const screenshot = exportWithHud(canvas, hudOptions)
+
+  // Build chart state
+  const chartState: ChartState = {
+    address: chartConfig.address,
+    timeframe: chartConfig.timeframe as any,
+    view: chartConfig.view,
+    indicators: chartConfig.indicators as any,
+    shapes: chartConfig.shapes,
+    timestamp: Date.now(),
+  }
+
+  return {
+    screenshot,
+    state: chartState,
+  }
+}
+
+/**
+ * Dispatch journal draft event (Chart → Journal flow)
+ */
+export function dispatchJournalDraft(
+  snapshot: ChartSnapshot,
+  metadata: {
+    ticker?: string
+    address: string
+    timeframe: string
+  }
+) {
+  window.dispatchEvent(
+    new CustomEvent('journal:draft', {
+      detail: {
+        chartSnapshot: snapshot,
+        ticker: metadata.ticker || 'UNKNOWN',
+        address: metadata.address,
+        timestamp: Date.now(),
+      },
+    })
+  )
 }
