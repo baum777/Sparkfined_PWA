@@ -45,6 +45,8 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `MORALIS_BASE` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL | - |
 | `VITE_MORALIS_API_KEY` | - | Moralis key (frontend, optional) | Same as above |
 | `VITE_MORALIS_BASE` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL (frontend) | - |
+| `MORALIS_WEBHOOK_SECRET` | - | HMAC secret to verify Moralis Streams webhooks | Set manually (deploy env only) |
+| `ENABLE_OG_MINT` | `false` | Enables OG lock/mint endpoints when `true` | Set manually |
 
 #### DexPaprika API
 | Variable | Default | Description | Where to Get |
@@ -52,6 +54,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `DEXPAPRIKA_API_KEY` | - | DexPaprika API key (backend) | Contact DexPaprika |
 | `DEXPAPRIKA_BASE` | `https://api.dexpaprika.com` | DexPaprika base URL | - |
 | `VITE_DEXPAPRIKA_BASE` | `https://api.dexpaprika.com` | DexPaprika base URL (frontend) | - |
+| `DATA_PROXY_SECRET` | - | Shared secret protecting backend data proxy endpoints | Set manually (deploy env only) |
 
 #### Provider Configuration
 | Variable | Default | Description |
@@ -69,6 +72,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `XAI_API_KEY` | - | xAI/Grok API key | Contact xAI |
 | `AI_MAX_COST_USD` | `0.25` | Max cost per AI call (USD) | Set manually |
 | `AI_CACHE_TTL_SEC` | `3600` | AI response cache duration (seconds) | Set manually |
+| `AI_PROXY_SECRET` | - | Shared secret to authorize backend AI proxy endpoints | Set manually (deploy env only) |
 | `ANALYSIS_AI_PROVIDER` | `none` | AI provider: `none` \| `openai` \| `anthropic` | Set manually |
 | `VITE_ENABLE_AI_TEASER` | `false` | Enable AI teaser features | Set manually |
 
@@ -97,6 +101,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `VAPID_PRIVATE_KEY` | VAPID private key (backend only!) | Same command |
 | `VAPID_SUBJECT` | Contact email | Set to `mailto:your-email@example.com` |
 | `VAPID_CONTACT` | Alternative contact | Same as subject |
+| `ALERTS_ADMIN_SECRET` | Shared secret protecting alerts worker/test-send endpoints | Set manually (deploy env only) |
 
 ### 6. Feature Flags
 

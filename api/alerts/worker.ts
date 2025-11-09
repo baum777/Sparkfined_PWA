@@ -13,7 +13,11 @@ const CONTACT = process.env.VAPID_CONTACT || "mailto:admin@example.com";
 if (PUB && PRIV) webpush.setVapidDetails(CONTACT, PUB, PRIV);
 
 // rudimentäres LPOP via LRANGE + TRIM nicht verfügbar in REST → wir konsumieren „batch-like"
-export default async function handler(_req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (!ensureAlertsAdminAuthorized(req, res)) {
+    return;
+  }
+
   try {
     // 1) Batch lesen
     const batch = await fetch(`${UPSTASH_REDIS_REST_URL}/LRANGE/alerts:queue/0/49`, {
@@ -70,4 +74,40 @@ async function clearRange(key:string, count:number){
   const token = process.env.UPSTASH_REDIS_REST_TOKEN!;
   // naive: LTRIM auf Rest (count Elemente entfernen)
   await fetch(`${base}/LTRIM/${encodeURIComponent(key)}/${count}/-1`, { headers:{ Authorization:`Bearer ${token}` } });
+}
+
+function ensureAlertsAdminAuthorized(req: VercelRequest, res: VercelResponse): boolean {
+  const secret = process.env.ALERTS_ADMIN_SECRET?.trim();
+  const env = process.env.NODE_ENV ?? "production";
+  const isProd = env === "production";
+
+  if (!secret) {
+    if (!isProd) {
+      console.warn("[alerts/worker] ALERTS_ADMIN_SECRET not set – allowing request in non-production environment");
+      return true;
+    }
+    res.status(503).json({ ok:false, error:"alerts worker disabled" });
+    return false;
+  }
+
+  const rawHeader = req.headers["authorization"];
+  const authHeader = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader;
+
+  if (!authHeader) {
+    res.status(401).json({ ok:false, error:"unauthorized" });
+    return false;
+  }
+
+  const [scheme, token] = authHeader.split(" ", 2);
+  if (!scheme || !token || scheme.toLowerCase() !== "bearer") {
+    res.status(401).json({ ok:false, error:"unauthorized" });
+    return false;
+  }
+
+  if (token.trim() !== secret) {
+    res.status(403).json({ ok:false, error:"unauthorized" });
+    return false;
+  }
+
+  return true;
 }

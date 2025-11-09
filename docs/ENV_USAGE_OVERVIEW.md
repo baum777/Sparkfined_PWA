@@ -21,12 +21,15 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
 | `VITE_MORALIS_BASE` | Basis-URL für Moralis API-Calls vom Frontend. |
 | `MORALIS_API_KEY` | Backend-Zugriff auf Moralis für Server-seitige API-Calls. |
 | `MORALIS_BASE` | Basis-URL für Moralis API-Calls vom Backend. |
+| `MORALIS_WEBHOOK_SECRET` | Verifiziert eingehende Moralis Streams Webhooks (HMAC). |
 | `VITE_DEXPAPRIKA_BASE` | Frontend-Zugriff auf DexPaprika API (alternative Datenquelle). |
 | `DEXPAPRIKA_API_KEY` | Backend-Zugriff auf DexPaprika API mit Authentifizierung. |
 | `DEXPAPRIKA_BASE` | Basis-URL für DexPaprika API-Calls vom Backend. |
 | `VITE_DATA_PRIMARY` | Definiert den primären Datenanbieter (dexpaprika/moralis/mock). |
 | `VITE_DATA_SECONDARY` | Definiert den Fallback-Datenanbieter wenn Primary fehlschlägt. |
 | `VITE_DATA_FALLBACKS` | Komma-separierte Liste zusätzlicher Fallback-Datenquellen. |
+| `DATA_PROXY_SECRET` | Autorisiert interne Requests an Moralis/DexPaprika-Proxys. |
+| `ENABLE_OG_MINT` | Schaltet OG Lock/Mint Endpunkte frei (nur für interne Tests). |
 
 ---
 
@@ -54,7 +57,7 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
 
 ---
 
-## 🤖 AI Features (6)
+## 🤖 AI Features (7)
 
 | Variable | Verwendungszweck |
 |----------|------------------|
@@ -63,6 +66,7 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
 | `XAI_API_KEY` | Backend-Zugriff auf xAI/Grok als alternative AI-Engine. |
 | `AI_MAX_COST_USD` | Maximale Kosten pro AI-Request in USD zur Kostenkontrolle. |
 | `AI_CACHE_TTL_SEC` | Time-to-Live für AI-Response-Cache in Sekunden. |
+| `AI_PROXY_SECRET` | Gemeinsames Secret zur Authentifizierung der internen AI-Proxy-Endpunkte. |
 | `ANALYSIS_AI_PROVIDER` | Wählt den aktiven AI-Provider (openai/anthropic/xai/none). |
 
 ---
@@ -76,6 +80,7 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
 | `VAPID_PRIVATE_KEY` | Privater VAPID-Key für Backend zum Signieren von Push-Nachrichten. |
 | `VAPID_SUBJECT` | Kontakt-Email im mailto-Format für VAPID-Authentifizierung. |
 | `VAPID_CONTACT` | Alternative Kontakt-Email für VAPID-Service. |
+| `ALERTS_ADMIN_SECRET` | Autorisiert den Alerts-Worker und Test-Push-Endpunkt. |
 
 ---
 
@@ -131,10 +136,10 @@ Diese Variablen werden automatisch von Vercel gesetzt:
 
 ## 📊 Zusammenfassung
 
-- **Total:** 51 ENV-Variablen
-- **Zwingend erforderlich:** 2 (VITE_APP_VERSION + mind. 1 Datenanbieter)
-- **Empfohlen:** 11 (AI + Push Notifications)
-- **Optional:** 38 (Blockchain, Performance, Debug, etc.)
+ - **Total:** 56 ENV-Variablen
+ - **Zwingend erforderlich:** 2 (VITE_APP_VERSION + mind. 1 Datenanbieter)
+ - **Empfohlen:** 16 (AI, Data/Alerts Proxies & Push Notifications)
+ - **Optional:** 38 (Blockchain, Performance, Debug, etc.)
 - **Auto-konfiguriert:** 4 (Vercel)
 
 ---

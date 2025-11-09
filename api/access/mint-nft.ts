@@ -15,6 +15,18 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
+  const isEnabled = process.env.ENABLE_OG_MINT === 'true'
+  const env = process.env.NODE_ENV ?? 'production'
+  const isProd = env === 'production'
+
+  if (!isEnabled) {
+    const status = isProd ? 503 : 403
+    return res.status(status).json({
+      ok: false,
+      error: 'OG mint temporarily disabled',
+    })
+  }
+
   // Only accept POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
