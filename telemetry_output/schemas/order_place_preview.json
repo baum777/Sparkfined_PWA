@@ -1,0 +1,73 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "side": {
+      "type": "string"
+    },
+    "size": {
+      "type": "string"
+    },
+    "sl": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "tp": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "symbol",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/order_place_preview.json",
+  "title": "order_place_preview",
+  "description": "Order-Vorschau anzeigen",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "userId": "user_123",
+      "sessionId": "sess_456",
+      "symbol": "BTCUSDT",
+      "side": "buy",
+      "size": "0.1",
+      "sl": 48000,
+      "tp": 52000,
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}

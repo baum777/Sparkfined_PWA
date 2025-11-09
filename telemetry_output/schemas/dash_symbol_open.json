@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "position": {
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "symbol",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/dash_symbol_open.json",
+  "title": "dash_symbol_open",
+  "description": "Chart für Symbol öffnen",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "sessionId": "sess_456",
+      "symbol": "BTCUSDT",
+      "position": 1,
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}

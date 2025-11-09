@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "errorType": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "stack": {
+      "type": "string",
+      "nullable": true
+    },
+    "context": {
+      "type": "object"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "errorType",
+    "message",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/error.occurred.json",
+  "title": "error.occurred",
+  "description": "Fehler ist aufgetreten",
+  "version": "1.0.0"
+}

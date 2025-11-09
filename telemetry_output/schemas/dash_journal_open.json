@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "from": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/dash_journal_open.json",
+  "title": "dash_journal_open",
+  "description": "Trade-Journal öffnen",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "userId": "user_123",
+      "sessionId": "sess_456",
+      "from": "dashboard",
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}

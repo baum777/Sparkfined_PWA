@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "platform": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/pwa.install_prompt_shown.json",
+  "title": "pwa.install_prompt_shown",
+  "description": "PWA-Installationsaufforderung wurde angezeigt",
+  "version": "1.0.0"
+}
