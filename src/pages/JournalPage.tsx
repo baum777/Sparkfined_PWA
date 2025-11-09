@@ -2,6 +2,7 @@ import React from "react";
 import { useJournal } from "../sections/journal/useJournal";
 import JournalEditor from "../sections/journal/JournalEditor";
 import JournalList from "../sections/journal/JournalList";
+import { JournalStats } from "../sections/journal/JournalStats";
 import type { JournalNote } from "../lib/journal";
 import { useAssist } from "../sections/ai/useAssist";
 
@@ -132,7 +133,10 @@ export default function JournalPage() {
         </div>
       </div>
 
-      <JournalEditor draft={draft} onChange={(d: any)=>setDraft(d)} onSave={()=>saveServer()} />
+        <JournalEditor draft={draft} onChange={(d: any)=>setDraft(d)} onSave={()=>saveServer()} />
+        <div className="mt-4">
+          <JournalStats notes={notes} />
+        </div>
       <div className="mt-3 rounded-xl border border-emerald-900 bg-emerald-950/20 p-3">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-sm text-emerald-200">AI-Assist: Notiz straffen</div>
