@@ -69,6 +69,11 @@ export default function RoutesRoot() {
                 <ReplayPage />
               </Layout>
             } />
+            <Route path="/replay/:sessionId" element={
+              <Layout>
+                <ReplayPage />
+              </Layout>
+            } />
             <Route path="/access" element={
               <Layout>
                 <AccessPage />

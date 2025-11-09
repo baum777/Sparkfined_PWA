@@ -1,181 +1,385 @@
-import { useState, useEffect } from 'react'
-import ReplayModal from '@/components/ReplayModal'
-import { getAllEvents, initDB } from '@/lib/db'
-import type { SessionEvent } from '@/lib/db'
+/**
+ * ReplayPage.tsx
+ * 
+ * Main page for Replay feature - combines:
+ * - ReplayPlayer (playback controls)
+ * - Chart visualization (synced with replay frame)
+ * - PatternDashboard (analytics & pattern library)
+ * 
+ * Can be accessed:
+ * - From Journal entry with "View Replay" button
+ * - Directly from navigation for pattern analysis
+ * - From PatternDashboard by clicking a pattern
+ */
+
+import React from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import ReplayPlayer from "@/components/ReplayPlayer";
+import PatternDashboard from "@/components/PatternDashboard";
+import type { ReplaySession, JournalEntry, ReplayBookmark, SetupTag, EmotionTag } from "@/types/journal";
+import {
+  getSession,
+  updateSession,
+  addBookmark,
+  deleteBookmark,
+  listSessions,
+  cacheOhlcData,
+} from "@/lib/ReplayService";
+import { calculatePatternStats, queryEntries } from "@/lib/JournalService";
+
+type ViewMode = "player" | "dashboard";
 
 export default function ReplayPage() {
-  const [sessions, setSessions] = useState<{ sessionId: string; count: number; firstEvent: number; lastEvent: number }[]>([])
-  const [isReplayOpen, setIsReplayOpen] = useState(false)
-  const [selectedSessionId, setSelectedSessionId] = useState('')
+  const { sessionId } = useParams<{ sessionId: string }>();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  useEffect(() => {
-    initDB().then(loadSessions)
-  }, [])
+  // State
+  const [viewMode, setViewMode] = React.useState<ViewMode>(
+    sessionId ? "player" : "dashboard"
+  );
+  const [session, setSession] = React.useState<ReplaySession | null>(null);
+  const [currentFrame, setCurrentFrame] = React.useState(0);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const [speed, setSpeed] = React.useState(1);
+  const [loading, setLoading] = React.useState(false);
 
-  const loadSessions = async () => {
+  // Dashboard state
+  const [entries, setEntries] = React.useState<JournalEntry[]>([]);
+  const [patternStats, setPatternStats] = React.useState<any>(null);
+  const [filteredSetup, setFilteredSetup] = React.useState<SetupTag | undefined>();
+  const [filteredEmotion, setFilteredEmotion] = React.useState<EmotionTag | undefined>();
+
+  // Load session if sessionId provided
+  React.useEffect(() => {
+    if (sessionId) {
+      loadSession(sessionId);
+    }
+  }, [sessionId]);
+
+  // Load dashboard data
+  React.useEffect(() => {
+    if (viewMode === "dashboard") {
+      loadDashboardData();
+    }
+  }, [viewMode]);
+
+  // Playback loop
+  React.useEffect(() => {
+    if (!isPlaying || !session || !session.ohlcCache) return;
+
+    const interval = setInterval(() => {
+      setCurrentFrame((prev) => {
+        const next = prev + 1;
+        if (next >= session.ohlcCache!.length) {
+          setIsPlaying(false);
+          return session.ohlcCache!.length - 1;
+        }
+        return next;
+      });
+    }, 1000 / speed); // Adjust speed
+
+    return () => clearInterval(interval);
+  }, [isPlaying, speed, session]);
+
+  // Load session
+  const loadSession = async (id: string) => {
+    setLoading(true);
     try {
-      const events = await getAllEvents()
-      
-      // Group events by session
-      const sessionMap = new Map<string, SessionEvent[]>()
-      events.forEach((event) => {
-        const existing = sessionMap.get(event.sessionId) || []
-        existing.push(event)
-        sessionMap.set(event.sessionId, existing)
-      })
-
-      // Convert to array with metadata
-      const sessionList = Array.from(sessionMap.entries()).map(([sessionId, events]) => ({
-        sessionId,
-        count: events.length,
-        firstEvent: Math.min(...events.map((e) => e.timestamp)),
-        lastEvent: Math.max(...events.map((e) => e.timestamp)),
-      }))
-
-      // Sort by most recent first
-      sessionList.sort((a, b) => b.lastEvent - a.lastEvent)
-      setSessions(sessionList)
+      const loaded = await getSession(id);
+      if (loaded) {
+        setSession(loaded);
+        setCurrentFrame(0);
+        
+        // If no OHLC cache, fetch and cache it
+        if (!loaded.ohlcCache) {
+          await fetchAndCacheOhlc(loaded);
+        }
+      } else {
+        console.error("Session not found:", id);
+        // Fallback to dashboard
+        setViewMode("dashboard");
+      }
     } catch (error) {
-      console.error('Failed to load sessions:', error)
+      console.error("Error loading session:", error);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
-  const openReplay = (sessionId: string) => {
-    setSelectedSessionId(sessionId)
-    setIsReplayOpen(true)
-  }
+  // Fetch and cache OHLC data
+  const fetchAndCacheOhlc = async (sess: ReplaySession) => {
+    try {
+      // TODO: Fetch actual OHLC data from Moralis API
+      // For now, generate mock data
+      const mockOhlc = Array.from({ length: 100 }, (_, i) => ({
+        timestamp: Date.now() - (100 - i) * 60000,
+        open: 0.001 + Math.random() * 0.0001,
+        high: 0.001 + Math.random() * 0.0001,
+        low: 0.001 + Math.random() * 0.0001,
+        close: 0.001 + Math.random() * 0.0001,
+        volume: Math.random() * 1000,
+      }));
 
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp)
-    return date.toLocaleString()
-  }
+      const updated = await cacheOhlcData(sess.id, mockOhlc);
+      if (updated) {
+        setSession(updated);
+      }
+    } catch (error) {
+      console.error("Error caching OHLC:", error);
+    }
+  };
 
-  const formatDuration = (start: number, end: number) => {
-    const durationMs = end - start
-    const minutes = Math.floor(durationMs / 60000)
-    const seconds = Math.floor((durationMs % 60000) / 1000)
+  // Load dashboard data
+  const loadDashboardData = async () => {
+    setLoading(true);
+    try {
+      const allEntries = await queryEntries({ status: "all" });
+      setEntries(allEntries);
+
+      const stats = await calculatePatternStats(allEntries);
+      setPatternStats(stats);
+    } catch (error) {
+      console.error("Error loading dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Playback controls
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
+  const handleSeek = (frame: number) => {
+    setCurrentFrame(frame);
+    setIsPlaying(false);
+  };
+  const handleSpeedChange = (newSpeed: number) => setSpeed(newSpeed);
+
+  // Bookmark controls
+  const handleAddBookmark = async (bookmark: Omit<ReplayBookmark, "id">) => {
+    if (!session) return;
     
-    if (minutes > 0) {
-      return `${minutes}m ${seconds}s`
+    const updated = await addBookmark(session.id, bookmark);
+    if (updated) {
+      setSession(updated);
     }
-    return `${seconds}s`
-  }
+  };
 
-  if (sessions.length === 0) {
+  const handleDeleteBookmark = async (bookmarkId: string) => {
+    if (!session) return;
+    
+    const updated = await deleteBookmark(session.id, bookmarkId);
+    if (updated) {
+      setSession(updated);
+    }
+  };
+
+  const handleJumpToBookmark = (frame: number) => {
+    setCurrentFrame(frame);
+    setIsPlaying(false);
+  };
+
+  // Dashboard controls
+  const handleFilterByPattern = (setup?: SetupTag, emotion?: EmotionTag) => {
+    setFilteredSetup(setup);
+    setFilteredEmotion(emotion);
+    
+    // Filter entries
+    const filtered = entries.filter((e) => {
+      if (setup && e.setup !== setup) return false;
+      if (emotion && e.emotion !== emotion) return false;
+      return true;
+    });
+    
+    // Update stats with filtered entries
+    calculatePatternStats(filtered).then(setPatternStats);
+  };
+
+  const handleViewEntry = (entryId: string) => {
+    navigate(`/journal?entry=${entryId}`);
+  };
+
+  // Toggle view mode
+  const toggleViewMode = () => {
+    setViewMode((prev) => (prev === "player" ? "dashboard" : "player"));
+  };
+
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-12rem)] px-4">
-        <div className="text-center space-y-6 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-xl bg-surface border border-border-accent/20 mb-2">
-            <svg className="w-10 h-10 text-brand" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" />
-            </svg>
-          </div>
-          <div className="space-y-3">
-            <h2 className="text-display-sm font-display font-bold text-text-primary">Session Replay</h2>
-            <p className="text-text-secondary max-w-md mx-auto leading-relaxed">
-              No recorded sessions yet. <span className="text-brand font-medium">Watch your analysis journey.</span>
-            </p>
-          </div>
-          <div className="mt-4 p-4 bg-brand/10 border border-brand/20 rounded-lg max-w-md mx-auto">
-            <p className="text-sm text-text-secondary">
-              <strong className="text-brand">Preview Mode:</strong> Static timeline viewer.
-              Full playback controls coming soon.
-            </p>
-          </div>
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 text-4xl">⏳</div>
+          <p className="text-sm text-zinc-500">Loading replay...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <>
-      <div className="p-4 space-y-4 max-w-4xl mx-auto">
-        <div className="flex justify-between items-start mb-6">
+    <div className="min-h-screen bg-zinc-950 p-4">
+      <div className="mx-auto max-w-7xl">
+        {/* Header */}
+        <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-display-sm font-display font-bold text-text-primary">
-              Session Replay
-            </h2>
-            <p className="text-sm text-text-secondary mt-1">
-              Review your analysis sessions and learning moments
+            <h1 className="text-2xl font-bold text-zinc-100">
+              {viewMode === "player" ? "🎬 Replay Player" : "📊 Pattern Dashboard"}
+            </h1>
+            <p className="text-sm text-zinc-500">
+              {viewMode === "player"
+                ? "Playback and analyze your trades frame-by-frame"
+                : "Discover patterns and insights from your trading history"}
             </p>
           </div>
-          <button
-            onClick={loadSessions}
-            className="btn-ghost text-sm"
-          >
-            🔄 Refresh
-          </button>
-        </div>
+          
+          <div className="flex items-center gap-2">
+            {/* View Toggle */}
+            <button
+              onClick={toggleViewMode}
+              className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
+            >
+              {viewMode === "player" ? "📊 Dashboard" : "🎬 Player"}
+            </button>
 
-        <div className="p-4 bg-brand/10 rounded-lg border border-brand/20">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">⚡</span>
-            <div className="flex-1">
-              <h3 className="font-display font-semibold text-brand mb-1">
-                Static Preview Mode
-              </h3>
-              <p className="text-sm text-text-secondary">
-                Proof-of-concept timeline viewer. Full replay features (scrubbing, 
-                playback controls, chart snapshots) coming in future phases.
-              </p>
-            </div>
+            {/* Back Button */}
+            <button
+              onClick={() => navigate("/journal")}
+              className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
+            >
+              ← Journal
+            </button>
           </div>
         </div>
 
-        <div className="text-sm font-mono text-text-tertiary mb-4">
-          {sessions.length} session{sessions.length !== 1 ? 's' : ''} recorded
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {sessions.map((session) => (
-            <div
-              key={session.sessionId}
-              className="card-interactive"
-              onClick={() => openReplay(session.sessionId)}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">🎬</span>
-                  <div>
-                    <h3 className="font-display font-semibold text-text-primary">
-                      Session
-                    </h3>
-                    <div className="text-xs text-text-tertiary font-mono">
-                      {session.sessionId.slice(0, 20)}...
+        {/* Player View */}
+        {viewMode === "player" && session && (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            {/* Chart Area (2/3 width on large screens) */}
+            <div className="lg:col-span-2">
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-zinc-200">
+                    📈 Chart View
+                  </h3>
+                  <button
+                    onClick={() => navigate(`/chart?replaySession=${session.id}`)}
+                    className="rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-400 transition-colors hover:bg-cyan-500/20"
+                  >
+                    Open in Chart →
+                  </button>
+                </div>
+                
+                {/* Chart Canvas (placeholder) */}
+                <div className="relative aspect-video rounded-lg bg-zinc-950">
+                  {session.ohlcCache && session.ohlcCache[currentFrame] && (
+                    <div className="flex h-full flex-col items-center justify-center">
+                      <p className="mb-2 text-xs text-zinc-600">
+                        Frame {currentFrame + 1} / {session.ohlcCache.length}
+                      </p>
+                      <div className="text-center">
+                        <p className="text-sm text-zinc-400">
+                          O: {session.ohlcCache[currentFrame].open.toFixed(6)}
+                        </p>
+                        <p className="text-sm text-zinc-400">
+                          H: {session.ohlcCache[currentFrame].high.toFixed(6)}
+                        </p>
+                        <p className="text-sm text-zinc-400">
+                          L: {session.ohlcCache[currentFrame].low.toFixed(6)}
+                        </p>
+                        <p className="text-lg font-bold text-zinc-200">
+                          C: {session.ohlcCache[currentFrame].close.toFixed(6)}
+                        </p>
+                        <p className="mt-2 text-xs text-zinc-600">
+                          Vol: {session.ohlcCache[currentFrame].volume.toFixed(2)}
+                        </p>
+                      </div>
+                      <p className="mt-4 text-xs text-zinc-700">
+                        🎨 Chart integration coming next...
+                      </p>
                     </div>
-                  </div>
-                </div>
-                <span className="px-2 py-1 text-xs font-mono rounded-md border bg-cyan/10 border-cyan text-cyan">
-                  {session.count} events
-                </span>
-              </div>
-
-              <div className="space-y-2 text-sm font-mono text-text-secondary">
-                <div className="flex justify-between">
-                  <span>Started</span>
-                  <span className="font-medium text-text-primary">{formatDate(session.firstEvent)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Duration</span>
-                  <span className="font-medium text-text-primary">
-                    {formatDuration(session.firstEvent, session.lastEvent)}
-                  </span>
+                  )}
+                  
+                  {!session.ohlcCache && (
+                    <div className="flex h-full items-center justify-center">
+                      <p className="text-xs text-zinc-600">
+                        No OHLC data cached
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
+            </div>
 
-              <button className="btn-primary w-full mt-4">
-                Watch Replay →
+            {/* Player Controls (1/3 width on large screens) */}
+            <div className="lg:col-span-1">
+              <ReplayPlayer
+                session={session}
+                currentFrame={currentFrame}
+                totalFrames={session.ohlcCache?.length || 0}
+                isPlaying={isPlaying}
+                speed={speed}
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onSeek={handleSeek}
+                onSpeedChange={handleSpeedChange}
+                onAddBookmark={handleAddBookmark}
+                onDeleteBookmark={handleDeleteBookmark}
+                onJumpToBookmark={handleJumpToBookmark}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Player View - No Session */}
+        {viewMode === "player" && !session && (
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-8 text-center">
+            <div className="mb-4 text-6xl">🎬</div>
+            <h2 className="mb-2 text-xl font-bold text-zinc-200">
+              No Replay Session Selected
+            </h2>
+            <p className="mb-6 text-sm text-zinc-500">
+              Select a journal entry and create a replay session, or browse patterns in the dashboard.
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => setViewMode("dashboard")}
+                className="rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 transition-colors hover:bg-cyan-500/20"
+              >
+                📊 View Dashboard
+              </button>
+              <button
+                onClick={() => navigate("/journal")}
+                className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
+              >
+                ← Back to Journal
               </button>
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        )}
 
-      <ReplayModal
-        isOpen={isReplayOpen}
-        onClose={() => setIsReplayOpen(false)}
-        sessionId={selectedSessionId}
-      />
-    </>
-  )
+        {/* Dashboard View */}
+        {viewMode === "dashboard" && (
+          <div>
+            {patternStats ? (
+              <PatternDashboard
+                stats={patternStats}
+                entries={entries}
+                onFilterByPattern={handleFilterByPattern}
+                onViewEntry={handleViewEntry}
+              />
+            ) : (
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-8 text-center">
+                <div className="mb-4 text-6xl">📊</div>
+                <h2 className="mb-2 text-xl font-bold text-zinc-200">
+                  No Data Yet
+                </h2>
+                <p className="text-sm text-zinc-500">
+                  Close some trades in your journal to see pattern analysis.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

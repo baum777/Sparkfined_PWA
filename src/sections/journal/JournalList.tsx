@@ -10,7 +10,9 @@
  */
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import type { JournalEntry } from "@/types/journal";
+import { createSession } from "@/lib/ReplayService";
 
 export default function JournalList({
   entries, onOpen, onDelete, filter
@@ -20,6 +22,9 @@ export default function JournalList({
   onDelete: (id: string) => void;
   filter?: { tag?: string; q?: string; status?: string };
 }) {
+  const navigate = useNavigate();
+  const [creatingReplay, setCreatingReplay] = React.useState<string | null>(null);
+  
   const q = filter?.q?.toLowerCase().trim();
   const t = filter?.tag?.toLowerCase().trim();
   const statusFilter = filter?.status;
@@ -30,12 +35,40 @@ export default function JournalList({
     const okStatus = !statusFilter || statusFilter === 'all' || e.status === statusFilter;
     return okQ && okT && okStatus;
   });
+  
   // Status badge styles
   const statusStyles = {
     temp: 'bg-amber-950/40 border-amber-800/40 text-amber-300',
     active: 'bg-cyan-950/40 border-cyan-800/40 text-cyan-300',
     closed: 'bg-zinc-900/60 border-zinc-800/40 text-zinc-400',
   }
+
+  // Create or view replay session
+  const handleReplay = async (entry: JournalEntry) => {
+    // If already has replay session, navigate to it
+    if (entry.replaySessionId) {
+      navigate(`/replay/${entry.replaySessionId}`);
+      return;
+    }
+
+    // Create new replay session
+    setCreatingReplay(entry.id);
+    try {
+      const session = await createSession({
+        name: `${entry.ticker} Replay`,
+        journalEntryId: entry.id,
+      });
+      
+      if (session) {
+        navigate(`/replay/${session.id}`);
+      }
+    } catch (error) {
+      console.error("Error creating replay session:", error);
+      alert("Failed to create replay session. Check console for details.");
+    } finally {
+      setCreatingReplay(null);
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -103,19 +136,32 @@ export default function JournalList({
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
-            <button 
-              className="flex-1 rounded border border-cyan-700 px-2 py-1 text-[11px] text-cyan-100 hover:bg-cyan-900/20" 
-              onClick={()=>onOpen(e.id)}
-            >
-              Edit
-            </button>
-            <button 
-              className="rounded border border-rose-900 px-2 py-1 text-[11px] text-rose-100 hover:bg-rose-900/20" 
-              onClick={()=>onDelete(e.id)}
-            >
-              Delete
-            </button>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <button 
+                className="flex-1 rounded border border-cyan-700 px-2 py-1 text-[11px] text-cyan-100 hover:bg-cyan-900/20" 
+                onClick={()=>onOpen(e.id)}
+              >
+                Edit
+              </button>
+              <button 
+                className="rounded border border-rose-900 px-2 py-1 text-[11px] text-rose-100 hover:bg-rose-900/20" 
+                onClick={()=>onDelete(e.id)}
+              >
+                Delete
+              </button>
+            </div>
+            
+            {/* Replay Button */}
+            {e.status !== 'temp' && (
+              <button
+                disabled={creatingReplay === e.id}
+                onClick={() => handleReplay(e)}
+                className="w-full rounded border border-purple-700/50 bg-purple-950/20 px-2 py-1 text-[11px] text-purple-300 hover:bg-purple-900/30 disabled:opacity-50"
+              >
+                {creatingReplay === e.id ? '⏳ Creating...' : e.replaySessionId ? '🎬 View Replay' : '🎬 Create Replay'}
+              </button>
+            )}
           </div>
         </div>
       ))}
