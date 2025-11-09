@@ -168,8 +168,8 @@ function ensureAiProxyAuthorized(req: Request): Response | null {
     return json({ ok:false, error:"Unauthorized" }, 401);
   }
 
-  const [scheme, token] = authHeader.split(" ");
-  if (!token || scheme.toLowerCase() !== "bearer") {
+  const [scheme, token] = authHeader.split(" ", 2);
+  if (!scheme || !token || scheme.toLowerCase() !== "bearer") {
     return json({ ok:false, error:"Unauthorized" }, 401);
   }
 

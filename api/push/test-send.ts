@@ -49,8 +49,8 @@ function ensureAlertsAdminAuthorized(req: VercelRequest, res: VercelResponse): b
     return false;
   }
 
-  const [scheme, token] = authHeader.split(" ");
-  if (!token || scheme.toLowerCase() !== "bearer") {
+  const [scheme, token] = authHeader.split(" ", 2);
+  if (!scheme || !token || scheme.toLowerCase() !== "bearer") {
     res.status(401).json({ ok:false, error:"unauthorized" });
     return false;
   }

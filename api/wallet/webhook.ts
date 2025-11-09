@@ -191,7 +191,7 @@ async function verifyHmacSignature(secret: string, payload: string, signatureHex
     ['sign', 'verify']
   )
 
-  return crypto.subtle.verify('HMAC', key, signatureBytes, payloadData)
+  return crypto.subtle.verify('HMAC', key, signatureBytes.buffer, payloadData)
 }
 
 function hexToUint8Array(hex: string): Uint8Array {
