@@ -27,35 +27,51 @@ export default function JournalPage() {
     return () => window.removeEventListener("journal:insert" as any, onIns as any);
   }, []);
 
-  const runAIOnDraft = () => {
-    const sys = "Du reduzierst Chart-Notizen auf das Wesentliche (deutsch). Schreibe 4–6 kurze Spiegelstriche: Kontext, Beobachtung, Hypothese, Plan, Risiko, Nächste Aktion.";
-    const ctx = [
-      draft.title ? `Titel: ${draft.title}` : "",
-      draft.address ? `CA: ${draft.address}` : "",
-      draft.tf ? `TF: ${draft.tf}` : "",
-      draft.body ? `Notiz:\n${draft.body}` : "",
-    ].filter(Boolean).join("\n");
-    if (!ctx) return;
-    runAssist(sys, ctx);
-  };
-  const insertAI = () => {
-    if (!aiResult?.text) return;
-    setDraft(d => ({ ...d, body: (d.body ? (d.body + "\n\n") : "") + aiResult.text }));
-  };
-
-  const saveServer = async (note?: Partial<JournalNote>) => {
-    const payload = {
-      id: note?.id || draft.id || undefined,
-      title: note?.title ?? draft.title ?? "",
-      body: note?.body ?? draft.body ?? "",
-      address: note?.address ?? draft.address ?? "",
-      tf: note?.tf ?? draft.tf ?? undefined,
-      ruleId: note?.ruleId ?? draft.ruleId ?? undefined,
-      tags: note?.tags ?? draft.tags ?? []
+    const runAIOnDraft = () => {
+      const sys = "Du reduzierst Chart-Notizen auf das Wesentliche (deutsch). Schreibe 4–6 kurze Spiegelstriche: Kontext, Beobachtung, Hypothese, Plan, Risiko, Nächste Aktion.";
+      const ctx = [
+        draft.title ? `Titel: ${draft.title}` : "",
+        draft.address ? `CA: ${draft.address}` : "",
+        draft.tf ? `TF: ${draft.tf}` : "",
+        draft.body ? `Notiz:\n${draft.body}` : "",
+      ].filter(Boolean).join("\n");
+      if (!ctx) return;
+      runAssist(sys, ctx);
     };
-    const res = await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify(payload) }).then((r): any=>r.json()).catch((): any=>null);
-    if (res?.ok) { setDraft(res.note); await loadServer(); }
-  };
+    const insertAI = () => {
+      if (!aiResult?.text) return;
+      setDraft(d => ({ ...d, body: (d.body ? (d.body + "\n\n") : "") + aiResult.text }));
+    };
+
+    const saveServer = async (note?: Partial<JournalNote>) => {
+      const pick = <T,>(primary: T | undefined, fallback: T | undefined) =>
+        primary !== undefined ? primary : fallback;
+
+      const payload: Partial<JournalNote> & { id?: string } = {
+        id: note?.id || draft.id || undefined,
+        title: pick(note?.title, draft.title) ?? "",
+        body: pick(note?.body, draft.body) ?? "",
+        address: pick(note?.address, draft.address),
+        tf: pick(note?.tf, draft.tf),
+        ruleId: pick(note?.ruleId, draft.ruleId),
+        tags: pick(note?.tags, draft.tags) ?? [],
+        setupName: pick(note?.setupName, draft.setupName),
+        status: pick(note?.status, draft.status),
+        entryPrice: pick(note?.entryPrice, draft.entryPrice),
+        exitPrice: pick(note?.exitPrice, draft.exitPrice),
+        positionSize: pick(note?.positionSize, draft.positionSize),
+        stopLoss: pick(note?.stopLoss, draft.stopLoss),
+        takeProfit: pick(note?.takeProfit, draft.takeProfit),
+        pnl: pick(note?.pnl, draft.pnl),
+        pnlPercent: pick(note?.pnlPercent, draft.pnlPercent),
+        riskRewardRatio: pick(note?.riskRewardRatio, draft.riskRewardRatio),
+        screenshotDataUrl: pick(note?.screenshotDataUrl, draft.screenshotDataUrl),
+        permalink: pick(note?.permalink, draft.permalink),
+        aiAttachedAt: pick(note?.aiAttachedAt, draft.aiAttachedAt),
+      };
+      const res = await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify(payload) }).then((r): any=>r.json()).catch((): any=>null);
+      if (res?.ok) { setDraft(res.note); await loadServer(); }
+    };
   const loadServer = async ()=> {
     const res = await fetch("/api/journal").then((r): any=>r.json()).catch((): any=>null);
     setServerNotes(res?.notes ?? []);
