@@ -1,8 +1,8 @@
 // IndexedDB utilities for Sparkfined TA-PWA
-// Handles trades, events, metrics, and feedback storage with offline-first approach
+// Handles trades, events, metrics, feedback, journal, and replay storage with offline-first approach
 
 const DB_NAME = 'sparkfined-ta-pwa'
-const DB_VERSION = 2 // Bumped for metrics + feedback stores
+const DB_VERSION = 3 // Bumped for journal_entries + replay_sessions stores
 
 export interface TradeEntry {
   id?: number
@@ -39,6 +39,12 @@ export interface FeedbackEntry {
   status: 'queued' | 'exported'
   sessionId: string
 }
+
+// Import unified journal types
+import type { JournalEntry, ReplaySession } from '@/types/journal'
+
+// Re-export for convenience
+export type { JournalEntry, ReplaySession }
 
 let dbInstance: IDBDatabase | null = null
 
@@ -97,6 +103,32 @@ export async function initDB(): Promise<IDBDatabase> {
         feedbackStore.createIndex('timestamp', 'timestamp', { unique: false })
         feedbackStore.createIndex('status', 'status', { unique: false })
         feedbackStore.createIndex('type', 'type', { unique: false })
+      }
+
+      // Create journal_entries store (BLOCK 1: Unified Schema)
+      if (!db.objectStoreNames.contains('journal_entries')) {
+        const journalStore = db.createObjectStore('journal_entries', {
+          keyPath: 'id',
+        })
+        journalStore.createIndex('timestamp', 'timestamp', { unique: false })
+        journalStore.createIndex('ticker', 'ticker', { unique: false })
+        journalStore.createIndex('address', 'address', { unique: false })
+        journalStore.createIndex('status', 'status', { unique: false })
+        journalStore.createIndex('setup', 'setup', { unique: false })
+        journalStore.createIndex('emotion', 'emotion', { unique: false })
+        journalStore.createIndex('createdAt', 'createdAt', { unique: false })
+        journalStore.createIndex('walletAddress', 'walletAddress', { unique: false })
+      }
+
+      // Create replay_sessions store (BLOCK 1: Unified Schema)
+      if (!db.objectStoreNames.contains('replay_sessions')) {
+        const replayStore = db.createObjectStore('replay_sessions', {
+          keyPath: 'id',
+        })
+        replayStore.createIndex('journalEntryId', 'journalEntryId', { unique: false })
+        replayStore.createIndex('ticker', 'ticker', { unique: false })
+        replayStore.createIndex('address', 'address', { unique: false })
+        replayStore.createIndex('createdAt', 'createdAt', { unique: false })
       }
     }
   })
