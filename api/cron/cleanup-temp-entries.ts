@@ -33,20 +33,26 @@ interface CleanupResult {
  * Verify cron secret to prevent unauthorized access
  */
 function verifyCronSecret(req: Request): boolean {
-  const authHeader = req.headers.get('authorization')
-  const secret = process.env.CRON_SECRET
+  const secret = process.env.CRON_SECRET?.trim()
+  const env = process.env.NODE_ENV ?? 'production'
+  const isProd = env === 'production'
 
   if (!secret) {
-    console.warn('[Cron] CRON_SECRET not set, allowing request (dev mode)')
-    return true // Allow in development
+    if (!isProd) {
+      console.warn('[Cron] CRON_SECRET not set – allowing request in non-production environment')
+      return true
+    }
+    console.error('[Cron] CRON_SECRET missing – blocking request')
+    return false
   }
 
+  const authHeader = req.headers.get('authorization')
   if (!authHeader) {
     console.error('[Cron] Missing authorization header')
     return false
   }
 
-  const token = authHeader.replace('Bearer ', '')
+  const token = authHeader.replace('Bearer ', '').trim()
   return token === secret
 }
 
@@ -162,7 +168,7 @@ export default async function handler(req: Request): Promise<Response> {
         message: 'Unauthorized',
       }),
       {
-        status: 401,
+        status: process.env.CRON_SECRET ? 401 : 503,
         headers: { 'Content-Type': 'application/json' },
       }
     )
