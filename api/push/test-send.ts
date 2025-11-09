@@ -9,6 +9,7 @@ if (PUB && PRIV) webpush.setVapidDetails(CONTACT, PUB, PRIV);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") return res.status(405).json({ ok: false, error: "POST only" });
+  if (!ensureAlertsAdminAuthorized(req, res)) return;
   try {
     if (!PUB || !PRIV) return res.status(500).json({ ok:false, error:"VAPID keys missing" });
     const { subscription, payload } = req.body || {};
@@ -24,4 +25,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (e:any) {
     return res.status(200).json({ ok:false, error: String(e?.message ?? e) });
   }
+}
+
+function ensureAlertsAdminAuthorized(req: VercelRequest, res: VercelResponse): boolean {
+  const secret = process.env.ALERTS_ADMIN_SECRET?.trim();
+  const env = process.env.NODE_ENV ?? "production";
+  const isProd = env === "production";
+
+  if (!secret) {
+    if (!isProd) {
+      console.warn("[push/test-send] ALERTS_ADMIN_SECRET not set – allowing request in non-production environment");
+      return true;
+    }
+    res.status(503).json({ ok:false, error:"push test disabled" });
+    return false;
+  }
+
+  const rawHeader = req.headers["authorization"];
+  const authHeader = Array.isArray(rawHeader) ? rawHeader[0] : rawHeader;
+
+  if (!authHeader) {
+    res.status(401).json({ ok:false, error:"unauthorized" });
+    return false;
+  }
+
+  const [scheme, token] = authHeader.split(" ");
+  if (!token || scheme.toLowerCase() !== "bearer") {
+    res.status(401).json({ ok:false, error:"unauthorized" });
+    return false;
+  }
+
+  if (token.trim() !== secret) {
+    res.status(403).json({ ok:false, error:"unauthorized" });
+    return false;
+  }
+
+  return true;
 }

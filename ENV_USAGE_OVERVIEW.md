@@ -78,6 +78,7 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
 | `VAPID_PRIVATE_KEY` | Privater VAPID-Key für Backend zum Signieren von Push-Nachrichten. |
 | `VAPID_SUBJECT` | Kontakt-Email im mailto-Format für VAPID-Authentifizierung. |
 | `VAPID_CONTACT` | Alternative Kontakt-Email für VAPID-Service. |
+| `ALERTS_ADMIN_SECRET` | Autorisiert den Alerts-Worker und Test-Push-Endpunkt. |
 
 ---
 
@@ -133,9 +134,9 @@ Diese Variablen werden automatisch von Vercel gesetzt:
 
 ## 📊 Zusammenfassung
 
- - **Total:** 53 ENV-Variablen
+ - **Total:** 54 ENV-Variablen
  - **Zwingend erforderlich:** 2 (VITE_APP_VERSION + mind. 1 Datenanbieter)
- - **Empfohlen:** 13 (AI, Data Proxies & Push Notifications)
+ - **Empfohlen:** 14 (AI, Data Proxies & Push Notifications)
  - **Optional:** 38 (Blockchain, Performance, Debug, etc.)
 - **Auto-konfiguriert:** 4 (Vercel)
 

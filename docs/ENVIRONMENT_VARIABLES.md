@@ -99,6 +99,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `VAPID_PRIVATE_KEY` | VAPID private key (backend only!) | Same command |
 | `VAPID_SUBJECT` | Contact email | Set to `mailto:your-email@example.com` |
 | `VAPID_CONTACT` | Alternative contact | Same as subject |
+| `ALERTS_ADMIN_SECRET` | Shared secret protecting alerts worker/test-send endpoints | Set manually (deploy env only) |
 
 ### 6. Feature Flags
 
