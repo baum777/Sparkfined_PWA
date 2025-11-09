@@ -2,6 +2,7 @@ import React from "react";
 import { useJournal } from "../sections/journal/useJournal";
 import JournalEditor from "../sections/journal/JournalEditor";
 import JournalList from "../sections/journal/JournalList";
+import { JournalStats } from "../sections/journal/JournalStats";
 import type { JournalNote } from "../lib/journal";
 import { useAssist } from "../sections/ai/useAssist";
 
@@ -17,45 +18,72 @@ export default function JournalPage() {
   const btn = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
   const { loading: aiLoading, result: aiResult, run: runAssist } = useAssist();
 
-  React.useEffect(() => {
-    const onIns = (e:any) => {
-      const t = e?.detail?.text as string;
-      if (!t) return;
-      setDraft(d => ({ ...d, body: (d.body ? (d.body + "\n\n") : "") + t }));
-    };
-    window.addEventListener("journal:insert" as any, onIns as any);
-    return () => window.removeEventListener("journal:insert" as any, onIns as any);
-  }, []);
+    React.useEffect(() => {
+      const onIns = (e:any) => {
+        const t = e?.detail?.text as string;
+        if (!t) return;
+        setDraft(d => ({ ...d, body: (d.body ? (d.body + "\n\n") : "") + t }));
+      };
+      window.addEventListener("journal:insert" as any, onIns as any);
+      return () => window.removeEventListener("journal:insert" as any, onIns as any);
+    }, []);
 
-  const runAIOnDraft = () => {
-    const sys = "Du reduzierst Chart-Notizen auf das Wesentliche (deutsch). Schreibe 4–6 kurze Spiegelstriche: Kontext, Beobachtung, Hypothese, Plan, Risiko, Nächste Aktion.";
-    const ctx = [
-      draft.title ? `Titel: ${draft.title}` : "",
-      draft.address ? `CA: ${draft.address}` : "",
-      draft.tf ? `TF: ${draft.tf}` : "",
-      draft.body ? `Notiz:\n${draft.body}` : "",
-    ].filter(Boolean).join("\n");
-    if (!ctx) return;
-    runAssist(sys, ctx);
-  };
-  const insertAI = () => {
-    if (!aiResult?.text) return;
-    setDraft(d => ({ ...d, body: (d.body ? (d.body + "\n\n") : "") + aiResult.text }));
-  };
-
-  const saveServer = async (note?: Partial<JournalNote>) => {
-    const payload = {
-      id: note?.id || draft.id || undefined,
-      title: note?.title ?? draft.title ?? "",
-      body: note?.body ?? draft.body ?? "",
-      address: note?.address ?? draft.address ?? "",
-      tf: note?.tf ?? draft.tf ?? undefined,
-      ruleId: note?.ruleId ?? draft.ruleId ?? undefined,
-      tags: note?.tags ?? draft.tags ?? []
+    const runAIOnDraft = () => {
+      const sys = "Du reduzierst Chart-Notizen auf das Wesentliche (deutsch). Schreibe 4–6 kurze Spiegelstriche: Kontext, Beobachtung, Hypothese, Plan, Risiko, Nächste Aktion.";
+      const ctx = [
+        draft.title ? `Titel: ${draft.title}` : "",
+        draft.address ? `CA: ${draft.address}` : "",
+        draft.tf ? `TF: ${draft.tf}` : "",
+        draft.body ? `Notiz:\n${draft.body}` : "",
+      ].filter(Boolean).join("\n");
+      if (!ctx) return;
+      runAssist(sys, ctx);
     };
-    const res = await fetch("/api/journal", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify(payload) }).then((r): any=>r.json()).catch((): any=>null);
-    if (res?.ok) { setDraft(res.note); await loadServer(); }
-  };
+
+    const insertAI = () => {
+      if (!aiResult?.text) return;
+      setDraft(d => ({ ...d, body: (d.body ? (d.body + "\n\n") : "") + aiResult.text }));
+    };
+
+    const saveServer = async (noteOverride?: Partial<JournalNote>) => {
+      const pick = <T,>(primary: T | undefined, fallback: T | undefined) =>
+        primary !== undefined ? primary : fallback;
+
+      const payload: Partial<JournalNote> & { id?: string } = {
+        id: noteOverride?.id || draft.id || undefined,
+        title: pick(noteOverride?.title, draft.title) ?? "",
+        body: pick(noteOverride?.body, draft.body) ?? "",
+        address: pick(noteOverride?.address, draft.address),
+        tf: pick(noteOverride?.tf, draft.tf),
+        ruleId: pick(noteOverride?.ruleId, draft.ruleId),
+        tags: pick(noteOverride?.tags, draft.tags) ?? [],
+        setupName: pick(noteOverride?.setupName, draft.setupName),
+        status: pick(noteOverride?.status, draft.status),
+        entryPrice: pick(noteOverride?.entryPrice, draft.entryPrice),
+        exitPrice: pick(noteOverride?.exitPrice, draft.exitPrice),
+        positionSize: pick(noteOverride?.positionSize, draft.positionSize),
+        stopLoss: pick(noteOverride?.stopLoss, draft.stopLoss),
+        takeProfit: pick(noteOverride?.takeProfit, draft.takeProfit),
+        pnl: pick(noteOverride?.pnl, draft.pnl),
+        pnlPercent: pick(noteOverride?.pnlPercent, draft.pnlPercent),
+        riskRewardRatio: pick(noteOverride?.riskRewardRatio, draft.riskRewardRatio),
+        screenshotDataUrl: pick(noteOverride?.screenshotDataUrl, draft.screenshotDataUrl),
+        permalink: pick(noteOverride?.permalink, draft.permalink),
+        aiAttachedAt: pick(noteOverride?.aiAttachedAt, draft.aiAttachedAt),
+      };
+
+      const res = await fetch("/api/journal", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      }).then((r): any => r.json()).catch((): any => null);
+
+      if (res?.ok) {
+        await loadServer();
+        return res.note as JournalNote;
+      }
+      return null;
+    };
   const loadServer = async ()=> {
     const res = await fetch("/api/journal").then((r): any=>r.json()).catch((): any=>null);
     setServerNotes(res?.notes ?? []);
@@ -71,17 +99,30 @@ export default function JournalPage() {
     await saveServer({ body: merged, aiAttachedAt: Date.now() } as any);
   };
 
-  const onSave = async () => {
-    if (openId && current) {
-      await update(openId, { ...current, ...draft });
-      setOpenId(null); setDraft({});
-    } else {
-      const n = await create(draft);
-      setOpenId(null); setDraft({});
-      // optional: scroll to created note
-      setTimeout(()=>{ document.getElementById(`note-${n.id}`)?.scrollIntoView({behavior:"smooth"}); }, 50);
-    }
-  };
+    const onSave = async () => {
+      let noteId = openId;
+      let base: Partial<JournalNote> = { ...draft };
+
+      if (openId) {
+        update(openId, draft);
+        base = {
+          ...(current ?? {}),
+          ...draft,
+          id: openId,
+        };
+      } else {
+        const created = create(draft);
+        noteId = created.id;
+        base = { ...created, ...draft, id: created.id };
+        setTimeout(() => {
+          document.getElementById(`note-${created.id}`)?.scrollIntoView({ behavior: "smooth" });
+        }, 50);
+      }
+
+      await saveServer(base);
+      setOpenId(null);
+      setDraft({});
+    };
 
   // accept incoming quick-drafts from Chart ("journal:draft" events)
   React.useEffect(() => {
@@ -116,7 +157,10 @@ export default function JournalPage() {
         </div>
       </div>
 
-      <JournalEditor draft={draft} onChange={(d: any)=>setDraft(d)} onSave={()=>saveServer()} />
+        <JournalEditor draft={draft} onChange={(d: any)=>setDraft(d)} onSave={onSave} />
+        <div className="mt-4">
+          <JournalStats notes={notes} />
+        </div>
       <div className="mt-3 rounded-xl border border-emerald-900 bg-emerald-950/20 p-3">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-sm text-emerald-200">AI-Assist: Notiz straffen</div>
@@ -161,12 +205,12 @@ export default function JournalPage() {
       </div>
 
       <div className="mt-4">
-        <JournalList
-          entries={notes}
-          onOpen={(id)=>{ const n = notes.find(x=>x.id===id); if (!n) return; setOpenId(id); setDraft(n as any); }}
-          onDelete={remove}
-          filter={{ q: search, tag }}
-        />
+          <JournalList
+            notes={notes}
+            onOpen={(id)=>{ const n = notes.find(x=>x.id===id); if (!n) return; setOpenId(id); setDraft(n as any); }}
+            onDelete={remove}
+            filter={{ q: search, tag }}
+          />
       </div>
     </div>
   );
