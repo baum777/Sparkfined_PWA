@@ -1,3 +1,7 @@
+/**
+ * @deprecated Use JournalEntry from @/types/journal instead
+ * This type is kept for backward compatibility only
+ */
 export type JournalNote = {
   id: string;
   title: string;
@@ -11,3 +15,6 @@ export type JournalNote = {
   address?: string;             // optional CA context
   tf?: string;
 };
+
+// Re-export unified types
+export type { JournalEntry, SetupTag, EmotionTag } from "@/types/journal";
