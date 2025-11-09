@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "userAgent": {
+      "type": "string"
+    },
+    "viewport": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/session.start.json",
+  "title": "session.start",
+  "description": "Neue Session gestartet",
+  "version": "1.0.0"
+}

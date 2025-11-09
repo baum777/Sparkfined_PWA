@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "walletType": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "walletType",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/wallet.connect.json",
+  "title": "wallet.connect",
+  "description": "Wallet wurde verbunden",
+  "version": "1.0.0"
+}

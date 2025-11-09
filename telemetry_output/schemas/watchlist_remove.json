@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string"
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "userId",
+    "sessionId",
+    "symbol",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/watchlist_remove.json",
+  "title": "watchlist_remove",
+  "description": "Symbol entfernen",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "userId": "user_123",
+      "sessionId": "sess_456",
+      "symbol": "BTCUSDT",
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}

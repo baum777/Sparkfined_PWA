@@ -1,0 +1,60 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "coords": {
+      "type": "object"
+    },
+    "text": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/chart_annotation_create.json",
+  "title": "chart_annotation_create",
+  "description": "Annotation erstellen",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "userId": "user_123",
+      "sessionId": "sess_456",
+      "id": "ann_01",
+      "coords": {
+        "x": 1000,
+        "y": 200
+      },
+      "text": "support hold",
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}

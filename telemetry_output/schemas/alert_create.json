@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string"
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "condition": {
+      "type": "string"
+    },
+    "threshold": {
+      "type": "string"
+    },
+    "notifyVia": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "userId",
+    "sessionId",
+    "symbol",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/alert_create.json",
+  "title": "alert_create",
+  "description": "Preis-Alert erstellen",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "userId": "user_123",
+      "sessionId": "sess_456",
+      "symbol": "BTCUSDT",
+      "condition": "price_above",
+      "threshold": 50000,
+      "notifyVia": "push",
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "screen_name": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "referrer": {
+      "type": "string",
+      "nullable": true
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "screen_name",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/screen_view.json",
+  "title": "screen_view",
+  "description": "Bildschirm/Seite wurde angezeigt",
+  "version": "1.0.0"
+}

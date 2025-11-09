@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "playing": {
+      "type": "boolean"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/replay_play_toggle.json",
+  "title": "replay_play_toggle",
+  "description": "Wiedergabe starten/pausieren",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "sessionId": "replay_789",
+      "playing": true,
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}
