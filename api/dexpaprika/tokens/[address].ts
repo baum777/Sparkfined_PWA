@@ -96,6 +96,10 @@ export default async function handler(
     });
   }
 
+  if (!ensureDataProxyAuthorized(req, res, 'dexpaprika')) {
+    return;
+  }
+
   // Extract address from query params
   const { address } = req.query;
 
@@ -170,4 +174,60 @@ export default async function handler(
       provider: 'dexpaprika',
     });
   }
+}
+
+function ensureDataProxyAuthorized(
+  req: VercelRequest,
+  res: VercelResponse,
+  provider: 'moralis' | 'dexpaprika'
+): boolean {
+  const secret = process.env.DATA_PROXY_SECRET?.trim();
+  const env = process.env.NODE_ENV ?? 'production';
+  const isProd = env === 'production';
+
+  if (!secret) {
+    if (!isProd) {
+      console.warn(`[${provider}] DATA_PROXY_SECRET not set – allowing request in non-production environment`);
+      return true;
+    }
+    res.status(503).json({
+      success: false,
+      error: 'Data proxy disabled',
+      provider,
+    });
+    return false;
+  }
+
+  const authHeaderValue = req.headers['authorization'];
+  const authHeader = Array.isArray(authHeaderValue) ? authHeaderValue[0] : authHeaderValue;
+
+  if (!authHeader) {
+    res.status(401).json({
+      success: false,
+      error: 'Unauthorized',
+      provider,
+    });
+    return false;
+  }
+
+  const [scheme, token] = authHeader.split(' ');
+  if (!token || scheme.toLowerCase() !== 'bearer') {
+    res.status(401).json({
+      success: false,
+      error: 'Unauthorized',
+      provider,
+    });
+    return false;
+  }
+
+  if (token.trim() !== secret) {
+    res.status(403).json({
+      success: false,
+      error: 'Unauthorized',
+      provider,
+    });
+    return false;
+  }
+
+  return true;
 }

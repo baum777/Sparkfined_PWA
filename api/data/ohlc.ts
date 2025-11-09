@@ -4,11 +4,20 @@ type Ohlc = { t:number;o:number;h:number;l:number;c:number; v?:number };
 function json(obj:any, status=200){ return new Response(JSON.stringify(obj), { status, headers:{ "content-type":"application/json" }}); }
 
 export default async function handler(req: Request){
+  if (req.method !== "GET") {
+    return json({ ok:false, error:"method not allowed" }, 405);
+  }
+
+  const authError = ensureDataProxyAuthorized(req);
+  if (authError) return authError;
+
   const url = new URL(req.url);
   const address = url.searchParams.get("address") || "";
   const tf = url.searchParams.get("tf") || "15m";
   const limit = Number(url.searchParams.get("limit") || "600");
   if (!address) return json({ ok:false, error:"address required" }, 400);
+  if (!isLikelySolanaAddress(address)) return json({ ok:false, error:"invalid address" }, 400);
+  if (!Number.isFinite(limit) || limit <= 0 || limit > 1000) return json({ ok:false, error:"invalid limit (1-1000)" }, 400);
   
   try{
     // 1. Moralis (Primär)
@@ -46,4 +55,39 @@ function normalize(rows:any[]): Ohlc[]{
     c: Number(r.c ?? r.close),
     v: Number(r.v ?? r.volume ?? 0)
   })).filter(x=>Number.isFinite(x.t)&&Number.isFinite(x.c));
+}
+
+function ensureDataProxyAuthorized(req: Request): Response | null {
+  const secret = process.env.DATA_PROXY_SECRET?.trim();
+  const env = process.env.NODE_ENV ?? "production";
+  const isProd = env === "production";
+
+  if (!secret) {
+    if (!isProd) {
+      console.warn("[data/ohlc] DATA_PROXY_SECRET not set – allowing request in non-production environment");
+      return null;
+    }
+    console.error("[data/ohlc] DATA_PROXY_SECRET missing – blocking data proxy request");
+    return json({ ok:false, error:"data proxy disabled" }, 503);
+  }
+
+  const authHeader = req.headers.get("authorization");
+  if (!authHeader) {
+    return json({ ok:false, error:"unauthorized" }, 401);
+  }
+
+  const [scheme, token] = authHeader.split(" ");
+  if (!token || scheme.toLowerCase() !== "bearer") {
+    return json({ ok:false, error:"unauthorized" }, 401);
+  }
+
+  if (token.trim() !== secret) {
+    return json({ ok:false, error:"unauthorized" }, 403);
+  }
+
+  return null;
+}
+
+function isLikelySolanaAddress(address: string): boolean {
+  return /^[1-9A-HJ-NP-Za-km-z]{32,64}$/.test(address);
 }

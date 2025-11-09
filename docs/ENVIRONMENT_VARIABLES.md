@@ -52,6 +52,7 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | `DEXPAPRIKA_API_KEY` | - | DexPaprika API key (backend) | Contact DexPaprika |
 | `DEXPAPRIKA_BASE` | `https://api.dexpaprika.com` | DexPaprika base URL | - |
 | `VITE_DEXPAPRIKA_BASE` | `https://api.dexpaprika.com` | DexPaprika base URL (frontend) | - |
+| `DATA_PROXY_SECRET` | - | Shared secret protecting backend data proxy endpoints | Set manually (deploy env only) |
 
 #### Provider Configuration
 | Variable | Default | Description |

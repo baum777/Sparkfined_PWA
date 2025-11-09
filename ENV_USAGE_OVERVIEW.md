@@ -27,6 +27,7 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
 | `VITE_DATA_PRIMARY` | Definiert den primären Datenanbieter (dexpaprika/moralis/mock). |
 | `VITE_DATA_SECONDARY` | Definiert den Fallback-Datenanbieter wenn Primary fehlschlägt. |
 | `VITE_DATA_FALLBACKS` | Komma-separierte Liste zusätzlicher Fallback-Datenquellen. |
+| `DATA_PROXY_SECRET` | Autorisiert interne Requests an Moralis/DexPaprika-Proxys. |
 
 ---
 
@@ -132,9 +133,9 @@ Diese Variablen werden automatisch von Vercel gesetzt:
 
 ## 📊 Zusammenfassung
 
- - **Total:** 52 ENV-Variablen
+ - **Total:** 53 ENV-Variablen
  - **Zwingend erforderlich:** 2 (VITE_APP_VERSION + mind. 1 Datenanbieter)
- - **Empfohlen:** 12 (AI + Push Notifications)
+ - **Empfohlen:** 13 (AI, Data Proxies & Push Notifications)
  - **Optional:** 38 (Blockchain, Performance, Debug, etc.)
 - **Auto-konfiguriert:** 4 (Vercel)
 
