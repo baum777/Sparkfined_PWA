@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "tsTarget": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "userTs": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scrubBy": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "sessionId"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/replay_seek.json",
+  "title": "replay_seek",
+  "description": "Zu Timestamp springen",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "sessionId": "replay_789",
+      "tsTarget": "2025-11-09T10:00:00Z",
+      "userTs": "2025-11-09T19:36:13.491220Z",
+      "scrubBy": 120
+    }
+  ]
+}

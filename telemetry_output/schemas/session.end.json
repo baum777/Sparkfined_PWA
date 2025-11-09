@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "duration": {
+      "type": "integer"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/session.end.json",
+  "title": "session.end",
+  "description": "Session beendet",
+  "version": "1.0.0"
+}

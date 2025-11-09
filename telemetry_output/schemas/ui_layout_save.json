@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "layoutId": {
+      "type": "string"
+    },
+    "layoutHash": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/ui_layout_save.json",
+  "title": "ui_layout_save",
+  "description": "Layout speichern",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "userId": "user_123",
+      "sessionId": "sess_456",
+      "layoutId": "layout_01",
+      "layoutHash": "abc123",
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string"
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "symbols": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "count": {
+      "type": "integer"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "userId",
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/watchlist_bulk_remove.json",
+  "title": "watchlist_bulk_remove",
+  "description": "Mehrere Symbole entfernen",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "userId": "user_123",
+      "sessionId": "sess_456",
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "count": 2,
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}

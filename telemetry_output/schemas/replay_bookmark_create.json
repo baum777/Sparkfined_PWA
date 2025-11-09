@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "note": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "userId": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "tsCreated": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/replay_bookmark_create.json",
+  "title": "replay_bookmark_create",
+  "description": "Lesezeichen erstellen",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "sessionId": "replay_789",
+      "ts": "2025-11-09T10:00:00Z",
+      "note": "Key inflection",
+      "userId": "user_123",
+      "tsCreated": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}

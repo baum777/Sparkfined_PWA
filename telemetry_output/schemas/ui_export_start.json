@@ -1,0 +1,53 @@
+{
+  "type": "object",
+  "properties": {
+    "userId": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "format": {
+      "type": "string"
+    },
+    "options": {
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/ui_export_start.json",
+  "title": "ui_export_start",
+  "description": "Datenexport starten",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "userId": "user_123",
+      "sessionId": "sess_456",
+      "format": "csv",
+      "options": {},
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}

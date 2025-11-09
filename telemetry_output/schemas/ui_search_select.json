@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "properties": {
+    "sessionId": {
+      "type": "string"
+    },
+    "query": {
+      "type": "string"
+    },
+    "selectedSymbol": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "selectionType": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sessionId",
+    "ts"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sparkfined.com/schemas/ui_search_select.json",
+  "title": "ui_search_select",
+  "description": "Suche auswählen und navigieren",
+  "version": "1.0.0",
+  "examples": [
+    {
+      "sessionId": "sess_456",
+      "query": "BTC",
+      "selectedSymbol": "BTCUSDT",
+      "selectionType": "symbol",
+      "ts": "2025-11-09T19:36:13.491220Z"
+    }
+  ]
+}
