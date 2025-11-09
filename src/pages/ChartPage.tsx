@@ -23,6 +23,9 @@ import { runBacktest, type BacktestResult, type AlertRule } from "../sections/ch
 import BacktestPanel from "../sections/chart/BacktestPanel";
 import { useSettings } from "../state/settings";
 import { useTelemetry } from "../state/telemetry";
+import { getSession } from "../lib/ReplayService";
+import { getEntry } from "../lib/JournalService";
+import type { ChartState } from "@/types/journal";
 
 export default function ChartPage() {
   const { settings } = useSettings();
@@ -91,7 +94,15 @@ export default function ChartPage() {
     // READ once on mount - shortlink has priority
     const url = new URL(window.location.href);
     const tok = url.searchParams.get("short");
-    // A) Test-Modus: ?test=<token> hat höchste Priorität
+    
+    // A) Replay Session: ?replaySession=<id> - highest priority
+    const replaySessionId = url.searchParams.get("replaySession");
+    if (replaySessionId) {
+      loadReplaySession(replaySessionId);
+      return;
+    }
+    
+    // B) Test-Modus: ?test=<token>
     const testTok = url.searchParams.get("test");
     if (testTok) {
       const payload = decodeRuleToken(testTok);
@@ -128,6 +139,58 @@ export default function ChartPage() {
       }
     }
   }, []); // Only run once on mount
+  
+  // Load chart state from replay session
+  const loadReplaySession = React.useCallback(async (sessionId: string) => {
+    try {
+      const session = await getSession(sessionId);
+      if (!session) {
+        console.error("Replay session not found:", sessionId);
+        return;
+      }
+
+      // If session has cached OHLC, use it
+      if (session.ohlcCache && session.ohlcCache.length > 0) {
+        setData(session.ohlcCache as OhlcPoint[]);
+      }
+
+      // If session is linked to journal entry, load chart state
+      if (session.journalEntryId) {
+        const entry = await getEntry(session.journalEntryId);
+        if (entry?.chartSnapshot?.state) {
+          const chartState = entry.chartSnapshot.state as ChartState;
+          
+          // Restore chart state
+          if (chartState.address) setAddress(chartState.address);
+          if (chartState.timeframe) setTf(chartState.timeframe as any);
+          if (chartState.view) setView(chartState.view);
+          
+          // Restore indicators
+          if (chartState.indicators) {
+            const newIndState: IndicatorState = { sma20: false, ema20: false, vwap: false };
+            chartState.indicators.forEach(ind => {
+              if (ind.type === "sma" && ind.enabled) newIndState.sma20 = true;
+              if (ind.type === "ema" && ind.enabled) newIndState.ema20 = true;
+              if (ind.type === "vwap" && ind.enabled) newIndState.vwap = true;
+            });
+            setIndState(newIndState);
+          }
+          
+          // Restore shapes (drawings)
+          // Note: chartState.shapes might have different structure than Shape[]
+          // For now, skip shapes restoration to avoid type errors
+          // TODO: Map chartState.shapes to proper Shape[] format
+          // if (chartState.shapes) {
+          //   setShapes(chartState.shapes as Shape[]);
+          // }
+        }
+      }
+
+      console.log("✅ Loaded replay session:", session.name || sessionId);
+    } catch (error) {
+      console.error("Error loading replay session:", error);
+    }
+  }, []);
   React.useEffect(() => {
     // WRITE on state change (replaceState, kein History-Spam)
     const state = { address, tf, view, snap, indState, shapes };

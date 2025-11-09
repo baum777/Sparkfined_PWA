@@ -88,12 +88,12 @@ export default function JournalPage() {
     await saveServer({ body: merged, aiAttachedAt: Date.now() } as any);
   };
 
-  const onSave = () => {
+  const onSave = async () => {
     if (openId && current) {
-      update(openId, { ...current, ...draft });
+      await update(openId, { ...current, ...draft });
       setOpenId(null); setDraft({});
     } else {
-      const n = create(draft);
+      const n = await create(draft);
       setOpenId(null); setDraft({});
       // optional: scroll to created note
       setTimeout(()=>{ document.getElementById(`note-${n.id}`)?.scrollIntoView({behavior:"smooth"}); }, 50);
@@ -182,7 +182,7 @@ export default function JournalPage() {
 
       <div className="mt-4">
         <JournalList
-          notes={notes}
+          entries={notes}
           onOpen={(id)=>{ const n = notes.find(x=>x.id===id); if (!n) return; setOpenId(id); setDraft(n as any); }}
           onDelete={remove}
           filter={{ q: search, tag }}

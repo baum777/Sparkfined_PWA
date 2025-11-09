@@ -50,3 +50,9 @@ export async function kvSMembers(key:string): Promise<string[]> {
   const j = await r.json();
   return j?.result ?? [];
 }
+
+export async function kvSRem(key:string, member:string): Promise<number> {
+  const r = await fetch(`${base()}/SREM/${encodeURIComponent(key)}/${encodeURIComponent(member)}`, { headers:headers() });
+  const j = await r.json();
+  return j?.result ?? 0;
+}

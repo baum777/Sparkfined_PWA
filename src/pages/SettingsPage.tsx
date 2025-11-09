@@ -4,6 +4,7 @@ import { KEYS, exportAppData, downloadJson, importAppData, clearNs, clearCaches,
 import { useTelemetry } from "../state/telemetry";
 import { useAISettings } from "../state/ai";
 import { useAIContext } from "../state/aiContext";
+import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from "../lib/walletMonitor";
 
 export default function SettingsPage() {
   const { settings, setSettings } = useSettings();
@@ -19,6 +20,51 @@ export default function SettingsPage() {
     return base;
   });
   const fileRef = React.useRef<HTMLInputElement | null>(null);
+
+  // BLOCK 2: Wallet monitoring state
+  const [walletAddress, setWalletAddress] = React.useState(() => {
+    return localStorage.getItem('sparkfined.wallet.monitored') || '';
+  });
+  const [monitoringEnabled, setMonitoringEnabled] = React.useState(() => {
+    return localStorage.getItem('sparkfined.wallet.monitoring') === 'true';
+  });
+  const [autoGrok, setAutoGrok] = React.useState(() => {
+    return localStorage.getItem('sparkfined.grok.auto') === 'true';
+  });
+  const [monitorStatus, setMonitorStatus] = React.useState<any>(null);
+
+  // Update monitor status
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const monitor = getWalletMonitor();
+      if (monitor) {
+        setMonitorStatus(monitor.getStatus());
+      }
+    }, 5000); // Update every 5s
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleWalletChange = (address: string) => {
+    setWalletAddress(address);
+    localStorage.setItem('sparkfined.wallet.monitored', address);
+  };
+
+  const toggleMonitoring = (enabled: boolean) => {
+    setMonitoringEnabled(enabled);
+    localStorage.setItem('sparkfined.wallet.monitoring', enabled ? 'true' : 'false');
+
+    if (enabled && walletAddress) {
+      startWalletMonitoring(walletAddress);
+    } else {
+      stopWalletMonitoring();
+    }
+  };
+
+  const toggleAutoGrok = (enabled: boolean) => {
+    setAutoGrok(enabled);
+    localStorage.setItem('sparkfined.grok.auto', enabled ? 'true' : 'false');
+  };
 
   const Row = ({ label, children }:{label:string;children:React.ReactNode}) => (
     <div className="flex items-center justify-between gap-3 border-b border-zinc-800 py-3">
@@ -62,6 +108,54 @@ export default function SettingsPage() {
       </div>
       <div className="mt-4 text-xs text-zinc-500">
         Gespeichert unter <code>sparkfined.settings.v1</code>. Änderungen wirken sofort.
+      </div>
+
+      {/* BLOCK 2: Wallet Monitoring */}
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Wallet-Monitoring (Auto-Journal)</h2>
+      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+        <Row label="Wallet-Adresse">
+          <input
+            type="text"
+            value={walletAddress}
+            onChange={(e) => handleWalletChange(e.target.value)}
+            placeholder="DezXAZ8z7Pnr..."
+            className="w-64 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm text-zinc-200"
+          />
+        </Row>
+        <Row label="Wallet-Monitoring aktiv">
+          <Toggle
+            checked={monitoringEnabled}
+            onChange={toggleMonitoring}
+          />
+        </Row>
+        <Row label="Auto-Fetch Grok Context">
+          <Toggle
+            checked={autoGrok}
+            onChange={toggleAutoGrok}
+          />
+        </Row>
+
+        {/* Status display */}
+        {monitorStatus && monitorStatus.isRunning && (
+          <div className="mt-3 rounded border border-emerald-800/40 bg-emerald-950/20 p-3 text-xs text-emerald-200">
+            <div className="mb-1 font-semibold">✅ Monitoring aktiv</div>
+            <div className="text-emerald-300/80">
+              <div>Wallet: {monitorStatus.walletAddress.slice(0, 8)}...{monitorStatus.walletAddress.slice(-6)}</div>
+              <div>Letzter Check: {new Date(monitorStatus.lastChecked).toLocaleTimeString()}</div>
+              <div>Transaktionen gesehen: {monitorStatus.seenTransactions}</div>
+            </div>
+          </div>
+        )}
+
+        {walletAddress && !monitoringEnabled && (
+          <div className="mt-3 rounded border border-zinc-700 bg-zinc-900/60 p-3 text-xs text-zinc-400">
+            ⏸️ Monitoring pausiert. Aktiviere oben, um Auto-Journal zu starten.
+          </div>
+        )}
+      </div>
+      <div className="mt-2 text-xs text-zinc-500">
+        <strong>Info:</strong> Wallet-Monitoring erkennt automatisch Buy-Transaktionen und erstellt
+        temporäre Journal-Einträge. Du hast 7 Tage Zeit, um sie als "aktiv" zu markieren.
       </div>
 
       {/* Data Export / Import */}
