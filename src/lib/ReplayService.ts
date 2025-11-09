@@ -170,12 +170,17 @@ export async function deleteSession(id: string): Promise<void> {
  */
 export async function addBookmark(
   sessionId: string,
-  bookmark: ReplayBookmark
+  bookmark: Omit<ReplayBookmark, 'id'>
 ): Promise<ReplaySession | undefined> {
   const session = await getSession(sessionId)
   if (!session) return undefined
 
-  const bookmarks = [...session.bookmarks, bookmark]
+  const newBookmark: ReplayBookmark = {
+    id: crypto.randomUUID(),
+    ...bookmark,
+  }
+
+  const bookmarks = [...(session.bookmarks || []), newBookmark]
   return updateSession(sessionId, { bookmarks })
 }
 
@@ -187,14 +192,20 @@ export async function addBookmark(
  */
 export async function removeBookmark(
   sessionId: string,
-  timestamp: number
+  bookmarkId: string
 ): Promise<ReplaySession | undefined> {
   const session = await getSession(sessionId)
-  if (!session) return undefined
+  if (!session || !session.bookmarks) return undefined
 
-  const bookmarks = session.bookmarks.filter((b) => b.timestamp !== timestamp)
+  const bookmarks = session.bookmarks.filter((b) => b.id !== bookmarkId)
   return updateSession(sessionId, { bookmarks })
 }
+
+// Alias for removeBookmark (for compatibility)
+export const deleteBookmark = removeBookmark
+
+// Alias for getAllSessions (for compatibility)
+export const listSessions = getAllSessions
 
 // ============================================================================
 // OHLC DATA CACHING
@@ -210,7 +221,7 @@ export async function cacheOhlcData(
   sessionId: string,
   ohlcData: OhlcPoint[]
 ): Promise<ReplaySession | undefined> {
-  return updateSession(sessionId, { ohlcData })
+  return updateSession(sessionId, { ohlcCache: ohlcData })
 }
 
 /**
@@ -222,7 +233,7 @@ export async function getCachedOhlc(
   sessionId: string
 ): Promise<OhlcPoint[] | undefined> {
   const session = await getSession(sessionId)
-  return session?.ohlcData
+  return session?.ohlcCache
 }
 
 // ============================================================================
@@ -382,13 +393,12 @@ export async function getReplayStats(): Promise<{
 }> {
   const sessions = await getAllSessions()
 
-  const totalDuration = sessions.reduce((sum, s) => sum + (s.duration || 0), 0)
-  const totalBookmarks = sessions.reduce((sum, s) => sum + s.bookmarks.length, 0)
+  const totalBookmarks = sessions.reduce((sum, s) => sum + (s.bookmarks?.length || 0), 0)
   const linkedToJournal = sessions.filter((s) => s.journalEntryId).length
 
   return {
     totalSessions: sessions.length,
-    avgDuration: sessions.length > 0 ? totalDuration / sessions.length : 0,
+    avgDuration: 0, // TODO: Add duration tracking to ReplaySession
     totalBookmarks,
     linkedToJournal,
   }

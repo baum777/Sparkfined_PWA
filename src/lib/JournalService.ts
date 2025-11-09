@@ -20,7 +20,11 @@ import type {
   JournalExportFormat,
   SetupTag,
   EmotionTag,
+  TradeOutcome,
 } from '@/types/journal'
+
+// Re-export types for external use
+export type { JournalEntry, PatternStats, SetupTag, EmotionTag }
 
 // ============================================================================
 // CRUD OPERATIONS
@@ -271,14 +275,12 @@ export async function calculatePatternStats(
 
   if (closedEntries.length === 0) {
     return {
-      totalEntries: allEntries.length,
+      totalTrades: 0,
       winRate: 0,
-      avgHoldTime: 0,
-      avgMcap: 0,
       avgPnl: 0,
-      totalPnl: 0,
-      emotionBreakdown: {} as Record<EmotionTag, number>,
-      setupBreakdown: {} as Record<SetupTag, number>,
+      avgTimeToExit: 0,
+      bySetup: [],
+      byEmotion: [],
     }
   }
 
@@ -291,40 +293,61 @@ export async function calculatePatternStats(
     if (!e.outcome?.closedAt) return sum
     return sum + (e.outcome.closedAt - e.createdAt)
   }, 0)
-  const avgHoldTime = totalHoldTime / closedEntries.length / 1000 // seconds
-
-  // Average MCap (from first buy transaction)
-  const totalMcap = closedEntries.reduce((sum, e) => {
-    const firstBuy = e.outcome?.transactions.find((t) => t.type === 'buy')
-    return sum + (firstBuy?.mcap || 0)
-  }, 0)
-  const avgMcap = totalMcap / closedEntries.length
+  const avgTimeToExit = totalHoldTime / closedEntries.length // milliseconds
 
   // PnL stats
   const totalPnl = closedEntries.reduce((sum, e) => sum + e.outcome!.pnl, 0)
   const avgPnl = totalPnl / closedEntries.length
 
-  // Emotion breakdown
-  const emotionBreakdown: Record<string, number> = {}
-  allEntries.forEach((e) => {
-    emotionBreakdown[e.emotion] = (emotionBreakdown[e.emotion] || 0) + 1
+  // Count by setup
+  const setupCount: Record<string, number> = {}
+  closedEntries.forEach((e) => {
+    setupCount[e.setup] = (setupCount[e.setup] || 0) + 1
   })
 
-  // Setup breakdown
-  const setupBreakdown: Record<string, number> = {}
-  allEntries.forEach((e) => {
-    setupBreakdown[e.setup] = (setupBreakdown[e.setup] || 0) + 1
+  // Count by emotion
+  const emotionCount: Record<string, number> = {}
+  closedEntries.forEach((e) => {
+    emotionCount[e.emotion] = (emotionCount[e.emotion] || 0) + 1
+  })
+
+  // Calculate bySetup stats
+  const bySetup = Object.entries(setupCount).map(([setup, count]) => {
+    const setupEntries = closedEntries.filter((e) => e.setup === setup)
+    const setupWins = setupEntries.filter((e) => e.outcome!.pnl > 0).length
+    const setupPnl = setupEntries.reduce((sum, e) => sum + e.outcome!.pnl, 0)
+    return {
+      setup: setup as SetupTag,
+      totalTrades: count,
+      winCount: setupWins,
+      lossCount: count - setupWins,
+      avgPnl: setupPnl / count,
+      totalPnl: setupPnl,
+    }
+  })
+
+  // Calculate byEmotion stats
+  const byEmotion = Object.entries(emotionCount).map(([emotion, count]) => {
+    const emotionEntries = closedEntries.filter((e) => e.emotion === emotion)
+    const emotionWins = emotionEntries.filter((e) => e.outcome!.pnl > 0).length
+    const emotionPnl = emotionEntries.reduce((sum, e) => sum + e.outcome!.pnl, 0)
+    return {
+      emotion: emotion as EmotionTag,
+      totalTrades: count,
+      winCount: emotionWins,
+      lossCount: count - emotionWins,
+      avgPnl: emotionPnl / count,
+      totalPnl: emotionPnl,
+    }
   })
 
   return {
-    totalEntries: allEntries.length,
+    totalTrades: closedEntries.length,
     winRate,
-    avgHoldTime,
-    avgMcap,
     avgPnl,
-    totalPnl,
-    emotionBreakdown: emotionBreakdown as Record<EmotionTag, number>,
-    setupBreakdown: setupBreakdown as Record<SetupTag, number>,
+    avgTimeToExit,
+    bySetup,
+    byEmotion,
   }
 }
 
@@ -373,13 +396,13 @@ export async function markAsActive(
  */
 export async function closeEntry(
   id: string,
-  outcome: JournalEntry['outcome']
+  outcome: TradeOutcome
 ): Promise<JournalEntry | undefined> {
   return updateEntry(id, {
     status: 'closed',
     outcome: {
       ...outcome,
-      closedAt: outcome?.closedAt || Date.now(),
+      closedAt: outcome.closedAt || Date.now(),
     },
   })
 }
@@ -444,10 +467,10 @@ export async function exportEntries(
     let md = '# Journal Export\n\n'
     md += `**Exported:** ${new Date().toISOString()}\n\n`
     md += `## Stats\n\n`
-    md += `- Total Entries: ${stats.totalEntries}\n`
+    md += `- Total Trades: ${stats.totalTrades}\n`
     md += `- Win Rate: ${stats.winRate.toFixed(1)}%\n`
-    md += `- Avg Hold Time: ${(stats.avgHoldTime / 3600).toFixed(1)} hours\n`
-    md += `- Total PnL: $${stats.totalPnl.toFixed(2)}\n\n`
+    md += `- Avg Time to Exit: ${(stats.avgTimeToExit / 3600000).toFixed(1)} hours\n`
+    md += `- Avg PnL: $${stats.avgPnl.toFixed(2)}\n\n`
     md += `## Entries\n\n`
 
     allEntries.forEach((e) => {

@@ -113,12 +113,12 @@ export default function ReplayPage() {
       // TODO: Fetch actual OHLC data from Moralis API
       // For now, generate mock data
       const mockOhlc = Array.from({ length: 100 }, (_, i) => ({
-        timestamp: Date.now() - (100 - i) * 60000,
-        open: 0.001 + Math.random() * 0.0001,
-        high: 0.001 + Math.random() * 0.0001,
-        low: 0.001 + Math.random() * 0.0001,
-        close: 0.001 + Math.random() * 0.0001,
-        volume: Math.random() * 1000,
+        t: Date.now() - (100 - i) * 60000,
+        o: 0.001 + Math.random() * 0.0001,
+        h: 0.001 + Math.random() * 0.0001 + 0.00001,
+        l: 0.001 + Math.random() * 0.0001 - 0.00001,
+        c: 0.001 + Math.random() * 0.0001,
+        v: Math.random() * 1000,
       }));
 
       const updated = await cacheOhlcData(sess.id, mockOhlc);
@@ -277,19 +277,19 @@ export default function ReplayPage() {
                       </p>
                       <div className="text-center">
                         <p className="text-sm text-zinc-400">
-                          O: {session.ohlcCache[currentFrame].open.toFixed(6)}
+                          O: {session.ohlcCache[currentFrame].o.toFixed(6)}
                         </p>
                         <p className="text-sm text-zinc-400">
-                          H: {session.ohlcCache[currentFrame].high.toFixed(6)}
+                          H: {session.ohlcCache[currentFrame].h.toFixed(6)}
                         </p>
                         <p className="text-sm text-zinc-400">
-                          L: {session.ohlcCache[currentFrame].low.toFixed(6)}
+                          L: {session.ohlcCache[currentFrame].l.toFixed(6)}
                         </p>
                         <p className="text-lg font-bold text-zinc-200">
-                          C: {session.ohlcCache[currentFrame].close.toFixed(6)}
+                          C: {session.ohlcCache[currentFrame].c.toFixed(6)}
                         </p>
                         <p className="mt-2 text-xs text-zinc-600">
-                          Vol: {session.ohlcCache[currentFrame].volume.toFixed(2)}
+                          Vol: {session.ohlcCache[currentFrame].v?.toFixed(2) || 'N/A'}
                         </p>
                       </div>
                       <p className="mt-4 text-xs text-zinc-700">

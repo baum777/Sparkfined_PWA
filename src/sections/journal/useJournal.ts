@@ -47,6 +47,7 @@ export function useJournal() {
       setup: partial.setup || "custom",
       emotion: partial.emotion || "uncertain",
       status: partial.status || "active",
+      timestamp: partial.timestamp || Date.now(),
       ...partial,
     });
     setEntries((s) => [entry, ...s]);

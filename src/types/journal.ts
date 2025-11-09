@@ -137,30 +137,25 @@ export type GrokTweet = {
 
 export type ReplaySession = {
   id: string;
+  name?: string;                 // User-friendly name
   journalEntryId?: string;       // Optional Link to Journal
   
-  // Context
-  ticker: string;
-  address: string;
-  timeframe: Timeframe;
-  
   // Replay-Data
-  chartState: ChartState;        // Chart state at replay time
-  ohlcData?: OhlcPoint[];        // Optional: Cached OHLC (for offline)
+  ohlcCache?: OhlcPoint[];       // Cached OHLC for playback (offline-first)
   
   // User-Actions during Replay
-  notes?: string;                // Learnings, Observations
-  bookmarks: ReplayBookmark[];
+  bookmarks?: ReplayBookmark[];  // Bookmarked moments
   
   // Metadata
   createdAt: number;
-  duration?: number;             // How long replay lasted (seconds)
+  updatedAt?: number;
 };
 
 export type ReplayBookmark = {
-  timestamp: number;             // Bar-Time
-  label: string;
-  note?: string;
+  id: string;                    // UUID
+  frame: number;                 // Frame index in ohlcCache
+  timestamp: number;             // Unix ms when bookmark was created
+  note?: string;                 // User note
 };
 
 export type OhlcPoint = {
@@ -222,14 +217,30 @@ export type JournalQueryOptions = {
 // ============================================================================
 
 export type PatternStats = {
-  totalEntries: number;
+  totalTrades: number;
   winRate: number;               // 0-100
-  avgHoldTime: number;           // seconds
-  avgMcap: number;               // USD
   avgPnl: number;                // USD
-  totalPnl: number;              // USD
-  emotionBreakdown: Record<EmotionTag, number>;
-  setupBreakdown: Record<SetupTag, number>;
+  avgTimeToExit: number;         // milliseconds
+  bySetup: SetupStats[];
+  byEmotion: EmotionStats[];
+};
+
+export type SetupStats = {
+  setup: SetupTag;
+  totalTrades: number;
+  winCount: number;
+  lossCount: number;
+  avgPnl: number;
+  totalPnl: number;
+};
+
+export type EmotionStats = {
+  emotion: EmotionTag;
+  totalTrades: number;
+  winCount: number;
+  lossCount: number;
+  avgPnl: number;
+  totalPnl: number;
 };
 
 // ============================================================================

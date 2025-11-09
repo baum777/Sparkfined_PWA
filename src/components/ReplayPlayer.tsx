@@ -56,24 +56,24 @@ export default function ReplayPlayer({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // Find transaction markers (buys/sells) for timeline
-  const transactionMarkers = React.useMemo(() => {
-    if (!session.ohlcCache) return [];
-    
-    // Calculate frame positions for transactions
-    return session.ohlcCache
-      .map((point, idx) => {
-        const hasBuy = point.volume > 0; // Simplified - in reality, check transaction data
-        const hasSell = point.volume < 0;
-        if (!hasBuy && !hasSell) return null;
-        return {
-          frame: idx,
-          type: hasBuy ? "buy" : "sell",
-          position: (idx / totalFrames) * 100,
-        };
-      })
-      .filter(Boolean) as Array<{ frame: number; type: string; position: number }>;
-  }, [session.ohlcCache, totalFrames]);
+    // Find transaction markers (buys/sells) for timeline
+    const transactionMarkers = React.useMemo(() => {
+      if (!session.ohlcCache) return [];
+      
+      // Calculate frame positions for transactions
+      return session.ohlcCache
+        .map((point, idx) => {
+          const hasBuy = (point.v || 0) > 0; // Simplified - in reality, check transaction data
+          const hasSell = (point.v || 0) < 0;
+          if (!hasBuy && !hasSell) return null;
+          return {
+            frame: idx,
+            type: hasBuy ? "buy" : "sell",
+            position: (idx / totalFrames) * 100,
+          };
+        })
+        .filter(Boolean) as Array<{ frame: number; type: string; position: number }>;
+    }, [session.ohlcCache, totalFrames]);
 
   // Bookmark markers for timeline
   const bookmarkMarkers = React.useMemo(() => {
