@@ -13,7 +13,7 @@
 import React, { useState } from 'react';
 import { X, BookOpen, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { MoodState, TradeJournalEntry, EmotionalState } from './types';
-import { saveJournalEntry } from '../../lib/storage/localRitualStore';
+import { saveJournalEntry } from '../../lib/storage/ritualStore';
 import { emitRitualEvent, RitualEvents } from '../../lib/telemetry/emitEvent';
 import { categorizePnL } from './types';
 

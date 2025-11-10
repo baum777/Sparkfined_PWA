@@ -12,7 +12,7 @@
 import React, { useState } from 'react';
 import { X, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
 import type { PreTradeChecklist } from './types';
-import { savePreTradeChecklist } from '../../lib/storage/localRitualStore';
+import { savePreTradeChecklist } from '../../lib/storage/ritualStore';
 import { emitRitualEvent, RitualEvents } from '../../lib/telemetry/emitEvent';
 
 interface PreTradeChecklistModalProps {

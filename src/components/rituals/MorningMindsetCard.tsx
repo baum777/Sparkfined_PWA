@@ -12,7 +12,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, Target, Flame } from 'lucide-react';
 import type { DailyRitual, MoodState } from './types';
-import { getTodaysRitual, saveDailyRitual, markRitualComplete } from '../../lib/storage/localRitualStore';
+import { getTodaysRitual, saveDailyRitual, markRitualComplete } from '../../lib/storage/ritualStore';
 import { emitRitualEvent, RitualEvents } from '../../lib/telemetry/emitEvent';
 
 const MOOD_OPTIONS: { value: MoodState; label: string; emoji: string }[] = [
@@ -37,8 +37,8 @@ export function MorningMindsetCard({ onComplete }: MorningMindsetCardProps) {
     loadTodaysRitual();
   }, []);
 
-  const loadTodaysRitual = () => {
-    const today = getTodaysRitual();
+  const loadTodaysRitual = async () => {
+    const today = await getTodaysRitual();
     if (today) {
       setRitual(today);
       setGoal(today.goal);
@@ -74,10 +74,10 @@ export function MorningMindsetCard({ onComplete }: MorningMindsetCardProps) {
     }
   };
 
-  const handleMarkComplete = () => {
+  const handleMarkComplete = async () => {
     if (!ritual) return;
 
-    const completed = markRitualComplete(ritual.date);
+    const completed = await markRitualComplete(ritual.date);
     if (completed) {
       setRitual(completed);
 

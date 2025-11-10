@@ -27,7 +27,7 @@ import {
   getJournalEntries,
   getRitualStats,
   clearAllRitualData,
-} from '../../lib/storage/localRitualStore';
+} from '../../lib/storage/ritualStore';
 
 export default function DemoRitualsPage() {
   const [isPreTradeOpen, setIsPreTradeOpen] = useState(false);
