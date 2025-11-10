@@ -7,9 +7,11 @@
  * - Option to skip
  */
 
-import { useState } from 'react';
+import { useRef, useId, useState } from 'react';
+import type { MouseEvent } from 'react';
 import { Zap, GraduationCap, TrendingUp, Rocket, X } from 'lucide-react';
 import { useOnboardingStore, UserLevel } from '@/store/onboardingStore';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface WelcomeModalProps {
   onClose: () => void;
@@ -19,6 +21,19 @@ interface WelcomeModalProps {
 export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) {
   const [selectedLevel, setSelectedLevel] = useState<UserLevel>(null);
   const { setUserLevel, markVisited } = useOnboardingStore();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const headingId = useId();
+  const modalRef = useFocusTrap<HTMLDivElement>({
+    isActive: true,
+    initialFocusRef: closeButtonRef,
+    onEscape: onClose,
+  });
+
+  const handleOverlayMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      handleSkip();
+    }
+  };
 
   const handleContinue = () => {
     if (selectedLevel) {
@@ -58,15 +73,23 @@ export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) 
   ];
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="welcome-title"
+      aria-labelledby={headingId}
+      onMouseDown={handleOverlayMouseDown}
+      data-testid="modal-overlay"
     >
-      <div className="relative w-full max-w-2xl mx-4 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl animate-slide-up">
+      <div
+        ref={modalRef}
+        tabIndex={-1}
+        className="relative w-full max-w-2xl mx-4 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl animate-slide-up focus:outline-none"
+        data-testid="modal-content"
+      >
         {/* Close Button */}
         <button
+          ref={closeButtonRef}
           onClick={handleSkip}
           className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-100 transition-colors p-2 rounded-lg hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
           aria-label="Close"
@@ -79,7 +102,7 @@ export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) 
           <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-2xl">
             <Zap className="text-emerald-500" size={32} />
           </div>
-          <h2 id="welcome-title" className="text-3xl font-bold mb-2">
+          <h2 id={headingId} className="text-3xl font-bold mb-2">
             Welcome to Sparkfined
           </h2>
           <p className="text-zinc-400 text-lg">

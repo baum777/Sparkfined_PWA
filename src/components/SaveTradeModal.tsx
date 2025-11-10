@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useId } from 'react'
+import type { MouseEvent } from 'react'
 import { saveTrade } from '@/lib/db'
 import type { TradeEntry } from '@/lib/db'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 interface SaveTradeModalProps {
   isOpen: boolean
@@ -22,6 +24,19 @@ export default function SaveTradeModal({
   const [status, setStatus] = useState<'Taken' | 'Planned'>('Taken')
   const [notes, setNotes] = useState('')
   const [isSaving, setIsSaving] = useState(false)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const headingId = useId()
+  const modalRef = useFocusTrap<HTMLDivElement>({
+    isActive: isOpen,
+    initialFocusRef: closeButtonRef,
+    onEscape: onClose,
+  })
+
+  const handleOverlayMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      onClose()
+    }
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -70,14 +85,27 @@ export default function SaveTradeModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
-      <div className="bg-surface rounded-lg border border-border shadow-card-elevated max-w-md w-full max-h-[90vh] overflow-y-auto animate-slide-up">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={headingId}
+      onMouseDown={handleOverlayMouseDown}
+      data-testid="modal-overlay"
+    >
+      <div
+        ref={modalRef}
+        tabIndex={-1}
+        className="bg-surface rounded-lg border border-border shadow-card-elevated max-w-md w-full max-h-[90vh] overflow-y-auto animate-slide-up focus:outline-none"
+        data-testid="modal-content"
+      >
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-display font-bold text-text-primary">
+            <h2 id={headingId} className="text-2xl font-display font-bold text-text-primary">
               Mark Entry
             </h2>
             <button
+              ref={closeButtonRef}
               onClick={onClose}
               className="text-text-tertiary hover:text-text-primary transition-colors duration-180 text-2xl leading-none w-8 h-8 flex items-center justify-center rounded hover:bg-surface-hover"
               aria-label="Close"
