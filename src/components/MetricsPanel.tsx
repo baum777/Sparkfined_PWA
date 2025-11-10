@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, useId } from 'react'
+import type { MouseEvent } from 'react'
 import {
   getAllMetrics,
   getAllFeedback,
@@ -10,6 +11,7 @@ import {
   type MetricEntry,
   type FeedbackEntry,
 } from '@/lib/db'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
 
 interface MetricsPanelProps {
   isOpen: boolean
@@ -21,6 +23,18 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
   const [feedback, setFeedback] = useState<FeedbackEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const headingId = useId()
+  const modalRef = useFocusTrap<HTMLDivElement>({
+    isActive: isOpen,
+    initialFocusRef: closeButtonRef,
+    onEscape: onClose,
+  })
+  const handleOverlayMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      onClose()
+    }
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -83,14 +97,27 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
   const totalEvents = metrics.reduce((sum, m) => sum + m.count, 0)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-h-[90vh] flex flex-col">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={headingId}
+      onMouseDown={handleOverlayMouseDown}
+      data-testid="modal-overlay"
+    >
+      <div
+        ref={modalRef}
+        tabIndex={-1}
+        className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-h-[90vh] flex flex-col focus:outline-none"
+        data-testid="modal-content"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <h2 id={headingId} className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             📊 Usage Metrics & Feedback
           </h2>
           <button
+            ref={closeButtonRef}
             onClick={onClose}
             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
           >

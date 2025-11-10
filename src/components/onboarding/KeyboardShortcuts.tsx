@@ -5,7 +5,9 @@
  */
 
 import { X } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef, useId } from 'react';
+import type { MouseEvent } from 'react';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface KeyboardShortcutsProps {
   isOpen: boolean;
@@ -58,22 +60,39 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
 
   if (!isOpen) return null;
 
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const headingId = useId();
+  const modalRef = useFocusTrap<HTMLDivElement>({
+    isActive: isOpen,
+    initialFocusRef: closeButtonRef,
+    onEscape: onClose,
+  });
+  const handleOverlayMouseDown = (event: MouseEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="shortcuts-title"
-      onClick={onClose}
+      aria-labelledby={headingId}
+      onMouseDown={handleOverlayMouseDown}
+      data-testid="modal-overlay"
     >
-      <div 
+      <div
+        ref={modalRef}
+        tabIndex={-1}
         className="relative w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl animate-slide-up"
-        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+        data-testid="modal-content"
       >
         {/* Header */}
         <div className="sticky top-0 bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
           <div>
-            <h2 id="shortcuts-title" className="text-2xl font-bold">
+            <h2 id={headingId} className="text-2xl font-bold">
               ⌨️ Keyboard Shortcuts
             </h2>
             <p className="text-sm text-zinc-400 mt-1">
@@ -81,6 +100,7 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
             </p>
           </div>
           <button
+            ref={closeButtonRef}
             onClick={onClose}
             className="text-zinc-400 hover:text-zinc-100 transition-colors p-2 rounded-lg hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
             aria-label="Close"
