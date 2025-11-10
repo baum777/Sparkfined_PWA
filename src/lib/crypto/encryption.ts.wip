@@ -1,0 +1,310 @@
+/**
+ * AES-GCM Encryption Utilities
+ * Privacy-first encryption for sensitive ritual data
+ *
+ * Security Notes:
+ * - Uses Web Crypto API (standard, secure)
+ * - AES-GCM with 256-bit keys
+ * - Random IV for each encryption
+ * - Key derivation from user password via PBKDF2
+ */
+
+/**
+ * Encrypted data structure
+ */
+export interface EncryptedData {
+  /** Base64-encoded ciphertext */
+  ciphertext: string;
+  /** Base64-encoded initialization vector */
+  iv: string;
+  /** Base64-encoded salt (for key derivation) */
+  salt: string;
+  /** Algorithm identifier */
+  algorithm: 'AES-GCM';
+  /** Version for future migrations */
+  version: number;
+}
+
+/**
+ * Generate a random salt for key derivation
+ */
+function generateSalt(): Uint8Array {
+  return crypto.getRandomValues(new Uint8Array(16));
+}
+
+/**
+ * Generate a random IV for AES-GCM
+ */
+function generateIV(): Uint8Array {
+  return crypto.getRandomValues(new Uint8Array(12)); // 96 bits for GCM
+}
+
+/**
+ * Derive encryption key from password using PBKDF2
+ */
+async function deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey> {
+  const encoder = new TextEncoder();
+  const passwordBuffer = encoder.encode(password);
+
+  // Import password as key material
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    passwordBuffer,
+    'PBKDF2',
+    false,
+    ['deriveKey']
+  );
+
+  // Derive AES key
+  return await crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: salt as Uint8Array,
+      iterations: 100000, // OWASP recommendation
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    {
+      name: 'AES-GCM',
+      length: 256,
+    },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
+/**
+ * Convert ArrayBuffer to Base64 string
+ */
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]!);
+  }
+  return btoa(binary);
+}
+
+/**
+ * Convert Base64 string to ArrayBuffer
+ */
+function base64ToArrayBuffer(base64: string): ArrayBuffer {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+/**
+ * Encrypt data with password
+ *
+ * @param data - Data to encrypt (will be JSON.stringified)
+ * @param password - User password for key derivation
+ * @returns Encrypted data with IV and salt
+ */
+export async function encrypt<T>(data: T, password: string): Promise<EncryptedData> {
+  const encoder = new TextEncoder();
+
+  // Generate random salt and IV
+  const salt = generateSalt();
+  const iv = generateIV();
+
+  // Derive encryption key from password
+  const key = await deriveKey(password, salt);
+
+  // Convert data to string and encode
+  const plaintext = JSON.stringify(data);
+  const plaintextBuffer = encoder.encode(plaintext);
+
+  // Encrypt
+  const ciphertextBuffer = await crypto.subtle.encrypt(
+    {
+      name: 'AES-GCM',
+      iv: iv as Uint8Array,
+    },
+    key,
+    plaintextBuffer
+  );
+
+  return {
+    ciphertext: arrayBufferToBase64(ciphertextBuffer),
+    iv: arrayBufferToBase64(iv),
+    salt: arrayBufferToBase64(salt),
+    algorithm: 'AES-GCM',
+    version: 1,
+  };
+}
+
+/**
+ * Decrypt data with password
+ *
+ * @param encryptedData - Encrypted data structure
+ * @param password - User password for key derivation
+ * @returns Decrypted data (parsed from JSON)
+ */
+export async function decrypt<T>(
+  encryptedData: EncryptedData,
+  password: string
+): Promise<T> {
+  const decoder = new TextDecoder();
+
+  // Convert Base64 back to ArrayBuffers
+  const ciphertextBuffer = base64ToArrayBuffer(encryptedData.ciphertext);
+  const iv = new Uint8Array(base64ToArrayBuffer(encryptedData.iv));
+  const salt = new Uint8Array(base64ToArrayBuffer(encryptedData.salt));
+
+  // Derive encryption key from password
+  const key = await deriveKey(password, salt);
+
+  // Decrypt
+  const plaintextBuffer = await crypto.subtle.decrypt(
+    {
+      name: 'AES-GCM',
+      iv: iv as Uint8Array,
+    },
+    key,
+    ciphertextBuffer
+  );
+
+  // Decode and parse
+  const plaintext = decoder.decode(plaintextBuffer);
+  return JSON.parse(plaintext) as T;
+}
+
+/**
+ * Generate a secure random password
+ * Useful for auto-generated device-specific keys
+ */
+export function generatePassword(length: number = 32): string {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  const randomValues = crypto.getRandomValues(new Uint8Array(length));
+
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += charset[randomValues[i]! % charset.length];
+  }
+
+  return password;
+}
+
+/**
+ * Encrypt-at-rest wrapper for sensitive fields
+ *
+ * Example usage:
+ * ```ts
+ * const ritual = {
+ *   date: '2025-11-10',
+ *   goal: await encryptField(rawGoal, userKey),
+ *   mood: 'calm',
+ * };
+ * ```
+ */
+export async function encryptField(
+  value: string,
+  password: string
+): Promise<EncryptedData> {
+  return await encrypt(value, password);
+}
+
+/**
+ * Decrypt-at-rest wrapper for sensitive fields
+ */
+export async function decryptField(
+  encryptedData: EncryptedData,
+  password: string
+): Promise<string> {
+  return await decrypt<string>(encryptedData, password);
+}
+
+/**
+ * Get or create device-specific encryption key
+ * Stored in localStorage (not ideal, but acceptable for MVP)
+ * Future: Use IndexedDB + Web Crypto API key storage
+ */
+export function getDeviceKey(): string {
+  const KEY_STORAGE_KEY = 'sparkfined:device_key';
+
+  // Try to get existing key
+  let key = localStorage.getItem(KEY_STORAGE_KEY);
+
+  if (!key) {
+    // Generate new key
+    key = generatePassword(64);
+    localStorage.setItem(KEY_STORAGE_KEY, key);
+
+    if (import.meta.env.DEV) {
+      console.log('[Encryption] Generated new device key');
+    }
+  }
+
+  return key;
+}
+
+/**
+ * Check if encryption is supported in current browser
+ */
+export function isEncryptionSupported(): boolean {
+  return (
+    typeof crypto !== 'undefined' &&
+    typeof crypto.subtle !== 'undefined' &&
+    typeof crypto.subtle.encrypt === 'function'
+  );
+}
+
+/**
+ * Encryption status and config
+ */
+export interface EncryptionConfig {
+  enabled: boolean;
+  supported: boolean;
+  algorithm: 'AES-GCM' | 'none';
+  keyDerivation: 'PBKDF2' | 'none';
+  iterations: number;
+}
+
+/**
+ * Get current encryption configuration
+ */
+export function getEncryptionConfig(): EncryptionConfig {
+  const supported = isEncryptionSupported();
+
+  return {
+    enabled: supported, // Auto-enable if supported
+    supported,
+    algorithm: supported ? 'AES-GCM' : 'none',
+    keyDerivation: supported ? 'PBKDF2' : 'none',
+    iterations: 100000,
+  };
+}
+
+/**
+ * Test encryption/decryption roundtrip
+ * Useful for debugging and verification
+ */
+export async function testEncryption(): Promise<boolean> {
+  if (!isEncryptionSupported()) {
+    console.warn('[Encryption] Web Crypto API not supported');
+    return false;
+  }
+
+  try {
+    const testData = { message: 'Hello, World!', timestamp: Date.now() };
+    const password = 'test_password_123';
+
+    const encrypted = await encrypt(testData, password);
+    const decrypted = await decrypt<typeof testData>(encrypted, password);
+
+    const success = JSON.stringify(testData) === JSON.stringify(decrypted);
+
+    if (import.meta.env.DEV) {
+      console.log('[Encryption] Test', success ? 'PASSED' : 'FAILED');
+    }
+
+    return success;
+  } catch (error) {
+    console.error('[Encryption] Test failed:', error);
+    return false;
+  }
+}
