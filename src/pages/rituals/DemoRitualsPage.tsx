@@ -35,13 +35,30 @@ export default function DemoRitualsPage() {
   const [recentRituals, setRecentRituals] = useState<DailyRitual[]>([]);
   const [recentChecklists, setRecentChecklists] = useState<PreTradeChecklist[]>([]);
   const [recentJournals, setRecentJournals] = useState<TradeJournalEntry[]>([]);
-  const [stats, setStats] = useState(getRitualStats());
+  const [stats, setStats] = useState({
+    totalDays: 0,
+    completedDays: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+    completionRate: 0,
+  });
 
-  const refreshData = () => {
-    setRecentRituals(getRitualHistory(7));
-    setRecentChecklists(getRecentPreTradeChecklists(5));
-    setRecentJournals(getJournalEntries(5));
-    setStats(getRitualStats());
+  const refreshData = async () => {
+    try {
+      const [rituals, checklists, journals, newStats] = await Promise.all([
+        getRitualHistory(7),
+        getRecentPreTradeChecklists(5),
+        getJournalEntries(5),
+        getRitualStats(),
+      ]);
+
+      setRecentRituals(rituals);
+      setRecentChecklists(checklists);
+      setRecentJournals(journals);
+      setStats(newStats);
+    } catch (error) {
+      console.error('[DemoRitualsPage] Failed to refresh data:', error);
+    }
   };
 
   React.useEffect(() => {
@@ -63,10 +80,10 @@ export default function DemoRitualsPage() {
     refreshData();
   };
 
-  const handleClearData = () => {
+  const handleClearData = async () => {
     if (confirm('⚠️ Alle Ritual-Daten löschen? (Nur in DEV Mode)')) {
-      clearAllRitualData();
-      refreshData();
+      await clearAllRitualData();
+      await refreshData();
     }
   };
 

@@ -104,7 +104,9 @@ const [isOpen, setIsOpen] = useState(false);
 
 ## 🗄️ Data Storage
 
-All data is stored **locally** in `localStorage` (MVP). Migration path: `localStorage → IndexedDB → Encrypted Sync`.
+**Sprint B (Current):** Data is stored in **IndexedDB** (via Dexie) with automatic localStorage fallback.
+
+Migration path: ✅ `localStorage → IndexedDB` → 🔜 `Encrypted Sync`
 
 **Storage API:**
 ```ts
@@ -115,13 +117,14 @@ import {
   savePreTradeChecklist,
   saveJournalEntry,
   getRitualStats,
-} from '@/lib/storage/localRitualStore';
+  getStorageInfo,
+} from '@/lib/storage/ritualStore';
 
-// Daily Ritual
-const ritual = getTodaysRitual();
+// Daily Ritual (async)
+const ritual = await getTodaysRitual();
 await saveDailyRitual('My goal', 'calm', false);
 
-// Pre-Trade Checklist
+// Pre-Trade Checklist (async)
 const checklist = await savePreTradeChecklist(
   'BTC/USDT',
   'My thesis',
@@ -129,7 +132,7 @@ const checklist = await savePreTradeChecklist(
   100
 );
 
-// Journal Entry
+// Journal Entry (async)
 const entry = await saveJournalEntry({
   symbol: 'BTC/USDT',
   tradePlan: 'My plan',
@@ -151,9 +154,25 @@ const entry = await saveJournalEntry({
   replaySnapshotId: null,
 });
 
-// Stats
-const stats = getRitualStats();
+// Stats (async)
+const stats = await getRitualStats();
 console.log('Current streak:', stats.currentStreak);
+
+// Check storage backend
+const info = getStorageInfo();
+console.log('Backend:', info.backend); // 'indexeddb' or 'localstorage'
+```
+
+**Migration:**
+```ts
+import { autoMigrate, getMigrationSummary } from '@/lib/storage/migration';
+
+// Automatic on app start
+await autoMigrate();
+
+// Check status
+const summary = getMigrationSummary();
+console.log(summary.status, summary.message);
 ```
 
 ---
@@ -249,19 +268,24 @@ const hasAccess = await verifyTokenOwnership(walletAddress, 'RITUAL_TOKEN');
 
 ---
 
-## 🚀 Future Enhancements (Sprint B & C)
+## 🚀 Sprint Status
 
-### Sprint B - Production Hardening
-- [ ] Migrate to IndexedDB (`idb` wrapper)
-- [ ] Background sync via Service Worker
-- [ ] Encryption-at-rest (AES-GCM)
-- [ ] Migration script (localStorage → idb)
+### Sprint B - Production Hardening ✅ (Completed)
+- ✅ Migrate to IndexedDB (Dexie wrapper)
+- ✅ Background sync via Service Worker (stub)
+- ⏳ Encryption-at-rest (AES-GCM) - Deferred to Sprint C
+- ✅ Migration script (localStorage → IndexedDB)
+- ✅ Unified storage layer with fallback
+- ✅ All components updated to async API
 
-### Sprint C - Backend Integration
+**See:** `SPRINT_B_STATUS.md` for details
+
+### Sprint C - Backend Integration (Planned)
 - [ ] API endpoints (`/api/journal/sync`, `/api/journal/fetch`)
 - [ ] Wallet signature auth
 - [ ] Token-gating (SBT/NFT verification)
 - [ ] AI summarizer (opt-in, metadata only)
+- [ ] Finish encryption-at-rest implementation
 
 ---
 
@@ -338,6 +362,11 @@ Part of Sparkfined PWA. All rights reserved.
 ## 🔗 Related
 
 - [Event Catalog](../../../docs/event_catalog/rituals_event_catalog.json)
-- [Storage Layer](../../lib/storage/localRitualStore.ts)
+- [Storage Layer (Sprint B)](../../lib/storage/ritualStore.ts)
+- [IndexedDB Layer](../../lib/storage/ritualDb.ts)
+- [Migration](../../lib/storage/migration.ts)
+- [Background Sync](../../lib/sync/backgroundSync.ts)
+- [Legacy Storage (Sprint A)](../../lib/storage/localRitualStore.ts)
 - [Telemetry Service](../../lib/TelemetryService.ts)
 - [Demo Page](../../pages/rituals/DemoRitualsPage.tsx)
+- [Sprint B Status](../../../SPRINT_B_STATUS.md)

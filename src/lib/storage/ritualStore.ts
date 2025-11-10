@@ -316,16 +316,6 @@ export async function getUnsyncedCount(): Promise<{
     return legacyStore.getUnsyncedCount();
   }
 }
-  rituals: number;
-  pretrade: number;
-  journal: number;
-}> {
-  if (currentBackend === 'indexeddb') {
-    return await dbGetUnsyncedCount();
-  } else {
-    return legacyStore.getUnsyncedCount();
-  }
-}
 
 // ===== Clear Data =====
 
