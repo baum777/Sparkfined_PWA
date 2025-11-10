@@ -1,0 +1,212 @@
+# Prometheus Alert Rules - Crosshair Telemetry
+# Place this file in your Prometheus config directory
+# Reference: https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+
+groups:
+  - name: crosshair_telemetry
+    interval: 60s
+    rules:
+      # ============================================
+      # CRITICAL ALERTS (PagerDuty)
+      # ============================================
+
+      - alert: CrosshairAggDropRateCritical
+        expr: |
+          (
+            rate(crosshair_agg_dropped_total[5m])
+            /
+            rate(crosshair_agg_incoming_total[5m])
+          ) > 0.10
+        for: 5m
+        labels:
+          severity: critical
+          component: analytics
+          service: crosshair-telemetry
+        annotations:
+          summary: "Crosshair aggregation drop rate > 10%"
+          description: "{{ $value | humanizePercentage }} of events are being dropped. Check server endpoint health and analytics provider API."
+          action: |
+            1. Check /api/analytics/agg endpoint logs
+            2. Verify analytics provider (Mixpanel/Amplitude/Segment) status
+            3. Check S3 write permissions if configured
+            4. Review rate limit settings
+          runbook: "https://docs.sparkfined.com/runbooks/crosshair-drop-rate"
+
+      - alert: CrosshairAggForwardFailure
+        expr: |
+          rate(crosshair_agg_dropped_total[10m]) > 0
+          and
+          rate(crosshair_agg_forwarded_total[10m]) == 0
+        for: 5m
+        labels:
+          severity: critical
+          component: analytics
+          service: crosshair-telemetry
+        annotations:
+          summary: "Crosshair aggregation forwarding completely failed"
+          description: "No events forwarded in last 10 minutes, but drops detected. Analytics pipeline may be down."
+          action: |
+            1. Check analytics provider API status
+            2. Verify ANALYTICS_PROVIDER env var is set correctly
+            3. Check API keys/tokens validity
+            4. Review server logs for adapter errors
+          runbook: "https://docs.sparkfined.com/runbooks/analytics-forward-failure"
+
+      # ============================================
+      # WARNING ALERTS (Slack)
+      # ============================================
+
+      - alert: CrosshairAggDropRateHigh
+        expr: |
+          (
+            rate(crosshair_agg_dropped_total[5m])
+            /
+            rate(crosshair_agg_incoming_total[5m])
+          ) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+          component: analytics
+          service: crosshair-telemetry
+        annotations:
+          summary: "Crosshair aggregation drop rate > 5%"
+          description: "{{ $value | humanizePercentage }} of events are being dropped. Monitor closely."
+          action: "Check server endpoint logs and analytics provider health"
+
+      - alert: CrosshairAggIncomingSpike
+        expr: |
+          rate(crosshair_agg_incoming_total[5m])
+          >
+          2 * avg_over_time(rate(crosshair_agg_incoming_total[1h])[1h:5m] offset 1h)
+        for: 10m
+        labels:
+          severity: warning
+          component: analytics
+          service: crosshair-telemetry
+        annotations:
+          summary: "Crosshair aggregation incoming rate 2x normal"
+          description: "Current rate: {{ $value | humanize }} req/sec. Consider increasing window_ms to reduce volume."
+          action: |
+            1. Monitor cost impact (analytics provider billing)
+            2. Consider sending X-AGG-WINDOW-OVERRIDE: 10000 to clients
+            3. Check if spike is legitimate (viral traffic) or bot activity
+          runbook: "https://docs.sparkfined.com/runbooks/traffic-spike"
+
+      - alert: CrosshairAggValidationErrors
+        expr: |
+          rate(crosshair_agg_validation_errors_total[5m]) > 1
+        for: 5m
+        labels:
+          severity: warning
+          component: analytics
+          service: crosshair-telemetry
+        annotations:
+          summary: "Crosshair aggregation validation errors detected"
+          description: "{{ $value | humanize }} validation errors/sec. Client may be sending malformed payloads."
+          action: |
+            1. Check server logs for Zod validation error details
+            2. Verify client version (VITE_APP_VERSION) is up-to-date
+            3. Check for mismatched schema versions
+            4. Review recent client-side changes
+
+      - alert: CrosshairAggRateLimitTriggered
+        expr: |
+          rate(crosshair_agg_rate_limited_total[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: analytics
+          service: crosshair-telemetry
+        annotations:
+          summary: "Crosshair aggregation rate limiting triggered"
+          description: "{{ $value | humanize }} rate-limited requests/sec. Possible bot or misconfigured client."
+          action: |
+            1. Check IP addresses being rate-limited
+            2. Verify ANALYTICS_RATE_LIMIT setting (default 100/min)
+            3. Consider IP allowlist for legitimate high-volume users
+            4. Check for DDOS or abuse patterns
+
+      # ============================================
+      # INFO ALERTS (Monitoring)
+      # ============================================
+
+      - alert: CrosshairAggCostThreshold
+        expr: |
+          (
+            rate(crosshair_agg_forwarded_total[1h]) * 3600 * 24 * 30 * 0.001
+          ) > 50
+        for: 1h
+        labels:
+          severity: info
+          component: analytics
+          service: crosshair-telemetry
+        annotations:
+          summary: "Crosshair aggregation projected monthly cost > $50"
+          description: "Projected cost: ${{ $value | humanize }}/month at current rate."
+          action: |
+            1. Review if traffic increase is expected
+            2. Consider adjusting sampling or window size
+            3. Monitor analytics provider billing
+            4. Verify no duplicate events being sent
+
+      - alert: CrosshairAggNoTrafficLow
+        expr: |
+          rate(crosshair_agg_incoming_total[15m]) < 0.1
+        for: 30m
+        labels:
+          severity: info
+          component: analytics
+          service: crosshair-telemetry
+        annotations:
+          summary: "Crosshair aggregation traffic unusually low"
+          description: "< 6 requests/hour. Check if analytics collection is working."
+          action: |
+            1. Verify clients are sending events (check dev console)
+            2. Check network connectivity for users
+            3. Verify /api/analytics/agg endpoint is accessible
+            4. Review recent deployments or feature flags
+
+      # ============================================
+      # SLO/SLA TRACKING
+      # ============================================
+
+      - alert: CrosshairAggSLOViolation
+        expr: |
+          (
+            sum(rate(crosshair_agg_forwarded_total[5m]))
+            /
+            sum(rate(crosshair_agg_incoming_total[5m]))
+          ) < 0.99
+        for: 15m
+        labels:
+          severity: warning
+          component: analytics
+          service: crosshair-telemetry
+          slo: "99% success rate"
+        annotations:
+          summary: "Crosshair aggregation SLO violated (99% success)"
+          description: "Success rate: {{ $value | humanizePercentage }}. Target: 99%."
+          action: "Review drop rate alerts and analytics provider health"
+
+# ============================================
+# RECORDING RULES (for faster queries)
+# ============================================
+
+  - name: crosshair_telemetry_recording
+    interval: 60s
+    rules:
+      - record: crosshair_agg:success_rate:5m
+        expr: |
+          sum(rate(crosshair_agg_forwarded_total[5m]))
+          /
+          sum(rate(crosshair_agg_incoming_total[5m]))
+
+      - record: crosshair_agg:drop_rate:5m
+        expr: |
+          sum(rate(crosshair_agg_dropped_total[5m]))
+          /
+          sum(rate(crosshair_agg_incoming_total[5m]))
+
+      - record: crosshair_agg:cost_per_day_usd
+        expr: |
+          rate(crosshair_agg_forwarded_total[1h]) * 3600 * 24 * 0.001
