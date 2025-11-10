@@ -19,6 +19,7 @@ const NotificationsPage = lazy(() => import("../pages/NotificationsPage"));
 const SignalsPage = lazy(() => import("../pages/SignalsPage"));
 const LessonsPage = lazy(() => import("../pages/LessonsPage"));
 const IconShowcase = lazy(() => import("../pages/IconShowcase"));
+const DemoRitualsPage = lazy(() => import("../pages/rituals/DemoRitualsPage"));
 
 function Fallback() {
   return (
@@ -99,6 +100,7 @@ export default function RoutesRoot() {
                 <LessonsPage />
               </Layout>
             } />
+            <Route path="/rituals/demo" element={<DemoRitualsPage />} />
             <Route path="/icons" element={<IconShowcase />} />
             <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
             </Routes>

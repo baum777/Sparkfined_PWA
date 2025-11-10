@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "title": "Sparkfined Rituals Event Catalog",
+  "version": "1.0.0",
+  "description": "Privacy-first telemetry event catalog for rituals and trade journaling features",
+  "events": [
+    {
+      "name": "ritual.morning_open",
+      "description": "User opened the morning mindset ritual for the first time today",
+      "category": "ritual",
+      "privacy": "safe - no PII",
+      "payload": {
+        "date": {
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "description": "Date when ritual was opened",
+          "example": "2025-11-10"
+        }
+      },
+      "notes": "Emitted when MorningMindsetCard loads and no ritual exists for today"
+    },
+    {
+      "name": "ritual.goal_set",
+      "description": "User set their daily goal and mood",
+      "category": "ritual",
+      "privacy": "hash only - no raw text",
+      "payload": {
+        "date": {
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "description": "Date of the ritual",
+          "example": "2025-11-10"
+        },
+        "goalHash": {
+          "type": "string",
+          "description": "SHA-256 hash of the goal text (for privacy)",
+          "example": "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"
+        },
+        "mood": {
+          "type": "string",
+          "enum": ["calm", "neutral", "anxious", "stressed"],
+          "description": "User's current mood state",
+          "example": "calm"
+        },
+        "streak": {
+          "type": "number",
+          "description": "Current streak count",
+          "example": 5
+        }
+      },
+      "notes": "Never send raw goal text - only hash. Text stays local."
+    },
+    {
+      "name": "ritual.complete",
+      "description": "User marked their daily ritual as complete",
+      "category": "ritual",
+      "privacy": "safe - no PII",
+      "payload": {
+        "date": {
+          "type": "string",
+          "format": "YYYY-MM-DD",
+          "description": "Date of completion",
+          "example": "2025-11-10"
+        },
+        "streak": {
+          "type": "number",
+          "description": "Updated streak count after completion",
+          "example": 6
+        }
+      },
+      "notes": "Tracks ritual completion for achievement/gamification systems"
+    },
+    {
+      "name": "pretrade.open",
+      "description": "User opened the pre-trade checklist modal",
+      "category": "pretrade",
+      "privacy": "safe - no PII",
+      "payload": {
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol (optional)",
+          "example": "BTC/USDT",
+          "optional": true
+        }
+      },
+      "notes": "Tracks checklist usage to measure discipline adherence"
+    },
+    {
+      "name": "pretrade.submit",
+      "description": "User submitted a pre-trade checklist",
+      "category": "pretrade",
+      "privacy": "hash only - no raw thesis",
+      "payload": {
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol",
+          "example": "BTC/USDT"
+        },
+        "rr": {
+          "type": "number",
+          "description": "Risk/Reward ratio",
+          "example": 2.5
+        },
+        "riskAmount": {
+          "type": "number",
+          "description": "Risk amount in USD",
+          "example": 100
+        },
+        "thesisHash": {
+          "type": "string",
+          "description": "SHA-256 hash of thesis text",
+          "example": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "thesisLength": {
+          "type": "number",
+          "description": "Length of thesis text (for quality metrics)",
+          "example": 127
+        }
+      },
+      "notes": "Never send raw thesis - only hash and length. Full text stays local."
+    },
+    {
+      "name": "trade.exec",
+      "description": "User executed a trade (stub for future integration)",
+      "category": "trade",
+      "privacy": "metadata only",
+      "payload": {
+        "tradeId": {
+          "type": "string",
+          "description": "Unique trade ID",
+          "example": "trade_123456"
+        },
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol",
+          "example": "BTC/USDT"
+        },
+        "side": {
+          "type": "string",
+          "enum": ["long", "short"],
+          "description": "Trade direction",
+          "example": "long"
+        },
+        "size": {
+          "type": "number",
+          "description": "Position size",
+          "example": 0.01
+        }
+      },
+      "notes": "Future integration with execution layer"
+    },
+    {
+      "name": "posttrade.open",
+      "description": "User opened the post-trade review drawer",
+      "category": "posttrade",
+      "privacy": "safe - no PII",
+      "payload": {
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol (optional)",
+          "example": "BTC/USDT",
+          "optional": true
+        },
+        "tradeId": {
+          "type": "string",
+          "description": "Related trade ID (optional)",
+          "example": "trade_123456",
+          "optional": true
+        }
+      },
+      "notes": "Tracks journal usage to measure reflection habits"
+    },
+    {
+      "name": "journal.create",
+      "description": "User created a trade journal entry",
+      "category": "journal",
+      "privacy": "buckets only - no raw text or exact PnL",
+      "payload": {
+        "journalId": {
+          "type": "string",
+          "description": "Unique journal entry ID",
+          "example": "journal_123456"
+        },
+        "symbol": {
+          "type": "string",
+          "description": "Trading symbol",
+          "example": "BTC/USDT"
+        },
+        "pnlBucket": {
+          "type": "string",
+          "enum": ["large_win", "small_win", "breakeven", "small_loss", "large_loss"],
+          "description": "PnL categorized into privacy-preserving bucket",
+          "example": "small_win"
+        },
+        "emotions": {
+          "type": "string",
+          "description": "Comma-separated emotional states (before,during,after)",
+          "example": "calm,anxious,relieved"
+        }
+      },
+      "notes": "Never send exact PnL or raw notes - only buckets and emotion flags"
+    },
+    {
+      "name": "replay.attach",
+      "description": "User attached a replay snapshot to a journal entry",
+      "category": "journal",
+      "privacy": "safe - IDs only",
+      "payload": {
+        "journalId": {
+          "type": "string",
+          "description": "Journal entry ID",
+          "example": "journal_123456"
+        },
+        "snapshotId": {
+          "type": "string",
+          "description": "Replay snapshot ID",
+          "example": "snapshot_789012"
+        }
+      },
+      "notes": "Links replay data to journal entries for future review"
+    },
+    {
+      "name": "sync.error",
+      "description": "Error occurred during sync operation",
+      "category": "sync",
+      "privacy": "error type only - no sensitive data",
+      "payload": {
+        "type": {
+          "type": "string",
+          "enum": ["ritual", "pretrade", "journal", "replay"],
+          "description": "Type of data that failed to sync",
+          "example": "journal"
+        },
+        "reason": {
+          "type": "string",
+          "enum": ["network", "auth", "validation", "server", "unknown"],
+          "description": "Error category",
+          "example": "network"
+        }
+      },
+      "notes": "Helps track sync reliability without exposing user data"
+    }
+  ],
+  "privacy_guidelines": {
+    "principles": [
+      "Never send raw text (goals, thesis, notes) to telemetry",
+      "Use SHA-256 hashes for text content when needed",
+      "Categorize numeric values into buckets (e.g., PnL ranges)",
+      "Only send metadata and flags, not actual content",
+      "All telemetry is opt-in and can be disabled",
+      "Full data stays in local storage, sync is encrypted"
+    ],
+    "data_retention": {
+      "local": "Indefinite (user controlled)",
+      "telemetry": "Last 1000 events in-memory, cleared on reload",
+      "server": "Not implemented in MVP - future encrypted sync only"
+    }
+  },
+  "usage_examples": [
+    {
+      "scenario": "User sets morning goal",
+      "events": [
+        "ritual.morning_open",
+        "ritual.goal_set"
+      ],
+      "description": "User opens app, sees MorningMindsetCard, sets goal and mood"
+    },
+    {
+      "scenario": "Disciplined trade flow",
+      "events": [
+        "pretrade.open",
+        "pretrade.submit",
+        "trade.exec",
+        "posttrade.open",
+        "journal.create"
+      ],
+      "description": "Full flow: checklist → trade → review → journal"
+    },
+    {
+      "scenario": "Streak milestone",
+      "events": [
+        "ritual.complete (streak: 7)",
+        "ritual.complete (streak: 30)"
+      ],
+      "description": "Track achievement milestones without storing content"
+    }
+  ]
+}
