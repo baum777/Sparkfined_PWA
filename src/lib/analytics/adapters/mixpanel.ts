@@ -15,6 +15,7 @@ export class MixpanelAdapter implements AnalyticsAdapter {
   private initialize() {
     try {
       // Lazy load mixpanel to avoid bundling in client
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const Mixpanel = require('mixpanel');
       const token = process.env.MIXPANEL_TOKEN;
 

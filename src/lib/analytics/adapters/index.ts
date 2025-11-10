@@ -9,6 +9,11 @@
  * - Noop (dev/test)
  */
 
+import { MixpanelAdapter } from './mixpanel';
+import { AmplitudeAdapter } from './amplitude';
+import { SegmentAdapter } from './segment';
+import { NoopAdapter } from './noop';
+
 export interface AnalyticsAdapter {
   /**
    * Track an event
@@ -43,35 +48,14 @@ export function createAdapter(provider?: string): AnalyticsAdapter {
 
   switch (providerName.toLowerCase()) {
     case 'mixpanel':
-      return createMixpanelAdapter();
+      return new MixpanelAdapter();
     case 'amplitude':
-      return createAmplitudeAdapter();
+      return new AmplitudeAdapter();
     case 'segment':
-      return createSegmentAdapter();
+      return new SegmentAdapter();
     case 'noop':
     default:
       console.warn(`[Analytics] Using noop adapter (provider: ${providerName})`);
-      return createNoopAdapter();
+      return new NoopAdapter();
   }
-}
-
-// Lazy imports to avoid bundling all adapters
-function createMixpanelAdapter(): AnalyticsAdapter {
-  const { MixpanelAdapter } = require('./mixpanel');
-  return new MixpanelAdapter();
-}
-
-function createAmplitudeAdapter(): AnalyticsAdapter {
-  const { AmplitudeAdapter } = require('./amplitude');
-  return new AmplitudeAdapter();
-}
-
-function createSegmentAdapter(): AnalyticsAdapter {
-  const { SegmentAdapter } = require('./segment');
-  return new SegmentAdapter();
-}
-
-function createNoopAdapter(): AnalyticsAdapter {
-  const { NoopAdapter } = require('./noop');
-  return new NoopAdapter();
 }

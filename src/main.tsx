@@ -117,8 +117,8 @@ if (!rootElement) {
   })
   // global listeners only in preview
   if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
-    window.addEventListener('error', (e) => logError('window.error', (e as ErrorEvent).error || (e as any).message))
-    window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e as PromiseRejectionEvent).reason))
+    window.addEventListener('error', (e) => logError('window.error', (e).error || (e as any).message))
+    window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e).reason))
   }
     root.render(
       <React.StrictMode>
@@ -138,8 +138,8 @@ if (!rootElement) {
     }
   })
   if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
-    window.addEventListener('error', (e) => logError('window.error', (e as ErrorEvent).error || (e as any).message))
-    window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e as PromiseRejectionEvent).reason))
+    window.addEventListener('error', (e) => logError('window.error', (e).error || (e as any).message))
+    window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e).reason))
   }
     root.render(
       <React.StrictMode>

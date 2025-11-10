@@ -16,7 +16,6 @@
  * Cost savings: ~99.996% vs raw event streaming
  */
 
-import { userBucket, isUserInSample } from './hash';
 import { OfflineQueue } from './offline-queue';
 
 export interface AggPayload {
@@ -161,10 +160,10 @@ export class CrosshairAggregator {
     }
 
     // Client-side: use requestIdleCallback for better performance
-    if ('requestIdleCallback' in window) {
+    if (typeof window.requestIdleCallback === 'function') {
       const idleCallbackId = window.requestIdleCallback(
         () => {
-          this.flushTimer = window.setTimeout(
+          this.flushTimer = setTimeout(
             () => this.flush(),
             this.config.windowMs
           ) as any;
@@ -174,7 +173,7 @@ export class CrosshairAggregator {
       this.flushTimer = idleCallbackId as any;
     } else {
       // Fallback: regular setTimeout
-      this.flushTimer = window.setTimeout(() => this.flush(), this.config.windowMs) as any;
+      this.flushTimer = setTimeout(() => this.flush(), this.config.windowMs) as any;
     }
   }
 

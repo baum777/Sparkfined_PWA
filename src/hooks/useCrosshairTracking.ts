@@ -47,7 +47,7 @@ export function useCrosshairTracking(config: UseCrosshairTrackingConfig) {
     const clientVersion = import.meta.env.VITE_APP_VERSION || 'dev';
 
     // Send function
-    const sendFn = async (payload: any) => {
+    const sendFn = async (payload: any): Promise<void> => {
       const response = await fetch('/api/analytics/agg', {
         method: 'POST',
         headers: {
@@ -70,8 +70,6 @@ export function useCrosshairTracking(config: UseCrosshairTrackingConfig) {
           aggregatorRef.current.updateWindow(newWindow);
         }
       }
-
-      return response;
     };
 
     // Initialize aggregator

@@ -83,8 +83,8 @@ export class OfflineQueue {
 
       if (count >= this.maxQueueSize) {
         // Evict oldest item (FIFO)
-        const oldestKeys = await this.db.getAllKeys('queue', undefined, 1);
-        if (oldestKeys.length > 0) {
+        const oldestKeys = await this.db.getAllKeys('queue', null, 1);
+        if (oldestKeys.length > 0 && oldestKeys[0] !== undefined) {
           await this.db.delete('queue', oldestKeys[0]);
           console.warn('[OfflineQueue] Queue full, evicted oldest item');
         }

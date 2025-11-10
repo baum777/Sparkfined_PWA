@@ -14,6 +14,7 @@ export class SegmentAdapter implements AnalyticsAdapter {
 
   private initialize() {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { Analytics } = require('@segment/analytics-node');
       const writeKey = process.env.SEGMENT_WRITE_KEY;
 

@@ -74,7 +74,7 @@ async function getTempEntriesFromKV(userId: string = 'default') {
     const entries = []
     for (const id of tempIds) {
       const entry = await kvGet(`journal:${userId}:${id}`)
-      if (entry && (entry as any).status === 'temp') {
+      if (entry && (entry).status === 'temp') {
         entries.push(entry)
       }
     }
@@ -143,11 +143,11 @@ async function cleanupTempEntries(ttlDays: number = 7) {
   const errors: string[] = []
 
   for (const entry of toDelete) {
-    const success = await deleteTempEntry((entry as any).id, userId)
+    const success = await deleteTempEntry((entry).id, userId)
     if (success) {
       deletedCount++
     } else {
-      errors.push(`Failed to delete entry ${(entry as any).id}`)
+      errors.push(`Failed to delete entry ${(entry).id}`)
     }
   }
 

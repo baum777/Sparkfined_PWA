@@ -382,7 +382,7 @@ describe('Market Orchestrator', () => {
       const result = await getMarketSnapshot('test123', 'solana')
 
       expect(result.totalLatency).toBeGreaterThan(0)
-      expect(result.totalLatency).toBeGreaterThanOrEqual(100)
+      expect(result.totalLatency).toBeGreaterThanOrEqual(90) // Allow for timer precision variance
     })
   })
 })

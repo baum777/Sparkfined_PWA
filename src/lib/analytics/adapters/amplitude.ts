@@ -14,6 +14,7 @@ export class AmplitudeAdapter implements AnalyticsAdapter {
 
   private initialize() {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { init, track, identify } = require('@amplitude/analytics-node');
       const apiKey = process.env.AMPLITUDE_API_KEY;
 

@@ -158,7 +158,7 @@ export default function ChartPage() {
       if (session.journalEntryId) {
         const entry = await getEntry(session.journalEntryId);
         if (entry?.chartSnapshot?.state) {
-          const chartState = entry.chartSnapshot.state as ChartState;
+          const chartState = entry.chartSnapshot.state;
           
           // Restore chart state
           if (chartState.address) setAddress(chartState.address);
