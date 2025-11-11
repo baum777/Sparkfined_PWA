@@ -27,10 +27,16 @@ const toStringValue = (value: unknown): string | undefined => {
 
 const toNumberValue = (value: unknown): number | undefined => {
   if (value === null || value === undefined || value === "") return undefined;
-  const raw = typeof value === "string" ? value.replace(/,/g, ".").trim() : String(value);
-  if (!raw) return undefined;
-  const n = Number(raw);
-  return Number.isFinite(n) ? n : undefined;
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : undefined;
+  }
+  if (typeof value === "string") {
+    const raw = value.replace(/,/g, ".").trim();
+    if (!raw) return undefined;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
 };
 
 const toTags = (value: unknown): string[] => {

@@ -16,14 +16,26 @@ const toStringValue = (value: unknown, { allowEmpty = false }: { allowEmpty?: bo
 const toBodyString = (value: unknown) => {
   if (typeof value === "string") return value;
   if (value === null || value === undefined) return "";
-  return String(value);
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return "";
+  }
 };
 
 const toNumberValue = (value: unknown): number | undefined => {
   if (value === null || value === undefined || value === "") return undefined;
   if (typeof value === "number") return Number.isFinite(value) ? value : undefined;
-  const parsed = Number(String(value).replace(/,/g, "."));
-  return Number.isFinite(parsed) ? parsed : undefined;
+  if (typeof value === "string") {
+    const normalized = value.replace(/,/g, ".").trim();
+    if (!normalized) return undefined;
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
 };
 
 const toTags = (value: unknown): string[] => {
