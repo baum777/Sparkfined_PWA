@@ -1,0 +1,78 @@
+{
+  "missing_scripts": [
+    "build:local",
+    "build:ci",
+    "check:size"
+  ],
+  "extra_scripts": [],
+  "env_mismatches": {
+    "missing_in_readme": [
+      "VITE_APP_VERSION",
+      "VITE_MORALIS_BASE",
+      "VITE_MORALIS_API_KEY",
+      "MORALIS_WEBHOOK_SECRET",
+      "VITE_DEXPAPRIKA_BASE",
+      "DEXPAPRIKA_API_KEY",
+      "DEXPAPRIKA_BASE",
+      "DATA_PROXY_SECRET",
+      "ENABLE_OG_MINT",
+      "VITE_DATA_PRIMARY",
+      "VITE_DATA_SECONDARY",
+      "VITE_DATA_FALLBACKS",
+      "XAI_API_KEY",
+      "AI_MAX_COST_USD",
+      "AI_CACHE_TTL_SEC",
+      "AI_PROXY_SECRET",
+      "ANALYSIS_AI_PROVIDER",
+      "VITE_DEBUG",
+      "VITE_ENABLE_DEBUG",
+      "VITE_ENABLE_AI_TEASER",
+      "VITE_ENABLE_ANALYTICS",
+      "VITE_ENABLE_METRICS",
+      "VITE_ORDERFLOW_PROVIDER",
+      "VITE_WALLETFLOW_PROVIDER"
+    ],
+    "not_in_env_template": [
+      "ANTHROPIC_API_KEY",
+      "VITE_SOLANA_RPC_URL",
+      "VAPID_PUBLIC_KEY",
+      "VAPID_PRIVATE_KEY",
+      "VITE_"
+    ]
+  },
+  "ci_jobs": [],
+  "docs_present": [
+    "ACCESS_PAGE_TAB_IMPROVEMENTS.md",
+    "API_KEYS.md",
+    "BUILD_SCRIPTS_EXPLAINED.md",
+    "CORTEX_INTEGRATION_PLAN.md",
+    "DEPLOY_CHECKLIST.md",
+    "DEPLOY_GUIDE.md",
+    "ENVIRONMENT_VARIABLES.md",
+    "ENV_USAGE_OVERVIEW.md",
+    "JOURNAL_SPECIFICATION.md",
+    "ONBOARDING_IMPLEMENTATION_COMPLETE.md",
+    "ONBOARDING_QUICK_START.md",
+    "ONBOARDING_STRATEGY.md",
+    "PROJEKT_ÜBERSICHT.md",
+    "README.md",
+    "REPO_STRUKTURPLAN_2025.md",
+    "SIGNAL_ORCHESTRATOR_INTEGRATION.md",
+    "SIGNAL_ORCHESTRATOR_USE_CASE.md",
+    "SIGNAL_UI_INTEGRATION.md"
+  ],
+  "badges_suggested": [],
+  "security_notices": [
+    "Environment template includes secrets and API keys"
+  ],
+  "other_notes": [
+    "No .github/workflows directory found",
+    "README marketing claims exceed codebase scope"
+  ],
+  "command_failures": {
+    "pnpm lint": {
+      "exitCode": 1,
+      "summary": "Lint errors (unused variables and unnecessary assertions) across API and UI modules."
+    }
+  }
+}

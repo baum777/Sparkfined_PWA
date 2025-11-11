@@ -25,7 +25,7 @@ import { useSettings } from "../state/settings";
 import { useTelemetry } from "../state/telemetry";
 import { getSession } from "../lib/ReplayService";
 import { getEntry } from "../lib/JournalService";
-import type { ChartState } from "@/types/journal";
+import { isTimeframe } from "../lib/journal";
 
 export default function ChartPage() {
   const { settings } = useSettings();
@@ -158,11 +158,13 @@ export default function ChartPage() {
       if (session.journalEntryId) {
         const entry = await getEntry(session.journalEntryId);
         if (entry?.chartSnapshot?.state) {
-          const chartState = entry.chartSnapshot.state as ChartState;
+          const chartState = entry.chartSnapshot.state;
           
           // Restore chart state
           if (chartState.address) setAddress(chartState.address);
-          if (chartState.timeframe) setTf(chartState.timeframe as any);
+          if (chartState.timeframe && isTimeframe(chartState.timeframe)) {
+            setTf(chartState.timeframe);
+          }
           if (chartState.view) setView(chartState.view);
           
           // Restore indicators
