@@ -21,6 +21,122 @@ Supporting documentation that details the product roadmap, rollout phases, and f
 
 ## Quick Start
 ### Prerequisites
+- **Node.js** >= 20.10.0
+- **pnpm** (recommended) or npm
+
+### Setup
+
+```bash
+# Clone repository
+git clone https://github.com/baum777/sparkfined-pwa.git
+cd sparkfined-pwa
+
+# Install dependencies
+pnpm install
+
+# Copy environment template
+cp .env.example .env.local
+
+# Add required API keys to .env.local
+# - MORALIS_API_KEY (required)
+# - OPENAI_API_KEY (optional, for AI features)
+# - VITE_SOLANA_RPC_URL (optional, defaults to mainnet)
+
+# Start development server
+pnpm dev
+```
+
+The app will be available at `http://localhost:5173`
+
+### Testing PWA Features
+
+```bash
+# Build production version
+pnpm build
+
+# Preview with service worker enabled
+pnpm preview
+
+# Access different pages:
+# - Main app: http://localhost:4173
+# - Icon showcase: http://localhost:4173/icons
+# - Offline test: http://localhost:4173/offline.html
+```
+
+**Test Installation:**
+1. Open Chrome DevTools → Application → Manifest
+2. Verify all 14 icons are listed (32px - 1024px)
+3. Check Service Worker status (should be "activated")
+4. Click "Install" button in browser address bar
+5. Test offline: Disconnect network → reload → see custom offline page
+
+---
+
+## 🛠️ Development Scripts
+
+```bash
+pnpm dev           # Start Vite dev server with HMR
+pnpm build         # TypeScript check + production build
+pnpm preview       # Preview production build locally (port 4173)
+pnpm test          # Run Vitest unit tests
+pnpm test:watch    # Watch mode for tests
+pnpm test:e2e      # Run Playwright E2E tests
+pnpm lint          # ESLint with flat config
+pnpm format        # Format code with Prettier
+pnpm typecheck     # Run TypeScript compiler (no emit)
+pnpm analyze       # Bundle size analysis
+pnpm lighthouse    # Lighthouse audit (requires preview)
+```
+
+---
+
+## 🌐 Deployment (Vercel)
+
+### Quick Deploy
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/baum777/sparkfined-pwa)
+
+### Manual Deployment
+
+1. **Connect Git Repository** in Vercel Dashboard
+2. **Set Environment Variables:**
+   ```
+   MORALIS_API_KEY=your_api_key
+   MORALIS_BASE=https://deep-index.moralis.io/api/v2.2
+   OPENAI_API_KEY=your_openai_key (optional)
+   ```
+3. **Deploy:** Push to main branch → auto-deploy
+4. **Verify:** Check Lighthouse scores (target 90+ in all categories)
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DEXPAPRIKA_BASE` | ✅ | Base URL for DexPaprika OHLC API (primary provider) |
+| `DEXPAPRIKA_API_KEY` | ❌ | DexPaprika API key (if required by plan) |
+| `MORALIS_API_KEY` | ✅ | Moralis Deep Index API key for fallback data |
+| `MORALIS_BASE` | ✅ | Base URL for Moralis API |
+| `DATA_PROXY_SECRET` | ✅ | Shared secret for internal API proxy calls |
+| `OPENAI_API_KEY` | ❌ | OpenAI API key for AI features |
+| `ANTHROPIC_API_KEY` | ❌ | Alternative AI provider |
+| `VITE_SOLANA_RPC_URL` | ❌ | Solana RPC endpoint (defaults to mainnet) |
+| `VAPID_PUBLIC_KEY` | ❌ | Web Push public key |
+| `VAPID_PRIVATE_KEY` | ❌ | Web Push private key (server-side only) |
+
+*Note: Client-side variables must be prefixed with `VITE_`*
+
+---
+
+## 📱 PWA Features
+
+### Offline Support
+- **Cache-First Strategy** for static assets (JS, CSS, fonts)
+- **Network-First** for API calls with fallback to cache
+- **Custom Offline Page** (`/offline.html`) with Sparkfined branding
+- Full app functionality without internet connection
+- 66 precached entries (~2.3 MB) for instant offline access
+- Background sync for pending actions (planned)
+
 - Node.js \>= 20.10.0 【F:package.json†L6-L13】
 - [pnpm](https://pnpm.io/) (repository ships with a `pnpm-lock.yaml`)
 
