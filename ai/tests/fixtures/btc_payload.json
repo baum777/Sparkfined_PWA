@@ -1,0 +1,11 @@
+{
+  "ticker": "BTC-USD",
+  "price": 58200.12,
+  "timeframe": "1h",
+  "candleSamples": [
+    { "open": 58010.2, "high": 58320.0, "low": 57890.1, "close": 58200.12, "volume": 1450.3, "timestamp": "2025-11-11T10:00:00Z" }
+  ],
+  "onchain": { "address": "bc1qexample", "txCount24h": 123 },
+  "indicators": { "rsi": 62.1, "sma50": 56000, "sma200": 52000, "atr": 1.8, "macdHistogram": 0.003 },
+  "meta": { "source": "dexpaprika", "timestamp": "2025-11-11T11:22:33Z" }
+}

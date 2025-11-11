@@ -9,6 +9,7 @@ dist/
 .turbo/
 coverage/
 *.log
+telemetry/ai/*.jsonl
 # Env/Secrets
 .env
 .env.*
