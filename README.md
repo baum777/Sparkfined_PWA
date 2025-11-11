@@ -196,8 +196,11 @@ pnpm lighthouse    # Lighthouse audit (requires preview)
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `MORALIS_API_KEY` | ✅ | Moralis Deep Index API key for price data |
+| `DEXPAPRIKA_BASE` | ✅ | Base URL for DexPaprika OHLC API (primary provider) |
+| `DEXPAPRIKA_API_KEY` | ❌ | DexPaprika API key (if required by plan) |
+| `MORALIS_API_KEY` | ✅ | Moralis Deep Index API key for fallback data |
 | `MORALIS_BASE` | ✅ | Base URL for Moralis API |
+| `DATA_PROXY_SECRET` | ✅ | Shared secret for internal API proxy calls |
 | `OPENAI_API_KEY` | ❌ | OpenAI API key for AI features |
 | `ANTHROPIC_API_KEY` | ❌ | Alternative AI provider |
 | `VITE_SOLANA_RPC_URL` | ❌ | Solana RPC endpoint (defaults to mainnet) |
