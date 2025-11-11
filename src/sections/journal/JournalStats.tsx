@@ -256,7 +256,7 @@ function buildStats(notes: JournalNote[]): BuiltStats {
 
   const setupBuckets = new Map<string, { count: number; totalPnL: number; totalRR: number; rrCount: number }>();
   let totalPnL = 0;
-  let totalNotes = notes.length;
+  const totalNotes = notes.length;
 
   let completedTrades = 0;
   let winners = 0;

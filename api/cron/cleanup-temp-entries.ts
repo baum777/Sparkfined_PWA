@@ -17,8 +17,6 @@
  *   -H "Authorization: Bearer YOUR_CRON_SECRET"
  */
 
-import type { VercelRequest, VercelResponse } from '@vercel/node'
-
 export const config = { runtime: 'edge' }
 
 interface CleanupResult {
@@ -59,10 +57,29 @@ function verifyCronSecret(req: Request): boolean {
 /**
  * Get all temp entries from KV store
  */
-async function getTempEntriesFromKV(userId: string = 'default') {
+type TempEntry = {
+  id: string
+  createdAt: number
+  status?: string
+}
+
+function isTempEntry(entry: unknown): entry is TempEntry {
+  if (!entry || typeof entry !== 'object') {
+    return false
+  }
+
+  const candidate = entry as Partial<TempEntry>
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.createdAt === 'number' &&
+    Number.isFinite(candidate.createdAt)
+  )
+}
+
+async function getTempEntriesFromKV(userId: string = 'default'): Promise<TempEntry[]> {
   try {
     const { kvSMembers, kvGet } = await import('../../src/lib/kv')
-    
+
     // Get temp entry IDs
     const tempIds = await kvSMembers(`journal:temp:${userId}`)
     
@@ -71,10 +88,10 @@ async function getTempEntriesFromKV(userId: string = 'default') {
     }
 
     // Fetch all temp entries
-    const entries = []
+    const entries: TempEntry[] = []
     for (const id of tempIds) {
       const entry = await kvGet(`journal:${userId}:${id}`)
-      if (entry && (entry as any).status === 'temp') {
+      if (isTempEntry(entry) && entry.status === 'temp') {
         entries.push(entry)
       }
     }
@@ -107,7 +124,9 @@ async function deleteTempEntry(entryId: string, userId: string = 'default') {
 /**
  * Main cleanup function
  */
-async function cleanupTempEntries(ttlDays: number = 7) {
+type CleanupSummary = { deletedCount: number; errors: string[] }
+
+async function cleanupTempEntries(ttlDays: number = 7): Promise<CleanupSummary> {
   const cutoffTime = Date.now() - ttlDays * 24 * 60 * 60 * 1000
   const userId = 'default' // TODO: Support multi-user cleanup
 
@@ -127,7 +146,7 @@ async function cleanupTempEntries(ttlDays: number = 7) {
   console.log(`[Cron] Found ${tempEntries.length} temp entries`)
 
   // Filter old entries
-  const toDelete = tempEntries.filter((entry: any) => {
+  const toDelete = tempEntries.filter((entry) => {
     return entry.createdAt < cutoffTime
   })
 
@@ -143,11 +162,11 @@ async function cleanupTempEntries(ttlDays: number = 7) {
   const errors: string[] = []
 
   for (const entry of toDelete) {
-    const success = await deleteTempEntry((entry as any).id, userId)
+    const success = await deleteTempEntry(entry.id, userId)
     if (success) {
       deletedCount++
     } else {
-      errors.push(`Failed to delete entry ${(entry as any).id}`)
+      errors.push(`Failed to delete entry ${entry.id}`)
     }
   }
 

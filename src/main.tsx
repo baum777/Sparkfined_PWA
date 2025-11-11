@@ -113,43 +113,53 @@ if (!rootElement) {
       if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
         logError('RecoverableError', error, info)
       }
-    }
+    },
   })
   // global listeners only in preview
   if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
-    window.addEventListener('error', (e) => logError('window.error', (e as ErrorEvent).error || (e as any).message))
-    window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e as PromiseRejectionEvent).reason))
+    window.addEventListener('error', (event: ErrorEvent) => {
+      const detail = event.error ?? event.message
+      logError('window.error', detail)
+    })
+    window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
+      logError('unhandledrejection', event.reason)
+    })
   }
-    root.render(
-      <React.StrictMode>
-        <BrowserRouter>
-          <AppErrorBoundary>
-            <App />
-          </AppErrorBoundary>
-        </BrowserRouter>
-      </React.StrictMode>
-    )
+  root.render(
+    <React.StrictMode>
+      <BrowserRouter>
+        <AppErrorBoundary>
+          <App />
+        </AppErrorBoundary>
+      </BrowserRouter>
+    </React.StrictMode>
+  )
 } else {
   const root = ReactDOM.createRoot(rootElement, {
     onRecoverableError(error, info) {
       if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
         logError('RecoverableError', error, info)
       }
-    }
+    },
   })
   if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
-    window.addEventListener('error', (e) => logError('window.error', (e as ErrorEvent).error || (e as any).message))
-    window.addEventListener('unhandledrejection', (e) => logError('unhandledrejection', (e as PromiseRejectionEvent).reason))
+    window.addEventListener('error', (event: ErrorEvent) => {
+      const detail = event.error ?? event.message
+      logError('window.error', detail)
+    })
+    window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
+      logError('unhandledrejection', event.reason)
+    })
   }
-    root.render(
-      <React.StrictMode>
-        <BrowserRouter>
-          <AppErrorBoundary>
-            <App />
-          </AppErrorBoundary>
-        </BrowserRouter>
-      </React.StrictMode>
-    )
+  root.render(
+    <React.StrictMode>
+      <BrowserRouter>
+        <AppErrorBoundary>
+          <App />
+        </AppErrorBoundary>
+      </BrowserRouter>
+    </React.StrictMode>
+  )
 }
 
 // Hydration hint for Lighthouse (main thread idle sooner)
