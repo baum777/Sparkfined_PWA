@@ -1,10 +1,10 @@
-// Server-side Router: OpenAI / Anthropic / xAI
+// Server-side Router: OpenAI / Grok (xAI)
 export const config = { runtime: "edge" };
 
 const json = (obj:any, status=200)=> new Response(JSON.stringify(obj), { status, headers:{ "content-type":"application/json" }});
 
 type Req = {
-  provider: "openai" | "anthropic" | "xai";
+  provider: "openai" | "grok";
   model?: string;
   system?: string;
   user?: string;
@@ -48,9 +48,9 @@ export default async function handler(req: Request) {
 
 async function route(p: Req["provider"], model?: string, system?: string, user?: string, maxOutputTokens?: number){
   switch (p) {
-    case "openai":    return callOpenAI(model ?? "gpt-4.1-mini", system, user!, maxOutputTokens);
-    case "anthropic": return callAnthropic(model ?? "claude-3-5-sonnet-latest", system, user!, maxOutputTokens);
-    case "xai":       return callXAI(model ?? "grok-2-mini", system, user!, maxOutputTokens);
+    case "openai": return callOpenAI(model ?? "gpt-4.1-mini", system, user!, maxOutputTokens);
+    case "grok":
+      return callGrok(model ?? "grok-4-mini", system, user!, maxOutputTokens);
     default: throw new Error("unknown provider");
   }
 }
@@ -89,43 +89,9 @@ function estimateOpenaiCost(model:string, usage:any){
   return ((inTok/1000)*price.in + (outTok/1000)*price.out);
 }
 
-async function callAnthropic(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) throw new Error("ANTHROPIC_API_KEY missing");
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method:"POST",
-    headers: {
-      "content-type":"application/json",
-      "x-api-key": key,
-      "anthropic-version":"2023-06-01"
-    },
-    body: JSON.stringify({
-      model, max_tokens: maxOutputTokens ?? 800, temperature: 0.2,
-      system: system || undefined,
-      messages: [{ role:"user", content: user }]
-    })
-  });
-  const j = await r.json();
-  const text = j?.content?.[0]?.text ?? "";
-  return {
-    provider:"anthropic",
-    model,
-    text,
-    usage: j?.usage ?? null,
-    costUsd: estimateAnthropicCost(model, j?.usage)
-  };
-}
-function estimateAnthropicCost(model:string, usage:any){
-  const inTok  = usage?.input_tokens ?? 0;
-  const outTok = usage?.output_tokens ?? 0;
-  // rough mini/sonnet $
-  const price = /haiku|mini/i.test(model) ? { in:0.00025, out:0.00125 } : { in:0.003, out:0.015 };
-  return ((inTok/1000)*price.in + (outTok/1000)*price.out);
-}
-
-async function callXAI(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
-  const key = process.env.XAI_API_KEY;
-  if (!key) throw new Error("XAI_API_KEY missing");
+async function callGrok(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
+  const key = process.env.GROK_API_KEY;
+  if (!key) throw new Error("GROK_API_KEY missing");
   const r = await fetch("https://api.x.ai/v1/chat/completions", {
     method:"POST",
     headers: { "content-type":"application/json", "authorization": `Bearer ${key}` },
@@ -141,7 +107,7 @@ async function callXAI(model: string, system: string|undefined, user: string, ma
   const j = await r.json();
   const text = j?.choices?.[0]?.message?.content ?? "";
   return {
-    provider:"xai",
+    provider:"grok",
     model,
     text,
     usage: j?.usage ?? null,
@@ -209,15 +175,11 @@ function render(templateId: "v1/analyze_bullets"|"v1/journal_condense", vars:Rec
 function maxOrInf(n?: number){ return Number.isFinite(n!) && n!>0 ? n! : Number.POSITIVE_INFINITY; }
 
 function pricePer1k(provider:string, model?:string){
-  if (provider==="anthropic") {
-    const mini = /haiku|mini/i.test(model||"");
-    return { in: mini?0.00025:0.003, out: mini?0.00125:0.015 };
-  }
   if (provider==="openai") {
     const mini = /mini|small/i.test(model||"");
     return { in: mini?0.00015:0.005, out: mini?0.0006:0.015 };
   }
-  // xAI: unknown → treat as low
+  // grok/xAI: conservative low cost estimate
   return { in: 0.00015, out: 0.0006 };
 }
 function estimatePromptCost(provider:string, model:string|undefined, system?:string, user?:string){
