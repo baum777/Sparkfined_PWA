@@ -1,0 +1,134 @@
+path,title,id,date,word_count,last_modified
+PR_DESCRIPTION.md,Summary,,,76,
+RISK_REGISTER.md,🛡️ Risk Register — Sparkfined PWA,,,1072,2025-11-07 09:33:51 +0100
+tests/event-test-matrix.md,Testmatrix — Übersicht,,,1199,2025-11-12 04:31:07 +0100
+tests/gpt-system-prompt.md,TestMatrixRunner System Prompt,,,1097,2025-11-12 04:31:07 +0100
+tests/README.md,Sparkfined Test-Matrix Playbook,,,501,2025-11-12 04:31:07 +0100
+events/analyze-bullets-ai.md,Analyze KPI Bullets (AI Proxy),events/analyze-bullets-ai,,634,2025-11-12 00:03:49 +0100
+events/index.md,AI Event Inventory,,,66,2025-11-12 00:03:49 +0100
+events/teaser-vision-analysis.md,AI Teaser Vision Analyse,events/teaser-vision-analysis,,671,2025-11-12 00:03:49 +0100
+events/journal-condense-ai.md,Journal Notiz Verdichten (AI Proxy),events/journal-condense-ai,,674,2025-11-12 00:03:49 +0100
+docs/setup/environment-and-providers.md,Environment & Datenprovider Setup,,,297,
+docs/setup/build-and-deploy.md,Build & Deployment Leitfaden,,,216,
+docs/PR_RUN_SUMMARY.md,PR Run Summary,,,87,
+docs/pwa-audit/03_core_flows.md,Core Interaction Flows,,,327,
+docs/pwa-audit/02_feature_catalog.md,Feature Catalog,,,544,
+docs/pwa-audit/01_repo_index.md,Repo Inventory,,,1747,
+docs/pwa-audit/05_security_privacy.md,Security & Privacy Notes,,,281,
+docs/pwa-audit/07_future_concepts.md,Future Concepts & Opportunities,,,175,
+docs/pwa-audit/04_offline_sync_model.md,Offline & Sync Model,,,328,
+docs/pwa-audit/06_tests_observability_gaps.md,Tests & Observability Gaps,,,232,
+docs/concepts/journal-system.md,Trading-Journal Spezifikation,,,212,
+docs/concepts/signal-orchestrator.md,Signal Orchestrator Konzept,,,301,
+docs/concepts/ai-roadmap.md,AI & Cortex Integrationsfahrplan,,,195,
+docs/lore/nft-meme-collection-concept.md,SPARKFINED × HERO'S JOURNEY,,,3423,2025-11-10 06:00:58 +0000
+docs/lore/x-timeline-posts.md,X (TWITTER) TIMELINE POSTS,,,2164,2025-11-10 06:00:58 +0000
+docs/lore/hero-journey-full.md,THE HERO'S JOURNEY × SPARKFINED,,,3042,2025-11-10 06:00:58 +0000
+docs/lore/community-posts-templates.md,COMMUNITY POSTS TEMPLATES,,,2484,2025-11-10 06:00:58 +0000
+docs/lore/degens-creed.md,THE DEGEN'S CREED,,,2309,2025-11-10 06:00:58 +0000
+docs/lore/onboarding-dialogs.md,ONBOARDING DIALOGS,,,2452,2025-11-10 06:00:58 +0000
+docs/lore/three-pillars.md,THE THREE PILLARS OF SPARKFINED,,,2181,2025-11-10 06:00:58 +0000
+docs/guides/access-tabs.md,Access Page Tab-Guide,,,146,
+docs/process/product-overview.md,Produktüberblick & Architektur,,,379,
+docs/process/onboarding-blueprint.md,Onboarding Blueprint,,,303,
+docs/archive/BUILD_NOTES.md,🔧 PHASE 1 – Build Notes & Fixes,,,1191,2025-11-06 10:18:20 +0000
+docs/archive/TABS_ORDER.md,🎯 PHASE 3 – Tabs-Bearbeitungsreihenfolge,,,1414,2025-11-06 10:18:20 +0000
+docs/archive/REPOSITORY_ANALYSE_2025-11-07.md,🔍 Repository-Analyse & Bewertung — Sparkfined PWA,,,3512,2025-11-09 16:58:13 +0000
+docs/archive/raw/2025-11-12/ONBOARDING_IMPLEMENTATION_COMPLETE.md,Sparkfined PWA - Onboarding System Implementation ✅,,,1280,
+docs/archive/raw/2025-11-12/DEXPAPRIKA_MORALIS_CHECKLIST.md,DexPaprika ↔ Moralis Integration — Detaillierte Prüfungs-Checkliste,,,1288,
+docs/archive/raw/2025-11-12/PROJEKT_ÜBERSICHT.md,Sparkfined PWA - Projekt-Übersicht,,,2244,
+docs/archive/raw/2025-11-12/SETUP_DEXPAPRIKA_MORALIS.md,Setup: DexPaprika (Primary) + Moralis (Server-side Fallback),,,122,
+docs/archive/raw/2025-11-12/DEPLOY_CHECKLIST.md,Deployment Checklist — Production Ready,,,1842,
+docs/archive/raw/2025-11-12/BUILD_SCRIPTS_EXPLAINED.md,Build Scripts Explained,,,677,
+docs/archive/raw/2025-11-12/CORTEX_INTEGRATION_PLAN.md,"Moralis Cortex Integration Plan — ""First Update""",,,3623,
+docs/archive/raw/2025-11-12/SIGNAL_UI_INTEGRATION.md,Signal Orchestrator UI Integration - Complete Guide,,,1587,
+docs/archive/raw/2025-11-12/ENVIRONMENT_VARIABLES.md,Environment Variables Guide,,,1166,
+docs/archive/raw/2025-11-12/DEPLOY_GUIDE.md,Vercel Deployment Guide - Step by Step,,,1934,
+docs/archive/raw/2025-11-12/REPO_STRUKTURPLAN_2025.md,🏗️ REPO STRUKTURPLAN 2025,,,7407,
+docs/archive/raw/2025-11-12/SIGNAL_ORCHESTRATOR_USE_CASE.md,Signal Orchestrator Use Case: SOL Momentum Breakout,,,975,
+docs/archive/raw/2025-11-12/SIGNAL_ORCHESTRATOR_INTEGRATION.md,Signal Orchestrator Integration Guide,,,1330,
+docs/archive/raw/2025-11-12/ONBOARDING_QUICK_START.md,Onboarding System - Quick Start Guide,,,814,
+docs/archive/raw/2025-11-12/ONBOARDING_STRATEGY.md,Sparkfined PWA - Onboarding & Einführungsstrategie,,,2807,
+docs/archive/raw/2025-11-12/JOURNAL_SPECIFICATION.md,Sparkfined Trading Journal – Spezifikation,,,1020,
+docs/archive/raw/2025-11-12/ENV_USAGE_OVERVIEW.md,🔧 ENV-Variablen Verwendungszweck,,,738,
+docs/archive/raw/2025-11-12/API_KEYS.md,🔑 API Keys & Environment Variables Guide,,,1316,
+docs/archive/raw/2025-11-12/ACCESS_PAGE_TAB_IMPROVEMENTS.md,AccessPage Tab Improvements,,,601,
+docs/archive/LANDING_PAGE_CONCEPT.md,⚡ Sparkfined Landing Page Concept,,,3075,2025-11-06 10:18:20 +0000
+docs/archive/CRYPTOBER_PRÄSENTATION.md,🎯 Sparkfined Präsentationskonzept für cryptober.xyz,,,4339,2025-11-09 16:58:13 +0000
+docs/archive/PWA_LOAD_FAILURE_FINAL.md,PWA Load-Failure Root Cause Analysis & Fix Report,,,2232,2025-11-09 16:58:13 +0000
+docs/archive/PWA_BLACK_SCREEN_FIX.md,PWA Black Screen Fix,,,691,2025-11-06 10:18:20 +0000
+docs/archive/CRYPTOBER_PRESENTER_GUIDE.md,🎤 Sparkfined Presenter's Quick-Reference Guide,,,1352,2025-11-09 16:58:13 +0000
+docs/archive/SCAN.md,🔍 PHASE 0 – Repo-Scan & Status Report,,,1686,2025-11-06 10:18:20 +0000
+docs/archive/PWA_CHECKLIST.md,✅ PHASE 2 – PWA-Checklist & Installability,,,1640,2025-11-06 10:18:20 +0000
+docs/archive/BUILD_FIX_REPORT.md,Build Fix Report — WebServer Font Resolution Timeout,,,996,2025-11-09 16:58:13 +0000
+docs/archive/BOARD_IMPLEMENTATION_PLAN.md,Board Implementation Plan — Phase A-D,,,6501,2025-11-06 10:18:20 +0000
+docs/archive/removed/INDEX.md,Archivierte Dokumente,,,51,
+docs/archive/SOLANA_ADAPTER_MIGRATION.md,Solana Adapter Migration Guide 🔐,,,1216,2025-11-06 10:18:20 +0000
+docs/archive/audits/PRODUCTION_READINESS_TEST_REPORT.md,Production Readiness Test Report - Vercel Deployment,,,1365,2025-11-06 10:18:20 +0000
+docs/archive/audits/PERFORMANCE_AUDIT.md,Sparkfined PWA – Performance Audit (E-18),,,410,2025-11-06 10:18:20 +0000
+docs/archive/audits/TEST_AUDIT_REPORT.md,Test & Audit Report — Sparkfined TA PWA Board,,,1636,2025-11-06 10:18:20 +0000
+docs/archive/deployment/VERCEL_DEPLOYMENT_CHECKLIST.md,Vercel Deployment Checklist ✅,,,725,2025-11-06 10:18:20 +0000
+docs/archive/deployment/DEPLOYMENT_READY.md,Deployment Ready — Sparkfined TA PWA Board,,,1397,2025-11-06 10:18:20 +0000
+docs/archive/phases/PHASE_8_COMPLETE.md,PHASE 8 - Post-Launch Quick Wins: COMPLETE ✅,,,1910,2025-11-06 10:18:20 +0000
+docs/archive/phases/PHASE_B_PROGRESS.md,Phase B: Board Layout — Progress Tracker,,,973,2025-11-06 10:18:20 +0000
+docs/archive/phases/PHASE_A_PROGRESS.md,Phase A: Foundation — Progress Tracker,,,619,2025-11-06 10:18:20 +0000
+docs/archive/phases/PHASE_5_COMPLETE.md,PHASE 5 - Post-Launch Polish: COMPLETE ✅,,,1685,2025-11-06 10:18:20 +0000
+docs/archive/phases/PHASE_C_PROGRESS.md,Phase C: Interaction & States — COMPLETED ✅,,,803,2025-11-06 10:18:20 +0000
+docs/archive/phases/PHASE_6_COMPLETE.md,PHASE 6 - Backend API Stubs & Final Optimizations: COMPLETE ✅,,,2228,2025-11-06 10:18:20 +0000
+docs/archive/phases/PHASE_4_COMPLETE.md,PHASE 4 - Per-Tab-Iteration: COMPLETE ✅,,,1913,2025-11-06 10:18:20 +0000
+docs/archive/phases/PHASE_E_PROGRESS.md,Phase E: Offline & A11y — COMPLETED ✅,,,1421,2025-11-06 10:18:20 +0000
+docs/archive/phases/PHASE_D_PROGRESS.md,Phase D: Data & API — COMPLETED ✅,,,843,2025-11-06 10:18:20 +0000
+docs/archive/INSTALLATION_COMPLETE.md,Installation Complete ✅,,,845,2025-11-06 10:18:20 +0000
+docs/archive/TABS_MAP.md,🗺️ PHASE 3 – Tabs/Pages-Map,,,2050,2025-11-06 10:18:20 +0000
+docs/archive/README.md,Documentation Archive,,,398,2025-11-06 10:18:20 +0000
+docs/archive/CHART_A11Y_GUIDELINES.md,Chart Accessibility Guidelines,,,836,2025-11-06 10:18:20 +0000
+docs/archive/CLEANUP_REPORT_2025-11-09.md,Repository Cleanup Report (2025-11-09),,,920,2025-11-09 16:58:13 +0000
+docs/archive/TODO_INDEX.md,📋 TODO Index – Offene Themen nach Kategorien,,,1589,2025-11-06 10:18:20 +0000
+docs/README_LEGACY.md,⚡ Sparkfined,,,2097,2025-11-11 07:34:38 +0100
+docs/index.md,Dokumentationsinventar,,,224,
+docs/README.md,Sparkfined PWA - Dokumentation,,,556,2025-11-07 08:50:25 +0000
+patches/link_check_failures.txt,markdown-link-check not available in environment; manual verification pending.,,,8,
+patches/run_meta.txt,start_commit: c7ed5b420fced470d6d47f56498beb15f1b24a11,,,7,
+ai/prompts/task_prompt_grok.md,{{SYSTEM_PROMPT}},,,54,2025-11-12 00:03:49 +0100
+ai/prompts/system_prompt.md,"Du bist ein Trading-Analyst: präzise, faktenorientiert, kurz (max 20 Wörter pro ",,,22,2025-11-12 00:03:49 +0100
+ai/prompts/task_prompt_openai.md,{{SYSTEM_PROMPT}},,,64,2025-11-12 00:03:49 +0100
+ai/README_AI.md,AI Orchestrator,,,265,2025-11-12 00:03:49 +0100
+CLEANUP_SUMMARY.md,Repository Cleanup - Zusammenfassung (2025-11-09),,,308,2025-11-09 16:58:13 +0000
+public/robots.txt,User-agent: *,,,4,2025-11-06 13:38:41 +0000
+public/fonts/README.md,Fonts — JetBrains Mono,,,529,2025-11-07 11:22:50 +0100
+IMPROVEMENT_ROADMAP.md,🗺️ Improvement Roadmap — Sparkfined PWA,,,2078,2025-11-07 09:33:51 +0100
+wireframes/components/INTERACTION-SPECS.md,Component Interaction Specifications,,,2101,2025-11-02 10:49:29 +0000
+wireframes/flows/user-flows.md,STEP 3: USER FLOWS (Detailed),,,2529,2025-11-02 10:49:29 +0000
+wireframes/flows/new-pages-user-flows.md,"User Flows: New Pages (HomePage, BoardPage, SignalsPage, LessonsPage, LandingPage)",,,3655,2025-11-09 16:48:14 +0000
+wireframes/flows/screen-hierarchy.md,STEP 2: SCREEN HIERARCHY & NAVIGATION MAP,,,1140,2025-11-02 10:49:29 +0000
+wireframes/COMPLETE-WIREFRAMES-MASTER-2025-11-09.md,Sparkfined PWA – Complete Wireframes & Workflows Master Document,,,3557,2025-11-09 16:48:14 +0000
+wireframes/INDEX.md,Sparkfined PWA — Complete UX/UI Wireframe Analysis,,,1632,2025-11-09 16:48:14 +0000
+wireframes/landing/COPY_VARIATIONS.md,Landing Page Copy Variations - Sparkfined,,,1480,2025-11-04 16:58:28 +0100
+wireframes/landing/LANDING_PAGE_WIREFRAME.md,Landing Page Wireframe - Sparkfined,,,6071,2025-11-10 06:00:58 +0000
+wireframes/storybook/README-STORYBOOK.md,Storybook Component Stories,,,1008,2025-11-02 10:49:29 +0000
+wireframes/REVIEW-CHECKLIST.md,UX/UI Wireframe Review Checklist,,,1753,2025-11-02 10:49:29 +0000
+wireframes/mobile/07-settings-page.md,Settings Page — Mobile Wireframe (375px),,,1695,2025-11-02 10:49:29 +0000
+wireframes/mobile/03-journal-page.md,Journal Page — Mobile Wireframe (375px),,,1790,2025-11-02 10:49:29 +0000
+wireframes/mobile/08-home-page.md,Mobile Wireframe: HomePage (375px),,,837,2025-11-09 16:48:14 +0000
+wireframes/mobile/04-replay-page.md,Replay Page — Mobile Wireframe (375px),,,1274,2025-11-02 10:49:29 +0000
+wireframes/mobile/05-access-page.md,Access Page — Mobile Wireframe (375px),,,1698,2025-11-02 10:49:29 +0000
+wireframes/mobile/06-notifications-page.md,Notifications Page — Mobile Wireframe (375px),,,1784,2025-11-02 10:49:29 +0000
+wireframes/mobile/12-landing-page.md,Mobile Wireframe: LandingPage (375px),,,2140,2025-11-09 16:48:14 +0000
+wireframes/mobile/09-board-page.md,Mobile Wireframe: BoardPage (375px),,,1729,2025-11-09 16:48:14 +0000
+wireframes/mobile/02-chart-page.md,Chart Page — Mobile Wireframe (375px),,,1816,2025-11-02 10:49:29 +0000
+wireframes/mobile/01-analyze-page.md,Analyze Page — Mobile Wireframe (375px),,,1364,2025-11-02 10:49:29 +0000
+wireframes/mobile/11-lessons-page.md,Mobile Wireframe: LessonsPage (375px),,,1979,2025-11-09 16:48:14 +0000
+wireframes/mobile/10-signals-page.md,Mobile Wireframe: SignalsPage (375px),,,1598,2025-11-09 16:48:14 +0000
+wireframes/desktop/NEW-PAGES-DESKTOP-WIREFRAMES.md,Desktop Wireframes: New Pages (1280px+),,,3054,2025-11-09 16:48:14 +0000
+wireframes/desktop/DESKTOP-WIREFRAMES.md,Desktop Wireframes (1280px+),,,2405,2025-11-02 10:49:29 +0000
+wireframes/SPARKFINED-TA-TABS-WIREFRAMES.md,Sparkfined TA-PWA — Tab Wireframes & Workflows,,,4211,2025-11-09 16:35:30 +0000
+wireframes/DELIVERABLES-2025-11-09.md,Deliverables Summary: Wireframes & Workflows (2025-11-09),,,1216,2025-11-09 16:48:14 +0000
+wireframes/README.md,Sparkfined PWA – UX/UI Wireframe Analysis,,,1637,2025-11-09 16:48:14 +0000
+wireframes/ROADMAP-AND-X-TEASER.md,Sparkfined PWA — Roadmap & X-Teaser,,,2454,2025-11-02 10:49:29 +0000
+tmp/codex_run/file_list.txt,./PR_DESCRIPTION.md,,,133,
+README.md,Sparkfined PWA,,,1728,2025-11-12 00:15:47 +0100
+telemetry_output/DELIVERABLES_CHECKLIST.md,Deliverables Checklist — Event Catalog Enrichment,,,1411,2025-11-09 21:37:02 +0100
+telemetry_output/reports/telemetry_qa_checklist.md,Telemetry QA Checklist,,,1482,2025-11-09 21:37:02 +0100
+telemetry_output/reports/EVENTS_MAPPING.md,Event Mapping Table,,,865,2025-11-09 21:37:02 +0100
+telemetry_output/reports/summary_findings.md,Event Catalog — Executive Summary & Findings,,,1523,2025-11-09 21:37:02 +0100
+telemetry_output/README.md,Event Catalog — Deliverables Package,,,1045,2025-11-09 21:37:02 +0100

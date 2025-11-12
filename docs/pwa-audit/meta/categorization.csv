@@ -1,0 +1,134 @@
+path,category,rationale
+PR_DESCRIPTION.md,B,Default concept
+RISK_REGISTER.md,B,Default concept
+tests/event-test-matrix.md,B,Default concept
+tests/gpt-system-prompt.md,B,Default concept
+tests/README.md,C,General guide
+events/analyze-bullets-ai.md,B,Default concept
+events/index.md,B,Default concept
+events/teaser-vision-analysis.md,B,Default concept
+events/journal-condense-ai.md,B,Default concept
+docs/setup/environment-and-providers.md,D,Setup/operations reference
+docs/setup/build-and-deploy.md,D,Setup/operations reference
+docs/PR_RUN_SUMMARY.md,B,Default concept
+docs/pwa-audit/03_core_flows.md,B,Default concept
+docs/pwa-audit/02_feature_catalog.md,B,Concept & architecture
+docs/pwa-audit/01_repo_index.md,B,Default concept
+docs/pwa-audit/05_security_privacy.md,B,Default concept
+docs/pwa-audit/07_future_concepts.md,B,Concept & architecture
+docs/pwa-audit/04_offline_sync_model.md,B,Default concept
+docs/pwa-audit/06_tests_observability_gaps.md,B,Default concept
+docs/concepts/journal-system.md,B,Default concept
+docs/concepts/signal-orchestrator.md,B,Default concept
+docs/concepts/ai-roadmap.md,A,Process / planning doc
+docs/lore/nft-meme-collection-concept.md,B,Concept & architecture
+docs/lore/x-timeline-posts.md,B,Default concept
+docs/lore/hero-journey-full.md,B,Default concept
+docs/lore/community-posts-templates.md,B,Default concept
+docs/lore/degens-creed.md,B,Default concept
+docs/lore/onboarding-dialogs.md,B,Default concept
+docs/lore/three-pillars.md,B,Default concept
+docs/guides/access-tabs.md,B,Default concept
+docs/process/product-overview.md,B,Concept & architecture
+docs/process/onboarding-blueprint.md,B,Default concept
+docs/archive/BUILD_NOTES.md,D,Setup/operations reference
+docs/archive/TABS_ORDER.md,B,Default concept
+docs/archive/REPOSITORY_ANALYSE_2025-11-07.md,B,Default concept
+docs/archive/raw/2025-11-12/ONBOARDING_IMPLEMENTATION_COMPLETE.md,B,Default concept
+docs/archive/raw/2025-11-12/DEXPAPRIKA_MORALIS_CHECKLIST.md,C,Actionable guide
+docs/archive/raw/2025-11-12/PROJEKT_ÜBERSICHT.md,B,Default concept
+docs/archive/raw/2025-11-12/SETUP_DEXPAPRIKA_MORALIS.md,D,Setup/operations reference
+docs/archive/raw/2025-11-12/DEPLOY_CHECKLIST.md,D,Setup/operations reference
+docs/archive/raw/2025-11-12/BUILD_SCRIPTS_EXPLAINED.md,D,Setup/operations reference
+docs/archive/raw/2025-11-12/CORTEX_INTEGRATION_PLAN.md,A,Process / planning doc
+docs/archive/raw/2025-11-12/SIGNAL_UI_INTEGRATION.md,B,Concept & architecture
+docs/archive/raw/2025-11-12/ENVIRONMENT_VARIABLES.md,D,Setup/operations reference
+docs/archive/raw/2025-11-12/DEPLOY_GUIDE.md,D,Setup/operations reference
+docs/archive/raw/2025-11-12/REPO_STRUKTURPLAN_2025.md,A,Process / planning doc
+docs/archive/raw/2025-11-12/SIGNAL_ORCHESTRATOR_USE_CASE.md,B,Default concept
+docs/archive/raw/2025-11-12/SIGNAL_ORCHESTRATOR_INTEGRATION.md,B,Concept & architecture
+docs/archive/raw/2025-11-12/ONBOARDING_QUICK_START.md,C,Actionable guide
+docs/archive/raw/2025-11-12/ONBOARDING_STRATEGY.md,A,Process / planning doc
+docs/archive/raw/2025-11-12/JOURNAL_SPECIFICATION.md,B,Concept & architecture
+docs/archive/raw/2025-11-12/ENV_USAGE_OVERVIEW.md,B,Concept & architecture
+docs/archive/raw/2025-11-12/API_KEYS.md,B,Default concept
+docs/archive/raw/2025-11-12/ACCESS_PAGE_TAB_IMPROVEMENTS.md,B,Default concept
+docs/archive/LANDING_PAGE_CONCEPT.md,B,Concept & architecture
+docs/archive/CRYPTOBER_PRÄSENTATION.md,B,Default concept
+docs/archive/PWA_LOAD_FAILURE_FINAL.md,B,Default concept
+docs/archive/PWA_BLACK_SCREEN_FIX.md,B,Default concept
+docs/archive/CRYPTOBER_PRESENTER_GUIDE.md,C,Actionable guide
+docs/archive/SCAN.md,B,Default concept
+docs/archive/PWA_CHECKLIST.md,C,Actionable guide
+docs/archive/BUILD_FIX_REPORT.md,D,Setup/operations reference
+docs/archive/BOARD_IMPLEMENTATION_PLAN.md,A,Process / planning doc
+docs/archive/removed/INDEX.md,B,Default concept
+docs/archive/SOLANA_ADAPTER_MIGRATION.md,B,Default concept
+docs/archive/audits/PRODUCTION_READINESS_TEST_REPORT.md,B,Default concept
+docs/archive/audits/PERFORMANCE_AUDIT.md,B,Default concept
+docs/archive/audits/TEST_AUDIT_REPORT.md,B,Default concept
+docs/archive/deployment/VERCEL_DEPLOYMENT_CHECKLIST.md,D,Setup/operations reference
+docs/archive/deployment/DEPLOYMENT_READY.md,D,Setup/operations reference
+docs/archive/phases/PHASE_8_COMPLETE.md,B,Default concept
+docs/archive/phases/PHASE_B_PROGRESS.md,B,Default concept
+docs/archive/phases/PHASE_A_PROGRESS.md,B,Default concept
+docs/archive/phases/PHASE_5_COMPLETE.md,B,Default concept
+docs/archive/phases/PHASE_C_PROGRESS.md,B,Default concept
+docs/archive/phases/PHASE_6_COMPLETE.md,B,Default concept
+docs/archive/phases/PHASE_4_COMPLETE.md,B,Default concept
+docs/archive/phases/PHASE_E_PROGRESS.md,B,Default concept
+docs/archive/phases/PHASE_D_PROGRESS.md,B,Default concept
+docs/archive/INSTALLATION_COMPLETE.md,B,Default concept
+docs/archive/TABS_MAP.md,B,Default concept
+docs/archive/README.md,C,General guide
+docs/archive/CHART_A11Y_GUIDELINES.md,C,Actionable guide
+docs/archive/CLEANUP_REPORT_2025-11-09.md,B,Default concept
+docs/archive/TODO_INDEX.md,B,Default concept
+docs/README_LEGACY.md,C,General guide
+docs/index.md,B,Default concept
+docs/README.md,C,General guide
+patches/link_check_failures.txt,B,Default concept
+patches/run_meta.txt,B,Default concept
+ai/prompts/task_prompt_grok.md,B,Default concept
+ai/prompts/system_prompt.md,B,Default concept
+ai/prompts/task_prompt_openai.md,B,Default concept
+ai/README_AI.md,C,General guide
+CLEANUP_SUMMARY.md,B,Default concept
+public/robots.txt,B,Default concept
+public/fonts/README.md,C,General guide
+IMPROVEMENT_ROADMAP.md,A,Process / planning doc
+wireframes/components/INTERACTION-SPECS.md,B,Concept & architecture
+wireframes/flows/user-flows.md,B,Default concept
+wireframes/flows/new-pages-user-flows.md,B,Default concept
+wireframes/flows/screen-hierarchy.md,B,Default concept
+wireframes/COMPLETE-WIREFRAMES-MASTER-2025-11-09.md,B,Default concept
+wireframes/INDEX.md,B,Default concept
+wireframes/landing/COPY_VARIATIONS.md,B,Default concept
+wireframes/landing/LANDING_PAGE_WIREFRAME.md,B,Default concept
+wireframes/storybook/README-STORYBOOK.md,C,General guide
+wireframes/REVIEW-CHECKLIST.md,C,Actionable guide
+wireframes/mobile/07-settings-page.md,B,Default concept
+wireframes/mobile/03-journal-page.md,B,Default concept
+wireframes/mobile/08-home-page.md,B,Default concept
+wireframes/mobile/04-replay-page.md,B,Default concept
+wireframes/mobile/05-access-page.md,B,Default concept
+wireframes/mobile/06-notifications-page.md,B,Default concept
+wireframes/mobile/12-landing-page.md,B,Default concept
+wireframes/mobile/09-board-page.md,B,Default concept
+wireframes/mobile/02-chart-page.md,B,Default concept
+wireframes/mobile/01-analyze-page.md,B,Default concept
+wireframes/mobile/11-lessons-page.md,B,Default concept
+wireframes/mobile/10-signals-page.md,B,Default concept
+wireframes/desktop/NEW-PAGES-DESKTOP-WIREFRAMES.md,B,Default concept
+wireframes/desktop/DESKTOP-WIREFRAMES.md,B,Default concept
+wireframes/SPARKFINED-TA-TABS-WIREFRAMES.md,B,Default concept
+wireframes/DELIVERABLES-2025-11-09.md,B,Default concept
+wireframes/README.md,C,General guide
+wireframes/ROADMAP-AND-X-TEASER.md,A,Process / planning doc
+tmp/codex_run/file_list.txt,B,Default concept
+README.md,C,General guide
+telemetry_output/DELIVERABLES_CHECKLIST.md,C,Actionable guide
+telemetry_output/reports/telemetry_qa_checklist.md,C,Actionable guide
+telemetry_output/reports/EVENTS_MAPPING.md,B,Default concept
+telemetry_output/reports/summary_findings.md,B,Default concept
+telemetry_output/README.md,C,General guide
