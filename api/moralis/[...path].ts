@@ -1,11 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const MORALIS_KEY = process.env.MORALIS_API_KEY
-const MORALIS_BASE = process.env.MORALIS_BASE_URL || 'https://deep-index.moralis.io/api/v2.2'
-const TTL_MS = parseInt(process.env.MORALIS_PROXY_TTL_MS || '60000', 10)
-const USE_MOCKS = process.env.DEV_USE_MOCKS === 'true'
+const DEFAULT_MORALIS_BASE = 'https://deep-index.moralis.io/api/v2.2'
 
-type CacheEntry = {
+interface CacheEntry {
   ts: number
   status: number
   payload: unknown
@@ -14,9 +11,24 @@ type CacheEntry = {
 
 const cache = new Map<string, CacheEntry>()
 
-function buildUpstreamUrl(path: string) {
+function resolveConfig() {
+  return {
+    key: process.env.MORALIS_API_KEY,
+    base: process.env.MORALIS_BASE_URL || DEFAULT_MORALIS_BASE,
+    ttlMs: parseInt(process.env.MORALIS_PROXY_TTL_MS || '60000', 10),
+    useMocks: process.env.DEV_USE_MOCKS === 'true',
+  }
+}
+
+function normalizePath(url?: string | null) {
+  if (!url) return '/'
+  const stripped = url.replace(/^\/api\/moralis/, '')
+  return stripped || '/'
+}
+
+function buildUpstreamUrl(path: string, base: string) {
   const sanitized = path.startsWith('/') ? path : `/${path}`
-  return new URL(sanitized, MORALIS_BASE).toString()
+  return new URL(sanitized, base).toString()
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -27,14 +39,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(204).end()
   }
 
-  const path = (req.url || '').replace(/^\/api\/moralis/, '') || '/'
-  const cacheKey = `${req.method}:${path}:${JSON.stringify(req.body || {})}`
+  const path = normalizePath(req.url)
+  const method = (req.method || 'GET').toUpperCase()
+  const { key, base, ttlMs, useMocks } = resolveConfig()
+  const cacheKey = `${method}:${path}:${JSON.stringify(req.body || {})}`
   const now = Date.now()
-  const isCacheable = (req.method || 'GET').toUpperCase() === 'GET'
+  const isCacheable = method === 'GET'
+
+  if (method === 'GET' && (path === '/' || path === '/health')) {
+    return res.status(200).json({
+      ok: true,
+      path: '/api/moralis/health',
+      hasKey: Boolean(key),
+      ttlMs,
+      usingMocks: useMocks,
+      baseUrl: base,
+    })
+  }
 
   if (isCacheable) {
     const cached = cache.get(cacheKey)
-    if (cached && now - cached.ts < TTL_MS) {
+    if (cached && now - cached.ts < ttlMs) {
       for (const [key, value] of Object.entries(cached.headers)) {
         res.setHeader(key, value)
       }
@@ -42,8 +67,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  if (!MORALIS_KEY) {
-    if (USE_MOCKS) {
+  if (!key) {
+    if (useMocks) {
       return res.status(200).json({
         ok: true,
         mocked: true,
@@ -60,9 +85,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const upstreamUrl = buildUpstreamUrl(path)
+    const upstreamUrl = buildUpstreamUrl(path, base)
     const headers: Record<string, string> = {
-      'X-API-Key': MORALIS_KEY,
+      'X-API-Key': key,
       accept: 'application/json',
     }
 
@@ -70,14 +95,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       headers['Content-Type'] = req.headers['content-type'] as string
     }
 
-    const body = ['GET', 'HEAD'].includes((req.method || 'GET').toUpperCase())
+    const body = ['GET', 'HEAD'].includes(method)
       ? undefined
       : typeof req.body === 'string' || req.body instanceof Buffer
         ? req.body
         : JSON.stringify(req.body)
 
-    const upstreamResponse = await fetch(upstreamUrl, {
-      method: req.method,
+    const upstreamResponse = await globalThis.fetch(upstreamUrl, {
+      method,
       headers,
       body,
     })
@@ -85,7 +110,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const text = await upstreamResponse.text()
     const contentType = upstreamResponse.headers.get('content-type') || 'application/json'
     res.setHeader('content-type', contentType)
-    res.setHeader('cache-control', isCacheable ? `s-maxage=${Math.floor(TTL_MS / 1000)}` : 'no-store')
+    res.setHeader('cache-control', isCacheable ? `s-maxage=${Math.floor(ttlMs / 1000)}` : 'no-store')
 
     const responsePayload = (() => {
       if (contentType.includes('application/json')) {
@@ -105,7 +130,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         payload: responsePayload,
         headers: {
           'content-type': contentType,
-          'cache-control': `s-maxage=${Math.floor(TTL_MS / 1000)}`,
+          'cache-control': `s-maxage=${Math.floor(ttlMs / 1000)}`,
         },
       })
     }
@@ -115,4 +140,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.error('moralis proxy error', error)
     return res.status(502).json({ error: 'proxy_error', message: 'Failed to reach Moralis upstream' })
   }
+}
+
+export function __clearMoralisProxyCacheForTests() {
+  cache.clear()
 }

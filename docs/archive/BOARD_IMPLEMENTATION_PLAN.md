@@ -1585,7 +1585,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 ### D1: API Integration (bereits abgeschlossen ✅)
 
 **Status:**
-- ✅ Moralis API Proxy (`/api/moralis/token/[address].ts`)
+- ✅ Moralis API Proxy (catch-all `/api/moralis/[...path].ts`)
 - ✅ Dexpaprika API Proxy (`/api/dexpaprika/tokens/[address].ts`)
 - ✅ OHLC Endpoint mit Moralis-Hierarchie (`/api/data/ohlc.ts`)
 - ✅ API Config (`src/lib/api-config.ts`)

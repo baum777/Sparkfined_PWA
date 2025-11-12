@@ -2,10 +2,10 @@
 
 | Name | Files | Used At | Exposure | Comment |
 |---|---|---|---|---|
-| `MORALIS_API_KEY` | `api/moralis/proxy.ts`, `api/moralis/health.ts`, `scripts/check-env.js` | runtime (server functions) | server-only | Required secret for Moralis proxy; validated before builds. |
-| `MORALIS_BASE_URL` | `api/moralis/proxy.ts`, `api/moralis/health.ts`, `src/config/providers.ts` | runtime (server functions) | server-only | Optional override for Moralis upstream base URL. |
-| `MORALIS_PROXY_TTL_MS` | `api/moralis/proxy.ts`, `api/moralis/health.ts` | runtime (server functions) | server-only | Controls in-memory cache TTL for proxy responses. |
-| `DEV_USE_MOCKS` | `api/moralis/proxy.ts`, `.env.example`, `scripts/smoke-vercel-check.sh` | runtime (server + local scripts) | server-only | When true, proxy returns mocked payloads instead of hitting Moralis. |
+| `MORALIS_API_KEY` | `api/moralis/[...path].ts`, `scripts/check-env.js` | runtime (server functions) | server-only | Required secret for Moralis proxy; validated before builds. |
+| `MORALIS_BASE_URL` | `api/moralis/[...path].ts`, `src/config/providers.ts` | runtime (server functions) | server-only | Optional override for Moralis upstream base URL. |
+| `MORALIS_PROXY_TTL_MS` | `api/moralis/[...path].ts` | runtime (server functions) | server-only | Controls in-memory cache TTL for proxy responses. |
+| `DEV_USE_MOCKS` | `api/moralis/[...path].ts`, `.env.example`, `scripts/smoke-vercel-check.sh` | runtime (server + local scripts) | server-only | When true, proxy returns mocked payloads instead of hitting Moralis. |
 | `DEXPAPRIKA_API_KEY` | `src/config/providers.ts`, `.env.example` | runtime (server functions) | server-only | Optional DexPaprika secret consumed by provider helper. |
 | `VITE_APP_VERSION` | `src/pages/SettingsPage.tsx` | runtime (client) | client (exposed) | Displays current app version in settings UI. |
 | `VITE_VAPID_PUBLIC_KEY` | `src/pages/SettingsPage.tsx`, `src/pages/NotificationsPage.tsx`, `src/lib/validateEnv.ts` | runtime (client) | client (exposed) | Public Web Push key; safe to expose. |

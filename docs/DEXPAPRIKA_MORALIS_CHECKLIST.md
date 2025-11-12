@@ -49,7 +49,7 @@ rg "priceAdapter|resetAdapterState|Candle" -S
 * Existenz und Pfade:
 
   * `src/lib/priceAdapter.ts`
-  * `api/moralis/token.ts`
+  * `api/moralis/[...path].ts`
   * `src/types/candles.ts` oder `src/lib/types.ts` (exportiert `Candle`)
   * `.env.example` enthält `MORALIS_PROXY_TTL_MS`, `VITE_DEXPAPRIKA_BASE`, `MORALIS_BASE` usw.
   * `docs/SETUP_DEXPAPRIKA_MORALIS.md` vorhanden
@@ -57,7 +57,7 @@ rg "priceAdapter|resetAdapterState|Candle" -S
 **Wie zu prüfen**
 
 ```bash
-rg "priceAdapter.ts|api/moralis/token.ts|MORALIS_PROXY_TTL_MS|Candle" -S
+rg "priceAdapter.ts|api/moralis/\\[...path\\].ts|MORALIS_PROXY_TTL_MS|Candle" -S
 ```
 
 **Akzeptanzkriterien**
@@ -73,7 +73,7 @@ rg "priceAdapter.ts|api/moralis/token.ts|MORALIS_PROXY_TTL_MS|Candle" -S
 * `priceAdapter` versucht zuerst DexPaprika.
 * Kontrollierte Retries mit exponentiellem Backoff vorhanden.
 * Provider-Cooldown bei wiederholten 429/5xx implementiert.
-* Bei endgültigem Fehler ruft Adapter den Moralis-Fallback (`/api/moralis/token`) auf.
+* Bei endgültigem Fehler ruft Adapter den Moralis-Fallback (`/api/moralis/token`) auf (Catch-all Proxy Route).
 
 **Wie zu prüfen**
 
@@ -115,14 +115,14 @@ rg "priceAdapter.ts|api/moralis/token.ts|MORALIS_PROXY_TTL_MS|Candle" -S
 
 **Was zu prüfen**
 
-* `api/moralis/token.ts` nutzt `process.env.MORALIS_API_KEY` (server-only), NICHT `VITE_`.
+* `api/moralis/[...path].ts` nutzt `process.env.MORALIS_API_KEY` (server-only), NICHT `VITE_`.
 * TTL-InMemory-Cache verwendet `MORALIS_PROXY_TTL_MS` (oder default).
 * `Cache-Control` Header gesetzt (`s-maxage`, `stale-while-revalidate`).
 * Keine Secrets in Logs/Responses.
 
 **Wie zu prüfen**
 
-* Öffne `api/moralis/token.ts`:
+* Öffne `api/moralis/[...path].ts`:
 
   * `const KEY = process.env.MORALIS_API_KEY`
   * `const TTL = Number(process.env.MORALIS_PROXY_TTL_MS) || 10000`

@@ -35,4 +35,4 @@ git apply patches/fix/vercel-moralis-proxy.patch
 
 ## Additional Notes
 - `/api/moralis/health` returns proxy status, TTL, and whether mocks are active.
-- Proxy logs appear in Vercel function logs under `api/moralis/proxy`.
+- Proxy logs appear in Vercel function logs under the catch-all `api/moralis` function.
