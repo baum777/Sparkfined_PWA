@@ -1,0 +1,16 @@
+{
+  "address": "So11111111111111111111111111111111111111112",
+  "tf": "15m",
+  "metrics": {
+    "lastClose": 0.000043,
+    "change24h": 8.4,
+    "volStdev": 0.12,
+    "atr14": 0.000002,
+    "hiLoPerc": 15.6,
+    "volumeSum": 1240000
+  },
+  "matrixRows": [
+    { "id": "SMA", "values": [1, 1, 0, -1] },
+    { "id": "RSI", "values": [0.7, 0.65, 0.5, 0.4] }
+  ]
+}
