@@ -6,6 +6,10 @@
     }
   ],
   "rewrites": [
+    { "source": "/manifest.webmanifest", "destination": "/manifest.webmanifest" },
+    { "source": "/favicon.ico", "destination": "/favicon.ico" },
+    { "source": "/robots.txt", "destination": "/robots.txt" },
+    { "source": "/_next/static/:path*", "destination": "/_next/static/:path*" }, 
     {
       "source": "/assets/(.*)",
       "destination": "/assets/$1"
