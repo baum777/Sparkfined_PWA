@@ -1,0 +1,100 @@
+---
+title: "Suggested Patch — API Rules Contract Tests"
+sources:
+  - api/rules/index.ts
+  - tests/cases/analyze-bullets-ai/ABA-UNIT-001.test.ts
+---
+
+diff --git a/tests/integration/api-rules.contract.test.ts b/tests/integration/api-rules.contract.test.ts
+new file mode 100644
+index 0000000..abcdef0
+--- /dev/null
++++ b/tests/integration/api-rules.contract.test.ts
+@@
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++import handler from '../../api/rules/index';
++
++function createReq(body?: unknown, method = 'POST') {
++  return new Request('https://app.local/api/rules', {
++    method,
++    headers: { 'content-type': 'application/json', 'x-user-id': 'test-user' },
++    body: body ? JSON.stringify(body) : undefined,
++  });
++}
++
++async function run(req: Request) {
++  const res = await handler(req);
++  const json = await res.json();
++  return { status: res.status, json };
++}
++
++describe('api/rules contract', () => {
++  const kv = new Map<string, any>();
++
++  beforeEach(() => {
++    vi.stubGlobal('crypto', { randomUUID: () => 'mock-rule-id' } as any);
++    vi.mock('../../src/lib/kv', async () => {
++      const { kvGet, kvSet, kvDel, kvSAdd, kvSMembers } = await vi.importActual<typeof import('../../src/lib/kv')>('../../src/lib/kv');
++      return {
++        kvGet: vi.fn((key: string) => Promise.resolve(kv.get(key))),
++        kvSet: vi.fn((key: string, value: unknown) => {
++          kv.set(key, value);
++          return Promise.resolve();
++        }),
++        kvDel: vi.fn((key: string) => {
++          kv.delete(key);
++          return Promise.resolve();
++        }),
++        kvSAdd: vi.fn((key: string, value: string) => {
++          const set = kv.get(key) ?? new Set<string>();
++          set.add(value);
++          kv.set(key, set);
++          return Promise.resolve();
++        }),
++        kvSMembers: vi.fn((key: string) => Promise.resolve(Array.from((kv.get(key) ?? new Set<string>()) as Set<string>))),
++      };
++    });
++  });
++
++  afterEach(() => {
++    vi.restoreAllMocks();
++    (kv as Map<string, any>).clear();
++  });
++
++  it('creates rule with validation', async () => {
++    const { status, json } = await run(
++      createReq({
++        address: 'So11111111111111111111111111111111111111112',
++        tf: '15m',
++        rule: { kind: 'price-cross', op: '>', value: 1.23 },
++      }),
++    );
++
++    expect(status).toBe(200);
++    expect(json.ok).toBe(true);
++    expect(json.rule.address).toContain('So1111');
++  });
++
++  it('rejects missing fields', async () => {
++    const { status, json } = await run(createReq({ address: '', tf: '', rule: null }));
++    expect(status).toBe(400);
++    expect(json.ok).toBe(false);
++  });
++
++  it('lists previously stored rules', async () => {
++    await run(
++      createReq({
++        address: 'So11111111111111111111111111111111111111112',
++        tf: '15m',
++        rule: { kind: 'price-cross', op: '>', value: 1.23 },
++      }),
++    );
++
++    const listReq = new Request('https://app.local/api/rules', { method: 'GET', headers: { 'x-user-id': 'test-user' } });
++    const listRes = await handler(listReq);
++    const listJson = await listRes.json();
++
++    expect(listJson.rules).toHaveLength(1);
++    expect(listJson.rules[0].id).toBe('mock-rule-id');
++  });
++});
