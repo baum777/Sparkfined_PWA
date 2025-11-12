@@ -1,0 +1,3 @@
+start_commit: c7ed5b420fced470d6d47f56498beb15f1b24a11
+log: lets-think-and-reason-step-by-step
+end: docs consolidated
