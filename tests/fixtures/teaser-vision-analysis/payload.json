@@ -1,0 +1,19 @@
+{
+  "provider": "openai",
+  "imageDataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAGgwJ/lWfu5wAAAABJRU5ErkJggg==",
+  "ocrData": {
+    "labels": ["RSI", "VWAP"],
+    "indicators": { "rsi": 64 }
+  },
+  "dexData": {
+    "price": 0.000043,
+    "high24": 0.000052,
+    "low24": 0.000031,
+    "vol24": 1250000
+  },
+  "pumpfunData": {
+    "symbol": "SOLX",
+    "liquidity": 120000
+  },
+  "contractAddress": "So11111111111111111111111111111111111111112"
+}
