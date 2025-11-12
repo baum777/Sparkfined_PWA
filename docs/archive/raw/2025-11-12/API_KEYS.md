@@ -90,7 +90,7 @@ Alle Frontend-Variablen müssen mit `VITE_` beginnen, damit sie im Browser verf�
 | Variable | Beschreibung | Standard |
 |----------|--------------|----------|
 | `VITE_APP_VERSION` | App-Version | `1.0.0-beta` |
-| `VITE_MORALIS_API_KEY` | Moralis-Key (Frontend, optional) | - |
+| `VITE_MORALIS_API_KEY` | **Deprecated.** Nicht mehr setzen; Proxy nutzt `MORALIS_API_KEY`. | - |
 | `VITE_MORALIS_BASE` | Moralis-Basis-URL (Frontend) | `https://deep-index.moralis.io/api/v2.2` |
 | `VITE_DEXPAPRIKA_BASE` | DexPaprika-Basis-URL (Frontend) | `https://api.dexpaprika.com` |
 | `VITE_DATA_PRIMARY` | Primärer Datenprovider | `dexpaprika` |

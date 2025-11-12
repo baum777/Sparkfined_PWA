@@ -270,7 +270,7 @@ export function heuristicToTeaser(heuristic: HeuristicAnalysis): AITeaserAnalysi
 function generateTeaserText(heuristic: HeuristicAnalysis): string {
   const { bias, volatility24h, rsiOverbought, rsiOversold } = heuristic
 
-  let text = ''
+  let text = 'Analysis: '
 
   // Bias statement
   if (bias === 'Bullish') {

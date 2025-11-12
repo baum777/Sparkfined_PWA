@@ -260,7 +260,10 @@ async function parseBuyTransactions(payload: MoralisStreamPayload) {
 async function fetchTokenData(
   address: string
 ): Promise<{ price: number; mcap: number } | null> {
-  const MORALIS_BASE = process.env.MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2'
+  const MORALIS_BASE =
+    process.env.MORALIS_BASE_URL ||
+    process.env.MORALIS_BASE ||
+    'https://deep-index.moralis.io/api/v2.2'
   const MORALIS_API_KEY = process.env.MORALIS_API_KEY
 
   if (!MORALIS_API_KEY) {

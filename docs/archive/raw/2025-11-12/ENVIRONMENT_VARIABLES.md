@@ -42,8 +42,9 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
 | Variable | Default | Description | Where to Get |
 |----------|---------|-------------|--------------|
 | `MORALIS_API_KEY` | - | Moralis API key (backend) | [admin.moralis.io](https://admin.moralis.io/) |
-| `MORALIS_BASE` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL | - |
-| `VITE_MORALIS_API_KEY` | - | Moralis key (frontend, optional) | Same as above |
+| `MORALIS_BASE` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL (legacy) | - |
+| `MORALIS_BASE_URL` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL override for serverless proxy | Optional |
+| `VITE_MORALIS_API_KEY` | - | **Deprecated.** Nicht mehr setzen; verwende `MORALIS_API_KEY` (Server). | Same as above |
 | `VITE_MORALIS_BASE` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL (frontend) | - |
 | `MORALIS_WEBHOOK_SECRET` | - | HMAC secret to verify Moralis Streams webhooks | Set manually (deploy env only) |
 | `ENABLE_OG_MINT` | `false` | Enables OG lock/mint endpoints when `true` | Set manually |

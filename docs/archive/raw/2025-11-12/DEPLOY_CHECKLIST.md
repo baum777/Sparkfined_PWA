@@ -29,7 +29,7 @@
 **Production Environment:**
 ```bash
 # Required
-VITE_MORALIS_API_KEY=your_moralis_api_key_here
+MORALIS_API_KEY=REDACTED_TOKEN
 VITE_APP_VERSION=1.0.0-beta
 
 # Optional (but recommended)
@@ -40,7 +40,7 @@ VITE_VAPID_PUBLIC_KEY=your_vapid_public_key_here
 **Preview Environment:**
 ```bash
 # Same as Production (recommended)
-VITE_MORALIS_API_KEY=your_moralis_api_key_here
+MORALIS_API_KEY=REDACTED_TOKEN
 VITE_APP_VERSION=1.0.0-beta-preview
 VITE_OPENAI_API_KEY=your_openai_key_here
 VITE_VAPID_PUBLIC_KEY=your_vapid_public_key_here
