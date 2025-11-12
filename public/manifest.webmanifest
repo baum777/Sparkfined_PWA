@@ -1,4 +1,6 @@
 {
+  "id": "/",
+  "lang": "en",
   "name": "Sparkfined",
   "short_name": "Sparkfined",
   "description": "Crypto trading analytics PWA with charting, signals, and offline-first UX.",

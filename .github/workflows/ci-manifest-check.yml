@@ -1,0 +1,39 @@
+name: CI - Manifest & Static Smoke Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  manifest-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Smoke check - manifest reachable
+        env:
+          URL: ${{ secrets.DEPLOY_URL }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${URL:-}" ]; then
+            echo "DEPLOY_URL secret is not set. Skipping smoke check."
+            exit 0
+          fi
+
+          manifest_status=$(curl -s -o /tmp/manifest.headers -w "%{http_code}" -D - "$URL/manifest.webmanifest")
+          echo "manifest status: $manifest_status"
+          if [ "$manifest_status" -ne 200 ]; then
+            echo "manifest.webmanifest not reachable (status $manifest_status)"
+            cat /tmp/manifest.headers
+            exit 1
+          fi
+
+          if grep -qi "^set-cookie:.*_vercel_sso_nonce" /tmp/manifest.headers; then
+            echo "manifest response contains Vercel SSO nonce cookie"
+            cat /tmp/manifest.headers
+            exit 1
+          fi
+
+          static_target=${STATIC_SAMPLE:-_next/static/chunks/webpack.js}
+          static_status=$(curl -s -o /dev/null -w "%{http_code}" "$URL/${static_target#/}")
+          echo "static check ($static_target) status: $static_status"

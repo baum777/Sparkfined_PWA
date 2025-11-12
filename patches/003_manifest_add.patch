@@ -1,0 +1,10 @@
+diff --git a/public/manifest.webmanifest b/public/manifest.webmanifest
+--- a/public/manifest.webmanifest
++++ b/public/manifest.webmanifest
+@@ -1,4 +1,6 @@
+ {
++  "id": "/",
++  "lang": "en",
+   "name": "Sparkfined",
+   "short_name": "Sparkfined",
+   "description": "Crypto trading analytics PWA with charting, signals, and offline-first UX.",

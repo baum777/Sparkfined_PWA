@@ -1,0 +1,5 @@
+Run Summary - 2025-11-12T10:03:08Z
+
+1. Added Vercel protectionBypass entries to bypass SSO for static assets.
+2. Extended rewrites to short-circuit manifest/favicon/robots and _next paths before SPA catch-all.
+3. Created manifest metadata additions, CI workflow, smoke script, docs, and PR description updates.

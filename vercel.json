@@ -1,40 +1,65 @@
-{
-  "crons": [
-    {
-      "path": "/api/cron/cleanup-temp-entries",
-      "schedule": "0 2 * * *"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/assets/(.*)",
-      "destination": "/assets/$1"
-    },
-    {
-      "source": "/icons/(.*)",
-      "destination": "/icons/$1"
-    },
-    {
-      "source": "/manifest.webmanifest",
-      "destination": "/manifest.webmanifest"
-    },
-    {
-      "source": "/sw.js",
-      "destination": "/sw.js"
-    },
-    {
-      "source": "/registerSW.js",
-      "destination": "/registerSW.js"
-    },
-    {
-      "source": "/workbox-(.*)",
-      "destination": "/workbox-$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
+  {
+    "crons": [
+      {
+        "path": "/api/cron/cleanup-temp-entries",
+        "schedule": "0 2 * * *"
+      }
+    ],
+    "protectionBypass": [
+      { "source": "/manifest.webmanifest" },
+      { "source": "/favicon.ico" },
+      { "source": "/robots.txt" },
+      { "source": "/_next/static/(.*)" },
+      { "source": "/_next/image/(.*)" },
+      { "source": "/static/(.*)" },
+      { "source": "/public/(.*)" }
+    ],
+    "rewrites": [
+      {
+        "source": "/assets/(.*)",
+        "destination": "/assets/$1"
+      },
+      {
+        "source": "/icons/(.*)",
+        "destination": "/icons/$1"
+      },
+      {
+        "source": "/_next/static/(.*)",
+        "destination": "/_next/static/$1"
+      },
+      {
+        "source": "/_next/image/(.*)",
+        "destination": "/_next/image/$1"
+      },
+      {
+        "source": "/favicon.ico",
+        "destination": "/favicon.ico"
+      },
+      {
+        "source": "/robots.txt",
+        "destination": "/robots.txt"
+      },
+      {
+        "source": "/manifest.webmanifest",
+        "destination": "/manifest.webmanifest"
+      },
+      {
+        "source": "/sw.js",
+        "destination": "/sw.js"
+      },
+      {
+        "source": "/registerSW.js",
+        "destination": "/registerSW.js"
+      },
+      {
+        "source": "/workbox-(.*)",
+        "destination": "/workbox-$1"
+      },
+      {
+        "source": "/(.*)",
+        "destination": "/index.html"
+      }
+    ],
   "headers": [
     {
       "source": "/(.*)",
