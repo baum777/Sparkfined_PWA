@@ -106,6 +106,9 @@ async function getMoralisFirstTransaction(address: string): Promise<number | nul
 
     if (data.result && data.result.length > 0) {
       const firstTx = data.result[0]
+      if (!firstTx) {
+        return null
+      }
       return new Date(firstTx.block_timestamp).getTime()
     }
 

@@ -19,23 +19,24 @@ export interface MoralisProxyOptions extends Omit<RequestInit, 'body'> {
  */
 export async function moralisFetch<T = unknown>(
   path: string,
-  options: MoralisProxyOptions = {}
+  options: MoralisProxyOptions = {},
 ): Promise<T> {
   const url = `/api/moralis${path.startsWith('/') ? path : `/${path}`}`
   const headers = new Headers(options.headers)
+  const { body, rawBody, ...rest } = options
 
   const init: RequestInit = {
-    ...options,
+    ...rest,
     headers,
   }
 
-  if (options.rawBody !== undefined) {
-    init.body = options.rawBody
-  } else if (options.body !== undefined && options.body !== null) {
+  if (rawBody !== undefined) {
+    init.body = rawBody
+  } else if (body !== undefined && body !== null) {
     if (!headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json')
     }
-    init.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body)
+    init.body = typeof body === 'string' ? body : JSON.stringify(body)
   }
 
   try {
