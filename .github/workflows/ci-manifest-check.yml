@@ -1,0 +1,35 @@
+name: CI - Manifest & Static Smoke Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  manifest-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Manifest reachable smoke test
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DEPLOY_URL:-}" ]; then
+            echo "DEPLOY_URL secret not set. Skipping smoke test."
+            exit 0
+          fi
+          echo "Checking manifest at ${DEPLOY_URL}/manifest.webmanifest"
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${DEPLOY_URL}/manifest.webmanifest")
+          echo "manifest status: $status"
+          if [ "$status" -ne 200 ]; then
+            echo "manifest.webmanifest not reachable (status $status)"
+            exit 1
+          fi
+          echo "Checking _next static (sample)"
+          status2=$(curl -s -o /dev/null -w "%{http_code}" "${DEPLOY_URL}/_next/static" || echo 404)
+          echo "_next/static status: $status2"
+          echo "Smoke test passed for manifest."
+*** End Patch
+
