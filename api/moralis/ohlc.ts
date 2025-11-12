@@ -2,7 +2,10 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 type Ohlc = { t: number; o: number; h: number; l: number; c: number; v?: number };
 
-const MORALIS_BASE = process.env.MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2';
+const MORALIS_BASE =
+  process.env.MORALIS_BASE_URL ||
+  process.env.MORALIS_BASE ||
+  'https://deep-index.moralis.io/api/v2.2';
 const MORALIS_API_KEY = process.env.MORALIS_API_KEY || '';
 const CACHE_TTL = 10_000; // 10 seconds
 

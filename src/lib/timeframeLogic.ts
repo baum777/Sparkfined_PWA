@@ -12,13 +12,11 @@
 
 import { getPumpfunData } from './adapters/pumpfunAdapter'
 import type { Timeframe } from '@/types/journal'
+import { moralisFetch } from './moralisProxy'
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
-
-const MORALIS_BASE = import.meta.env.VITE_MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2'
-const MORALIS_API_KEY = import.meta.env.VITE_MORALIS_API_KEY || ''
 
 // Age thresholds (in milliseconds)
 const ONE_DAY_MS = 24 * 60 * 60 * 1000
@@ -99,30 +97,13 @@ export async function getTokenAge(address: string): Promise<TokenAgeResult> {
  * Get first transaction timestamp from Moralis
  */
 async function getMoralisFirstTransaction(address: string): Promise<number | null> {
-  if (!MORALIS_API_KEY) {
-    console.warn('[TokenAge] MORALIS_API_KEY not configured')
-    return null
-  }
-
   try {
     // Get wallet history for token (oldest first, limit 1)
-    const url = `${MORALIS_BASE}/erc20/${address}/transactions?chain=mainnet&order=asc&limit=1`
-    
-    const response = await fetch(url, {
-      headers: {
-        'X-API-Key': MORALIS_API_KEY,
-        'Accept': 'application/json',
-      },
+    const path = `/erc20/${address}/transactions?chain=mainnet&order=asc&limit=1`
+    const data = await moralisFetch<{ result?: Array<{ block_timestamp: string }> }>(path, {
       signal: AbortSignal.timeout(5000),
     })
 
-    if (!response.ok) {
-      console.error('[TokenAge] Moralis API error:', response.status)
-      return null
-    }
-
-    const data = await response.json()
-    
     if (data.result && data.result.length > 0) {
       const firstTx = data.result[0]
       return new Date(firstTx.block_timestamp).getTime()

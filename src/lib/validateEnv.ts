@@ -18,11 +18,6 @@ interface EnvCheck {
 const ENV_CHECKS: EnvCheck[] = [
   // CRITICAL - App won't function without these
   {
-    key: 'VITE_MORALIS_API_KEY',
-    required: true,
-    description: 'Moralis API key (for chart data)',
-  },
-  {
     key: 'VITE_DEXPAPRIKA_BASE',
     required: false,
     description: 'DexPaprika API base URL (fallback provider)',
@@ -78,7 +73,8 @@ export function hasFeature(feature: 'ai' | 'notifications' | 'charts'): boolean 
     case 'notifications':
       return !!(import.meta.env.VITE_VAPID_PUBLIC_KEY)
     case 'charts':
-      return !!(import.meta.env.VITE_MORALIS_API_KEY || import.meta.env.VITE_DEXPAPRIKA_BASE)
+      // Chart data now flows through the secure Moralis proxy; rely on server checks
+      return true
     default:
       return false
   }

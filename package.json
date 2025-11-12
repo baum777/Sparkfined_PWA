@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b tsconfig.build.json && vite build",
+    "prebuild": "pnpm run check-env",
     "build:local": "pnpm build && pnpm check:size",
     "build:ci": "pnpm build:local && pnpm test:e2e",
     "preview": "vite preview",
@@ -20,7 +21,8 @@
     "test": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check:size": "node scripts/check-bundle-size.mjs"
+    "check:size": "node scripts/check-bundle-size.mjs",
+    "check-env": "node scripts/check-env.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.0",

@@ -19,7 +19,10 @@ const cache = new Map<string, CacheEntry>()
 const toSeconds = (ms: number) => Math.max(Math.floor(ms / 1000), 0)
 
 function getMoralisBase(): string {
-  const base = process.env.MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2'
+  const base =
+    process.env.MORALIS_BASE_URL ||
+    process.env.MORALIS_BASE ||
+    'https://deep-index.moralis.io/api/v2.2'
   return base.endsWith('/') ? base.slice(0, -1) : base
 }
 

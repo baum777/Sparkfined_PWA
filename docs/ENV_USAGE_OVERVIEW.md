@@ -17,10 +17,10 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
 
 | Variable | Verwendungszweck |
 |----------|------------------|
-| `VITE_MORALIS_API_KEY` | Frontend-Zugriff auf Moralis für Token-Daten und Blockchain-Informationen. |
+| `VITE_MORALIS_API_KEY` | **Deprecated.** Moralis-Schlüssel wird nun ausschließlich serverseitig über `MORALIS_API_KEY` genutzt. |
 | `VITE_MORALIS_BASE` | Basis-URL für Moralis API-Calls vom Frontend. |
 | `MORALIS_API_KEY` | Backend-Zugriff auf Moralis für Server-seitige API-Calls. |
-| `MORALIS_BASE` | Basis-URL für Moralis API-Calls vom Backend. |
+| `MORALIS_BASE` | Basis-URL für Moralis API-Calls vom Backend (legacy, bevorzugt `MORALIS_BASE_URL`). |
 | `MORALIS_WEBHOOK_SECRET` | Verifiziert eingehende Moralis Streams Webhooks (HMAC). |
 | `VITE_DEXPAPRIKA_BASE` | Frontend-Zugriff auf DexPaprika API (alternative Datenquelle). |
 | `DEXPAPRIKA_API_KEY` | Backend-Zugriff auf DexPaprika API mit Authentifizierung. |

@@ -20,14 +20,14 @@ import type {
   AdapterResponse,
   ChainId,
 } from '../../types/market'
+import { moralisFetch } from '../moralisProxy'
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
 const DEFAULT_CONFIG: AdapterConfig = {
-  baseUrl: import.meta.env.VITE_MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2',
-  apiKey: import.meta.env.VITE_MORALIS_API_KEY || '',
+  baseUrl: '/api/moralis',
   timeout: 6000, // 6s timeout (Moralis can be slower)
   retries: 2,
   cacheTtl: 10 * 60 * 1000, // 10 min cache TTL
@@ -114,44 +114,32 @@ async function fetchMoralisPrice(
 
   try {
     const moralisChain = CHAIN_MAP[chain]
-    const url =
+    const path =
       chain === 'solana'
-        ? `${config.baseUrl}/solana/mainnet/token/${address}/price`
-        : `${config.baseUrl}/erc20/${address}/price?chain=${moralisChain}`
+        ? `/solana/mainnet/token/${address}/price`
+        : `/erc20/${address}/price?chain=${moralisChain}`
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      accept: 'application/json',
-    }
-
-    if (config.apiKey) {
-      headers['X-API-Key'] = config.apiKey
-    }
-
-    const response = await fetch(url, {
+    const data = await moralisFetch<MoralisPriceResponse>(path, {
       signal: controller.signal,
-      headers,
+      headers: {
+        accept: 'application/json',
+      },
     })
 
     clearTimeout(timeoutId)
-
-    if (!response.ok) {
-      if (response.status === 429 && attempt <= config.retries) {
-        // Rate limit - exponential backoff
-        const delay = Math.pow(2, attempt) * 1000
-        await new Promise((resolve) => setTimeout(resolve, delay))
-        return fetchMoralisPrice(address, chain, config, attempt + 1)
-      }
-
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-    }
-
-    const data = await response.json()
     return data
   } catch (error) {
     clearTimeout(timeoutId)
 
-    // Retry on network error
+    const status = typeof error === 'object' && error && 'status' in error ? (error as any).status : undefined
+
+    if (status === 429 && attempt <= config.retries) {
+      const delay = Math.pow(2, attempt) * 1000
+      await new Promise((resolve) => setTimeout(resolve, delay))
+      return fetchMoralisPrice(address, chain, config, attempt + 1)
+    }
+
+    // Retry on generic network error as well
     if (attempt <= config.retries && error instanceof Error) {
       const delay = Math.pow(2, attempt) * 1000
       await new Promise((resolve) => setTimeout(resolve, delay))
@@ -181,29 +169,17 @@ async function fetchMoralisPair(
 
   try {
     const moralisChain = CHAIN_MAP[chain]
-    const url = `${config.baseUrl}/erc20/${pairAddress}/reserves?chain=${moralisChain}`
+    const path = `/erc20/${pairAddress}/reserves?chain=${moralisChain}`
 
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      accept: 'application/json',
-    }
-
-    if (config.apiKey) {
-      headers['X-API-Key'] = config.apiKey
-    }
-
-    const response = await fetch(url, {
+    const data = await moralisFetch<any>(path, {
       signal: controller.signal,
-      headers,
+      headers: {
+        accept: 'application/json',
+      },
     })
 
     clearTimeout(timeoutId)
-
-    if (!response.ok) {
-      return null // Pair data is optional
-    }
-
-    return response.json()
+    return data
   } catch {
     clearTimeout(timeoutId)
     return null
@@ -348,25 +324,6 @@ export async function getMoralisSnapshot(
           retries: 0,
         },
       }
-    }
-  }
-
-  // Validate API key
-  if (!DEFAULT_CONFIG.apiKey) {
-    return {
-      success: false,
-      error: {
-        code: 'INVALID_ADDRESS',
-        message: 'Moralis API key not configured (VITE_MORALIS_API_KEY)',
-        provider: 'moralis',
-        timestamp: Date.now(),
-      },
-      metadata: {
-        provider: 'moralis',
-        cached: false,
-        latency: Date.now() - startTime,
-        retries: 0,
-      },
     }
   }
 

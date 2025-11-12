@@ -1,0 +1,615 @@
+diff --git a/.env.example b/.env.example
+index 2f8569b..8e0a6d5 100644
+--- a/.env.example
++++ b/.env.example
+@@ -13,19 +13,18 @@ VITE_APP_VERSION=1.0.0-beta
+ # DATA PROVIDERS (FRONTEND & BACKEND) - ACTIVE
+ # ============================================
+ 
+-# Moralis API Configuration
++# Moralis API Configuration (server-side secrets only)
+ VITE_MORALIS_BASE=https://deep-index.moralis.io/api/v2.2
+-VITE_MORALIS_API_KEY=YOUR_MORALIS_KEY_HERE
+-MORALIS_API_KEY=YOUR_MORALIS_KEY_HERE
+-MORALIS_BASE=https://deep-index.moralis.io/api/v2.2
+-MORALIS_PROXY_TTL_MS=10000
+-MORALIS_WEBHOOK_SECRET=CHANGE_ME_FOR_MORALIS_WEBHOOK
++MORALIS_API_KEY=REDACTED_TOKEN
++MORALIS_BASE_URL=https://deep-index.moralis.io/api/v2.2
++MORALIS_PROXY_TTL_MS=60000
++MORALIS_WEBHOOK_SECRET=REDACTED_TOKEN
+ 
+ # DexPaprika API Configuration
+ VITE_DEXPAPRIKA_BASE=https://api.dexpaprika.com
+-DEXPAPRIKA_API_KEY=YOUR_DEXPAPRIKA_KEY_HERE
++DEXPAPRIKA_API_KEY=REDACTED_TOKEN
+ DEXPAPRIKA_BASE=https://api.dexpaprika.com
+-DATA_PROXY_SECRET=CHANGE_ME_FOR_DATA_PROXY
++DATA_PROXY_SECRET=REDACTED_TOKEN
+ ENABLE_OG_MINT=false
+ 
+ # Data Provider Priority
+@@ -40,15 +39,15 @@ VITE_DATA_FALLBACKS=dexscreener,pumpfun
+ # ============================================
+ 
+ # OpenAI API
+-OPENAI_API_KEY=YOUR_OPENAI_KEY_HERE
++OPENAI_API_KEY=REDACTED_TOKEN
+ 
+ # xAI/Grok API
+-XAI_API_KEY=YOUR_XAI_KEY_HERE
++XAI_API_KEY=REDACTED_TOKEN
+ 
+ # AI Configuration
+ AI_MAX_COST_USD=0.25
+ AI_CACHE_TTL_SEC=3600
+-AI_PROXY_SECRET=CHANGE_ME_FOR_AI_PROXY
++AI_PROXY_SECRET=REDACTED_TOKEN
+ ANALYSIS_AI_PROVIDER=openai
+ 
+ # ============================================
+@@ -83,8 +82,8 @@ VITE_WALLETFLOW_PROVIDER=none
+ # # Web Push Notifications (DISABLED)
+ # # Generate via: npx web-push generate-vapid-keys
+ # VITE_VAPID_PUBLIC_KEY=
+-# VAPID_PUBLIC_KEY=
+-# VAPID_PRIVATE_KEY=
++# VAPID_PUBLIC_KEY=REDACTED_TOKEN
++# VAPID_PRIVATE_KEY=REDACTED_TOKEN
+ # VAPID_SUBJECT=mailto:your-email@example.com
+ # VAPID_CONTACT=mailto:your-email@example.com
+ # ALERTS_ADMIN_SECRET=CHANGE_ME_FOR_ALERTS
+@@ -93,7 +92,7 @@ VITE_WALLETFLOW_PROVIDER=none
+ # VITE_SOLANA_NETWORK=mainnet-beta
+ # VITE_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+ # SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+-# SOLANA_KEYPAIR_JSON=
++# SOLANA_KEYPAIR_JSON=REDACTED_TOKEN
+ # ACCESS_OG_SYMBOL=OGPASS
+ # ACCESS_TOKEN_MINT=So11111111111111111111111111111111111111112
+ 
+@@ -115,6 +114,7 @@ VITE_WALLETFLOW_PROVIDER=none
+ # # Development Only (DISABLED)
+ # DEV_API_URL=http://localhost:8787
+ # DEV_SKIP_HTTPS=true
++# DEV_USE_MOCKS=true
+ 
+ # ============================================
+ # DEPLOYMENT (VERCEL)
+@@ -133,7 +133,7 @@ VITE_WALLETFLOW_PROVIDER=none
+ # MINIMUM REQUIRED FOR MVP:
+ # 1. VITE_APP_VERSION=1.0.0-beta
+ # 2. Choose one data provider:
+-#    Option A: MORALIS_API_KEY + MORALIS_BASE (recommended)
++#    Option A: MORALIS_API_KEY + MORALIS_BASE_URL (recommended)
+ #    Option B: DEXPAPRIKA_API_KEY + DEXPAPRIKA_BASE
+ # 3. (Optional) OPENAI_API_KEY for AI features
+ 
+diff --git a/README.md b/README.md
+index 121a57c..2fb4233 100644
+--- a/README.md
++++ b/README.md
+@@ -37,8 +37,8 @@ pnpm install
+ # Copy environment template
+ cp .env.example .env.local
+ 
+-# Add required API keys to .env.local
+-# - MORALIS_API_KEY (required)
++# Add required API keys to .env.local (server-only)
++# - MORALIS_API_KEY (required for Moralis proxy)
+ # - OPENAI_API_KEY (optional, for AI features)
+ # - VITE_SOLANA_RPC_URL (optional, defaults to mainnet)
+ 
+@@ -99,12 +99,13 @@ pnpm lighthouse    # Lighthouse audit (requires preview)
+ ### Manual Deployment
+ 
+ 1. **Connect Git Repository** in Vercel Dashboard
+-2. **Set Environment Variables:**
++2. **Set Environment Variables (Vercel Project → Settings → Environment Variables):**
+    ```
+-   MORALIS_API_KEY=your_api_key
+-   MORALIS_BASE=https://deep-index.moralis.io/api/v2.2
+-   OPENAI_API_KEY=your_openai_key (optional)
++   MORALIS_API_KEY=REDACTED_TOKEN
++   MORALIS_BASE_URL=https://deep-index.moralis.io/api/v2.2
++   OPENAI_API_KEY=REDACTED_TOKEN # optional
+    ```
++   > ⚠️ Do **not** expose `VITE_MORALIS_API_KEY` anymore. The Moralis key must stay server-side.
+ 3. **Deploy:** Push to main branch → auto-deploy
+ 4. **Verify:** Check Lighthouse scores (target 90+ in all categories)
+ 
+@@ -114,14 +115,15 @@ pnpm lighthouse    # Lighthouse audit (requires preview)
+ |----------|----------|-------------|
+ | `DEXPAPRIKA_BASE` | ✅ | Base URL for DexPaprika OHLC API (primary provider) |
+ | `DEXPAPRIKA_API_KEY` | ❌ | DexPaprika API key (if required by plan) |
+-| `MORALIS_API_KEY` | ✅ | Moralis Deep Index API key for fallback data |
+-| `MORALIS_BASE` | ✅ | Base URL for Moralis API |
++| `MORALIS_API_KEY` | ✅ | Server-only Moralis API key consumed by `/api/moralis` |
++| `MORALIS_BASE_URL` | ❌ | Override base URL for Moralis API (defaults to official endpoint) |
+ | `DATA_PROXY_SECRET` | ✅ | Shared secret for internal API proxy calls |
+ | `OPENAI_API_KEY` | ❌ | OpenAI API key for AI features |
+ | `ANTHROPIC_API_KEY` | ❌ | Alternative AI provider |
+ | `VITE_SOLANA_RPC_URL` | ❌ | Solana RPC endpoint (defaults to mainnet) |
+ | `VAPID_PUBLIC_KEY` | ❌ | Web Push public key |
+ | `VAPID_PRIVATE_KEY` | ❌ | Web Push private key (server-side only) |
++| `DEV_USE_MOCKS` | ❌ | When `true`, proxy returns mocked responses instead of live Moralis calls |
+ 
+ *Note: Client-side variables must be prefixed with `VITE_`*
+ 
+diff --git a/api/moralis/ohlc.ts b/api/moralis/ohlc.ts
+index 36f6379..99cd4c0 100644
+--- a/api/moralis/ohlc.ts
++++ b/api/moralis/ohlc.ts
+@@ -2,7 +2,10 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
+ 
+ type Ohlc = { t: number; o: number; h: number; l: number; c: number; v?: number };
+ 
+-const MORALIS_BASE = process.env.MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2';
++const MORALIS_BASE =
++  process.env.MORALIS_BASE_URL ||
++  process.env.MORALIS_BASE ||
++  'https://deep-index.moralis.io/api/v2.2';
+ const MORALIS_API_KEY = process.env.MORALIS_API_KEY || '';
+ const CACHE_TTL = 10_000; // 10 seconds
+ 
+diff --git a/api/moralis/token.ts b/api/moralis/token.ts
+index 06b0ada..d9b93ac 100644
+--- a/api/moralis/token.ts
++++ b/api/moralis/token.ts
+@@ -19,7 +19,10 @@ const cache = new Map<string, CacheEntry>()
+ const toSeconds = (ms: number) => Math.max(Math.floor(ms / 1000), 0)
+ 
+ function getMoralisBase(): string {
+-  const base = process.env.MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2'
++  const base =
++    process.env.MORALIS_BASE_URL ||
++    process.env.MORALIS_BASE ||
++    'https://deep-index.moralis.io/api/v2.2'
+   return base.endsWith('/') ? base.slice(0, -1) : base
+ }
+ 
+diff --git a/api/moralis/token/[address].ts b/api/moralis/token/[address].ts
+index 0d27969..6be136b 100644
+--- a/api/moralis/token/[address].ts
++++ b/api/moralis/token/[address].ts
+@@ -13,7 +13,10 @@
+ 
+ import type { VercelRequest, VercelResponse } from '@vercel/node';
+ 
+-const MORALIS_BASE = process.env.MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2';
++const MORALIS_BASE =
++  process.env.MORALIS_BASE_URL ||
++  process.env.MORALIS_BASE ||
++  'https://deep-index.moralis.io/api/v2.2';
+ const MORALIS_API_KEY = process.env.MORALIS_API_KEY || '';
+ const TIMEOUT_MS = 6000; // 6s timeout for Moralis
+ const MAX_RETRIES = 1;
+diff --git a/api/wallet/webhook.ts b/api/wallet/webhook.ts
+index 2f488b4..8d357aa 100644
+--- a/api/wallet/webhook.ts
++++ b/api/wallet/webhook.ts
+@@ -260,7 +260,10 @@ async function parseBuyTransactions(payload: MoralisStreamPayload) {
+ async function fetchTokenData(
+   address: string
+ ): Promise<{ price: number; mcap: number } | null> {
+-  const MORALIS_BASE = process.env.MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2'
++  const MORALIS_BASE =
++    process.env.MORALIS_BASE_URL ||
++    process.env.MORALIS_BASE ||
++    'https://deep-index.moralis.io/api/v2.2'
+   const MORALIS_API_KEY = process.env.MORALIS_API_KEY
+ 
+   if (!MORALIS_API_KEY) {
+diff --git a/docs/API_KEYS.md b/docs/API_KEYS.md
+index 8aef881..f74434c 100644
+--- a/docs/API_KEYS.md
++++ b/docs/API_KEYS.md
+@@ -90,7 +90,7 @@ Alle Frontend-Variablen müssen mit `VITE_` beginnen, damit sie im Browser verf
+ | Variable | Beschreibung | Standard |
+ |----------|--------------|----------|
+ | `VITE_APP_VERSION` | App-Version | `1.0.0-beta` |
+-| `VITE_MORALIS_API_KEY` | Moralis-Key (Frontend, optional) | - |
++| `VITE_MORALIS_API_KEY` | **Deprecated.** Nicht mehr setzen; Proxy nutzt `MORALIS_API_KEY`. | - |
+ | `VITE_MORALIS_BASE` | Moralis-Basis-URL (Frontend) | `https://deep-index.moralis.io/api/v2.2` |
+ | `VITE_DEXPAPRIKA_BASE` | DexPaprika-Basis-URL (Frontend) | `https://api.dexpaprika.com` |
+ | `VITE_DATA_PRIMARY` | Primärer Datenprovider | `dexpaprika` |
+diff --git a/docs/DEPLOY_CHECKLIST.md b/docs/DEPLOY_CHECKLIST.md
+index 64eab99..135b017 100644
+--- a/docs/DEPLOY_CHECKLIST.md
++++ b/docs/DEPLOY_CHECKLIST.md
+@@ -29,7 +29,7 @@
+ **Production Environment:**
+ ```bash
+ # Required
+-VITE_MORALIS_API_KEY=your_moralis_api_key_here
++MORALIS_API_KEY=REDACTED_TOKEN
+ VITE_APP_VERSION=1.0.0-beta
+ 
+ # Optional (but recommended)
+@@ -40,7 +40,7 @@ VITE_VAPID_PUBLIC_KEY=your_vapid_public_key_here
+ **Preview Environment:**
+ ```bash
+ # Same as Production (recommended)
+-VITE_MORALIS_API_KEY=your_moralis_api_key_here
++MORALIS_API_KEY=REDACTED_TOKEN
+ VITE_APP_VERSION=1.0.0-beta-preview
+ VITE_OPENAI_API_KEY=your_openai_key_here
+ VITE_VAPID_PUBLIC_KEY=your_vapid_public_key_here
+diff --git a/docs/ENVIRONMENT_VARIABLES.md b/docs/ENVIRONMENT_VARIABLES.md
+index 5925a0e..4e43823 100644
+--- a/docs/ENVIRONMENT_VARIABLES.md
++++ b/docs/ENVIRONMENT_VARIABLES.md
+@@ -42,8 +42,9 @@ DEXPAPRIKA_BASE=https://api.dexpaprika.com
+ | Variable | Default | Description | Where to Get |
+ |----------|---------|-------------|--------------|
+ | `MORALIS_API_KEY` | - | Moralis API key (backend) | [admin.moralis.io](https://admin.moralis.io/) |
+-| `MORALIS_BASE` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL | - |
+-| `VITE_MORALIS_API_KEY` | - | Moralis key (frontend, optional) | Same as above |
++| `MORALIS_BASE` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL (legacy) | - |
++| `MORALIS_BASE_URL` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL override for serverless proxy | Optional |
++| `VITE_MORALIS_API_KEY` | - | **Deprecated.** Nicht mehr setzen; verwende `MORALIS_API_KEY` (Server). | Same as above |
+ | `VITE_MORALIS_BASE` | `https://deep-index.moralis.io/api/v2.2` | Moralis base URL (frontend) | - |
+ | `MORALIS_WEBHOOK_SECRET` | - | HMAC secret to verify Moralis Streams webhooks | Set manually (deploy env only) |
+ | `ENABLE_OG_MINT` | `false` | Enables OG lock/mint endpoints when `true` | Set manually |
+diff --git a/docs/ENV_USAGE_OVERVIEW.md b/docs/ENV_USAGE_OVERVIEW.md
+index 3d59703..4db55b1 100644
+--- a/docs/ENV_USAGE_OVERVIEW.md
++++ b/docs/ENV_USAGE_OVERVIEW.md
+@@ -17,10 +17,10 @@ Alle aktiv genutzten Umgebungsvariablen mit jeweils einer Satzbeschreibung.
+ 
+ | Variable | Verwendungszweck |
+ |----------|------------------|
+-| `VITE_MORALIS_API_KEY` | Frontend-Zugriff auf Moralis für Token-Daten und Blockchain-Informationen. |
++| `VITE_MORALIS_API_KEY` | **Deprecated.** Moralis-Schlüssel wird nun ausschließlich serverseitig über `MORALIS_API_KEY` genutzt. |
+ | `VITE_MORALIS_BASE` | Basis-URL für Moralis API-Calls vom Frontend. |
+ | `MORALIS_API_KEY` | Backend-Zugriff auf Moralis für Server-seitige API-Calls. |
+-| `MORALIS_BASE` | Basis-URL für Moralis API-Calls vom Backend. |
++| `MORALIS_BASE` | Basis-URL für Moralis API-Calls vom Backend (legacy, bevorzugt `MORALIS_BASE_URL`). |
+ | `MORALIS_WEBHOOK_SECRET` | Verifiziert eingehende Moralis Streams Webhooks (HMAC). |
+ | `VITE_DEXPAPRIKA_BASE` | Frontend-Zugriff auf DexPaprika API (alternative Datenquelle). |
+ | `DEXPAPRIKA_API_KEY` | Backend-Zugriff auf DexPaprika API mit Authentifizierung. |
+diff --git a/package.json b/package.json
+index 16e5913..27d21b2 100644
+--- a/package.json
++++ b/package.json
+@@ -9,6 +9,7 @@
+   "scripts": {
+     "dev": "vite",
+     "build": "tsc -b tsconfig.build.json && vite build",
++    "prebuild": "pnpm run check-env",
+     "build:local": "pnpm build && pnpm check:size",
+     "build:ci": "pnpm build:local && pnpm test:e2e",
+     "preview": "vite preview",
+@@ -20,7 +21,8 @@
+     "test": "vitest run --coverage",
+     "test:watch": "vitest",
+     "test:e2e": "playwright test",
+-    "check:size": "node scripts/check-bundle-size.mjs"
++    "check:size": "node scripts/check-bundle-size.mjs",
++    "check-env": "node scripts/check-env.js"
+   },
+   "dependencies": {
+     "@heroicons/react": "^2.1.0",
+diff --git a/src/config/providers.ts b/src/config/providers.ts
+index e151a77..4120400 100644
+--- a/src/config/providers.ts
++++ b/src/config/providers.ts
+@@ -12,7 +12,10 @@ export const Providers = {
+     }
+   },
+   moralis: {
+-    base: process.env.MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2',
++    base:
++      process.env.MORALIS_BASE_URL ||
++      process.env.MORALIS_BASE ||
++      'https://deep-index.moralis.io/api/v2.2',
+     headers: (): Record<string, string> => {
+       const key = process.env.MORALIS_API_KEY || '';
+       return key ? { 'X-API-Key': key } : {};
+diff --git a/src/lib/adapters/moralisAdapter.ts b/src/lib/adapters/moralisAdapter.ts
+index 5db08a4..7371120 100644
+--- a/src/lib/adapters/moralisAdapter.ts
++++ b/src/lib/adapters/moralisAdapter.ts
+@@ -20,14 +20,14 @@ import type {
+   AdapterResponse,
+   ChainId,
+ } from '../../types/market'
++import { moralisFetch } from '../moralisProxy'
+ 
+ // ============================================================================
+ // CONFIGURATION
+ // ============================================================================
+ 
+ const DEFAULT_CONFIG: AdapterConfig = {
+-  baseUrl: import.meta.env.VITE_MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2',
+-  apiKey: import.meta.env.VITE_MORALIS_API_KEY || '',
++  baseUrl: '/api/moralis',
+   timeout: 6000, // 6s timeout (Moralis can be slower)
+   retries: 2,
+   cacheTtl: 10 * 60 * 1000, // 10 min cache TTL
+@@ -114,44 +114,32 @@ async function fetchMoralisPrice(
+ 
+   try {
+     const moralisChain = CHAIN_MAP[chain]
+-    const url =
++    const path =
+       chain === 'solana'
+-        ? `${config.baseUrl}/solana/mainnet/token/${address}/price`
+-        : `${config.baseUrl}/erc20/${address}/price?chain=${moralisChain}`
++        ? `/solana/mainnet/token/${address}/price`
++        : `/erc20/${address}/price?chain=${moralisChain}`
+ 
+-    const headers: Record<string, string> = {
+-      'Content-Type': 'application/json',
+-      accept: 'application/json',
+-    }
+-
+-    if (config.apiKey) {
+-      headers['X-API-Key'] = config.apiKey
+-    }
+-
+-    const response = await fetch(url, {
++    const data = await moralisFetch<MoralisPriceResponse>(path, {
+       signal: controller.signal,
+-      headers,
++      headers: {
++        accept: 'application/json',
++      },
+     })
+ 
+     clearTimeout(timeoutId)
+-
+-    if (!response.ok) {
+-      if (response.status === 429 && attempt <= config.retries) {
+-        // Rate limit - exponential backoff
+-        const delay = Math.pow(2, attempt) * 1000
+-        await new Promise((resolve) => setTimeout(resolve, delay))
+-        return fetchMoralisPrice(address, chain, config, attempt + 1)
+-      }
+-
+-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+-    }
+-
+-    const data = await response.json()
+     return data
+   } catch (error) {
+     clearTimeout(timeoutId)
+ 
+-    // Retry on network error
++    const status = typeof error === 'object' && error && 'status' in error ? (error as any).status : undefined
++
++    if (status === 429 && attempt <= config.retries) {
++      const delay = Math.pow(2, attempt) * 1000
++      await new Promise((resolve) => setTimeout(resolve, delay))
++      return fetchMoralisPrice(address, chain, config, attempt + 1)
++    }
++
++    // Retry on generic network error as well
+     if (attempt <= config.retries && error instanceof Error) {
+       const delay = Math.pow(2, attempt) * 1000
+       await new Promise((resolve) => setTimeout(resolve, delay))
+@@ -181,29 +169,17 @@ async function fetchMoralisPair(
+ 
+   try {
+     const moralisChain = CHAIN_MAP[chain]
+-    const url = `${config.baseUrl}/erc20/${pairAddress}/reserves?chain=${moralisChain}`
+-
+-    const headers: Record<string, string> = {
+-      'Content-Type': 'application/json',
+-      accept: 'application/json',
+-    }
+-
+-    if (config.apiKey) {
+-      headers['X-API-Key'] = config.apiKey
+-    }
++    const path = `/erc20/${pairAddress}/reserves?chain=${moralisChain}`
+ 
+-    const response = await fetch(url, {
++    const data = await moralisFetch<any>(path, {
+       signal: controller.signal,
+-      headers,
++      headers: {
++        accept: 'application/json',
++      },
+     })
+ 
+     clearTimeout(timeoutId)
+-
+-    if (!response.ok) {
+-      return null // Pair data is optional
+-    }
+-
+-    return response.json()
++    return data
+   } catch {
+     clearTimeout(timeoutId)
+     return null
+@@ -351,25 +327,6 @@ export async function getMoralisSnapshot(
+     }
+   }
+ 
+-  // Validate API key
+-  if (!DEFAULT_CONFIG.apiKey) {
+-    return {
+-      success: false,
+-      error: {
+-        code: 'INVALID_ADDRESS',
+-        message: 'Moralis API key not configured (VITE_MORALIS_API_KEY)',
+-        provider: 'moralis',
+-        timestamp: Date.now(),
+-      },
+-      metadata: {
+-        provider: 'moralis',
+-        cached: false,
+-        latency: Date.now() - startTime,
+-        retries: 0,
+-      },
+-    }
+-  }
+-
+   try {
+     // Fetch price data
+     const priceData = await fetchMoralisPrice(address, chain, DEFAULT_CONFIG)
+diff --git a/src/lib/timeframeLogic.ts b/src/lib/timeframeLogic.ts
+index df7859f..9ae3a5e 100644
+--- a/src/lib/timeframeLogic.ts
++++ b/src/lib/timeframeLogic.ts
+@@ -12,14 +12,12 @@
+ 
+ import { getPumpfunData } from './adapters/pumpfunAdapter'
+ import type { Timeframe } from '@/types/journal'
++import { moralisFetch } from './moralisProxy'
+ 
+ // ============================================================================
+ // CONFIGURATION
+ // ============================================================================
+ 
+-const MORALIS_BASE = import.meta.env.VITE_MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2'
+-const MORALIS_API_KEY = import.meta.env.VITE_MORALIS_API_KEY || ''
+-
+ // Age thresholds (in milliseconds)
+ const ONE_DAY_MS = 24 * 60 * 60 * 1000
+ const ONE_HOUR_MS = 60 * 60 * 1000
+@@ -99,30 +97,13 @@ export async function getTokenAge(address: string): Promise<TokenAgeResult> {
+  * Get first transaction timestamp from Moralis
+  */
+ async function getMoralisFirstTransaction(address: string): Promise<number | null> {
+-  if (!MORALIS_API_KEY) {
+-    console.warn('[TokenAge] MORALIS_API_KEY not configured')
+-    return null
+-  }
+-
+   try {
+     // Get wallet history for token (oldest first, limit 1)
+-    const url = `${MORALIS_BASE}/erc20/${address}/transactions?chain=mainnet&order=asc&limit=1`
+-    
+-    const response = await fetch(url, {
+-      headers: {
+-        'X-API-Key': MORALIS_API_KEY,
+-        'Accept': 'application/json',
+-      },
++    const path = `/erc20/${address}/transactions?chain=mainnet&order=asc&limit=1`
++    const data = await moralisFetch<{ result?: Array<{ block_timestamp: string }> }>(path, {
+       signal: AbortSignal.timeout(5000),
+     })
+ 
+-    if (!response.ok) {
+-      console.error('[TokenAge] Moralis API error:', response.status)
+-      return null
+-    }
+-
+-    const data = await response.json()
+-    
+     if (data.result && data.result.length > 0) {
+       const firstTx = data.result[0]
+       return new Date(firstTx.block_timestamp).getTime()
+diff --git a/src/lib/validateEnv.ts b/src/lib/validateEnv.ts
+index 09da70c..dacea30 100644
+--- a/src/lib/validateEnv.ts
++++ b/src/lib/validateEnv.ts
+@@ -17,11 +17,6 @@ interface EnvCheck {
+ 
+ const ENV_CHECKS: EnvCheck[] = [
+   // CRITICAL - App won't function without these
+-  {
+-    key: 'VITE_MORALIS_API_KEY',
+-    required: true,
+-    description: 'Moralis API key (for chart data)',
+-  },
+   {
+     key: 'VITE_DEXPAPRIKA_BASE',
+     required: false,
+@@ -78,7 +73,8 @@ export function hasFeature(feature: 'ai' | 'notifications' | 'charts'): boolean
+     case 'notifications':
+       return !!(import.meta.env.VITE_VAPID_PUBLIC_KEY)
+     case 'charts':
+-      return !!(import.meta.env.VITE_MORALIS_API_KEY || import.meta.env.VITE_DEXPAPRIKA_BASE)
++      // Chart data now flows through the secure Moralis proxy; rely on server checks
++      return true
+     default:
+       return false
+   }
+diff --git a/src/lib/walletMonitor.ts b/src/lib/walletMonitor.ts
+index d6b3f6b..8834115 100644
+--- a/src/lib/walletMonitor.ts
++++ b/src/lib/walletMonitor.ts
+@@ -21,15 +21,13 @@
+ 
+ import { createEntry } from './JournalService'
+ import type { Transaction } from '@/types/journal'
++import { moralisFetch } from './moralisProxy'
+ 
+ // ============================================================================
+ // CONFIGURATION
+ // ============================================================================
+ 
+ const POLL_INTERVAL_MS = 2 * 60 * 1000 // 2 minutes
+-const MORALIS_BASE = import.meta.env.VITE_MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2'
+-const MORALIS_API_KEY = import.meta.env.VITE_MORALIS_API_KEY || ''
+-
+ // ============================================================================
+ // TYPES
+ // ============================================================================
+@@ -138,11 +136,6 @@ export class WalletMonitor {
+    * Check wallet for new token transfers
+    */
+   private async checkWalletActivity(): Promise<void> {
+-    if (!MORALIS_API_KEY) {
+-      console.error('[WalletMonitor] MORALIS_API_KEY not configured')
+-      return
+-    }
+-
+     try {
+       console.log('[WalletMonitor] Checking wallet activity...')
+ 
+@@ -192,21 +185,10 @@ export class WalletMonitor {
+    * Fetch token transfers from Moralis
+    */
+   private async fetchTokenTransfers(): Promise<MoralisTokenTransfer[]> {
+-    const url = `${MORALIS_BASE}/wallets/${this.walletAddress}/tokens/transfers?chain=mainnet&limit=20`
+-
+-    const response = await fetch(url, {
+-      headers: {
+-        'X-API-Key': MORALIS_API_KEY,
+-        'Accept': 'application/json',
+-      },
+-      signal: AbortSignal.timeout(10000), // 10s timeout
++    const path = `/wallets/${this.walletAddress}/tokens/transfers?chain=mainnet&limit=20`
++    const data = await moralisFetch<MoralisTokenTransfersResponse>(path, {
++      signal: AbortSignal.timeout(10000),
+     })
+-
+-    if (!response.ok) {
+-      throw new Error(`Moralis API error: ${response.status}`)
+-    }
+-
+-    const data: MoralisTokenTransfersResponse = await response.json()
+     return data.result || []
+   }
+ 
+@@ -264,22 +246,9 @@ export class WalletMonitor {
+     address: string
+   ): Promise<{ price: number; mcap: number } | null> {
+     try {
+-      const response = await fetch(
+-        `${MORALIS_BASE}/erc20/${address}/price?chain=mainnet`,
+-        {
+-          headers: {
+-            'X-API-Key': MORALIS_API_KEY,
+-            'Accept': 'application/json',
+-          },
+-          signal: AbortSignal.timeout(5000),
+-        }
+-      )
+-
+-      if (!response.ok) {
+-        return null
+-      }
+-
+-      const data = await response.json()
++      const data = await moralisFetch<any>(`/erc20/${address}/price?chain=mainnet`, {
++        signal: AbortSignal.timeout(5000),
++      })
+ 
+       return {
+         price: parseFloat(data.usdPrice || '0'),

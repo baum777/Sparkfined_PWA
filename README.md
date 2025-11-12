@@ -37,8 +37,8 @@ pnpm install
 # Copy environment template
 cp .env.example .env.local
 
-# Add required API keys to .env.local
-# - MORALIS_API_KEY (required)
+# Add required API keys to .env.local (server-only)
+# - MORALIS_API_KEY (required for Moralis proxy)
 # - OPENAI_API_KEY (optional, for AI features)
 # - VITE_SOLANA_RPC_URL (optional, defaults to mainnet)
 
@@ -99,12 +99,13 @@ pnpm lighthouse    # Lighthouse audit (requires preview)
 ### Manual Deployment
 
 1. **Connect Git Repository** in Vercel Dashboard
-2. **Set Environment Variables:**
+2. **Set Environment Variables (Vercel Project → Settings → Environment Variables):**
    ```
-   MORALIS_API_KEY=your_api_key
-   MORALIS_BASE=https://deep-index.moralis.io/api/v2.2
-   OPENAI_API_KEY=your_openai_key (optional)
+   MORALIS_API_KEY=REDACTED_TOKEN
+   MORALIS_BASE_URL=https://deep-index.moralis.io/api/v2.2
+   OPENAI_API_KEY=REDACTED_TOKEN # optional
    ```
+   > ⚠️ Do **not** expose `VITE_MORALIS_API_KEY` anymore. The Moralis key must stay server-side.
 3. **Deploy:** Push to main branch → auto-deploy
 4. **Verify:** Check Lighthouse scores (target 90+ in all categories)
 
@@ -114,14 +115,15 @@ pnpm lighthouse    # Lighthouse audit (requires preview)
 |----------|----------|-------------|
 | `DEXPAPRIKA_BASE` | ✅ | Base URL for DexPaprika OHLC API (primary provider) |
 | `DEXPAPRIKA_API_KEY` | ❌ | DexPaprika API key (if required by plan) |
-| `MORALIS_API_KEY` | ✅ | Moralis Deep Index API key for fallback data |
-| `MORALIS_BASE` | ✅ | Base URL for Moralis API |
+| `MORALIS_API_KEY` | ✅ | Server-only Moralis API key consumed by `/api/moralis` |
+| `MORALIS_BASE_URL` | ❌ | Override base URL for Moralis API (defaults to official endpoint) |
 | `DATA_PROXY_SECRET` | ✅ | Shared secret for internal API proxy calls |
 | `OPENAI_API_KEY` | ❌ | OpenAI API key for AI features |
 | `ANTHROPIC_API_KEY` | ❌ | Alternative AI provider |
 | `VITE_SOLANA_RPC_URL` | ❌ | Solana RPC endpoint (defaults to mainnet) |
 | `VAPID_PUBLIC_KEY` | ❌ | Web Push public key |
 | `VAPID_PRIVATE_KEY` | ❌ | Web Push private key (server-side only) |
+| `DEV_USE_MOCKS` | ❌ | When `true`, proxy returns mocked responses instead of live Moralis calls |
 
 *Note: Client-side variables must be prefixed with `VITE_`*
 

@@ -13,7 +13,10 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const MORALIS_BASE = process.env.MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2';
+const MORALIS_BASE =
+  process.env.MORALIS_BASE_URL ||
+  process.env.MORALIS_BASE ||
+  'https://deep-index.moralis.io/api/v2.2';
 const MORALIS_API_KEY = process.env.MORALIS_API_KEY || '';
 const TIMEOUT_MS = 6000; // 6s timeout for Moralis
 const MAX_RETRIES = 1;

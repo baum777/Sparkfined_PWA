@@ -12,7 +12,10 @@ export const Providers = {
     }
   },
   moralis: {
-    base: process.env.MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2',
+    base:
+      process.env.MORALIS_BASE_URL ||
+      process.env.MORALIS_BASE ||
+      'https://deep-index.moralis.io/api/v2.2',
     headers: (): Record<string, string> => {
       const key = process.env.MORALIS_API_KEY || '';
       return key ? { 'X-API-Key': key } : {};

@@ -21,15 +21,13 @@
 
 import { createEntry } from './JournalService'
 import type { Transaction } from '@/types/journal'
+import { moralisFetch } from './moralisProxy'
 
 // ============================================================================
 // CONFIGURATION
 // ============================================================================
 
 const POLL_INTERVAL_MS = 2 * 60 * 1000 // 2 minutes
-const MORALIS_BASE = import.meta.env.VITE_MORALIS_BASE || 'https://deep-index.moralis.io/api/v2.2'
-const MORALIS_API_KEY = import.meta.env.VITE_MORALIS_API_KEY || ''
-
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -138,11 +136,6 @@ export class WalletMonitor {
    * Check wallet for new token transfers
    */
   private async checkWalletActivity(): Promise<void> {
-    if (!MORALIS_API_KEY) {
-      console.error('[WalletMonitor] MORALIS_API_KEY not configured')
-      return
-    }
-
     try {
       console.log('[WalletMonitor] Checking wallet activity...')
 
@@ -192,21 +185,10 @@ export class WalletMonitor {
    * Fetch token transfers from Moralis
    */
   private async fetchTokenTransfers(): Promise<MoralisTokenTransfer[]> {
-    const url = `${MORALIS_BASE}/wallets/${this.walletAddress}/tokens/transfers?chain=mainnet&limit=20`
-
-    const response = await fetch(url, {
-      headers: {
-        'X-API-Key': MORALIS_API_KEY,
-        'Accept': 'application/json',
-      },
-      signal: AbortSignal.timeout(10000), // 10s timeout
+    const path = `/wallets/${this.walletAddress}/tokens/transfers?chain=mainnet&limit=20`
+    const data = await moralisFetch<MoralisTokenTransfersResponse>(path, {
+      signal: AbortSignal.timeout(10000),
     })
-
-    if (!response.ok) {
-      throw new Error(`Moralis API error: ${response.status}`)
-    }
-
-    const data: MoralisTokenTransfersResponse = await response.json()
     return data.result || []
   }
 
@@ -264,22 +246,9 @@ export class WalletMonitor {
     address: string
   ): Promise<{ price: number; mcap: number } | null> {
     try {
-      const response = await fetch(
-        `${MORALIS_BASE}/erc20/${address}/price?chain=mainnet`,
-        {
-          headers: {
-            'X-API-Key': MORALIS_API_KEY,
-            'Accept': 'application/json',
-          },
-          signal: AbortSignal.timeout(5000),
-        }
-      )
-
-      if (!response.ok) {
-        return null
-      }
-
-      const data = await response.json()
+      const data = await moralisFetch<any>(`/erc20/${address}/price?chain=mainnet`, {
+        signal: AbortSignal.timeout(5000),
+      })
 
       return {
         price: parseFloat(data.usdPrice || '0'),
