@@ -1,0 +1,6 @@
+public/manifest.webmanifest - present
+public/favicon.ico - present
+middleware.ts - missing
+src/middleware.ts - missing
+vercel.json - present
+next.config.js - missing

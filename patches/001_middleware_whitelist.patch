@@ -1,0 +1,19 @@
+diff --git a/vercel.json b/vercel.json
+--- a/vercel.json
++++ b/vercel.json
+@@ -6,6 +6,14 @@
+       "schedule": "0 2 * * *"
+     }
+   ],
++  "protectionBypass": [
++    { "source": "/manifest.webmanifest" },
++    { "source": "/favicon.ico" },
++    { "source": "/robots.txt" },
++    { "source": "/_next/static/(.*)" },
++    { "source": "/_next/image/(.*)" },
++    { "source": "/static/(.*)" },
++    { "source": "/public/(.*)" }
++  ],
+   "rewrites": [
+     {
+       "source": "/assets/(.*)",

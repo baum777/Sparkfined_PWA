@@ -1,0 +1,166 @@
+diff --git a/.github/workflows/ci-manifest-check.yml b/.github/workflows/ci-manifest-check.yml
+new file mode 100644
+--- /dev/null
++++ b/.github/workflows/ci-manifest-check.yml
+@@ -0,0 +1,39 @@
++name: CI - Manifest & Static Smoke Test
++
++on:
++  push:
++  pull_request:
++
++jobs:
++  manifest-smoke:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - name: Smoke check - manifest reachable
++        env:
++          URL: ${{ secrets.DEPLOY_URL }}
++        run: |
++          set -euo pipefail
++
++          if [ -z "${URL:-}" ]; then
++            echo "DEPLOY_URL secret is not set. Skipping smoke check."
++            exit 0
++          fi
++
++          manifest_status=$(curl -s -o /tmp/manifest.headers -w "%{http_code}" -D - "$URL/manifest.webmanifest")
++          echo "manifest status: $manifest_status"
++          if [ "$manifest_status" -ne 200 ]; then
++            echo "manifest.webmanifest not reachable (status $manifest_status)"
++            cat /tmp/manifest.headers
++            exit 1
++          fi
++
++          if grep -qi "^set-cookie:.*_vercel_sso_nonce" /tmp/manifest.headers; then
++            echo "manifest response contains Vercel SSO nonce cookie"
++            cat /tmp/manifest.headers
++            exit 1
++          fi
++
++          static_target=${STATIC_SAMPLE:-_next/static/chunks/webpack.js}
++          static_status=$(curl -s -o /dev/null -w "%{http_code}" "$URL/${static_target#/}")
++          echo "static check ($static_target) status: $static_status"
++
+diff --git a/scripts/check_manifest.sh b/scripts/check_manifest.sh
+new file mode 100644
+--- /dev/null
++++ b/scripts/check_manifest.sh
+@@ -0,0 +1,22 @@
++#!/usr/bin/env bash
++
++set -euo pipefail
++
++if [ -z "${1:-}" ]; then
++  echo "Usage: $0 <deploy-url>"
++  exit 1
++fi
++
++url="${1%/}"
++
++manifest_status=$(curl -s -o /dev/null -w "%{http_code}" "$url/manifest.webmanifest")
++echo "manifest status: $manifest_status"
++
++if [ "$manifest_status" != "200" ]; then
++  echo "manifest.webmanifest not reachable (status $manifest_status)"
++  exit 1
++fi
++
++static_sample="${2:-_next/static/chunks/webpack.js}"
++static_status=$(curl -s -o /dev/null -w "%{http_code}" "$url/${static_sample#/}")
++echo "static sample ($static_sample) status: $static_status"
++
+diff --git a/package.json b/package.json
+--- a/package.json
++++ b/package.json
+@@ -22,7 +22,8 @@
+     "test:watch": "vitest",
+     "test:e2e": "playwright test",
+     "check:size": "node scripts/check-bundle-size.mjs",
+-    "check-env": "node scripts/check-env.js"
++    "check-env": "node scripts/check-env.js",
++    "smoke:manifest": "bash ./scripts/check_manifest.sh $DEPLOY_URL"
+   },
+   "dependencies": {
+     "@heroicons/react": "^2.1.0",
+
+diff --git a/docs/tests/README.md b/docs/tests/README.md
+new file mode 100644
+--- /dev/null
++++ b/docs/tests/README.md
+@@ -0,0 +1,15 @@
++# Manifest & Static Asset Smoke Test
++
++This repository includes the workflow `.github/workflows/ci-manifest-check.yml` to ensure the public manifest and bundled static assets stay reachable without authentication on Vercel.
++
++To enable the job:
++
++1. In GitHub, go to `Settings → Secrets and variables → Actions`.
++2. Add a repository secret named `DEPLOY_URL` that points to the production or preview deployment you want to probe (for example `https://sparkfined.vercel.app`).
++3. Optionally set `STATIC_SAMPLE` in the workflow environment if your build serves a different static asset path than the default `_next/static/chunks/webpack.js`.
++
++The job exits with failure when:
++
++- `manifest.webmanifest` returns a non-200 status code,
++- the manifest response includes a `Set-Cookie: _vercel_sso_nonce` header, or
++- the sampled static asset path is blocked.
+
+diff --git a/docs/manifest_fix_README.md b/docs/manifest_fix_README.md
+new file mode 100644
+--- /dev/null
++++ b/docs/manifest_fix_README.md
+@@ -0,0 +1,25 @@
++# Manifest & Static Asset Access Notes
++
++## Summary
++
++Live deployments behind Vercel SSO were returning `401` HTML for public assets such as `/manifest.webmanifest`. The fix uses Vercel's `protectionBypass` configuration together with explicit rewrites so that browser boot files skip SSO while application routes stay protected.
++
++## Changes
++
++- Added `protectionBypass` entries in `vercel.json` for:
++  - `/manifest.webmanifest`, `/favicon.ico`, `/robots.txt`
++  - `/_next/static/*`, `/_next/image/*`
++  - `/static/*`, `/public/*`
++- Declared explicit rewrites to re-serve the same asset path before the SPA catch-all rewrite.
++- Introduced CI smoke coverage (`ci-manifest-check.yml`) plus a local helper script to detect regressions.
++
++## Operational Guidance
++
++1. Whenever SSO is toggled, verify that `curl -I "$DEPLOY_URL/manifest.webmanifest"` returns `200` and omits `_vercel_sso_nonce`.
++2. If the build emits assets under a different prefix (for example `/_astro/`), update both the `protectionBypass` list and the workflow's `STATIC_SAMPLE`.
++3. Review access logs after deployment for unexpected hits on bypassed paths to ensure no sensitive resources leaked.
++
++## Future Considerations
++
++- If the project migrates to Next.js middleware, implement the same whitelist logic there to short-circuit auth earlier at the edge.
++- Add automated probes for `robots.txt` and other marketing assets as they are added to the public directory.
+
+diff --git a/PR_DESCRIPTION.md b/PR_DESCRIPTION.md
+--- a/PR_DESCRIPTION.md
++++ b/PR_DESCRIPTION.md
+@@ -1,14 +1,13 @@
+ ## Summary
+-- Konsolidierte 19 Alt-Dokumente in vier Zielkategorien (process, concepts, guides, setup) mit neuen strukturieren Dateien.
+-- Ergänzte vollständige PWA-Audit-Artefakte (Inventar, Feature-Katalog, Flows, Offline, Security, Tests, Zukunft) für ~90% Feature-Abdeckung.
+-- Archivierte Originaldokumente unter `docs/archive/raw/2025-11-12` und dokumentierte Zuordnung in `docs/index.md`.
++- allow public assets (manifest, favicon, `_next` bundles) to bypass Vercel SSO using `protectionBypass`
++- add explicit rewrites for static asset families so SPA catch-all no longer steals those requests
++- document and automate a smoke check that verifies manifest reachability both locally and in CI
+ 
+ ## Testing
+-- `pnpm lint`
+-- `pnpm test`
+-- `pnpm build`
++- `pnpm run smoke:manifest` *(requires `DEPLOY_URL` to be exported in the shell)*
++- `curl -I https://<preview-url>/manifest.webmanifest`
++- `curl -I https://<preview-url>/_next/static/chunks/webpack.js`
+ 
+-## Review
+-- Docs Owner: Review neue Struktur & Inhalte (`docs/process`, `docs/concepts`, `docs/guides`, `docs/setup`).
+-- Security: Prüfe `docs/pwa-audit/05_security_privacy.md` Empfehlungen.
+-- Core Dev: Bestätige Feature/Flow-Beschreibungen.
++## Deployment
++- add the `DEPLOY_URL` GitHub Actions secret for the new workflow
++- optionally set `STATIC_SAMPLE` if your static chunk path differs from `_next/static/chunks/webpack.js`

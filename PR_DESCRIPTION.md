@@ -1,14 +1,13 @@
 ## Summary
-- Konsolidierte 19 Alt-Dokumente in vier Zielkategorien (process, concepts, guides, setup) mit neuen strukturieren Dateien.
-- Ergänzte vollständige PWA-Audit-Artefakte (Inventar, Feature-Katalog, Flows, Offline, Security, Tests, Zukunft) für ~90% Feature-Abdeckung.
-- Archivierte Originaldokumente unter `docs/archive/raw/2025-11-12` und dokumentierte Zuordnung in `docs/index.md`.
+- allow public assets (manifest, favicon, `_next` bundles) to bypass Vercel SSO using `protectionBypass`
+- add explicit rewrites for static asset families so SPA catch-all no longer steals those requests
+- document and automate a smoke check that verifies manifest reachability both locally and in CI
 
 ## Testing
-- `pnpm lint`
-- `pnpm test`
-- `pnpm build`
+- `pnpm run smoke:manifest` *(requires `DEPLOY_URL` to be exported in the shell)*
+- `curl -I https://<preview-url>/manifest.webmanifest`
+- `curl -I https://<preview-url>/_next/static/chunks/webpack.js`
 
-## Review
-- Docs Owner: Review neue Struktur & Inhalte (`docs/process`, `docs/concepts`, `docs/guides`, `docs/setup`).
-- Security: Prüfe `docs/pwa-audit/05_security_privacy.md` Empfehlungen.
-- Core Dev: Bestätige Feature/Flow-Beschreibungen.
+## Deployment
+- add the `DEPLOY_URL` GitHub Actions secret for the new workflow
+- optionally set `STATIC_SAMPLE` if your static chunk path differs from `_next/static/chunks/webpack.js`

@@ -1,0 +1,28 @@
+diff --git a/vercel.json b/vercel.json
+--- a/vercel.json
++++ b/vercel.json
+@@ -13,6 +13,18 @@
+     {
+       "source": "/icons/(.*)",
+       "destination": "/icons/$1"
+     },
++    {
++      "source": "/_next/static/(.*)",
++      "destination": "/_next/static/$1"
++    },
++    {
++      "source": "/_next/image/(.*)",
++      "destination": "/_next/image/$1"
++    },
++    {
++      "source": "/favicon.ico",
++      "destination": "/favicon.ico"
++    },
++    {
++      "source": "/robots.txt",
++      "destination": "/robots.txt"
++    },
+     {
+       "source": "/manifest.webmanifest",
+       "destination": "/manifest.webmanifest"
+     },

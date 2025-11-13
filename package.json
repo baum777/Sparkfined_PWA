@@ -22,7 +22,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "check:size": "node scripts/check-bundle-size.mjs",
-    "check-env": "node scripts/check-env.js"
+    "check-env": "node scripts/check-env.js",
+    "smoke:manifest": "bash ./scripts/check_manifest.sh $DEPLOY_URL"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.0",
