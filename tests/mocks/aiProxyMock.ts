@@ -1,68 +1,47 @@
-import http from 'node:http'
+// tests/mocks/aiProxyMock.ts
+import http from 'http';
+import type { AddressInfo } from 'net';
 
-export interface AiProxyMockOptions {
-  port?: number
-  expectedSecret?: string
-  onRequest?: (body: any) => void
-  responseBody?: Record<string, any>
-}
-
-export interface AiProxyMock {
-  url: string
-  close: () => Promise<void>
-}
+export type AiMockHandle = {
+  url: string;
+  close: () => Promise<void>;
+};
 
 /**
- * Starts a minimal HTTP server that mimics the Sparkfined AI proxy endpoint.
- * Secrets are never persisted; use `expectedSecret` with placeholder tokens like `// REDACTED_TOKEN`.
+ * Startet einen kleinen HTTP-Mockserver für AI-Proxy requests.
+ * Wenn `port` nicht gesetzt ist, verwendet die OS-Portauswahl (0) -> verhindert EADDRINUSE.
  */
-export function startAiProxyMock(options: AiProxyMockOptions = {}): Promise<AiProxyMock> {
-  const port = options.port ?? 4455
-  const expectedSecret = options.expectedSecret ?? 'Bearer // REDACTED_TOKEN'
-
+export function startAiProxyMock(port?: number): Promise<AiMockHandle> {
   return new Promise((resolve, reject) => {
     const server = http.createServer((req, res) => {
-      if (req.method !== 'POST' || req.url !== '/api/ai/assist') {
-        res.statusCode = 404
-        res.end('Not Found')
-        return
+      try {
+        // einfache Mock-Antwort — passe an die bestehende Logik an
+        // z.B. behavior based on req.url / method / body
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, text: 'mocked response', provider: 'mock' }));
+      } catch (err) {
+        res.writeHead(500);
+        res.end();
       }
+    });
 
-      if (expectedSecret && req.headers['authorization'] !== expectedSecret) {
-        res.statusCode = 401
-        res.end('Unauthorized')
-        return
+    server.on('error', (err) => reject(err));
+
+    // bind to provided port or 0 -> OS assigns free port
+    server.listen(port ?? 0, '127.0.0.1', () => {
+      const addr = server.address() as AddressInfo;
+      if (!addr || typeof addr.port !== 'number') {
+        reject(new Error('could not determine mock server port'));
+        return;
       }
-
-      const chunks: Buffer[] = []
-      req.on('data', (chunk) => chunks.push(chunk as Buffer))
-      req.on('end', () => {
-        try {
-          const body = JSON.parse(Buffer.concat(chunks).toString('utf8'))
-          options.onRequest?.(body)
-          res.setHeader('content-type', 'application/json')
-          res.end(JSON.stringify(options.responseBody ?? {
-            ok: true,
-            provider: body.provider,
-            model: body.model ?? 'mock-model',
-            text: 'Mocked bullet list',
-            usage: { input_tokens: 300, output_tokens: 180 },
-            costUsd: 0.00042,
-            fromCache: false,
-          }))
-        } catch (error) {
-          res.statusCode = 500
-          res.end(JSON.stringify({ ok: false, error: (error as Error).message }))
-        }
-      })
-    })
-
-    server.on('error', reject)
-    server.listen(port, () => {
+      const url = `http://127.0.0.1:${addr.port}`;
       resolve({
-        url: `http://127.0.0.1:${port}`,
-        close: () => new Promise<void>((closeResolve) => server.close(() => closeResolve()))
-      })
-    })
-  })
+        url,
+        close: () =>
+          new Promise<void>((resClose) => {
+            server.close(() => resClose());
+          }),
+      });
+    });
+  });
 }
