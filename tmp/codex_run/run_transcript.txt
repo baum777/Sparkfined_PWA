@@ -1,0 +1,24 @@
+**********************
+PowerShell transcript start
+Start time: 20251112122653
+Username: BAUM\twim
+RunAs User: BAUM\twim
+Configuration Name: 
+Machine: BAUM (Microsoft Windows NT 10.0.26100.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoProfile -ExecutionPolicy Bypass -Command & { Start-Transcript -Path .\tmp\codex_run\run_transcript2.txt -Force; . .\scripts\apply_patches.ps1; Stop-Transcript }
+Process ID: 19772
+PSVersion: 7.5.4
+PSEdition: Core
+GitCommitId: 7.5.4
+OS: Microsoft Windows 10.0.26100
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+Transcript started, output file is C:\workspace\Sparkfined_PWA\tmp\codex_run\run_transcript.txt
+**********************
+PowerShell transcript end
+End time: 20251112122654
+**********************
