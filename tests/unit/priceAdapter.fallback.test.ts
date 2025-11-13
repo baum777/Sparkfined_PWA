@@ -38,9 +38,14 @@ describe('fetchTokenCandles', () => {
       expect.stringContaining('/networks/solana/tokens/So11111111111111111111111111111111111111112/ohlcv'),
       expect.objectContaining({ method: 'GET' })
     )
+    expect(candles).toBeDefined()
+    expect(Array.isArray(candles)).toBe(true)
+    expect(candles.length).toBeGreaterThan(0)
     expect(candles).toHaveLength(1)
-    expect(candles[0].open).toBeCloseTo(1)
-    expect(candles[0].high).toBeCloseTo(2)
+
+    const primaryCandle = candles[0]!
+    expect(primaryCandle.open).toBeCloseTo(1)
+    expect(primaryCandle.high).toBeCloseTo(2)
   })
 
   it('falls back to the Moralis proxy when DexPaprika fails', async () => {
@@ -68,7 +73,12 @@ describe('fetchTokenCandles', () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(2)
     expect(fetchMock.mock.calls[1]?.[0]).toContain('/api/moralis/token')
+    expect(candles).toBeDefined()
+    expect(Array.isArray(candles)).toBe(true)
+    expect(candles.length).toBeGreaterThan(0)
     expect(candles).toHaveLength(1)
-    expect(candles[0].close).toBeCloseTo(1.2)
+
+    const fallbackCandle = candles[0]!
+    expect(fallbackCandle.close).toBeCloseTo(1.2)
   })
 })

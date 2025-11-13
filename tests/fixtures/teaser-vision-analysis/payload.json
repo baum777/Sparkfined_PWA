@@ -3,17 +3,23 @@
   "imageDataUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAGgwJ/lWfu5wAAAABJRU5ErkJggg==",
   "ocrData": {
     "labels": ["RSI", "VWAP"],
-    "indicators": { "rsi": 64 }
+    "indicators": { "rsi": 64 },
+    "text": "Detected text placeholder",
+    "confidence": 0.98,
+    "processingTime": 45
   },
   "dexData": {
     "price": 0.000043,
     "high24": 0.000052,
     "low24": 0.000031,
-    "vol24": 1250000
+    "vol24": 1250000,
+    "timestamp": 1700000000000
   },
   "pumpfunData": {
     "symbol": "SOLX",
-    "liquidity": 120000
+    "liquidity": 120000,
+    "name": "SolX Token",
+    "launchDate": "2025-01-15T00:00:00Z"
   },
   "contractAddress": "So11111111111111111111111111111111111111112"
 }
