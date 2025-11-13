@@ -1,0 +1,98 @@
+---
+title: "Suggested Patch — Journal CRUD Tests"
+sources:
+  - tests/unit/journal.crud.test.ts
+  - src/sections/journal/useJournal.ts
+  - src/lib/journal.ts
+---
+
+diff --git a/tests/unit/journal.crud.test.ts b/tests/unit/journal.crud.test.ts
+@@
+-import { describe, it } from 'vitest';
+-import { describe, it } from 'vitest';
++import { describe, it, beforeEach, expect, vi } from 'vitest';
++import { createJournalStore } from '@/sections/journal/useJournal';
++
++vi.mock('@/lib/journal', async () => {
++  const mod = await vi.importActual<typeof import('@/lib/journal')>('@/lib/journal');
++  return {
++    ...mod,
++    createNoteId: () => 'note-1',
++  };
++});
++
++describe('Journal Service', () => {
++  let store: ReturnType<typeof createJournalStore>;
++
++  beforeEach(() => {
++    store = createJournalStore();
++    vi.clearAllMocks();
++  });
+ 
+-describe('Journal Service', () => {
+-  it.skip('saves entry within 60ms budget', async () => {
+-    // TODO: Test save performance
+-    // const start = performance.now();
+-    // const id = await saveEntry({ token: 'SOL', price: 150, status: 'winner', timestamp: Date.now(), address: 'So1...' });
+-    // const duration = performance.now() - start;
+-    // expect(duration).toBeLessThan(60);
+-    // expect(id).toBeTruthy();
+-  });
++  it('creates note and assigns id', async () => {
++    const created = store.create({ title: 'Test', body: 'Body' });
++    expect(created.id).toBe('note-1');
++    expect(store.notes.getState().notes[0]?.title).toBe('Test');
++  });
+ 
+-  it.skip('filters entries by preset', async () => {
+-    // TODO: Test preset filters (W/L/B/R)
+-    // const winners = await queryEntries({ preset: 'W' });
+-    // winners.forEach(entry => expect(entry.status).toBe('winner'));
+-  });
++  it('updates existing note', async () => {
++    const created = store.create({ title: 'Draft' });
++    store.update(created.id, { title: 'Updated' });
++    const note = store.notes.getState().notes.find(n => n.id === created.id);
++    expect(note?.title).toBe('Updated');
++  });
+ 
+-  it.skip('exports to CSV with teaser fields', async () => {
+-    // TODO: Test CSV export format
+-    // const csv = await exportToCSV(entries);
+-    // expect(csv).toContain('stop_loss');
+-    // expect(csv).toContain('take_profit');
+-  });
++  it('deletes note', async () => {
++    const created = store.create({ title: 'To delete' });
++    store.remove(created.id);
++    expect(store.notes.getState().notes).toHaveLength(0);
++  });
+ 
+-  it.skip('deletes entry successfully', async () => {
+-    // TODO: Test delete operation
+-  });
++  it('exports to CSV with trade metrics', async () => {
++    const created = store.create({
++      title: 'Trade',
++      entryPrice: 10,
++      exitPrice: 12,
++      positionSize: 2,
++      stopLoss: 9,
++      takeProfit: 14,
++    });
++    const csv = store.exportCsv([created]);
++    expect(csv).toContain('Trade');
++    expect(csv).toContain('PNL');
++  });
+ 
+-  it.skip('renders grid within 250ms budget', async () => {
+-    // TODO: Test grid rendering performance
+-  });
++  it('filters winners', () => {
++    store.create({ title: 'Win', status: 'winner' });
++    store.create({ title: 'Loss', status: 'loser' });
++    const winners = store.filterByPreset('W');
++    expect(winners).toHaveLength(1);
++    expect(winners[0]?.status).toBe('winner');
++  });
+ });

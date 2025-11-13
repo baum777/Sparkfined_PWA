@@ -1,0 +1,73 @@
+---
+title: "Suggested Patch — Replay OHLC Integration"
+sources:
+  - src/pages/ReplayPage.tsx
+  - src/lib/ReplayService.ts
+  - src/sections/chart/marketOhlc.ts
+---
+
+diff --git a/src/pages/ReplayPage.tsx b/src/pages/ReplayPage.tsx
+@@
+-import React from "react";
+-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+-import ReplayPlayer from "@/components/ReplayPlayer";
+-import PatternDashboard from "@/components/PatternDashboard";
+-import type { ReplaySession, JournalEntry, ReplayBookmark, SetupTag, EmotionTag } from "@/types/journal";
+-import {
+-    getSession,
+-    updateSession,
+-    addBookmark,
+-    deleteBookmark,
+-    listSessions,
+-    cacheOhlcData,
+-  } from "@/lib/ReplayService";
+-import { calculatePatternStats, queryEntries } from "@/lib/JournalService";
++import React from "react";
++import { useParams, useNavigate, useSearchParams } from "react-router-dom";
++import ReplayPlayer from "@/components/ReplayPlayer";
++import PatternDashboard from "@/components/PatternDashboard";
++import type { ReplaySession, JournalEntry, ReplayBookmark, SetupTag, EmotionTag } from "@/types/journal";
++import {
++    getSession,
++    updateSession,
++    addBookmark,
++    deleteBookmark,
++    listSessions,
++    cacheOhlcData,
++  } from "@/lib/ReplayService";
++import { calculatePatternStats, queryEntries } from "@/lib/JournalService";
++import { fetchOhlc } from "@/sections/chart/marketOhlc";
+@@
+-    const fetchAndCacheOhlc = async (sess: ReplaySession) => {
+-      try {
+-        // TODO: Fetch actual OHLC data from Moralis API
+-        // For now, generate mock data
+-        const mockOhlc = Array.from({ length: 100 }, (_, i) => ({
+-          t: Date.now() - (100 - i) * 60000,
+-          o: 0.001 + Math.random() * 0.0001,
+-          h: 0.001 + Math.random() * 0.0001 + 0.00001,
+-          l: 0.001 + Math.random() * 0.0001 - 0.00001,
+-          c: 0.001 + Math.random() * 0.0001,
+-          v: Math.random() * 1000,
+-        }));
+-
+-        const updated = await cacheOhlcData(sess.id, mockOhlc);
+-        if (updated) {
+-          setSession(updated);
+-        }
+-      } catch (error) {
+-        console.error("Error caching OHLC:", error);
+-      }
+-    };
++    const fetchAndCacheOhlc = async (sess: ReplaySession) => {
++      if (!sess.address || !sess.tf) return;
++      try {
++        const data = await fetchOhlc({ address: sess.address, tf: sess.tf });
++        const updated = await cacheOhlcData(sess.id, data);
++        if (updated) {
++          setSession(updated);
++        }
++      } catch (error) {
++        console.error("Error caching OHLC:", error);
++      }
++    };
