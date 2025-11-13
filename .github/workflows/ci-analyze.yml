@@ -1,0 +1,82 @@
+name: CI — Analyze Hardening
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build
+        env:
+          DEV_USE_MOCKS: 'true'
+          ANALYZE_IDEA_PACKET: 'true'
+          NODE_ENV: 'test'
+        run: pnpm build
+
+      - name: Unit/Integration + Coverage
+        env:
+          DEV_USE_MOCKS: 'true'
+          ANALYZE_IDEA_PACKET: 'true'
+          CI: 'true'
+        run: |
+          pnpm test --coverage --run
+          pnpm test -t "journal|contract|ABA|priceAdapter" --run
+
+      - name: Playwright @analyze
+        env:
+          DEV_USE_MOCKS: 'true'
+          ANALYZE_IDEA_PACKET: 'true'
+          CI: 'true'
+        run: pnpm exec playwright test --grep "@analyze" --reporter=line
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+
+      - name: Upload traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/**/**.zip
+
+      - name: Upload coverage (lcov)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: coverage/lcov.info
