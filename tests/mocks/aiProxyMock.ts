@@ -19,13 +19,14 @@ export function startAiProxyMock(port?: number): Promise<AiMockHandle> {
         // z.B. behavior based on req.url / method / body
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: true, text: 'mocked response', provider: 'mock' }));
-      } catch (err) {
+      } catch {
         res.writeHead(500);
         res.end();
       }
     });
 
-    server.on('error', (err) => reject(err));
+    // pass the reject function directly so no unused-parameter is reported
+    server.on('error', reject);
 
     // bind to provided port or 0 -> OS assigns free port
     server.listen(port ?? 0, '127.0.0.1', () => {
