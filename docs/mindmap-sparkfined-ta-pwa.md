@@ -165,65 +165,317 @@ State Types
 
 ## 3. 🧩 Module & UX-Flows
 
-### 3.1 Core Modules (7 Domains)
+### 3.1 Core Modules (7 Domains) — VOLLSTÄNDIG AUFGESCHLÜSSELT
+
 ```
 Sparkfined Modules
 │
 ├── 1. Market Data
 │   ├── OHLC Charts (Candlestick, Line, Area)
+│   │   ├── Data-Sources: DexPaprika (primary), Dexscreener (fallback), Moralis
+│   │   ├── Timeframes: 1m, 5m, 15m, 1h, 4h, 1d, 1w
+│   │   ├── Offline-Capable: Cached-OHLC (last 1000 candles)
+│   │   └── Update-Strategy: Polling (5s), WebSocket (planned Q1 2025)
+│   │
 │   ├── Token Prices (Real-time, Historical)
+│   │   ├── Adapters: priceAdapter.ts (multi-source-orchestration)
+│   │   ├── Sources: Moralis, DexPaprika, Dexscreener, Pumpfun
+│   │   └── Caching: 5s-TTL (in-memory), 1h-TTL (IndexedDB)
+│   │
 │   ├── Volume Analysis
+│   │   ├── 24h-Volume, 7d-Volume, Volume-Change%
+│   │   ├── Volume-Profile (Price-Levels, High-Volume-Nodes)
+│   │   └── Order-Flow-Analysis (orderflow.ts)
+│   │
 │   └── On-Chain Metrics (TVL, Holders, Transactions)
+│       ├── Moralis-API: Token-Holders, Transfers, TVL
+│       ├── Solscan-Whale-Alerts (Top-10-Wallets)
+│       ├── Wallet-Flow-Tracking (walletFlow.ts)
+│       └── Wallet-Monitor-Service (walletMonitor.ts)
 │
 ├── 2. Technical Analysis (TA)
-│   ├── Indicators
+│   ├── Indicators (DETAILLIERT)
 │   │   ├── RSI (Relative Strength Index)
-│   │   ├── EMA/SMA (Moving Averages)
+│   │   │   ├── Calculation: 100 - (100 / (1 + RS)), RS = AvgGain / AvgLoss
+│   │   │   ├── Period: 14 (default), configurable 7-21
+│   │   │   ├── Thresholds: <30 Oversold, >70 Overbought
+│   │   │   ├── Signals: Divergence (Bullish/Bearish), Overbought/Oversold
+│   │   │   └── Implementation: src/sections/chart/indicators.ts
+│   │   │
+│   │   ├── EMA/SMA (Exponential/Simple Moving Averages)
+│   │   │   ├── Periods: 9, 21, 50, 200 (configurable)
+│   │   │   ├── Calculation: SMA = Sum(Close) / N, EMA = (Close - EMA_prev) * (2/(N+1)) + EMA_prev
+│   │   │   ├── Signals: Golden-Cross (50 > 200), Death-Cross (50 < 200)
+│   │   │   └── Crossovers: 9/21, 21/50, 50/200
+│   │   │
 │   │   ├── MACD (Moving Average Convergence Divergence)
+│   │   │   ├── Calculation: MACD = EMA12 - EMA26, Signal = EMA9(MACD), Histogram = MACD - Signal
+│   │   │   ├── Signals: Zero-Line-Cross, Signal-Line-Cross, Divergence
+│   │   │   ├── Thresholds: Histogram > 0 Bullish, < 0 Bearish
+│   │   │   └── Implementation: src/sections/chart/indicators.ts
+│   │   │
 │   │   ├── Bollinger Bands
-│   │   └── Fibonacci Retracements
+│   │   │   ├── Calculation: Middle = SMA20, Upper = SMA20 + (2 * StdDev), Lower = SMA20 - (2 * StdDev)
+│   │   │   ├── Signals: Squeeze (Bands-Narrow), Expansion (Bands-Wide), Breakout (Close > Upper)
+│   │   │   ├── Width: (Upper - Lower) / Middle (volatility-indicator)
+│   │   │   └── Implementation: src/sections/chart/indicators.ts
+│   │   │
+│   │   ├── Fibonacci Retracements
+│   │   │   ├── Levels: 0%, 23.6%, 38.2%, 50%, 61.8%, 78.6%, 100%
+│   │   │   ├── Calculation: Level = High - ((High - Low) * FibRatio)
+│   │   │   ├── Usage: Support/Resistance, Entry/Exit-Points
+│   │   │   └── Drawing-Tools: src/sections/chart/draw/
+│   │   │
+│   │   └── Volume-Weighted (Planned Q2 2025)
+│   │       ├── VWAP (Volume-Weighted-Average-Price)
+│   │       └── Volume-Profile (High-Volume-Nodes)
 │   │
 │   ├── Chart Types
-│   │   ├── Candlestick
-│   │   ├── Line
-│   │   ├── Area
-│   │   └── Heikin-Ashi
+│   │   ├── Candlestick (default)
+│   │   ├── Line (simplified, mobile-friendly)
+│   │   ├── Area (gradient-fill)
+│   │   └── Heikin-Ashi (smoothed-candlesticks, planned Q2 2025)
 │   │
-│   └── Drawing Tools
-│       ├── Trendlines
-│       ├── Horizontal Lines (Support/Resistance)
-│       └── Annotations
+│   ├── Drawing Tools (src/sections/chart/draw/)
+│   │   ├── Trendlines (Drag-to-Draw, Snap-to-Price)
+│   │   ├── Horizontal Lines (Support/Resistance)
+│   │   ├── Rectangles (Range-Boxes)
+│   │   ├── Fibonacci (Auto-Levels)
+│   │   ├── Annotations (Text-Labels)
+│   │   └── Hit-Detection (hit.ts, Click-to-Edit)
+│   │
+│   └── Backtest-Module (backtest.ts, BacktestPanel.tsx)
+│       ├── Strategy-Backtesting (Test-Indicators on Historical-Data)
+│       ├── P&L-Calculation (Realized/Unrealized)
+│       ├── Metrics: Winrate, Sharpe-Ratio, Max-Drawdown
+│       └── Export-Results (CSV, JSON)
 │
-├── 3. Meme Trading
-│   ├── Wallet Tracking (Top Wallets)
-│   ├── Social Sentiment Analysis
-│   ├── GT Score (Good-Trade Score)
+├── 3. Meme Trading (12 Signals, 6 Combos, 8 Solana-Strategies)
+│   ├── 12 Core-Signals
+│   │   ├── 1. Wallet-Accumulation (Top-10-Wallets buying, >5% total-supply)
+│   │   ├── 2. Volume-Spike (>3x 24h-avg, sustained >1h)
+│   │   ├── 3. Social-Mentions (Twitter, Reddit, Telegram growth >50%)
+│   │   ├── 4. Holder-Distribution (No whale >10%, >1000 holders)
+│   │   ├── 5. Liquidity-Depth (>$100k pool-size, <5% price-impact)
+│   │   ├── 6. Price-Action (New-ATH, Breakout from consolidation)
+│   │   ├── 7. Developer-Activity (GitHub-Commits, Contract-Updates)
+│   │   ├── 8. Community-Engagement (Discord-Activity, Reactions >100/day)
+│   │   ├── 9. Influencer-Shills (Tracked-Influencer mentions, >10k followers)
+│   │   ├── 10. Launch-Timing (Favorable-Market-Conditions, BTC-stable)
+│   │   ├── 11. Contract-Audit (Rugcheck-Pass, Honeypot-Scan-Pass)
+│   │   └── 12. Token-Unlock-Schedule (No-Cliff-Unlocks, <10% circulating)
+│   │
+│   ├── 6 Confluence-Combos
+│   │   ├── 1. Whale-Watch (Signal 1 + 2: Wallet-Accumulation + Volume-Spike)
+│   │   ├── 2. Social-Momentum (Signal 3 + 8: Social-Mentions + Community-Engagement)
+│   │   ├── 3. Launch-Perfect (Signal 10 + 5 + 11: Launch-Timing + Liquidity + Audit)
+│   │   ├── 4. Breakout-Confluence (Signal 6 + 2 + 3: Price-Action + Volume + Social)
+│   │   ├── 5. Dev-Active (Signal 7 + 8: Developer-Activity + Community-Engagement)
+│   │   └── 6. Influencer-Pump (Signal 9 + 2: Influencer-Shills + Volume-Spike)
+│   │
+│   ├── 8 Top Solana-Strategies
+│   │   ├── 1. Raydium-Liquidity-Snipe (Front-Run-New-Pools, <5min after launch)
+│   │   ├── 2. Jupiter-Aggregator-Arbitrage (Cross-DEX-Price-Diff, >1% spread)
+│   │   ├── 3. Pump.fun-Launch-Tracker (Track-New-Launches, pumpfunAdapter.ts)
+│   │   ├── 4. Solscan-Whale-Alert (Monitor-Top-Wallets, >1M SOL)
+│   │   ├── 5. Magic-Eden-NFT-Correlation (NFT-Project-Token-Pump, >50% floor-price-increase)
+│   │   ├── 6. Marinade-stSOL-Yield (Liquid-Staking-Yield-Farming, 6-8% APY)
+│   │   ├── 7. Orca-Whirlpool-LP (Concentrated-Liquidity-Farming, high-fee-tiers)
+│   │   └── 8. Backpack-Gang-Gating (Community-Token-Gating, NFT-based-access)
+│   │
+│   ├── Wallet Tracking (walletMonitor.ts, walletFlow.ts)
+│   │   ├── Top-10-Wallets (Solana-Whales, >1M SOL)
+│   │   ├── Wallet-Flow-Tracking (Inflows, Outflows, Net-Change)
+│   │   ├── Wallet-Alerts (Webhook-based, wallet/webhook.ts)
+│   │   └── Wallet-Monitor-Service (Real-time-tracking, polling 10s)
+│   │
+│   ├── Social Sentiment Analysis (socialHeuristics.ts, ai/orchestrator.ts)
+│   │   ├── Twitter-Mentions (Track-Keywords, @mentions)
+│   │   ├── Reddit-Activity (r/cryptocurrency, r/solana)
+│   │   ├── Telegram-Group-Activity (Message-Count, Active-Users)
+│   │   ├── AI-Sentiment-Score (Grok-Powered, -1 to +1)
+│   │   └── Influencer-Tracking (Monitored-List, >10k followers)
+│   │
+│   ├── GT Score (Good-Trade Score, analysis/heuristic.ts)
+│   │   ├── Calculation: Weighted-Score (0-100) based on 12 Signals
+│   │   ├── Thresholds: <30 Avoid, 30-60 Neutral, 60-80 Good, >80 Excellent
+│   │   ├── Factors: Liquidity (20%), Volume (15%), Social (15%), Wallet (15%), etc.
+│   │   └── Update-Frequency: Every 5min (cached, re-calc on-demand)
+│   │
 │   └── Degen Metrics (Rug-Risk, Holder-Distribution)
+│       ├── Rug-Risk-Score (0-100, based on Contract-Audit, Liquidity-Lock)
+│       ├── Holder-Distribution (Top-10, Top-50, Top-100 holders %)
+│       ├── Honeypot-Check (Can-Sell-Check, Simulation-based)
+│       └── Liquidity-Lock-Status (Lock-Duration, Unlock-Date)
 │
-├── 4. Journaling
-│   ├── Trade Logs (Entry, Exit, P&L)
-│   ├── Tags (#lesson-learned, #mistake, #win)
-│   ├── AI Condense (Summarize entries)
-│   ├── Bullet Analysis (Extract insights)
-│   └── Lessons-Learned Archive
+├── 4. Journaling (CRUD, AI-Condense, OCR, Stats)
+│   ├── Journal-CRUD (journal.ts, JournalService.ts)
+│   │   ├── Create-Entry (Rich-Text-Editor, JournalEditor.tsx)
+│   │   ├── Read-Entries (Filter, Sort, Search, JournalList.tsx)
+│   │   ├── Update-Entry (Inline-Edit, Modal-Edit)
+│   │   ├── Delete-Entry (Soft-Delete, Archive)
+│   │   └── Storage: Dexie (IndexedDB), Offline-First
+│   │
+│   ├── Trade Logs (Entry, Exit, P&L, Tags)
+│   │   ├── Fields: Symbol, Entry-Price, Exit-Price, Quantity, P&L, Timestamp
+│   │   ├── Tags: #win, #loss, #lesson-learned, #mistake, #setup, #breakout
+│   │   ├── Auto-Calculation: P&L, %-Gain/Loss, Risk-Reward
+│   │   └── Linked-Charts: Reference-to-Chart-Screenshot
+│   │
+│   ├── AI Condense (Summarize entries, journal-condense.md prompt)
+│   │   ├── Provider: OpenAI (gpt-4o-mini, cheap ~$0.003/entry)
+│   │   ├── Output: 1-2 sentence summary + Key-Insights + Mistakes
+│   │   ├── Max-Tokens: 300 (cost-limit)
+│   │   └── Caching: 1h-TTL (identical-entries)
+│   │
+│   ├── Bullet Analysis (Extract insights, analyze-bullets-ai.md prompt)
+│   │   ├── Provider: OpenAI (gpt-4o-mini)
+│   │   ├── Output: Bullet-Points (Actionable-Insights, Lessons)
+│   │   ├── Usage: Multi-Entry-Analysis (select 5-10 entries)
+│   │   └── Export: Markdown, PDF (planned)
+│   │
+│   ├── OCR (Image-to-Text, ocr/ocrService.ts)
+│   │   ├── Engine: Tesseract.js (client-side, offline-capable)
+│   │   ├── Use-Case: Screenshot-Import (Trading-Platform, Charts)
+│   │   ├── Accuracy: ~85% (English, Trading-Jargon)
+│   │   └── Post-Processing: Extract-Numbers, Symbols, Timestamps
+│   │
+│   ├── Lessons-Learned Archive (LessonsPage.tsx)
+│   │   ├── Auto-Tag: Entries with #lesson-learned
+│   │   ├── Display: Card-Grid (LessonCard.tsx)
+│   │   ├── Search: Full-Text-Search (Dexie-Query)
+│   │   └── Export: CSV, JSON, Markdown
+│   │
+│   └── Journal-Stats (JournalStats.tsx)
+│       ├── Metrics: Total-Entries, Winrate, Avg-P&L, Max-Drawdown
+│       ├── Charts: P&L-over-Time, Tag-Distribution, Entry-Frequency
+│       ├── Timeframes: 7d, 30d, 90d, All-Time
+│       └── KPI-Formulas (siehe Abschnitt 3.7)
 │
-├── 5. Alerts & Signals
+├── 5. Alerts & Signals (CRUD, Rule-Editor, Confluence, Push)
+│   ├── Alert-CRUD (notifications/useAlertRules.ts)
+│   │   ├── Create-Alert (RuleWizard.tsx, Step-by-Step)
+│   │   ├── Read-Alerts (NotificationsPage.tsx, Filter-by-Status)
+│   │   ├── Update-Alert (RuleEditor.tsx, Visual-Rule-Builder)
+│   │   ├── Delete-Alert (Soft-Delete, Archive)
+│   │   └── Storage: Dexie (db.signals), Sync-to-Backend (planned Q1 2025)
+│   │
 │   ├── Price Alerts (Above, Below, Crossover)
+│   │   ├── Types: Price > X, Price < X, Price-Change% > X
+│   │   ├── Evaluation: Server-Side (rules/eval-cron.ts, every 1min)
+│   │   ├── Notification: Browser-Push-API (push/subscribe.ts)
+│   │   └── Status: Active, Triggered, Paused, Expired
+│   │
 │   ├── Indicator Alerts (RSI, MACD, Confluence)
-│   ├── Signal Matrix (Multi-timeframe view)
-│   └── Push Notifications (Browser, planned)
+│   │   ├── Conditions: RSI < 30, MACD-Cross, Bollinger-Breakout
+│   │   ├── Confluence-Rules: Multi-Indicator (RSI + MACD + Volume)
+│   │   ├── Presets: notifications/presets.ts (RSI-Oversold, Golden-Cross)
+│   │   └── Custom-Rules: User-Defined-Logic (ruleToken.ts parser)
+│   │
+│   ├── Signal Matrix (Multi-timeframe view, SignalsPage.tsx)
+│   │   ├── Timeframes: 15m, 1h, 4h, 1d (4x4 grid)
+│   │   ├── Indicators: RSI, MACD, EMA-Cross, Bollinger (per timeframe)
+│   │   ├── Confluence-Score: Sum of Bullish-Signals (0-10 scale)
+│   │   └── Color-Coding: Green (Bullish), Red (Bearish), Yellow (Neutral)
+│   │
+│   ├── Push Notifications (Browser, PWA, planned Q1 2025)
+│   │   ├── Subscribe: push/subscribe.ts (Web-Push-API)
+│   │   ├── Dispatch: alerts/dispatch.ts (Triggered-Alert → Push)
+│   │   ├── Service-Worker: Handle-Push-Event (show-notification)
+│   │   └── Permissions: Browser-Permission-Prompt (NotificationsPage)
+│   │
+│   └── Signal-Orchestrator (Event-Sourcing, Learning-Architect, planned Q1 2025)
+│       ├── Event-Sourcing: Log all Signals (Success/Failure)
+│       ├── Learning-Architect: Improve-Signals based on Past-Performance
+│       ├── Lessons-Module: Auto-Generate-Lessons from Signal-History
+│       └── Export: Signal-Playbook (JSON, Markdown)
 │
-├── 6. Access Gating
-│   ├── Solana Wallet Connect
-│   ├── NFT Ownership Check (planned)
-│   ├── Beta Access (currently mocked)
-│   └── Access Logs (telemetry)
+├── 6. Access Gating (Solana-Wallet, NFT-Check, Lock-Calculator)
+│   ├── Solana Wallet Connect (AccessPage.tsx, access/)
+│   │   ├── Adapters: @solana/wallet-adapter-react (Phantom, Solflare)
+│   │   ├── Connect-UI: AccessStatusCard.tsx (Connect-Button, Status-Display)
+│   │   ├── Status: Connected, Disconnected, Checking, Error
+│   │   └── Storage: accessStore.ts (Zustand), localStorage-cache
+│   │
+│   ├── NFT Ownership Check (HoldCheck.tsx, planned Q1 2025)
+│   │   ├── Contract: Backpack-Gang-NFT (Solana-Mainnet)
+│   │   ├── Verification: On-Chain-Query (Solana-RPC, Moralis-API)
+│   │   ├── Grace-Period: 7-day-trial (mock-wallet)
+│   │   └── Fallback: access/status.ts (API-check)
+│   │
+│   ├── Beta Access (currently mocked, access/status.ts)
+│   │   ├── Mock-Wallet: Always-Returns-Granted (Development-Only)
+│   │   ├── Whitelist: Hardcoded-Addresses (Beta-Testers)
+│   │   └── Migration: Q1 2025 (On-Chain-Verification)
+│   │
+│   ├── Lock-Calculator (LockCalculator.tsx, access/lock.ts)
+│   │   ├── Calculate: Token-Lock-Duration based on Holdings
+│   │   ├── Formula: Lock-Days = (Holdings / Total-Supply) * 365
+│   │   ├── UI: Slider-Input, Real-Time-Calculation
+│   │   └── Use-Case: Token-Gating-Preview (Pre-Purchase)
+│   │
+│   └── Access Logs (telemetry, TelemetryService.ts)
+│       ├── Events: wallet_connect, access_check, nft_verify
+│       ├── Storage: IndexedDB (local), API-telemetry.ts (backend)
+│       └── Analytics: Access-Funnel (Connect → Check → Grant)
 │
-└── 7. AI Orchestration
-    ├── Dual Provider (OpenAI + Grok)
-    ├── Task Queue (Priority, Cost-Budget)
-    ├── Prompt Library (System prompts)
-    └── Cost Management (<$0.25/request, $100/day)
+└── 7. AI Orchestration (OpenAI + Grok, Task-Queue, Cost-Management)
+    ├── Dual Provider (OpenAI + Grok, ai/orchestrator.ts)
+    │   ├── OpenAI (gpt-4o-mini):
+    │   │   ├── Cost: ~$0.15/1M input-tokens, ~$0.60/1M output-tokens
+    │   │   ├── Use-Cases: Journal-Condense, Bullet-Analysis, Quick-Summaries
+    │   │   ├── Latency: 500-800ms (p50), 1-2s (p95)
+    │   │   └── Client: ai/model_clients/openai.ts
+    │   │
+    │   ├── Grok (xAI, grok-beta):
+    │   │   ├── Cost: ~$5/1M input-tokens, ~$15/1M output-tokens (40x OpenAI)
+    │   │   ├── Use-Cases: Market-Reasoning, Social-Heuristics, Meme-Analysis
+    │   │   ├── Latency: 1-2s (p50), 3-5s (p95)
+    │   │   └── Client: ai/model_clients/grok.ts
+    │   │
+    │   └── Provider-Selection-Logic (ai/orchestrator.ts, selectProvider())
+    │       ├── Rules: market-reasoning → Grok, journal-condense → OpenAI
+    │       ├── Fallback: Grok-Error → OpenAI (graceful-degradation)
+    │       └── Override: User-Selectable (SettingsPage, ai-provider-toggle)
+    │
+    ├── Task Queue (Priority, Cost-Budget, ai/orchestrator.ts)
+    │   ├── Queue-Structure: Priority-Queue (High → Low)
+    │   ├── Priorities: High (User-Initiated), Low (Background-Analysis)
+    │   ├── Concurrency-Limit: 3 concurrent-tasks (rate-limiting)
+    │   └── Retry-Logic: Exponential-Backoff (ai/retry.ts, 3 retries)
+    │
+    ├── Prompt Library (System prompts, ai/prompts/*.md)
+    │   ├── journal-condense.md          Summary-Generation (1-2 sentences + Insights)
+    │   ├── analyze-bullets-ai.md        Bullet-Point-Analysis (Actionable-Insights)
+    │   ├── teaser-vision-analysis.md    Vision-API-Analysis (Image-Description)
+    │   ├── market-reasoning.md          Market-Reasoning (Grok, Crypto-Context)
+    │   ├── social-heuristics.md         Social-Sentiment-Analysis (Grok, Twitter/Reddit)
+    │   └── Prompt-Loader (ai/promptLoader.ts, loadSystemPrompt())
+    │
+    ├── Cost Management (<$0.25/request, $100/day, ai/orchestrator.ts)
+    │   ├── Per-Request-Limit: $0.25 (throws-error if exceeded)
+    │   ├── Per-User-Limit: $10/day (planned, not implemented)
+    │   ├── Total-Daily-Limit: $100/day (global-limit)
+    │   ├── Cost-Estimation: estimateCost() (token-count * provider-rate)
+    │   ├── Cost-Tracking: trackAICall() (log-cost, provider, timestamp)
+    │   └── Cost-Analytics: telemetry_output/ai_cost_tracked.json
+    │
+    ├── Response-Caching (1h-TTL, ai/orchestrator.ts)
+    │   ├── Cache-Key: hash(task-type + input)
+    │   ├── TTL: 1 hour (3600s)
+    │   ├── Storage: In-Memory-Map (ephemeral, per-session)
+    │   └── Planned: IndexedDB-Cache (persistent, Q1 2025)
+    │
+    ├── Request-Deduplication (ai/orchestrator.ts, inFlight-Map)
+    │   ├── Logic: If-identical-task-in-flight → await-existing-request
+    │   ├── Benefit: Prevent-Duplicate-API-Calls (cost-savings)
+    │   └── Use-Case: User-Double-Click on "Condense"-Button
+    │
+    └── Telemetry (TelemetryService.ts, events/)
+        ├── Events: ai_assist_invoked, ai_assist_success, ai_assist_error
+        ├── Metrics: latency, tokens-used, cost, provider
+        ├── Storage: IndexedDB (local), api/telemetry.ts (backend)
+        └── Analytics: AI-Cost-Dashboard (planned, Q2 2025)
 ```
 
 ### 3.2 Key UX Flows
