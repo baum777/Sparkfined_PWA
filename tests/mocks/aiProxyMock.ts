@@ -1,68 +1,80 @@
-import http from 'node:http'
+import http from 'http';
+import type { AddressInfo } from 'net';
 
-export interface AiProxyMockOptions {
-  port?: number
-  expectedSecret?: string
-  onRequest?: (body: any) => void
-  responseBody?: Record<string, any>
-}
+export type AiMockHandle = { url: string; close: () => Promise<void> };
+export type AiMockOptions = {
+  port?: number;
+  responseBody?: any;
+  expectedSecret?: string;
+  onRequest?: (body: Record<string, any>) => void;
+};
 
-export interface AiProxyMock {
-  url: string
-  close: () => Promise<void>
-}
+const responseBodyDefault = {
+  ok: true,
+  provider: 'mock',
+  text: 'Mocked bullet list',
+  usage: { input_tokens: 1, output_tokens: 1 },
+};
 
-/**
- * Starts a minimal HTTP server that mimics the Sparkfined AI proxy endpoint.
- * Secrets are never persisted; use `expectedSecret` with placeholder tokens like `// REDACTED_TOKEN`.
- */
-export function startAiProxyMock(options: AiProxyMockOptions = {}): Promise<AiProxyMock> {
-  const port = options.port ?? 4455
-  const expectedSecret = options.expectedSecret ?? 'Bearer // REDACTED_TOKEN'
+export function startAiProxyMock(portOrOptions?: number | AiMockOptions): Promise<AiMockHandle> {
+  const opts: AiMockOptions = typeof portOrOptions === 'number' ? { port: portOrOptions } : portOrOptions ?? {};
 
   return new Promise((resolve, reject) => {
     const server = http.createServer((req, res) => {
-      if (req.method !== 'POST' || req.url !== '/api/ai/assist') {
-        res.statusCode = 404
-        res.end('Not Found')
-        return
-      }
+      const chunks: Array<Buffer> = [];
+      let parsedBody: Record<string, any> | null = null;
 
-      if (expectedSecret && req.headers['authorization'] !== expectedSecret) {
-        res.statusCode = 401
-        res.end('Unauthorized')
-        return
-      }
+      req.on('data', (chunk) => {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      });
 
-      const chunks: Buffer[] = []
-      req.on('data', (chunk) => chunks.push(chunk as Buffer))
       req.on('end', () => {
-        try {
-          const body = JSON.parse(Buffer.concat(chunks).toString('utf8'))
-          options.onRequest?.(body)
-          res.setHeader('content-type', 'application/json')
-          res.end(JSON.stringify(options.responseBody ?? {
-            ok: true,
-            provider: body.provider,
-            model: body.model ?? 'mock-model',
-            text: 'Mocked bullet list',
-            usage: { input_tokens: 300, output_tokens: 180 },
-            costUsd: 0.00042,
-            fromCache: false,
-          }))
-        } catch (error) {
-          res.statusCode = 500
-          res.end(JSON.stringify({ ok: false, error: (error as Error).message }))
+        if (opts.expectedSecret && req.headers['authorization'] !== opts.expectedSecret) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'Unauthorized' }));
+          return;
         }
-      })
-    })
 
-    server.on('error', reject)
-    server.listen(port, () => {
-      resolve({
-        url: `http://127.0.0.1:${port}`,
-        close: () => new Promise<void>((closeResolve) => server.close(() => closeResolve()))
-      })
-    })
-  })
+        const raw = chunks.length ? Buffer.concat(chunks).toString('utf8') : '';
+        if (raw) {
+          try {
+            parsedBody = JSON.parse(raw) as Record<string, any>;
+            opts.onRequest?.(parsedBody);
+          } catch {
+            // ignore malformed JSON, still return deterministic response
+          }
+        } else if (opts.onRequest) {
+          // Allow onRequest handlers to observe empty payloads.
+          parsedBody = {};
+          opts.onRequest(parsedBody);
+        }
+
+        const defaultBody = {
+          ...responseBodyDefault,
+          provider: parsedBody?.provider ?? responseBodyDefault.provider,
+        };
+        const body = opts.responseBody ?? defaultBody;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(body));
+      });
+
+      req.on('error', () => {
+        res.writeHead(500);
+        res.end();
+      });
+    });
+
+    server.on('error', reject);
+
+    const bindPort = opts.port ?? 0; // 0 -> ephemeral
+    server.listen(bindPort, '127.0.0.1', () => {
+      const addr = server.address() as AddressInfo | null;
+      if (!addr || typeof addr.port !== 'number') {
+        reject(new Error('could not determine mock server port'));
+        return;
+      }
+      const url = `http://127.0.0.1:${addr.port}`;
+      resolve({ url, close: () => new Promise<void>((resClose) => server.close(() => resClose())) });
+    });
+  });
 }
