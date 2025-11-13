@@ -282,8 +282,39 @@ pnpm run lint          # ESLint
 
 **Generated in Phase 4:**
 - `CLAUDE.md` (repo-root) — Full `.rulesync/` config, optimised for Claude's format
+- `.cursor/rules/claude-ui-vite.md` — **Vite UI Agent** (Claude-specific, UI-only workflow)
 
 **Format:** Markdown with clear sections, examples, and context-notes
+
+#### Claude UI Agent (Vite-Specific)
+
+**Special Rule:** `.cursor/rules/claude-ui-vite.md`
+
+**Purpose:** Dedicated UI-coding workflow for Claude Code when working on React components, pages, and sections.
+
+**Scope:**
+- `src/components/**/*.{tsx,jsx}`
+- `src/pages/**/*.{tsx,jsx}`
+- `src/sections/**/*.{tsx,jsx}`
+
+**Workflow:** Wireframe → 3 Layout Variants → Component Composition → A11y Check → Wireframe Update
+
+**Key Features:**
+1. **Wireframe-Driven:** Reads specs from `wireframes/mobile/*.md`, `wireframes/desktop/*.md`
+2. **3 Responsive Variants:** Mobile (375px), Tablet (768px), Desktop (1024px+)
+3. **Design System References:** Uses `_intentions.md` (ADRs), design tokens, component taxonomy
+4. **Structured Output:** Summary, Wireframe Mapping, Variants, Change Review
+
+**When to Use:**
+- ✅ Implementing new pages/sections from wireframes
+- ✅ Creating component variations (mobile/tablet/desktop)
+- ✅ Complex UI refactoring (10+ components)
+- ✅ Design system updates
+
+**When NOT to Use:**
+- ❌ Quick component fixes (use Cursor)
+- ❌ Business logic / hooks (use Cursor)
+- ❌ API / backend work (use Cursor)
 
 ---
 
