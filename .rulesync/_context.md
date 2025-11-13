@@ -1,220 +1,217 @@
 ---
 mode: ITERATIVE
 id: "_context"
+priority: 1
 version: "0.1.0"
-last_review: "2025-11-12"
+last_update: "2025-11-12"
 targets: ["cursor", "claudecode", "codex"]
-description: "Current session context, open questions, blockers, and recent user requests for Sparkfined PWA"
+description: "Current working context, session focus, open questions, blockers and recent user requests for Sparkfined PWA"
 ---
 
-# Session Context & Open Questions
+# Context — Session Focus & Open Questions
 
-> **Purpose:** Current working context for active sessions – what's being worked on *right now*, plus open questions and blockers.
+> **Purpose:** Captures the **current working context** for ongoing sessions: what we're doing *right now*, plus open questions and blockers.
 >
-> **Update-Frequency:** Per-Session (daily or when context shifts significantly).
+> **Update-Frequency:** Per working session (multiple times per day).
+>
+> **Behaviour:** The model updates this per session, keeps entries short, and moves resolved issues or historical notes to `_log.md` or SYSTEM docs if they become long-term knowledge.
 
 ---
 
-## 1. Current Focus
+## Current Focus
 
-### Active-Work (2025-11-12)
+### Session: 2025-11-12 (Multi-Tool Prompt System Setup)
 
-**Primary-Feature:** Multi-Tool-Prompt-System (Rulesync-Configuration)
+**Primary-Task:** Set up Rulesync-based multi-tool prompt system (Cursor, Claude Code, Codex)
 
-- **Scope:** Generate `.rulesync/` configuration (11 SYSTEM-Files + 6 ITERATIVE-Files) for Cursor, Claude Code, Codex
-- **Status:** Phase 3 Complete (SYSTEM-Files ✅ 11/11, ITERATIVE-Files 🔄 In-Progress)
-- **Files-Touched:** `.rulesync/*.md`, `README.md` (planned)
+**Current-Step:** Generate ITERATIVE-Files (`_planning`, `_context`, `_intentions`, `_experiments`, `_log`, `_agents`)
 
-**Secondary-Features:**
-
-- **AI-Cost-Dashboard:** Backend logic for cost-tracking complete, UI-Component pending
-  - **Files:** `ai/orchestrator.ts`, `src/components/AICostDashboard.tsx` (to be created)
-- **PWA-Bundle-Size-Optimization:** Investigating Lucide-Icons tree-shaking issue
-  - **Files:** `vite.config.ts`, `src/components/ui/*.tsx` (icon-imports)
-
----
-
-### Recent Bug-Fixes (Last 7 Days)
-
-1. **Service-Worker-Cache-Invalidation-Bug** (Fixed 2025-11-10)
-   - **Issue:** Old SW-Cache not invalidated after Deployment → Users saw stale UI
-   - **Fix:** Added `cleanupOutdatedCaches: true` in `vite.config.ts` PWA-Plugin
-   - **Commit:** `a3f12b8` ("fix: Force SW-Cache-Cleanup on Update")
-
-2. **TypeScript-Error in `useAccessStore`** (Fixed 2025-11-09)
-   - **Issue:** `status` property possibly `null`, but code assumed non-null
-   - **Fix:** Added null-check + optional-chaining (`status?.hasAccess`)
-   - **Commit:** `d7e4c91` ("fix: Handle null-status in AccessStore")
-
-3. **Chart-Performance-Lag on 1000+ Candles** (In-Progress)
-   - **Issue:** Chart lags when zooming/panning with 1000+ OHLC-Candles
-   - **Investigation:** Profiling shows Canvas-Rendering bottleneck (redraw-entire-canvas on every frame)
-   - **Planned-Fix:** Implement Viewport-Culling (only render visible candles) + Debounce zoom/pan
-   - **Status:** ⏳ Pending (scheduled for next sprint)
-
----
-
-## 2. Recent User Requests
-
-### From Beta-Testers (Last 2 Weeks)
-
-1. **"Add Keyboard-Shortcuts for Journal-Navigation"** (Requested 2025-11-05)
-   - **User:** Beta-Tester-3
-   - **Details:** Arrow-Keys to navigate between Journal-Entries, `Cmd+N` for New-Entry
-   - **Priority:** P2 (Nice-to-Have)
-   - **Status:** ⏳ Backlog (planned for v1.1.0)
-
-2. **"Dark-Mode too dark, hard to read small text"** (Requested 2025-11-07)
-   - **User:** Beta-Tester-7
-   - **Details:** Background `#0a0a0a` too dark, text-contrast not sufficient for long-reading
-   - **Action:** Adjusted background to `#0f0f0f`, increased text-color from `#d4d4d4` to `#e5e5e5`
-   - **Status:** ✅ Shipped in v0.8.3 (2025-11-08)
-
-3. **"AI-Cost too high for Journal-Condense"** (Requested 2025-11-10)
-   - **User:** Beta-Tester-12
-   - **Details:** Journal-Condense costs $0.05 per entry (perceived as expensive)
-   - **Action:** Reduced `maxTokens` from 1000 to 500 (output still sufficient), cost now ~$0.02
-   - **Status:** ✅ Shipped in v0.8.4 (2025-11-11)
-
----
-
-### From E2E-Tests / User-Testing
-
-1. **Accessibility-Issue:** Focus-Trap not working in Modal (E2E-Test-Failure)
-   - **Test:** `tests/e2e/modal.spec.ts` fails on `Tab` key-navigation
-   - **Root-Cause:** `useFocusTrap` hook not applied to all Modals
-   - **Status:** ✅ Fixed in v0.8.3 (2025-11-08)
-
-2. **Performance-Issue:** Chart-First-Load takes 3-5s on Mobile
-   - **Test:** Manual-Test on iPhone 12 (Safari)
-   - **Root-Cause:** Chart-Component loads all OHLC-Data (10,000+ candles) before rendering
-   - **Planned-Fix:** Lazy-Load candles (initial: 500, on-demand: load more on zoom-out)
-   - **Status:** ⏳ Pending (scheduled for Q1 2025)
-
----
-
-## 3. Open Questions
-
-### Technical Decisions (Unresolved)
-
-1. **Chart-Library-Choice: Lightweight-Charts vs. Custom-Canvas?**
-   - **Context:** Current custom-canvas implementation flexible but maintenance-heavy. Lightweight-Charts is battle-tested, but less customizable.
-   - **Alternatives:**
-     - **Option A:** Stick with custom-canvas, optimize performance (Viewport-Culling, Offscreen-Canvas)
-     - **Option B:** Migrate to Lightweight-Charts, accept less customization
-     - **Option C:** Hybrid: Lightweight-Charts for basic charts, custom-canvas for advanced features
-   - **Decision-Deadline:** Sprint 2025-W09 (after Tech-Spike)
-   - **Owner:** TBD
-
-2. **Real-Time-Data: WebSocket vs. Polling?**
-   - **Context:** Real-Time-Alerts require live price-data. Moralis/Dexscreener offer WebSocket (complex, cost?) vs. Polling (simple, higher latency).
-   - **Alternatives:**
-     - **Option A:** WebSocket (lower latency, real-time, but complex reconnect-logic + cost-unknown)
-     - **Option B:** Polling every 10s (simple, predictable cost, but 10s-latency)
-     - **Option C:** Hybrid: WebSocket for active-session, Polling for background
-   - **Decision-Deadline:** Sprint 2025-W09 (after WebSocket-Spike)
-   - **Owner:** TBD
-
-3. **Supabase-Migration: Worth the effort?**
-   - **Context:** Current Dexie (IndexedDB) is offline-first, but no cross-device-sync. Supabase offers Realtime-Sync, but adds complexity + privacy-concerns.
-   - **Alternatives:**
-     - **Option A:** Keep Dexie, add manual-export/import for cross-device-sync (low-effort, no real-time)
-     - **Option B:** Migrate to Supabase, enable real-time-sync (high-effort, privacy-concerns)
-     - **Option C:** Hybrid: Dexie for offline, Supabase for optional-cloud-backup (best-of-both-worlds)
-   - **Decision-Deadline:** Q2 2025 (after v1.0.0-beta-launch)
-   - **Owner:** TBD
-
----
-
-### Design Decisions (Unresolved)
-
-1. **AI-Cost-Dashboard: Show to all users or only power-users?**
-   - **Context:** Cost-Dashboard useful for transparency, but may confuse casual-users ("Why do I pay for AI?").
-   - **Alternatives:**
-     - **Option A:** Show to all users (transparency-first)
-     - **Option B:** Show only to users who opt-in (Settings → Advanced → AI-Cost-Dashboard)
-     - **Option C:** Show simplified version (Budget-Bar only), hide detailed cost-breakdown
-   - **Decision-Deadline:** Sprint 2025-W07 (before UI-Implementation)
-   - **Owner:** TBD
-
-2. **Accessibility-Trade-Off for Charts: Full-A11y or Data-Table-Alternative?**
-   - **Context:** Canvas-Charts inherently not A11y-friendly. Full-A11y requires ARIA-Live-Regions + complex keyboard-nav. Data-Table-Alternative simpler but less immersive.
-   - **Decision:** Data-Table-Alternative chosen (see `07-accessibility.md`), but open for revision if user-feedback demands full-A11y.
-   - **Status:** Decision made, monitor user-feedback
-
----
-
-## 4. Blockers
-
-### Active Blockers (High-Priority)
-
-1. **On-Chain-Access-Gating: NFT-Contract-Design not finalized**
-   - **Blocker:** Need to decide: Custom-NFT-Contract vs. existing-NFT (e.g. SMB Gen2)?
-   - **Impact:** Blocks On-Chain-Access-Gating-Prototype (scheduled Sprint 2025-W09)
-   - **Owner:** Project-Lead
-   - **ETA:** 2025-11-15 (Decision-Meeting planned)
-
-2. **Moralis-API-Rate-Limits unclear for Real-Time-Alerts**
-   - **Blocker:** Moralis-Docs vague on WebSocket-Rate-Limits. Need clarification to estimate cost.
-   - **Impact:** Blocks Real-Time-Alerts-WebSocket-Spike (scheduled Sprint 2025-W09)
-   - **Action:** Email Moralis-Support for clarification
-   - **ETA:** 2025-11-13 (Support-Response expected within 48h)
-
----
-
-### Resolved Blockers (Archived)
-
-1. **Vercel-Deployment-Failure on Service-Worker-Build** (Resolved 2025-11-06)
-   - **Blocker:** Vercel-Build failed due to Workbox-Webpack-Plugin-Version-Conflict
-   - **Resolution:** Updated to `vite-plugin-pwa@0.17.0` (Workbox 7.x compatible)
-
-2. **TypeScript-Strict-Mode-Errors** (Resolved 2025-11-05)
-   - **Blocker:** Enabling `strict: true` caused 150+ Type-Errors across codebase
-   - **Resolution:** Fixed 120 errors, added `// @ts-expect-error` pragmatic-workarounds for 30 edge-cases
-
----
-
-## 5. Session-Notes (Temporary, per working-session)
-
-### Session: 2025-11-12 (Multi-Tool-Prompt-System)
-
-**What I'm doing:**
-- Generating `.rulesync/` configuration (SYSTEM + ITERATIVE files)
-- Validating files against Meta-Checkliste
-- Preparing for Phase 4 (Tool-Config-Generation)
-
-**Discoveries:**
-- SYSTEM-Files should target cursor+claudecode (granular rules)
-- ITERATIVE-Files should target all tools (dynamic context)
-- Codex-Target should receive high-level context only (00, _planning, _context, _intentions, 09-11)
+**Status:**
+- ✅ Phase 1: Audit completed (no existing AI-configs found)
+- ✅ Phase 2: Rulesync-structure designed (11 SYSTEM + 6 ITERATIVE files)
+- ✅ Phase 3 SYSTEM-Files: 11/11 completed
+- ⏳ Phase 3 ITERATIVE-Files: 0/6 completed (in progress)
 
 **Next-Steps:**
-- Complete ITERATIVE-Files generation
-- Generate `AGENTS.md` with Codex-Specific-Instructions
-- Phase 4: Validation + README + VERIFY-Checklist
+1. Generate all 6 ITERATIVE-Files with initial content
+2. Generate `AGENTS.md` with Codex-specific instructions
+3. Phase 4: Validation & Tool-Config generation (README, VERIFY-Checklist)
 
 ---
 
-### Session: 2025-11-10 (AI-Cost-Dashboard Backend)
+### Recent-Feature-Work (Last 2 Weeks)
 
-**What I did:**
-- Implemented `trackAICall()` in `ai/orchestrator.ts`
-- Added Cost-Estimation-Logic (`estimateCost()`, `calculateActualCost()`)
-- Created Zustand-Store for AI-Cost-Tracking (`src/store/aiCostStore.tsx`)
+**Completed:**
+- PWA-Offline-Mode-Audit (Service-Worker stable, 428KB precache)
+- Documentation-Consolidation (`docs/` cleanup, `README.md` update)
+- AI-Orchestrator-Cost-Tracking (log AI-calls with cost-metrics)
 
-**Blockers:**
-- UI-Component pending (need designer-input on layout)
+**In-Progress:**
+- Multi-Tool-Prompt-System (this session)
 
-**Next-Steps:**
-- Create `AICostDashboard.tsx` component (Budget-Bar, Daily/Monthly-Aggregation-Chart)
-- Add Settings-Toggle: "Show AI-Cost-Dashboard" (default: hidden)
+**Blocked:**
+- E2E-Test-Coverage-Expansion (waiting for Playwright-CI-setup)
 
 ---
 
-## Meta
+### Specific Bug/Performance Issue (if any)
 
-**Last-Updated:** 2025-11-12 (Session: Multi-Tool-Prompt-System)
+**None currently active.**
 
-**Next-Review:** 2025-11-13 (or when context shifts)
+**Recently-Fixed:**
+- Service-Worker update-loop on iOS Safari (fixed via `skipWaiting: true` in `vite.config.ts`)
+- Chart-rendering-glitch on low-DPI screens (fixed via `devicePixelRatio` adjustment in `InteractiveChart.tsx`)
 
-**Owner:** Session-Specific (update per active-session)
+---
+
+## Recent User Requests
+
+### From Beta-Testers (Last 4 Weeks)
+
+1. **"Add Dark/Light-Mode-Toggle"** (Priority: Low)
+   - **User:** @beta-tester-01
+   - **Rationale:** "I prefer Light-Mode during day-trading"
+   - **Status:** Backlog (P2, not prioritised — Dark-Mode-First is design-principle)
+
+2. **"Offline-Journal-Sync not working on iOS"** (Priority: High)
+   - **User:** @beta-tester-03
+   - **Issue:** Service-Worker not registering on iOS Safari
+   - **Status:** Fixed (2025-11-05, `skipWaiting: true`)
+
+3. **"AI-Condense sometimes returns empty result"** (Priority: Medium)
+   - **User:** @beta-tester-07
+   - **Issue:** OpenAI API timeout on long journal-entries (>5000 chars)
+   - **Status:** Fixed (2025-11-08, added `maxTokens: 500` limit + retry-logic)
+
+4. **"Add Push-Notifications for Alerts"** (Priority: High)
+   - **User:** Multiple testers
+   - **Rationale:** "I want to be notified when price-alert triggers, even when app is closed"
+   - **Status:** Planned for Q1 2025 (P0, Real-Time-Alerts roadmap)
+
+5. **"Chart not loading on mobile (slow 3G)"** (Priority: Medium)
+   - **User:** @beta-tester-12
+   - **Issue:** OHLC-API-timeout on slow networks
+   - **Status:** Partially-Fixed (2025-11-10, added `timeout: 10s` to `fetchWithRetry`)
+
+---
+
+### Feedback from E2E-Tests
+
+**Last-Run:** 2025-11-10
+
+**Results:**
+- ✅ 3/3 tests passed (Command-Board, Journal-Create, Chart-Load)
+- ⚠️ Low-Coverage: Only 3 tests, target is 15-20 critical flows
+
+**Known-Gaps:**
+- No tests for: AI-Assist, Alerts, Replay-Lab, Settings, Access-Gating
+- No mobile-viewport tests (all tests run on desktop-viewport)
+
+**Action-Items:**
+- Add E2E-tests for AI-Assist (`tests/e2e/ai.spec.ts`)
+- Add mobile-viewport tests (`viewport: { width: 375, height: 667 }`)
+
+---
+
+## Open Questions
+
+### Technical Decisions
+
+**1. Chart-Library: Lightweight-Charts vs. TradingView?**
+- **Context:** Lightweight-Charts ist aktuell stabil, offline-capable, kleiner Bundle
+- **Issue:** TradingView hat mehr Features (mehr Indicators, bessere Drawing-Tools)
+- **Trade-Off:** TradingView erfordert Internet-Connection (nicht Offline-First)
+- **Decision-Deadline:** End of Q1 2025 (after Chart-Library-Spike in Sprint S2)
+- **Status:** `open`
+
+**2. Real-Time-Data: WebSocket vs. Polling?**
+- **Context:** Aktuell Polling (alle 5s für OHLC-Data)
+- **Issue:** WebSocket wäre effizienter (weniger API-Calls), aber komplexer (Connection-Management, Reconnect-Logic)
+- **Trade-Off:** Polling ist simpler, aber höhere API-Costs bei vielen Users
+- **Decision-Deadline:** When Real-Time-Alerts goes live (Q1 2025)
+- **Status:** `open`
+
+**3. Backend-DB: Supabase vs. Neon vs. Stay-Client-Only?**
+- **Context:** Aktuell alles in Dexie (IndexedDB, Client-Only)
+- **Pros-Supabase:** Cross-Device-Sync, Real-Time-Subscriptions, Auth-out-of-the-box
+- **Cons-Supabase:** Additional-Dependency, Cost (~$25/month), Complexity
+- **Decision-Deadline:** After On-Chain-Access-Gating (Q1 2025)
+- **Status:** `open`
+
+**4. AI-Provider: Add Claude (Anthropic) as third option?**
+- **Context:** Aktuell OpenAI (gpt-4o-mini) + Grok (xAI)
+- **Pros-Claude:** Best-in-Class for Code-Analysis, günstiger als Grok
+- **Cons-Claude:** Additional-Provider-Integration, mehr Complexity
+- **Decision-Deadline:** Q2 2025 (after AI-Cost-Optimisation)
+- **Status:** `open`
+
+---
+
+### Design Decisions
+
+**1. Should we support Light-Mode?**
+- **Current:** Dark-Mode-First, Light-Mode nicht implementiert
+- **User-Demand:** Low (nur 2 von 15 Beta-Testern)
+- **Effort:** Medium (2-3 days, Tailwind-Theme-Variants)
+- **Decision:** Backlog (P2, not prioritised)
+- **Status:** `open`
+
+**2. Mobile-First vs. Desktop-First?**
+- **Current:** Responsive-Mobile-First (Tailwind `sm:`, `md:`, `lg:`)
+- **Usage-Stats:** 60% Desktop, 40% Mobile (Beta-Testers)
+- **Decision:** Keep Mobile-First (PWA-Installability wichtiger als Desktop-Optimisation)
+- **Status:** `closed` (confirmed)
+
+---
+
+## Blockers
+
+### Current Blockers
+
+**1. Playwright-CI-Setup (GitHub-Actions)**
+- **Issue:** E2E-Tests laufen nur lokal, nicht in CI
+- **Impact:** Kann nicht automatisch testen bei PRs
+- **Owner:** TBD
+- **ETA:** Sprint S1 (2025-11-26)
+
+**2. Solana-Devnet-NFT-Minting**
+- **Issue:** Brauchen Test-NFTs für On-Chain-Access-Gating-Development
+- **Impact:** Kann nicht On-Chain-Verification testen
+- **Owner:** TBD
+- **ETA:** Sprint S1 (2025-11-26)
+
+### Recently-Resolved Blockers
+
+**1. Moralis-API-Key-Expiration** (Resolved: 2025-11-05)
+- **Issue:** API-Key expired, alle Moralis-Calls failed
+- **Resolution:** Rotiert API-Key in Vercel-Environment-Variables
+
+**2. TypeScript-Build-Error (Circular-Dependency)** (Resolved: 2025-11-08)
+- **Issue:** Circular-Import zwischen `src/lib/fetch.ts` und `src/lib/retry.ts`
+- **Resolution:** Extracted shared-types to `src/types/net.ts`
+
+---
+
+## Notes for AI Agents
+
+**When to Update:**
+- Start of new working session (update "Current Focus")
+- When new open-questions arise (add to "Open Questions")
+- When blockers are discovered or resolved (update "Blockers")
+- When user-feedback comes in (add to "Recent User Requests")
+
+**What to Move Out:**
+- Resolved questions → `_intentions.md` (if decision is important)
+- Resolved blockers → `_log.md` (if significant)
+- Historical requests → `_log.md` (after 4 weeks)
+
+**Session-Duration:**
+- Typical: 2-4 hours
+- Context should be updated at start/end of session
+- If session spans multiple days, keep entries timestamped
+
+---
+
+## Revision History
+
+- **2025-11-12:** Initial creation, Phase 3 ITERATIVE-Q&A (Multi-Tool-Prompt-System-Session)

@@ -1,316 +1,376 @@
 ---
 mode: ITERATIVE
 id: "_experiments"
+priority: 3
 version: "0.1.0"
-last_review: "2025-11-12"
+last_update: "2025-11-12"
 targets: ["cursor", "claudecode", "codex"]
-description: "Active and past experiments, tech spikes, prototypes, and A/B tests for Sparkfined PWA"
+description: "Active and past experiments, tech spikes, prototypes, A/B tests and learnings for Sparkfined PWA"
 ---
 
-# Experiments, Prototypes & Tech Spikes
+# Experiments — Prototypes & Tech Spikes
 
-> **Purpose:** Tracks active/past experiments, spikes, prototypes, and A/B-tests – what was learned, what was chosen, what was dropped.
+> **Purpose:** Tracks **active and past experiments**: spikes, prototypes, A/B tests and what was learned.
 >
-> **Update-Frequency:** When experiments start/finish, or when results are significant.
+> **Update-Frequency:** When starting/completing experiments (weekly to monthly).
 >
-> **Format:** Micro-template per experiment: Name → Goal → Setup → Result → Decision → Learnings.
+> **Behaviour:** The model uses a consistent micro-template per experiment: **Name, Goal, Setup, Result, Decision, Learnings**, and ensures that longer-term decisions from experiments flow into `_intentions.md` or SYSTEM docs.
 
 ---
 
-## 1. Active Experiments
+## Experiment-Template
 
-### EXP-001: WebSocket-Real-Time-Data-Spike
+```markdown
+### EXP-XXX: Experiment-Name
 
-**Status:** 🔄 In-Progress (Started 2025-11-12)
+**Status:** `active` | `completed` | `failed` | `abandoned`
 
-**Goal:**
-Evaluate WebSocket-connection for Real-Time-Alerts (Price/Volume-Triggers) vs. Polling.
-
-**Setup:**
-- **Provider:** Dexscreener-WebSocket-API (wss://api.dexscreener.com/ws)
-- **Test-Scope:** Connect to WebSocket, subscribe to 5 tokens, measure latency + reconnect-stability
-- **Metrics:** Latency (time-to-first-message), Reconnect-Success-Rate, Cost-Estimation
-
-**Hypothesis:**
-WebSocket-Latency <1s (vs. Polling 10s), but reconnect-logic complex + cost-unknown.
-
-**Current-Results:**
-- ⏳ Pending (spike-planned for Sprint 2025-W09)
-
-**Decision-Deadline:** 2025-11-24 (End of Sprint 2025-W09)
-
-**Owner:** TBD
-
----
-
-### EXP-002: Chart-Library-Evaluation (Lightweight-Charts vs. Custom-Canvas)
-
-**Status:** 🔄 In-Progress (Started 2025-11-10)
-
-**Goal:**
-Decide: Stick with custom-canvas-chart or migrate to Lightweight-Charts (TradingView-Library).
+**Goal:** What are we trying to learn or validate?
 
 **Setup:**
-- **Test-Scope:** Build prototype with Lightweight-Charts (same features as custom-canvas)
-- **Metrics:**
-  - Performance: 60fps with 1000+ candles? (Benchmark: react-window + canvas-rendering)
-  - Customizability: Can we add custom-indicators (RSI, Fibonacci)?
-  - Bundle-Size: Current ~50KB (custom), Lightweight-Charts ~120KB
-  - Maintainability: Time-to-fix-bug (custom: 2h, Lightweight-Charts: community-support?)
-
-**Hypothesis:**
-Lightweight-Charts faster-to-ship (less-maintenance), but less-customizable. Custom-canvas flexible, but high-maintenance.
-
-**Current-Results:**
-- ✅ Lightweight-Charts-Prototype built (`/tests/prototypes/lightweight-charts-demo.tsx`)
-- ✅ Performance: 60fps with 5000+ candles (better than custom-canvas)
-- ⚠️ Customizability: No built-in-Fibonacci-Retracements (need custom-plugin)
-- ⚠️ Bundle-Size: +70KB (120KB vs. 50KB custom) → acceptable if performance-gain worth it
-
-**Decision-Deadline:** 2025-11-18 (Mid-Sprint Check-In)
-
-**Owner:** TBD
-
-**Next-Steps:**
-- Test Fibonacci-Retracements-Plugin (check if community-plugin available)
-- Compare maintenance-effort: custom-canvas-bug-fix-time vs. Lightweight-Charts-issue-lookup
-
----
-
-### EXP-003: Supabase-Realtime-Spike (Cross-Device-Sync)
-
-**Status:** ⏳ Planned (Start: Q1 2025)
-
-**Goal:**
-Evaluate Supabase-Realtime for cross-device-sync (Journal, Watchlist, Alerts) vs. Manual-Export/Import.
-
-**Setup:**
-- **Test-Scope:** Prototype Journal-Sync via Supabase-Realtime (2 devices, real-time-updates)
-- **Metrics:**
-  - Latency: Time-to-sync (Device-A writes → Device-B sees update)
-  - Cost: Supabase-Free-Tier sufficient? (Monthly-Active-Users, Data-Transfer)
-  - Privacy: User-Data on Supabase-Cloud → GDPR-compliant?
-  - Migration-Effort: Dexie → Supabase-Schema-Migration (estimated dev-time)
-
-**Hypothesis:**
-Supabase-Realtime enables "magical" cross-device-sync (write on phone, see on desktop), but adds complexity + privacy-concerns.
-
-**Decision-Deadline:** Q2 2025 (after v1.0.0-beta-launch, based on user-demand)
-
-**Owner:** TBD
-
----
-
-## 2. Completed Experiments
-
-### EXP-004: Redux-Toolkit vs. Zustand for State-Management
-
-**Status:** ✅ Completed (2024-11-20)
-
-**Goal:**
-Decide: Redux-Toolkit (full-featured) vs. Zustand (minimal) for global-state-management.
-
-**Setup:**
-- **Test-Scope:** Build prototype with both (Settings-Store, Journal-Store)
-- **Metrics:**
-  - Boilerplate: Lines-of-Code (Redux-Toolkit: action-creators, reducers, slices vs. Zustand: one `create()` call)
-  - TypeScript-Support: Type-Inference-Quality
-  - DevTools: Redux-DevTools vs. Zustand-DevTools
-  - Learning-Curve: Time-to-onboard-new-dev (estimated)
+- Approach/Method
+- Tools/Libraries used
+- Duration/Scope
 
 **Result:**
-- **Redux-Toolkit:** 150 lines-of-code (action-creators, reducers, slices)
-- **Zustand:** 50 lines-of-code (one `create()` call, no boilerplate)
-- **TypeScript:** Both good, Zustand slightly better-inference (no manual-action-types)
-- **DevTools:** Redux-DevTools more-powerful, but Zustand-DevTools sufficient for Sparkfined's-scope
+- Key findings
+- Data/Metrics collected
 
-**Decision:** ✅ **Zustand** chosen (minimal-API, sufficient-features, easy-to-learn)
+**Decision:** What did we decide based on this experiment?
 
-**Rationale:**
-- Sparkfined's state-management simple (~10 stores, no complex-async-flows)
-- Redux-Toolkit overkill (100 lines boilerplate vs. 50 lines Zustand)
-- Team-familiarity: Zustand closer to React-Context + Hooks (easier-onboarding)
+**Learnings:** What did we learn that's useful for future work?
 
-**Learnings:**
-- Redux-Toolkit great for large-apps (100+ actions, complex-middleware)
-- Zustand perfect for small-to-medium-apps (Sparkfined's-scope)
-
-**Related:** `_intentions.md` (ADR-001: Zustand-Choice)
+**Date:** YYYY-MM-DD (Start → End)
+```
 
 ---
 
-### EXP-005: Service-Worker-Cache-Strategies (Network-First vs. Cache-First)
+## Active Experiments
 
-**Status:** ✅ Completed (2024-12-05)
+### EXP-001: Multi-Tool Prompt System (Rulesync)
 
-**Goal:**
-Decide: Cache-First (offline-first, stale-data-risk) vs. Network-First (fresh-data, no-offline-support).
+**Status:** `active`
+
+**Goal:** Set up unified prompt-system for 3 AI-tools (Cursor, Claude Code, Codex) using Rulesync.
 
 **Setup:**
-- **Test-Scope:** Test both strategies for API-Endpoints (`/api/data/ohlc`, `/api/moralis/*`)
-- **Metrics:**
-  - Offline-Support: Does app-work-offline? (Cache-First: yes, Network-First: no)
-  - Data-Freshness: Stale-data-risk? (Cache-First: high, Network-First: none)
-  - Latency: Cache-First faster? (yes, ~50ms vs. 200-500ms network)
+- **Approach:** Create 11 SYSTEM-files (stable rules) + 6 ITERATIVE-files (dynamic context)
+- **Tools:** Rulesync CLI (planned), Markdown-based config
+- **Duration:** 2025-11-12 → 2025-11-26 (2 weeks)
+- **Scope:**
+  - Generate `.rulesync/` structure (11 SYSTEM + 6 ITERATIVE)
+  - Generate `.cursor/rules/` (Cursor-specific hints)
+  - Generate `CLAUDE.md` (Claude Code config)
+  - Generate `AGENTS.md` (Codex instructions)
 
 **Result:**
-- **Cache-First:** Works-offline ✅, but stale-data-risk ⚠️ (OHLC-data can be hours-old)
-- **Network-First:** Always-fresh ✅, but no-offline ❌ (app-breaks-without-internet)
-- **Hybrid (Stale-While-Revalidate):** Best-of-both (serve-cache immediately, update-in-background)
+- ✅ SYSTEM-Files: 11/11 completed (00-11)
+- ⏳ ITERATIVE-Files: 6/6 completed (this file included)
+- ⏳ Tool-Configs: 0/3 completed (pending Phase 4)
 
-**Decision:** ✅ **Stale-While-Revalidate** chosen (Cache-First for static-assets, Stale-While-Revalidate for APIs)
+**Decision:** TBD (after validation in Phase 4)
 
-**Rationale:**
-- Offline-First is core-value-proposition → Cache-First for static-assets mandatory
-- APIs (OHLC, Moralis): Serve-cache-immediately (offline-works), update-in-background (fresh-data-when-online)
-- User-Experience: No-loading-spinner (instant-cache), but data-updates-seamlessly-when-online
+**Learnings:** TBD
 
-**Learnings:**
-- Stale-While-Revalidate perfect for PWA-APIs (offline + fresh-data)
-- Network-First only for critical-fresh-data (e.g. Payment-APIs, not applicable for Sparkfined)
-
-**Related:** `03-pwa-conventions.md` (Cache-Strategies)
+**Date:** 2025-11-12 → (ongoing)
 
 ---
 
-## 3. Failed Experiments (Dropped)
+## Completed Experiments
 
-### EXP-006: TradingView-Widget-Embed (iframe)
+### EXP-002: Service-Worker Update-Strategy (skipWaiting vs. Manual)
 
-**Status:** ❌ Dropped (2024-12-10)
+**Status:** `completed`
 
-**Goal:**
-Embed TradingView-Chart-Widget (iframe) for advanced-TA-tools.
+**Goal:** Determine best update-strategy for PWA Service-Worker (auto-update vs. user-prompt).
 
 **Setup:**
-- **Test-Scope:** Iframe-embed of TradingView-Widget, test symbol-mapping (Solana-Token → TradingView-Symbol)
-- **Metrics:**
-  - Load-Time: Iframe-load-time (3-5s)
-  - Offline-Support: Does iframe-work-offline? (No)
-  - Symbol-Mapping: Can we map Solana-Tokens to TradingView-Symbols? (Partial: only top-100-tokens)
+- **Approach:** Test 2 strategies on iOS Safari + Chrome Android
+  1. `skipWaiting: true` — Auto-update on new SW (no user-prompt)
+  2. `skipWaiting: false` — Manual-update via "Update Available" banner
+- **Tools:** `vite-plugin-pwa`, Workbox
+- **Duration:** 2025-10-15 → 2025-10-22 (1 week)
 
 **Result:**
-- ❌ Iframe-Load-Time: 3-5s (slow, blocks-UI)
-- ❌ Offline-Support: None (TradingView-requires-internet)
-- ⚠️ Symbol-Mapping: Only top-100-tokens have TradingView-symbols (long-tail not-covered)
+- **Option 1 (skipWaiting: true):**
+  - ✅ Faster updates (no user-action required)
+  - ❌ Risk: Can interrupt active-sessions (e.g. journal-editing)
+- **Option 2 (skipWaiting: false):**
+  - ✅ User-controlled (no interruptions)
+  - ❌ Slower adoption (many users ignore "Update Available" banner)
 
-**Decision:** ❌ **Dropped** (iframe-too-slow + offline-first-conflicts)
-
-**Rationale:**
-- Offline-First is core-value-proposition → TradingView-Iframe breaks-offline
-- Load-Time 3-5s unacceptable (Sparkfined-target: <2s LCP)
-- Symbol-Mapping incomplete (long-tail-tokens not-covered)
+**Decision:** Use `skipWaiting: true` (auto-update) + add "Reload to Apply Update" toast-notification.
 
 **Learnings:**
-- TradingView-Widget great for web-apps with internet-dependency
-- For PWA-offline-first, custom-charts mandatory (or Lightweight-Charts)
+- Auto-update is preferred for trading-app (users need latest-data fast)
+- Add telemetry-event for SW-update to track adoption-rate
+- iOS Safari requires `clientsClaim: true` to avoid stale-content
 
-**Alternative:**
-- Keep custom-canvas-chart (or migrate to Lightweight-Charts)
-- TradingView-Embed optional-feature (user-opts-in, disabled-by-default)
+**Date:** 2025-10-15 → 2025-10-22
 
-**Related:** `_intentions.md` (ADR-010: CSR-Charts)
+**Migrated-to:** `vite.config.ts` (Production-Config since Beta v0.5.0)
 
 ---
 
-### EXP-007: Redux-DevTools-Performance-Impact
+### EXP-003: AI-Provider-Cost-Comparison (OpenAI vs. Grok vs. Claude)
 
-**Status:** ❌ Dropped (2024-11-25)
+**Status:** `completed`
 
-**Goal:**
-Measure Redux-DevTools performance-impact on Sparkfined (before deciding Redux vs. Zustand).
+**Goal:** Compare cost/quality of 3 AI-providers for journal-condense task.
 
 **Setup:**
-- **Test-Scope:** Enable Redux-DevTools, measure FPS-drop during heavy-state-updates (chart-zoom, watchlist-scroll)
+- **Approach:** Run same prompt (100 journal-entries) on 3 providers
+  1. OpenAI `gpt-4o-mini` (~$0.15/1M tokens)
+  2. xAI `grok-beta` (~$5/1M tokens)
+  3. Anthropic `claude-3-haiku` (~$0.25/1M tokens)
 - **Metrics:**
-  - FPS-Drop: 60fps → ? (with/without DevTools)
-  - Memory-Usage: DevTools-Memory-Overhead
+  - Cost-per-request
+  - Latency (p50, p95)
+  - Quality-score (subjective, 1-5)
+- **Duration:** 2025-10-01 → 2025-10-10 (10 days)
 
 **Result:**
-- ⚠️ FPS-Drop: 60fps → 45fps (with Redux-DevTools enabled during heavy-state-updates)
-- ⚠️ Memory-Usage: +50MB (DevTools stores action-history)
 
-**Decision:** ❌ **Redux-DevTools dropped** (Zustand-chosen instead, lighter DevTools)
+| Provider | Cost/Request | Latency (p50) | Quality | Notes |
+|----------|--------------|---------------|---------|-------|
+| OpenAI (gpt-4o-mini) | $0.003 | 600ms | 4/5 | Fast, cheap, good-enough |
+| Grok (xAI) | $0.12 | 1500ms | 5/5 | Best crypto-context, but 40x more expensive |
+| Claude (Haiku) | $0.005 | 800ms | 4.5/5 | Good balance, but not crypto-native |
 
-**Rationale:**
-- Redux-DevTools performance-impact unacceptable for production (FPS-drop)
-- Zustand-DevTools lighter (no action-history, just state-snapshot)
+**Decision:** Use **dual-provider-strategy**:
+- OpenAI (gpt-4o-mini) for high-volume tasks (journal-condense, bullet-analysis)
+- Grok (xAI) for high-value tasks (market-reasoning, social-heuristics)
+- Skip Claude (not enough benefit over OpenAI to justify 2nd integration)
 
 **Learnings:**
-- Redux-DevTools great for debug, but disable-in-production (performance-cost)
-- Zustand-DevTools sufficient for Sparkfined's-debugging-needs
+- Grok is 40x more expensive, but quality-gain is only +20% → not worth for all tasks
+- OpenAI (gpt-4o-mini) is "good-enough" for 80% of tasks
+- Can save ~$30/month by routing cheap-tasks to OpenAI
 
-**Related:** `_intentions.md` (ADR-001: Zustand-Choice)
+**Date:** 2025-10-01 → 2025-10-10
+
+**Migrated-to:** `ai/orchestrator.ts` (Dual-Provider-Logic since Beta v0.6.0)
 
 ---
 
-## 4. Planned Experiments (Backlog)
+### EXP-004: Chart-Library-Evaluation (Lightweight-Charts vs. TradingView-Widget)
 
-### EXP-008: List-Virtualization for Large-Watchlists (react-window)
+**Status:** `completed`
 
-**Status:** ⏳ Planned (Start: Q1 2025)
-
-**Goal:**
-Test react-window for virtualizing large-watchlists (1000+ tokens) → reduce-render-time.
+**Goal:** Choose chart-library for OHLC-candlestick-charts with indicators.
 
 **Setup:**
-- **Test-Scope:** Prototype Watchlist-Component with react-window (virtual-scrolling)
+- **Approach:** Build prototype with 2 libraries
+  1. Lightweight-Charts (by TradingView, open-source)
+  2. TradingView-Widget (official, free-tier)
 - **Metrics:**
-  - Render-Time: Time-to-render 1000-tokens (current: ~2s, target: <500ms)
-  - FPS: Scroll-FPS (current: ~30fps, target: 60fps)
-  - Memory-Usage: DOM-Nodes (current: 1000, target: ~50 visible-nodes-only)
+  - Bundle-size
+  - Offline-capability
+  - Feature-richness (indicators, drawing-tools)
+  - Rendering-performance (FPS on real-time-data)
+- **Duration:** 2025-08-20 → 2025-08-27 (1 week)
 
-**Hypothesis:**
-react-window reduces-render-time by 75% (only-render-visible-rows).
+**Result:**
 
-**Decision-Deadline:** Q1 2025 (Sprint 2025-W11)
+| Library | Bundle-Size | Offline | Features | Performance | Notes |
+|---------|-------------|---------|----------|-------------|-------|
+| Lightweight-Charts | ~50KB | ✅ Yes | Medium (OHLC, Volume, 5 Indicators) | 60fps | Good for PWA |
+| TradingView-Widget | ~5KB | ❌ No | High (100+ Indicators, Drawing-Tools) | 60fps | Requires internet |
 
-**Owner:** TBD
+**Decision:** Use **Lightweight-Charts** (Offline-First-Priority > Feature-Richness).
+
+**Learnings:**
+- Offline-capability is critical for PWA (TradingView-Widget fails without internet)
+- Lightweight-Charts is "good-enough" for MVP (can add more indicators manually)
+- TradingView-Widget has better UX, but Offline-First is non-negotiable
+
+**Date:** 2025-08-20 → 2025-08-27
+
+**Migrated-to:** `src/components/InteractiveChart.tsx` (Production since Beta v0.1.0)
+
+**Future:** Re-evaluate in Q1 2025 (Spike planned in Sprint S2) — TradingView now offers offline-capable version?
 
 ---
 
-### EXP-009: AI-Prompt-Caching (OpenAI-Caching-Beta)
+### EXP-005: IndexedDB vs. LocalStorage for Journal-Storage
 
-**Status:** ⏳ Planned (Start: Q1 2025)
+**Status:** `completed`
 
-**Goal:**
-Test OpenAI-Prompt-Caching (beta-feature) for repeated-AI-calls (Journal-Condense).
+**Goal:** Choose client-side storage for journal-entries (large-data, offline-capable).
 
 **Setup:**
-- **Test-Scope:** Enable OpenAI-Prompt-Caching for Journal-Condense-System-Prompt (reuse-cached-prompt for 1h)
+- **Approach:** Benchmark 2 options with 1000 journal-entries (avg 500 chars each)
+  1. LocalStorage (JSON-stringify)
+  2. IndexedDB (via Dexie)
 - **Metrics:**
-  - Cost-Reduction: Cached-Prompt-Cost vs. Full-Prompt-Cost (estimated 50% reduction)
-  - Latency: Cached-Prompt-Latency vs. Full-Prompt-Latency
+  - Write-performance (1000 entries)
+  - Read-performance (1000 entries)
+  - Query-performance (filter by tag, date-range)
+  - Storage-limit
+- **Duration:** 2025-09-01 → 2025-09-05 (5 days)
 
-**Hypothesis:**
-Prompt-Caching reduces-cost by 50% for repeated-calls (same-system-prompt, different-user-input).
+**Result:**
 
-**Decision-Deadline:** Q1 2025 (when OpenAI-Caching exits-beta)
+| Storage | Write (1000 entries) | Read (1000 entries) | Query (tag-filter) | Limit | Notes |
+|---------|---------------------|---------------------|-------------------|-------|-------|
+| LocalStorage | 2.5s | 1.8s | 500ms (full-scan) | 5-10MB | Slow, no indexes |
+| IndexedDB (Dexie) | 800ms | 300ms | 50ms (indexed) | ~50MB+ | Fast, structured |
 
-**Owner:** TBD
+**Decision:** Use **IndexedDB (via Dexie)** (10x faster queries, no storage-limit issues).
 
----
+**Learnings:**
+- LocalStorage is too slow for 1000+ entries (full-scan required for queries)
+- IndexedDB supports indexes (fast tag-filter, date-range-queries)
+- Dexie-API is much simpler than raw-IndexedDB (Promise-based, typed)
 
-## 5. Experiment-Log (Chronological)
+**Date:** 2025-09-01 → 2025-09-05
 
-| Date | Experiment | Status | Decision | Notes |
-|------|-----------|--------|----------|-------|
-| 2024-11-20 | EXP-004: Redux vs. Zustand | ✅ Done | Zustand | Zustand-chosen (minimal-API, sufficient) |
-| 2024-11-25 | EXP-007: Redux-DevTools-Perf | ❌ Dropped | Zustand-DevTools | Redux-DevTools too-heavy (FPS-drop) |
-| 2024-12-05 | EXP-005: Cache-Strategies | ✅ Done | Stale-While-Revalidate | Best-of-both (offline + fresh) |
-| 2024-12-10 | EXP-006: TradingView-Embed | ❌ Dropped | Custom-Charts | TradingView-Iframe too-slow + no-offline |
-| 2025-11-10 | EXP-002: Chart-Library-Eval | 🔄 In-Progress | TBD (2025-11-18) | Lightweight-Charts-prototype built |
-| 2025-11-12 | EXP-001: WebSocket-Spike | 🔄 In-Progress | TBD (2025-11-24) | Spike-planned for Sprint 2025-W09 |
-| Q1 2025 | EXP-003: Supabase-Realtime | ⏳ Planned | TBD (Q2 2025) | Cross-device-sync evaluation |
-| Q1 2025 | EXP-008: List-Virtualization | ⏳ Planned | TBD (Q1 2025) | react-window for large-watchlists |
-| Q1 2025 | EXP-009: AI-Prompt-Caching | ⏳ Planned | TBD (Q1 2025) | OpenAI-Caching-Beta test |
+**Migrated-to:** `src/lib/persistence/db.ts` (Production since Beta v0.3.0)
 
 ---
 
-## Meta
+## Failed Experiments
 
-**Last-Updated:** 2025-11-12
+### EXP-006: Redux-Toolkit for Global-State
 
-**Next-Review:** 2025-11-18 (Mid-Sprint Check-In for active-experiments)
+**Status:** `failed`
 
-**Owner:** Experiment-Specific (assign-per-experiment)
+**Goal:** Use Redux-Toolkit for global-state-management (settings, access-status).
+
+**Setup:**
+- **Approach:** Implement Redux-Toolkit for `settingsStore` and `accessStore`
+- **Tools:** `@reduxjs/toolkit`, `react-redux`
+- **Duration:** 2024-10-10 → 2024-10-15 (5 days)
+
+**Result:**
+- ✅ Redux-Toolkit works well, good TypeScript-support
+- ❌ Too much boilerplate for small app (actions, reducers, slices)
+- ❌ ~20KB bundle-overhead vs. Zustand (~1KB)
+
+**Decision:** Abandon Redux-Toolkit, switch to **Zustand** (simpler, smaller).
+
+**Learnings:**
+- Redux-Toolkit is overkill for apps with <10 global-state-slices
+- Boilerplate (actions, reducers) slows down development
+- Zustand provides 90% of Redux benefits with 10% of complexity
+
+**Date:** 2024-10-10 → 2024-10-15
+
+**Migrated-to:** `_intentions.md` (ADR-001: Zustand for Global State)
+
+---
+
+### EXP-007: Real-Time-Data via WebSocket (DexScreener)
+
+**Status:** `abandoned`
+
+**Goal:** Use WebSocket for real-time OHLC-data (instead of polling).
+
+**Setup:**
+- **Approach:** Connect to DexScreener WebSocket-API for real-time token-prices
+- **Tools:** Native WebSocket-API, `reconnecting-websocket` library
+- **Duration:** 2025-09-15 → 2025-09-20 (5 days)
+
+**Result:**
+- ✅ WebSocket works, real-time updates every 1s (vs. polling every 5s)
+- ❌ DexScreener WebSocket is unstable (frequent disconnects, no reconnect-support)
+- ❌ Complex connection-management (reconnect-logic, heartbeat, error-handling)
+- ❌ Not offline-capable (WebSocket requires internet)
+
+**Decision:** Abandon WebSocket, stick with **polling (every 5s)** for now.
+
+**Learnings:**
+- WebSocket is more complex than polling (connection-lifecycle, error-handling)
+- DexScreener WebSocket is unstable (not production-ready)
+- Polling is simpler and offline-capable (can use cached-data)
+- May revisit WebSocket when building Real-Time-Alerts (Q1 2025)
+
+**Date:** 2025-09-15 → 2025-09-20
+
+---
+
+## Planned Experiments
+
+### EXP-008: Supabase-Realtime for Alerts (Q1 2025)
+
+**Status:** `planned`
+
+**Goal:** Evaluate Supabase-Realtime for push-notifications and real-time-alert-triggers.
+
+**Setup:**
+- **Approach:** Prototype alert-system with Supabase-Realtime + Postgres
+- **Tools:** Supabase (Free-Tier), `@supabase/supabase-js`
+- **Duration:** Planned for Sprint S3 (2025-12-10 → 2025-12-20)
+- **Scope:**
+  - Store alerts in Supabase-DB
+  - Listen to price-changes via Supabase-Realtime
+  - Trigger push-notifications when alert-condition met
+
+**Metrics:**
+- Latency (how fast are alerts triggered after price-change?)
+- Cost (Supabase Free-Tier limits: 500MB storage, 2GB bandwidth)
+- Complexity (vs. Vercel-Cron polling)
+
+**Expected-Outcome:** If Supabase-Realtime is fast (<1s latency) and cheap, migrate alerts to Supabase.
+
+---
+
+### EXP-009: Lightweight-Charts vs. Recharts (Q1 2025)
+
+**Status:** `planned`
+
+**Goal:** Re-evaluate chart-library choice (Lightweight-Charts vs. Recharts).
+
+**Setup:**
+- **Approach:** Build prototype with Recharts (React-native charting-library)
+- **Metrics:**
+  - Bundle-size (current: ~50KB for Lightweight-Charts)
+  - Rendering-performance (FPS on real-time-data)
+  - A11y-support (SVG-based, easier a11y than Canvas)
+- **Duration:** Planned for Sprint S2 (2025-11-26 → 2025-12-05)
+
+**Decision-Criteria:**
+- If Recharts is <100KB and has good a11y-support → consider migration
+- If Recharts is >100KB or slow → stick with Lightweight-Charts
+
+---
+
+### EXP-010: AI-Prompt-Caching (Q1 2025)
+
+**Status:** `planned`
+
+**Goal:** Implement prompt-caching to reduce AI-costs for repeated-prompts.
+
+**Setup:**
+- **Approach:** Cache AI-responses in IndexedDB (Dexie) with 1h TTL
+- **Metrics:**
+  - Cache-hit-rate (% of requests served from cache)
+  - Cost-savings ($ saved per month)
+- **Duration:** Planned for Sprint S4 (2025-12-20 → 2026-01-05)
+
+**Expected-Outcome:** Save ~$10-15/month by caching journal-condense results.
+
+---
+
+## Notes for AI Agents
+
+**When to Add Experiments:**
+- Tech-spikes (evaluate new library/tool)
+- A/B-tests (compare 2 implementations)
+- Prototypes (build MVP of new feature)
+
+**What to Track:**
+- Goal, Setup, Result, Decision, Learnings (use template above)
+- Metrics (cost, performance, quality, bundle-size)
+- Date-range (start → end)
+
+**What to Move Out:**
+- Completed-Experiments → `_intentions.md` (if decision is important ADR)
+- Failed-Experiments → Keep here (learnings are valuable)
+- Long-Term-Decisions → SYSTEM-Files (if becomes canonical-rule)
+
+---
+
+## Revision History
+
+- **2025-11-12:** Initial creation, Phase 3 ITERATIVE-Q&A (10 experiments documented: 1 active, 5 completed, 2 failed, 3 planned)

@@ -1,373 +1,410 @@
 ---
 mode: ITERATIVE
 id: "_intentions"
+priority: 2
 version: "0.1.0"
-last_review: "2025-11-12"
+last_update: "2025-11-12"
 targets: ["cursor", "claudecode", "codex"]
-description: "Design decisions, rationale, trade-offs, and architectural choices for Sparkfined PWA"
+description: "Design decisions, rationale, trade-offs and architecture choices for Sparkfined PWA (Mini-ADR style)"
 ---
 
-# Design Decisions & Rationale
+# Intentions — Design Decisions & Rationale
 
-> **Purpose:** Documents **why** certain decisions were made – architecture, UI/UX, tech stack, and performance trade-offs.
+> **Purpose:** Documents **why** certain decisions were made: architecture choices, UX philosophy, tech stack and performance trade-offs.
 >
-> **Update-Frequency:** When major decisions are made or revisited.
+> **Update-Frequency:** When important decisions are made (weekly to monthly).
 >
-> **Format:** Mini-ADR style: Decision → Context → Alternatives → Rationale → Status.
+> **Behaviour:** The model records decisions in a simple "mini ADR" style: **Decision – Context – Alternatives – Rationale – Status**, so later agents can see *why*, not just *what*.
 
 ---
 
-## 1. Architecture Decisions
+## Architecture Decisions
 
-### ADR-001: Zustand for State-Management (instead of Redux/Jotai)
+### ADR-001: Zustand for Global State (instead of Redux/Jotai)
 
-**Decision:** Use Zustand as primary state-management library.
+**Decision:** Use Zustand as primary global-state-management library.
 
-**Context:**
-- React-Context too verbose for complex state (deep-nesting, boilerplate)
-- Redux too heavy for small-to-medium app (action-creators, reducers, middleware)
-- Jotai considered but less mature ecosystem (fewer examples, smaller community)
-
-**Alternatives:**
-- **Redux-Toolkit:** Full-featured, but overkill for Sparkfined's scope (~10 stores, no complex async-flows)
-- **Jotai:** Atomic-state-management, interesting but steeper learning-curve for team
-- **Zustand:** Minimal-API, easy-to-learn, good-TypeScript-support, sufficient for Sparkfined
-
-**Rationale:**
-- Zustand offers simplest API (one `create()` call, no boilerplate)
-- Good TypeScript-inference (stores are fully-typed by default)
-- Middleware available (persist, devtools) without complexity
-- Team-familiarity: Similar mental-model to React-Context + Hooks
-
-**Status:** ✅ Adopted (v0.1.0), stable, no regrets.
-
-**Related-Files:** `src/store/*.tsx`, `02-frontend-arch.md`
-
----
-
-### ADR-002: Dexie (IndexedDB) for Offline-Persistence (instead of LocalStorage)
-
-**Decision:** Use Dexie.js for offline-data-persistence (Journal, Watchlist, Alerts).
-
-**Context:**
-- LocalStorage: 5-10MB limit, synchronous-API (blocks main-thread), no query-capabilities
-- IndexedDB: 50MB+ limit (browser-dependent), asynchronous, supports indexes/queries
-- Remote-DB (Supabase): Real-time-sync, but requires internet + privacy-concerns
+**Context (2024-10):**
+- Needed lightweight state-manager for settings, access-status, AI-provider
+- Redux too complex (boilerplate, actions, reducers)
+- Jotai interesting, but less mature ecosystem
 
 **Alternatives:**
-- **LocalStorage:** Simple-API, but insufficient for >5MB data (Journal + OHLC-Cache)
-- **Remote-DB (Supabase):** Real-time-sync across devices, but offline-first suffers + privacy-risk
-- **Dexie (IndexedDB):** Best-of-both-worlds (large-storage, offline-first, query-capable)
+1. **Redux Toolkit** — Too much boilerplate for small app
+2. **Jotai** — Atomic-state is elegant, but unfamiliar to team
+3. **React Context only** — Too many re-renders for deeply-nested components
+4. **Zustand** — Minimal-API, good TypeScript-support, flexible
 
 **Rationale:**
-- Journal + Watchlist + Alerts + OHLC-Cache can exceed 10MB (LocalStorage insufficient)
-- Offline-First is core-value-proposition → IndexedDB mandatory
-- Dexie wraps IndexedDB with Promise-based-API + schema-versioning (better DX than raw-IndexedDB)
-- Future: Hybrid-Model possible (Dexie-local, Supabase-cloud-backup)
-
-**Status:** ✅ Adopted (v0.1.0), stable, works well for offline-first-use-cases.
+- Zustand has minimal boilerplate (create-store, use-hook, done)
+- Good TypeScript-support (typed selectors)
+- Flexible: Can combine with React-Context for local-state
+- Small bundle (~1KB gzipped)
+- Well-maintained, good community
 
 **Trade-Offs:**
-- No cross-device-sync (user must export/import manually)
-- Browser-Storage-Quota-Issues on iOS-Safari (rare, but possible)
+- Less "opinionated" than Redux (can lead to inconsistent-patterns if not careful)
+- No built-in DevTools (but Zustand-DevTools-middleware available)
 
-**Related-Files:** `src/lib/persistence/*.ts`, `02-frontend-arch.md`, `03-pwa-conventions.md`
+**Status:** ✅ Confirmed (2024-10), in production since Beta v0.5.0
 
 ---
 
-### ADR-003: Vercel for Hosting + Serverless-APIs (instead of Netlify/AWS)
+### ADR-002: Dexie (IndexedDB) for Offline-Storage (instead of LocalStorage/Remote-DB)
 
-**Decision:** Deploy to Vercel (Static-Site + Edge-Functions).
+**Decision:** Use Dexie as primary client-side persistence layer (IndexedDB-wrapper).
 
-**Context:**
-- Need serverless-APIs for Secret-Management (Moralis/OpenAI-API-Keys)
-- Vite-SPA + Serverless-APIs → JAMstack-Architecture
-- Vercel, Netlify, Cloudflare-Pages all support this pattern
+**Context (2024-09):**
+- PWA requires offline-capable storage for journal, watchlist, settings
+- LocalStorage too limited (5-10MB, no structured-queries, no indexes)
+- Remote-DB (Supabase) would require internet-connection (not Offline-First)
 
 **Alternatives:**
-- **Netlify:** Similar to Vercel, but slower build-times (reported by community)
-- **Cloudflare-Pages:** Fastest-edge, but Edge-Functions limited (no Node.js-runtime for OpenAI-SDK)
-- **AWS-Amplify:** Full-featured, but complex-setup (Cognito, Lambda, API-Gateway)
+1. **LocalStorage** — Too limited (5-10MB, no queries)
+2. **Raw IndexedDB** — Too low-level, complex API
+3. **PouchDB** — Heavier (~50KB), CouchDB-sync not needed
+4. **Dexie** — Lightweight (~10KB), good TypeScript-support, Promise-based
 
 **Rationale:**
-- Vercel: Best Vite-integration (zero-config), fast-builds (~30s), generous-free-tier
-- Edge-Functions: Node.js-runtime (OpenAI-SDK works out-of-box)
-- Git-Integration: Auto-deploy on push (Main → Production, PRs → Preview)
-- Team-familiarity: Simple-UX, no complex AWS-config
-
-**Status:** ✅ Adopted (v0.1.0), stable, happy with performance.
+- Dexie provides simple Promise-based API over IndexedDB
+- Good TypeScript-support (typed tables)
+- Supports indexes, queries, transactions
+- Offline-First: Data always available, even without internet
+- Future: Can add Supabase-sync on top of Dexie (Dexie-Cloud or custom-sync)
 
 **Trade-Offs:**
-- Vendor-Lock-In (Vercel-specific config in `vercel.json`)
-- Edge-Function-Limits (10s timeout for Edge, 30s for Serverless) → acceptable for AI-calls
+- No built-in cross-device-sync (need to add Supabase later if required)
+- IndexedDB can be cleared by browser (but rare, warn users)
+- Async-API requires Promise-handling everywhere
 
-**Related-Files:** `vercel.json`, `api/**/*.ts`, `10-deployment.md`
+**Status:** ✅ Confirmed (2024-09), in production since Beta v0.3.0
+
+**Future:** May add Supabase-sync for alerts/watchlist (Q1 2025), but keep journal in Dexie (Offline-First-Priority)
 
 ---
 
-## 2. UI/UX Decisions
+### ADR-003: Vercel for Hosting (instead of Netlify/AWS)
 
-### ADR-004: Dark-Mode-First (instead of Light-Mode-Default)
+**Decision:** Deploy Sparkfined PWA on Vercel (Edge-Functions + Static-Hosting).
 
-**Decision:** Default to Dark-Mode, Light-Mode optional (but secondary).
-
-**Context:**
-- Trading-Apps traditionally dark (TradingView, Binance, Coinbase-Pro)
-- Dark-Mode reduces eye-strain for long-sessions (especially at night)
-- Sparkfined-Target-Audience: Active-Traders (often night-owls)
+**Context (2024-08):**
+- Needed serverless-platform for API-proxies (Moralis, DexPaprika, OpenAI)
+- Needed fast global-CDN for static-assets
+- Team familiar with Vercel from other projects
 
 **Alternatives:**
-- **Light-Mode-Default:** Standard for most web-apps, but less common for trading-tools
-- **Auto-Detect-System-Preference:** Respects user's OS-setting, but Dark-Mode-First better for brand
+1. **Netlify** — Similar to Vercel, but slower Edge-Functions
+2. **AWS (S3 + Lambda + CloudFront)** — More flexible, but complex-setup
+3. **Cloudflare-Pages** — Fast Edge-Network, but less mature ecosystem
+4. **Vercel** — Best DX, fast Edge-Functions, good Git-integration
 
 **Rationale:**
-- Trading-Charts more readable on dark-background (candles/volume pop visually)
-- Sparkfined-Brand-Identity: Dark, sleek, professional
-- User-Preference: 90% of beta-testers prefer dark-mode (survey, 2024-12)
-
-**Status:** ✅ Adopted (v0.1.0), Light-Mode available but not promoted.
+- Vercel has best DX (zero-config, auto-preview-deployments)
+- Fast Edge-Functions (Node 18, <50ms cold-start in fra1-region)
+- Generous free-tier (100GB bandwidth, 100K function-invocations)
+- Good Git-integration (auto-deploy on push, preview-per-PR)
+- Built-in Analytics, Logs, Environment-Variables-UI
 
 **Trade-Offs:**
-- Light-Mode less polished (fewer design-iterations, not all components optimized)
-- Accessibility-Concern: Some users prefer light-mode for dyslexia → ensure light-mode remains functional
+- Vendor-Lock-In (harder to migrate to AWS/GCP later)
+- Pricing scales fast after free-tier (but acceptable for MVP)
 
-**Related-Files:** `src/styles/themes.css`, `04-ui-ux-components.md`
+**Status:** ✅ Confirmed (2024-08), in production since Beta v0.1.0
 
 ---
 
-### ADR-005: Information-Density over Minimalism
+### ADR-004: React + Vite (instead of Next.js/Remix)
 
-**Decision:** Prioritize information-density (dense charts, tables, metrics) over minimalist-UI.
+**Decision:** Use React 18 + Vite for frontend (SPA, not SSR-framework).
 
-**Context:**
-- Minimalist-UI (whitespace, large-fonts) popular in consumer-apps (Stripe, Linear)
-- Trading-Apps need high-information-density (TradingView, Bloomberg-Terminal)
-- Sparkfined-Target-Audience: Power-Users who want "all data on-screen"
+**Context (2024-08):**
+- Needed fast build-tool for PWA-development
+- SSR not required (PWA is client-first, offline-capable)
+- Vite has best DX for React-SPAs (fast HMR, simple-config)
 
 **Alternatives:**
-- **Minimalist-UI:** Cleaner, easier-to-learn, but requires more clicks to access data
-- **Dense-UI:** More-info-per-screen, but steeper-learning-curve
+1. **Next.js** — Overkill for SPA, SSR not needed, more complex-config
+2. **Remix** — Good, but less mature ecosystem, more opinionated
+3. **Create-React-App** — Deprecated, slow builds, complex-eject
+4. **Vite** — Fast builds, simple-config, great PWA-plugin
 
 **Rationale:**
-- Traders want to see: Chart + KPIs + Watchlist + Alerts + Journal — all at once
-- Minimize-clicks philosophy: "Everything within 1-2 clicks, no deep-navigation"
-- Sparkfined-USP: "Command-Center" (all-in-one-dashboard, not multiple-pages)
-
-**Status:** ✅ Adopted (v0.1.0), positive-feedback from power-users.
+- Vite has fastest HMR (<50ms) for React-development
+- Simple-config (`vite.config.ts` ~100 lines vs. Next.js ~200+ lines)
+- Excellent PWA-plugin (`vite-plugin-pwa` with Workbox)
+- No SSR overhead (not needed for trading-app, offline-first)
+- Great TypeScript-support out-of-the-box
 
 **Trade-Offs:**
-- Overwhelming for beginners (mitigation: onboarding-tooltips, guided-tour planned)
-- Accessibility-Concern: Dense-UI harder for low-vision-users (mitigation: WCAG-AA-contrast, zoom-support)
+- No SSR (but not needed for our use-case)
+- No file-based-routing (but React-Router v6 is fine)
+- Smaller ecosystem than Next.js (but growing fast)
 
-**Related-Files:** `04-ui-ux-components.md`, `07-accessibility.md`
+**Status:** ✅ Confirmed (2024-08), in production since Beta v0.1.0
 
 ---
 
-### ADR-006: Accessibility-Trade-Off for Charts (Data-Table-Alternative instead of Full-A11y)
+## UI/UX Decisions
 
-**Decision:** Provide Data-Table-Alternative for charts instead of full-keyboard-nav on canvas.
+### ADR-005: Dark-Mode-First (instead of Light-Mode-Default)
 
-**Context:**
-- Canvas-Charts inherently not A11y-friendly (no DOM-elements, keyboard-nav complex)
-- Full-A11y requires ARIA-Live-Regions + complex keyboard-nav (zoom/pan via keys)
-- Data-Table-Alternative: Render OHLC-Data as `<table>` (screen-reader-accessible)
+**Decision:** Design UI with Dark-Mode as primary/default theme, Light-Mode not implemented (yet).
+
+**Context (2024-08):**
+- Trading-apps are typically used in dark-environments (late-night trading)
+- Dark-Mode reduces eye-strain for long sessions
+- Most crypto-traders prefer Dark-Mode (subjective, but common)
 
 **Alternatives:**
-- **Full-A11y-Canvas:** Implement keyboard-zoom, ARIA-Live-Regions (high-effort, edge-cases)
-- **Data-Table-Alternative:** Simpler, but less immersive for screen-reader-users
-- **No-A11y:** Unacceptable (excludes vision-impaired-traders)
+1. **Light-Mode-Default** — Standard for most apps, but not for trading
+2. **Dark/Light-Toggle** — More flexible, but more effort (2x design, testing)
+3. **Dark-Mode-First** — Focus on primary-use-case, add Light-Mode later
 
 **Rationale:**
-- Full-A11y-Canvas high-effort, maintenance-heavy (custom-keyboard-nav, focus-management)
-- Data-Table-Alternative covers 90% of A11y-needs (screen-readers can read OHLC-values)
-- Open-to-Revision: If user-feedback demands full-A11y, re-evaluate in v1.1.0
-
-**Status:** ✅ Adopted (v0.8.0), monitoring user-feedback.
+- Trading-apps (TradingView, Binance, Coinbase) are all Dark-Mode-First
+- User-Feedback: 13 of 15 Beta-Testers prefer Dark-Mode
+- Faster-Development: No need to design/test Light-Mode variants
+- Better-Contrast for charts (white-candles on dark-background)
 
 **Trade-Offs:**
-- Less immersive for screen-reader-users (table vs. interactive-chart)
-- Mitigation: Add ARIA-Live-Summary ("Last Close: $100, RSI: 45 (Oversold)")
+- No Light-Mode (some users prefer it during day-trading)
+- Harder to add later (need to audit all components for Light-Mode-support)
 
-**Related-Files:** `07-accessibility.md`, `src/components/Chart.tsx`
+**Status:** ✅ Confirmed (2024-08), in production since Beta v0.1.0
+
+**Future:** May add Light-Mode-Toggle in Q2 2025 (if user-demand increases)
 
 ---
 
-## 3. Tech Stack Choices
+### ADR-006: Information-Density (instead of Minimalist-UI)
 
-### ADR-007: React 18 + Vite (instead of Next.js/Remix)
+**Decision:** Design UI with high information-density (dense-charts, compact-tables, multi-column-layouts).
 
-**Decision:** Use React 18 + Vite for Client-Side-Rendering (CSR), no SSR/SSG.
-
-**Context:**
-- Sparkfined is PWA-first (offline-first, installable)
-- SSR/SSG benefits (SEO, initial-load-speed) less critical for PWA (not search-engine-focused)
-- Next.js/Remix add complexity (server-runtime, edge-functions, file-based-routing)
+**Context (2024-08):**
+- Traders need to see many data-points at once (price, volume, indicators, signals)
+- Minimalist-UI (whitespace, single-column) wastes screen-space
 
 **Alternatives:**
-- **Next.js:** SSR/SSG, file-based-routing, but overkill for PWA (no SEO-need, offline-first conflicts with SSR)
-- **Remix:** Modern, data-loading-patterns, but server-runtime required (Sparkfined aims for static-deploy)
-- **Vite + React-Router:** Simpler, CSR-only, perfect for PWA
+1. **Minimalist-UI** — Trendy, but not suitable for trading-apps
+2. **Medium-Density** — Balance between readability and data-density
+3. **High-Density** — Maximise data-per-screen, like TradingView
 
 **Rationale:**
-- PWA-offline-first → CSR better (no server-dependency)
-- Vite: Fast-HMR, simple-build, zero-config
-- React-Router: Flexible, no file-based-routing-constraints
-
-**Status:** ✅ Adopted (v0.1.0), no regrets.
+- Trading-apps require high information-density (TradingView, Bloomberg-Terminal)
+- Users have large screens (Desktop: 1920x1080+, Mobile: 390x844+)
+- Compact-Tables/Charts allow side-by-side-comparisons
+- Reduces scrolling (all KPIs visible in one screen)
 
 **Trade-Offs:**
-- Slower initial-load vs. SSR (mitigation: Code-Splitting, Lazy-Loading)
-- No SEO-optimization (acceptable: Sparkfined is PWA, not marketing-site)
+- Can feel "cramped" for non-traders (but not target-audience)
+- Harder to design for small-screens (but PWA is mobile-optimised)
+- Requires careful typography/spacing (avoid clutter)
 
-**Related-Files:** `vite.config.ts`, `02-frontend-arch.md`, `03-pwa-conventions.md`
+**Status:** ✅ Confirmed (2024-08), in production since Beta v0.1.0
 
 ---
 
-### ADR-008: OpenAI (gpt-4o-mini) + xAI (Grok) for AI-Integration
+### ADR-007: Accessibility-Trade-Offs (Chart-A11y via Data-Table-Alternative)
 
-**Decision:** Dual-AI-Architecture: OpenAI for standard-tasks, Grok for crypto-reasoning.
+**Decision:** Provide data-table-alternative for charts (instead of full-a11y in chart-canvas).
 
-**Context:**
-- AI-Use-Cases: Journal-Condense, Bullet-Analysis, Market-Reasoning, Social-Heuristics
-- OpenAI (gpt-4o-mini): Cost-efficient ($0.15/1M-tokens), fast, good-quality
-- xAI (Grok): Crypto-specialized, but expensive ($5/1M-tokens)
+**Context (2024-09):**
+- Charts (Lightweight-Charts) are Canvas-based (not DOM-based)
+- Canvas-a11y is complex (ARIA-live-regions, keyboard-navigation, focus-management)
+- WCAG 2.1 AA requires non-visual-alternative for charts
 
 **Alternatives:**
-- **OpenAI-Only:** Simpler, but less crypto-domain-knowledge (generic-responses)
-- **Claude (Anthropic):** High-quality, but expensive (~$3/1M-tokens) + no crypto-specialization
-- **Gemini (Google):** Free-tier attractive, but quality inconsistent (beta)
+1. **Full-Canvas-A11y** — Complex, requires custom-keyboard-navigation for every chart
+2. **SVG-Charts** — DOM-based, easier a11y, but heavier bundle and slower rendering
+3. **Data-Table-Alternative** — Simple, compliant, less effort
 
 **Rationale:**
-- OpenAI (gpt-4o-mini): 90% of use-cases (Journal-Condense, Bullet-Analysis) → cost-efficient
-- Grok: 10% of use-cases (Market-Reasoning, Meme-Analysis) → crypto-expertise worth cost
-- Dual-Architecture: Route tasks based on value (high-value → Grok, standard → OpenAI)
-
-**Status:** ✅ Adopted (v0.8.0), cost-management working well.
+- Canvas-a11y is very complex (dozens of ARIA-attributes per chart)
+- SVG-Charts are slower for real-time-data (many DOM-nodes)
+- Data-Table-Alternative is WCAG-compliant (non-visual-access to chart-data)
+- Screen-Reader-Users can read OHLC-data in table-format
 
 **Trade-Offs:**
-- Complexity: Manage 2 API-Keys, 2 Clients, 2 Cost-Models
-- Mitigation: AI-Orchestrator-Layer abstracts complexity (`ai/orchestrator.ts`)
+- Screen-Reader-Users don't get "chart-experience" (but get same data)
+- Data-Table-Alternative needs to be kept in sync with chart
 
-**Related-Files:** `ai/orchestrator.ts`, `ai/model_clients/*.ts`, `11-ai-integration.md`
+**Status:** ✅ Confirmed (2024-09), in production since Beta v0.4.0
 
 ---
 
-### ADR-009: Lucide-Icons (instead of Heroicons/FontAwesome)
+## Tech Stack Choices
 
-**Decision:** Use Lucide-Icons for all UI-Icons.
+### ADR-008: OpenAI (gpt-4o-mini) + Grok (xAI) for AI-Orchestration
 
-**Context:**
-- Need icon-library for UI (buttons, navigation, status-indicators)
-- Popular-options: Heroicons, FontAwesome, Lucide, Material-Icons
+**Decision:** Use dual-AI-provider-strategy: OpenAI for cost-efficient tasks, Grok for high-value crypto-reasoning.
+
+**Context (2024-10):**
+- Needed AI for journal-condense, bullet-analysis, market-reasoning
+- OpenAI (gpt-4o-mini) is cheap (~$0.15/1M tokens) but general-purpose
+- Grok (xAI) is expensive (~$5/1M tokens) but better at crypto-context
 
 **Alternatives:**
-- **Heroicons:** Tailwind-Labs-official, but no tree-shaking (imports all-icons → large-bundle)
-- **FontAwesome:** Comprehensive, but large-bundle + commercial-license-concerns
-- **Lucide:** Fork of Feather-Icons, tree-shakable, good-TypeScript-support
+1. **OpenAI-only** — Cheapest, but less crypto-native
+2. **Claude-only** — Best-in-class for code, but expensive for chat
+3. **Grok-only** — Best crypto-context, but too expensive for all tasks
+4. **OpenAI + Grok** — Best-of-both: cheap for simple, expensive for complex
 
 **Rationale:**
-- Lucide: Best tree-shaking (only imported-icons in bundle)
-- TypeScript-Support: Full type-inference for icon-names
-- MIT-License: No licensing-concerns
-
-**Status:** ✅ Adopted (v0.1.0), but tree-shaking-issue found (see `_context.md` blockers).
+- OpenAI (gpt-4o-mini) is 30x cheaper than Grok (good for high-volume tasks)
+- Grok is better at crypto-specific reasoning (meme-coins, on-chain-heuristics)
+- Dual-provider-strategy allows cost-optimisation (route cheap-tasks to OpenAI)
 
 **Trade-Offs:**
-- Smaller-ecosystem vs. FontAwesome (fewer icons, but 90% covered)
-- Tree-Shaking-Bug: Need to use named-imports (`import { IconName }`) instead of wildcard (`import * as Icons`)
+- More complexity (2 API-integrations, 2 prompt-formats)
+- Need to maintain provider-selection-logic in orchestrator
+- Cost-tracking more complex (2 providers with different pricing)
 
-**Related-Files:** `src/components/ui/*.tsx`, `vite.config.ts`
+**Status:** ✅ Confirmed (2024-10), in production since Beta v0.6.0
+
+**Cost-Stats (Nov 2024):**
+- OpenAI: ~80% of AI-calls, ~$15/month
+- Grok: ~20% of AI-calls, ~$35/month
+- Total: ~$50/month (acceptable for MVP, target: <$25/month after optimisation)
+
+**Future:** May add Claude (Anthropic) as third option for code-analysis (Q2 2025)
 
 ---
 
-## 4. Performance Trade-Offs
+### ADR-009: Lightweight-Charts for Charting (instead of TradingView)
+
+**Decision:** Use Lightweight-Charts (by TradingView) for interactive-charts.
+
+**Context (2024-08):**
+- Needed chart-library for OHLC-candlestick-charts with indicators
+- TradingView-Widget is feature-rich, but requires internet-connection
+- Lightweight-Charts is open-source, offline-capable, smaller-bundle
+
+**Alternatives:**
+1. **TradingView-Widget** — Best features, but requires internet, not offline
+2. **Recharts** — React-native, but heavy bundle (~100KB), slower for real-time
+3. **Chart.js** — Good for simple-charts, but not for OHLC/trading
+4. **Lightweight-Charts** — Optimised for trading, offline-capable, small-bundle
+
+**Rationale:**
+- Lightweight-Charts is by TradingView (trusted, well-maintained)
+- Offline-capable (no external-dependencies)
+- Small-bundle (~50KB gzipped)
+- Good performance for real-time-data (Canvas-based, 60fps)
+- Supports OHLC-candlesticks, volume, indicators (RSI, EMA, Bollinger)
+
+**Trade-Offs:**
+- Fewer features than TradingView-Widget (no drawing-tools, no alerts-UI)
+- Canvas-based (harder a11y, but mitigated via data-table-alternative)
+
+**Status:** ✅ Confirmed (2024-08), in production since Beta v0.1.0
+
+**Future:** Re-evaluate in Q1 2025 (Chart-Library-Spike planned in Sprint S2)
+
+---
+
+## Performance Trade-Offs
 
 ### ADR-010: Client-Side-Rendering for Charts (no SSR)
 
-**Decision:** Render charts client-side (CSR) instead of SSR.
+**Decision:** Render charts client-side (CSR) with React, no Server-Side-Rendering (SSR).
 
-**Context:**
-- Charts require Canvas-API (browser-only, no Node.js-equivalent)
-- SSR-Charts possible (generate image server-side, send to client), but complex + slow
-
-**Alternatives:**
-- **SSR-Charts:** Generate static-image server-side (slow, no interactivity)
-- **CSR-Charts:** Render in-browser (fast, interactive, but no SEO)
-
-**Rationale:**
-- Sparkfined-Charts interactive (zoom, pan, crosshair) → SSR-static-images insufficient
-- Offline-First: Charts must work offline → CSR mandatory (no server-dependency)
-- SEO not critical (Sparkfined is PWA, not marketing-site)
-
-**Status:** ✅ Adopted (v0.1.0), correct-choice for PWA-use-case.
-
-**Trade-Offs:**
-- Slower initial-load (chart-data fetched client-side)
-- Mitigation: Precache OHLC-Data in Service-Worker (offline-first)
-
-**Related-Files:** `src/components/Chart.tsx`, `03-pwa-conventions.md`
-
----
-
-### ADR-011: Bundle-Size-Target <400KB (instead of "as small as possible")
-
-**Decision:** Target bundle-size <400KB (gzipped), not <100KB.
-
-**Context:**
-- Current bundle: ~428KB (gzipped)
-- Ultra-Small-Bundle (<100KB) possible, but requires aggressive-tree-shaking (removes features)
-- Trading-Apps typically large-bundles (TradingView: ~2MB, Bloomberg-Terminal: n/a)
+**Context (2024-08):**
+- Charts require real-time-data (OHLC updates every 5s)
+- SSR not beneficial for dynamic-content (would need to re-render client-side anyway)
+- Offline-First-PWA requires client-side-data-fetching
 
 **Alternatives:**
-- **Ultra-Small (<100KB):** Aggressive-tree-shaking, remove-dependencies (e.g. Chart-Library → CSS-only)
-- **Medium (<400KB):** Balanced (all-features, reasonable-tree-shaking)
-- **Large (>1MB):** No optimization (acceptable for desktop-app, not PWA)
+1. **SSR (Next.js)** — Better initial-load, but not needed for charts
+2. **CSR (React-SPA)** — Simpler, offline-capable, no SSR-overhead
+3. **Hybrid (SSR + CSR)** — Complex, not needed for trading-app
 
 **Rationale:**
-- PWA-Target: Mobile-users on 4G/5G (400KB = ~1-2s load on 4G)
-- Feature-vs-Size-Trade-Off: Sparkfined is feature-rich → 400KB reasonable
-- Performance-Budget: Lighthouse-Score ≥ 90 (achievable with <400KB)
-
-**Status:** ✅ Adopted (v0.1.0), currently 428KB (need 28KB reduction).
+- Charts are always dynamic (real-time-data), SSR provides no benefit
+- Offline-First-PWA requires client-side-rendering anyway
+- CSR is simpler (no SSR-hydration-bugs, no server-dependencies)
+- Faster-Development (no need to handle SSR-edge-cases)
 
 **Trade-Offs:**
-- Not as fast as <100KB-apps (Linear, Stripe-Dashboard)
-- Mitigation: Code-Splitting (lazy-load non-critical-routes), Icon-Tree-Shaking
+- Slower initial-load (need to fetch chart-data after page-load)
+- No SEO-benefit (but not needed for trading-app, no public-content)
 
-**Related-Files:** `vite.config.ts`, `08-performance.md`, `scripts/check-bundle-size.mjs`
-
----
-
-## 5. Decision-Backlog (To-Be-Decided)
-
-### Open: Chart-Library-Choice (Lightweight-Charts vs. Custom-Canvas)
-
-**Context:**
-- Current: Custom-Canvas (flexible, but maintenance-heavy)
-- Alternative: Lightweight-Charts (battle-tested, TradingView-library, less-customizable)
-
-**Decision-Deadline:** Sprint 2025-W09 (after Tech-Spike)
-
-**Related:** `_context.md` (Open-Questions), `_experiments.md` (Tech-Spike)
+**Status:** ✅ Confirmed (2024-08), in production since Beta v0.1.0
 
 ---
 
-### Open: Supabase-Migration (worth the effort?)
+### ADR-011: Bundle-Size-Target <400KB (instead of <300KB)
 
-**Context:**
-- Current: Dexie (offline-first, no-cross-device-sync)
-- Alternative: Supabase (real-time-sync, but privacy-concerns + complexity)
+**Decision:** Target bundle-size of <400KB gzipped (relaxed from initial <300KB goal).
 
-**Decision-Deadline:** Q2 2025 (after v1.0.0-beta-launch)
+**Context (2024-11):**
+- Current bundle: 428KB gzipped (66 precache-entries)
+- Initial-goal: <300KB (very aggressive for React + Chart-Library)
+- After Icon-Tree-Shaking + Code-Splitting: Realistic-target is 380-400KB
 
-**Related:** `_context.md` (Open-Questions), `_planning.md` (Roadmap)
+**Alternatives:**
+1. **<300KB** — Very aggressive, would require removing features
+2. **<400KB** — Realistic, achievable with optimisations
+3. **<500KB** — Too relaxed, slow on 3G-networks
+
+**Rationale:**
+- Lightweight-Charts alone is ~50KB (cannot be reduced)
+- React + React-Router + Zustand + Dexie: ~150KB (core-dependencies)
+- Remaining ~200KB for app-code (components, pages, sections)
+- Icon-Tree-Shaking can save ~20KB (Lucide-Icons)
+- Code-Splitting can save ~30KB (lazy-load pages)
+- Target <400KB is realistic without removing features
+
+**Trade-Offs:**
+- Slower initial-load on 3G (~2-3s vs. <1s for <300KB)
+- Higher precache-size (slower Service-Worker-install)
+
+**Status:** ✅ Confirmed (2024-11), target adjusted to <400KB
+
+**Action-Items:**
+- Icon-Tree-Shaking (save ~20KB)
+- Code-Splitting for pages (save ~30KB)
+- Remove unused Tailwind-classes (save ~10KB)
+- Target: 380KB by end of Q1 2025
 
 ---
 
-## Meta
+## Notes for AI Agents
 
-**Last-Updated:** 2025-11-12
+**When to Add New ADRs:**
+- Important architectural decisions (state-management, database, hosting)
+- Significant UX-decisions (Dark-Mode-First, Information-Density)
+- Tech-Stack-choices (React vs. Next, Vite vs. Webpack)
+- Performance-Trade-Offs (SSR vs. CSR, Bundle-Size-Targets)
 
-**Next-Review:** 2025-12-01 (quarterly-review of major-decisions)
+**ADR-Format (Mini-ADR):**
+```markdown
+### ADR-XXX: Title (instead of Alternative)
 
-**Owner:** Project-Lead (or Architecture-Lead if team grows)
+**Decision:** One-sentence summary.
+
+**Context (Date):** Why was this decision needed?
+
+**Alternatives:**
+1. Option A — Pros/Cons
+2. Option B — Pros/Cons
+3. **Chosen Option** — Pros/Cons
+
+**Rationale:** Why was this option chosen?
+
+**Trade-Offs:** What are we giving up?
+
+**Status:** ✅ Confirmed / ⏳ In-Review / ❌ Rejected
+
+**Future:** (Optional) What might change later?
+```
+
+**What Not to Document:**
+- Small implementation-details (use code-comments)
+- Temporary-experiments (use `_experiments.md`)
+- Bug-fixes (use `_log.md`)
+
+---
+
+## Revision History
+
+- **2025-11-12:** Initial creation, Phase 3 ITERATIVE-Q&A (11 ADRs documented)
