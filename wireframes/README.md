@@ -17,18 +17,32 @@ wireframes/
 ├── alerts.md                    # Alerts tab spec
 ├── settings.md                  # Settings tab spec
 │
-├── components/                  # Reusable UI components
+├── components/                  # Reference UI components (wireframe prototypes)
 │   ├── Button.tsx               # Button (Primary, Secondary, Ghost, Destructive)
 │   ├── Card.tsx                 # Card (Default, Elevated, Glass)
 │   ├── Badge.tsx                # Badge (Success, Warning, Error, Info, Neutral)
 │   └── Input.tsx                # Input with label, error, icons
 │
-└── pages/                       # Full page implementations
+└── pages/                       # Reference page implementations (wireframe prototypes)
     ├── DashboardPage.tsx        # Dashboard (Variant 1: KPI Focus)
     ├── ChartPage.tsx            # Chart (Variant 1: Chart Dominance)
     ├── JournalPage.tsx          # Journal (Variant 1: List + Sidebar)
     ├── AlertsPage.tsx           # Alerts (Variant 1: Tabbed List)
     └── SettingsPage.tsx         # Settings (Variant 1: Single Column)
+
+src/
+├── components/ui/               # ✅ IMPLEMENTED Production UI components
+│   ├── Button.tsx               # Enhanced with leftIcon/rightIcon, isLoading, destructive variant
+│   ├── Card.tsx                 # NEW: Card with variants and sub-components
+│   ├── Badge.tsx                # NEW: Badge with 5 semantic variants
+│   └── Input.tsx                # Enhanced with label, leftIcon/rightIcon, helperText
+│
+└── pages/                       # ✅ IMPLEMENTED Production pages (V2 versions)
+    ├── DashboardPageV2.tsx      # NEW: Dashboard (Variant 1: KPI Focus)
+    ├── ChartPageV2.tsx          # NEW: Chart (Variant 1: Chart Dominance)
+    ├── JournalPageV2.tsx        # NEW: Journal (Variant 1: List + Sidebar)
+    ├── AlertsPageV2.tsx         # NEW: Alerts (Variant 1: Tabbed List)
+    └── SettingsPageV2.tsx       # NEW: Settings (Variant 1: Single Column)
 ```
 
 ---
@@ -200,22 +214,82 @@ All tabs use **Variant 1** (see `VARIANT_DECISION.md` for rationale):
 
 ---
 
-## Implementation Roadmap
+## Implementation Status
 
-**Total Effort:** 18-24 days (single developer)
+### ✅ Phase 1: Core UI Components (COMPLETED)
+**Location:** `src/components/ui/`
 
-### Phase 1: Core UI Components (2-3 days)
-- ✅ Button, Card, Badge, Input (completed in `/wireframes/components/`)
-- TODO: Modal, Dropdown, Toggle, Tabs
+- ✅ **Button.tsx** - Enhanced with:
+  - leftIcon/rightIcon props
+  - isLoading prop (with loading backward compat)
+  - destructive variant (with danger backward compat)
+  - Maintains all existing functionality
 
-### Phase 2: P0 Tabs (12-16 days)
-- Dashboard (3-4 days)
-- Chart (5-7 days) – Most complex, chart library integration
-- Journal (4-5 days) – AI condense feature, IndexedDB integration
+- ✅ **Card.tsx** - NEW component with:
+  - 3 variants: default, elevated, glass
+  - Sub-components: CardHeader, CardTitle, CardContent
+  - Keyboard navigation support (onClick cards)
 
-### Phase 3: P1 Tabs (4-5 days)
-- Alerts (4-5 days) – Condition builder, push notifications
-- Settings (2-3 days) – Wallet integration, toggle states
+- ✅ **Badge.tsx** - NEW component with:
+  - 5 semantic variants: success, warning, error, info, neutral
+  - Consistent with design system colors
+
+- ✅ **Input.tsx** - Enhanced with:
+  - label, helperText props
+  - leftIcon/rightIcon props
+  - Maintains backward compatibility (hint alias for helperText)
+  - Forward ref support
+
+**Backward Compatibility:** All enhancements maintain existing API compatibility. Existing code will continue to work without changes.
+
+### ✅ Phase 2: Page Implementations (COMPLETED)
+**Location:** `src/pages/*V2.tsx`
+
+All pages implement **Variant 1** layouts (recommended from VARIANT_DECISION.md):
+
+- ✅ **DashboardPageV2.tsx** (Variant 1: KPI Focus)
+  - 4 KPI tiles with real data from `useBoardKPIs` hook
+  - Activity feed integrated with `useBoardFeed` hook
+  - Market movers section (mock data for now)
+  - Quick actions bar with navigation buttons
+
+- ✅ **ChartPageV2.tsx** (Variant 1: Chart Dominance)
+  - Token search with autocomplete placeholder
+  - Timeframe selector (1m → 1w)
+  - Chart canvas placeholder (500px height)
+  - Active indicators panel
+  - On-chain metrics + quick actions
+  - Ready for chart library integration (Lightweight Charts or TradingView)
+
+- ✅ **JournalPageV2.tsx** (Variant 1: List + Sidebar)
+  - Integrated with existing `useJournal` hook
+  - Sidebar with date filters, tag cloud, stats
+  - Entry cards with real journal data
+  - Search and tag filtering
+  - AI Condense button (stub for now)
+
+- ✅ **AlertsPageV2.tsx** (Variant 1: Tabbed List)
+  - Tabbed interface (Price Alerts | Signal Rules)
+  - Alerts grouped by status (Active → Triggered → Disabled)
+  - Toggle switches for enable/disable
+  - Status badges with semantic colors
+  - Ready for backend integration
+
+- ✅ **SettingsPageV2.tsx** (Variant 1: Single Column)
+  - Wallet connection card (stub handler)
+  - AI provider selection integrated with `useAISettings` hook
+  - Notifications toggle
+  - Auto-sync settings
+  - Usage stats with progress bars
+  - Danger zone section
+
+### 📋 Phase 3: Integration & Enhancement (NEXT)
+- [ ] Add V2 pages to router (keep existing pages for now)
+- [ ] Modal, Dropdown, Toggle, Tabs components (if needed)
+- [ ] Chart library integration (Lightweight Charts recommended)
+- [ ] Alert backend integration
+- [ ] AI Condense feature completion
+- [ ] Mobile responsive testing
 
 ---
 
