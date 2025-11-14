@@ -29,13 +29,13 @@ export default [
     ...config,
     files: ["**/*.{ts,tsx}"]
   })),
-  {
-    files: ["**/*.{ts,tsx}"],
-    languageOptions: {
-      parserOptions: {
-        project: "./tsconfig.json"
-      }
-    },
+    {
+      files: ["**/*.{ts,tsx}"],
+      languageOptions: {
+        parserOptions: {
+          project: "./tsconfig.eslint.json"
+        }
+      },
     plugins: { 
       react,
       'jsx-a11y': jsxA11y
