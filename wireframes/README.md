@@ -1,241 +1,302 @@
-# Sparkfined PWA – UX/UI Wireframe Analysis
+# Sparkfined PWA – Wireframes & High-Fidelity Components
 
-**Repository:** github.com/baum777/Sparkfined_PWA  
-**Original Analysis Date:** 2025-11-02  
-**Last Update:** 2025-11-09  
-**Framework:** React 18.3 + TypeScript + Vite  
-**Purpose:** Progressive Web App for crypto technical analysis, trading journaling, and alert management
+This directory contains the complete UI/UX specifications and high-fidelity React/TSX components for the Sparkfined PWA.
 
----
-
-## 🆕 LATEST UPDATE (2025-11-09)
-
-**👉 NEW MASTER DOCUMENT: [COMPLETE-WIREFRAMES-MASTER-2025-11-09.md](./COMPLETE-WIREFRAMES-MASTER-2025-11-09.md)**
-
-This master document includes:
-- **12 total pages** (7 original + 5 new)
-- Complete mobile + desktop wireframes
-- 12 detailed user flows
-- Ready for Review/Storybook/PR-Specs
-
-**New Pages Added:**
-- HomePage (Beta Shell)
-- BoardPage (Command Center Dashboard)
-- SignalsPage (Trading Signals)
-- LessonsPage (Trading Lessons)
-- LandingPage (Marketing)
-
----
-
-## 📋 STEP 1: REPOSITORY INVENTARISIERUNG
-
-### Tech Stack
-
-| Category | Technology | Version | Purpose |
-|----------|-----------|---------|---------|
-| **Frontend** | React | 18.3.1 | UI Framework |
-| | TypeScript | 5.6.2 | Type Safety |
-| | Vite | 5.4.3 | Build Tool & Dev Server |
-| | React Router | 6.26.0 | Client-Side Routing |
-| **State Management** | React Context | Built-in | Global State (Settings, Telemetry, AI, Access) |
-| **Styling** | TailwindCSS | Implicit (via classes) | Utility-First CSS |
-| | Heroicons | 2.1.0 | Icon Library |
-| **Storage** | Dexie | 3.2.0 | IndexedDB Wrapper |
-| | LocalStorage | Native | Simple Key-Value Store |
-| **PWA** | vite-plugin-pwa | 0.20.0 | Service Worker & Manifest |
-| | Workbox | 7.1.0 | Offline Strategy |
-| **API Integration** | Solana Web3.js | 1.95.0 | Blockchain Queries |
-| | @solana/spl-token | 0.4.0 | Token Operations |
-| | OpenAI | 4.0.0 | AI-Assisted Analysis |
-| **Backend** | Vercel Functions | - | Serverless API Routes |
-| | Web Push | 3.6.7 | Push Notifications |
-| **OCR** | Tesseract.js | 5.0.0 | Screenshot Analysis |
-| **Testing** | Vitest | 1.6.0 | Unit Tests |
-| | Playwright | 1.48.2 | E2E Tests |
-| | Testing Library | 14.3.1 | Component Tests |
-
----
-
-### Feature Matrix
-
-| Feature | File Path | Tech | Status |
-|---------|-----------|------|--------|
-| **Token Analysis** | `src/pages/AnalyzePage.tsx` | React + OHLC API | ✅ Implemented |
-| ├─ OHLC Data Fetch | `src/sections/chart/marketOhlc.ts` | Fetch API | ✅ Implemented |
-| ├─ KPI Calculation | `src/sections/analyze/analytics.ts` | Pure Functions | ✅ Implemented |
-| ├─ Heatmap Visualization | `src/sections/analyze/Heatmap.tsx` | React Component | ✅ Implemented |
-| ├─ AI Assist (Bullets) | `src/sections/ai/useAssist.ts` | OpenAI API | ✅ Implemented |
-| └─ Playbook (Risk Calc) | `src/sections/ideas/Playbook.tsx` | React Component | ✅ Implemented |
-| **Advanced Charting** | `src/pages/ChartPage.tsx` | Canvas API | ✅ Implemented |
-| ├─ Candlestick Rendering | `src/sections/chart/CandlesCanvas.tsx` | React + Canvas | ✅ Implemented |
-| ├─ Indicators (SMA/EMA/VWAP) | `src/sections/chart/indicators.ts` | Pure Functions | ✅ Implemented |
-| ├─ Drawing Tools | `src/sections/chart/draw/` | Canvas Shapes | ✅ Implemented |
-| ├─ Replay Mode | `src/sections/chart/replay/useReplay.ts` | React Hook | ✅ Implemented |
-| ├─ Backtest Engine | `src/sections/chart/backtest.ts` | Pure Functions | ✅ Implemented |
-| ├─ Timeline Events | `src/sections/chart/Timeline.tsx` | React Component | ✅ Implemented |
-| └─ Export (PNG, JSON) | `src/sections/chart/export.ts` | Canvas to Blob | ✅ Implemented |
-| **Journal** | `src/pages/JournalPage.tsx` | IndexedDB + Server | ✅ Implemented |
-| ├─ Local Storage | `src/lib/journal.ts` | Dexie | ✅ Implemented |
-| ├─ Server Sync | `api/journal/index.ts` | Vercel Function | ✅ Implemented |
-| ├─ AI Compression | `src/sections/ai/useAssist.ts` | OpenAI API | ✅ Implemented |
-| └─ Export (JSON, MD) | `api/journal/export.ts` | Vercel Function | ✅ Implemented |
-| **Session Replay** | `src/pages/ReplayPage.tsx` | IndexedDB | ✅ Implemented |
-| ├─ Event Tracking | `src/lib/db.ts` | Dexie | ✅ Implemented |
-| └─ Timeline Viewer | `src/components/ReplayModal.tsx` | React Component | ✅ Implemented |
-| **Access Gating** | `src/pages/AccessPage.tsx` | Solana + Server | ✅ Implemented |
-| ├─ Status Check | `src/hooks/useAccessStatus.ts` | React Hook | ✅ Implemented |
-| ├─ Lock Calculator | `src/components/access/LockCalculator.tsx` | React Component | ✅ Implemented |
-| ├─ Hold Verification | `src/components/access/HoldCheck.tsx` | React Component | ✅ Implemented |
-| └─ Leaderboard | `src/components/access/LeaderboardList.tsx` | React Component | ✅ Implemented |
-| **Alert System** | `src/pages/NotificationsPage.tsx` | LocalStorage + Server | ✅ Implemented |
-| ├─ Rule Editor | `src/sections/notifications/RuleEditor.tsx` | React Component | ✅ Implemented |
-| ├─ Rule Wizard | `src/sections/notifications/RuleWizard.tsx` | React Component | ✅ Implemented |
-| ├─ Server Rules | `api/rules/` | Vercel Functions | ✅ Implemented |
-| ├─ Push Notifications | `src/lib/push.ts` | Web Push API | ✅ Implemented |
-| └─ Backtest Integration | `api/backtest.ts` | Vercel Function | ✅ Implemented |
-| **Settings** | `src/pages/SettingsPage.tsx` | LocalStorage | ✅ Implemented |
-| ├─ Theme Toggle | `src/hooks/useDarkMode.ts` | React Hook | ✅ Implemented |
-| ├─ Data Export/Import | `src/lib/datastore.ts` | LocalStorage Utils | ✅ Implemented |
-| ├─ AI Configuration | `src/state/ai.tsx` | React Context | ✅ Implemented |
-| └─ PWA Controls | `src/lib/swUpdater.ts` | Service Worker API | ✅ Implemented |
-| **Telemetry** | `src/state/telemetry.tsx` | Context + API | ✅ Implemented |
-| └─ Event Tracking | `api/telemetry.ts` | Vercel Function | ✅ Implemented |
-
----
-
-### API Routes (Vercel Functions)
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/api/access/status` | GET | Check user access status (OG/Holder) |
-| `/api/access/mint-nft` | POST | Mint soulbound NFT for OG |
-| `/api/access/lock` | POST | Calculate MCAP-based lock |
-| `/api/ai/assist` | POST | AI-powered analysis (OpenAI/Anthropic) |
-| `/api/alerts/dispatch` | POST | Send alert notifications |
-| `/api/backtest` | POST | Run backtest with rules |
-| `/api/data/ohlc` | GET | Fetch OHLC data |
-| `/api/ideas` | GET/POST | CRUD for trade ideas |
-| `/api/ideas/export` | GET | Export ideas as case studies |
-| `/api/ideas/export-pack` | GET | Export execution pack |
-| `/api/ideas/close` | POST | Close trade idea |
-| `/api/journal` | GET/POST | CRUD for journal notes |
-| `/api/journal/export` | GET | Export journal (JSON/MD) |
-| `/api/market/ohlc` | GET | Market OHLC proxy |
-| `/api/rules` | GET/POST | CRUD for server rules |
-| `/api/rules/eval` | POST | Evaluate rules |
-| `/api/rules/eval-cron` | POST | Batch rule evaluation |
-| `/api/push/subscribe` | POST | Subscribe to push notifications |
-| `/api/push/unsubscribe` | POST | Unsubscribe from push |
-| `/api/push/test-send` | POST | Test push notification |
-| `/api/telemetry` | POST | Log telemetry events |
-
----
-
-### File Structure Overview
+## Directory Structure
 
 ```
-/workspace/
-├── api/                    # Vercel Serverless Functions
-│   ├── access/            # Access gating (OG system)
-│   ├── ai/                # AI proxy (OpenAI/Anthropic)
-│   ├── alerts/            # Alert dispatch & worker
-│   ├── data/              # Data fetching proxies
-│   ├── ideas/             # Trade idea CRUD
-│   ├── journal/           # Journal CRUD + export
-│   ├── market/            # Market data proxy
-│   ├── push/              # Push notification handlers
-│   └── rules/             # Server rule management
-├── src/
-│   ├── components/        # Reusable UI components
-│   │   ├── access/       # Access-related components
-│   │   ├── layout/       # Layout components
-│   │   └── ui/           # Generic UI components
-│   ├── config/           # App configuration
-│   ├── hooks/            # Custom React hooks
-│   ├── lib/              # Core business logic
-│   │   ├── adapters/    # External API adapters
-│   │   ├── ai/          # AI client logic
-│   │   ├── analysis/    # Analysis algorithms
-│   │   ├── data/        # Data processing
-│   │   └── validation/  # Input validation
-│   ├── pages/            # Route-level pages
-│   ├── sections/         # Page-specific sections
-│   │   ├── ai/          # AI-specific logic
-│   │   ├── analyze/     # Analysis features
-│   │   ├── chart/       # Chart components
-│   │   ├── ideas/       # Trade ideas
-│   │   ├── journal/     # Journal logic
-│   │   └── notifications/ # Alert rules
-│   ├── state/            # Global state contexts
-│   └── types/            # TypeScript definitions
-└── tests/                # Test suites
-    ├── e2e/             # Playwright tests
-    ├── integration/     # Integration tests
-    └── unit/            # Vitest unit tests
+wireframes/
+├── README.md                    # This file
+├── global-style.md              # Design system & style guide
+├── VARIANT_DECISION.md          # Layout variant comparison & recommendations
+│
+├── Tab Specifications (Markdown)
+├── dashboard.md                 # Dashboard tab spec
+├── chart.md                     # Chart/Market tab spec
+├── journal.md                   # Journal tab spec
+├── alerts.md                    # Alerts tab spec
+├── settings.md                  # Settings tab spec
+│
+├── components/                  # Reusable UI components
+│   ├── Button.tsx               # Button (Primary, Secondary, Ghost, Destructive)
+│   ├── Card.tsx                 # Card (Default, Elevated, Glass)
+│   ├── Badge.tsx                # Badge (Success, Warning, Error, Info, Neutral)
+│   └── Input.tsx                # Input with label, error, icons
+│
+└── pages/                       # Full page implementations
+    ├── DashboardPage.tsx        # Dashboard (Variant 1: KPI Focus)
+    ├── ChartPage.tsx            # Chart (Variant 1: Chart Dominance)
+    ├── JournalPage.tsx          # Journal (Variant 1: List + Sidebar)
+    ├── AlertsPage.tsx           # Alerts (Variant 1: Tabbed List)
+    └── SettingsPage.tsx         # Settings (Variant 1: Single Column)
 ```
 
 ---
 
-## 📊 PWA Capabilities
+## Quick Start
 
-| Feature | Status | Implementation |
-|---------|--------|----------------|
-| **Offline Support** | ✅ | Service Worker + Cache-First |
-| **Install Prompt** | ✅ | Manifest + Add-to-Home |
-| **Push Notifications** | ✅ | Web Push API + VAPID |
-| **Background Sync** | 🚧 | Planned (not implemented) |
-| **Shortcuts** | ❌ | Not implemented |
+### 1. Review Design System
+
+Start with **`global-style.md`** to understand:
+- Color palette (dark-mode-first)
+- Typography (Inter + JetBrains Mono)
+- Spacing & layout system
+- Core UI component patterns
+- Interaction patterns (hover, focus, loading, error states)
+
+### 2. Review Layout Decisions
+
+Read **`VARIANT_DECISION.md`** for:
+- Comparison of 3 layout variants per tab
+- Scoring matrix (UX Clarity, Info Density, Mobile Friendliness, etc.)
+- Final recommendations (all Variant 1 layouts)
+- Implementation roadmap (18-24 days, P0/P1 priorities)
+
+### 3. Explore Tab Specifications
+
+Each tab has a dedicated Markdown spec:
+- **Purpose** – Why this tab exists
+- **Wireframe** – Text-based layout structure
+- **Components** – Detailed component props, state, events
+- **Layout Variants** – 3 options with pros/cons
+- **Data & Parameters** – Expected data models
+- **Interactions & UX Details** – User flows, empty/loading/error states
+- **Open Questions** – Unresolved design decisions
+
+### 4. Use High-Fidelity Components
+
+**Reusable UI Components** (`components/`):
+- `Button` – 4 variants (primary, secondary, ghost, destructive), 3 sizes, loading state
+- `Card` – 3 variants (default, elevated, glass), with header/title/content subcomponents
+- `Badge` – 5 variants (success, warning, error, info, neutral)
+- `Input` – With label, error, helper text, left/right icons
+
+**Page Components** (`pages/`):
+- Fully functional React components with mock data
+- Tailwind CSS styling (matches `global-style.md`)
+- Responsive design (mobile-first breakpoints)
+- Interactive states (hover, focus, loading)
 
 ---
 
-## 🎨 Design System
+## Design System Overview
 
-### Colors (Inferred from Code)
-- **Primary (Brand):** `#0fb34c` (Emerald Green)
-- **Background:** `#0a0a0a` (Near Black)
-- **Surface:** `zinc-900` (#18181b)
-- **Text Primary:** `zinc-100` (#f4f4f5)
-- **Text Secondary:** `zinc-400` (#a1a1aa)
-- **Accent Success:** `emerald-*`
-- **Accent Danger:** `rose-*`
-- **Accent Info:** `cyan-*`
+### Colors
 
-### Spacing (8px Grid)
-- Base: `8px`
-- Common: `p-2` (8px), `p-3` (12px), `p-4` (16px), `p-6` (24px)
-- Gap: `gap-2` (8px), `gap-3` (12px), `gap-4` (16px)
+**Backgrounds:**
+- App: `#0a0a0a` (near-black)
+- Surface 1: `#141414` (zinc-900)
+- Surface 2: `#1a1a1a` (zinc-800)
+
+**Primary:**
+- Accent: `#3b82f6` (blue-500)
+- Hover: `#2563eb` (blue-600)
+
+**Semantic:**
+- Success: `#22c55e` (green-500) – Gains, confirmations
+- Warning: `#f59e0b` (amber-500) – Alerts, cautions
+- Error: `#ef4444` (red-500) – Losses, errors
+- Info: `#06b6d4` (cyan-500) – Hints
 
 ### Typography
-- Font: System default (likely Inter or San Francisco)
-- Sizes: `text-xs` (12px), `text-sm` (14px), `text-base` (16px), `text-lg` (18px), `text-xl` (20px)
+
+**Font Families:**
+- UI: `'Inter', system-ui, sans-serif`
+- Data/Numbers: `'JetBrains Mono', monospace`
+
+**Scale:**
+- H1 (Page Title): `text-3xl` (30px) `font-bold`
+- H2 (Section): `text-2xl` (24px) `font-semibold`
+- H3 (Subsection): `text-xl` (20px) `font-semibold`
+- H4 (Card Title): `text-lg` (18px) `font-medium`
+- Body: `text-sm` (14px) `font-normal`
+
+### Spacing
+
+- xs: `space-2` (8px)
+- sm: `space-3` (12px)
+- md: `space-4` (16px)
+- lg: `space-6` (24px)
+- xl: `space-8` (32px)
 
 ---
 
-## 🔑 Key Insights
+## Component Usage Examples
 
-1. **Mobile-First:** Bottom navigation, responsive breakpoints (md: 768px, lg: 1024px)
-2. **Dark Theme Default:** Entire UI built for dark mode (zinc palette)
-3. **Performance-Optimized:** Lazy-loaded routes, Canvas for charts, IndexedDB for storage
-4. **AI-Powered:** OpenAI integration for analysis compression and insight generation
-5. **Offline-First:** PWA architecture with service worker caching
-6. **Modular Architecture:** Clear separation of concerns (pages/sections/lib)
-7. **Multi-Provider AI:** Supports Anthropic, OpenAI, xAI (configurable)
-8. **Crypto-Native:** Solana blockchain integration for access gating
-9. **Export-Heavy:** Multiple export formats (JSON, MD, CSV, PNG)
-10. **Real-Time Alerts:** Server-side rule evaluation with push notifications
+### Button
+
+```tsx
+import { Button } from './components/Button';
+
+// Primary CTA
+<Button variant="primary" leftIcon={<PlusIcon />}>
+  New Entry
+</Button>
+
+// Secondary action
+<Button variant="secondary" size="sm">
+  Cancel
+</Button>
+
+// Destructive action
+<Button variant="destructive" isLoading={isDeleting}>
+  Delete Account
+</Button>
+```
+
+### Card
+
+```tsx
+import { Card, CardHeader, CardTitle, CardContent } from './components/Card';
+
+<Card variant="elevated">
+  <CardHeader>
+    <CardTitle>Market Movers</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <p>Content goes here...</p>
+  </CardContent>
+</Card>
+```
+
+### Badge
+
+```tsx
+import { Badge } from './components/Badge';
+
+<Badge variant="success">+12.5%</Badge>
+<Badge variant="error">-5.3%</Badge>
+<Badge variant="neutral">Active</Badge>
+```
+
+### Input
+
+```tsx
+import { Input } from './components/Input';
+
+<Input
+  label="Email Address"
+  type="email"
+  placeholder="you@example.com"
+  error={error}
+  helperText="We'll never share your email"
+  leftIcon={<EmailIcon />}
+/>
+```
 
 ---
 
-## 📁 Output Structure
+## Recommended Layout Variants
 
-This analysis includes:
+All tabs use **Variant 1** (see `VARIANT_DECISION.md` for rationale):
 
-- **Mobile Wireframes:** `/wireframes/mobile/` (375px baseline)
-- **Desktop Wireframes:** `/wireframes/desktop/` (1280px+ baseline)
-- **User Flows:** `/wireframes/flows/` (Mermaid diagrams)
-- **Component Specs:** `/wireframes/components/` (Interaction details)
-- **Storybook Files:** `/wireframes/storybook/` (Ready-to-use stories)
+| Tab | Layout | Key Strength |
+|-----|--------|--------------|
+| **Dashboard** | KPI Focus | Metrics-first, clear hierarchy |
+| **Chart** | Chart Dominance | Max chart space (75vh) |
+| **Journal** | List + Sidebar | Filters always visible |
+| **Alerts** | Tabbed List | Clear simple/advanced separation |
+| **Settings** | Single Column | Easy to scan, standard pattern |
 
 ---
 
-**Next:** See individual screen wireframes and user flows in respective directories.
+## Implementation Roadmap
+
+**Total Effort:** 18-24 days (single developer)
+
+### Phase 1: Core UI Components (2-3 days)
+- ✅ Button, Card, Badge, Input (completed in `/wireframes/components/`)
+- TODO: Modal, Dropdown, Toggle, Tabs
+
+### Phase 2: P0 Tabs (12-16 days)
+- Dashboard (3-4 days)
+- Chart (5-7 days) – Most complex, chart library integration
+- Journal (4-5 days) – AI condense feature, IndexedDB integration
+
+### Phase 3: P1 Tabs (4-5 days)
+- Alerts (4-5 days) – Condition builder, push notifications
+- Settings (2-3 days) – Wallet integration, toggle states
+
+---
+
+## Mobile Considerations
+
+All components are **mobile-first**:
+- Tailwind breakpoints: `sm:640px`, `md:768px`, `lg:1024px`
+- Touch targets: Minimum 48x48px for buttons/toggles
+- Sidebars: Convert to modals/bottom sheets on mobile
+- Tables: Horizontal scroll or card layout on mobile
+
+---
+
+## Accessibility (WCAG 2.1 AA)
+
+- **Keyboard Navigation:** Tab order follows visual flow
+- **Focus Rings:** 2px blue ring with offset (visible on all interactive elements)
+- **Color Contrast:** All text meets 4.5:1 (body) or 3:1 (large text)
+- **Screen Readers:** Semantic HTML, aria-labels on icons
+
+---
+
+## Integration with Existing Codebase
+
+### Current Project Structure
+
+```
+src/
+  pages/          — Existing pages (may need refactoring)
+  sections/       — Page sections
+  components/     — Existing components
+    ui/           — UI primitives (Button, Input, etc.)
+  hooks/          — Custom hooks
+  lib/            — Utilities
+  state/          — React Context
+  store/          — Zustand stores
+  types/          — Type definitions
+```
+
+### Migration Strategy
+
+1. **Copy UI components** from `wireframes/components/` → `src/components/ui/`
+2. **Replace existing pages** with `wireframes/pages/` implementations
+3. **Update imports** to use new component APIs
+4. **Add missing dependencies** (react-icons or lucide-react for icons)
+5. **Test on staging** before production deploy
+
+---
+
+## Dependencies
+
+**Required:**
+- `react` (18.3+)
+- `react-dom`
+- `tailwindcss` (4.1+)
+- Icon library: `react-icons` or `lucide-react` (replace mock icons)
+
+**Chart Integration (for ChartPage):**
+- Option 1: `lightweight-charts` (recommended, faster)
+- Option 2: `react-tradingview-widget` (more features, heavier)
+
+---
+
+## Next Steps
+
+1. **Approve Designs:** Review components and provide feedback
+2. **Icon Library:** Choose between `react-icons` or `lucide-react`
+3. **Chart Library:** Decide on Lightweight Charts vs. TradingView
+4. **Start Implementation:** Begin with Dashboard (simplest) or Chart (highest impact)
+
+---
+
+## Support & Questions
+
+For questions or feedback:
+- Review `global-style.md` for design system details
+- Review `VARIANT_DECISION.md` for layout rationale
+- Review individual tab specs (`dashboard.md`, `chart.md`, etc.) for detailed interactions
+
+---
+
+**Last Updated:** 2025-11-14  
+**Status:** ✅ Ready for implementation  
+**Version:** 1.0.0
