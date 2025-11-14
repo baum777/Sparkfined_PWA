@@ -92,7 +92,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (req.headers['content-type']) {
-      headers['Content-Type'] = req.headers['content-type'] as string
+      headers['Content-Type'] = String(req.headers['content-type'])
     }
 
     const body = ['GET', 'HEAD'].includes(method)
