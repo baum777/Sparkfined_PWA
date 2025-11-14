@@ -97,62 +97,62 @@ export class GrokClient {
       return res.json();
     }, this.retry);
 
-    const text: string = response?.choices?.[0]?.message?.content ?? "";
+      const text: string = response?.choices?.[0]?.message?.content ?? "";
 
-    let parsed: Partial<SocialAnalysis> & {
-      posts?: Array<Partial<SocialPostAssessment>>;
-      aggregates?: SocialAnalysis["aggregates"];
-    } = {};
-    try {
-      parsed = text ? JSON.parse(text) : {};
-    } catch (error) {
-      throw new Error(`Grok returned non-JSON payload: ${text}`);
-    }
+      let parsed: Partial<SocialAnalysis> & {
+        posts?: Array<Partial<SocialPostAssessment>>;
+        aggregates?: SocialAnalysis["aggregates"];
+      } = {};
+      try {
+        parsed = text ? JSON.parse(text) : {};
+      } catch {
+        throw new Error(`Grok returned non-JSON payload: ${text}`);
+      }
 
-    const assessedPosts = posts.map((post, index) => {
-      const heuristics = scoreBotLikelihood(post);
-      const modelAssessment = parsed.posts?.[index];
-      const combinedScore = Math.min(
-        1,
-        Math.max(0, (heuristics.botScore + (modelAssessment?.botScore ?? 0)) / 2),
-      );
-      const reasons = new Set<string>([
-        ...heuristics.reason_flags,
-        ...((modelAssessment?.reason_flags ?? []) as string[]),
-      ]);
+      const assessedPosts = posts.map((post, index) => {
+        const heuristics = scoreBotLikelihood(post);
+        const modelAssessment = parsed.posts?.[index];
+        const combinedScore = Math.min(
+          1,
+          Math.max(0, (heuristics.botScore + (modelAssessment?.botScore ?? 0)) / 2),
+        );
+        const reasons = new Set<string>([
+          ...heuristics.reason_flags,
+          ...(modelAssessment?.reason_flags ?? []),
+        ]);
+
+        return {
+          id: post.id,
+          text_snippet: modelAssessment?.text_snippet ?? post.text.slice(0, 140),
+          sentiment: modelAssessment?.sentiment ?? 0,
+          botScore: combinedScore,
+          isLikelyBot:
+            typeof modelAssessment?.isLikelyBot === "boolean"
+              ? modelAssessment.isLikelyBot
+              : combinedScore >= 0.5,
+          reason_flags: Array.from(reasons),
+        } satisfies SocialPostAssessment;
+      });
+
+      const botRatio = assessedPosts.length
+        ? assessedPosts.filter((p) => p.isLikelyBot).length / assessedPosts.length
+        : 0;
 
       return {
-        id: post.id,
-        text_snippet: modelAssessment?.text_snippet ?? post.text.slice(0, 140),
-        sentiment: modelAssessment?.sentiment ?? 0,
-        botScore: combinedScore,
-        isLikelyBot:
-          typeof modelAssessment?.isLikelyBot === "boolean"
-            ? modelAssessment.isLikelyBot
-            : combinedScore >= 0.5,
-        reason_flags: Array.from(reasons),
-      } satisfies SocialPostAssessment;
-    });
-
-    const botRatio = assessedPosts.length
-      ? assessedPosts.filter((p) => p.isLikelyBot).length / assessedPosts.length
-      : 0;
-
-    return {
-      provider: "grok",
-      model: this.model,
-      mode: (payload.socialMode ?? "newest") as "newest" | "oldest",
-      thesis: parsed.thesis ?? "",
-      bullets: parsed.bullets ?? [],
-      sentiment: parsed.sentiment ?? 0,
-      confidence: parsed.confidence ?? 0,
-      aggregates: parsed.aggregates ?? { positive: 0, neutral: 0, negative: 0 },
-      posts: assessedPosts,
-      narrative_lore: parsed.narrative_lore,
-      source_trace: parsed.source_trace ?? { social_provider: "unknown" },
-      social_review_required:
-        (parsed.confidence ?? 0) < 0.6 || botRatio >= 0.4,
-    };
+        provider: "grok",
+        model: this.model,
+        mode: payload.socialMode ?? "newest",
+        thesis: parsed.thesis ?? "",
+        bullets: parsed.bullets ?? [],
+        sentiment: parsed.sentiment ?? 0,
+        confidence: parsed.confidence ?? 0,
+        aggregates: parsed.aggregates ?? { positive: 0, neutral: 0, negative: 0 },
+        posts: assessedPosts,
+        narrative_lore: parsed.narrative_lore,
+        source_trace: parsed.source_trace ?? { social_provider: "unknown" },
+        social_review_required:
+          (parsed.confidence ?? 0) < 0.6 || botRatio >= 0.4,
+      };
   }
 }
 
