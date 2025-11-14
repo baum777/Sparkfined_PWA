@@ -12,8 +12,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { TrendingUp, TrendingDown, Plus, Bell, FileText, BarChart3 } from 'lucide-react';
-import { useBoardKPIs } from '@/hooks/useBoardKPIs';
-import { useBoardFeed } from '@/hooks/useBoardFeed';
+import useBoardKPIs from '@/hooks/useBoardKPIs';
+import useBoardFeed from '@/hooks/useBoardFeed';
 
 interface KPIData {
   label: string;
@@ -39,8 +39,8 @@ interface MarketMover {
 }
 
 export default function DashboardPageV2() {
-  const { kpis } = useBoardKPIs();
-  const { items } = useBoardFeed();
+  const { summary: kpis } = useBoardKPIs();
+  const { data: feedItems } = useBoardFeed();
 
   // Transform real data to KPI format
   const kpiData: KPIData[] = [
@@ -72,13 +72,13 @@ export default function DashboardPageV2() {
     },
   ];
 
-  const activities: ActivityItem[] = items?.slice(0, 5).map(item => ({
+  const activities: ActivityItem[] = (feedItems ?? []).slice(0, 5).map((item) => ({
     id: item.id,
-    type: item.type as 'journal' | 'alert',
-    timestamp: new Date(item.ts),
-    title: item.title || '',
-    excerpt: item.subtitle,
-  })) || [];
+    type: item.type === 'alert' ? 'alert' : 'journal',
+    timestamp: new Date(item.timestamp ?? Date.now()),
+    title: item.text || 'New event',
+    excerpt: item.metadata?.symbol ? `${item.metadata.symbol} · ${item.metadata.timeframe ?? ''}`.trim() : item.metadata?.timeframe || item.text,
+  }));
 
   // Mock market movers (replace with real data later)
   const marketMovers: MarketMover[] = [
