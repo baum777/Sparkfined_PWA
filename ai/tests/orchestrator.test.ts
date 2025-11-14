@@ -21,7 +21,11 @@ describe("validateBulletResponse", () => {
     const words = new Array(40).fill("wort").join(" ");
     const analysis = { bullets: [words, "ok", "ok2", "ok3"] };
     validateBulletResponse(analysis);
-    expect(analysis.bullets[0].split(" ").length).toBeLessThanOrEqual(20);
+    const firstBullet = analysis.bullets[0];
+    if (!firstBullet) {
+      throw new Error("Expected normalized bullet in validateBulletResponse test.");
+    }
+    expect(firstBullet.split(" ").length).toBeLessThanOrEqual(20);
   });
 });
 
