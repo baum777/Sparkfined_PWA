@@ -91,8 +91,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       accept: 'application/json',
     }
 
-    if (req.headers['content-type']) {
-      headers['Content-Type'] = req.headers['content-type'] as string
+    const contentTypeHeader = req.headers['content-type']
+    if (contentTypeHeader) {
+      headers['Content-Type'] = Array.isArray(contentTypeHeader)
+        ? contentTypeHeader[0]
+        : contentTypeHeader
     }
 
     const body = ['GET', 'HEAD'].includes(method)
