@@ -12,7 +12,7 @@ import { useAdvancedInsightStore } from "../features/analysis/advancedInsightSto
 import { generateMockAdvancedInsight, generateMockUnlockedAccess, generateMockLockedAccess } from "../features/analysis/mockAdvancedInsightData";
 
 const SHOW_ADVANCED_INSIGHT_DEV_CONTROLS =
-  import.meta.env.MODE !== "production";
+  process.env.NODE_ENV !== "production";
 
 export default function AnalyzePage() {
   const [address, setAddress] = React.useState<string>("");
