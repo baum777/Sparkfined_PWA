@@ -11,6 +11,9 @@ import AdvancedInsightCard from "../features/analysis/AdvancedInsightCard";
 import { useAdvancedInsightStore } from "../features/analysis/advancedInsightStore";
 import { generateMockAdvancedInsight, generateMockUnlockedAccess, generateMockLockedAccess } from "../features/analysis/mockAdvancedInsightData";
 
+const SHOW_ADVANCED_INSIGHT_DEV_CONTROLS =
+  import.meta.env.MODE !== "production";
+
 export default function AnalyzePage() {
   const [address, setAddress] = React.useState<string>("");
   const [tf, setTf] = React.useState<TF>("15m");
@@ -146,26 +149,32 @@ export default function AnalyzePage() {
         {shortlink && <button className={btn} onClick={()=>navigator.clipboard.writeText(shortlink)}>Copy Shortlink</button>}
         <button className={btn} onClick={exportJSON} disabled={!data}>Export JSON</button>
         <button className={btn} onClick={exportCSV}  disabled={!data}>Export CSV</button>
-        <button 
-          className={btn + " border-emerald-700"} 
-          onClick={()=> {
-            const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
-            advancedInsightStore.ingest(mockData, generateMockUnlockedAccess());
-          }}
-          disabled={!data}
-        >
-          🧪 Load Insight (Unlocked)
-        </button>
-        <button 
-          className={btn + " border-amber-700"} 
-          onClick={()=> {
-            const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
-            advancedInsightStore.ingest(mockData, generateMockLockedAccess());
-          }}
-          disabled={!data}
-        >
-          🔒 Load Insight (Locked)
-        </button>
+          {SHOW_ADVANCED_INSIGHT_DEV_CONTROLS && (
+            <>
+              <button 
+                className={btn + " border-emerald-700"} 
+                onClick={()=> {
+                  const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
+                  advancedInsightStore.ingest(mockData, generateMockUnlockedAccess());
+                }}
+                disabled={!data}
+                title="Dev-only: load unlocked Advanced Insight mock data"
+              >
+                🧪 Load Insight (Unlocked)
+              </button>
+              <button 
+                className={btn + " border-amber-700"} 
+                onClick={()=> {
+                  const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
+                  advancedInsightStore.ingest(mockData, generateMockLockedAccess());
+                }}
+                disabled={!data}
+                title="Dev-only: load locked Advanced Insight mock data"
+              >
+                🔒 Load Insight (Locked)
+              </button>
+            </>
+          )}
       </div>
       {error && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
 
