@@ -1,13 +1,13 @@
 import { renderPrompt } from "../promptLoader.js";
 import { withExponentialBackoff } from "../retry.js";
-import {
+import type {
   FetchLike,
   MarketPayload,
   RetryOptions,
   SocialAnalysis,
   SocialPost,
   SocialPostAssessment,
-} from "../types.js";
+} from "@/types/ai";
 import { scoreBotLikelihood } from "../socialHeuristics.js";
 
 export interface GrokClientConfig {
@@ -112,10 +112,13 @@ export class GrokClient {
     const assessedPosts = posts.map((post, index) => {
       const heuristics = scoreBotLikelihood(post);
       const modelAssessment = parsed.posts?.[index];
-      const combinedScore = Math.min(
-        1,
-        Math.max(0, (heuristics.botScore + (modelAssessment?.botScore ?? 0)) / 2),
-      );
+      const modelBotScore =
+        typeof modelAssessment?.bot_score === "number"
+          ? modelAssessment.bot_score
+          : typeof modelAssessment?.botScore === "number"
+            ? modelAssessment.botScore
+            : 0;
+      const combinedScore = Math.min(1, Math.max(0, (heuristics.botScore + modelBotScore) / 2));
       const reasons = new Set<string>([
         ...heuristics.reason_flags,
         ...((modelAssessment?.reason_flags ?? []) as string[]),
@@ -126,6 +129,7 @@ export class GrokClient {
         text_snippet: modelAssessment?.text_snippet ?? post.text.slice(0, 140),
         sentiment: modelAssessment?.sentiment ?? 0,
         botScore: combinedScore,
+        bot_score: combinedScore,
         isLikelyBot:
           typeof modelAssessment?.isLikelyBot === "boolean"
             ? modelAssessment.isLikelyBot

@@ -406,7 +406,10 @@ export interface BotScorePostPayload {
 export type BotScore = number;       // 0..1
 
 export type SanityCheckInputBullets = string[];
-export type SanityCheckInputPayload = MarketSnapshotPayload | DeepSignalPayload;
+export type SanityCheckInputPayload =
+  | MarketSnapshotPayload
+  | DeepSignalPayload
+  | MarketPayload;
 export type SanityCheckOutputBullets = string[];
 
 //

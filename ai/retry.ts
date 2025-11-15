@@ -1,4 +1,4 @@
-import { RetryOptions } from "./types.js";
+import type { RetryOptions } from "@/types/ai";
 
 export async function withExponentialBackoff<T>(
   fn: () => Promise<T>,

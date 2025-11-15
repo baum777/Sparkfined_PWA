@@ -1,4 +1,5 @@
-import { SocialPost, SocialPostAssessment } from "./types.js";
+import type { BotScorePostPayload, SocialPost, SocialPostAssessment } from "@/types/ai";
+import { computeBotScore } from "@/lib/ai/heuristics";
 
 export interface BotHeuristicResult extends Pick<SocialPostAssessment, "botScore" | "reason_flags"> {}
 
@@ -14,46 +15,54 @@ const DEFAULT_FLAGS = {
 };
 
 export function scoreBotLikelihood(post: SocialPost): BotHeuristicResult {
-  let score = 0;
+  const author = post.author ?? { id: "unknown" };
   const flags: string[] = [];
-  const author = post.author || { id: "unknown" };
 
   if (author.is_bot_flag) {
-    score += 0.4;
     flags.push("provider_flagged_bot");
   }
 
-  const accountAgeDays = author.created_at
-    ? Math.max(0, (Date.now() - new Date(author.created_at).getTime()) / 86_400_000)
-    : undefined;
+  const accountAgeDays =
+    author.age_days ??
+    (author.created_at
+      ? Math.max(0, (Date.now() - new Date(author.created_at).getTime()) / 86_400_000)
+      : undefined);
+
+  const payload: BotScorePostPayload = {
+    author: {
+      age_days: accountAgeDays,
+      followers: author.followers,
+      verified: author.verified,
+    },
+    post_frequency_per_day: post.post_frequency_per_day,
+    repeated: post.repeated,
+    source_type: post.source_type,
+    text: post.text,
+  };
+
+  const botScore = computeBotScore(payload);
 
   if (typeof accountAgeDays === "number" && accountAgeDays < 7) {
-    score += 0.25;
     flags.push(DEFAULT_FLAGS.NEW_ACCOUNT);
   }
 
   if ((author.followers ?? 0) < 10) {
-    score += 0.15;
     flags.push(DEFAULT_FLAGS.LOW_FOLLOWERS);
   }
 
   if ((author.following ?? 0) > 2000 && (author.followers ?? 0) < 50) {
-    score += 0.05;
     flags.push("follow_ratio_skewed");
   }
 
   if (post.source_type && ["api", "webhook"].includes(post.source_type)) {
-    score += 0.4;
     flags.push(DEFAULT_FLAGS.SIGNAL_SOURCE);
   }
 
   if (/https?:\/\//i.test(post.text) && (post.text.match(/https?:\/\//gi)?.length ?? 0) > 1) {
-    score += 0.2;
     flags.push(DEFAULT_FLAGS.LINK_SPAM);
   }
 
   if (/signal/i.test(post.text) || /copy/i.test(post.text)) {
-    score += 0.1;
     flags.push("signal_language");
   }
 
@@ -61,18 +70,16 @@ export function scoreBotLikelihood(post: SocialPost): BotHeuristicResult {
     flags.push("trading_language");
   }
 
-  if (/default|user\d{3,}/i.test(post.author?.id ?? "")) {
-    score += 0.1;
+  if (/default|user\d{3,}/i.test(author.id ?? "")) {
     flags.push(DEFAULT_FLAGS.GENERIC_PROFILE);
   }
 
   if (author.verified) {
-    score -= 0.15;
     flags.push(DEFAULT_FLAGS.VERIFIED);
   }
 
   return {
-    botScore: Math.min(1, Math.max(0, score)),
+    botScore,
     reason_flags: Array.from(new Set(flags)),
   };
 }

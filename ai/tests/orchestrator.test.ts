@@ -3,7 +3,7 @@ import path from "path";
 import { describe, expect, it, vi } from "vitest";
 import { AIOrchestrator, mergeJournalFields, validateBulletResponse } from "../orchestrator.js";
 import { withExponentialBackoff } from "../retry.js";
-import { MarketPayload, SocialAnalysis } from "../types.js";
+import type { MarketPayload, SocialAnalysis } from "@/types/ai";
 
 const fixturePath = path.resolve(process.cwd(), "ai", "tests", "fixtures", "btc_payload.json");
 
