@@ -18,7 +18,8 @@ describe('JCA-INTEG-010 — journal condense via proxy (mocked)', () => {
     })
 
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
-      const rewritten = new URL(typeof input === 'string' ? input : input.toString(), mock.url).toString()
+      const inputUrl = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+      const rewritten = new URL(inputUrl, mock.url).toString()
       return realFetch(rewritten, {
         ...init,
         headers: {

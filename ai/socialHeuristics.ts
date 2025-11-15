@@ -1,6 +1,6 @@
 import { SocialPost, SocialPostAssessment } from "./types.js";
 
-export interface BotHeuristicResult extends Pick<SocialPostAssessment, "botScore" | "reason_flags"> {}
+export type BotHeuristicResult = Pick<SocialPostAssessment, "botScore" | "reason_flags">;
 
 const DEFAULT_FLAGS = {
   NEW_ACCOUNT: "account_age_lt_7d",

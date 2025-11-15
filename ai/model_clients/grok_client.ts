@@ -118,7 +118,7 @@ export class GrokClient {
       );
       const reasons = new Set<string>([
         ...heuristics.reason_flags,
-        ...((modelAssessment?.reason_flags ?? []) as string[]),
+        ...(modelAssessment?.reason_flags ?? []),
       ]);
 
       return {
@@ -141,7 +141,7 @@ export class GrokClient {
     return {
       provider: "grok",
       model: this.model,
-      mode: (payload.socialMode ?? "newest") as "newest" | "oldest",
+      mode: payload.socialMode ?? "newest",
       thesis: parsed.thesis ?? "",
       bullets: parsed.bullets ?? [],
       sentiment: parsed.sentiment ?? 0,
