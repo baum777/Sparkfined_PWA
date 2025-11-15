@@ -19,6 +19,36 @@ description: "Current working context, session focus, open questions, blockers a
 ---
 
 ## Current Focus
+### Session: 2025-11-15 (Loop P0-UI – Advanced Insight Card)
+
+**Primary Task:** Frontend-Flow & UI für `AdvancedInsightCard` auf Basis der stabilen AI-Schicht (sanityCheck + botScore).
+
+**Current Step:** Analyse & Design der Advanced Insight UI (Tabs, Store, Telemetry, Token-Lock) + Einhängen in den Analyse-Flow.
+
+**Status:**
+- ✅ AI-Schicht stabil (Types in `src/types/ai.ts`, Heuristiken in `src/lib/ai/heuristics/`, Orchestrator + Social-Heuristics im `ai/`-Workspace).
+- ✅ P0 AI-Wiring (sanityCheck + computeBotScore) konzeptionell abgeschlossen.
+- ⏳ UI-Loop P0-UI – Advanced Insight: Store, Card, Telemetry und Page-Integration in Arbeit.
+
+**Next Steps:**
+1. Mit Claude 4.5 (Advanced Insight UI Agent) die UX-Kontrakte definieren:
+   - Tabs: *Market Structure · Flow/Volume · Playbook* (Macro optional hinter Flag)
+   - Override-Modell (`EditableField<T>`) inkl. Dirty-Flags
+   - Token-Lock-Overlay + Access-Meta
+2. `advancedInsightStore` schärfen:
+   - State aus `AnalyzeMarketResult.advanced` einlesen
+   - Overrides, `overrides_count`, Access-Meta
+   - Telemetry-Hooks (opened, field_overridden, saved)
+3. `AdvancedInsightCard.tsx` an Store + Telemetry binden:
+   - Tabs, Override-UI, Token-Lock-Overlay
+4. Karte in Analyse-Flow einhängen (z. B. AnalyzePage / Chart-View):
+   - Result → Store (z. B. `setFromAnalysis(result.advanced)`)
+   - Card an sinnvoller Stelle rendern
+5. Handover-Checkliste für Codex vorbereiten:
+   - Tests (`AdvancedInsightCard.test.tsx`, Store-Tests)
+   - kleinere UI-/UX-Finishes (Storybook optional)
+
+---
 
 ### Session: 2025-11-12 (Multi-Tool Prompt System Setup)
 
