@@ -1,26 +1,33 @@
+Hier ist dein **aktualisiertes Regelwerk** für `03-ops.md`, leicht gestrafft, sprachlich konsistent (Englisch für Agent-Regeln) und mit ein paar Best-Practice-Klarstellungen für den Codex-AI-P0-Agenten.
+
+Du kannst den Inhalt so in `.cursor/rules/03-ops.md` übernehmen:
+
+````md
 # Cursor Rules — Ops (Security + Deployment + AI)
 
 > **Source:** `.rulesync/09-security.md` + `.rulesync/10-deployment.md` + `.rulesync/11-ai-integration.md`
 >
-> **Purpose:** Security best-practices, deployment process, and AI-integration patterns for ops/infrastructure work.
+> **Purpose:** Security best practices, deployment process, and AI-integration patterns for ops/infrastructure work.
 
 ---
 
 ## Security
 
-### Secrets-Management
+### Secrets Management
 
-**MUST:** Never expose secrets in client-bundle
+**MUST:** Never expose secrets in the client bundle
+
 ```bash
-# ✅ Good: Server-Side-Only (no VITE_ prefix)
+# ✅ Good: Server-side-only (no VITE_ prefix)
 MORALIS_API_KEY=sk-abc123...
 OPENAI_API_KEY=sk-openai...
 
-# ❌ Avoid: Client-Side-Expose (VITE_ prefix)
-VITE_MORALIS_API_KEY=sk-abc123...  # In bundle!
-```
+# ❌ Avoid: Client-side-exposed (VITE_ prefix)
+VITE_MORALIS_API_KEY=sk-abc123...  # ends up in bundle
+````
 
-**MUST:** Use Serverless-Proxies for API-calls
+**MUST:** Use serverless proxies for API calls
+
 ```ts
 // Client calls proxy (no secret in client)
 const response = await fetch('/api/moralis/token/SOL');
@@ -32,9 +39,10 @@ const moralisResponse = await fetch(`https://moralis.io/...`, {
 });
 ```
 
-### Input-Validation
+### Input Validation
 
-**MUST:** Validate all user-inputs server-side
+**MUST:** Validate all user inputs server-side
+
 ```ts
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { content } = req.body;
@@ -48,6 +56,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 ```
 
 ### HTTPS-Only
+
 ```json
 // vercel.json
 {
@@ -66,17 +75,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 ## Deployment
 
-### Pre-Deployment-Checklist
+### Pre-deployment checklist
+
 ```bash
-# MUST run before every production-deploy
-pnpm run typecheck   # TypeScript-check
-pnpm run lint        # ESLint
-pnpm test            # Vitest unit-tests
-pnpm run build       # Build-test
-pnpm run check:bundle-size  # Bundle-size-check
+# MUST run before every production deploy
+pnpm run typecheck          # TypeScript check
+pnpm run lint               # ESLint
+pnpm test                   # Vitest unit tests
+pnpm run build              # Build test
+pnpm run check:bundle-size  # Bundle size check (if available)
 ```
 
-### Vercel-Configuration
+### Vercel configuration
+
 ```json
 // vercel.json
 {
@@ -87,9 +98,10 @@ pnpm run check:bundle-size  # Bundle-size-check
 }
 ```
 
-### Environment-Variables
+### Environment variables
 
-**Setup in Vercel-Dashboard:**
+**Setup in Vercel dashboard:**
+
 ```
 Settings → Environment Variables
 
@@ -97,12 +109,13 @@ Production:
   MORALIS_API_KEY=sk-prod-...
   OPENAI_API_KEY=sk-prod-...
 
-Preview (PR-Previews):
+Preview (PR previews):
   MORALIS_API_KEY=sk-preview-...
   OPENAI_API_KEY=sk-preview-...
 ```
 
-**Local-Development:**
+**Local development:**
+
 ```bash
 # 1. Copy template
 cp .env.example .env.local
@@ -115,14 +128,16 @@ OPENAI_API_KEY=YOUR_KEY_HERE
 pnpm run dev
 ```
 
-### Rollback-Strategy
+### Rollback strategy
 
-**Instant-Rollback (Vercel):**
-1. Vercel-Dashboard → Deployments
-2. Select last-stable-deployment
-3. "Promote to Production" (~5-10 seconds)
+**Instant rollback (Vercel):**
 
-### Health-Check
+1. Vercel dashboard → Deployments
+2. Select last stable deployment
+3. “Promote to Production” (~5–10 seconds)
+
+### Health check
+
 ```bash
 # After deployment, verify:
 curl https://sparkfined.app/api/health
@@ -131,13 +146,15 @@ curl https://sparkfined.app/sw.js
 
 ---
 
-## AI-Integration
+## AI Integration
 
-### Dual-Provider-Strategy
-- **OpenAI (gpt-4o-mini):** Cheap (~$0.15/1M tokens), fast, for high-volume-tasks
-- **Grok (xAI):** Expensive (~$5/1M tokens), crypto-native, for high-value-tasks
+### Dual-provider strategy
 
-### Provider-Selection-Logic
+* **OpenAI (gpt-4o-mini):** cheap, fast, good for high-volume tasks.
+* **Grok (xAI):** more expensive, crypto-native, reserved for high-value tasks.
+
+### Provider selection logic
+
 ```ts
 // ai/orchestrator.ts
 export function selectProvider(taskType: string): 'openai' | 'grok' {
@@ -151,12 +168,13 @@ export function selectProvider(taskType: string): 'openai' | 'grok' {
 }
 ```
 
-### Cost-Management
+### Cost management
 
-**MUST:** Enforce cost-limits
+**MUST:** Enforce cost limits
+
 ```ts
 const COST_LIMITS = {
-  perRequest: 0.25,   // Max $0.25 per AI-call
+  perRequest: 0.25,   // Max $0.25 per AI call
   perUser: 10.0,      // Max $10 per user/day (planned)
   total: 100.0,       // Max $100 total/day
 };
@@ -165,16 +183,17 @@ export async function executeTask(task: AITask): Promise<AIResult> {
   const estimatedCost = estimateCost(task);
 
   if (estimatedCost > COST_LIMITS.perRequest) {
-    throw new Error(`Cost-limit exceeded: ${estimatedCost}`);
+    throw new Error(`Cost limit exceeded: ${estimatedCost}`);
   }
 
   // Execute...
 }
 ```
 
-### Prompt-Design
+### Prompt design
 
-**MUST:** Use system + user-message pattern
+**MUST:** Use system + user message pattern
+
 ```ts
 const systemPrompt = await loadSystemPrompt('journal-condense');
 const userPrompt = journalEntry.content;
@@ -184,13 +203,14 @@ const result = await callAI({
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt },
   ],
-  maxTokens: 500,  // Limit output to prevent cost-explosion
+  maxTokens: 500,  // Limit output to prevent cost explosion
 });
 ```
 
-### Error-Handling
+### Error handling
 
-**MUST:** Use retry-logic for AI-calls
+**MUST:** Use retry logic for AI calls
+
 ```ts
 import { withRetry } from '@/ai/retry';
 
@@ -200,9 +220,10 @@ const result = await withRetry(
 );
 ```
 
-### Response-Caching
+### Response caching
 
-**SHOULD:** Cache identical AI-requests
+**SHOULD:** Cache identical AI requests
+
 ```ts
 const cacheKey = hashTask(task);
 const cached = cache.get(cacheKey);
@@ -218,69 +239,89 @@ if (cached && Date.now() - cached.timestamp < 3600_000) {  // 1h TTL
 
 ## Related
 
-- Full rules: `.rulesync/09-security.md`, `.rulesync/10-deployment.md`, `.rulesync/11-ai-integration.md`
+* Full rules: `.rulesync/09-security.md`, `.rulesync/10-deployment.md`, `.rulesync/11-ai-integration.md`
 
 ---
 
-## Agent: Codex – AI P0 Integration & Cleanup Agent
+## Ops Agents
 
-**Targets:** `codex`  
-**Patterns:**  
-- `src/types/ai.ts`  
-- `src/types/index.ts`  
-- `src/lib/ai/**/*.{ts,tsx}`  
-- `docs/ai/**/*.md`  
-- `CODEX_HANDOVER_CHECKLIST.md`  
+### Agent: Codex – AI P0 Integration & Cleanup Agent
 
-### Rolle & Fokus
+**Targets:** `codex`
+**Patterns (conceptual scope):**
 
-- Du bist Codex, ein Senior TypeScript/React Engineer für Sparkfined PWA.
-- Dein Fokus in diesen Pfaden:
-  - P0-Aufgaben aus `CODEX_HANDOVER_CHECKLIST.md` umsetzen,
-  - AI-Typen und -Heuristiken sauber integrieren,
-  - CI (lint/test/build/typecheck) stabil halten.
+* `src/types/ai.ts`
+* `src/types/index.ts`
+* `src/lib/ai/**/*.{ts,tsx}`
+* `docs/ai/**/*.md`
+* `CODEX_HANDOVER_CHECKLIST.md`
 
-### Verhalten
+#### Role & Focus
 
-Wenn du in diesen Dateien arbeitest:
+* You are Codex, a senior TypeScript/React engineer for the Sparkfined PWA.
+* In these paths your focus is to:
 
-1. **Lesen & Planen**
-   - Öffne zuerst:
-     - `CLEANUP_COMPLETE.md`
-     - `REPO_CLEANUP_SUMMARY.md`
-     - `REPO_CLEANUP_DECISIONS.md`
-     - `REPO_CLEANUP_INVENTORY.md`
-     - `CODEX_HANDOVER_CHECKLIST.md`
-   - Extrahiere die P0-Tasks:
-     - Import-Updates von Legacy-AI-Typen → `@/types/ai` / `@/types`.
-     - `computeBotScore` in Social-Analyse einhängen.
-     - `sanityCheck` in die AI-Pipeline einhängen.
-   - Erstelle einen kurzen Plan (3–7 Bulletpoints), bevor du Patches vorschlägst.
+  * Implement the P0 tasks from `CODEX_HANDOVER_CHECKLIST.md`,
+  * Integrate AI types and heuristics cleanly,
+  * Keep CI (lint/test/build/typecheck) stable and green.
 
-2. **Imports aktualisieren**
-   - Finde alle Importe, die auf alte AI-Typ-Pfade zeigen (`ai/types`, alte `ai_types`-Pfadvarianten).
-   - Ersetze sie minimal durch `@/types/ai` oder `@/types`.
-   - Keine weiteren Refactors in denselben Dateien.
+#### Behaviour
 
-3. **computeBotScore integrieren**
-   - Nutze `computeBotScore` aus `src/lib/ai/heuristics/**`.
-   - Binde es in den Social-Analyse-Fluss ein (z. B. `grok`-Flow / Social-Endpoint).
-   - Ergänze das Ergebnis typisiert im Response (gemäß `src/types/ai.ts`).
+When you work in these files/areas:
 
-4. **sanityCheck integrieren**
-   - Nutze `sanityCheck` aus `src/lib/ai/heuristics/**`.
-   - Führe es im AI-Orchestrator auf den generierten Bullets/Insights aus, bevor du sie zurückgibst.
-   - Halte dich an die Strukturen aus `AnalyzeMarketResult` / `AdvancedInsightCard`.
+1. **Read & plan**
 
-5. **Tests & CI im Kopf behalten**
-   - Bevorzuge kleine, fokussierte `apply_patch`-Blöcke.
-   - Stelle sicher, dass deine Änderungen logisch mit folgenden Kommandos kompatibel sind:
-     - `pnpm run typecheck`
-     - `pnpm run lint`
-     - `pnpm test`
-     - `pnpm run build`
+   * First, open (if they exist):
 
-6. **Grenzen**
-   - Keine Änderungen am Rules-/Agenten-System.
-   - Keine großen Refactors, keine neuen Features außerhalb der P0-Tasks.
-   - Erkläre jede Patchgruppe in 1–2 Sätzen.
+     * `CLEANUP_COMPLETE.md`
+     * `REPO_CLEANUP_SUMMARY.md`
+     * `REPO_CLEANUP_DECISIONS.md`
+     * `REPO_CLEANUP_INVENTORY.md`
+     * `CODEX_HANDOVER_CHECKLIST.md`
+   * Extract the P0 tasks, especially:
+
+     * Update legacy AI type imports → `@/types/ai` or `@/types`.
+     * Wire `computeBotScore` into the social analysis flow.
+     * Wire `sanityCheck` into the AI pipeline.
+   * Write a short plan (3–7 bullet points) before proposing patches.
+
+2. **Update imports**
+
+   * Find all imports that still reference old AI type paths (`ai/types`, legacy `ai_types` paths, etc.).
+   * Replace them minimally with `@/types/ai` or `@/types`, using the consolidated types in `src/types/ai.ts`.
+   * Avoid unrelated refactors in the same files.
+
+3. **Integrate `computeBotScore`**
+
+   * Use `computeBotScore` from `src/lib/ai/heuristics/**`.
+   * Integrate it into the social analysis flow (e.g. the `grok`/social endpoint or associated pipeline).
+   * Attach the bot score to the social analysis response in a type-safe way, following the shapes defined in `src/types/ai.ts`.
+
+4. **Integrate `sanityCheck`**
+
+   * Use `sanityCheck` from `src/lib/ai/heuristics/**`.
+   * Apply it in the AI orchestrator on generated bullets/insights before returning them.
+   * Keep structures consistent with `AnalyzeMarketResult` and `AdvancedInsightCard` from `src/types/ai.ts`.
+
+5. **Tests & CI in mind**
+
+   * Prefer small, focused `apply_patch` blocks.
+   * Ensure your changes are logically compatible with:
+
+     * `pnpm run typecheck`
+     * `pnpm run lint`
+     * `pnpm test`
+     * `pnpm run build`
+   * Update or add tests only where necessary to confirm the new integration points (botScore, sanityCheck) are exercised.
+
+6. **Constraints**
+
+   * Do **not** change the rules/agent system itself (.rulesync, `.cursor/rules`, `AGENTS.md`).
+   * Do **not** introduce large refactors or new features outside the defined P0 tasks.
+   * Explain each patch group in 1–2 sentences (what changed and why).
+   * Follow existing coding style and TypeScript strictness.
+
+```
+
+::contentReference[oaicite:0]{index=0}
+```
