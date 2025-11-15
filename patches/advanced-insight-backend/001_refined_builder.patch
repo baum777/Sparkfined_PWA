@@ -1,0 +1,29 @@
+### Advanced Insight Builder - Phase 1 (Beta v0.9)
+
+**Module:** `src/lib/ai/buildAdvancedInsight.ts`
+
+**Changes:**
+- Removed `any` types (strictly typed)
+- Made function deterministic (same input → same output)
+- Simplified playbook (heuristic-based, passed as array)
+- Macro section feature-flagged (`includeMacro` default: false)
+- All `is_overridden = false` by default
+- Added readonly modifiers to options
+
+**Key Properties:**
+- Pure function (no side effects)
+- Easy to unit test
+- Type-safe throughout
+
+**Usage:**
+```ts
+const card = buildAdvancedInsightFromSnapshot(snapshot, {
+  playbookEntries: ['Entry 1', 'Entry 2'],
+  includeMacro: false, // Beta v0.9: keep macro empty
+});
+```
+
+All `EditableField<T>` values initialize with:
+- `auto_value`: from snapshot or fallback
+- `user_value`: undefined
+- `is_overridden`: false
