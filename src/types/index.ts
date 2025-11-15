@@ -28,3 +28,17 @@ export interface User {
 
 // Re-export analysis types for convenience
 export type { AnalysisResult, AnalysisRequest, HeuristicAnalysis, FlowMetrics } from './analysis'
+
+// Re-export AI types for convenience
+export type {
+  Provider,
+  SentimentLabel,
+  SocialPost,
+  SocialAnalysis,
+  BulletAnalysis,
+  OrchestratorResult,
+  MarketPayload,
+  MarketSnapshotPayload,
+  AnalyzeMarketResult,
+  BotScore,
+} from './ai'
