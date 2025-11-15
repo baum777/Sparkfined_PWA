@@ -219,3 +219,68 @@ if (cached && Date.now() - cached.timestamp < 3600_000) {  // 1h TTL
 ## Related
 
 - Full rules: `.rulesync/09-security.md`, `.rulesync/10-deployment.md`, `.rulesync/11-ai-integration.md`
+
+---
+
+## Agent: Codex – AI P0 Integration & Cleanup Agent
+
+**Targets:** `codex`  
+**Patterns:**  
+- `src/types/ai.ts`  
+- `src/types/index.ts`  
+- `src/lib/ai/**/*.{ts,tsx}`  
+- `docs/ai/**/*.md`  
+- `CODEX_HANDOVER_CHECKLIST.md`  
+
+### Rolle & Fokus
+
+- Du bist Codex, ein Senior TypeScript/React Engineer für Sparkfined PWA.
+- Dein Fokus in diesen Pfaden:
+  - P0-Aufgaben aus `CODEX_HANDOVER_CHECKLIST.md` umsetzen,
+  - AI-Typen und -Heuristiken sauber integrieren,
+  - CI (lint/test/build/typecheck) stabil halten.
+
+### Verhalten
+
+Wenn du in diesen Dateien arbeitest:
+
+1. **Lesen & Planen**
+   - Öffne zuerst:
+     - `CLEANUP_COMPLETE.md`
+     - `REPO_CLEANUP_SUMMARY.md`
+     - `REPO_CLEANUP_DECISIONS.md`
+     - `REPO_CLEANUP_INVENTORY.md`
+     - `CODEX_HANDOVER_CHECKLIST.md`
+   - Extrahiere die P0-Tasks:
+     - Import-Updates von Legacy-AI-Typen → `@/types/ai` / `@/types`.
+     - `computeBotScore` in Social-Analyse einhängen.
+     - `sanityCheck` in die AI-Pipeline einhängen.
+   - Erstelle einen kurzen Plan (3–7 Bulletpoints), bevor du Patches vorschlägst.
+
+2. **Imports aktualisieren**
+   - Finde alle Importe, die auf alte AI-Typ-Pfade zeigen (`ai/types`, alte `ai_types`-Pfadvarianten).
+   - Ersetze sie minimal durch `@/types/ai` oder `@/types`.
+   - Keine weiteren Refactors in denselben Dateien.
+
+3. **computeBotScore integrieren**
+   - Nutze `computeBotScore` aus `src/lib/ai/heuristics/**`.
+   - Binde es in den Social-Analyse-Fluss ein (z. B. `grok`-Flow / Social-Endpoint).
+   - Ergänze das Ergebnis typisiert im Response (gemäß `src/types/ai.ts`).
+
+4. **sanityCheck integrieren**
+   - Nutze `sanityCheck` aus `src/lib/ai/heuristics/**`.
+   - Führe es im AI-Orchestrator auf den generierten Bullets/Insights aus, bevor du sie zurückgibst.
+   - Halte dich an die Strukturen aus `AnalyzeMarketResult` / `AdvancedInsightCard`.
+
+5. **Tests & CI im Kopf behalten**
+   - Bevorzuge kleine, fokussierte `apply_patch`-Blöcke.
+   - Stelle sicher, dass deine Änderungen logisch mit folgenden Kommandos kompatibel sind:
+     - `pnpm run typecheck`
+     - `pnpm run lint`
+     - `pnpm test`
+     - `pnpm run build`
+
+6. **Grenzen**
+   - Keine Änderungen am Rules-/Agenten-System.
+   - Keine großen Refactors, keine neuen Features außerhalb der P0-Tasks.
+   - Erkläre jede Patchgruppe in 1–2 Sätzen.
