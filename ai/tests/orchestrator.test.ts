@@ -1,9 +1,23 @@
 import { readFile } from "fs/promises";
 import path from "path";
-import { describe, expect, it, vi } from "vitest";
-import { AIOrchestrator, mergeJournalFields, validateBulletResponse } from "../orchestrator.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { AIOrchestrator, SANITY_WARNING, mergeJournalFields, validateBulletResponse } from "../orchestrator.js";
 import { withExponentialBackoff } from "../retry.js";
 import type { MarketPayload, SocialAnalysis } from "@/types/ai";
+
+vi.mock("@/lib/ai/heuristics", () => ({
+  sanityCheck: vi.fn((bullets: string[]) => bullets),
+  computeBotScore: vi.fn(),
+}));
+
+import { sanityCheck } from "@/lib/ai/heuristics";
+
+const sanityCheckMock = vi.mocked(sanityCheck);
+
+beforeEach(() => {
+  sanityCheckMock.mockReset();
+  sanityCheckMock.mockImplementation((bullets: string[]) => bullets);
+});
 
 const fixturePath = path.resolve(process.cwd(), "ai", "tests", "fixtures", "btc_payload.json");
 
@@ -182,5 +196,65 @@ describe("AIOrchestrator", () => {
 
     const result = await orchestrator.generateAnalysis(payload, { posts: [] });
     expect(result.socialAnalysis).toBeUndefined();
+  });
+
+  it("handles missing bullet arrays without crashing or warnings", async () => {
+    const payload = await loadPayload();
+    const orchestrator = new AIOrchestrator({
+      openaiClient: {
+        analyzeMarket: vi.fn(async () => ({
+          provider: "openai",
+          model: "test-mini",
+          bullets: undefined as unknown as string[],
+          source_trace: { price_source: "dexpaprika" },
+        })),
+      } as unknown as any,
+      grokClient: {
+        analyzeSocial: vi.fn(),
+      } as unknown as any,
+      random: () => 1,
+      socialSampleRate: 0,
+    });
+
+    const result = await orchestrator.generateAnalysis(payload, { posts: [] });
+    expect(result.marketAnalysis.bullets).toEqual([]);
+    expect(result.meta.warnings).not.toContain(SANITY_WARNING);
+    expect(sanityCheckMock).toHaveBeenCalledWith([], expect.anything());
+  });
+
+  it("adds warning when sanityCheck modifies bullets", async () => {
+    const payload = await loadPayload();
+    const adjustedBullets = [
+      "Trimmed Marktstatus.",
+      "Trimmed Momentum.",
+      "Trimmed Risiko.",
+      "Trimmed Trades.",
+    ];
+    sanityCheckMock.mockImplementationOnce(() => adjustedBullets);
+
+    const orchestrator = new AIOrchestrator({
+      openaiClient: {
+        analyzeMarket: vi.fn(async () => ({
+          provider: "openai",
+          model: "test-mini",
+          bullets: [
+            "Marktstatus: Preis 58.200 USD, Support 57.000, Resistance 59.400.",
+            "Momentum: RSI 62, SMA50 56k, SMA200 52k.",
+            "Risiko: ATR14 1.8%, Vol 4.6%.",
+            "Trades: Long 58.4k SL 57.6k TP1 60.2k.",
+          ],
+          source_trace: { price_source: "dexpaprika" },
+        })),
+      } as unknown as any,
+      grokClient: {
+        analyzeSocial: vi.fn(),
+      } as unknown as any,
+      random: () => 1,
+      socialSampleRate: 0,
+    });
+
+    const result = await orchestrator.generateAnalysis(payload, { posts: [] });
+    expect(result.marketAnalysis.bullets).toEqual(adjustedBullets);
+    expect(result.meta.warnings).toContain(SANITY_WARNING);
   });
 });

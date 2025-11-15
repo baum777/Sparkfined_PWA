@@ -1,7 +1,8 @@
 import type { BotScorePostPayload, SocialPost, SocialPostAssessment } from "@/types/ai";
 import { computeBotScore } from "@/lib/ai/heuristics";
 
-export interface BotHeuristicResult extends Pick<SocialPostAssessment, "botScore" | "reason_flags"> {}
+export interface BotHeuristicResult
+  extends Pick<SocialPostAssessment, "botScore" | "bot_score" | "reason_flags"> {}
 
 const DEFAULT_FLAGS = {
   NEW_ACCOUNT: "account_age_lt_7d",
@@ -30,17 +31,19 @@ export function scoreBotLikelihood(post: SocialPost): BotHeuristicResult {
 
   const payload: BotScorePostPayload = {
     author: {
-      age_days: accountAgeDays,
-      followers: author.followers,
-      verified: author.verified,
+      age_days: Number.isFinite(accountAgeDays) ? accountAgeDays : undefined,
+      followers: typeof author.followers === "number" ? author.followers : 0,
+      verified: author.verified === true,
     },
-    post_frequency_per_day: post.post_frequency_per_day,
-    repeated: post.repeated,
+    post_frequency_per_day: Number.isFinite(post.post_frequency_per_day)
+      ? (post.post_frequency_per_day as number)
+      : undefined,
+    repeated: Boolean(post.repeated),
     source_type: post.source_type,
-    text: post.text,
+    text: post.text ?? "",
   };
 
-  const botScore = computeBotScore(payload);
+  const botScore = clampToUnit(computeBotScore(payload));
 
   if (typeof accountAgeDays === "number" && accountAgeDays < 7) {
     flags.push(DEFAULT_FLAGS.NEW_ACCOUNT);
@@ -80,6 +83,14 @@ export function scoreBotLikelihood(post: SocialPost): BotHeuristicResult {
 
   return {
     botScore,
+    bot_score: botScore,
     reason_flags: Array.from(new Set(flags)),
   };
+}
+
+function clampToUnit(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
 }

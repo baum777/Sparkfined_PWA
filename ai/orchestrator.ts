@@ -12,6 +12,8 @@ import type {
 } from "@/types/ai";
 import { sanityCheck } from "@/lib/ai/heuristics";
 
+export const SANITY_WARNING = "sanity_check adjusted AI bullets";
+
 export interface OrchestratorOptions {
   openaiClient?: OpenAIClient;
   grokClient?: GrokClient;
@@ -63,11 +65,18 @@ export class AIOrchestrator {
 
     const startOpenAi = this.now();
     const marketAnalysis = await this.openai.analyzeMarket(normalized);
-    validateBulletResponse(marketAnalysis);
+    const initialBullets = Array.isArray(marketAnalysis.bullets) ? marketAnalysis.bullets : [];
+    marketAnalysis.bullets = initialBullets;
+    if (marketAnalysis.bullets.length > 0) {
+      validateBulletResponse(marketAnalysis);
+    } else {
+      marketAnalysis.bullets = [];
+    }
     const validatedBullets = [...marketAnalysis.bullets];
-    const sanitizedBullets = sanityCheck(validatedBullets, normalized);
+    const sanityResult = sanityCheck(validatedBullets, normalized);
+    const sanitizedBullets = Array.isArray(sanityResult) ? sanityResult : validatedBullets;
     if (bulletsChanged(validatedBullets, sanitizedBullets)) {
-      warnings.push("sanity_check adjusted AI bullets");
+      warnings.push(SANITY_WARNING);
     }
     marketAnalysis.bullets = sanitizedBullets;
     usedProviders.push("openai");

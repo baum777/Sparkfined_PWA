@@ -109,34 +109,29 @@ export class GrokClient {
       throw new Error(`Grok returned non-JSON payload: ${text}`);
     }
 
-    const assessedPosts = posts.map((post, index) => {
-      const heuristics = scoreBotLikelihood(post);
-      const modelAssessment = parsed.posts?.[index];
-      const modelBotScore =
-        typeof modelAssessment?.bot_score === "number"
-          ? modelAssessment.bot_score
-          : typeof modelAssessment?.botScore === "number"
-            ? modelAssessment.botScore
-            : 0;
-      const combinedScore = Math.min(1, Math.max(0, (heuristics.botScore + modelBotScore) / 2));
-      const reasons = new Set<string>([
-        ...heuristics.reason_flags,
-        ...((modelAssessment?.reason_flags ?? []) as string[]),
-      ]);
+      const assessedPosts = posts.map((post, index) => {
+        const heuristics = scoreBotLikelihood(post);
+        const modelAssessment = parsed.posts?.[index];
+        const modelBotScore = extractModelBotScore(modelAssessment);
+        const combinedScore = mergeBotScores(heuristics.botScore, modelBotScore);
+        const reasons = new Set<string>([
+          ...heuristics.reason_flags,
+          ...((modelAssessment?.reason_flags ?? []) as string[]),
+        ]);
 
-      return {
-        id: post.id,
-        text_snippet: modelAssessment?.text_snippet ?? post.text.slice(0, 140),
-        sentiment: modelAssessment?.sentiment ?? 0,
-        botScore: combinedScore,
-        bot_score: combinedScore,
-        isLikelyBot:
-          typeof modelAssessment?.isLikelyBot === "boolean"
-            ? modelAssessment.isLikelyBot
-            : combinedScore >= 0.5,
-        reason_flags: Array.from(reasons),
-      } satisfies SocialPostAssessment;
-    });
+        return {
+          id: post.id,
+          text_snippet: modelAssessment?.text_snippet ?? post.text.slice(0, 140),
+          sentiment: modelAssessment?.sentiment ?? 0,
+          botScore: combinedScore,
+          bot_score: combinedScore,
+          isLikelyBot:
+            typeof modelAssessment?.isLikelyBot === "boolean"
+              ? modelAssessment.isLikelyBot
+              : combinedScore >= 0.5,
+          reason_flags: Array.from(reasons),
+        } satisfies SocialPostAssessment;
+      });
 
     const botRatio = assessedPosts.length
       ? assessedPosts.filter((p) => p.isLikelyBot).length / assessedPosts.length
@@ -161,3 +156,45 @@ export class GrokClient {
 }
 
 export class RetryableSocialError extends Error {}
+
+export function mergeBotScores(
+  heuristicScore?: number,
+  modelScore?: number,
+): number {
+  const hasHeuristic = isFiniteNumber(heuristicScore);
+  const hasModel = isFiniteNumber(modelScore);
+
+  if (hasHeuristic && hasModel) {
+    return clampToUnit(((heuristicScore as number) + (modelScore as number)) / 2);
+  }
+
+  if (hasHeuristic) {
+    return clampToUnit(heuristicScore as number);
+  }
+
+  if (hasModel) {
+    return clampToUnit(modelScore as number);
+  }
+
+  return 0;
+}
+
+function extractModelBotScore(modelAssessment?: Partial<SocialPostAssessment>): number | undefined {
+  if (!modelAssessment) return undefined;
+  if (isFiniteNumber(modelAssessment.bot_score)) return modelAssessment.bot_score;
+  if (isFiniteNumber(modelAssessment.botScore)) return modelAssessment.botScore;
+  return undefined;
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function clampToUnit(value: number): number {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
+}
