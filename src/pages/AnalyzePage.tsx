@@ -7,6 +7,9 @@ import { encodeToken } from "../lib/shortlink";
 import type { TF } from "../lib/timeframe";
 import { useAssist } from "../sections/ai/useAssist";
 import PlaybookCard from "../sections/ideas/Playbook";
+import AdvancedInsightCard from "../features/analysis/AdvancedInsightCard";
+import { useAdvancedInsightStore } from "../features/analysis/advancedInsightStore";
+import { generateMockAdvancedInsight, generateMockUnlockedAccess, generateMockLockedAccess } from "../features/analysis/mockAdvancedInsightData";
 
 export default function AnalyzePage() {
   const [address, setAddress] = React.useState<string>("");
@@ -14,6 +17,7 @@ export default function AnalyzePage() {
   const [data, setData] = React.useState<OhlcPoint[]|null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string| null>(null);
+  const advancedInsightStore = useAdvancedInsightStore();
 
   const load = async () => {
     if (!address) return;
@@ -142,6 +146,26 @@ export default function AnalyzePage() {
         {shortlink && <button className={btn} onClick={()=>navigator.clipboard.writeText(shortlink)}>Copy Shortlink</button>}
         <button className={btn} onClick={exportJSON} disabled={!data}>Export JSON</button>
         <button className={btn} onClick={exportCSV}  disabled={!data}>Export CSV</button>
+        <button 
+          className={btn + " border-emerald-700"} 
+          onClick={()=> {
+            const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
+            advancedInsightStore.ingest(mockData, generateMockUnlockedAccess());
+          }}
+          disabled={!data}
+        >
+          🧪 Load Insight (Unlocked)
+        </button>
+        <button 
+          className={btn + " border-amber-700"} 
+          onClick={()=> {
+            const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
+            advancedInsightStore.ingest(mockData, generateMockLockedAccess());
+          }}
+          disabled={!data}
+        >
+          🔒 Load Insight (Locked)
+        </button>
       </div>
       {error && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
 
@@ -219,6 +243,12 @@ export default function AnalyzePage() {
               }}
             />
           </div>
+
+          {/* Advanced Insight Card */}
+          <div className="mt-4">
+            <AdvancedInsightCard />
+          </div>
+
           {/* Sample window info */}
           <div className="mt-2 text-[11px] text-zinc-500">Samples: {data.length} · TF: {tf}</div>
         </>
