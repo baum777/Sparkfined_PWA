@@ -1,0 +1,36 @@
+### Advanced Insight API Integration - Phase 2 & 3 (Beta v0.9)
+
+**Context:**
+The `ai/orchestrator.ts` module is Node.js-based and returns `OrchestratorResult`.
+For Beta v0.9, Advanced Insight wiring happens in the Edge function API route.
+
+**Integration Point:** `api/ai/analyze-market.ts`
+
+This endpoint:
+1. Receives market analysis request
+2. Fetches OHLC candles
+3. Builds `MarketSnapshotPayload` with heuristics
+4. Calls `buildAdvancedInsightFromSnapshot()` with simple playbook
+5. Returns `AnalyzeMarketResult` with `.advanced` field populated
+
+**Key Design Decisions:**
+- Heuristics computed inline in edge function (no Node.js orchestrator dependency)
+- Simple heuristic playbook (no AI augmentation for Beta v0.9)
+- Macro section empty (`includeMacro: false`)
+- All `EditableField<T>` have `is_overridden = false`
+
+**Type Flow:**
+```
+MarketSnapshotPayload (from OHLC + heuristics)
+  ↓
+buildAdvancedInsightFromSnapshot(snapshot, { playbookEntries, includeMacro: false })
+  ↓
+AdvancedInsightCard
+  ↓
+AnalyzeMarketResult.advanced
+```
+
+**No Changes to orchestrator:**
+- `ai/orchestrator.ts` remains unchanged
+- Continues to return `OrchestratorResult` for Node.js consumers
+- Advanced Insight is Edge-only for Beta v0.9

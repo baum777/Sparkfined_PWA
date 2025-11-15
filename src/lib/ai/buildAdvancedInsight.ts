@@ -1,9 +1,8 @@
 /**
  * Advanced Insight Builder
- * Pure function that transforms MarketSnapshotPayload → AdvancedInsightCard
+ * Pure, deterministic function: MarketSnapshotPayload → AdvancedInsightCard
  * 
- * Beta v0.9: Core builder for Advanced Insight feature
- * Maps heuristic pre-analysis and AI output into structured EditableField format
+ * Beta v0.9: Strictly typed, no `any`, simple heuristic playbook
  */
 
 import type {
@@ -16,7 +15,6 @@ import type {
   BiasReading,
   FlowVolumeSnapshot,
   MacroTag,
-  FeatureAccessMeta,
   EditableField,
   AnalysisLayerId,
 } from '@/types/ai';
@@ -25,24 +23,27 @@ import type {
  * Build options for Advanced Insight generation
  */
 export interface BuildAdvancedInsightOptions {
-  /** Access meta for token-gating */
-  access?: FeatureAccessMeta;
+  /** Active analysis layers (default: L1, L2, L3) */
+  readonly activeLayers?: ReadonlyArray<AnalysisLayerId>;
   
-  /** Active analysis layers (L1-L5) */
-  activeLayers?: AnalysisLayerId[];
+  /** Simple heuristic playbook entries (default: empty) */
+  readonly playbookEntries?: ReadonlyArray<string>;
   
-  /** Playbook entries from AI or heuristics */
-  playbookEntries?: string[];
+  /** Include macro section (default: false for Beta v0.9) */
+  readonly includeMacro?: boolean;
 }
 
 /**
  * Build an AdvancedInsightCard from a MarketSnapshotPayload
  * 
- * This is a pure function that maps pre-computed heuristics from the snapshot
- * into the EditableField structure expected by the frontend store.
+ * Pure, deterministic function:
+ * - No side effects
+ * - Same input always produces same output
+ * - Strictly typed (no `any`)
+ * - Easy to unit test
  * 
  * @param snapshot - Market snapshot with pre-computed heuristics
- * @param options - Build options (access, layers, playbook)
+ * @param options - Build options (layers, playbook, macro)
  * @returns Complete AdvancedInsightCard ready for frontend ingestion
  */
 export function buildAdvancedInsightFromSnapshot(
@@ -50,38 +51,38 @@ export function buildAdvancedInsightFromSnapshot(
   options: BuildAdvancedInsightOptions = {}
 ): AdvancedInsightCard {
   const {
-    access,
     activeLayers = ['L1_STRUCTURE', 'L2_FLOW', 'L3_TACTICAL'],
     playbookEntries = [],
+    includeMacro = false,
   } = options;
 
-  // Build sections from snapshot data
+  // Build sections from snapshot data (deterministic)
   const sections: AdvancedInsightSections = {
     market_structure: {
       range: createEditableField(
-        snapshot.range_structure || createFallbackRange(snapshot)
+        snapshot.range_structure ?? createFallbackRange(snapshot)
       ),
       key_levels: createEditableField(
-        snapshot.key_levels || []
+        snapshot.key_levels ?? []
       ),
       zones: createEditableField(
-        snapshot.zones || []
+        snapshot.zones ?? []
       ),
       bias: createEditableField(
-        snapshot.bias || createFallbackBias(snapshot)
+        snapshot.bias ?? createFallbackBias(snapshot)
       ),
     },
     flow_volume: {
       flow: createEditableField(
-        snapshot.flow_volume || createFallbackFlowVolume(snapshot)
+        snapshot.flow_volume ?? createFallbackFlowVolume(snapshot)
       ),
     },
     playbook: {
-      entries: createEditableField(playbookEntries),
+      entries: createEditableField([...playbookEntries]),
     },
     macro: {
       tags: createEditableField(
-        snapshot.macro_tags || []
+        includeMacro ? (snapshot.macro_tags ?? []) : []
       ),
     },
   };
@@ -89,12 +90,14 @@ export function buildAdvancedInsightFromSnapshot(
   return {
     sections,
     source_payload: snapshot,
-    active_layers: activeLayers,
+    active_layers: [...activeLayers],
   };
 }
 
 /**
- * Create an EditableField with auto_value and no override
+ * Create an EditableField with auto_value and is_overridden = false
+ * 
+ * Pure function - deterministic output
  */
 function createEditableField<T>(autoValue: T): EditableField<T> {
   return {
@@ -106,9 +109,10 @@ function createEditableField<T>(autoValue: T): EditableField<T> {
 
 /**
  * Fallback range structure from candles if not pre-computed
+ * Deterministic: same candles → same range
  */
 function createFallbackRange(snapshot: MarketSnapshotPayload): RangeStructure {
-  const candles = snapshot.candles || [];
+  const candles = snapshot.candles ?? [];
   
   if (candles.length === 0) {
     return {
@@ -119,9 +123,11 @@ function createFallbackRange(snapshot: MarketSnapshotPayload): RangeStructure {
     };
   }
 
-  // Calculate 24h range from candles
-  const high = Math.max(...candles.map(c => c.h));
-  const low = Math.min(...candles.map(c => c.l));
+  // Calculate 24h range from candles (deterministic)
+  const highs = candles.map(c => c.h);
+  const lows = candles.map(c => c.l);
+  const high = Math.max(...highs);
+  const low = Math.min(...lows);
   const mid = (high + low) / 2;
 
   return {
@@ -134,9 +140,10 @@ function createFallbackRange(snapshot: MarketSnapshotPayload): RangeStructure {
 
 /**
  * Fallback bias reading from price position if not pre-computed
+ * Deterministic: same candles → same bias
  */
 function createFallbackBias(snapshot: MarketSnapshotPayload): BiasReading {
-  const candles = snapshot.candles || [];
+  const candles = snapshot.candles ?? [];
   
   if (candles.length === 0) {
     return {
@@ -148,14 +155,17 @@ function createFallbackBias(snapshot: MarketSnapshotPayload): BiasReading {
     };
   }
 
-  // Simple bias: last close vs mid-range
-  const lastClose = candles[candles.length - 1]?.c || 0;
-  const high = Math.max(...candles.map(c => c.h));
-  const low = Math.min(...candles.map(c => c.l));
+  // Simple bias: last close vs mid-range (deterministic)
+  const lastCandle = candles[candles.length - 1];
+  const lastClose = lastCandle?.c ?? 0;
+  const highs = candles.map(c => c.h);
+  const lows = candles.map(c => c.l);
+  const high = Math.max(...highs);
+  const low = Math.min(...lows);
   const mid = (high + low) / 2;
   
   const aboveMid = lastClose > mid;
-  const deltaFromMid = ((lastClose - mid) / mid) * 100;
+  const deltaFromMid = mid !== 0 ? ((lastClose - mid) / mid) * 100 : 0;
   
   let bias: BiasReading['bias'];
   let reason: string;
@@ -173,12 +183,12 @@ function createFallbackBias(snapshot: MarketSnapshotPayload): BiasReading {
 
   // Simple higher lows / lower highs detection (last 3 candles)
   const recent = candles.slice(-3);
-  const higherLows = recent.length >= 2 && 
+  const higherLows = recent.length >= 3 && 
     recent[1].l > recent[0].l && 
-    recent[2]?.l > recent[1].l;
-  const lowerHighs = recent.length >= 2 && 
+    recent[2].l > recent[1].l;
+  const lowerHighs = recent.length >= 3 && 
     recent[1].h < recent[0].h && 
-    recent[2]?.h < recent[1].h;
+    recent[2].h < recent[1].h;
 
   return {
     bias,
@@ -191,26 +201,12 @@ function createFallbackBias(snapshot: MarketSnapshotPayload): BiasReading {
 
 /**
  * Fallback flow/volume snapshot if not pre-computed
+ * Deterministic: same snapshot → same flow
  */
 function createFallbackFlowVolume(snapshot: MarketSnapshotPayload): FlowVolumeSnapshot {
   return {
     vol_24h_usd: snapshot.volume_24h_usd,
     vol_24h_delta_pct: undefined,
-    source: snapshot.meta.source || 'Unknown',
-  };
-}
-
-/**
- * Generate default access meta for unlocked access
- */
-export function createDefaultAccessMeta(isUnlocked: boolean = false): FeatureAccessMeta {
-  return {
-    feature: 'advanced_deep_dive',
-    tier: isUnlocked ? 'basic' : 'advanced_locked',
-    is_unlocked: isUnlocked,
-    token_lock_id: isUnlocked ? undefined : 'pending-nft-check',
-    reason: isUnlocked 
-      ? undefined 
-      : 'Beta: Advanced Insight requires NFT-based access. Manual approval available.',
+    source: snapshot.meta.source ?? 'Unknown',
   };
 }

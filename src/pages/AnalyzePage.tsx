@@ -12,6 +12,9 @@ import { useAdvancedInsightStore } from "../features/analysis/advancedInsightSto
 import { generateMockAdvancedInsight, generateMockUnlockedAccess, generateMockLockedAccess } from "../features/analysis/mockAdvancedInsightData";
 import { useAdvancedInsight } from "../hooks/useAdvancedInsight";
 
+// Beta v0.9: Dev toggle for mock data (hidden in production)
+const SHOW_MOCK_BUTTONS = process.env.NODE_ENV !== "production";
+
 export default function AnalyzePage() {
   const [address, setAddress] = React.useState<string>("");
   const [tf, setTf] = React.useState<TF>("15m");
@@ -161,28 +164,32 @@ export default function AnalyzePage() {
           }}
           disabled={!data || insightLoading}
         >
-          {insightLoading ? "⏳ Generating..." : "🚀 Generate Real Insight"}
+          {insightLoading ? "⏳ Generating..." : "🚀 Advanced Insight"}
         </button>
-        <button 
-          className={btn + " border-emerald-700"} 
-          onClick={()=> {
-            const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
-            advancedInsightStore.ingest(mockData, generateMockUnlockedAccess());
-          }}
-          disabled={!data}
-        >
-          🧪 Mock (Unlocked)
-        </button>
-        <button 
-          className={btn + " border-amber-700"} 
-          onClick={()=> {
-            const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
-            advancedInsightStore.ingest(mockData, generateMockLockedAccess());
-          }}
-          disabled={!data}
-        >
-          🔒 Mock (Locked)
-        </button>
+        {SHOW_MOCK_BUTTONS && (
+          <>
+            <button 
+              className={btn + " border-emerald-700"} 
+              onClick={()=> {
+                const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
+                advancedInsightStore.ingest(mockData, generateMockUnlockedAccess());
+              }}
+              disabled={!data}
+            >
+              🧪 Mock (Unlocked)
+            </button>
+            <button 
+              className={btn + " border-amber-700"} 
+              onClick={()=> {
+                const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
+                advancedInsightStore.ingest(mockData, generateMockLockedAccess());
+              }}
+              disabled={!data}
+            >
+              🔒 Mock (Locked)
+            </button>
+          </>
+        )}
       </div>
       {error && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
       {insightError && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">Advanced Insight Error: {insightError}</div>}
