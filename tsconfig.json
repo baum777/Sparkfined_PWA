@@ -30,7 +30,9 @@
   "include": [
     "src",
     "api",
+    "ai",
     "tests",
+    "types",
     "vite.config.ts",
     "vitest.config.ts",
     "playwright.config.ts"
