@@ -1,0 +1,125 @@
+<svg width="900" height="350" viewBox="0 0 900 350" xmlns="http://www.w3.org/2000/svg">
+  <!-- CONCEPT 2: Project Focus - Meme Token Trading, Rocket/Diamond Hands Energy -->
+  
+  <!-- Dark Background -->
+  <rect width="900" height="350" fill="#0d0d0d"/>
+  
+  <!-- Gradients for 3D Effect -->
+  <defs>
+    <linearGradient id="rocketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#00d4ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff00ff;stop-opacity:0.8" />
+    </linearGradient>
+    <linearGradient id="chartGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#00ff88;stop-opacity:0" />
+    </linearGradient>
+    <radialGradient id="glowGrad" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#00ff88;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Main Icon: Rocket + Chart (To The Moon!) -->
+  <g id="main-icon" transform="translate(120, 175)">
+    <!-- Background Glow -->
+    <circle cx="0" cy="0" r="70" fill="url(#glowGrad)" opacity="0.4"/>
+    
+    <!-- Chart Lines Going Up (Bullish!) -->
+    <path d="M -50,35 L -30,15 L -10,25 L 10,5 L 30,-15 L 50,-35" 
+          fill="none" 
+          stroke="#00ff88" 
+          stroke-width="4" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"
+          opacity="0.6"/>
+    
+    <!-- Chart Fill (Optional Visual Richness) -->
+    <path d="M -50,35 L -30,15 L -10,25 L 10,5 L 30,-15 L 50,-35 L 50,45 L -50,45 Z" 
+          fill="url(#chartGrad)"/>
+    
+    <!-- Rocket (Stylized, Geometric) -->
+    <g transform="translate(0, -25)">
+      <!-- Rocket Body -->
+      <path d="M 0,-40 L 12,-20 L 12,20 L 8,30 L -8,30 L -12,20 L -12,-20 Z" 
+            fill="url(#rocketGrad)" 
+            stroke="#ffffff" 
+            stroke-width="2"/>
+      <!-- Rocket Window -->
+      <circle cx="0" cy="-10" r="6" fill="#0d0d0d" opacity="0.8"/>
+      <circle cx="0" cy="-10" r="4" fill="#00d4ff" opacity="0.6"/>
+      <!-- Rocket Fins -->
+      <path d="M -12,10 L -20,25 L -12,20 Z" fill="#ff00ff" opacity="0.8"/>
+      <path d="M 12,10 L 20,25 L 12,20 Z" fill="#ff00ff" opacity="0.8"/>
+      <!-- Rocket Flame (Dynamic) -->
+      <path d="M -8,30 L -5,40 L 0,50 L 5,40 L 8,30" 
+            fill="#ff6600" 
+            opacity="0.9"/>
+      <path d="M -5,35 L 0,48 L 5,35" 
+            fill="#ffdd00" 
+            opacity="0.8"/>
+    </g>
+    
+    <!-- Diamond Hands (Subtle Bottom Accent) -->
+    <g transform="translate(0, 55)" opacity="0.5">
+      <path d="M -8,0 L 0,-6 L 8,0 L 0,8 Z" fill="#00d4ff" stroke="#ffffff" stroke-width="1"/>
+      <path d="M -6,0 L 0,-4 L 6,0 L 0,6 Z" fill="#0d0d0d" opacity="0.6"/>
+    </g>
+  </g>
+  
+  <!-- Brand Name (Combination Mark) -->
+  <g id="combination-text" transform="translate(240, 175)">
+    <text x="0" y="0" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="72" 
+          font-weight="900" 
+          fill="#ffffff" 
+          letter-spacing="-2">
+      Sparkfined
+    </text>
+    <text x="0" y="35" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="16" 
+          font-weight="700" 
+          fill="#00ff88" 
+          letter-spacing="3"
+          style="text-transform: uppercase;">
+      Meme Token Trading
+    </text>
+    <text x="0" y="55" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="13" 
+          font-weight="500" 
+          fill="#888888" 
+          letter-spacing="2"
+          style="text-transform: uppercase;">
+      Learn • Trade • Moon
+    </text>
+  </g>
+  
+  <!-- Icon-Only Version (App Icon, Favicon) -->
+  <g id="icon-only" transform="translate(800, 175)">
+    <rect x="-45" y="-45" width="90" height="90" fill="#1a1a1a" rx="20"/>
+    <!-- Simplified Rocket -->
+    <path d="M 0,-25 L 8,-10 L 8,10 L 5,15 L -5,15 L -8,10 L -8,-10 Z" 
+          fill="url(#rocketGrad)"/>
+    <circle cx="0" cy="-5" r="3" fill="#00d4ff"/>
+    <path d="M -5,15 L 0,25 L 5,15" fill="#ff6600"/>
+    <!-- Chart Line -->
+    <path d="M -20,20 L -10,10 L 0,15 L 10,5 L 20,-5" 
+          fill="none" 
+          stroke="#00ff88" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          opacity="0.6"/>
+    <text x="0" y="70" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="10" 
+          font-weight="600" 
+          fill="#666666" 
+          text-anchor="middle">
+      APP ICON
+    </text>
+  </g>
+</svg>

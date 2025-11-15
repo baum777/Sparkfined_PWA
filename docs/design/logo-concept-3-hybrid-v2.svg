@@ -1,0 +1,161 @@
+<svg width="900" height="350" viewBox="0 0 900 350" xmlns="http://www.w3.org/2000/svg">
+  <!-- CONCEPT 3: Hybrid (70% Brand / 30% Project) - Community-First Integration -->
+  
+  <!-- Dark Background -->
+  <rect width="900" height="350" fill="#0d0d0d"/>
+  
+  <defs>
+    <!-- Gradient for subtle accents -->
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Primary Wordmark with Integrated Project Hints -->
+  <g id="hybrid-wordmark" transform="translate(70, 175)">
+    
+    <!-- SPARK (Bold, Primary) -->
+    <text x="0" y="0" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="80" 
+          font-weight="900" 
+          fill="#ffffff" 
+          letter-spacing="-2.5">
+      SPA
+    </text>
+    
+    <!-- R - Modified with Rocket Integration (30% Project Hint) -->
+    <g id="letter-r-modified" transform="translate(215, -55)">
+      <!-- R Stem -->
+      <rect x="0" y="0" width="10" height="80" fill="#ffffff"/>
+      
+      <!-- R Bowl (with integrated mini rocket) -->
+      <path d="M 10,0 L 35,0 Q 45,0 45,17 Q 45,30 38,32 L 10,32 Z" 
+            fill="#00ff88"/>
+      
+      <!-- Mini Rocket Inside R (Subtle!) -->
+      <g transform="translate(25, 12)">
+        <path d="M 0,-6 L 4,0 L 4,8 L 2,10 L -2,10 L -4,8 L -4,0 Z" 
+              fill="#0d0d0d" 
+              opacity="0.7"/>
+        <path d="M -2,10 L 0,14 L 2,10" fill="#ff6600" opacity="0.8"/>
+      </g>
+      
+      <!-- R Leg -->
+      <path d="M 35,32 L 50,80" 
+            stroke="#ffffff" 
+            stroke-width="10" 
+            stroke-linecap="round"/>
+    </g>
+    
+    <!-- K (Standard) -->
+    <text x="285" y="0" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="80" 
+          font-weight="900" 
+          fill="#ffffff" 
+          letter-spacing="-2.5">
+      K
+    </text>
+    
+    <!-- FINED (Gradient Accent) -->
+    <text x="365" y="0" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="80" 
+          font-weight="900" 
+          fill="url(#accentGrad)" 
+          letter-spacing="-2.5">
+      FINED
+    </text>
+    
+    <!-- Community Underline (Connected Dots = Community) -->
+    <g id="community-accent" transform="translate(0, 35)">
+      <!-- Base Line -->
+      <line x1="0" y1="0" x2="650" y2="0" 
+            stroke="#333333" 
+            stroke-width="2"/>
+      
+      <!-- Connected Dots (Community Network) -->
+      <g opacity="0.8">
+        <!-- Dots -->
+        <circle cx="50" cy="0" r="4" fill="#00ff88"/>
+        <circle cx="150" cy="0" r="4" fill="#00ff88"/>
+        <circle cx="250" cy="0" r="4" fill="#00d4ff"/>
+        <circle cx="350" cy="0" r="4" fill="#00ff88"/>
+        <circle cx="450" cy="0" r="4" fill="#00ff88"/>
+        <circle cx="550" cy="0" r="4" fill="#00d4ff"/>
+        
+        <!-- Connection Lines (Subtle) -->
+        <line x1="50" y1="0" x2="150" y2="0" stroke="#00ff88" stroke-width="1.5" opacity="0.4"/>
+        <line x1="150" y1="0" x2="250" y2="0" stroke="#00ff88" stroke-width="1.5" opacity="0.4"/>
+        <line x1="250" y1="0" x2="350" y2="0" stroke="#00d4ff" stroke-width="1.5" opacity="0.4"/>
+        <line x1="350" y1="0" x2="450" y2="0" stroke="#00ff88" stroke-width="1.5" opacity="0.4"/>
+        <line x1="450" y1="0" x2="550" y2="0" stroke="#00ff88" stroke-width="1.5" opacity="0.4"/>
+      </g>
+      
+      <!-- Subtle Chart Pulse (Project Hint) -->
+      <path d="M 100,-8 L 130,-15 L 160,-5 L 190,-12 L 220,-3" 
+            fill="none" 
+            stroke="#00ff88" 
+            stroke-width="1.5" 
+            opacity="0.3"/>
+      <path d="M 300,-7 L 330,-14 L 360,-6 L 390,-11" 
+            fill="none" 
+            stroke="#00d4ff" 
+            stroke-width="1.5" 
+            opacity="0.3"/>
+    </g>
+    
+    <!-- Tagline (Community Message) -->
+    <text x="0" y="70" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="15" 
+          font-weight="600" 
+          fill="#888888" 
+          letter-spacing="3"
+          style="text-transform: uppercase;">
+      Community-First Trading • Hero's Journey
+    </text>
+  </g>
+  
+  <!-- Compact Version (Name Only, Flexible) -->
+  <g id="compact-flexible" transform="translate(750, 130)">
+    <rect x="-15" y="-20" width="140" height="120" fill="#1a1a1a" rx="8"/>
+    
+    <text x="0" y="10" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="28" 
+          font-weight="900" 
+          fill="#ffffff" 
+          letter-spacing="-1">
+      SPARK
+    </text>
+    <text x="0" y="38" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="28" 
+          font-weight="900" 
+          fill="url(#accentGrad)" 
+          letter-spacing="-1">
+      FINED
+    </text>
+    
+    <!-- Mini community dots -->
+    <g transform="translate(10, 55)">
+      <circle cx="0" cy="0" r="2" fill="#00ff88"/>
+      <circle cx="15" cy="0" r="2" fill="#00ff88"/>
+      <circle cx="30" cy="0" r="2" fill="#00d4ff"/>
+      <circle cx="45" cy="0" r="2" fill="#00ff88"/>
+      <line x1="0" y1="0" x2="45" y2="0" stroke="#00ff88" stroke-width="1" opacity="0.3"/>
+    </g>
+    
+    <text x="60" y="135" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="9" 
+          font-weight="600" 
+          fill="#666666" 
+          text-anchor="middle">
+      COMPACT
+    </text>
+  </g>
+</svg>

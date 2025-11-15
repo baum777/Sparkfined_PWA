@@ -1,0 +1,37 @@
+<svg width="800" height="300" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Concept 1: Brand-Name Focus - Wordmark with Geometric Accent -->
+  
+  <!-- Background (for preview only) -->
+  <rect width="800" height="300" fill="#0a0a0a"/>
+  
+  <!-- Geometric Accent Circle (Brand Identity Mark) -->
+  <circle cx="100" cy="150" r="45" fill="none" stroke="#00d4ff" stroke-width="3"/>
+  <circle cx="100" cy="150" r="35" fill="none" stroke="#00d4ff" stroke-width="2" opacity="0.6"/>
+  <circle cx="100" cy="150" r="12" fill="#00d4ff"/>
+  
+  <!-- Sparkfined Wordmark - Bold, Modern Typography -->
+  <g id="wordmark" transform="translate(180, 150)">
+    <!-- SPARK (Bold, Primary) -->
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="#ffffff" letter-spacing="-2">
+      SPARK
+    </text>
+    <!-- FINED (Bold, Accent Color) -->
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="#00d4ff" letter-spacing="-2">
+      <tspan x="240" y="0">FINED</tspan>
+    </text>
+    <!-- Tagline (Optional) -->
+    <text x="0" y="35" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="400" fill="#888888" letter-spacing="3">
+      TRADING COMMAND CENTER
+    </text>
+  </g>
+  
+  <!-- Alternative: Icon-only Mark (for favicons) -->
+  <g id="icon-mark" transform="translate(700, 50)">
+    <circle cx="0" cy="0" r="30" fill="none" stroke="#00d4ff" stroke-width="2.5"/>
+    <circle cx="0" cy="0" r="22" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="0" cy="0" r="8" fill="#00d4ff"/>
+    <text x="0" y="55" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#666666" text-anchor="middle">
+      ICON ONLY
+    </text>
+  </g>
+</svg>

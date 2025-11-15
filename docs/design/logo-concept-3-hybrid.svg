@@ -1,0 +1,59 @@
+<svg width="800" height="300" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Concept 3: Hybrid Mix (70% Brand / 30% Project) -->
+  
+  <!-- Background (for preview only) -->
+  <rect width="800" height="300" fill="#0a0a0a"/>
+  
+  <!-- Primary: Brand Name with Modified Letter -->
+  <g id="hybrid-wordmark" transform="translate(100, 150)">
+    <!-- SPARK (Standard) -->
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="68" font-weight="700" fill="#ffffff" letter-spacing="-1.5">
+      SPA
+    </text>
+    
+    <!-- R - Modified with Chart Integration (Project Hint) -->
+    <g transform="translate(185, -48)">
+      <!-- R letter base -->
+      <path d="M 0,0 L 0,68 M 0,0 L 25,0 Q 35,0 35,15 Q 35,30 25,30 L 0,30 M 25,30 L 40,68" 
+            fill="none" stroke="#00d4ff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Integrated mini chart in R -->
+      <path d="M 5,15 L 12,22 L 18,12 L 25,20" 
+            fill="none" stroke="#00ff88" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+    </g>
+    
+    <!-- K (Standard) -->
+    <text x="240" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="68" font-weight="700" fill="#ffffff" letter-spacing="-1.5">
+      K
+    </text>
+    
+    <!-- FINED (Accent Color) -->
+    <text x="305" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="68" font-weight="700" fill="#00d4ff" letter-spacing="-1.5">
+      FINED
+    </text>
+    
+    <!-- Subtle Underline with Data Visualization Pattern -->
+    <g transform="translate(0, 15)">
+      <line x1="0" y1="0" x2="550" y2="0" stroke="#00d4ff" stroke-width="2" opacity="0.3"/>
+      <!-- Subtle pulse pattern -->
+      <path d="M 50,0 L 80,-8 L 110,5 L 140,-5 L 170,3 L 200,-3" 
+            fill="none" stroke="#00ff88" stroke-width="1.5" opacity="0.5"/>
+      <path d="M 250,0 L 280,-6 L 310,4 L 340,-4 L 370,2 L 400,-2" 
+            fill="none" stroke="#00ff88" stroke-width="1.5" opacity="0.5"/>
+    </g>
+    
+    <!-- Tagline -->
+    <text x="0" y="35" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="500" fill="#888888" letter-spacing="2.5">
+      AI-POWERED TRADING ANALYTICS
+    </text>
+  </g>
+  
+  <!-- Compact Version (Name Only, for small spaces) -->
+  <g id="compact-version" transform="translate(620, 150)">
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="700" fill="#ffffff" letter-spacing="-1">
+      SPARK
+    </text>
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="700" fill="#00d4ff" letter-spacing="-1">
+      <tspan x="0" y="30">FINED</tspan>
+    </text>
+  </g>
+</svg>

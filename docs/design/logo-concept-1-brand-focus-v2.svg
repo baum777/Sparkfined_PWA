@@ -1,0 +1,98 @@
+<svg width="900" height="350" viewBox="0 0 900 350" xmlns="http://www.w3.org/2000/svg">
+  <!-- CONCEPT 1: Brand-Name Focus - WAGMI Energy, Bold & Confident -->
+  
+  <!-- Dark Background (Crypto-Native Dark Mode) -->
+  <rect width="900" height="350" fill="#0d0d0d"/>
+  
+  <!-- Main Wordmark: SPARKFINED (Bold, Impactful Typography) -->
+  <g id="primary-wordmark" transform="translate(80, 175)">
+    <!-- SPARK (Electric Green - "Gains" color) -->
+    <text x="0" y="0" 
+          font-family="system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif" 
+          font-size="85" 
+          font-weight="900" 
+          fill="#00ff88" 
+          letter-spacing="-3"
+          style="text-transform: uppercase;">
+      SPARK
+    </text>
+    
+    <!-- FINED (White - Clean, Strong) -->
+    <text x="325" y="0" 
+          font-family="system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif" 
+          font-size="85" 
+          font-weight="900" 
+          fill="#ffffff" 
+          letter-spacing="-3"
+          style="text-transform: uppercase;">
+      FINED
+    </text>
+    
+    <!-- Subtle "Spark" Energy Lines (Abstract, Not Literal) -->
+    <g transform="translate(-35, -15)" opacity="0.7">
+      <line x1="0" y1="0" x2="20" y2="-25" stroke="#00ff88" stroke-width="3" stroke-linecap="round"/>
+      <line x1="10" y1="0" x2="25" y2="-20" stroke="#00ff88" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="20" y1="0" x2="35" y2="-15" stroke="#00ff88" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+    </g>
+    
+    <!-- Tagline: WAGMI Energy -->
+    <text x="0" y="45" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="16" 
+          font-weight="600" 
+          fill="#888888" 
+          letter-spacing="5"
+          style="text-transform: uppercase;">
+      We're All Gonna Make It
+    </text>
+  </g>
+  
+  <!-- Alternative Layout: Stacked (for vertical spaces) -->
+  <g id="stacked-version" transform="translate(750, 100)">
+    <rect x="-10" y="-15" width="140" height="140" fill="#1a1a1a" rx="8"/>
+    <text x="0" y="20" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="32" 
+          font-weight="900" 
+          fill="#00ff88" 
+          letter-spacing="-1">
+      SPARK
+    </text>
+    <text x="0" y="55" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="32" 
+          font-weight="900" 
+          fill="#ffffff" 
+          letter-spacing="-1">
+      FINED
+    </text>
+    <line x1="0" y1="65" x2="120" y2="65" stroke="#00ff88" stroke-width="2"/>
+    <text x="60" y="160" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="9" 
+          font-weight="600" 
+          fill="#666666" 
+          text-anchor="middle">
+      STACKED
+    </text>
+  </g>
+  
+  <!-- Monochrome Test Version (Bottom) -->
+  <g id="monochrome-test" transform="translate(80, 320)">
+    <text x="0" y="0" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="28" 
+          font-weight="900" 
+          fill="#ffffff" 
+          letter-spacing="-1">
+      SPARKFINED
+    </text>
+    <text x="230" y="0" 
+          font-family="system-ui, -apple-system, sans-serif" 
+          font-size="10" 
+          font-weight="500" 
+          fill="#666666">
+      (Monochrome Version)
+    </text>
+  </g>
+</svg>
