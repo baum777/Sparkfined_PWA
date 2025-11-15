@@ -10,6 +10,7 @@ import PlaybookCard from "../sections/ideas/Playbook";
 import AdvancedInsightCard from "../features/analysis/AdvancedInsightCard";
 import { useAdvancedInsightStore } from "../features/analysis/advancedInsightStore";
 import { generateMockAdvancedInsight, generateMockUnlockedAccess, generateMockLockedAccess } from "../features/analysis/mockAdvancedInsightData";
+import { useAdvancedInsight } from "../hooks/useAdvancedInsight";
 
 export default function AnalyzePage() {
   const [address, setAddress] = React.useState<string>("");
@@ -18,6 +19,7 @@ export default function AnalyzePage() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string| null>(null);
   const advancedInsightStore = useAdvancedInsightStore();
+  const { loading: insightLoading, error: insightError, fetch: fetchAdvancedInsight } = useAdvancedInsight({ autoIngest: true });
 
   const load = async () => {
     if (!address) return;
@@ -147,6 +149,21 @@ export default function AnalyzePage() {
         <button className={btn} onClick={exportJSON} disabled={!data}>Export JSON</button>
         <button className={btn} onClick={exportCSV}  disabled={!data}>Export CSV</button>
         <button 
+          className={btn + " border-blue-700"} 
+          onClick={async ()=> {
+            if (!address || !data) return;
+            await fetchAdvancedInsight({
+              address,
+              timeframe: tf,
+              volume24hUsd: metrics?.volumeSum,
+              candles: data as any,
+            });
+          }}
+          disabled={!data || insightLoading}
+        >
+          {insightLoading ? "⏳ Generating..." : "🚀 Generate Real Insight"}
+        </button>
+        <button 
           className={btn + " border-emerald-700"} 
           onClick={()=> {
             const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
@@ -154,7 +171,7 @@ export default function AnalyzePage() {
           }}
           disabled={!data}
         >
-          🧪 Load Insight (Unlocked)
+          🧪 Mock (Unlocked)
         </button>
         <button 
           className={btn + " border-amber-700"} 
@@ -164,10 +181,11 @@ export default function AnalyzePage() {
           }}
           disabled={!data}
         >
-          🔒 Load Insight (Locked)
+          🔒 Mock (Locked)
         </button>
       </div>
       {error && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
+      {insightError && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">Advanced Insight Error: {insightError}</div>}
 
       {!data && <div className="rounded border border-zinc-800 p-6 text-sm text-zinc-400">Gib eine Contract-Adresse ein und klicke „Analysieren".</div>}
       {data && (
