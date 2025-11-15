@@ -1,0 +1,190 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+  <!-- LOGO USAGE MOCKUPS - Real-World Applications -->
+  
+  <defs>
+    <linearGradient id="mockGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Title -->
+  <text x="600" y="40" font-family="system-ui, sans-serif" font-size="24" font-weight="700" fill="#333333" text-anchor="middle">
+    SPARKFINED LOGO — USAGE MOCKUPS
+  </text>
+  
+  <!-- 1. Website Header Mockup -->
+  <g id="mockup-website-header">
+    <text x="50" y="90" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#666666">
+      1. Website Header (Desktop)
+    </text>
+    <rect x="50" y="100" width="700" height="80" fill="#0d0d0d" rx="4"/>
+    <!-- Concept 3 in Header -->
+    <text x="70" y="145" font-family="system-ui, sans-serif" font-size="32" font-weight="900" fill="#ffffff" letter-spacing="-1">
+      SPARK
+    </text>
+    <text x="185" y="145" font-family="system-ui, sans-serif" font-size="32" font-weight="900" fill="url(#mockGrad1)" letter-spacing="-1">
+      FINED
+    </text>
+    <!-- Nav Items (mockup) -->
+    <text x="420" y="145" font-family="system-ui, sans-serif" font-size="14" font-weight="500" fill="#888888">
+      Market  •  Journal  •  Alerts  •  Board
+    </text>
+  </g>
+  
+  <!-- 2. App Icon Mockup -->
+  <g id="mockup-app-icon">
+    <text x="50" y="220" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#666666">
+      2. PWA App Icon (512x512)
+    </text>
+    <rect x="50" y="230" width="140" height="140" fill="#1a1a1a" rx="28"/>
+    <!-- Concept 2 Simplified -->
+    <g transform="translate(120, 300)">
+      <polygon points="0,-35 10,-20 10,20 6,28 -6,28 -10,20 -10,-20" fill="url(#mockGrad1)"/>
+      <circle cx="0" cy="-10" r="5" fill="#0d0d0d"/>
+      <path d="M -6,28 L 0,42 L 6,28" fill="#ff6600"/>
+      <path d="M -30,25 L -15,10 L 0,18 L 15,5 L 30,-10" 
+            fill="none" stroke="#00ff88" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    </g>
+    <text x="120" y="395" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#999999" text-anchor="middle">
+      Concept 2 (Icon)
+    </text>
+  </g>
+  
+  <!-- 3. Social Media Avatar -->
+  <g id="mockup-social-avatar">
+    <text x="230" y="220" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#666666">
+      3. Twitter/X Avatar (400x400)
+    </text>
+    <circle cx="305" cy="300" r="70" fill="#1a1a1a"/>
+    <!-- Concept 2 Mini -->
+    <g transform="translate(305, 300)">
+      <polygon points="0,-28 8,-16 8,16 5,22 -5,22 -8,16 -8,-16" fill="url(#mockGrad1)"/>
+      <circle cx="0" cy="-8" r="4" fill="#0d0d0d"/>
+      <path d="M -5,22 L 0,32 L 5,22" fill="#ff6600"/>
+      <path d="M -25,18 L -12,8 L 0,12 L 12,3 L 25,-8" 
+            fill="none" stroke="#00ff88" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    </g>
+    <text x="305" y="395" font-family="system-ui, sans-serif" font-size="10" font-weight="600" fill="#999999" text-anchor="middle">
+      Circular Crop
+    </text>
+  </g>
+  
+  <!-- 4. Business Card Mockup -->
+  <g id="mockup-business-card">
+    <text x="420" y="220" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#666666">
+      4. Business Card (85x55mm)
+    </text>
+    <rect x="420" y="230" width="320" height="200" fill="#0d0d0d" rx="8"/>
+    <!-- Front -->
+    <text x="440" y="270" font-family="system-ui, sans-serif" font-size="36" font-weight="900" fill="#00ff88" letter-spacing="-1.5">
+      SPARK
+    </text>
+    <text x="590" y="270" font-family="system-ui, sans-serif" font-size="36" font-weight="900" fill="#ffffff" letter-spacing="-1.5">
+      FINED
+    </text>
+    <line x1="440" y1="285" x2="720" y2="285" stroke="#00ff88" stroke-width="1" opacity="0.3"/>
+    <text x="440" y="310" font-family="system-ui, sans-serif" font-size="11" font-weight="500" fill="#888888" letter-spacing="1">
+      MEME TOKEN TRADING
+    </text>
+    <text x="440" y="380" font-family="system-ui, sans-serif" font-size="10" font-weight="400" fill="#666666">
+      hello@sparkfined.app
+    </text>
+    <text x="440" y="400" font-family="system-ui, sans-serif" font-size="10" font-weight="400" fill="#666666">
+      @sparkfined
+    </text>
+  </g>
+  
+  <!-- 5. Loading Screen Mockup -->
+  <g id="mockup-loading-screen">
+    <text x="50" y="460" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#666666">
+      5. Loading / Splash Screen (Mobile)
+    </text>
+    <rect x="50" y="470" width="250" height="400" fill="#0d0d0d" rx="20"/>
+    <!-- Centered Logo -->
+    <g transform="translate(175, 620)">
+      <!-- Animated Rocket (static in mockup) -->
+      <polygon points="0,-40 12,-20 12,25 8,32 -8,32 -12,25 -12,-20" fill="url(#mockGrad1)"/>
+      <circle cx="0" cy="-10" r="6" fill="#0d0d0d"/>
+      <circle cx="0" cy="-10" r="4" fill="#00d4ff"/>
+      <path d="M -8,32 L 0,48 L 8,32" fill="#ff6600"/>
+      <path d="M -5,38 L 0,46 L 5,38" fill="#ffdd00"/>
+    </g>
+    <text x="175" y="730" font-family="system-ui, sans-serif" font-size="28" font-weight="900" fill="#ffffff" letter-spacing="-1" text-anchor="middle">
+      SPARKFINED
+    </text>
+    <text x="175" y="755" font-family="system-ui, sans-serif" font-size="11" font-weight="500" fill="#888888" letter-spacing="2" text-anchor="middle">
+      LOADING...
+    </text>
+    <!-- Progress Bar -->
+    <rect x="95" y="770" width="160" height="4" fill="#333333" rx="2"/>
+    <rect x="95" y="770" width="100" height="4" fill="#00ff88" rx="2"/>
+  </g>
+  
+  <!-- 6. Email Signature -->
+  <g id="mockup-email-signature">
+    <text x="330" y="460" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#666666">
+      6. Email Signature
+    </text>
+    <rect x="330" y="470" width="400" height="120" fill="#f9f9f9" rx="4"/>
+    <text x="350" y="510" font-family="system-ui, sans-serif" font-size="24" font-weight="900" fill="#000000" letter-spacing="-1">
+      SPARK
+    </text>
+    <text x="450" y="510" font-family="system-ui, sans-serif" font-size="24" font-weight="900" fill="#00ff88" letter-spacing="-1">
+      FINED
+    </text>
+    <line x1="350" y1="520" x2="700" y2="520" stroke="#cccccc" stroke-width="1"/>
+    <text x="350" y="545" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="#333333">
+      Max Mustermann — Co-Founder
+    </text>
+    <text x="350" y="565" font-family="system-ui, sans-serif" font-size="10" font-weight="400" fill="#666666">
+      max@sparkfined.app • @sparkfined
+    </text>
+  </g>
+  
+  <!-- 7. Favicon (Browser Tab) -->
+  <g id="mockup-favicon">
+    <text x="330" y="620" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#666666">
+      7. Favicon (16x16, 32x32)
+    </text>
+    <rect x="330" y="630" width="400" height="50" fill="#e8e8e8" rx="4"/>
+    <!-- Browser Tab Mockup -->
+    <rect x="345" y="640" width="120" height="32" fill="#ffffff" rx="4"/>
+    <!-- Tiny favicon -->
+    <rect x="352" y="648" width="16" height="16" fill="#00ff88" rx="2"/>
+    <text x="355" y="659" font-family="system-ui, sans-serif" font-size="10" font-weight="900" fill="#ffffff">
+      S
+    </text>
+    <text x="375" y="660" font-family="system-ui, sans-serif" font-size="10" font-weight="400" fill="#333333">
+      Sparkfined
+    </text>
+  </g>
+  
+  <!-- 8. T-Shirt / Merchandise -->
+  <g id="mockup-tshirt">
+    <text x="760" y="460" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#666666">
+      8. Merchandise (T-Shirt)
+    </text>
+    <rect x="760" y="470" width="400" height="400" fill="#1a1a1a" rx="8"/>
+    <!-- Large Chest Logo -->
+    <text x="960" y="610" font-family="system-ui, sans-serif" font-size="56" font-weight="900" fill="#00ff88" letter-spacing="-2" text-anchor="middle">
+      SPARK
+    </text>
+    <text x="960" y="670" font-family="system-ui, sans-serif" font-size="56" font-weight="900" fill="#ffffff" letter-spacing="-2" text-anchor="middle">
+      FINED
+    </text>
+    <text x="960" y="705" font-family="system-ui, sans-serif" font-size="14" font-weight="500" fill="#888888" letter-spacing="3" text-anchor="middle">
+      WE'RE ALL GONNA MAKE IT
+    </text>
+    <!-- Rocket Icon Small -->
+    <g transform="translate(960, 750)">
+      <polygon points="0,-15 5,-8 5,8 3,12 -3,12 -5,8 -5,-8" fill="#00ff88" opacity="0.6"/>
+      <path d="M -3,12 L 0,18 L 3,12" fill="#ff6600" opacity="0.8"/>
+    </g>
+  </g>
+  
+  <!-- Note -->
+  <text x="600" y="890" font-family="system-ui, sans-serif" font-size="12" font-weight="500" fill="#999999" text-anchor="middle">
+    All mockups use recommended concepts for each use-case • See LOGO_DESIGN_DOCUMENTATION.md for details
+  </text>
+</svg>
