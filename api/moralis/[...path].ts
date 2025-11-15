@@ -84,18 +84,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
   }
 
-  try {
-    const upstreamUrl = buildUpstreamUrl(path, base)
-    const headers: Record<string, string> = {
-      'X-API-Key': key,
-      accept: 'application/json',
-    }
+    try {
+      const upstreamUrl = buildUpstreamUrl(path, base)
+      const headers: Record<string, string> = {
+        'X-API-Key': key,
+        accept: 'application/json',
+      }
 
-    if (req.headers['content-type']) {
-      headers['Content-Type'] = req.headers['content-type'] as string
-    }
+      const contentTypeHeader = req.headers['content-type']
+      const headerArray = Array.isArray(contentTypeHeader) ? contentTypeHeader : undefined
+      if (typeof contentTypeHeader === 'string') {
+        headers['Content-Type'] = contentTypeHeader
+      } else if (headerArray?.length) {
+        headers['Content-Type'] = headerArray[0]
+      }
 
-    const body = ['GET', 'HEAD'].includes(method)
+      const body = ['GET', 'HEAD'].includes(method)
       ? undefined
       : typeof req.body === 'string' || req.body instanceof Buffer
         ? req.body

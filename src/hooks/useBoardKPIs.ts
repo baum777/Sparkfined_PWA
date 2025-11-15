@@ -36,8 +36,19 @@ interface UseBoardKPIsOptions {
   enabled?: boolean; // Allow hook to be disabled
 }
 
+export interface BoardKPISummary {
+  totalPnL?: number;
+  pnlChange?: number;
+  winRate?: number;
+  winRateChange?: number;
+  activeAlerts?: number;
+  journalCount?: number;
+  journalChange?: number;
+}
+
 interface UseBoardKPIsReturn {
   data: KPI[] | null;
+  summary: BoardKPISummary | null;
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
@@ -53,6 +64,7 @@ export default function useBoardKPIs({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<number | null>(null);
+  const [summary, setSummary] = useState<BoardKPISummary | null>(null);
   
   const abortControllerRef = useRef<AbortController | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -85,7 +97,8 @@ export default function useBoardKPIs({
         throw new Error('Failed to fetch KPIs');
       }
       
-      setData(result.data);
+        setData(result.data);
+        setSummary(buildSummary(result.data));
       setLastUpdated(result.timestamp);
       setError(null);
     } catch (err: any) {
@@ -135,12 +148,51 @@ export default function useBoardKPIs({
   }, []);
   
   return {
-    data,
+      data,
+      summary,
     loading,
     error,
     refresh: fetchKPIs,
     lastUpdated,
   };
+}
+
+function buildSummary(kpis: KPI[]): BoardKPISummary {
+  if (!kpis.length) {
+    return {};
+  }
+
+  const byId = new Map(kpis.map((kpi) => [kpi.id, kpi]));
+
+  const pnl = byId.get('pnl-today');
+  const winRate = byId.get('win-rate');
+  const alerts = byId.get('active-alerts');
+  const journal = byId.get('journal-entries');
+
+  return {
+    totalPnL: toNumber(pnl?.value),
+    pnlChange: toNumber(pnl?.trend),
+    winRate: toNumber(winRate?.value),
+    winRateChange: toNumber(winRate?.trend),
+    activeAlerts: toNumber(alerts?.value),
+    journalCount: toNumber(journal?.value),
+    journalChange: toNumber(journal?.trend),
+  };
+}
+
+function toNumber(input: string | number | undefined): number | undefined {
+  if (typeof input === 'number') {
+    return input;
+  }
+
+  if (typeof input === 'string') {
+    const cleaned = input.replace(/[^\d.-]/g, '');
+    if (!cleaned) return undefined;
+    const parsed = Number(cleaned);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+
+  return undefined;
 }
 
 /**

@@ -16,16 +16,23 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Search, Star, Maximize2, Plus, Bell, FileText, Share2 } from 'lucide-react';
 
+type IndicatorStatus = 'bullish' | 'bearish' | 'neutral';
+type Indicator = {
+  name: string;
+  value: string;
+  status: IndicatorStatus;
+};
+
 export default function ChartPageV2() {
   const [selectedToken, setSelectedToken] = useState('SOL');
   const [selectedTimeframe, setSelectedTimeframe] = useState('1h');
   const [activeIndicators] = useState(['RSI', 'MACD']);
 
   const timeframes = ['1m', '5m', '15m', '1h', '4h', '1d', '1w'];
-  const indicators = [
-    { name: 'RSI', value: '65', status: 'neutral' as const },
-    { name: 'MACD', value: 'Bullish', status: 'bullish' as const },
-    { name: 'EMA(20)', value: '$148.50', status: 'bullish' as const },
+  const indicators: Indicator[] = [
+    { name: 'RSI', value: '65', status: 'neutral' },
+    { name: 'MACD', value: 'Bullish', status: 'bullish' },
+    { name: 'EMA(20)', value: '$148.50', status: 'bullish' },
   ];
 
   const metrics = [

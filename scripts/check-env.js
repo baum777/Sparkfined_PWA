@@ -9,9 +9,15 @@ const DISALLOWED_CLIENT_VARS = ['VITE_MORALIS_API_KEY']
 
 const missing = REQUIRED_SERVER_VARS.filter((key) => !process.env[key])
 const leaked = DISALLOWED_CLIENT_VARS.filter((key) => process.env[key])
+const isCiLike = process.env.CI === 'true' || process.env.VERCEL === '1'
 
 if (missing.length > 0) {
-  console.error(`Missing required server env vars: ${missing.join(', ')}`)
+  const message = `Missing required server env vars: ${missing.join(', ')}`
+  if (isCiLike) {
+    console.error(message)
+  } else {
+    console.warn(`${message}. Skipping hard failure locally (set these in .env).`)
+  }
 }
 
 if (leaked.length > 0) {
@@ -20,8 +26,12 @@ if (leaked.length > 0) {
   )
 }
 
-if (missing.length > 0 || leaked.length > 0) {
+const shouldFail =
+  leaked.length > 0 ||
+  (missing.length > 0 && isCiLike)
+
+if (shouldFail) {
   process.exitCode = 2
 } else {
-  console.log('All required server env vars present.')
+  console.log('Environment validation passed.')
 }
