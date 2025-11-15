@@ -20,6 +20,11 @@ export interface OCRResult {
     bollinger?: 'upper' | 'middle' | 'lower'
     ema?: number[]
     sma?: number[]
+    macd?: {
+      value: number
+      signal: number
+      histogram: number
+    }
     volume?: string
     price?: number
   }
@@ -102,6 +107,8 @@ export interface HeuristicAnalysis {
   rsiOverbought?: boolean
   rsiOversold?: boolean
   bollingerBandStatus?: 'upper' | 'lower' | 'middle' | 'neutral'
+  macdSignal?: 'bullish' | 'bearish' | 'neutral'
+  macdCrossover?: 'bullish_crossover' | 'bearish_crossover' | 'none'
   
   // Metadata
   confidence: number // 0-1 score

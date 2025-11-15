@@ -92,12 +92,18 @@ export function signalMatrix(data:Ohlc[]){
   const closes = data.map(d=>d.c);
   const vwaps = vwapVec(data);
   const windows = [9,20,50,200] as const;
+  
+  // Calculate MACD
+  const macdData = macdVec(data);
+  const macdSig = macdSignalVec(macdData);
+  
   const rows = [
     { id:"SMA", values: windows.map(w => vecSignal(closes, smaVec(closes, w))) },
     { id:"EMA", values: windows.map(w => vecSignal(closes, emaVec(closes, w))) },
     { id:"VWAP", values: [vecSignal(closes, vwaps)] },
+    { id:"MACD", values: [macdSig] },
   ];
-  return { rows, windows };
+  return { rows, windows, macd: macdData };
 }
 
 // simple vwap per-bar cumulative
@@ -134,4 +140,95 @@ export function sliceByTime<T extends {t:number}>(arr:T[], periodMs:number): T[]
   let i = arr.length-1;
   while (i>0 && arr[i]?.t && arr[i]!.t >= startTs) i--;
   return arr.slice(Math.max(0,i), arr.length);
+}
+
+// ============================================================================
+// MACD Implementation
+// ============================================================================
+
+export interface MacdData {
+  macd: (number|undefined)[];
+  signal: (number|undefined)[];
+  histogram: (number|undefined)[];
+}
+
+/**
+ * Calculate MACD from OHLC data
+ * MACD = EMA(12) - EMA(26)
+ * Signal = EMA(9) of MACD
+ * Histogram = MACD - Signal
+ */
+export function macdVec(data: Ohlc[], fast=12, slow=26, sig=9): MacdData {
+  const closes = data.map(d => d.c);
+  
+  // Calculate fast and slow EMAs
+  const fastEma = emaVec(closes, fast);
+  const slowEma = emaVec(closes, slow);
+  
+  // MACD Line = Fast EMA - Slow EMA
+  const macdLine: (number|undefined)[] = [];
+  for (let i=0; i<closes.length; i++) {
+    const f = fastEma[i];
+    const s = slowEma[i];
+    if (f !== undefined && s !== undefined) {
+      macdLine.push(f - s);
+    } else {
+      macdLine.push(undefined);
+    }
+  }
+  
+  // Signal Line = EMA of MACD
+  const signalLine = emaVec(macdLine.map(v => v ?? 0), sig);
+  
+  // Histogram = MACD - Signal
+  const histogram: (number|undefined)[] = [];
+  for (let i=0; i<macdLine.length; i++) {
+    const m = macdLine[i];
+    const s = signalLine[i];
+    if (m !== undefined && s !== undefined) {
+      histogram.push(m - s);
+    } else {
+      histogram.push(undefined);
+    }
+  }
+  
+  return { macd: macdLine, signal: signalLine, histogram };
+}
+
+/**
+ * Get MACD signal from last bar
+ * Returns: +1 (bullish), -1 (bearish), 0 (neutral)
+ * 
+ * Bullish: MACD > Signal or bullish crossover
+ * Bearish: MACD < Signal or bearish crossover
+ */
+export function macdSignalVec(macdData: MacdData): number {
+  const len = macdData.macd.length;
+  if (len < 2) return 0;
+  
+  const currMacd = macdData.macd[len-1];
+  const currSignal = macdData.signal[len-1];
+  const prevMacd = macdData.macd[len-2];
+  const prevSignal = macdData.signal[len-2];
+  
+  if (currMacd === undefined || currSignal === undefined) return 0;
+  if (prevMacd === undefined || prevSignal === undefined) return 0;
+  
+  // Detect crossovers (stronger signal)
+  const wasBelowSignal = prevMacd <= prevSignal;
+  const isAboveSignal = currMacd > currSignal;
+  const wasAboveSignal = prevMacd >= prevSignal;
+  const isBelowSignal = currMacd < currSignal;
+  
+  // Bullish crossover
+  if (wasBelowSignal && isAboveSignal) return +1;
+  
+  // Bearish crossover
+  if (wasAboveSignal && isBelowSignal) return -1;
+  
+  // No crossover, just check current position
+  if (currMacd > currSignal) return +1;
+  if (currMacd < currSignal) return -1;
+  
+  return 0;
 }
