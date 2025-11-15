@@ -1,6 +1,6 @@
 import { renderPrompt } from "../promptLoader.js";
 import { withExponentialBackoff } from "../retry.js";
-import { BulletAnalysis, FetchLike, MarketPayload, RetryOptions } from "../types.js";
+import type { BulletAnalysis, FetchLike, MarketPayload, RetryOptions } from "@/types/ai";
 
 export interface OpenAIClientConfig {
   apiKey?: string;

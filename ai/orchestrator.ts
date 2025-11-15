@@ -2,14 +2,17 @@ import { appendFile, mkdir } from "fs/promises";
 import path from "path";
 import { OpenAIClient } from "./model_clients/openai_client.js";
 import { GrokClient } from "./model_clients/grok_client.js";
-import {
+import type {
   MarketPayload,
   OrchestratorResult,
   Provider,
   SocialAnalysis,
   SocialPost,
   TelemetryEvent,
-} from "./types.js";
+} from "@/types/ai";
+import { sanityCheck } from "@/lib/ai/heuristics";
+
+export const SANITY_WARNING = "sanity_check adjusted AI bullets";
 
 export interface OrchestratorOptions {
   openaiClient?: OpenAIClient;
@@ -62,7 +65,20 @@ export class AIOrchestrator {
 
     const startOpenAi = this.now();
     const marketAnalysis = await this.openai.analyzeMarket(normalized);
-    validateBulletResponse(marketAnalysis);
+    const initialBullets = Array.isArray(marketAnalysis.bullets) ? marketAnalysis.bullets : [];
+    marketAnalysis.bullets = initialBullets;
+    if (marketAnalysis.bullets.length > 0) {
+      validateBulletResponse(marketAnalysis);
+    } else {
+      marketAnalysis.bullets = [];
+    }
+    const validatedBullets = [...marketAnalysis.bullets];
+    const sanityResult = sanityCheck(validatedBullets, normalized);
+    const sanitizedBullets = Array.isArray(sanityResult) ? sanityResult : validatedBullets;
+    if (bulletsChanged(validatedBullets, sanitizedBullets)) {
+      warnings.push(SANITY_WARNING);
+    }
+    marketAnalysis.bullets = sanitizedBullets;
     usedProviders.push("openai");
     telemetryEvents.push({
       timestamp: new Date().toISOString(),
@@ -181,4 +197,11 @@ export function mergeJournalFields(result: OrchestratorResult) {
 
 function estimateCostUsd(events: TelemetryEvent[]): number {
   return events.reduce((acc, event) => acc + (event.costUsd ?? 0), 0);
+}
+
+function bulletsChanged(original: string[], sanitized: string[]): boolean {
+  if (original.length !== sanitized.length) {
+    return true;
+  }
+  return original.some((bullet, index) => bullet !== sanitized[index]);
 }
