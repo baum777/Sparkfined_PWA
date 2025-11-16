@@ -5,7 +5,7 @@
  * Beta v0.9: Core UI with token-lock overlay and user overrides
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   useAdvancedInsightStore,
   useAdvancedInsightData,
@@ -48,8 +48,6 @@ export default function AdvancedInsightCard() {
   const telemetry = useAdvancedInsightTelemetry();
   const sourcePayload = useAdvancedInsightStore((state) => state.sourcePayload);
 
-  const [previousTab, setPreviousTab] = useState<TabId>(activeTab);
-
   // Track opened event on mount
   useEffect(() => {
     if (sections) {
@@ -63,7 +61,6 @@ export default function AdvancedInsightCard() {
   const handleTabChange = (newTab: TabId) => {
     if (newTab !== activeTab) {
       telemetry.trackTabSwitched(activeTab, newTab);
-      setPreviousTab(activeTab);
       setActiveTab(newTab);
     }
   };
@@ -119,57 +116,73 @@ export default function AdvancedInsightCard() {
             )}
           </div>
           
-          {overridesCount > 0 && (
-            <button
-              onClick={handleResetAll}
-              className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
-            >
-              Reset All
-            </button>
+            {overridesCount > 0 && (
+              <button
+                type="button"
+                onClick={handleResetAll}
+                aria-label="Reset all Advanced Insight overrides"
+                className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+              >
+                Reset All
+              </button>
+            )}
+        </div>
+      </div>
+        {/* Tabs */}
+        <div className="border-b border-zinc-800 px-4">
+          <div
+            className="flex gap-1"
+            role="tablist"
+            aria-label="Advanced Insight sections"
+          >
+            {tabs
+              .filter((tab) => !tab.hidden)
+              .map((tab) => (
+                <button
+                  key={tab.id}
+                  id={`advanced-insight-tab-${tab.id}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
+                  aria-controls="advanced-insight-panel"
+                  tabIndex={activeTab === tab.id ? 0 : -1}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`
+                    px-3 py-2 text-xs font-medium transition-colors
+                    border-b-2 -mb-px
+                    ${
+                      activeTab === tab.id
+                        ? 'border-emerald-500 text-emerald-300'
+                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                    }
+                  `}
+                >
+                  {tab.label}
+                </button>
+              ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <div
+          className="p-4"
+          role="tabpanel"
+          id="advanced-insight-panel"
+          aria-labelledby={`advanced-insight-tab-${activeTab}`}
+        >
+          {activeTab === 'market_structure' && (
+            <MarketStructureTab data={sections.market_structure} />
+          )}
+          {activeTab === 'flow_volume' && (
+            <FlowVolumeTab data={sections.flow_volume} />
+          )}
+          {activeTab === 'playbook' && (
+            <PlaybookTab data={sections.playbook} />
+          )}
+          {activeTab === 'macro' && (
+            <MacroTab data={sections.macro} />
           )}
         </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="border-b border-zinc-800 px-4">
-        <div className="flex gap-1">
-          {tabs
-            .filter((tab) => !tab.hidden)
-            .map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`
-                  px-3 py-2 text-xs font-medium transition-colors
-                  border-b-2 -mb-px
-                  ${
-                    activeTab === tab.id
-                      ? 'border-emerald-500 text-emerald-300'
-                      : 'border-transparent text-zinc-400 hover:text-zinc-200'
-                  }
-                `}
-              >
-                {tab.label}
-              </button>
-            ))}
-        </div>
-      </div>
-
-      {/* Tab Content */}
-      <div className="p-4">
-        {activeTab === 'market_structure' && (
-          <MarketStructureTab data={sections.market_structure} />
-        )}
-        {activeTab === 'flow_volume' && (
-          <FlowVolumeTab data={sections.flow_volume} />
-        )}
-        {activeTab === 'playbook' && (
-          <PlaybookTab data={sections.playbook} />
-        )}
-        {activeTab === 'macro' && (
-          <MacroTab data={sections.macro} />
-        )}
-      </div>
     </div>
   );
 }
@@ -184,19 +197,38 @@ interface TokenLockOverlayProps {
 }
 
 function TokenLockOverlay({ access, onUnlockClick }: TokenLockOverlayProps) {
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const titleId = 'advanced-insight-lock-title';
+  const descriptionId = 'advanced-insight-lock-description';
+
+  useEffect(() => {
+    overlayRef.current?.focus();
+  }, []);
+
+  const reasonText = access?.reason || 'This feature requires NFT-based access.';
+
   return (
     <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="max-w-sm rounded-lg border border-zinc-700 bg-zinc-900 p-6 text-center">
+      <div
+        ref={overlayRef}
+        className="max-w-sm rounded-lg border border-zinc-700 bg-zinc-900 p-6 text-center focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+        tabIndex={-1}
+      >
         <div className="mb-3 text-3xl">🔒</div>
-        <h4 className="mb-2 text-sm font-medium text-zinc-200">
+        <h4 id={titleId} className="mb-2 text-sm font-medium text-zinc-200">
           Advanced Insight Locked
         </h4>
-        <p className="mb-4 text-xs text-zinc-400">
-          {access?.reason || 'This feature requires NFT-based access.'}
+        <p id={descriptionId} className="mb-4 text-xs text-zinc-400">
+          {reasonText}
         </p>
         <a
           href="/access"
           onClick={onUnlockClick}
+          aria-label="Unlock advanced insight access"
           className="inline-block rounded bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700 transition-colors"
         >
           Unlock Access
@@ -229,6 +261,8 @@ function MarketStructureTab({ data }: MarketStructureTabProps) {
       <FieldGroup
         label="Range Structure"
         field={data.range}
+        editLabel="Edit range structure"
+        resetLabel="Reset range structure overrides"
         onEdit={(newValue) => {
           overrideField('market_structure', 'range', newValue);
           telemetry.trackFieldOverridden('market_structure', 'range', data.range.is_overridden);
@@ -237,6 +271,9 @@ function MarketStructureTab({ data }: MarketStructureTabProps) {
           resetField('market_structure', 'range');
           telemetry.trackReset('market_structure', 'range');
         }}
+        renderEditor={({ value, onSubmit, onCancel }) => (
+          <RangeEditor initialValue={value} onSubmit={onSubmit} onCancel={onCancel} />
+        )}
         renderValue={(range) => (
           <div className="grid grid-cols-3 gap-2 text-xs">
             <div>
@@ -420,6 +457,8 @@ function PlaybookTab({ data }: PlaybookTabProps) {
       <FieldGroup
         label="Tactical Entries"
         field={data.entries}
+        editLabel="Edit playbook entries"
+        resetLabel="Reset playbook overrides"
         onEdit={(newValue) => {
           overrideField('playbook', 'entries', newValue);
           telemetry.trackFieldOverridden('playbook', 'entries', data.entries.is_overridden);
@@ -428,6 +467,13 @@ function PlaybookTab({ data }: PlaybookTabProps) {
           resetField('playbook', 'entries');
           telemetry.trackReset('playbook', 'entries');
         }}
+        renderEditor={({ value, onSubmit, onCancel }) => (
+          <PlaybookEntriesEditor
+            initialValue={value}
+            onSubmit={onSubmit}
+            onCancel={onCancel}
+          />
+        )}
         renderValue={(entries) => (
           <div className="space-y-2">
             {entries.length === 0 ? (
@@ -496,12 +542,21 @@ function MacroTab({ data }: MacroTabProps) {
 // Field Group Component
 // ============================================================================
 
+interface FieldEditorRenderProps<T> {
+  value: T;
+  onSubmit: (value: T) => void;
+  onCancel: () => void;
+}
+
 interface FieldGroupProps<T> {
   label: string;
   field: EditableField<T>;
   onEdit: (value: T) => void;
   onReset: () => void;
   renderValue: (value: T) => React.ReactNode;
+  renderEditor?: (props: FieldEditorRenderProps<T>) => React.ReactNode;
+  editLabel?: string;
+  resetLabel?: string;
 }
 
 function FieldGroup<T>({
@@ -510,10 +565,31 @@ function FieldGroup<T>({
   onEdit,
   onReset,
   renderValue,
+  renderEditor,
+  editLabel,
+  resetLabel,
 }: FieldGroupProps<T>) {
   const value = field.is_overridden && field.user_value !== undefined
     ? field.user_value
     : field.auto_value;
+  const [isEditing, setIsEditing] = useState(false);
+  const isEditable = Boolean(renderEditor);
+  const editButtonLabel = editLabel ?? `Edit ${label}`;
+  const resetButtonLabel = resetLabel ?? `Reset ${label}`;
+
+  const handleEditStart = () => {
+    if (!isEditable) return;
+    setIsEditing(true);
+  };
+
+  const handleEditSubmit = (nextValue: T) => {
+    onEdit(nextValue);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
 
   return (
     <div className="rounded border border-zinc-800 bg-zinc-900/60 p-3">
@@ -527,25 +603,232 @@ function FieldGroup<T>({
           )}
         </div>
         <div className="flex items-center gap-1">
-          {/* Edit button - simplified for Beta, opens inline edit in future */}
-          <button
-            className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-            title="Edit (inline edit coming soon)"
-          >
-            ✏️
-          </button>
+          {isEditable && (
+            <button
+              type="button"
+              onClick={handleEditStart}
+              aria-label={editButtonLabel}
+              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+            >
+              ✏️
+            </button>
+          )}
           {field.is_overridden && (
             <button
+              type="button"
               onClick={onReset}
+              aria-label={resetButtonLabel}
               className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
-              title="Reset to auto value"
             >
               ↺
             </button>
           )}
         </div>
       </div>
-      <div>{renderValue(value)}</div>
+      <div>
+        {isEditing && renderEditor ? (
+          <div className="space-y-2">
+            {renderEditor({
+              value,
+              onSubmit: handleEditSubmit,
+              onCancel: handleCancel,
+            })}
+          </div>
+        ) : (
+          renderValue(value)
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Inline Editors
+// ============================================================================
+
+interface RangeEditorProps {
+  initialValue: RangeStructure;
+  onSubmit: (value: RangeStructure) => void;
+  onCancel: () => void;
+}
+
+function rangeToDraft(value: RangeStructure) {
+  return {
+    window_hours: value.window_hours.toString(),
+    low: value.low.toString(),
+    mid: value.mid.toString(),
+    high: value.high.toString(),
+  };
+}
+
+function RangeEditor({ initialValue, onSubmit, onCancel }: RangeEditorProps) {
+  const [draft, setDraft] = useState(rangeToDraft(initialValue));
+
+  useEffect(() => {
+    setDraft(rangeToDraft(initialValue));
+  }, [initialValue]);
+
+  const handleInputChange =
+    (key: keyof typeof draft) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setDraft((prev) => ({ ...prev, [key]: event.target.value }));
+    };
+
+  const parsedRange = {
+    window_hours: Number(draft.window_hours),
+    low: Number(draft.low),
+    mid: Number(draft.mid),
+    high: Number(draft.high),
+  };
+
+  const hasValues =
+    draft.window_hours.trim().length > 0 &&
+    draft.low.trim().length > 0 &&
+    draft.mid.trim().length > 0 &&
+    draft.high.trim().length > 0;
+
+  const isValid = hasValues && Object.values(parsedRange).every((value) => Number.isFinite(value));
+
+  const handleSave = () => {
+    if (!isValid) return;
+    onSubmit({
+      window_hours: parsedRange.window_hours,
+      low: parsedRange.low,
+      mid: parsedRange.mid,
+      high: parsedRange.high,
+    });
+  };
+
+  const handleCancel = () => {
+    setDraft(rangeToDraft(initialValue));
+    onCancel();
+  };
+
+  const inputClass =
+    'rounded border border-zinc-700 bg-black/40 px-2 py-1 text-xs text-zinc-100 focus:border-emerald-600 focus:outline-none';
+
+  return (
+    <div className="space-y-3 text-xs">
+      <div className="grid grid-cols-2 gap-3">
+        <label className="flex flex-col gap-1 text-[11px] text-zinc-400">
+          Window (hours)
+          <input
+            type="number"
+            aria-label="Range window in hours"
+            className={inputClass}
+            value={draft.window_hours}
+            onChange={handleInputChange('window_hours')}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-[11px] text-zinc-400">
+          Low
+          <input
+            type="number"
+            aria-label="Range low price"
+            className={inputClass}
+            value={draft.low}
+            onChange={handleInputChange('low')}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-[11px] text-zinc-400">
+          Mid
+          <input
+            type="number"
+            aria-label="Range mid price"
+            className={inputClass}
+            value={draft.mid}
+            onChange={handleInputChange('mid')}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-[11px] text-zinc-400">
+          High
+          <input
+            type="number"
+            aria-label="Range high price"
+            className={inputClass}
+            value={draft.high}
+            onChange={handleInputChange('high')}
+          />
+        </label>
+      </div>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={!isValid}
+          className="rounded bg-emerald-600 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-500 disabled:bg-emerald-900/40 disabled:text-emerald-200/40"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="rounded border border-zinc-700 px-3 py-1 text-xs text-zinc-200 hover:bg-zinc-800"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+interface PlaybookEntriesEditorProps {
+  initialValue: string[];
+  onSubmit: (value: string[]) => void;
+  onCancel: () => void;
+}
+
+function PlaybookEntriesEditor({
+  initialValue,
+  onSubmit,
+  onCancel,
+}: PlaybookEntriesEditorProps) {
+  const [draft, setDraft] = useState(initialValue.join('\n'));
+
+  useEffect(() => {
+    setDraft(initialValue.join('\n'));
+  }, [initialValue]);
+
+  const normalizedEntries = draft
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+  const handleSave = () => {
+    onSubmit(normalizedEntries);
+  };
+
+  const handleCancel = () => {
+    setDraft(initialValue.join('\n'));
+    onCancel();
+  };
+
+  return (
+    <div className="space-y-2">
+      <textarea
+        aria-label="Edit tactical playbook entries"
+        className="h-32 w-full rounded border border-zinc-700 bg-black/40 px-3 py-2 text-xs text-zinc-100 focus:border-emerald-600 focus:outline-none"
+        placeholder="If price breaks above $45 -> target $50"
+        value={draft}
+        onChange={(event) => setDraft(event.target.value)}
+      />
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={normalizedEntries.length === 0}
+          className="rounded bg-emerald-600 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-500 disabled:bg-emerald-900/40 disabled:text-emerald-200/40"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="rounded border border-zinc-700 px-3 py-1 text-xs text-zinc-200 hover:bg-zinc-800"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   );
 }

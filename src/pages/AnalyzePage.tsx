@@ -15,6 +15,9 @@ import { useAdvancedInsight } from "../hooks/useAdvancedInsight";
 // Beta v0.9: Dev toggle for mock data (hidden in production)
 const SHOW_MOCK_BUTTONS = process.env.NODE_ENV !== "production";
 
+const SHOW_ADVANCED_INSIGHT_DEV_CONTROLS =
+  process.env.NODE_ENV !== "production";
+
 export default function AnalyzePage() {
   const [address, setAddress] = React.useState<string>("");
   const [tf, setTf] = React.useState<TF>("15m");
@@ -151,6 +154,33 @@ export default function AnalyzePage() {
         {shortlink && <button className={btn} onClick={()=>navigator.clipboard.writeText(shortlink)}>Copy Shortlink</button>}
         <button className={btn} onClick={exportJSON} disabled={!data}>Export JSON</button>
         <button className={btn} onClick={exportCSV}  disabled={!data}>Export CSV</button>
+          {SHOW_ADVANCED_INSIGHT_DEV_CONTROLS && (
+            <>
+              <button 
+                className={btn + " border-emerald-700"} 
+                onClick={()=> {
+                  const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
+                  advancedInsightStore.ingest(mockData, generateMockUnlockedAccess());
+                }}
+                disabled={!data}
+                title="Dev-only: load unlocked Advanced Insight mock data"
+              >
+                🧪 Load Insight (Unlocked)
+              </button>
+              <button 
+                className={btn + " border-amber-700"} 
+                onClick={()=> {
+                  const mockData = generateMockAdvancedInsight(address || 'SOL', metrics?.lastClose || 45.67);
+                  advancedInsightStore.ingest(mockData, generateMockLockedAccess());
+                }}
+                disabled={!data}
+                title="Dev-only: load locked Advanced Insight mock data"
+              >
+                🔒 Load Insight (Locked)
+              </button>
+            </>
+          )}
+
         <button 
           className={btn + " border-blue-700"} 
           onClick={async ()=> {
