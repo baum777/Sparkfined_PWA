@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { performance } from 'node:perf_hooks'
 import payload from '../../fixtures/teaser-vision-analysis/payload.json'
 
-let currentBaseURL = ''
+const currentBaseURL = ''
 
 vi.mock('openai', () => {
   return {

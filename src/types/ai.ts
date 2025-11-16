@@ -314,7 +314,7 @@ export interface DeepSignalResult {
   text: string;                      // full OpenAI answer
 }
 
-export interface DeepSignalCard extends DeepSignalResult {}
+export type DeepSignalCard = DeepSignalResult;
 
 //
 // === Advanced Insight & Token Gating ===
