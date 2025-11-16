@@ -81,12 +81,41 @@ export function calculateHeuristic(input: HeuristicInput): HeuristicAnalysis {
   // Bollinger Band status from OCR
   const bollingerBandStatus = ocrData?.indicators.bollinger
 
+  // MACD signals from OCR
+  let macdSignal: 'bullish' | 'bearish' | 'neutral' | undefined = undefined
+  let macdCrossover: 'bullish_crossover' | 'bearish_crossover' | 'none' | undefined = undefined
+  
+  if (ocrData?.indicators.macd) {
+    const macdValue = ocrData.indicators.macd.value
+    const macdSignalValue = ocrData.indicators.macd.signal
+    const histogram = ocrData.indicators.macd.histogram
+    
+    // Determine signal based on MACD vs Signal line
+    if (macdValue > macdSignalValue) {
+      macdSignal = 'bullish'
+    } else if (macdValue < macdSignalValue) {
+      macdSignal = 'bearish'
+    } else {
+      macdSignal = 'neutral'
+    }
+    
+    // Detect crossovers based on histogram direction
+    if (histogram > 0 && Math.abs(histogram) < Math.abs(macdValue) * 0.1) {
+      macdCrossover = 'bullish_crossover'
+    } else if (histogram < 0 && Math.abs(histogram) < Math.abs(macdValue) * 0.1) {
+      macdCrossover = 'bearish_crossover'
+    } else {
+      macdCrossover = 'none'
+    }
+  }
+
   // Confidence calculation
   const confidence = calculateConfidence({
     hasOCR: !!ocrData,
     hasHighLow: !!(high24 && low24),
     volatility: volatility24h,
     rsiSignal: rsiOverbought || rsiOversold,
+    macdSignal: !!macdSignal,
   })
 
   // const processingTime = performance.now() - startTime
@@ -107,6 +136,8 @@ export function calculateHeuristic(input: HeuristicInput): HeuristicAnalysis {
     rsiOverbought,
     rsiOversold,
     bollingerBandStatus,
+    macdSignal,
+    macdCrossover,
     confidence,
     timestamp: Date.now(),
     source: 'heuristic',
@@ -202,6 +233,7 @@ function calculateConfidence(factors: {
   hasHighLow: boolean
   volatility: number
   rsiSignal: boolean | undefined
+  macdSignal: boolean
 }): number {
   let confidence = 0.5 // Base confidence
 
@@ -209,6 +241,7 @@ function calculateConfidence(factors: {
   if (factors.hasHighLow) confidence += 0.15
   if (factors.volatility > 5 && factors.volatility < 30) confidence += 0.1 // Good volatility range
   if (factors.rsiSignal) confidence += 0.05
+  if (factors.macdSignal) confidence += 0.05
 
   return Math.min(confidence, 1)
 }
@@ -244,6 +277,12 @@ export function heuristicToTeaser(heuristic: HeuristicAnalysis): AITeaserAnalysi
   if (heuristic.bollingerBandStatus) {
     indicators.push(`Bollinger: ${heuristic.bollingerBandStatus}`)
   }
+  if (heuristic.macdSignal) {
+    indicators.push(`MACD: ${heuristic.macdSignal}`)
+  }
+  if (heuristic.macdCrossover && heuristic.macdCrossover !== 'none') {
+    indicators.push(`MACD Crossover: ${heuristic.macdCrossover.replace('_', ' ')}`)
+  }
   indicators.push(`Volatility: ${heuristic.volatility24h.toFixed(2)}%`)
   indicators.push(`Range: ${heuristic.rangeSize}`)
 
@@ -268,7 +307,7 @@ export function heuristicToTeaser(heuristic: HeuristicAnalysis): AITeaserAnalysi
  * Generate human-readable teaser text from heuristic analysis
  */
 function generateTeaserText(heuristic: HeuristicAnalysis): string {
-  const { bias, volatility24h, rsiOverbought, rsiOversold } = heuristic
+  const { bias, volatility24h, rsiOverbought, rsiOversold, macdSignal, macdCrossover } = heuristic
 
   let text = 'Analysis: '
 
@@ -278,15 +317,28 @@ function generateTeaserText(heuristic: HeuristicAnalysis): string {
     if (rsiOversold) {
       text += 'RSI shows oversold conditions, potential bounce opportunity. '
     }
+    if (macdCrossover === 'bullish_crossover') {
+      text += 'MACD bullish crossover confirms momentum. '
+    } else if (macdSignal === 'bullish') {
+      text += 'MACD supports bullish bias. '
+    }
     text += `Entry zone around ${heuristic.entryZone?.min.toFixed(6)} - ${heuristic.entryZone?.max.toFixed(6)}. `
   } else if (bias === 'Bearish') {
     text += 'Bearish pressure detected. '
     if (rsiOverbought) {
       text += 'RSI shows overbought conditions, potential reversal ahead. '
     }
+    if (macdCrossover === 'bearish_crossover') {
+      text += 'MACD bearish crossover signals weakness. '
+    } else if (macdSignal === 'bearish') {
+      text += 'MACD confirms bearish bias. '
+    }
     text += 'Consider waiting for better entry or short opportunities. '
   } else {
     text += 'Neutral range-bound market. '
+    if (macdSignal) {
+      text += `MACD shows ${macdSignal} tendency. `
+    }
     text += 'Look for breakout confirmation before entering. '
   }
 
