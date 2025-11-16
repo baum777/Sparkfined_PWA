@@ -10,7 +10,7 @@ import PlaybookCard from "../sections/ideas/Playbook";
 import AdvancedInsightCard from "../features/analysis/AdvancedInsightCard";
 import { useAdvancedInsightStore } from "../features/analysis/advancedInsightStore";
 import { generateMockAdvancedInsight, generateMockUnlockedAccess, generateMockLockedAccess } from "../features/analysis/mockAdvancedInsightData";
-import { useAdvancedInsight } from "../hooks/useAdvancedInsight";
+import type { AnalyzeMarketResult } from "@/types/ai";
 
 // Beta v0.9: Dev toggle for mock data (hidden in production)
 const SHOW_MOCK_BUTTONS = process.env.NODE_ENV !== "production";
@@ -25,7 +25,8 @@ export default function AnalyzePage() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string| null>(null);
   const advancedInsightStore = useAdvancedInsightStore();
-  const { loading: insightLoading, error: insightError, fetch: fetchAdvancedInsight } = useAdvancedInsight({ autoIngest: true });
+  const [insightLoading, setInsightLoading] = React.useState(false);
+  const [insightError, setInsightError] = React.useState<string | null>(null);
 
   const load = async () => {
     if (!address) return;
@@ -142,6 +143,48 @@ export default function AnalyzePage() {
   const ctrl = "rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm text-zinc-200";
   const btn  = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
 
+  const handleAdvancedInsight = React.useCallback(async () => {
+    if (!address || !data) return;
+    setInsightLoading(true);
+    setInsightError(null);
+    try {
+      const response = await fetch("/api/ai/analyze-market", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address,
+          timeframe: tf,
+          price: metrics?.lastClose ?? 0,
+          volume24hUsd: metrics?.volumeSum ?? 0,
+          candles: data as any,
+          checkAccess: true,
+        }),
+      });
+
+      const payload: { ok?: boolean; data?: AnalyzeMarketResult | null; error?: string } =
+        await response.json().catch(() => ({}));
+
+      if (!payload?.ok) {
+        const message =
+          payload?.error || `Advanced Insight failed (status ${response.status})`;
+        throw new Error(message);
+      }
+
+      const result = payload.data;
+      if (result?.advanced) {
+        advancedInsightStore.ingest(result.advanced, result.access);
+      }
+    } catch (err: any) {
+      const message = err?.message || "Failed to fetch Advanced Insight data";
+      setInsightError(message);
+      console.error("[AnalyzePage] Advanced Insight error:", err);
+    } finally {
+      setInsightLoading(false);
+    }
+  }, [address, data, tf, metrics, advancedInsightStore]);
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-4 pb-20 md:py-6 md:pb-6">
       <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -181,19 +224,11 @@ export default function AnalyzePage() {
             </>
           )}
 
-        <button 
-          className={btn + " border-blue-700"} 
-          onClick={async ()=> {
-            if (!address || !data) return;
-            await fetchAdvancedInsight({
-              address,
-              timeframe: tf,
-              volume24hUsd: metrics?.volumeSum,
-              candles: data as any,
-            });
-          }}
-          disabled={!data || insightLoading}
-        >
+          <button 
+            className={btn + " border-blue-700"} 
+            onClick={handleAdvancedInsight}
+            disabled={!data || insightLoading}
+          >
           {insightLoading ? "⏳ Generating..." : "🚀 Advanced Insight"}
         </button>
         {SHOW_MOCK_BUTTONS && (
