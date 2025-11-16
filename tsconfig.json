@@ -32,9 +32,11 @@
     "api",
     "tests",
     "ai",
-    "docs/archive/middleware-next-legacy.ts",
     "vite.config.ts",
     "vitest.config.ts",
     "playwright.config.ts"
+  ],
+  "exclude": [
+    "docs/archive"
   ]
 }
