@@ -113,10 +113,10 @@ export class GrokClient {
       const modelAssessment = parsed.posts?.[index];
       const modelBotScore = extractModelBotScore(modelAssessment);
       const combinedScore = mergeBotScores(heuristics.botScore, modelBotScore);
-      const reasons = new Set<string>([
-        ...(heuristics.reason_flags ?? []),
-        ...((modelAssessment?.reason_flags ?? []) as string[]),
-      ]);
+        const reasons = new Set<string>([
+          ...(heuristics.reason_flags ?? []),
+          ...(modelAssessment?.reason_flags ?? []),
+        ]);
 
       return {
         id: post.id,
@@ -165,19 +165,21 @@ export function mergeBotScores(
   heuristicScore?: number,
   modelScore?: number,
 ): number {
-  const hasHeuristic = isFiniteNumber(heuristicScore);
-  const hasModel = isFiniteNumber(modelScore);
+  const heuristic = isFiniteNumber(heuristicScore)
+    ? heuristicScore
+    : undefined;
+  const model = isFiniteNumber(modelScore) ? modelScore : undefined;
 
-  if (hasHeuristic && hasModel) {
-    return clampToUnit(((heuristicScore as number) + (modelScore as number)) / 2);
+  if (heuristic !== undefined && model !== undefined) {
+    return clampToUnit((heuristic + model) / 2);
   }
 
-  if (hasHeuristic) {
-    return clampToUnit(heuristicScore as number);
+  if (heuristic !== undefined) {
+    return clampToUnit(heuristic);
   }
 
-  if (hasModel) {
-    return clampToUnit(modelScore as number);
+  if (model !== undefined) {
+    return clampToUnit(model);
   }
 
   return 0;
