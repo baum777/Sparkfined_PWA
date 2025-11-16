@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, type SpyInstance } from 'vitest';
 
 import {
   trackAdvancedInsightOpened,
@@ -20,8 +20,8 @@ vi.mock('@/state/telemetry', () => ({
 }));
 
 describe('advancedInsightTelemetry', () => {
-  let logSpy: ReturnType<typeof vi.spyOn>;
-  let dispatchSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: SpyInstance<[string, number, Record<string, unknown>?], void>;
+  let dispatchSpy: SpyInstance<[Event], boolean>;
 
   beforeEach(() => {
     enqueueSpy.mockClear();

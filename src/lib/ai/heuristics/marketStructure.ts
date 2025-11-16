@@ -159,6 +159,9 @@ function findSwingHighs(candles: OhlcCandle[]): Array<{ price: number; touches: 
     const prev = candles[i - 1];
     const curr = candles[i];
     const next = candles[i + 1];
+    if (!prev || !curr || !next) {
+      continue;
+    }
     
     // Swing high: current high > both neighbors
     if (curr.h > prev.h && curr.h > next.h) {
@@ -179,6 +182,9 @@ function findSwingLows(candles: OhlcCandle[]): Array<{ price: number; touches: n
     const prev = candles[i - 1];
     const curr = candles[i];
     const next = candles[i + 1];
+    if (!prev || !curr || !next) {
+      continue;
+    }
     
     // Swing low: current low < both neighbors
     if (curr.l < prev.l && curr.l < next.l) {
@@ -234,52 +240,58 @@ export function computePriceZones(
   // Add support zone (entry/reentry)
   if (supports.length > 0) {
     const strongestSupport = supports[0];
-    zones.push({
-      label: 'support',
-      from: strongestSupport.price * (1 - defaultOffset),
-      to: strongestSupport.price * (1 + defaultOffset),
-      source_level: strongestSupport.price,
-      offset_type: 'percent',
-      offset_value: defaultOffset,
-      is_default: true,
-    });
-    
-    // Stop loss below support
-    zones.push({
-      label: 'stop_loss',
-      from: strongestSupport.price * (1 - defaultOffset * 2),
-      to: strongestSupport.price * (1 - defaultOffset),
-      source_level: strongestSupport.price,
-      offset_type: 'percent',
-      offset_value: defaultOffset * 2,
-      is_default: true,
-    });
+    if (strongestSupport) {
+      zones.push({
+        label: 'support',
+        from: strongestSupport.price * (1 - defaultOffset),
+        to: strongestSupport.price * (1 + defaultOffset),
+        source_level: strongestSupport.price,
+        offset_type: 'percent',
+        offset_value: defaultOffset,
+        is_default: true,
+      });
+      
+      // Stop loss below support
+      zones.push({
+        label: 'stop_loss',
+        from: strongestSupport.price * (1 - defaultOffset * 2),
+        to: strongestSupport.price * (1 - defaultOffset),
+        source_level: strongestSupport.price,
+        offset_type: 'percent',
+        offset_value: defaultOffset * 2,
+        is_default: true,
+      });
+    }
   }
   
   // Add resistance zones (targets)
   if (resistances.length > 0) {
     const firstResistance = resistances[0];
-    zones.push({
-      label: 'target_tp1',
-      from: firstResistance.price * (1 - defaultOffset),
-      to: firstResistance.price * (1 + defaultOffset),
-      source_level: firstResistance.price,
-      offset_type: 'percent',
-      offset_value: defaultOffset,
-      is_default: true,
-    });
-    
-    if (resistances.length > 1) {
-      const secondResistance = resistances[1];
+    if (firstResistance) {
       zones.push({
-        label: 'target_tp2',
-        from: secondResistance.price * (1 - defaultOffset),
-        to: secondResistance.price * (1 + defaultOffset),
-        source_level: secondResistance.price,
+        label: 'target_tp1',
+        from: firstResistance.price * (1 - defaultOffset),
+        to: firstResistance.price * (1 + defaultOffset),
+        source_level: firstResistance.price,
         offset_type: 'percent',
         offset_value: defaultOffset,
         is_default: true,
       });
+      
+      if (resistances.length > 1) {
+        const secondResistance = resistances[1];
+        if (secondResistance) {
+          zones.push({
+            label: 'target_tp2',
+            from: secondResistance.price * (1 - defaultOffset),
+            to: secondResistance.price * (1 + defaultOffset),
+            source_level: secondResistance.price,
+            offset_type: 'percent',
+            offset_value: defaultOffset,
+            is_default: true,
+          });
+        }
+      }
     }
   }
   
@@ -371,7 +383,12 @@ function isAscending(values: number[]): boolean {
   
   let upCount = 0;
   for (let i = 1; i < values.length; i++) {
-    if (values[i] > values[i - 1]) upCount++;
+    const prev = values[i - 1];
+    const curr = values[i];
+    if (prev === undefined || curr === undefined) {
+      continue;
+    }
+    if (curr > prev) upCount++;
   }
   
   return upCount >= values.length * 0.6; // 60% threshold
@@ -385,7 +402,12 @@ function isDescending(values: number[]): boolean {
   
   let downCount = 0;
   for (let i = 1; i < values.length; i++) {
-    if (values[i] < values[i - 1]) downCount++;
+    const prev = values[i - 1];
+    const curr = values[i];
+    if (prev === undefined || curr === undefined) {
+      continue;
+    }
+    if (curr < prev) downCount++;
   }
   
   return downCount >= values.length * 0.6; // 60% threshold

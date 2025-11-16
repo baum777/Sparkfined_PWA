@@ -183,12 +183,16 @@ function createFallbackBias(snapshot: MarketSnapshotPayload): BiasReading {
 
   // Simple higher lows / lower highs detection (last 3 candles)
   const recent = candles.slice(-3);
-  const higherLows = recent.length >= 3 && 
-    recent[1].l > recent[0].l && 
-    recent[2].l > recent[1].l;
-  const lowerHighs = recent.length >= 3 && 
-    recent[1].h < recent[0].h && 
-    recent[2].h < recent[1].h;
+  let higherLows = false;
+  let lowerHighs = false;
+
+  if (recent.length >= 3) {
+    const [first, second, third] = recent;
+    if (first && second && third) {
+      higherLows = second.l > first.l && third.l > second.l;
+      lowerHighs = second.h < first.h && third.h < second.h;
+    }
+  }
 
   return {
     bias,

@@ -75,6 +75,10 @@ export function analyzeVolumeProfile(
   for (let i = 1; i < candles.length; i++) {
     const prev = candles[i - 1];
     const curr = candles[i];
+    if (!prev || !curr) {
+      continue;
+    }
+
     const volume = curr.v || 0;
 
     if (curr.c > prev.c) {

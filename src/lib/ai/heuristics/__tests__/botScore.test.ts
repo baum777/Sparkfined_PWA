@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { computeBotScore } from '../botScore';
 import type { BotScorePostPayload } from '@/types/ai';
 
@@ -16,7 +16,7 @@ describe('computeBotScore', () => {
     };
 
     const score = computeBotScore(post);
-    expect(score).toBeLessThan(0.1); // Very low score for verified human
+    expect(score).toBeLessThan(0.1);
   });
 
   test('should return high score for new low-follower API account', () => {
@@ -32,7 +32,7 @@ describe('computeBotScore', () => {
     };
 
     const score = computeBotScore(post);
-    expect(score).toBeGreaterThan(0.8); // High bot score
+    expect(score).toBeGreaterThan(0.8);
   });
 
   test('should handle missing author data gracefully', () => {
@@ -60,14 +60,14 @@ describe('computeBotScore', () => {
     };
 
     const score = computeBotScore(post);
-    expect(score).toBe(1); // Should be clamped to 1, not exceed
+    expect(score).toBe(1);
   });
 
   test('should reduce score for verified account', () => {
     const postUnverified: BotScorePostPayload = {
       author: {
         age_days: 30,
-        followers: 100,
+        followers: 5,
         verified: false,
       },
       post_frequency_per_day: 10,

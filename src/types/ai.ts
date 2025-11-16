@@ -285,7 +285,7 @@ export interface MarketSnapshotPayload {
   macro_tags?: MacroTag[];
   indicator_status?: IndicatorStatus[];
 
-  heuristics_source?: 'local_engine' | 'ocr_screenshot' | 'mixed';
+  heuristics_source?: 'local_engine' | 'ocr_screenshot' | 'mixed' | 'fallback_no_candles';
 }
 
 export interface BulletAnalysis {
@@ -357,7 +357,7 @@ export type AccessTier = 'free' | 'basic' | 'advanced_locked';
 export interface FeatureAccessMeta {
   feature: 'advanced_deep_dive' | 'basic_snapshot' | 'journal_condense' | 'social_analysis';
   tier: AccessTier;
-  token_lock_id?: string;            // on-chain lock account id
+  token_lock_id?: string | null;     // on-chain lock account id
   is_unlocked: boolean;
   reason?: string;                   // for locked state messages
 }

@@ -13,12 +13,13 @@ import type {
   MarketMeta,
   OhlcCandle,
 } from "../../src/types/ai";
+import {
+  enrichMarketSnapshot,
+  generatePlaybookFromSnapshot,
+} from "../../src/lib/ai/enrichMarketSnapshot";
+import { buildAdvancedInsightFromSnapshot } from "../../src/lib/ai/buildAdvancedInsight";
 
-// Import from compiled build (Vercel edge runtime compatibility)
-// Note: These imports will resolve after build
-// For development, ensure proper tsconfig paths
-
-const json = (obj: any, status = 200) =>
+const json = (obj: unknown, status = 200) =>
   new Response(JSON.stringify(obj), {
     status,
     headers: { "content-type": "application/json" },
@@ -27,321 +28,188 @@ const json = (obj: any, status = 200) =>
 interface AnalyzeMarketRequest {
   /** Token contract address or ticker */
   address: string;
-  
+
   /** Timeframe (1m, 5m, 15m, 1h, 4h, 1d) */
   timeframe: string;
-  
+
   /** Current price */
   price?: number;
-  
+
   /** 24h volume in USD */
   volume24hUsd?: number;
-  
+
   /** Market cap in USD */
   marketCapUsd?: number;
-  
+
   /** Liquidity in USD */
   liquidityUsd?: number;
-  
+
   /** OHLC candles (if pre-fetched) */
   candles?: OhlcCandle[];
-  
+
   /** Whether to check access gating */
   checkAccess?: boolean;
 }
 
+const SUPPORTED_TIMEFRAMES = new Set([
+  "1m",
+  "5m",
+  "15m",
+  "1h",
+  "4h",
+  "1d",
+]);
+
 export default async function handler(req: Request) {
   if (req.method !== "POST") {
-    return json({ error: "POST only" }, 405);
+    return json(
+      { ok: false, error: "POST only", code: "METHOD_NOT_ALLOWED" },
+      405
+    );
   }
 
   try {
     const body = (await req.json()) as AnalyzeMarketRequest;
-    const { address, timeframe, price, volume24hUsd, marketCapUsd, liquidityUsd, candles, checkAccess } = body;
+    const address = typeof body.address === "string" ? body.address.trim() : "";
+    const timeframe =
+      typeof body.timeframe === "string" ? body.timeframe.trim() : "";
 
     if (!address || !timeframe) {
-      return json({ error: "address and timeframe required" }, 400);
+      return json(
+        { ok: false, error: "address and timeframe required", code: "MISSING_FIELDS" },
+        400
+      );
     }
 
-    // Fetch OHLC data if not provided
-    let ohlcCandles: OhlcCandle[] = candles || [];
-    
+    if (!SUPPORTED_TIMEFRAMES.has(timeframe)) {
+      return json(
+        { ok: false, error: "Unsupported timeframe", code: "UNSUPPORTED_TIMEFRAME" },
+        422
+      );
+    }
+
+    const volume24hUsd = coerceNumber(body.volume24hUsd);
+    const marketCapUsd = coerceNumber(body.marketCapUsd);
+    const liquidityUsd = coerceNumber(body.liquidityUsd);
+    const checkAccess = Boolean(body.checkAccess);
+
+    const providedCandles = normalizeCandles(body.candles);
+    if (providedCandles === null) {
+      return json(
+        { ok: false, error: "Invalid candles payload", code: "INVALID_CANDLES" },
+        422
+      );
+    }
+
+    let ohlcCandles: OhlcCandle[] = providedCandles;
+
     if (ohlcCandles.length === 0) {
-      // Call OHLC API to get candle data
       const ohlcUrl = new URL("/api/data/ohlc", req.url);
       ohlcUrl.searchParams.set("address", address);
       ohlcUrl.searchParams.set("tf", timeframe);
-      
-      const ohlcRes = await fetch(ohlcUrl.toString());
-      if (ohlcRes.ok) {
-        const ohlcData = await ohlcRes.json();
-        ohlcCandles = ohlcData.candles || [];
-      } else {
-        return json({ error: "Failed to fetch OHLC data" }, 500);
+
+      try {
+        const ohlcRes = await fetch(ohlcUrl.toString());
+        if (!ohlcRes.ok) {
+          return json(
+            {
+              ok: false,
+              error: `Failed to fetch OHLC data (status ${ohlcRes.status})`,
+              code: "UPSTREAM_ERROR",
+            },
+            502
+          );
+        }
+        const ohlcData = await ohlcRes.json().catch(() => ({}));
+        const fetchedCandles = normalizeCandles(ohlcData?.candles);
+        if (fetchedCandles === null) {
+          return json(
+            {
+              ok: false,
+              error: "OHLC provider returned invalid data",
+              code: "UPSTREAM_INVALID",
+            },
+            502
+          );
+        }
+        ohlcCandles = fetchedCandles ?? [];
+      } catch (err) {
+        return json(
+          { ok: false, error: "Failed to fetch OHLC data", code: "UPSTREAM_ERROR" },
+          502
+        );
       }
     }
 
-    if (ohlcCandles.length === 0) {
-      return json({ error: "No candle data available" }, 400);
-    }
-
-    // Build market meta
     const meta: MarketMeta = {
       symbol: `${address}/USDT`,
-      ticker: address.slice(0, 8),
+      ticker: address.slice(0, 8).toUpperCase(),
       timeframe,
       exchange: "DexScreener",
       source: "Sparkfined",
       timestamp: new Date().toISOString(),
     };
 
-    // Build base snapshot
     const baseSnapshot: Partial<MarketSnapshotPayload> = {
       meta,
       candles: ohlcCandles,
       volume_24h_usd: volume24hUsd,
       market_cap_usd: marketCapUsd,
       liquidity_usd: liquidityUsd,
+      heuristics_source: "local_engine",
     };
 
-    // Enrich with heuristics
-    const enrichedSnapshot = await enrichSnapshot(baseSnapshot);
+    let enrichedSnapshot: MarketSnapshotPayload;
 
-    // Generate playbook
-    const playbookEntries = await generatePlaybook(enrichedSnapshot);
+    if (ohlcCandles.length === 0) {
+      enrichedSnapshot = {
+        meta,
+        candles: [],
+        volume_24h_usd: volume24hUsd,
+        market_cap_usd: marketCapUsd,
+        liquidity_usd: liquidityUsd,
+        macro_tags: [],
+        indicator_status: [],
+        heuristics_source: "fallback_no_candles",
+      };
+    } else {
+      enrichedSnapshot = enrichMarketSnapshot(baseSnapshot);
+    }
 
-    // Build Advanced Insight Card
-    const advancedInsight = await buildAdvancedInsight(enrichedSnapshot, playbookEntries);
+    const playbookEntries =
+      ohlcCandles.length === 0
+        ? []
+        : generatePlaybookFromSnapshot(enrichedSnapshot);
 
-    // Check access if requested
+    const advancedInsight = buildAdvancedInsightFromSnapshot(enrichedSnapshot, {
+      playbookEntries,
+    });
+
     let accessMeta = undefined;
     if (checkAccess) {
       accessMeta = await checkAccessGating(req);
     }
 
-    // Build result
     const result: AnalyzeMarketResult = {
-      snapshot: null, // Basic snapshot not implemented yet
-      deep_signal: null, // Deep signal not implemented yet
+      snapshot: null,
+      deep_signal: null,
       advanced: advancedInsight,
       access: accessMeta,
       sanity_flags: [],
     };
 
-    return json(result);
+    return json({ ok: true, data: result });
   } catch (error: any) {
     console.error("[analyze-market] Error:", error);
-    return json({ error: error.message || "Internal server error" }, 500);
-  }
-}
-
-/**
- * Enrich snapshot with heuristics
- * This would normally import from src/lib/ai/enrichMarketSnapshot
- * For edge runtime, we inline the logic
- */
-async function enrichSnapshot(
-  snapshot: Partial<MarketSnapshotPayload>
-): Promise<MarketSnapshotPayload> {
-  const { meta, candles } = snapshot;
-  
-  if (!meta || !candles || candles.length === 0) {
-    throw new Error("Invalid snapshot: missing meta or candles");
-  }
-
-  // Compute range structure
-  const high = Math.max(...candles.map(c => c.h));
-  const low = Math.min(...candles.map(c => c.l));
-  const mid = (high + low) / 2;
-  
-  const rangeStructure = {
-    window_hours: 24,
-    low,
-    high,
-    mid,
-  };
-
-  // Compute bias
-  const lastClose = candles[candles.length - 1]?.c || mid;
-  const aboveMid = lastClose > mid;
-  const percentFromMid = ((lastClose - mid) / mid) * 100;
-  
-  const bias = {
-    bias: (Math.abs(percentFromMid) < 1 ? "neutral" : aboveMid ? "bullish" : "bearish") as any,
-    reason: `Price ${aboveMid ? "above" : "below"} midrange (${percentFromMid.toFixed(1)}%)`,
-    above_midrange: aboveMid,
-    higher_lows: false,
-    lower_highs: false,
-  };
-
-  // Compute key levels (simplified)
-  const keyLevels = [
-    {
-      price: high,
-      type: ["resistance"] as any,
-      label: "24h High",
-      strength: "medium" as any,
-    },
-    {
-      price: low,
-      type: ["support"] as any,
-      label: "24h Low",
-      strength: "medium" as any,
-    },
-  ];
-
-  // Compute zones
-  const zones = [
-    {
-      label: "support" as any,
-      from: low * 0.98,
-      to: low * 1.02,
-      source_level: low,
-      offset_type: "percent" as any,
-      offset_value: 0.02,
-      is_default: true,
-    },
-    {
-      label: "target_tp1" as any,
-      from: high * 0.98,
-      to: high * 1.02,
-      source_level: high,
-      offset_type: "percent" as any,
-      offset_value: 0.02,
-      is_default: true,
-    },
-  ];
-
-  // Flow/volume
-  const flowVolume = {
-    vol_24h_usd: snapshot.volume_24h_usd,
-    vol_24h_delta_pct: undefined,
-    source: meta.source,
-  };
-
-  return {
-    meta,
-    candles,
-    indicators: snapshot.indicators,
-    liquidity_usd: snapshot.liquidity_usd,
-    market_cap_usd: snapshot.market_cap_usd,
-    volume_24h_usd: snapshot.volume_24h_usd,
-    range_structure: rangeStructure,
-    key_levels: keyLevels,
-    zones: zones,
-    bias: bias,
-    flow_volume: flowVolume,
-    macro_tags: [],
-    indicator_status: [],
-    heuristics_source: "local_engine",
-  };
-}
-
-/**
- * Generate playbook from enriched snapshot
- */
-async function generatePlaybook(snapshot: MarketSnapshotPayload): Promise<string[]> {
-  const { range_structure, bias, key_levels, zones } = snapshot;
-  
-  if (!range_structure || !bias) {
-    return [];
-  }
-
-  const currentPrice = snapshot.candles[snapshot.candles.length - 1]?.c || range_structure.mid;
-  const entries: string[] = [];
-
-  // Generate tactical entries based on bias
-  if (bias.bias === "bullish") {
-    entries.push(
-      `If price breaks above $${range_structure.high.toFixed(2)} with volume → target $${(range_structure.high * 1.05).toFixed(2)}`
-    );
-    entries.push(
-      `On pullback to $${range_structure.low.toFixed(2)} → look for long entry with tight stop`
-    );
-    entries.push(
-      `Stop loss: clean break below $${(range_structure.low * 0.98).toFixed(2)} → bias shifts bearish`
-    );
-  } else if (bias.bias === "bearish") {
-    entries.push(
-      `If price breaks below $${range_structure.low.toFixed(2)} → target $${(range_structure.low * 0.95).toFixed(2)}`
-    );
-    entries.push(
-      `On bounce to $${range_structure.high.toFixed(2)} → look for short entry or exit longs`
-    );
-    entries.push(
-      `Stop loss for shorts: clean break above $${(range_structure.high * 1.02).toFixed(2)} → bias shifts bullish`
-    );
-  } else {
-    entries.push(
-      `Range-bound between $${range_structure.low.toFixed(2)}-$${range_structure.high.toFixed(2)} → fade extremes`
-    );
-    entries.push(
-      `Break above $${range_structure.high.toFixed(2)} → bullish, target $${(range_structure.high * 1.05).toFixed(2)}`
-    );
-    entries.push(
-      `Break below $${range_structure.low.toFixed(2)} → bearish, target $${(range_structure.low * 0.95).toFixed(2)}`
+    return json(
+      {
+        ok: false,
+        error: error?.message || "Internal server error",
+        code: "UNHANDLED_ERROR",
+      },
+      500
     );
   }
-
-  return entries;
-}
-
-/**
- * Build Advanced Insight Card from enriched snapshot
- */
-async function buildAdvancedInsight(
-  snapshot: MarketSnapshotPayload,
-  playbookEntries: string[]
-): Promise<any> {
-  return {
-    sections: {
-      market_structure: {
-        range: {
-          auto_value: snapshot.range_structure,
-          user_value: undefined,
-          is_overridden: false,
-        },
-        key_levels: {
-          auto_value: snapshot.key_levels || [],
-          user_value: undefined,
-          is_overridden: false,
-        },
-        zones: {
-          auto_value: snapshot.zones || [],
-          user_value: undefined,
-          is_overridden: false,
-        },
-        bias: {
-          auto_value: snapshot.bias,
-          user_value: undefined,
-          is_overridden: false,
-        },
-      },
-      flow_volume: {
-        flow: {
-          auto_value: snapshot.flow_volume,
-          user_value: undefined,
-          is_overridden: false,
-        },
-      },
-      playbook: {
-        entries: {
-          auto_value: playbookEntries,
-          user_value: undefined,
-          is_overridden: false,
-        },
-      },
-      macro: {
-        tags: {
-          auto_value: snapshot.macro_tags || [],
-          user_value: undefined,
-          is_overridden: false,
-        },
-      },
-    },
-    source_payload: snapshot,
-    active_layers: ["L1_STRUCTURE", "L2_FLOW", "L3_TACTICAL"],
-  };
 }
 
 /**
@@ -361,4 +229,75 @@ async function checkAccessGating(req: Request): Promise<any> {
     token_lock_id: isDev ? undefined : "pending-nft-check",
     reason: isDev ? undefined : "Beta: Advanced Insight requires NFT-based access",
   };
+}
+
+function coerceNumber(value: unknown): number {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function normalizeCandles(input: unknown): OhlcCandle[] | null {
+  if (input === undefined) {
+    return [];
+  }
+
+  if (!Array.isArray(input)) {
+    return null;
+  }
+
+  const sanitized: OhlcCandle[] = [];
+
+  for (const candle of input) {
+    if (!isRecord(candle)) {
+      return null;
+    }
+
+    const t = toFiniteNumber(candle.t);
+    const o = toFiniteNumber(candle.o);
+    const h = toFiniteNumber(candle.h);
+    const l = toFiniteNumber(candle.l);
+    const c = toFiniteNumber(candle.c);
+
+    if (
+      t === null ||
+      o === null ||
+      h === null ||
+      l === null ||
+      c === null
+    ) {
+      return null;
+    }
+
+    const normalizedCandle: OhlcCandle = {
+      t,
+      o,
+      h,
+      l,
+      c,
+    };
+
+    const v = toFiniteNumber(candle.v, true);
+    if (v !== null) {
+      normalizedCandle.v = v;
+    }
+
+    sanitized.push(normalizedCandle);
+  }
+
+  return sanitized;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function toFiniteNumber(value: unknown, allowZero = true): number | null {
+  const num = Number(value);
+  if (!Number.isFinite(num)) {
+    return null;
+  }
+  if (!allowZero && num === 0) {
+    return null;
+  }
+  return num;
 }

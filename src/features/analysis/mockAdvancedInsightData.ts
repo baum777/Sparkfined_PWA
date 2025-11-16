@@ -98,7 +98,7 @@ export function generateMockAdvancedInsight(
     { label: 'Weekly Support', category: 'narrative' },
   ];
 
-  const mockPayload: Partial<MarketSnapshotPayload> = {
+  const mockPayload: MarketSnapshotPayload = {
     meta: {
       symbol: `${ticker}/USDT`,
       ticker: ticker,
@@ -108,6 +108,7 @@ export function generateMockAdvancedInsight(
       timestamp: new Date().toISOString(),
     } as MarketMeta,
     candles: [],
+    heuristics_source: 'local_engine',
   };
 
   return {

@@ -1,46 +1,12 @@
-// tests/mocks/aiProxyMock.ts
-import http from 'http';
-import type { AddressInfo } from 'net';
-
-export type AiMockHandle = {
-  url: string;
-  close: () => Promise<void>;
-};
-
-/**
- * Startet einen kleinen HTTP-Mockserver für AI-Proxy requests.
- * Wenn `port` nicht gesetzt ist, verwendet die OS-Portauswahl (0) -> verhindert EADDRINUSE.
- */
-export function startAiProxyMock(port?: number): Promise<AiMockHandle> {
-  return new Promise((resolve, reject) => {
-    const server = http.createServer((req, res) => {
-      try {
-        // einfache Mock-Antwort — passe an die bestehende Logik an
-        // z.B. behavior based on req.url / method / body
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true, text: 'mocked response', provider: 'mock' }));
-      } catch {
-        res.writeHead(500);
-        res.end();
-      }
-    });
-
-    // pass the reject function directly so no unused-parameter is reported
-    server.on('error', reject);
-
-    // bind to provided port or 0 -> OS assigns free port
-    server.listen(port ?? 0, '127.0.0.1', () => {
-      const addr = server.address() as AddressInfo;
-
 import http from 'http';
 import type { AddressInfo } from 'net';
 
 export type AiMockHandle = { url: string; close: () => Promise<void> };
 export type AiMockOptions = {
   port?: number;
-  responseBody?: any;
+  responseBody?: unknown;
   expectedSecret?: string;
-  onRequest?: (body: Record<string, any>) => void;
+  onRequest?: (body: Record<string, unknown>) => void;
 };
 
 const responseBodyDefault = {
@@ -50,13 +16,20 @@ const responseBodyDefault = {
   usage: { input_tokens: 1, output_tokens: 1 },
 };
 
-export function startAiProxyMock(portOrOptions?: number | AiMockOptions): Promise<AiMockHandle> {
-  const opts: AiMockOptions = typeof portOrOptions === 'number' ? { port: portOrOptions } : portOrOptions ?? {};
+/**
+ * Starts a lightweight HTTP mock server for AI proxy requests.
+ * Returns its URL and a close helper for teardown in tests.
+ */
+export function startAiProxyMock(
+  portOrOptions?: number | AiMockOptions,
+): Promise<AiMockHandle> {
+  const opts: AiMockOptions =
+    typeof portOrOptions === 'number' ? { port: portOrOptions } : portOrOptions ?? {};
 
   return new Promise((resolve, reject) => {
     const server = http.createServer((req, res) => {
-      const chunks: Array<Buffer> = [];
-      let parsedBody: Record<string, any> | null = null;
+      const chunks: Buffer[] = [];
+      let parsedBody: Record<string, unknown> | null = null;
 
       req.on('data', (chunk) => {
         chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
@@ -72,13 +45,12 @@ export function startAiProxyMock(portOrOptions?: number | AiMockOptions): Promis
         const raw = chunks.length ? Buffer.concat(chunks).toString('utf8') : '';
         if (raw) {
           try {
-            parsedBody = JSON.parse(raw) as Record<string, any>;
+            parsedBody = JSON.parse(raw) as Record<string, unknown>;
             opts.onRequest?.(parsedBody);
           } catch {
             // ignore malformed JSON, still return deterministic response
           }
         } else if (opts.onRequest) {
-          // Allow onRequest handlers to observe empty payloads.
           parsedBody = {};
           opts.onRequest(parsedBody);
         }
@@ -87,6 +59,7 @@ export function startAiProxyMock(portOrOptions?: number | AiMockOptions): Promis
           ...responseBodyDefault,
           provider: parsedBody?.provider ?? responseBodyDefault.provider,
         };
+
         const body = opts.responseBody ?? defaultBody;
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(body));
@@ -100,13 +73,14 @@ export function startAiProxyMock(portOrOptions?: number | AiMockOptions): Promis
 
     server.on('error', reject);
 
-    const bindPort = opts.port ?? 0; // 0 -> ephemeral
+    const bindPort = opts.port ?? 0;
     server.listen(bindPort, '127.0.0.1', () => {
       const addr = server.address() as AddressInfo | null;
       if (!addr || typeof addr.port !== 'number') {
         reject(new Error('could not determine mock server port'));
         return;
       }
+
       const url = `http://127.0.0.1:${addr.port}`;
       resolve({
         url,
@@ -115,8 +89,6 @@ export function startAiProxyMock(portOrOptions?: number | AiMockOptions): Promis
             server.close(() => resClose());
           }),
       });
-
-      resolve({ url, close: () => new Promise<void>((resClose) => server.close(() => resClose())) });
     });
   });
 }
