@@ -12,12 +12,6 @@ import type {
   AdvancedInsightSections,
   FeatureAccessMeta,
   EditableField,
-  RangeStructure,
-  KeyLevel,
-  PriceZone,
-  BiasReading,
-  FlowVolumeSnapshot,
-  MacroTag,
 } from '@/types/ai';
 
 // ============================================================================

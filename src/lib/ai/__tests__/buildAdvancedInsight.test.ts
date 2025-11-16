@@ -14,8 +14,6 @@ import type {
   MarketMeta,
   RangeStructure,
   KeyLevel,
-  BiasReading,
-  FlowVolumeSnapshot,
 } from '@/types/ai';
 
 /**

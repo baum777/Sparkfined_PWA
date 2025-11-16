@@ -17,8 +17,24 @@ describe('JCA-INTEG-010 — journal condense via proxy (mocked)', () => {
       },
     })
 
+    const toRequestTarget = (value: Parameters<typeof fetch>[0]): string => {
+      if (typeof value === 'string') return value
+      if (value instanceof URL) return value.toString()
+      if (typeof Request !== 'undefined' && value instanceof Request) {
+        return value.url
+      }
+      if (typeof value === 'object' && value && 'url' in value) {
+        const maybeUrl = (value as { url?: unknown }).url
+        if (typeof maybeUrl === 'string') {
+          return maybeUrl
+        }
+      }
+      return JSON.stringify(value)
+    }
+
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
-      const rewritten = new URL(typeof input === 'string' ? input : input.toString(), mock.url).toString()
+      const target = toRequestTarget(input)
+      const rewritten = new URL(target, mock.url).toString()
       return realFetch(rewritten, {
         ...init,
         headers: {

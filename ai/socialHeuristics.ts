@@ -1,8 +1,10 @@
 import type { BotScorePostPayload, SocialPost, SocialPostAssessment } from "@/types/ai";
 import { computeBotScore } from "@/lib/ai/heuristics";
 
-export interface BotHeuristicResult
-  extends Pick<SocialPostAssessment, "botScore" | "bot_score" | "reason_flags"> {}
+export type BotHeuristicResult = Pick<
+  SocialPostAssessment,
+  "botScore" | "bot_score" | "reason_flags"
+>;
 
 const DEFAULT_FLAGS = {
   NEW_ACCOUNT: "account_age_lt_7d",
