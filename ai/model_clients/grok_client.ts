@@ -61,9 +61,7 @@ export class GrokClient {
       model: this.model,
       temperature: this.temperature,
       max_tokens: this.maxTokens,
-      messages: [
-        { role: "user", content: prompt },
-      ],
+      messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
     };
 
@@ -103,37 +101,37 @@ export class GrokClient {
       posts?: Array<Partial<SocialPostAssessment>>;
       aggregates?: SocialAnalysis["aggregates"];
     } = {};
+
     try {
       parsed = text ? JSON.parse(text) : {};
     } catch (error) {
       throw new Error(`Grok returned non-JSON payload: ${text}`);
     }
 
-        const assessedPosts = posts.map((post, index) => {
-          const heuristics = scoreBotLikelihood(post);
-          const modelAssessment = parsed.posts?.[index];
-          const modelBotScore = extractModelBotScore(modelAssessment);
-          const combinedScore = mergeBotScores(heuristics.botScore, modelBotScore);
-          const modelReasons =
-            Array.isArray(modelAssessment?.reason_flags) ? modelAssessment.reason_flags : [];
-          const reasons = new Set<string>([
-            ...heuristics.reason_flags,
-            ...modelReasons,
-          ]);
+    const assessedPosts = posts.map((post, index) => {
+      const heuristics = scoreBotLikelihood(post);
+      const modelAssessment = parsed.posts?.[index];
+      const modelBotScore = extractModelBotScore(modelAssessment);
+      const combinedScore = mergeBotScores(heuristics.botScore, modelBotScore);
+      const reasons = new Set<string>([
+        ...(heuristics.reason_flags ?? []),
+        ...((modelAssessment?.reason_flags ?? []) as string[]),
+      ]);
 
-        return {
-          id: post.id,
-          text_snippet: modelAssessment?.text_snippet ?? post.text.slice(0, 140),
-          sentiment: modelAssessment?.sentiment ?? 0,
-          botScore: combinedScore,
-          bot_score: combinedScore,
-          isLikelyBot:
-            typeof modelAssessment?.isLikelyBot === "boolean"
-              ? modelAssessment.isLikelyBot
-              : combinedScore >= 0.5,
-          reason_flags: Array.from(reasons),
-        } satisfies SocialPostAssessment;
-      });
+      return {
+        id: post.id,
+        text_snippet:
+          modelAssessment?.text_snippet ?? post.text.slice(0, 140),
+        sentiment: modelAssessment?.sentiment ?? 0,
+        botScore: combinedScore,
+        bot_score: combinedScore,
+        isLikelyBot:
+          typeof modelAssessment?.isLikelyBot === "boolean"
+            ? modelAssessment.isLikelyBot
+            : combinedScore >= 0.5,
+        reason_flags: Array.from(reasons),
+      } satisfies SocialPostAssessment;
+    });
 
     const botRatio = assessedPosts.length
       ? assessedPosts.filter((p) => p.isLikelyBot).length / assessedPosts.length
@@ -147,7 +145,11 @@ export class GrokClient {
       bullets: parsed.bullets ?? [],
       sentiment: parsed.sentiment ?? 0,
       confidence: parsed.confidence ?? 0,
-      aggregates: parsed.aggregates ?? { positive: 0, neutral: 0, negative: 0 },
+      aggregates: parsed.aggregates ?? {
+        positive: 0,
+        neutral: 0,
+        negative: 0,
+      },
       posts: assessedPosts,
       narrative_lore: parsed.narrative_lore,
       source_trace: parsed.source_trace ?? { social_provider: "unknown" },
@@ -163,22 +165,27 @@ export function mergeBotScores(
   heuristicScore?: number,
   modelScore?: number,
 ): number {
-  if (isFiniteNumber(heuristicScore) && isFiniteNumber(modelScore)) {
-    return clampToUnit((heuristicScore + modelScore) / 2);
+  const hasHeuristic = isFiniteNumber(heuristicScore);
+  const hasModel = isFiniteNumber(modelScore);
+
+  if (hasHeuristic && hasModel) {
+    return clampToUnit(((heuristicScore as number) + (modelScore as number)) / 2);
   }
 
-  if (isFiniteNumber(heuristicScore)) {
-    return clampToUnit(heuristicScore);
+  if (hasHeuristic) {
+    return clampToUnit(heuristicScore as number);
   }
 
-  if (isFiniteNumber(modelScore)) {
-    return clampToUnit(modelScore);
+  if (hasModel) {
+    return clampToUnit(modelScore as number);
   }
 
   return 0;
 }
 
-function extractModelBotScore(modelAssessment?: Partial<SocialPostAssessment>): number | undefined {
+function extractModelBotScore(
+  modelAssessment?: Partial<SocialPostAssessment>,
+): number | undefined {
   if (!modelAssessment) return undefined;
   if (isFiniteNumber(modelAssessment.bot_score)) return modelAssessment.bot_score;
   if (isFiniteNumber(modelAssessment.botScore)) return modelAssessment.botScore;
