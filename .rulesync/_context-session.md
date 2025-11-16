@@ -20,24 +20,14 @@ description: "Current working session context, open questions, blockers and rece
 
 **Active Work:**
 
-- **Rulesync Multi-Tool Prompt System**
-  - Status: ✅ Complete (All 11 SYSTEM + 6 ITERATIVE files generated)
-  - Next: Validation, rulesync CLI generation, AGENTS.md creation for Codex.
+**Status:**
+- ✅ Frontend: AdvancedInsightCard + Store + Telemetry + Tests
+- ✅ Backend: buildAdvancedInsight + /api/ai/analyze-market + Heuristik-TS-Hardening
+- ✅ CI: typecheck, build, lint laufen green (Lint nur noch mit Warnungen)
 
-- **E2E Test Suite (Playwright)**
-  - Status: 🟡 In Progress
-  - Current Focus: Setting up 10+ critical user flows (Journal, Board, Market Analyze, Alerts, Access Gating).
-  - Blockers: None.
-
-- **Performance Optimization**
-  - Status: 🟡 In Progress
-  - Current Focus: Reducing bundle size from 428KB → <400KB gzipped.
-  - Next Steps: Lazy-load chart components, optimize icon imports (Lucide tree-shaking), code-split API adapters.
-
-**Page/Feature in Focus:**
-
-- **Journal Workspace** – Testing AI-powered condense feature, offline sync, tag filtering.
-- **Signal Matrix** – Performance tuning for rendering 50+ signal cards with live updates.
+**Next-Steps:**
+- Optional: Lint-Warnings-Cleanup-Loop (unused vars, JSX-a11y anchor hints)
+- Vorbereitung nächster Loop: z.B. Replay/Journal-Flow oder Wallet/Token-Lock-Verbindung
 
 ---
 
