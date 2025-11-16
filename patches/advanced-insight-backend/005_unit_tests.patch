@@ -1,0 +1,34 @@
+### Unit Tests for Builder - Phase 5 (Beta v0.9)
+
+**Module:** `src/lib/ai/__tests__/buildAdvancedInsight.test.ts`
+
+**Test Coverage:**
+- ✅ Fallback range calculation (when no heuristics provided)
+- ✅ Using provided heuristics (range, levels, bias, flow)
+- ✅ All `is_overridden` initialize to `false`
+- ✅ Bullish/bearish/neutral bias detection
+- ✅ Playbook entries integration
+- ✅ Macro section feature flag (`includeMacro`)
+- ✅ Empty candles handling (graceful fallbacks)
+- ✅ Determinism (same input → same output)
+- ✅ Source payload preservation
+- ✅ Active layers configuration
+- ✅ Flow/volume mapping
+
+**Test Count:** 18 tests
+
+**Run Tests:**
+```bash
+npm test -- src/lib/ai/__tests__/buildAdvancedInsight.test.ts
+```
+
+**Expected Results:**
+- All tests pass ✅
+- No type errors
+- Pure function behavior validated
+- Determinism confirmed
+
+**CI Compatibility:**
+- Uses Vitest (already configured)
+- No external dependencies
+- Fast execution (<100ms)

@@ -1,0 +1,38 @@
+### Frontend Dev Toggle - Phase 4 (Beta v0.9)
+
+**Module:** `src/pages/AnalyzePage.tsx`
+
+**Changes:**
+1. Added `SHOW_MOCK_BUTTONS` constant (false in production)
+2. Real "Advanced Insight" button always visible
+3. Mock buttons ("🧪 Mock (Unlocked)", "🔒 Mock (Locked)") only in dev
+
+**Behavior:**
+- **Production:** Only "🚀 Advanced Insight" button (real backend data)
+- **Development:** "🚀 Advanced Insight" + two mock buttons for testing
+
+**Implementation:**
+```ts
+const SHOW_MOCK_BUTTONS = process.env.NODE_ENV !== "production";
+
+// In JSX:
+{SHOW_MOCK_BUTTONS && (
+  <>
+    <button>🧪 Mock (Unlocked)</button>
+    <button>🔒 Mock (Locked)</button>
+  </>
+)}
+```
+
+**No Layout Changes:**
+- Same button row
+- Same styling
+- No new components
+- Minimal code change
+
+**Real Data Flow:**
+1. User clicks "🚀 Advanced Insight"
+2. Calls `/api/ai/analyze-market`
+3. Returns `AnalyzeMarketResult` with `.advanced` populated
+4. Auto-ingests into `advancedInsightStore`
+5. Advanced Insight Card displays real data
