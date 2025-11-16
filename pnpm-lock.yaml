@@ -78,6 +78,9 @@ importers:
       '@testing-library/react':
         specifier: ^14.3.1
         version: 14.3.1(@types/react@18.3.26)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@testing-library/user-event':
+        specifier: ^14.6.1
+        version: 14.6.1(@testing-library/dom@9.3.4)
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.24
@@ -119,7 +122,7 @@ importers:
         version: 3.6.2
       rollup-plugin-visualizer:
         specifier: ^5.12.0
-        version: 5.14.0(rollup@2.79.2)
+        version: 5.14.0(rollup@4.52.5)
       tailwindcss:
         specifier: ^4.1.16
         version: 4.1.16
@@ -1351,6 +1354,12 @@ packages:
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
+
+  '@testing-library/user-event@14.6.1':
+    resolution: {integrity: sha512-vq7fv0rnt+QTXgPxr5Hjc210p6YKq2kmdziLgnsZGgLJ9e6VAShx1pACLuRjd/AS/sr7phAR58OIIpf0LlmQNw==}
+    engines: {node: '>=12', npm: '>=6'}
+    peerDependencies:
+      '@testing-library/dom': '>=7.21.4'
 
   '@ts-morph/common@0.11.1':
     resolution: {integrity: sha512-7hWZS0NRpEsNV8vWJzg7FEz6V8MaLNeJOmwmghqUXTpzk16V1LLZhdo+4QvE/+zv4cVci0OviuJFnqhEfoV3+g==}
@@ -5511,6 +5520,10 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
+  '@testing-library/user-event@14.6.1(@testing-library/dom@9.3.4)':
+    dependencies:
+      '@testing-library/dom': 9.3.4
+
   '@ts-morph/common@0.11.1':
     dependencies:
       fast-glob: 3.3.3
@@ -7813,14 +7826,14 @@ snapshots:
     dependencies:
       glob: 7.2.3
 
-  rollup-plugin-visualizer@5.14.0(rollup@2.79.2):
+  rollup-plugin-visualizer@5.14.0(rollup@4.52.5):
     dependencies:
       open: 8.4.2
       picomatch: 4.0.3
       source-map: 0.7.6
       yargs: 17.7.2
     optionalDependencies:
-      rollup: 2.79.2
+      rollup: 4.52.5
 
   rollup@2.79.2:
     optionalDependencies:
