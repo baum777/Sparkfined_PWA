@@ -9,6 +9,8 @@ on:
 jobs:
   lint-test-build:
     runs-on: ubuntu-latest
+    env:
+      MORALIS_API_KEY: ${{ secrets.MORALIS_API_KEY }}
 
     steps:
       - name: Checkout
