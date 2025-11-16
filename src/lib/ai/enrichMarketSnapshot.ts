@@ -159,8 +159,9 @@ export function generatePlaybookFromSnapshot(
     return [];
   }
 
-  const currentPrice = snapshot.candles.length > 0
-    ? snapshot.candles[snapshot.candles.length - 1].c
+  const lastCandle = snapshot.candles[snapshot.candles.length - 1];
+  const currentPrice = lastCandle
+    ? lastCandle.c
     : snapshot.range_structure.mid;
 
   return generatePlaybookEntries({

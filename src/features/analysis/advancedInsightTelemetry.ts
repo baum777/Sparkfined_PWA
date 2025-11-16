@@ -28,35 +28,37 @@ export type AdvancedInsightEventName = typeof AdvancedInsightEvents[keyof typeof
 // Event Payloads
 // ============================================================================
 
-export interface AdvancedInsightOpenedPayload {
+type TelemetryPayload = Record<string, unknown>;
+
+export interface AdvancedInsightOpenedPayload extends TelemetryPayload {
   ticker?: string;
   timeframe?: string;
   has_data: boolean;
   is_locked: boolean;
 }
 
-export interface AdvancedInsightTabSwitchedPayload {
+export interface AdvancedInsightTabSwitchedPayload extends TelemetryPayload {
   from_tab: string;
   to_tab: string;
 }
 
-export interface AdvancedInsightFieldOverriddenPayload {
+export interface AdvancedInsightFieldOverriddenPayload extends TelemetryPayload {
   section: string;
   field_name: string;
   had_previous_override: boolean;
 }
 
-export interface AdvancedInsightSavedPayload {
+export interface AdvancedInsightSavedPayload extends TelemetryPayload {
   overrides_count: number;
   sections_modified: string[];
 }
 
-export interface AdvancedInsightResetPayload {
+export interface AdvancedInsightResetPayload extends TelemetryPayload {
   section: string;
   field_name: string;
 }
 
-export interface AdvancedInsightUnlockClickedPayload {
+export interface AdvancedInsightUnlockClickedPayload extends TelemetryPayload {
   current_tier: string;
 }
 
