@@ -109,15 +109,17 @@ export class GrokClient {
       throw new Error(`Grok returned non-JSON payload: ${text}`);
     }
 
-      const assessedPosts = posts.map((post, index) => {
-        const heuristics = scoreBotLikelihood(post);
-        const modelAssessment = parsed.posts?.[index];
-        const modelBotScore = extractModelBotScore(modelAssessment);
-        const combinedScore = mergeBotScores(heuristics.botScore, modelBotScore);
-        const reasons = new Set<string>([
-          ...heuristics.reason_flags,
-          ...((modelAssessment?.reason_flags ?? []) as string[]),
-        ]);
+        const assessedPosts = posts.map((post, index) => {
+          const heuristics = scoreBotLikelihood(post);
+          const modelAssessment = parsed.posts?.[index];
+          const modelBotScore = extractModelBotScore(modelAssessment);
+          const combinedScore = mergeBotScores(heuristics.botScore, modelBotScore);
+          const modelReasons =
+            Array.isArray(modelAssessment?.reason_flags) ? modelAssessment.reason_flags : [];
+          const reasons = new Set<string>([
+            ...heuristics.reason_flags,
+            ...modelReasons,
+          ]);
 
         return {
           id: post.id,
@@ -161,19 +163,16 @@ export function mergeBotScores(
   heuristicScore?: number,
   modelScore?: number,
 ): number {
-  const hasHeuristic = isFiniteNumber(heuristicScore);
-  const hasModel = isFiniteNumber(modelScore);
-
-  if (hasHeuristic && hasModel) {
-    return clampToUnit(((heuristicScore as number) + (modelScore as number)) / 2);
+  if (isFiniteNumber(heuristicScore) && isFiniteNumber(modelScore)) {
+    return clampToUnit((heuristicScore + modelScore) / 2);
   }
 
-  if (hasHeuristic) {
-    return clampToUnit(heuristicScore as number);
+  if (isFiniteNumber(heuristicScore)) {
+    return clampToUnit(heuristicScore);
   }
 
-  if (hasModel) {
-    return clampToUnit(modelScore as number);
+  if (isFiniteNumber(modelScore)) {
+    return clampToUnit(modelScore);
   }
 
   return 0;
