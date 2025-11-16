@@ -14,6 +14,11 @@ describe("scoreBotLikelihood", () => {
       source: "x",
     } as any);
 
+    const { botScore, bot_score } = result;
+    if (botScore === undefined || bot_score === undefined) {
+      throw new Error("scoreBotLikelihood should always return bot scores");
+    }
+
     expect(computeSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         author: expect.objectContaining({
@@ -23,8 +28,8 @@ describe("scoreBotLikelihood", () => {
         text: "Test post about SOL.",
       }),
     );
-    expect(result.botScore).toBeCloseTo(0.42);
-    expect(result.bot_score).toBeCloseTo(result.botScore);
+    expect(botScore).toBeCloseTo(0.42);
+    expect(bot_score).toBeCloseTo(botScore);
 
     computeSpy.mockRestore();
   });
@@ -40,8 +45,13 @@ describe("scoreBotLikelihood", () => {
       source: "telegram",
     } as any);
 
-    expect(result.botScore).toBe(1);
-    expect(result.bot_score).toBe(1);
+    const { botScore, bot_score } = result;
+    if (botScore === undefined || bot_score === undefined) {
+      throw new Error("scoreBotLikelihood should always return bot scores");
+    }
+
+    expect(botScore).toBe(1);
+    expect(bot_score).toBe(1);
 
     computeSpy.mockRestore();
   });

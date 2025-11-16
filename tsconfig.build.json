@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "exclude": [
+    "docs/archive",
     "tests",
     "**/*.test.ts",
     "**/*.test.tsx",
