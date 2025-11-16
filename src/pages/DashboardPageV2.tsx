@@ -12,8 +12,8 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { TrendingUp, TrendingDown, Plus, Bell, FileText, BarChart3 } from 'lucide-react';
-import { useBoardKPIs } from '@/hooks/useBoardKPIs';
-import { useBoardFeed } from '@/hooks/useBoardFeed';
+import useBoardKPIs from '@/hooks/useBoardKPIs';
+import useBoardFeed from '@/hooks/useBoardFeed';
 
 interface KPIData {
   label: string;
@@ -22,6 +22,16 @@ interface KPIData {
   trend?: 'up' | 'down' | 'neutral';
   icon: React.ReactNode;
 }
+
+type KPISummary = {
+  totalPnL?: number;
+  pnlChange?: number;
+  winRate?: number;
+  winRateChange?: number;
+  activeAlerts?: number;
+  journalCount?: number;
+  journalChange?: number;
+};
 
 interface ActivityItem {
   id: string;
@@ -38,9 +48,12 @@ interface MarketMover {
   price: string;
 }
 
+type BoardFeedItem = ReturnType<typeof useBoardFeed>['data'][number];
+
 export default function DashboardPageV2() {
-  const { kpis } = useBoardKPIs();
-  const { items } = useBoardFeed();
+  const { data: kpiDataResponse } = useBoardKPIs();
+  const { data: feedItems } = useBoardFeed();
+  const kpis = (kpiDataResponse as unknown as KPISummary | null) || null;
 
   // Transform real data to KPI format
   const kpiData: KPIData[] = [
@@ -72,13 +85,15 @@ export default function DashboardPageV2() {
     },
   ];
 
-  const activities: ActivityItem[] = items?.slice(0, 5).map(item => ({
-    id: item.id,
-    type: item.type as 'journal' | 'alert',
-    timestamp: new Date(item.ts),
-    title: item.title || '',
-    excerpt: item.subtitle,
-  })) || [];
+  const activities: ActivityItem[] = feedItems
+    .slice(0, 5)
+    .map((item: BoardFeedItem) => ({
+      id: item.id,
+      type: item.type === 'alert' ? 'alert' : 'journal',
+      timestamp: new Date(item.timestamp),
+      title: item.text,
+      excerpt: item.metadata?.symbol,
+    }));
 
   // Mock market movers (replace with real data later)
   const marketMovers: MarketMover[] = [

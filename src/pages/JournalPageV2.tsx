@@ -46,8 +46,8 @@ export default function JournalPageV2() {
     return matchesSearch && matchesTags;
   });
 
-  const formatDate = (date: Date | string): string => {
-    const d = typeof date === 'string' ? new Date(date) : date;
+  const formatDate = (date: Date | string | number): string => {
+    const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -201,7 +201,7 @@ export default function JournalPageV2() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs text-zinc-500">
-                          {formatDate(entry.ts)}
+                          {formatDate(entry.createdAt)}
                         </span>
                         {entry.address && (
                           <Badge variant="neutral">{entry.address.slice(0, 6)}...</Badge>

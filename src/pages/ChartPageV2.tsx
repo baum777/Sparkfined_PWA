@@ -14,6 +14,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import type { BiasLabel } from '@/types/ai';
 import { Search, Star, Maximize2, Plus, Bell, FileText, Share2 } from 'lucide-react';
 
 export default function ChartPageV2() {
@@ -22,10 +23,10 @@ export default function ChartPageV2() {
   const [activeIndicators] = useState(['RSI', 'MACD']);
 
   const timeframes = ['1m', '5m', '15m', '1h', '4h', '1d', '1w'];
-  const indicators = [
-    { name: 'RSI', value: '65', status: 'neutral' as const },
-    { name: 'MACD', value: 'Bullish', status: 'bullish' as const },
-    { name: 'EMA(20)', value: '$148.50', status: 'bullish' as const },
+  const indicators: { name: string; value: string; status: BiasLabel }[] = [
+    { name: 'RSI', value: '65', status: 'neutral' },
+    { name: 'MACD', value: 'Bullish', status: 'bullish' },
+    { name: 'EMA(20)', value: '$148.50', status: 'bullish' },
   ];
 
   const metrics = [
