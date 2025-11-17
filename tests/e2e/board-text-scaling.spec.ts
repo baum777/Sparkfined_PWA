@@ -94,11 +94,6 @@ test.describe('Board Page - Text Scaling (200% Zoom)', () => {
   test('should maintain readability at 200% zoom', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
 
-    // Get initial font size
-    const initialFontSize = await page.locator('body').evaluate((el) => {
-      return window.getComputedStyle(el).fontSize;
-    });
-
     // Zoom to 200%
     await page.setViewportSize({ width: 640, height: 360 });
     await page.waitForTimeout(500);
