@@ -6,7 +6,23 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 
 export default [
   {
-    ignores: ["dist/**", "node_modules/**", "*.config.js", "*.config.ts", "scripts/**", "wireframes/**"]
+    ignores: [
+      "dist/**",
+      "node_modules/**",
+      "*.config.js",
+      "*.config.ts",
+      "scripts/**",
+      "wireframes/**",
+      "docs/archive/**"
+    ]
+  },
+  {
+    files: ["docs/archive/**"],
+    languageOptions: {
+      parserOptions: {
+        project: null
+      }
+    }
   },
   // Service Worker files (public/push/sw.js)
   {
