@@ -359,30 +359,41 @@ describe('Market Orchestrator', () => {
 
   describe('Performance', () => {
     it('should track total latency across all attempts', async () => {
-      vi.mocked(getDexPaprikaSnapshot).mockImplementation(
-        () =>
-          new Promise((resolve) =>
-            setTimeout(
-              () =>
-                resolve({
-                  success: true,
-                  data: MOCK_SNAPSHOT,
-                  metadata: {
-                    provider: 'dexpaprika',
-                    cached: false,
-                    latency: 100,
-                    retries: 0,
-                  },
-                }),
-              100
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2025-01-01T00:00:00.000Z'))
+
+      try {
+        vi.mocked(getDexPaprikaSnapshot).mockImplementation(
+          () =>
+            new Promise((resolve) =>
+              setTimeout(
+                () =>
+                  resolve({
+                    success: true,
+                    data: MOCK_SNAPSHOT,
+                    metadata: {
+                      provider: 'dexpaprika',
+                      cached: false,
+                      latency: 100,
+                      retries: 0,
+                    },
+                  }),
+                100
+              )
             )
-          )
-      )
+        )
 
-      const result = await getMarketSnapshot('test123', 'solana')
+        const resultPromise = getMarketSnapshot('test123', 'solana')
 
-      expect(result.totalLatency).toBeGreaterThan(0)
-      expect(result.totalLatency).toBeGreaterThanOrEqual(100)
+        await vi.advanceTimersByTimeAsync(100)
+        const result = await resultPromise
+
+        expect(result.totalLatency).toBeGreaterThan(0)
+        expect(result.totalLatency).toBe(100)
+      } finally {
+        vi.clearAllTimers()
+        vi.useRealTimers()
+      }
     })
   })
 })
