@@ -1,0 +1,40 @@
+import React from 'react';
+import AnalysisSidebarTabs, { AnalysisTab } from './AnalysisSidebarTabs';
+
+interface AnalysisLayoutProps {
+  title: string;
+  tabs: ReadonlyArray<AnalysisTab>;
+  activeTab: string;
+  onTabChange: (id: string) => void;
+  children: React.ReactNode;
+}
+
+export default function AnalysisLayout({
+  title,
+  tabs,
+  activeTab,
+  onTabChange,
+  children,
+}: AnalysisLayoutProps) {
+  return (
+    <div className="space-y-6 rounded-3xl border border-white/5 bg-black/20 p-4 sm:p-6">
+      <div className="md:hidden">
+        <AnalysisSidebarTabs tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} orientation="horizontal" />
+      </div>
+
+      <div className="md:grid md:grid-cols-[240px_minmax(0,1fr)] md:gap-8">
+        <aside className="hidden md:block">
+          <AnalysisSidebarTabs tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} />
+        </aside>
+
+        <section className="space-y-6">
+          <header className="space-y-2">
+            <p className="text-xs uppercase tracking-[0.4em] text-zinc-500">Sparkfined</p>
+            <h1 className="text-3xl font-semibold text-white">{title}</h1>
+          </header>
+          <div className="rounded-2xl border border-white/5 bg-black/40 p-6 shadow-inner">{children}</div>
+        </section>
+      </div>
+    </div>
+  );
+}
