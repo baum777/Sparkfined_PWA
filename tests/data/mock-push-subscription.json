@@ -1,0 +1,16 @@
+{
+  "subscription": {
+    "endpoint": "https://fcm.googleapis.com/fcm/send/fake-token-for-tests",
+    "expirationTime": null,
+    "keys": {
+      "p256dh": "BMockP256DHKeyUsedOnlyForTests1234567890abcdefg",
+      "auth": "MockAuthSecret"
+    }
+  },
+  "payload": {
+    "title": "Sparkfined — Test Push (mock)",
+    "body": "If you see this in logs, the push endpoint processed the mock payload.",
+    "url": "/notifications",
+    "tag": "sparkfined-test"
+  }
+}

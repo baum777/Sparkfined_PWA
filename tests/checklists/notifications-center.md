@@ -37,6 +37,6 @@ sources:
 - [ ] Verify Playwright run attaches traces
 
 ## Artefacts
-- [ ] Update docs with push configuration checklist (VAPID, server secrets)
-- [ ] Include mock subscription JSON in PR
+- [ ] Update docs with push configuration checklist (VAPID, server secrets) → see `docs/setup/push-notifications.md`
+- [ ] Include mock subscription JSON in PR → see `tests/data/mock-push-subscription.json`
 
