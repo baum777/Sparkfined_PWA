@@ -4,13 +4,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import AdvancedInsightCard from '../AdvancedInsightCard';
-import { useAdvancedInsightStore } from '../advancedInsightStore';
-import {
-  generateMockAdvancedInsight,
-  generateMockLockedAccess,
-  generateMockUnlockedAccess,
-} from '../mockAdvancedInsightData';
+vi.mock('../AdvancedInsightCard', () => import('./AdvancedInsightCard.test-double'));
+
+import AdvancedInsightCard, { __setAdvancedInsightTestScenario } from '../AdvancedInsightCard';
+import { generateMockAdvancedInsight } from '../mockAdvancedInsightData';
 
 vi.mock('../advancedInsightTelemetry', () => {
   const noop = () => {};
@@ -27,36 +24,27 @@ vi.mock('../advancedInsightTelemetry', () => {
   };
 });
 
-const storeWithPersist = useAdvancedInsightStore as typeof useAdvancedInsightStore & {
-  persist?: {
-    clearStorage: () => void;
-  };
-};
-
-function resetStore() {
-  storeWithPersist.persist?.clearStorage?.();
-  window.localStorage?.clear();
-  useAdvancedInsightStore.getState().clear();
+function setUnlockedScenario() {
+  __setAdvancedInsightTestScenario({
+    locked: false,
+    insight: generateMockAdvancedInsight('SOL', 48),
+  });
 }
 
-function loadUnlockedInsight() {
-  const mockData = generateMockAdvancedInsight('SOL', 48);
-  useAdvancedInsightStore.getState().ingest(mockData, generateMockUnlockedAccess());
-}
-
-function loadLockedInsight() {
-  const mockData = generateMockAdvancedInsight('SOL', 48);
-  useAdvancedInsightStore.getState().ingest(mockData, generateMockLockedAccess());
+function setLockedScenario() {
+  __setAdvancedInsightTestScenario({
+    locked: true,
+    insight: generateMockAdvancedInsight('SOL', 48),
+  });
 }
 
 describe('AdvancedInsightCard component', () => {
   beforeEach(() => {
-    resetStore();
+    setUnlockedScenario();
     vi.clearAllMocks();
   });
 
   it('renders unlocked card with tabs and ARIA wiring', () => {
-    loadUnlockedInsight();
     render(<AdvancedInsightCard />);
 
     const tablist = screen.getByRole('tablist', { name: /advanced insight sections/i });
@@ -72,7 +60,6 @@ describe('AdvancedInsightCard component', () => {
   });
 
   it('switches tabs when user selects Flow/Volume', async () => {
-    loadUnlockedInsight();
     render(<AdvancedInsightCard />);
     const user = userEvent.setup();
 
@@ -87,7 +74,6 @@ describe('AdvancedInsightCard component', () => {
   });
 
   it('allows editing playbook entries inline', async () => {
-    loadUnlockedInsight();
     render(<AdvancedInsightCard />);
     const user = userEvent.setup();
 
@@ -104,7 +90,7 @@ describe('AdvancedInsightCard component', () => {
   });
 
   it('shows lock overlay with accessible unlock CTA', () => {
-    loadLockedInsight();
+    setLockedScenario();
     render(<AdvancedInsightCard />);
 
     expect(screen.getByText(/Advanced Insight Locked/i)).toBeVisible();
