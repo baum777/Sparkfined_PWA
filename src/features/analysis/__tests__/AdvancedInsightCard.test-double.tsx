@@ -4,17 +4,17 @@ import { generateMockAdvancedInsight } from '../mockAdvancedInsightData';
 
 type TabId = 'market_structure' | 'flow_volume' | 'playbook';
 
-interface ScenarioState {
+export interface AdvancedInsightScenarioState {
   locked: boolean;
   insight: InsightPayload;
 }
 
-let scenario: ScenarioState = {
+let scenario: AdvancedInsightScenarioState = {
   locked: false,
   insight: generateMockAdvancedInsight('SOL', 48),
 };
 
-export function __setAdvancedInsightTestScenario(partial: Partial<ScenarioState>) {
+export function __setAdvancedInsightTestScenario(partial: Partial<AdvancedInsightScenarioState>) {
   scenario = {
     ...scenario,
     ...partial,
