@@ -121,11 +121,15 @@ pnpm lighthouse    # Lighthouse audit (requires preview)
 | `OPENAI_API_KEY` | ❌ | OpenAI API key for AI features |
 | `ANTHROPIC_API_KEY` | ❌ | Alternative AI provider |
 | `VITE_SOLANA_RPC_URL` | ❌ | Solana RPC endpoint (defaults to mainnet) |
+| `VITE_VAPID_PUBLIC_KEY` | ❌ | Public Web Push key exposed to the client; must match `VAPID_PUBLIC_KEY` |
 | `VAPID_PUBLIC_KEY` | ❌ | Web Push public key |
 | `VAPID_PRIVATE_KEY` | ❌ | Web Push private key (server-side only) |
+| `ALERTS_ADMIN_SECRET` | ❌ | Bearer token for `/api/push/test-send` (required in production) |
 | `DEV_USE_MOCKS` | ❌ | When `true`, proxy returns mocked responses instead of live Moralis calls |
 
 *Note: Client-side variables must be prefixed with `VITE_`*
+
+See `docs/setup/push-notifications.md` for a dedicated Web Push checklist, sample payload, and verification commands.
 
 ---
 
