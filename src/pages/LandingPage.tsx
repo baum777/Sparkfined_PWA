@@ -361,11 +361,34 @@ export default function LandingPage() {
             <span className="text-xl font-bold">Sparkfined</span>
           </div>
 
-          <div className="mb-6 flex justify-center gap-6 text-sm text-zinc-400">
-            <a href="#" className="hover:text-zinc-100">Twitter</a>
-            <a href="#" className="hover:text-zinc-100">GitHub</a>
-            <a href="#" className="hover:text-zinc-100">Discord</a>
-            <a href="#" className="hover:text-zinc-100">Docs</a>
+            <div className="mb-6 flex justify-center gap-6 text-sm text-zinc-400">
+              <a
+                href="https://twitter.com/sparkfined"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-zinc-100"
+              >
+                Twitter
+              </a>
+              <a
+                href="https://github.com/sparkfined"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-zinc-100"
+              >
+                GitHub
+              </a>
+              <a
+                href="https://discord.gg/sparkfined"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-zinc-100"
+              >
+                Discord
+              </a>
+              <a href="/docs" className="hover:text-zinc-100">
+                Docs
+              </a>
           </div>
 
           <p className="text-sm text-zinc-600">
