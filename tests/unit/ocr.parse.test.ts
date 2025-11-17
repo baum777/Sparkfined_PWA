@@ -3,7 +3,7 @@
  * Tests for OCR parsing and label extraction
  */
 
-import { describe, it, expect as _expect } from 'vitest';
+import { describe, it } from 'vitest';
 
 describe('OCR Service', () => {
   it.skip('extracts at least one label from sample image', async () => {
