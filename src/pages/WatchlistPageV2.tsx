@@ -1,19 +1,11 @@
 import React from 'react';
 import WatchlistLayout from '@/components/watchlist/WatchlistLayout';
-import WatchlistTable, { WatchlistTableRow } from '@/components/watchlist/WatchlistTable';
-
-const mockWatchlistRows: WatchlistTableRow[] = [
-  { symbol: 'BTCUSDT', name: 'Bitcoin', price: '$43,280', change24h: '+2.4%', session: 'London' },
-  { symbol: 'ETHUSDT', name: 'Ethereum', price: '$2,320', change24h: '+1.1%', session: 'NY' },
-  { symbol: 'SOLUSDT', name: 'Solana', price: '$98.42', change24h: '-0.8%', session: 'Asia' },
-  { symbol: 'OPUSDT', name: 'Optimism', price: '$3.12', change24h: '+5.6%', session: 'London' },
-  { symbol: 'LINKUSDT', name: 'Chainlink', price: '$19.44', change24h: '-1.5%', session: 'NY' },
-  { symbol: 'ARBUSDT', name: 'Arbitrum', price: '$1.98', change24h: '+0.4%', session: 'NY' },
-  { symbol: 'TIAUSDT', name: 'Celestia', price: '$13.55', change24h: '+4.9%', session: 'Asia' },
-] as const;
+import WatchlistTable from '@/components/watchlist/WatchlistTable';
+import { useWatchlistStore } from '@/store/watchlistStore';
 
 export default function WatchlistPageV2() {
-  const assetCount = mockWatchlistRows.length;
+  const rows = useWatchlistStore((state) => state.rows);
+  const assetCount = rows.length;
   const headerDescription = `${assetCount} assets watched \u00b7 Quickly scan risk, momentum and context`;
 
   return (
@@ -31,7 +23,7 @@ export default function WatchlistPageV2() {
           title="Watchlist"
           subtitle="Monitor key assets, spot shifts in market tone and keep your edge synced."
         >
-          <WatchlistTable rows={mockWatchlistRows} />
+          <WatchlistTable rows={rows} />
         </WatchlistLayout>
       </div>
     </div>

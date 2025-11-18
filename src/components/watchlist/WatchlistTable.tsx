@@ -1,15 +1,8 @@
 import React from 'react';
-
-export interface WatchlistTableRow {
-  symbol: string;
-  name: string;
-  price: string;
-  change24h: string;
-  session: string;
-}
+import type { WatchlistRow } from '@/store/watchlistStore';
 
 interface WatchlistTableProps {
-  rows: ReadonlyArray<WatchlistTableRow>;
+  rows: ReadonlyArray<WatchlistRow>;
 }
 
 export default function WatchlistTable({ rows }: WatchlistTableProps) {
