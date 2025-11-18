@@ -1,19 +1,8 @@
 import React from 'react';
-
-export type AlertType = 'price' | 'volume' | 'volatility';
-export type AlertStatus = 'armed' | 'triggered' | 'snoozed';
-
-export interface AlertListItem {
-  id: string;
-  symbol: string;
-  condition: string;
-  type: AlertType;
-  status: AlertStatus;
-  timeframe: string;
-}
+import type { Alert, AlertStatus, AlertType } from '@/store/alertsStore';
 
 interface AlertsListProps {
-  alerts: AlertListItem[];
+  alerts: Alert[];
 }
 
 const STATUS_STYLES: Record<AlertStatus, string> = {

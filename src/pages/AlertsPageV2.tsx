@@ -1,9 +1,10 @@
 import React from 'react';
 import AlertsLayout from '@/components/alerts/AlertsLayout';
-import AlertsList, { type AlertListItem } from '@/components/alerts/AlertsList';
+import AlertsList from '@/components/alerts/AlertsList';
+import { useAlertsStore } from '@/store/alertsStore';
 
 export default function AlertsPageV2() {
-  const alerts = DUMMY_ALERTS;
+  const alerts = useAlertsStore((state) => state.alerts);
   const headerDescription = `${alerts.length} alerts tracked · Stay ahead of key levels, momentum shifts and volatility spikes`;
 
   return (
@@ -27,54 +28,3 @@ export default function AlertsPageV2() {
     </div>
   );
 }
-
-const DUMMY_ALERTS: AlertListItem[] = [
-  {
-    id: 'btc-breakout',
-    symbol: 'BTCUSDT',
-    condition: 'Price closes above 42,500 with RSI > 60',
-    type: 'price',
-    status: 'armed',
-    timeframe: '4H',
-  },
-  {
-    id: 'eth-volume-surge',
-    symbol: 'ETHUSDT',
-    condition: 'Volume spikes > 160% of 20-session average',
-    type: 'volume',
-    status: 'triggered',
-    timeframe: '1H',
-  },
-  {
-    id: 'sol-volatility-squeeze',
-    symbol: 'SOLUSDT',
-    condition: 'Volatility compression breaks with > 4% range expansion',
-    type: 'volatility',
-    status: 'snoozed',
-    timeframe: '1D',
-  },
-  {
-    id: 'op-reclaim',
-    symbol: 'OPUSDT',
-    condition: 'Price reclaims 200 EMA and holds for 2 closes',
-    type: 'price',
-    status: 'armed',
-    timeframe: '4H',
-  },
-  {
-    id: 'arb-volume-imabalance',
-    symbol: 'ARBUSDT',
-    condition: 'Buy volume > sell volume by 30% on session open',
-    type: 'volume',
-    status: 'snoozed',
-    timeframe: '30M',
-  },
-  {
-    id: 'avax-volatility-break',
-    symbol: 'AVAXUSDT',
-    condition: 'ATR(14) expands above 2.8 with +3% move in hour',
-    type: 'volatility',
-    status: 'triggered',
-    timeframe: '1H',
-  },
-];
