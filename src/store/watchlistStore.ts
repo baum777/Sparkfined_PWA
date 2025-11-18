@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { WatchlistQuote } from '@/features/market/watchlistData';
 
 export type WatchlistRow = {
   symbol: string;
@@ -10,7 +11,12 @@ export type WatchlistRow = {
 
 interface WatchlistState {
   rows: WatchlistRow[];
+  isLoading: boolean;
+  error: string | null;
   setRows: (rows: WatchlistRow[]) => void;
+  setLoading: (value: boolean) => void;
+  setError: (message: string | null) => void;
+  hydrateFromQuotes: (quotes: WatchlistQuote[]) => void;
 }
 
 const INITIAL_ROWS: WatchlistRow[] = [
@@ -23,8 +29,81 @@ const INITIAL_ROWS: WatchlistRow[] = [
   { symbol: 'TIAUSDT', name: 'Celestia', price: '$13.55', change24h: '+4.9%', session: 'Asia' },
 ];
 
+const USD_INTEGER_FORMATTER = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
+const USD_STANDARD_FORMATTER = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+const USD_LOW_FORMATTER = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  minimumFractionDigits: 4,
+  maximumFractionDigits: 4,
+});
+
 export const useWatchlistStore = create<WatchlistState>((set) => ({
   rows: INITIAL_ROWS,
+  isLoading: false,
+  error: null,
   setRows: (rows) => set({ rows }),
+  setLoading: (value) => set({ isLoading: value }),
+  setError: (message) => set({ error: message }),
+  hydrateFromQuotes: (quotes) =>
+    set((state) => {
+      if (!quotes.length) {
+        return state;
+      }
+
+      const quoteMap = new Map(quotes.map((quote) => [quote.symbol.toUpperCase(), quote]));
+      const rows = state.rows.map((row) => {
+        const quote = quoteMap.get(row.symbol.toUpperCase());
+        if (!quote) {
+          // Fallback: preserve the last known mock value if a provider misses the symbol.
+          return row;
+        }
+
+        return {
+          ...row,
+          price: formatPrice(quote.price),
+          change24h: formatChange(quote.change24hPct),
+        };
+      });
+
+      return { rows };
+    }),
 }));
+
+function formatPrice(value: number): string {
+  if (!Number.isFinite(value) || value <= 0) {
+    return '—';
+  }
+
+  if (value >= 1000) {
+    return USD_INTEGER_FORMATTER.format(value);
+  }
+
+  if (value >= 1) {
+    return USD_STANDARD_FORMATTER.format(value);
+  }
+
+  return USD_LOW_FORMATTER.format(value);
+}
+
+function formatChange(value: number): string {
+  if (!Number.isFinite(value)) {
+    return '+0.0%';
+  }
+
+  const fixed = value.toFixed(1);
+  return `${value >= 0 ? '+' : ''}${fixed}%`;
+}
 
