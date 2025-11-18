@@ -2,8 +2,10 @@ import { NavLink } from 'react-router-dom'
 
 const navItems = [
   { to: '/dashboard-v2', label: 'Dashboard' },
+  { to: '/watchlist-v2', label: 'Watchlist' },
   { to: '/analysis-v2', label: 'Analysis' },
   { to: '/journal-v2', label: 'Journal' },
+  { to: '/alerts-v2', label: 'Alerts' },
 ]
 
 export default function AppHeader() {
