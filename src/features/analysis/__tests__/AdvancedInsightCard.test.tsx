@@ -6,7 +6,8 @@ import userEvent from '@testing-library/user-event';
 
 vi.mock('../AdvancedInsightCard', () => import('./AdvancedInsightCard.test-double'));
 
-import AdvancedInsightCard, { __setAdvancedInsightTestScenario } from '../AdvancedInsightCard';
+import AdvancedInsightCard from '../AdvancedInsightCard';
+import { __setAdvancedInsightTestScenario } from './AdvancedInsightCard.test-double';
 import { generateMockAdvancedInsight } from '../mockAdvancedInsightData';
 
 vi.mock('../advancedInsightTelemetry', () => {
