@@ -1,41 +1,79 @@
 import React from 'react';
-import type { JournalListEntry } from './JournalList';
+import type { JournalEntry } from '@/store/journalStore';
 
-interface JournalDetailPanelProps {
-  entry?: JournalListEntry & { notes?: string };
-}
+type JournalDetailPanelProps = {
+  entry?: JournalEntry;
+};
 
 export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
+  // Read-only view; edit/create flows kommen in einem späteren Loop.
+
   if (!entry) {
     return (
-      <div className="flex min-h-[320px] items-center justify-center rounded-2xl border border-dashed border-white/10 bg-black/30 text-sm text-zinc-400">
-        Select a journal entry to see details.
+      <div className="flex h-full items-center justify-center px-4 text-sm text-muted-foreground">
+        Select a journal entry on the left to see full details and notes here.
       </div>
     );
   }
 
+  const isNegativePnl =
+    typeof entry.pnl === 'string' && entry.pnl.trim().startsWith('-');
+
+  const pnlColorClass = entry.pnl
+    ? isNegativePnl
+      ? 'text-red-600'
+      : 'text-emerald-600'
+    : 'text-muted-foreground';
+
+  const directionLabel = entry.direction.toUpperCase();
+
+  const directionBadgeClass =
+    entry.direction === 'long'
+      ? 'bg-emerald-100 text-emerald-700'
+      : 'bg-red-100 text-red-700';
+
   return (
-    <div className="space-y-4 rounded-2xl border border-white/5 bg-black/30 p-6">
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-center gap-3">
-          <h2 className="text-xl font-semibold text-white">{entry.title}</h2>
-          <span className="rounded-full border border-white/10 px-2 py-1 text-xs text-zinc-400">{entry.date}</span>
+    <div className="flex h-full flex-col p-4">
+      {/* Header: title, direction badge, date */}
+      <div className="flex flex-col gap-2 border-b pb-3">
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-lg font-semibold leading-tight">{entry.title}</h2>
           <span
-            className={`rounded-full px-2 py-1 text-xs font-semibold ${
-              entry.direction === 'long' ? 'bg-emerald-500/10 text-emerald-300' : 'bg-rose-500/10 text-rose-300'
-            }`}
+            className={[
+              'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+              directionBadgeClass,
+            ].join(' ')}
           >
-            {entry.direction.toUpperCase()}
+            {directionLabel}
           </span>
-          {entry.pnl ? (
-            <span className="rounded-full bg-white/5 px-2 py-1 text-xs font-mono text-zinc-100">{entry.pnl}</span>
-          ) : null}
         </div>
-        <p className="text-sm text-zinc-400">Notes</p>
+        <div className="text-xs text-muted-foreground">{entry.date}</div>
       </div>
 
-      <div className="rounded-xl border border-white/5 bg-black/40 p-4 text-sm text-zinc-300">
-        {entry.notes ?? 'No notes yet — add reflections later.'}
+      {/* PnL row */}
+      <div className="mt-3 flex items-center justify-between text-sm">
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          PnL
+        </span>
+        <span className={['text-sm font-semibold', pnlColorClass].join(' ')}>
+          {entry.pnl ?? 'N/A'}
+        </span>
+      </div>
+
+      {/* Notes */}
+      <div className="mt-4 flex-1 border-t pt-4">
+        <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Notes
+        </div>
+        {entry.notes ? (
+          <div className="max-h-64 overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed">
+            {entry.notes}
+          </div>
+        ) : (
+          <div className="text-sm text-muted-foreground">
+            No notes for this entry yet.
+          </div>
+        )}
       </div>
     </div>
   );
