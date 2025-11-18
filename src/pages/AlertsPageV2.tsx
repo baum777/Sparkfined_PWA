@@ -3,15 +3,21 @@ import AlertsLayout from '@/components/alerts/AlertsLayout';
 import AlertsList from '@/components/alerts/AlertsList';
 import AlertsDetailPanel from '@/components/alerts/AlertsDetailPanel';
 import { useAlertsStore } from '@/store/alertsStore';
+import { useSearchParams } from 'react-router-dom';
 
 type StatusFilter = 'all' | 'armed' | 'triggered' | 'snoozed';
 type TypeFilter = 'all' | 'price' | 'volume' | 'volatility';
 
 export default function AlertsPageV2() {
   const alerts = useAlertsStore((state) => state.alerts);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [typeFilter, setTypeFilter] = React.useState<TypeFilter>('all');
-  const [activeAlertId, setActiveAlertId] = React.useState<string | undefined>(undefined);
+  const alertFromUrl = searchParams.get('alert');
+  const isValidAlertId = alerts.some((alert) => alert.id === alertFromUrl);
+  const [activeAlertId, setActiveAlertId] = React.useState<string | undefined>(
+    isValidAlertId ? (alertFromUrl as string) : undefined,
+  );
   const headerDescription = `${alerts.length} alerts tracked · Stay ahead of key levels, momentum shifts and volatility spikes`;
   const filteredAlerts = React.useMemo(() => {
     return alerts.filter((alert) => {
@@ -23,6 +29,20 @@ export default function AlertsPageV2() {
   const activeAlert = React.useMemo(() => {
     return alerts.find((alert) => alert.id === activeAlertId);
   }, [alerts, activeAlertId]);
+  React.useEffect(() => {
+    const current = searchParams.get('alert');
+    if (activeAlertId && current !== activeAlertId) {
+      const next = new URLSearchParams(searchParams);
+      next.set('alert', activeAlertId);
+      setSearchParams(next, { replace: true });
+      return;
+    }
+    if (!activeAlertId && current) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('alert');
+      setSearchParams(next, { replace: true });
+    }
+  }, [activeAlertId, searchParams, setSearchParams]);
 
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100">
