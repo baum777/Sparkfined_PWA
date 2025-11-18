@@ -19,6 +19,9 @@ const NotificationsPage = lazy(() => import("../pages/NotificationsPage"));
 const SignalsPage = lazy(() => import("../pages/SignalsPage"));
 const LessonsPage = lazy(() => import("../pages/LessonsPage"));
 const IconShowcase = lazy(() => import("../pages/IconShowcase"));
+const DashboardPageV2 = lazy(() => import("../pages/DashboardPageV2"));
+const AnalysisPageV2 = lazy(() => import("../pages/AnalysisPageV2"));
+const JournalPageV2 = lazy(() => import("../pages/JournalPageV2"));
 
 function Fallback() {
   return (
@@ -42,9 +45,10 @@ export default function RoutesRoot() {
             <Routes>
             {/* Landing Page - No Layout (standalone) */}
             <Route path="/landing" element={<LandingPage />} />
-            
+
             {/* App Routes - With Layout */}
-            <Route path="/" element={
+            <Route path="/" element={<Navigate to="/dashboard-v2" replace />} />
+            <Route path="/board" element={
               <Layout>
                 <BoardPage />
               </Layout>
@@ -99,6 +103,9 @@ export default function RoutesRoot() {
                 <LessonsPage />
               </Layout>
             } />
+            <Route path="/dashboard-v2" element={<DashboardPageV2 />} />
+            <Route path="/analysis-v2" element={<AnalysisPageV2 />} />
+            <Route path="/journal-v2" element={<JournalPageV2 />} />
             <Route path="/icons" element={<IconShowcase />} />
             <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
             </Routes>
