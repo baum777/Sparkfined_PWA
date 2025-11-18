@@ -51,6 +51,10 @@ export default function AnalysisPageV2() {
 
   const renderTabContent = () => {
     if (activeTab === 'overview') {
+      if (!hasInsight) {
+        return <OverviewInsightSkeleton />;
+      }
+
       const stats = [
         { label: 'Bias', value: overviewInsight.bias, accent: 'text-emerald-300' },
         { label: 'Confidence', value: `${Math.round(overviewInsight.confidence * 100)}%`, accent: 'text-amber-300' },
@@ -132,6 +136,33 @@ function ComingSoonBlock({ title, description }: ComingSoonBlockProps) {
     <div className="space-y-3 rounded-2xl border border-dashed border-white/10 bg-black/20 p-8 text-center">
       <p className="text-base font-semibold text-white">{title}</p>
       <p className="text-sm text-zinc-400">{description}</p>
+    </div>
+  );
+}
+
+function OverviewInsightSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="h-3 w-40 rounded-full bg-white/10 animate-pulse" />
+          <div className="h-6 w-3/4 rounded-full bg-white/10 animate-pulse" />
+          <div className="h-4 w-full rounded-full bg-white/5 animate-pulse" />
+          <div className="h-4 w-2/3 rounded-full bg-white/5 animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {[0, 1, 2].map((key) => (
+            <div
+              key={key}
+              className="h-20 rounded-2xl border border-white/10 bg-white/5 animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+        <div className="h-64 w-full animate-pulse rounded-2xl bg-white/10" />
+        <p className="mt-4 text-center text-sm text-zinc-500">No AI insight available yet. Fetching the latest market view…</p>
+      </div>
     </div>
   );
 }
