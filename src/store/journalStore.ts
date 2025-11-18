@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { queryEntries } from '@/lib/JournalService';
+import { createEntry, queryEntries } from '@/lib/JournalService';
 import type { JournalEntry as PersistedJournalEntry } from '@/types/journal';
 
 export type JournalDirection = 'long' | 'short';
@@ -22,6 +22,7 @@ interface JournalState {
   setActiveId: (id?: string) => void;
   setLoading: (value: boolean) => void;
   setError: (message: string | null) => void;
+  addEntry: (entry: JournalEntry) => void;
 }
 
 const INITIAL_ENTRIES: JournalEntry[] = [
@@ -68,6 +69,10 @@ export const useJournalStore = create<JournalState>((set) => ({
   setActiveId: (id) => set({ activeId: id }),
   setLoading: (value) => set({ isLoading: value }),
   setError: (message) => set({ error: message }),
+  addEntry: (entry) =>
+    set((state) => ({
+      entries: [entry, ...state.entries],
+    })),
 }));
 
 const monthFormatter = new Intl.DateTimeFormat('en-US', {
@@ -156,4 +161,41 @@ export async function loadJournalEntries(): Promise<JournalEntry[]> {
   }
 
   return persistedEntries.map(mapPersistedToJournalEntry);
+}
+
+type QuickEntryInput = {
+  title: string;
+  notes: string;
+};
+
+function buildQuickEntryTicker(title: string): string {
+  const fallback = 'MANUAL';
+  if (!title.trim()) {
+    return fallback;
+  }
+  const sanitized = title.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  return sanitized.length ? sanitized.slice(0, 12) : fallback;
+}
+
+/**
+ * Create a minimal journal entry via Dexie and map it to the V2 UI shape.
+ */
+export async function createQuickJournalEntry(input: QuickEntryInput): Promise<JournalEntry> {
+  const now = Date.now();
+  const title = input.title.trim();
+  const notes = input.notes.trim();
+  const thesisSections = [title, notes].filter(Boolean);
+  const thesis = thesisSections.join('\n\n') || undefined;
+
+  const persisted = await createEntry({
+    ticker: buildQuickEntryTicker(title),
+    address: 'manual-entry',
+    setup: 'custom',
+    emotion: 'custom',
+    status: 'active',
+    timestamp: now,
+    thesis,
+  });
+
+  return mapPersistedToJournalEntry(persisted);
 }

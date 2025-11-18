@@ -3,13 +3,14 @@ import { useSearchParams } from 'react-router-dom';
 import JournalLayout from '@/components/journal/JournalLayout';
 import JournalList from '@/components/journal/JournalList';
 import JournalDetailPanel from '@/components/journal/JournalDetailPanel';
-import { loadJournalEntries, useJournalStore } from '@/store/journalStore';
+import JournalNewEntryDialog from '@/components/journal/JournalNewEntryDialog';
+import { createQuickJournalEntry, loadJournalEntries, useJournalStore } from '@/store/journalStore';
 
 type DirectionFilter = 'all' | 'long' | 'short';
 
 export default function JournalPageV2() {
-  const { entries, isLoading, error, activeId, setEntries, setActiveId, setLoading, setError } = useJournalStore(
-    (state) => ({
+  const { entries, isLoading, error, activeId, setEntries, setActiveId, setLoading, setError, addEntry } =
+    useJournalStore((state) => ({
       entries: state.entries,
       isLoading: state.isLoading,
       error: state.error,
@@ -18,10 +19,13 @@ export default function JournalPageV2() {
       setActiveId: state.setActiveId,
       setLoading: state.setLoading,
       setError: state.setError,
-    }),
-  );
+      addEntry: state.addEntry,
+    }));
   const [searchParams, setSearchParams] = useSearchParams();
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
+  const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [createErrorMessage, setCreateErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let isCurrent = true;
@@ -127,6 +131,28 @@ export default function JournalPageV2() {
     [directionCounts.all, directionCounts.long, directionCounts.short],
   );
 
+  const handleCreateEntry = useCallback(
+    async ({ title, notes }: { title: string; notes: string }) => {
+      setIsCreating(true);
+      setCreateErrorMessage(null);
+      try {
+        const newEntry = await createQuickJournalEntry({ title, notes });
+        addEntry(newEntry);
+        setActiveId(newEntry.id);
+        const nextParams = new URLSearchParams(searchParams);
+        nextParams.set('entry', newEntry.id);
+        setSearchParams(nextParams, { replace: true });
+        setIsNewDialogOpen(false);
+      } catch (createError) {
+        console.warn('[Journal V2] Failed to create entry', createError);
+        setCreateErrorMessage('Unable to create entry. Please try again.');
+      } finally {
+        setIsCreating(false);
+      }
+    },
+    [addEntry, searchParams, setActiveId, setSearchParams],
+  );
+
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 space-y-8">
@@ -141,9 +167,19 @@ export default function JournalPageV2() {
               {isLoading && <p className="text-xs text-zinc-500">Loading entries…</p>}
               {!isLoading && error && <p className="text-xs text-amber-300">{error}</p>}
             </div>
-            <div className="text-right text-sm text-zinc-400">
-              <p>Next review in 2 days</p>
-              <p className="text-xs uppercase tracking-wide">Daily ritual: 06:30 UTC</p>
+            <div className="flex flex-col items-end gap-3 text-right text-sm text-zinc-400 sm:flex-row sm:items-center">
+              <div>
+                <p>Next review in 2 days</p>
+                <p className="text-xs uppercase tracking-wide">Daily ritual: 06:30 UTC</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsNewDialogOpen(true)}
+                disabled={isLoading || isCreating}
+                className="rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/10 disabled:opacity-40"
+              >
+                New entry
+              </button>
             </div>
           </div>
         </header>
@@ -187,6 +223,18 @@ export default function JournalPageV2() {
           detail={<JournalDetailPanel entry={activeEntry} />}
         />
       </div>
+      <JournalNewEntryDialog
+        isOpen={isNewDialogOpen}
+        onClose={() => {
+          if (!isCreating) {
+            setIsNewDialogOpen(false);
+            setCreateErrorMessage(null);
+          }
+        }}
+        onCreate={handleCreateEntry}
+        isSubmitting={isCreating}
+        errorMessage={createErrorMessage}
+      />
     </div>
   );
 }
