@@ -1,12 +1,8 @@
 import React from 'react';
+import { useSearchParams } from 'react-router-dom';
+import type { JournalEntry } from '@/store/journalStore';
 
-export interface JournalListEntry {
-  id: string;
-  title: string;
-  date: string;
-  direction: 'long' | 'short';
-  pnl?: string;
-}
+export type JournalListEntry = JournalEntry;
 
 interface JournalListProps {
   entries: ReadonlyArray<JournalListEntry>;
@@ -15,6 +11,17 @@ interface JournalListProps {
 }
 
 export default function JournalList({ entries, activeId, onSelect }: JournalListProps) {
+  const [, setSearchParams] = useSearchParams();
+
+  const handleSelect = (id: string) => {
+    onSelect(id);
+    setSearchParams((prev) => {
+      const nextParams = new URLSearchParams(prev);
+      nextParams.set('entry', id);
+      return nextParams;
+    });
+  };
+
   if (!entries.length) {
     return (
       <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 p-6 text-center text-sm text-zinc-400">
@@ -31,7 +38,7 @@ export default function JournalList({ entries, activeId, onSelect }: JournalList
           <button
             key={entry.id}
             type="button"
-            onClick={() => onSelect(entry.id)}
+            onClick={() => handleSelect(entry.id)}
             className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
               isActive
                 ? 'border-emerald-400/60 bg-emerald-400/10'

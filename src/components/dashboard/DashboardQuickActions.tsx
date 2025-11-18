@@ -1,31 +1,22 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/ui/Button';
 
-interface DashboardQuickActionsProps {
-  onOpenBoard?: () => void;
-  onOpenJournal?: () => void;
-  onOpenAnalysis?: () => void;
-}
+export default function DashboardQuickActions() {
+  const navigate = useNavigate();
 
-const noop = () => {};
-
-export default function DashboardQuickActions({
-  onOpenBoard = noop,
-  onOpenJournal = noop,
-  onOpenAnalysis = noop,
-}: DashboardQuickActionsProps) {
   const actions = [
     {
-      label: 'Open Board',
-      onClick: onOpenBoard,
+      label: 'Dashboard',
+      path: '/dashboard-v2',
     },
     {
-      label: 'Open Journal',
-      onClick: onOpenJournal,
+      label: 'Journal',
+      path: '/journal-v2',
     },
     {
-      label: 'Open Analysis',
-      onClick: onOpenAnalysis,
+      label: 'Analysis',
+      path: '/analysis-v2',
     },
   ];
 
@@ -36,10 +27,7 @@ export default function DashboardQuickActions({
           key={action.label}
           variant="secondary"
           size="sm"
-          onClick={() => {
-            action.onClick();
-            // TODO: wire navigation
-          }}
+          onClick={() => navigate(action.path)}
         >
           {action.label}
         </Button>
