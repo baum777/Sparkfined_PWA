@@ -2,7 +2,9 @@ import React from 'react';
 import type { Alert, AlertStatus, AlertType } from '@/store/alertsStore';
 
 interface AlertsListProps {
-  alerts: Alert[];
+  alerts: ReadonlyArray<Alert>;
+  activeAlertId?: string;
+  onSelectAlert?: (id: string) => void;
 }
 
 const STATUS_STYLES: Record<AlertStatus, string> = {
@@ -17,7 +19,7 @@ const TYPE_LABELS: Record<AlertType, string> = {
   volatility: 'Volatility',
 };
 
-export default function AlertsList({ alerts }: AlertsListProps) {
+export default function AlertsList({ alerts, activeAlertId, onSelectAlert }: AlertsListProps) {
   if (alerts.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 px-6 py-10 text-center text-sm text-zinc-400">
@@ -29,13 +31,17 @@ export default function AlertsList({ alerts }: AlertsListProps) {
   return (
     <div className="space-y-3">
       {alerts.map((alert) => {
+        const isActive = activeAlertId === alert.id;
         const statusClasses = STATUS_STYLES[alert.status];
         const typeLabel = TYPE_LABELS[alert.type];
 
         return (
           <article
             key={alert.id}
-            className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-zinc-200 transition hover:bg-white/5 sm:px-5 sm:py-4"
+            onClick={() => onSelectAlert?.(alert.id)}
+            className={`rounded-2xl border px-4 py-3 text-sm text-zinc-200 transition sm:px-5 sm:py-4 ${
+              isActive ? 'border-emerald-400/60 bg-white/5' : 'border-white/10 bg-black/30 cursor-pointer hover:bg-white/5'
+            }`}
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import AlertsLayout from '@/components/alerts/AlertsLayout';
 import AlertsList from '@/components/alerts/AlertsList';
+import AlertsDetailPanel from '@/components/alerts/AlertsDetailPanel';
 import { useAlertsStore } from '@/store/alertsStore';
 
 type StatusFilter = 'all' | 'armed' | 'triggered' | 'snoozed';
@@ -10,6 +11,7 @@ export default function AlertsPageV2() {
   const alerts = useAlertsStore((state) => state.alerts);
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
   const [typeFilter, setTypeFilter] = React.useState<TypeFilter>('all');
+  const [activeAlertId, setActiveAlertId] = React.useState<string | undefined>(undefined);
   const headerDescription = `${alerts.length} alerts tracked · Stay ahead of key levels, momentum shifts and volatility spikes`;
   const filteredAlerts = React.useMemo(() => {
     return alerts.filter((alert) => {
@@ -18,6 +20,9 @@ export default function AlertsPageV2() {
       return statusOk && typeOk;
     });
   }, [alerts, statusFilter, typeFilter]);
+  const activeAlert = React.useMemo(() => {
+    return alerts.find((alert) => alert.id === activeAlertId);
+  }, [alerts, activeAlertId]);
 
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100">
@@ -34,48 +39,55 @@ export default function AlertsPageV2() {
           title="Alerts"
           subtitle="Centralize signals, key levels and volatility triggers."
         >
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
-              <div className="flex flex-wrap items-center gap-2">
-                {STATUS_FILTERS.map((filter) => {
-                  const isActive = statusFilter === filter;
-                  return (
-                    <button
-                      key={filter}
-                      type="button"
-                      onClick={() => setStatusFilter(filter)}
-                      className={`rounded-full border px-3 py-1 font-semibold transition ${
-                        isActive
-                          ? 'border-white/30 bg-white/10 text-white'
-                          : 'border-white/10 text-white/60 hover:bg-white/5'
-                      }`}
-                    >
-                      {formatFilterLabel(filter)}
-                    </button>
-                  );
-                })}
+          <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  {STATUS_FILTERS.map((filter) => {
+                    const isActive = statusFilter === filter;
+                    return (
+                      <button
+                        key={filter}
+                        type="button"
+                        onClick={() => setStatusFilter(filter)}
+                        className={`rounded-full border px-3 py-1 font-semibold transition ${
+                          isActive
+                            ? 'border-white/30 bg-white/10 text-white'
+                            : 'border-white/10 text-white/60 hover:bg-white/5'
+                        }`}
+                      >
+                        {formatFilterLabel(filter)}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  {TYPE_FILTERS.map((filter) => {
+                    const isActive = typeFilter === filter;
+                    return (
+                      <button
+                        key={filter}
+                        type="button"
+                        onClick={() => setTypeFilter(filter)}
+                        className={`rounded-full border px-3 py-1 font-semibold transition ${
+                          isActive
+                            ? 'border-white/30 bg-white/10 text-white'
+                            : 'border-white/10 text-white/60 hover:bg-white/5'
+                        }`}
+                      >
+                        {formatFilterLabel(filter)}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                {TYPE_FILTERS.map((filter) => {
-                  const isActive = typeFilter === filter;
-                  return (
-                    <button
-                      key={filter}
-                      type="button"
-                      onClick={() => setTypeFilter(filter)}
-                      className={`rounded-full border px-3 py-1 font-semibold transition ${
-                        isActive
-                          ? 'border-white/30 bg-white/10 text-white'
-                          : 'border-white/10 text-white/60 hover:bg-white/5'
-                      }`}
-                    >
-                      {formatFilterLabel(filter)}
-                    </button>
-                  );
-                })}
-              </div>
+              <AlertsList
+                alerts={filteredAlerts}
+                activeAlertId={activeAlertId}
+                onSelectAlert={setActiveAlertId}
+              />
             </div>
-            <AlertsList alerts={filteredAlerts} />
+            <AlertsDetailPanel alert={activeAlert} />
           </div>
         </AlertsLayout>
       </div>
