@@ -3,6 +3,7 @@ import AnalysisSidebarTabs, { AnalysisTab } from './AnalysisSidebarTabs';
 
 interface AnalysisLayoutProps {
   title: string;
+  subtitle?: string;
   tabs: ReadonlyArray<AnalysisTab>;
   activeTab: string;
   onTabChange: (id: string) => void;
@@ -11,6 +12,7 @@ interface AnalysisLayoutProps {
 
 export default function AnalysisLayout({
   title,
+  subtitle,
   tabs,
   activeTab,
   onTabChange,
@@ -30,7 +32,10 @@ export default function AnalysisLayout({
         <section className="space-y-6">
           <header className="space-y-2">
             <p className="text-xs uppercase tracking-[0.4em] text-zinc-500">Sparkfined</p>
-            <h1 className="text-3xl font-semibold text-white">{title}</h1>
+            <div>
+              <h1 className="text-3xl font-semibold text-white">{title}</h1>
+              {subtitle ? <p className="mt-1 text-sm text-zinc-400">{subtitle}</p> : null}
+            </div>
           </header>
           <div className="rounded-2xl border border-white/5 bg-black/40 p-6 shadow-inner">{children}</div>
         </section>
