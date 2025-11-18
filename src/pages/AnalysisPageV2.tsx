@@ -6,6 +6,7 @@ import {
   generateMockUnlockedAccess,
   useAdvancedInsightStore,
 } from '@/features/analysis';
+import { useSearchParams } from 'react-router-dom';
 
 const tabs = [
   { id: 'overview', label: 'Overview' },
@@ -24,9 +25,20 @@ const overviewInsight = {
 };
 
 export default function AnalysisPageV2() {
-  const [activeTab, setActiveTab] = React.useState<AnalysisTabId>(tabs[0]?.id ?? 'overview');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab');
+  const initialTab = tabs.some((tab) => tab.id === tabFromUrl) ? (tabFromUrl as AnalysisTabId) : tabs[0].id;
+  const [activeTab, setActiveTab] = React.useState<AnalysisTabId>(initialTab);
   const ingestAdvancedInsight = useAdvancedInsightStore((state) => state.ingest);
   const hasInsight = Boolean(useAdvancedInsightStore((state) => state.sections));
+
+  React.useEffect(() => {
+    if (!tabFromUrl || tabFromUrl !== activeTab) {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.set('tab', activeTab);
+      setSearchParams(nextParams, { replace: true });
+    }
+  }, [activeTab, tabFromUrl, searchParams, setSearchParams]);
 
   React.useEffect(() => {
     if (hasInsight) {
@@ -96,7 +108,12 @@ export default function AnalysisPageV2() {
           subtitle="AI-backed market views, flows and playbooks."
           tabs={tabs}
           activeTab={activeTab}
-          onTabChange={(id) => setActiveTab(id as AnalysisTabId)}
+          onTabChange={(id) => {
+            setActiveTab(id as AnalysisTabId);
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.set('tab', id);
+            setSearchParams(nextParams, { replace: true });
+          }}
         >
           {renderTabContent()}
         </AnalysisLayout>
