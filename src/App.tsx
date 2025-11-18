@@ -6,6 +6,7 @@ import GlobalInstruments from './pages/_layout/GlobalInstruments'
 import Sidebar from './components/layout/Sidebar'
 import BottomNav from './components/BottomNav'
 import MissingConfigBanner from './components/MissingConfigBanner'
+import AppHeader from './components/layout/AppHeader'
 import './styles/App.css'
 
 function App() {
@@ -26,9 +27,10 @@ function App() {
           
           {/* Desktop Sidebar (>= lg) */}
           <Sidebar />
-          
+
           {/* Main content with sidebar offset on desktop */}
           <div id="main-content" className="lg:pl-20">
+            <AppHeader />
             <RoutesRoot />
             <GlobalInstruments />
           </div>
