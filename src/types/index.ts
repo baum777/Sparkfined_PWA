@@ -42,3 +42,22 @@ export type {
   AnalyzeMarketResult,
   BotScore,
 } from './ai'
+
+// Event pipeline types
+export type {
+  SolanaMemeTrendEvent,
+  SolanaMemeTrendSparkfined,
+  SolanaMemeTrendTrading,
+  SolanaMemeTrendSentiment,
+  SolanaMemeTrendMarketSnapshot,
+  SolanaMemeTrendToken,
+  SolanaMemeTrendTweet,
+  SolanaMemeTrendAuthor,
+  SolanaMemeTrendSearchDocument,
+  GrokTweetPayload,
+  GrokTweetTokenRef,
+  TrendSentimentLabel,
+  TrendHypeLevel,
+  TrendCallToAction,
+  TrendSearchTopic,
+} from './events'

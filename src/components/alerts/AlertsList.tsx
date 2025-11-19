@@ -17,6 +17,7 @@ const TYPE_LABELS: Record<AlertType, string> = {
   price: 'Price',
   volume: 'Volume',
   volatility: 'Volatility',
+  trend: 'Trend',
 };
 
 export default function AlertsList({ alerts, activeAlertId, onSelectAlert }: AlertsListProps) {
