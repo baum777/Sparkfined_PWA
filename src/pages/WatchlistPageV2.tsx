@@ -2,9 +2,12 @@ import React from "react";
 import WatchlistLayout from "@/components/watchlist/WatchlistLayout";
 import WatchlistTable from "@/components/watchlist/WatchlistTable";
 import WatchlistDetailPanel from "@/components/watchlist/WatchlistDetailPanel";
+import TokenSearchAutocomplete from "@/components/search/TokenSearchAutocomplete";
+import { SimpleFilterChips } from "@/components/filters/FilterChips";
 import { fetchWatchlistQuotes } from "@/features/market/watchlistData";
 import { useWatchlistStore } from "@/store/watchlistStore";
 import type { WatchlistRow } from "@/store/watchlistStore";
+import type { Token } from "@/types/token";
 
 type SessionFilter = "all" | "London" | "NY" | "Asia";
 type SortMode = "default" | "top-movers";
@@ -24,6 +27,16 @@ export default function WatchlistPageV2() {
   const [sortMode, setSortMode] = React.useState<SortMode>("default");
   const [activeSymbol, setActiveSymbol] = React.useState<string | undefined>(undefined);
   const hasHydratedRef = React.useRef(false);
+
+  const handleTokenSelect = (token: Token) => {
+    console.log('[WatchlistPageV2] Selected token:', token);
+    // TODO: Add token to watchlist
+    // For now, just log it - actual watchlist addition requires store update
+  };
+
+  const handleSessionFilterToggle = (filter: string) => {
+    setSessionFilter(filter as SessionFilter);
+  };
   const loadQuotes = React.useCallback(
     async (symbols: string[]) => {
       if (!symbols.length) {
@@ -75,7 +88,7 @@ export default function WatchlistPageV2() {
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-        <header className="mb-10 space-y-3">
+        <header className="mb-10 space-y-4">
           <p className="text-xs uppercase tracking-[0.4em] text-zinc-500">Market radar</p>
           <div>
             <h1 className="text-4xl font-semibold text-white">Watchlist</h1>
@@ -86,6 +99,14 @@ export default function WatchlistPageV2() {
               </p>
             )}
           </div>
+
+          {/* Token Search */}
+          <div className="max-w-md">
+            <TokenSearchAutocomplete
+              onSelect={handleTokenSelect}
+              placeholder="Add token to watchlist (e.g., SOL, BTC)"
+            />
+          </div>
         </header>
 
         <WatchlistLayout
@@ -94,45 +115,35 @@ export default function WatchlistPageV2() {
         >
           <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
             <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
-                <div className="flex flex-wrap items-center gap-2">
-                  {SESSION_FILTERS.map((filter) => {
-                    const isActive = sessionFilter === filter;
-                    return (
-                      <button
-                        key={filter}
-                        type="button"
-                        onClick={() => setSessionFilter(filter)}
-                        className={`rounded-full border px-3 py-1 font-semibold transition ${
-                          isActive
-                            ? "border-white/30 bg-white/10 text-white"
-                            : "border-white/10 text-white/60 hover:bg-white/5"
-                        }`}
-                      >
-                        {filter === "all" ? "All" : filter}
-                      </button>
-                    );
-                  })}
-                </div>
+              {/* Filters & Controls */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                {/* Session Filters */}
+                <SimpleFilterChips
+                  chips={SESSION_FILTERS.map((f) => (f === "all" ? "All" : f))}
+                  activeChips={[sessionFilter === "all" ? "All" : sessionFilter]}
+                  onToggle={(filter) => {
+                    const sessionFilterValue = filter === "All" ? "all" : filter.toLowerCase();
+                    setSessionFilter(sessionFilterValue as SessionFilter);
+                  }}
+                  showClearAll={false}
+                  layout="horizontal-scroll"
+                />
 
-                <div className="flex items-center gap-3">
+                {/* Sort & Status */}
+                <div className="flex items-center gap-3 flex-shrink-0">
                   <button
                     type="button"
                     onClick={() =>
                       setSortMode((prev) => (prev === "default" ? "top-movers" : "default"))
                     }
-                    className="rounded-full border border-white/10 px-3 py-1 font-semibold text-white/80 transition hover:border-white/30 hover:text-white"
+                    className="px-4 h-11 bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-zinc-100 text-sm font-medium transition-all duration-200 touch-manipulation active:scale-95"
+                    style={{ borderRadius: '16px' }}
                   >
                     Order: {sortMode === "default" ? "Default" : "Top movers"}
                   </button>
                   {isLoading && (
                     <span className="text-xs font-semibold uppercase tracking-[0.3em] text-zinc-500 animate-pulse">
-                      Refreshing prices…
-                    </span>
-                  )}
-                  {!isLoading && error && (
-                    <span className="text-xs text-amber-300">
-                      Price data unavailable, showing last known values.
+                      Refreshing…
                     </span>
                   )}
                 </div>

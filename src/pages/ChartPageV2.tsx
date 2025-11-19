@@ -13,16 +13,21 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
+import TokenSearchAutocomplete from '@/components/search/TokenSearchAutocomplete';
+import { SimpleFilterChips } from '@/components/filters/FilterChips';
 import type { BiasLabel } from '@/types/ai';
-import { Search, Star, Maximize2, Plus, Bell, FileText, Share2 } from 'lucide-react';
+import type { Token } from '@/types/token';
+import { Star, Maximize2, Plus, Bell, FileText, Share2 } from 'lucide-react';
 
 export default function ChartPageV2() {
-  const [selectedToken, setSelectedToken] = useState('SOL');
+  const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [selectedTimeframe, setSelectedTimeframe] = useState('1h');
   const [activeIndicators] = useState(['RSI', 'MACD']);
+  const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
   const timeframes = ['1m', '5m', '15m', '1h', '4h', '1d', '1w'];
+  const filterOptions = ['Meme', 'DeFi', 'Layer-1', 'Top 100', 'Trending'];
+
   const indicators: { name: string; value: string; status: BiasLabel }[] = [
     { name: 'RSI', value: '65', status: 'neutral' },
     { name: 'MACD', value: 'Bullish', status: 'bullish' },
@@ -36,37 +41,71 @@ export default function ChartPageV2() {
     { label: 'Social Score', value: '8.5/10' },
   ];
 
+  const handleTokenSelect = (token: Token) => {
+    setSelectedToken(token);
+    console.log('[ChartPageV2] Selected token:', token);
+  };
+
+  const handleFilterToggle = (filter: string) => {
+    setActiveFilters((prev) =>
+      prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter]
+    );
+  };
+
+  const handleClearFilters = () => {
+    setActiveFilters([]);
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-100">
       {/* Header */}
       <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-10">
         <div className="max-w-full px-4 md:px-6 lg:px-8 py-4">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-            {/* Token Search */}
-            <div className="flex-1 max-w-md">
-              <Input
-                placeholder="Search tokens (e.g. SOL, BTC)"
-                leftIcon={<Search className="w-4 h-4" />}
-                defaultValue={selectedToken}
-              />
+          <div className="flex flex-col gap-4">
+            {/* Top Row: Search + Selected Token */}
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+              {/* Token Search */}
+              <div className="flex-1 max-w-md">
+                <TokenSearchAutocomplete
+                  onSelect={handleTokenSelect}
+                  placeholder="Search tokens (e.g., SOL, BTC, ETH)"
+                  defaultValue={selectedToken?.symbol || ''}
+                />
+              </div>
+
+              {/* Selected Token Info */}
+              {selectedToken && (
+                <div className="flex items-center gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-2xl font-bold">{selectedToken.symbol}</h1>
+                      <Badge variant="neutral">{selectedToken.name}</Badge>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xl font-mono font-bold">
+                        ${selectedToken.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                      <Badge variant={selectedToken.change24h > 0 ? 'success' : 'error'}>
+                        {selectedToken.change24h > 0 ? '+' : ''}
+                        {selectedToken.change24h.toFixed(2)}%
+                      </Badge>
+                    </div>
+                  </div>
+                  <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors touch-manipulation">
+                    <Star className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Selected Token Info */}
-            <div className="flex items-center gap-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold">{selectedToken}</h1>
-                  <Badge variant="neutral">Solana</Badge>
-                </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xl font-mono font-bold">$152.34</span>
-                  <Badge variant="success">+12.5%</Badge>
-                </div>
-              </div>
-              <button className="p-2 hover:bg-zinc-800 rounded-lg transition-colors">
-                <Star className="w-5 h-5" />
-              </button>
-            </div>
+            {/* Bottom Row: Filters */}
+            <SimpleFilterChips
+              chips={filterOptions}
+              activeChips={activeFilters}
+              onToggle={handleFilterToggle}
+              onClearAll={handleClearFilters}
+              layout="horizontal-scroll"
+            />
           </div>
         </div>
       </header>
@@ -130,7 +169,7 @@ export default function ChartPageV2() {
                   Integrate Lightweight Charts or TradingView library here
                 </p>
                 <p className="text-zinc-600 text-xs mt-2">
-                  Timeframe: {selectedTimeframe} | Token: {selectedToken}
+                  Timeframe: {selectedTimeframe} | Token: {selectedToken?.symbol || 'None selected'}
                 </p>
               </div>
             </div>
