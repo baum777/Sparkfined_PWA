@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createEntry, queryEntries, updateEntryNotes } from '@/lib/JournalService';
 import type { JournalEntry as PersistedJournalEntry } from '@/types/journal';
+import type { SolanaMemeTrendEvent } from '@/types/events';
 
 export type JournalDirection = 'long' | 'short';
 
@@ -24,6 +25,7 @@ interface JournalState {
   setError: (message: string | null) => void;
   addEntry: (entry: JournalEntry) => void;
   updateEntry: (entry: JournalEntry) => void;
+  autoTagFromTrendEvent: (event: SolanaMemeTrendEvent) => Promise<void>;
 }
 
 const INITIAL_ENTRIES: JournalEntry[] = [
@@ -77,7 +79,17 @@ export const useJournalStore = create<JournalState>((set) => ({
   updateEntry: (nextEntry) =>
     set((state) => ({
       entries: state.entries.map((entry) => (entry.id === nextEntry.id ? nextEntry : entry)),
-    })),
+      })),
+    autoTagFromTrendEvent: async (event) => {
+      try {
+        const entry = await buildAutoJournalEntry(event);
+        set((state) => ({
+          entries: [entry, ...state.entries],
+        }));
+      } catch (error) {
+        console.warn('[journalStore] failed to auto-tag from trend event', error);
+      }
+    },
 }));
 
 const monthFormatter = new Intl.DateTimeFormat('en-US', {
@@ -203,6 +215,26 @@ export async function createQuickJournalEntry(input: QuickEntryInput): Promise<J
   });
 
   return mapPersistedToJournalEntry(persisted);
+}
+
+async function buildAutoJournalEntry(event: SolanaMemeTrendEvent): Promise<JournalEntry> {
+  const title = `[Auto] ${event.token.symbol} trend`;
+  const notesSections = [
+    event.sparkfined.narrative,
+    event.sparkfined.journalContextTags.length
+      ? `Context: ${event.sparkfined.journalContextTags.join(', ')}`
+      : undefined,
+    event.sentiment?.label ? `Sentiment: ${event.sentiment.label}` : undefined,
+  ].filter(Boolean);
+
+  const notes = notesSections.join('\n\n') || event.tweet.fullText.slice(0, 240);
+
+  const quickEntry = await createQuickJournalEntry({
+    title,
+    notes,
+  });
+
+  return quickEntry;
 }
 
 /**

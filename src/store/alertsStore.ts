@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type AlertType = 'price' | 'volume' | 'volatility';
+export type AlertType = 'price' | 'volume' | 'volatility' | 'trend';
 export type AlertStatus = 'armed' | 'triggered' | 'snoozed';
 
 export type Alert = {
@@ -10,11 +10,14 @@ export type Alert = {
   type: AlertType;
   status: AlertStatus;
   timeframe: string;
+  createdAt?: string;
+  meta?: Record<string, unknown>;
 };
 
 interface AlertsState {
   alerts: Alert[];
   setAlerts: (alerts: Alert[]) => void;
+  pushAlert: (alert: Alert) => void;
 }
 
 const INITIAL_ALERTS: Alert[] = [
@@ -71,5 +74,9 @@ const INITIAL_ALERTS: Alert[] = [
 export const useAlertsStore = create<AlertsState>((set) => ({
   alerts: INITIAL_ALERTS,
   setAlerts: (alerts) => set({ alerts }),
+  pushAlert: (alert) =>
+    set((state) => ({
+      alerts: [alert, ...state.alerts].slice(0, 50),
+    })),
 }));
 

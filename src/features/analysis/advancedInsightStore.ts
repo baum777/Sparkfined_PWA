@@ -13,6 +13,7 @@ import type {
   FeatureAccessMeta,
   EditableField,
 } from '@/types/ai';
+import type { SolanaMemeTrendEvent } from '@/types/events';
 
 // ============================================================================
 // Store State
@@ -33,10 +34,12 @@ export interface AdvancedInsightState {
   // Telemetry
   overridesCount: number;
   lastSavedAt: number | null;
+  trendSnapshots: Record<string, SolanaMemeTrendEvent>;
   
   // Actions
   ingest: (data: AdvancedInsightCard, access?: FeatureAccessMeta) => void;
   setActiveTab: (tab: AdvancedInsightState['activeTab']) => void;
+  applyTrendEvent?: (event: SolanaMemeTrendEvent) => void;
   
   // Override management
   overrideField: <T>(
@@ -108,15 +111,16 @@ function resetEditableField<T>(field: EditableField<T>): EditableField<T> {
 
 export const useAdvancedInsightStore = create<AdvancedInsightState>()(
   persist(
-    (set, get) => ({
-      // Initial state
-      sections: null,
-      sourcePayload: null,
-      access: null,
-      activeTab: 'market_structure',
-      isEditing: false,
-      overridesCount: 0,
-      lastSavedAt: null,
+      (set, get) => ({
+        // Initial state
+        sections: null,
+        sourcePayload: null,
+        access: null,
+        activeTab: 'market_structure',
+        isEditing: false,
+        overridesCount: 0,
+        lastSavedAt: null,
+        trendSnapshots: {},
 
       // Ingest AI data
       ingest: (data, access) => {
@@ -210,26 +214,35 @@ export const useAdvancedInsightStore = create<AdvancedInsightState>()(
       },
 
       // Clear all data
-      clear: () => {
-        set({
-          sections: null,
-          sourcePayload: null,
-          access: null,
-          activeTab: 'market_structure',
-          isEditing: false,
-          overridesCount: 0,
-          lastSavedAt: null,
-        });
-      },
+        clear: () => {
+          set({
+            sections: null,
+            sourcePayload: null,
+            access: null,
+            activeTab: 'market_structure',
+            isEditing: false,
+            overridesCount: 0,
+            lastSavedAt: null,
+            trendSnapshots: {},
+          });
+        },
 
-      // Getters
-      getOverridesCount: () => {
-        return get().overridesCount;
-      },
+        // Getters
+        getOverridesCount: () => {
+          return get().overridesCount;
+        },
 
       isLocked: () => {
         const { access } = get();
         return access ? !access.is_unlocked : false;
+      },
+      applyTrendEvent: (event) => {
+        set((state) => ({
+          trendSnapshots: {
+            ...state.trendSnapshots,
+            [event.token.symbol.toUpperCase()]: event,
+          },
+        }));
       },
     }),
     {
