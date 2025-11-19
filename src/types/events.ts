@@ -1,8 +1,21 @@
 import type { SentimentLabel } from '@/types/ai';
 
+// --- Core enums & helper types ------------------------------------------------
+
 export type TrendSentimentLabel = SentimentLabel | 'warning' | 'opportunity';
+
 export type TrendHypeLevel = 'cooldown' | 'steady' | 'acceleration' | 'mania';
-export type TrendCallToAction = 'watch' | 'scalp' | 'swing' | 'take-profit' | 'avoid';
+
+export type TrendCallToAction =
+  | 'watch'
+  | 'scalp'
+  | 'swing'
+  | 'take-profit'
+  | 'avoid'
+  | 'monitor'
+  | 'unknown';
+
+export type TrendSearchTopic = 'entry' | 'exit' | 'risk' | 'meme' | 'rotation' | 'unknown';
 
 export interface GrokTweetTokenMarketSnapshot {
   price_usd?: number;
@@ -13,8 +26,11 @@ export interface GrokTweetTokenMarketSnapshot {
   fdv_usd?: number;
 }
 
+// --- Grok payloads ------------------------------------------------------------
+
 export interface GrokTweetTokenRef {
-  symbol?: string;
+  token_symbol?: string;
+  symbol?: string; // fallback for legacy payloads
   cashtag?: string;
   name?: string;
   chain?: string;
@@ -146,6 +162,7 @@ export interface SolanaMemeTrendSentiment {
   label?: TrendSentimentLabel;
   confidence?: number;
   keywords?: string[];
+  hypeLevel?: TrendHypeLevel;
 }
 
 export interface SolanaMemeTrendTrading {
@@ -161,10 +178,40 @@ export interface SolanaMemeTrendSparkfined {
   emotionTags: string[];
   replayFlag: boolean;
   narrative?: string;
+  callToAction?: TrendCallToAction;
+}
+
+export interface SolanaMemeTrendSearchDocument {
+  id: string;
+  symbol: string;
+  cashtag: string;
+  tweetId: string;
+  authorHandle: string;
+  authorType: string;
+  language: string;
+  createdAt: string;
+  receivedAt: string;
+  fullText: string;
+  tokensJoined: string;
+  sentimentLabel: TrendSentimentLabel | 'unknown';
+  hypeLevel: TrendHypeLevel | 'unknown';
+  callToAction: TrendCallToAction;
+  searchTopic: TrendSearchTopic;
+  trendingScore: number;
+  alertRelevance: number;
+  mediaPresent: boolean;
+  linksPresent: boolean;
 }
 
 export interface SolanaMemeTrendDerived {
   normalizedSymbol: string;
+  primaryCashtag: string;
+  lastUpdated: string;
+  searchTopic?: TrendSearchTopic;
+  authorCategory?: GrokAuthorType;
+  twitterScore?: number;
+  volatilityHint?: 'calm' | 'building' | 'spiky';
+  searchDocument?: SolanaMemeTrendSearchDocument;
 }
 
 export interface SolanaMemeTrendEvent {

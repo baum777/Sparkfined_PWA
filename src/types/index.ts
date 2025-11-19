@@ -53,9 +53,11 @@ export type {
   SolanaMemeTrendToken,
   SolanaMemeTrendTweet,
   SolanaMemeTrendAuthor,
+  SolanaMemeTrendSearchDocument,
   GrokTweetPayload,
   GrokTweetTokenRef,
   TrendSentimentLabel,
   TrendHypeLevel,
   TrendCallToAction,
+  TrendSearchTopic,
 } from './events'

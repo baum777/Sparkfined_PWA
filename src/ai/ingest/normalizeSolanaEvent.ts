@@ -6,10 +6,13 @@ import type {
   GrokTweetTokenRef,
   SolanaMemeTrendEvent,
   SolanaMemeTrendMarketSnapshot,
+  SolanaMemeTrendDerived,
+  SolanaMemeTrendSearchDocument,
   SolanaMemeTrendSentiment,
   SolanaMemeTrendSparkfined,
   SolanaMemeTrendTrading,
   TrendCallToAction,
+  TrendSearchTopic,
   TrendSentimentLabel,
 } from '@/types/events';
 
@@ -77,11 +80,14 @@ function buildEvent({ tweet, token, importedAt, platform }: BuildEventParams): S
   const normalizedSymbol = normalizeSymbol(token);
   const cashtag = ensureCashtag(token, normalizedSymbol);
   const metrics = normalizeMetrics(tweet.metrics);
-
   const tweetCashtags = uniqueStringArray([...extractCashtags(tweet.tags), cashtag]);
   const tweetHashtags = extractHashtags(tweet.tags);
 
-  return {
+  const sentiment = normalizeSentiment(tweet.sentiment, tweet.analytics);
+  const trading = normalizeTrading(tweet.analytics, tweet.sentiment);
+  const sparkfined = normalizeSparkfined(tweet, metrics, trading);
+
+  const event: SolanaMemeTrendEvent = {
     id: `${tweet.id}::${normalizedSymbol}`,
     source: {
       platform,
@@ -100,7 +106,7 @@ function buildEvent({ tweet, token, importedAt, platform }: BuildEventParams): S
     tweet: {
       createdAt: tweet.created_at,
       fullText: tweet.full_text ?? tweet.text ?? '',
-      language: tweet.language ?? null,
+      language: tweet.language ?? 'unknown',
       cashtags: tweetCashtags,
       hashtags: tweetHashtags,
       hasMedia: Boolean(tweet.attachments?.has_media),
@@ -116,14 +122,26 @@ function buildEvent({ tweet, token, importedAt, platform }: BuildEventParams): S
       dexPair: token.dex_pair,
     },
     market: normalizeMarketSnapshot(token.market),
-    sentiment: normalizeSentiment(tweet.sentiment),
-    trading: normalizeTrading(tweet.analytics, tweet.sentiment),
-    sparkfined: normalizeSparkfined(tweet, metrics),
-    derived: {
+    sentiment,
+    trading,
+    sparkfined,
+    derived: normalizeDerived({
       normalizedSymbol,
-    },
+      cashtag,
+      importedAt,
+      authorType: tweet.author?.type ?? 'unknown',
+      sparkfined,
+      trading,
+      metrics,
+    }),
     receivedAt: importedAt,
   };
+
+  const searchDocument = buildSearchDocument(event, tweet);
+  event.derived.searchDocument = searchDocument;
+  event.derived.searchTopic = searchDocument.searchTopic;
+
+  return event;
 }
 
 function isSupportedToken(token: GrokTweetTokenRef | undefined | null): token is GrokTweetTokenRef {
@@ -131,19 +149,20 @@ function isSupportedToken(token: GrokTweetTokenRef | undefined | null): token is
     return false;
   }
 
-  if (!(token.symbol || token.cashtag)) {
+  if (!getTokenSymbolCandidate(token) && !token.cashtag) {
     return false;
   }
 
-  if (!token.chain) {
+  const chain = token.chain?.toLowerCase();
+  if (!chain) {
     return true;
   }
 
-  return SOLANA_CHAIN_ALIASES.has(token.chain.toLowerCase());
+  return SOLANA_CHAIN_ALIASES.has(chain);
 }
 
 function normalizeSymbol(token: GrokTweetTokenRef): string {
-  const raw = token.symbol ?? token.cashtag ?? '';
+  const raw = getTokenSymbolCandidate(token) ?? token.cashtag ?? '';
   const clean = raw.replace(/^\$/, '').trim();
   return clean ? clean.toUpperCase() : 'UNKNOWN';
 }
@@ -158,6 +177,10 @@ function ensureCashtag(token: GrokTweetTokenRef, fallbackSymbol: string): string
 function formatCashtag(rawTag: string): string {
   const clean = rawTag.replace(/^\$/, '').trim().toUpperCase();
   return clean ? `$${clean}` : '';
+}
+
+function getTokenSymbolCandidate(token: GrokTweetTokenRef): string | undefined {
+  return token.token_symbol ?? token.symbol ?? token.slug;
 }
 
 function extractCashtags(tags?: string[]): string[] {
@@ -232,6 +255,7 @@ function normalizeMarketSnapshot(
 
 function normalizeSentiment(
   sentiment?: GrokTweetSentiment,
+  analytics?: GrokTweetAnalytics,
 ): SolanaMemeTrendSentiment | undefined {
   if (!sentiment) {
     return undefined;
@@ -242,13 +266,15 @@ function normalizeSentiment(
     label: sentiment.label,
     confidence: sanitizeNumber(sentiment.confidence),
     keywords: sentiment.keywords ?? [],
+    hypeLevel: analytics?.hype_level,
   };
 
   if (
     normalized.score === undefined &&
     !normalized.label &&
     normalized.confidence === undefined &&
-    !normalized.keywords?.length
+    !normalized.keywords?.length &&
+    !normalized.hypeLevel
   ) {
     return undefined;
   }
@@ -282,6 +308,7 @@ function normalizeTrading(
 function normalizeSparkfined(
   tweet: GrokTweetPayload,
   metrics: GrokTweetMetrics,
+  trading?: SolanaMemeTrendTrading,
 ): SolanaMemeTrendSparkfined {
   const trendingScore = computeTrendingScore(tweet.analytics?.trending_score, metrics);
   const alertRelevance = computeAlertRelevance(
@@ -302,6 +329,7 @@ function normalizeSparkfined(
     emotionTags,
     replayFlag: Boolean(tweet.analytics?.replay_flag),
     narrative: tweet.analytics?.narrative,
+    callToAction: trading?.callToAction,
   };
 }
 
@@ -334,6 +362,122 @@ function computeAlertRelevance(
   const bonus = trendingScore ? Math.min(trendingScore / 1000, 0.35) : 0;
 
   return clamp(base + bonus, 0, 1);
+}
+
+type NormalizeDerivedArgs = {
+  normalizedSymbol: string;
+  cashtag: string;
+  importedAt: string;
+  authorType: string;
+  sparkfined: SolanaMemeTrendSparkfined;
+  trading?: SolanaMemeTrendTrading;
+  metrics: GrokTweetMetrics;
+};
+
+function normalizeDerived({
+  normalizedSymbol,
+  cashtag,
+  importedAt,
+  authorType,
+  sparkfined,
+  trading,
+  metrics,
+}: NormalizeDerivedArgs): SolanaMemeTrendDerived {
+  const twitterScore = scoreFromMetrics(metrics) ?? sparkfined.trendingScore;
+  return {
+    normalizedSymbol,
+    primaryCashtag: cashtag,
+    lastUpdated: importedAt,
+    authorCategory: authorType,
+    twitterScore: twitterScore ?? undefined,
+    volatilityHint: deriveVolatilityHint(trading?.volatilityRisk, sparkfined.trendingScore),
+  };
+}
+
+function buildSearchDocument(
+  event: SolanaMemeTrendEvent,
+  tweet: GrokTweetPayload,
+): SolanaMemeTrendSearchDocument {
+  const sentimentLabel = event.sentiment?.label ?? 'unknown';
+  const hypeLevel = event.trading?.hypeLevel ?? event.sentiment?.hypeLevel ?? 'unknown';
+  const callToAction = event.trading?.callToAction ?? event.sparkfined.callToAction ?? 'unknown';
+
+  const tokensJoined = (tweet.tokens ?? [])
+    .map((token) => getTokenSymbolCandidate(token))
+    .filter((value): value is string => Boolean(value))
+    .map((token) => token.toUpperCase())
+    .join(' ');
+
+  const searchTopic = inferSearchTopic(callToAction, event.tweet.fullText);
+
+  return {
+    id: event.id,
+    symbol: event.token.symbol,
+    cashtag: event.token.cashtag ?? '',
+    tweetId: event.source.tweetId,
+    authorHandle: event.author.handle,
+    authorType: event.author.authorType,
+    language: event.tweet.language ?? 'unknown',
+    createdAt: event.tweet.createdAt,
+    receivedAt: event.receivedAt,
+    fullText: event.tweet.fullText,
+    tokensJoined,
+    sentimentLabel,
+    hypeLevel,
+    callToAction,
+    searchTopic,
+    trendingScore: event.sparkfined.trendingScore ?? 0,
+    alertRelevance: event.sparkfined.alertRelevance ?? 0,
+    mediaPresent: event.tweet.hasMedia,
+    linksPresent: event.tweet.hasLinks,
+  };
+}
+
+function inferSearchTopic(callToAction: string, fullText: string): TrendSearchTopic {
+  const needle = `${callToAction} ${fullText}`.toLowerCase();
+
+  if (containsAny(needle, ['entry', 'ape in', 'buy the dip', 'long now'])) {
+    return 'entry';
+  }
+  if (containsAny(needle, ['exit', 'take profit', 'tp', 'trim'])) {
+    return 'exit';
+  }
+  if (containsAny(needle, ['risk', 'hedge', 'stop', 'drawdown'])) {
+    return 'risk';
+  }
+  if (containsAny(needle, ['meme', 'shitcoin', 'degen', 'pump'])) {
+    return 'meme';
+  }
+  if (containsAny(needle, ['rotation', 'rotate', 'sector'])) {
+    return 'rotation';
+  }
+
+  return 'unknown';
+}
+
+function containsAny(haystack: string, candidates: string[]): boolean {
+  return candidates.some((candidate) => haystack.includes(candidate));
+}
+
+function deriveVolatilityHint(
+  volatilityRisk: number | undefined,
+  trendingScore: number | undefined,
+): 'calm' | 'building' | 'spiky' | undefined {
+  if (volatilityRisk === undefined && trendingScore === undefined) {
+    return undefined;
+  }
+
+  const combined = (volatilityRisk ?? 0) + (trendingScore ? trendingScore / 1000 : 0);
+
+  if (combined < 0.4) {
+    return 'calm';
+  }
+
+  if (combined < 0.8) {
+    return 'building';
+  }
+
+  return 'spiky';
 }
 
 function deriveCallToAction(label?: TrendSentimentLabel): TrendCallToAction | undefined {

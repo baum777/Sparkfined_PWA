@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 import type { WatchlistQuote } from '@/features/market/watchlistData';
+import type {
+  SolanaMemeTrendEvent,
+  TrendHypeLevel,
+  TrendSentimentLabel,
+} from '@/types/events';
 
 export type WatchlistRow = {
   symbol: string;
@@ -9,14 +14,26 @@ export type WatchlistRow = {
   session: string;
 };
 
+export type WatchlistTrendMeta = {
+  symbol: string;
+  lastUpdated: string;
+  sentimentLabel?: TrendSentimentLabel | 'unknown';
+  hypeLevel?: TrendHypeLevel | 'unknown';
+  trendingScore?: number;
+  alertRelevance?: number;
+  lastEventId?: string;
+};
+
 interface WatchlistState {
   rows: WatchlistRow[];
   isLoading: boolean;
   error: string | null;
+  trendBySymbol: Record<string, WatchlistTrendMeta>;
   setRows: (rows: WatchlistRow[]) => void;
   setLoading: (value: boolean) => void;
   setError: (message: string | null) => void;
   hydrateFromQuotes: (quotes: WatchlistQuote[]) => void;
+  applyTrendEvent: (event: SolanaMemeTrendEvent) => void;
 }
 
 const INITIAL_ROWS: WatchlistRow[] = [
@@ -54,6 +71,7 @@ export const useWatchlistStore = create<WatchlistState>((set) => ({
   rows: INITIAL_ROWS,
   isLoading: false,
   error: null,
+  trendBySymbol: {},
   setRows: (rows) => set({ rows }),
   setLoading: (value) => set({ isLoading: value }),
   setError: (message) => set({ error: message }),
@@ -79,6 +97,32 @@ export const useWatchlistStore = create<WatchlistState>((set) => ({
       });
 
       return { rows };
+      }),
+  applyTrendEvent: (event) =>
+    set((state) => {
+      const symbol = event.token.symbol.toUpperCase();
+      const previous = state.trendBySymbol[symbol];
+
+      const nextMeta: WatchlistTrendMeta = {
+        symbol,
+        lastUpdated: event.receivedAt,
+        sentimentLabel: event.sentiment?.label ?? previous?.sentimentLabel ?? 'unknown',
+        hypeLevel:
+          event.trading?.hypeLevel ??
+          event.sentiment?.hypeLevel ??
+          previous?.hypeLevel ??
+          'unknown',
+        trendingScore: event.sparkfined.trendingScore ?? previous?.trendingScore,
+        alertRelevance: event.sparkfined.alertRelevance ?? previous?.alertRelevance,
+        lastEventId: event.id,
+      };
+
+      return {
+        trendBySymbol: {
+          ...state.trendBySymbol,
+          [symbol]: nextMeta,
+        },
+      };
     }),
 }));
 
