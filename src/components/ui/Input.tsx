@@ -26,13 +26,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   const generatedErrorId = errorId || `error-${Math.random().toString(36).substr(2, 9)}`;
   const helperTextValue = helperText || hint;
   
-  const baseStyles = 'w-full bg-zinc-800 border text-zinc-100 placeholder-zinc-500 transition-all focus:outline-none focus:ring-2 rounded-lg';
-  const stateStyles = error 
-    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50' 
+  const baseStyles = 'w-full bg-zinc-800 border text-zinc-100 placeholder-zinc-500 transition-all focus:outline-none focus:ring-2 rounded-lg touch-manipulation';
+  const stateStyles = error
+    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50'
     : 'border-zinc-700 focus:border-blue-500 focus:ring-blue-500/50';
-  const sizeStyles = 'px-3 py-2 text-sm';
+  // Touch-optimized: h-12 = 48px (exceeds iOS HIG 44px minimum)
+  const sizeStyles = 'px-4 py-3 text-sm h-12';
   const fontClass = mono ? 'font-mono tabular-nums' : '';
-  const iconPadding = leftIcon ? 'pl-10' : rightIcon ? 'pr-10' : '';
+  const iconPadding = leftIcon ? 'pl-11' : rightIcon ? 'pr-11' : '';
   
   return (
     <div className="w-full">

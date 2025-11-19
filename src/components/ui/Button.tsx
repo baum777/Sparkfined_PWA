@@ -27,8 +27,8 @@ export default function Button({
 }: ButtonProps) {
   const isLoadingState = isLoading || loading;
   
-  const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 disabled:opacity-50 disabled:pointer-events-none rounded-lg';
-  
+  const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 disabled:opacity-50 disabled:pointer-events-none rounded-lg touch-manipulation';
+
   const variants: Record<string, string> = {
     primary: 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95',
     secondary: 'bg-zinc-800 text-zinc-100 border border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600 active:scale-95',
@@ -36,11 +36,12 @@ export default function Button({
     destructive: 'bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20 active:scale-95',
     danger: 'bg-rose-500 text-white hover:bg-rose-600 active:scale-95', // Keep for backward compatibility
   };
-  
+
+  // Touch-optimized sizes (iOS HIG: min 44px, Material: min 48px)
   const sizes = {
-    sm: 'px-3 py-1.5 text-xs h-9',
-    md: 'px-4 py-2 text-sm h-11',
-    lg: 'px-6 py-3 text-base h-12',
+    sm: 'px-4 py-2 text-sm h-11 min-w-[44px]',  // 44px height (iOS standard)
+    md: 'px-5 py-2.5 text-base h-12 min-w-[48px]',  // 48px height (Material standard)
+    lg: 'px-6 py-3 text-lg h-14 min-w-[56px]',  // 56px height (comfortable)
   };
   
   return (

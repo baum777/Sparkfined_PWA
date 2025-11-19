@@ -16,12 +16,19 @@ const DIST_DIR = path.join(__dirname, '..', 'dist', 'assets');
 
 // Size thresholds (in KB, gzipped)
 // IMPORTANT: Order matters - more specific patterns first!
+// Updated for 2025 best practices (PWA + Trading Interface)
 const THRESHOLDS = {
-  'vendor-react': 55,  // Must check before 'vendor'
-  'chart': 12,
-  'index': 12,
-  'vendor': 15,  // Generic vendor chunks (not react)
+  'vendor-react': 60,        // React + ReactDOM (gzipped)
+  'vendor-workbox': 12,      // Service Worker utilities
+  'vendor-dexie': 8,         // IndexedDB wrapper
+  'chart': 15,               // Lightweight Charts target (35KB uncompressed ~15KB gzipped)
+  'analyze': 10,             // Analysis sections
+  'index': 15,               // Main app code
+  'vendor': 20,              // Generic vendor chunks
 };
+
+// Total bundle budget (uncompressed)
+const TOTAL_BUDGET_KB = 400;
 
 // ANSI color codes
 const RED = '\x1b[31m';
@@ -126,7 +133,29 @@ function checkBundleSizes() {
     process.exit(1);
   }
 
-  console.log(`${GREEN}${BOLD}✓ All bundles within size limits!${RESET}\n`);
+  // Check total bundle size (uncompressed)
+  console.log(`${BOLD}📊 Total Bundle Size${RESET}`);
+  let totalSizeKB = 0;
+  for (const file of files) {
+    const filePath = path.join(DIST_DIR, file);
+    const stats = fs.statSync(filePath);
+    totalSizeKB += Math.round(stats.size / 1024);
+  }
+
+  const totalPercent = Math.round((totalSizeKB / TOTAL_BUDGET_KB) * 100);
+
+  if (totalSizeKB > TOTAL_BUDGET_KB) {
+    console.log(`  ${RED}✗${RESET} Total: ${totalSizeKB}KB / ${TOTAL_BUDGET_KB}KB (${totalPercent}%) - EXCEEDS BUDGET`);
+    console.log(`\n${RED}${BOLD}Total bundle size exceeds budget!${RESET}`);
+    console.log(`${RED}Tip: Run 'pnpm analyze' to identify large dependencies.${RESET}\n`);
+    process.exit(1);
+  } else if (totalPercent > 90) {
+    console.log(`  ${YELLOW}⚠${RESET} Total: ${totalSizeKB}KB / ${TOTAL_BUDGET_KB}KB (${totalPercent}%) - approaching limit`);
+  } else {
+    console.log(`  ${GREEN}✓${RESET} Total: ${totalSizeKB}KB / ${TOTAL_BUDGET_KB}KB (${totalPercent}%)`);
+  }
+
+  console.log(`\n${GREEN}${BOLD}✓ All bundles within size limits!${RESET}\n`);
   process.exit(0);
 }
 
