@@ -26,6 +26,9 @@ importers:
       driver.js:
         specifier: ^1.3.6
         version: 1.3.6
+      lightweight-charts:
+        specifier: ^5.0.9
+        version: 5.0.9
       lucide-react:
         specifier: ^0.552.0
         version: 0.552.0(react@18.3.1)
@@ -2314,6 +2317,9 @@ packages:
     resolution: {integrity: sha512-GipyPsXO1anza0AOZdy69Im7hGFCNB7Y/NGjDlZGJ3GJJLtwNSb2vrzYrTYJRrRloVx7pl+bhUaTB8yiccPvFQ==}
     engines: {node: '> 0.1.90'}
 
+  fancy-canvas@2.1.0:
+    resolution: {integrity: sha512-nifxXJ95JNLFR2NgRV4/MxVP45G9909wJTEKz5fg/TZS20JJZA6hfgRVh/bC9bwl2zBtBNcYPjiBE4njQHVBwQ==}
+
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
@@ -2939,6 +2945,9 @@ packages:
   lightningcss@1.30.2:
     resolution: {integrity: sha512-utfs7Pr5uJyyvDETitgsaqSyjCb2qNRAtuqUeWIAKztsOYdcACf2KtARYXg2pSvhkt+9NfoaNY7fxjl6nuMjIQ==}
     engines: {node: '>= 12.0.0'}
+
+  lightweight-charts@5.0.9:
+    resolution: {integrity: sha512-8oQIis8jfZVfSwz8j9Z5x3O79dIRTkEYI9UY7DKtE4O3ZxlHjMK3L0+4nOVOOFq4FHI/oSIzz1RHeNImCk6/Jg==}
 
   local-pkg@0.5.1:
     resolution: {integrity: sha512-9rrA30MRRP3gBD3HTGnC6cDFpaE1kVDWxWgqWJUN0RvDNAo+Nz/9GxB+nHOH0ifbVFy0hSA1V6vFDvnx54lTEQ==}
@@ -6721,6 +6730,8 @@ snapshots:
 
   eyes@0.1.8: {}
 
+  fancy-canvas@2.1.0: {}
+
   fast-deep-equal@3.1.3: {}
 
   fast-glob@3.3.3:
@@ -7350,6 +7361,10 @@ snapshots:
       lightningcss-linux-x64-musl: 1.30.2
       lightningcss-win32-arm64-msvc: 1.30.2
       lightningcss-win32-x64-msvc: 1.30.2
+
+  lightweight-charts@5.0.9:
+    dependencies:
+      fancy-canvas: 2.1.0
 
   local-pkg@0.5.1:
     dependencies:

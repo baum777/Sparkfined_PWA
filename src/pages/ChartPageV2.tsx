@@ -9,12 +9,15 @@
  * - On-chain metrics + quick actions
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import TokenSearchAutocomplete from '@/components/search/TokenSearchAutocomplete';
 import { SimpleFilterChips } from '@/components/filters/FilterChips';
+import LightweightChartCanvas from '@/components/chart/LightweightChartCanvas';
+import IndicatorPanel from '@/components/chart/IndicatorPanel';
+import { generateMockOHLC, calculateRSI, calculateEMA } from '@/lib/chartUtils';
 import type { BiasLabel } from '@/types/ai';
 import type { Token } from '@/types/token';
 import { Star, Maximize2, Plus, Bell, FileText, Share2 } from 'lucide-react';
@@ -22,8 +25,14 @@ import { Star, Maximize2, Plus, Bell, FileText, Share2 } from 'lucide-react';
 export default function ChartPageV2() {
   const [selectedToken, setSelectedToken] = useState<Token | null>(null);
   const [selectedTimeframe, setSelectedTimeframe] = useState('1h');
-  const [activeIndicators] = useState(['RSI', 'MACD']);
+  const [activeIndicators, setActiveIndicators] = useState<string[]>(['RSI']);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+  const [crosshairData, setCrosshairData] = useState<{
+    open?: number;
+    high?: number;
+    low?: number;
+    close?: number;
+  }>({});
 
   const timeframes = ['1m', '5m', '15m', '1h', '4h', '1d', '1w'];
   const filterOptions = ['Meme', 'DeFi', 'Layer-1', 'Top 100', 'Trending'];
@@ -54,6 +63,69 @@ export default function ChartPageV2() {
 
   const handleClearFilters = () => {
     setActiveFilters([]);
+  };
+
+  const handleIndicatorToggle = (indicator: string) => {
+    setActiveIndicators((prev) =>
+      prev.includes(indicator) ? prev.filter((i) => i !== indicator) : [...prev, indicator]
+    );
+  };
+
+  // Generate chart data based on selected token
+  const chartData = useMemo(() => {
+    if (!selectedToken) return [];
+
+    // Map timeframe to interval in seconds
+    const intervalMap: Record<string, number> = {
+      '1m': 60,
+      '5m': 300,
+      '15m': 900,
+      '1h': 3600,
+      '4h': 14400,
+      '1d': 86400,
+      '1w': 604800,
+    };
+
+    const interval = intervalMap[selectedTimeframe] || 3600;
+    return generateMockOHLC(selectedToken.symbol, 30, interval);
+  }, [selectedToken, selectedTimeframe]);
+
+  // Calculate RSI data
+  const rsiData = useMemo(() => {
+    if (chartData.length === 0) return [];
+    return calculateRSI(chartData, 14);
+  }, [chartData]);
+
+  // Calculate EMA data
+  const emaData = useMemo(() => {
+    if (chartData.length === 0) return [];
+    return calculateEMA(chartData, 20);
+  }, [chartData]);
+
+  const handleCrosshairMove = (price: number | null, time: number | null) => {
+    if (price !== null && time !== null) {
+      // Find the candle at this time
+      const candle = chartData.find((d) => d.time === time);
+      if (candle) {
+        setCrosshairData({
+          open: candle.open,
+          high: candle.high,
+          low: candle.low,
+          close: candle.close,
+        });
+      }
+    } else {
+      // Use latest candle
+      const latest = chartData[chartData.length - 1];
+      if (latest) {
+        setCrosshairData({
+          open: latest.open,
+          high: latest.high,
+          low: latest.low,
+          close: latest.close,
+        });
+      }
+    }
   };
 
   return (
@@ -145,9 +217,26 @@ export default function ChartPageV2() {
                 <option>Line</option>
                 <option>Area</option>
               </select>
-              <Button variant="ghost" size="sm" leftIcon={<Plus className="w-3 h-3" />}>
-                Add Indicator
-              </Button>
+              <div className="relative group">
+                <Button variant="ghost" size="sm" leftIcon={<Plus className="w-3 h-3" />}>
+                  Indicators
+                </Button>
+                {/* Indicator Dropdown */}
+                <div className="hidden group-hover:block absolute top-full right-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-lg shadow-2xl py-2 min-w-[150px] z-20">
+                  {['RSI', 'EMA'].map((indicator) => (
+                    <button
+                      key={indicator}
+                      onClick={() => handleIndicatorToggle(indicator)}
+                      className={`w-full px-4 py-2 text-sm text-left hover:bg-zinc-800 transition-colors ${
+                        activeIndicators.includes(indicator) ? 'text-blue-400' : 'text-zinc-300'
+                      }`}
+                    >
+                      {activeIndicators.includes(indicator) ? '✓ ' : ''}
+                      {indicator}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <button className="p-2 hover:bg-zinc-800 rounded-md transition-colors">
                 <Maximize2 className="w-4 h-4" />
               </button>
@@ -156,47 +245,82 @@ export default function ChartPageV2() {
         </Card>
 
         {/* Chart Canvas */}
-        <Card variant="default" className="mb-6">
-          <div className="relative bg-[#0a0a0a] rounded-lg" style={{ height: '500px' }}>
-            {/* Placeholder for chart library (Lightweight Charts / TradingView) */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-6xl mb-4">📊</div>
-                <p className="text-zinc-400 text-lg font-medium mb-2">
-                  Chart Canvas Placeholder
-                </p>
-                <p className="text-zinc-500 text-sm">
-                  Integrate Lightweight Charts or TradingView library here
-                </p>
-                <p className="text-zinc-600 text-xs mt-2">
-                  Timeframe: {selectedTimeframe} | Token: {selectedToken?.symbol || 'None selected'}
-                </p>
-              </div>
-            </div>
+        <div className="mb-6 space-y-3">
+          <Card variant="default" className="overflow-hidden">
+            <div className="relative">
+              {/* Crosshair Info (Overlay) */}
+              {selectedToken && crosshairData.close && (
+                <div className="absolute top-4 left-4 z-10 bg-zinc-900/90 backdrop-blur-md border border-zinc-700 rounded-lg p-3">
+                  <div className="grid grid-cols-4 gap-4 text-xs">
+                    <div>
+                      <span className="text-zinc-500">O</span>
+                      <span className="ml-1 font-mono text-zinc-100">
+                        {crosshairData.open?.toFixed(2)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">H</span>
+                      <span className="ml-1 font-mono text-green-500">
+                        {crosshairData.high?.toFixed(2)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">L</span>
+                      <span className="ml-1 font-mono text-red-500">
+                        {crosshairData.low?.toFixed(2)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-zinc-500">C</span>
+                      <span className="ml-1 font-mono text-zinc-100">
+                        {crosshairData.close?.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-            {/* Crosshair Info (Overlay) */}
-            <div className="absolute top-4 left-4 bg-zinc-900/90 backdrop-blur-md border border-zinc-700 rounded-lg p-3">
-              <div className="grid grid-cols-4 gap-4 text-xs">
-                <div>
-                  <span className="text-zinc-500">O</span>
-                  <span className="ml-1 font-mono text-zinc-100">150.20</span>
+              {/* Main Chart */}
+              {selectedToken && chartData.length > 0 ? (
+                <LightweightChartCanvas
+                  data={chartData}
+                  symbol={selectedToken.symbol}
+                  height={500}
+                  onCrosshairMove={handleCrosshairMove}
+                  showVolume={true}
+                />
+              ) : (
+                <div
+                  className="flex items-center justify-center bg-[#0a0a0a]"
+                  style={{ height: '500px' }}
+                >
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">📊</div>
+                    <p className="text-zinc-400 text-lg font-medium mb-2">
+                      Select a token to view chart
+                    </p>
+                    <p className="text-zinc-500 text-sm">
+                      Use the search above to find SOL, BTC, ETH, or any other token
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-zinc-500">H</span>
-                  <span className="ml-1 font-mono text-green-500">153.45</span>
-                </div>
-                <div>
-                  <span className="text-zinc-500">L</span>
-                  <span className="ml-1 font-mono text-red-500">149.80</span>
-                </div>
-                <div>
-                  <span className="text-zinc-500">C</span>
-                  <span className="ml-1 font-mono text-zinc-100">152.34</span>
-                </div>
-              </div>
+              )}
             </div>
-          </div>
-        </Card>
+          </Card>
+
+          {/* Indicator Panels */}
+          {selectedToken && activeIndicators.includes('RSI') && rsiData.length > 0 && (
+            <Card variant="default" className="overflow-hidden">
+              <IndicatorPanel data={rsiData} type="RSI" height={150} />
+            </Card>
+          )}
+
+          {selectedToken && activeIndicators.includes('EMA') && emaData.length > 0 && (
+            <Card variant="default" className="overflow-hidden">
+              <IndicatorPanel data={emaData} type="EMA" height={150} />
+            </Card>
+          )}
+        </div>
 
         {/* Bottom Section - Indicators + Metrics */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
