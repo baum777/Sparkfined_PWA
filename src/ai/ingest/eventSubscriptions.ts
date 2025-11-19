@@ -15,19 +15,17 @@ export function registerEventSubscriptionsOnce(): void {
   }
   subscriptionsRegistered = true;
 
-  useEventBusStore.subscribe(
-    (state) => state.events[0],
-    (latestEvent) => {
-      if (!latestEvent) {
-        return;
-      }
-      if (lastEventId === latestEvent.id) {
-        return;
-      }
-      lastEventId = latestEvent.id;
-      routeTrendEvent(latestEvent);
-    },
-  );
+  useEventBusStore.subscribe((state) => {
+    const latestEvent = state.events[0];
+    if (!latestEvent) {
+      return;
+    }
+    if (latestEvent.id === lastEventId) {
+      return;
+    }
+    lastEventId = latestEvent.id;
+    routeTrendEvent(latestEvent);
+  });
 }
 
 function routeTrendEvent(event: SolanaMemeTrendEvent): void {

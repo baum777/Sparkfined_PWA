@@ -1,12 +1,13 @@
 import type {
+  GrokAuthorType,
   GrokTweetAnalytics,
   GrokTweetMetrics,
   GrokTweetPayload,
   GrokTweetSentiment,
   GrokTweetTokenRef,
+  SolanaMemeTrendDerived,
   SolanaMemeTrendEvent,
   SolanaMemeTrendMarketSnapshot,
-  SolanaMemeTrendDerived,
   SolanaMemeTrendSearchDocument,
   SolanaMemeTrendSentiment,
   SolanaMemeTrendSparkfined,
@@ -368,7 +369,7 @@ type NormalizeDerivedArgs = {
   normalizedSymbol: string;
   cashtag: string;
   importedAt: string;
-  authorType: string;
+  authorType: GrokAuthorType;
   sparkfined: SolanaMemeTrendSparkfined;
   trading?: SolanaMemeTrendTrading;
   metrics: GrokTweetMetrics;
