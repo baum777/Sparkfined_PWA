@@ -164,6 +164,7 @@ export default function JournalPageV2() {
               <p className="text-sm text-zinc-400">
                 {entries.length} recent entries · Focus on clarity, context, conviction
               </p>
+              <p className="text-xs text-zinc-500">Select any entry to review and edit notes inline.</p>
               {isLoading && <p className="text-xs text-zinc-500">Loading entries…</p>}
               {!isLoading && error && <p className="text-xs text-amber-300">{error}</p>}
             </div>

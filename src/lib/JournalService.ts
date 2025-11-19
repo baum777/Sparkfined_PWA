@@ -89,6 +89,25 @@ export async function updateEntry(
 }
 
 /**
+ * Update only the notes (thesis) field of a journal entry.
+ * Returns the updated persisted entry.
+ */
+export async function updateEntryNotes(
+  id: string,
+  notes: string
+): Promise<JournalEntry> {
+  const updated = await updateEntry(id, {
+    thesis: notes,
+  })
+
+  if (!updated) {
+    throw new Error(`Journal entry ${id} not found`)
+  }
+
+  return updated
+}
+
+/**
  * Get a single journal entry by ID
  * @param id - Entry ID
  * @returns Entry or undefined

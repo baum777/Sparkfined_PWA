@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createEntry, queryEntries } from '@/lib/JournalService';
+import { createEntry, queryEntries, updateEntryNotes } from '@/lib/JournalService';
 import type { JournalEntry as PersistedJournalEntry } from '@/types/journal';
 
 export type JournalDirection = 'long' | 'short';
@@ -23,6 +23,7 @@ interface JournalState {
   setLoading: (value: boolean) => void;
   setError: (message: string | null) => void;
   addEntry: (entry: JournalEntry) => void;
+  updateEntry: (entry: JournalEntry) => void;
 }
 
 const INITIAL_ENTRIES: JournalEntry[] = [
@@ -72,6 +73,10 @@ export const useJournalStore = create<JournalState>((set) => ({
   addEntry: (entry) =>
     set((state) => ({
       entries: [entry, ...state.entries],
+    })),
+  updateEntry: (nextEntry) =>
+    set((state) => ({
+      entries: state.entries.map((entry) => (entry.id === nextEntry.id ? nextEntry : entry)),
     })),
 }));
 
@@ -197,5 +202,13 @@ export async function createQuickJournalEntry(input: QuickEntryInput): Promise<J
     thesis,
   });
 
+  return mapPersistedToJournalEntry(persisted);
+}
+
+/**
+ * Update notes for an existing journal entry (persisted + store shape).
+ */
+export async function updateJournalEntryNotes(id: string, notes: string): Promise<JournalEntry> {
+  const persisted = await updateEntryNotes(id, notes);
   return mapPersistedToJournalEntry(persisted);
 }
