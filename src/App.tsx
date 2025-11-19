@@ -6,6 +6,7 @@ import GlobalInstruments from './pages/_layout/GlobalInstruments'
 import Sidebar from './components/layout/Sidebar'
 import BottomNav from './components/BottomNav'
 import MissingConfigBanner from './components/MissingConfigBanner'
+import OfflineIndicator from './components/pwa/OfflineIndicator'
 import AppHeader from './components/layout/AppHeader'
 import './styles/App.css'
 
@@ -16,7 +17,10 @@ function App() {
         <AIProviderState>
           {/* Missing Config Banner */}
           <MissingConfigBanner />
-          
+
+          {/* Offline Mode Indicator */}
+          <OfflineIndicator />
+
           {/* Skip to main content link (A11y) */}
           <a 
             href="#main-content" 

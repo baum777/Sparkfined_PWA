@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
+import DataFreshness from '@/components/pwa/DataFreshness';
 
 type Trend = 'up' | 'down' | 'flat';
 
@@ -7,6 +8,7 @@ export interface DashboardKpiItem {
   label: string;
   value: string;
   trend?: Trend;
+  lastUpdated?: number; // Timestamp in ms (Date.now() format)
 }
 
 interface DashboardKpiStripProps {
@@ -46,7 +48,10 @@ export default function DashboardKpiStrip({ items }: DashboardKpiStripProps) {
               key={item.label}
               className="flex min-w-[160px] flex-1 flex-col rounded-2xl border border-white/5 bg-white/5 px-4 py-3 backdrop-blur"
             >
-              <span className="text-xs uppercase tracking-widest text-zinc-400">{item.label}</span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs uppercase tracking-widest text-zinc-400">{item.label}</span>
+                {item.lastUpdated && <DataFreshness lastUpdated={item.lastUpdated} />}
+              </div>
               <div className="mt-2 flex items-baseline justify-between gap-3">
                 <span className="text-2xl font-mono font-semibold text-white">{item.value}</span>
                 {trend ? (
