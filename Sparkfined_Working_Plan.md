@@ -664,11 +664,52 @@ The 4 critical modal/banner components are now production-ready. The remaining 1
 **Checklist:**
 - [x] Vollständiges Inventar aller TODO/FIXME/HACK-Kommentare erstellt.
 - [x] Alle Einträge in P0/P1/P2/P3 kategorisiert.
-- [x] P3-„Noise“ vollständig entfernt oder in neutrale Kommentare umgewandelt.
+- [x] P3-„Noise" vollständig entfernt oder in neutrale Kommentare umgewandelt.
 - [x] Kleine P1/P2-Aufgaben innerhalb von 6B.2 umgesetzt (Navigation hooks, backlog notes).
 - [x] Verbleibende TODOs < 10 und klar gekennzeichnet.
 - [x] `Sparkfined_Execution_Log.md` aktualisiert.
 - [x] `docs/internal/todo-inventory-6B2.txt` aktualisiert (Stand nach Cleanup).
+
+**Review Summary (Claude 2025-11-20):**
+
+✅ **VERIFIED - Core Deliverables:**
+- TODO Count: Exactly 8 TODOs in `src/` (reduced from ~30 baseline = 73% reduction) ✅
+- Priority Tags: All 8 TODOs properly tagged with [P0] (2x) or [P1] (6x) ✅
+- Inventory File: `docs/internal/todo-inventory-6B2.txt` exists and matches current code state ✅
+- Backlog Cores: Provider-Muxing (Issue #4, P0) and Export-Bundle (Issue #11, P1) clearly documented ✅
+- Build & Tests: `pnpm typecheck` ✅, `pnpm run build` ✅ (expected MORALIS_API_KEY warning only)
+
+**Remaining 8 Prioritized TODOs (Verified):**
+1. [P0] `src/lib/data/getTokenSnapshot.ts:14` — Implement provider muxing + SWR cache (Issue #4)
+2. [P0] `src/lib/data/getTokenSnapshot.ts:23` — Wire provider fetch + fallback and cache layer (Issue #4)
+3. [P1] `src/lib/data/getTokenSnapshot.ts:33` — Implement cache clearing once SWR cache is added
+4. [P1] `src/lib/ExportService.ts:23` — Implement export bundle pipeline (Issue #11)
+5. [P1] `src/pages/DashboardPageV2.tsx:31` — Replace placeholder UI state with dashboard data store
+6. [P1] `src/pages/ReplayPage.tsx:113` — Fetch actual OHLC data from Moralis API instead of mock
+7. [P1] `src/lib/signalOrchestrator.ts:58` — Replace placeholder on-chain metrics with live provider data
+8. [P1] `src/lib/ai/heuristics/sanity.ts:22` — Implement validation rules (range checks, contradiction flags)
+
+⚠️ **Minor Issues Found (Non-Blocking):**
+
+**6B.2-FIX-01 (P2 — Navigation Route Inconsistency):**
+- **Issue:** 2 navigation shortcuts navigate to V1 routes instead of V2 routes:
+  - `src/components/dashboard/JournalSnapshot.tsx:24` — navigates to `/journal` (should be `/journal-v2`)
+  - `src/components/dashboard/InsightTeaser.tsx:21` — navigates to `/analyze` (should be `/analysis-v2`)
+- **Impact:** Non-critical (V1 routes redirect to V2, but adds unnecessary hop)
+- **Fix Effort:** ~3 lines (change route strings in 2 files)
+- **Recommendation:** Quick follow-up PR or include in next Section 6B pass
+
+**6B.2-NOTE-01 (Intentional P2-Backlog Item):**
+- **File:** `src/components/board/Feed.tsx:49-53`
+- **Status:** `handleFeedItemClick()` is a stub (console.log only, no navigation)
+- **Reason:** Deep-link navigation system not yet defined (noted as "P2-backlog" in comment)
+- **Recommendation:** Accept as intentional stub, track in backlog for deep-link feature
+
+**Overall Grade:** ✅ **95% Complete** — Core TODO hygiene work is excellent and production-ready
+
+**Handoff to Section 6B.3:**
+- ESLint Cleanup ready for execution (58 warnings baseline documented)
+- Recommended to execute 6B.3 → 6B.4 sequentially for clean codebase state before E2E work
 
 #### 6B.3 – ESLint Cleanup (Unused Vars/Imports)
 

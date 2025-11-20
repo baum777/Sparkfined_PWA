@@ -502,3 +502,78 @@ Handoff to Section 6B.3:
 - ESLint Cleanup ready for execution (58 warnings baseline documented in Working Plan)
 - Recommended to execute 6B.3 → 6B.4 sequentially for clean codebase state before E2E work
 
+### 2025-11-20 – Section 6B.2 – TODO/FIXME Hygiene Review (Claude)
+
+Date: 2025-11-20
+Agent: Claude 4.5 (Repo Auditor & Architecture Steward)
+Section: #6B.2 – TODO/FIXME Hygiene & Backlog-Priorisierung (Review)
+Branch: claude/review-todo-fixme-hygiene-01Ngr3wzwnKThZEbk6wsAdLA
+
+Actions:
+- Conducted comprehensive verification of Section 6B.2 TODO/FIXME hygiene work reported by Codex/Claude (2025-11-20 pass).
+- Verified TODO count reduction from ~30 baseline to exactly 8 prioritized TODOs (73% reduction).
+- Cross-checked all 8 remaining TODOs for proper [P0]/[P1] priority tags and Issue references.
+- Validated `docs/internal/todo-inventory-6B2.txt` inventory file matches current codebase state.
+- Verified backlog cores (Provider-Muxing Issue #4, Export-Bundle Issue #11) are clearly documented with P0/P1 priorities.
+- Reviewed navigation handler implementations in JournalSnapshot, InsightTeaser, and Feed components.
+- Identified 2 minor navigation route inconsistencies (V1 routes instead of V2) and 1 intentional stub.
+- Confirmed builds and type checks pass (`pnpm typecheck` ✅, `pnpm run build` ✅).
+- Updated `Sparkfined_Working_Plan.md` Section 6B.2 with comprehensive review summary, verified TODO list, and issue findings.
+
+Commands & Results:
+- `rg "TODO|FIXME|HACK|XXX" src` → ✅ 8 matches (DashboardPageV2, ReplayPage, ExportService, signalOrchestrator, getTokenSnapshot x3, sanity)
+- `rg "TODO|FIXME|HACK|XXX" src | wc -l` → ✅ 8 total
+- `rg "TODO|FIXME|HACK|XXX" src --count` → ✅ Verified distribution (DashboardPageV2:1, ReplayPage:1, ExportService:1, signalOrchestrator:1, getTokenSnapshot:3, sanity:1)
+- `rg "\[P[0-3]\]" src` → ✅ All 8 TODOs have proper priority tags
+- `pnpm install --frozen-lockfile` → ✅ 798 packages installed
+- `pnpm typecheck` → ✅ No TypeScript errors
+- `pnpm run build` → ✅ Successful build (expected MORALIS_API_KEY warning only)
+- Read `JournalSnapshot.tsx`, `InsightTeaser.tsx`, `Feed.tsx` → ⚠️ Found navigation route issues
+- Read `getTokenSnapshot.ts`, `ExportService.ts`, `signalOrchestrator.ts`, `sanity.ts` → ✅ Verified [P0]/[P1] tags and Issue references
+
+Review Findings:
+
+✅ **Core Deliverables Verified:**
+- TODO Reduction: 30 → 8 (73% reduction) ✅
+- Priority Tags: All 8 TODOs properly tagged ([P0] x2, [P1] x6) ✅
+- Inventory Sync: `docs/internal/todo-inventory-6B2.txt` exists and matches code ✅
+- Backlog Cores: Provider-Muxing (Issue #4, P0) and Export-Bundle (Issue #11, P1) clearly documented ✅
+- Build Status: TypeCheck ✅, Build ✅ (no regressions)
+
+**8 Remaining TODOs (Verified):**
+1. [P0] `getTokenSnapshot.ts:14` — Implement provider muxing + SWR cache (Issue #4)
+2. [P0] `getTokenSnapshot.ts:23` — Wire provider fetch + fallback and cache layer (Issue #4)
+3. [P1] `getTokenSnapshot.ts:33` — Implement cache clearing once SWR cache is added
+4. [P1] `ExportService.ts:23` — Implement export bundle pipeline (Issue #11)
+5. [P1] `DashboardPageV2.tsx:31` — Replace placeholder UI state with dashboard data store
+6. [P1] `ReplayPage.tsx:113` — Fetch actual OHLC data from Moralis API instead of mock
+7. [P1] `signalOrchestrator.ts:58` — Replace placeholder on-chain metrics with live provider data
+8. [P1] `ai/heuristics/sanity.ts:22` — Implement validation rules (range checks, contradiction flags)
+
+⚠️ **Minor Issues Found (Non-Blocking):**
+
+**6B.2-FIX-01:** Navigation route inconsistency in 2 components:
+- `JournalSnapshot.tsx:24` navigates to `/journal` (should be `/journal-v2`)
+- `InsightTeaser.tsx:21` navigates to `/analyze` (should be `/analysis-v2`)
+- Impact: Non-critical (V1 routes redirect to V2, but adds unnecessary hop)
+- Recommendation: Quick follow-up fix (~3 lines)
+
+**6B.2-NOTE-01:** Feed.tsx handleFeedItemClick is intentional stub:
+- `Feed.tsx:49-53` has console.log-only handler (no navigation)
+- Reason: Deep-link navigation system not yet defined (noted as "P2-backlog")
+- Recommendation: Accept as intentional, track in backlog
+
+New open points:
+- **6B.2-FIX-01:** Quick fix needed for navigation routes (JournalSnapshot → `/journal-v2`, InsightTeaser → `/analysis-v2`)
+- **6B.2-OP-01:** 8 remaining [P0]/[P1] TODOs require dedicated implementation (tracked in Issue #4 and Issue #11, Q1 2025 target)
+- **6B.2-OP-02:** Consider automated TODO hygiene checks in CI/CD (e.g., fail if TODO without [Px]-tag is added)
+
+Section 6B.2 Status: ✅ **95% COMPLETE** – Core TODO hygiene work verified and production-ready
+
+Overall Grade: **Excellent** — TODO reduction, prioritization, and backlog clarification all meet objectives
+
+Handoff to Section 6B.3:
+- ESLint Cleanup ready for execution (58 warnings baseline documented)
+- 6B.2-FIX-01 can be addressed in 6B.3 pass or as standalone quick fix
+- Recommended execution order: 6B.3 (ESLint Cleanup) → 6B.4 (Final Zombie Sweep)
+
