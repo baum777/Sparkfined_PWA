@@ -230,3 +230,64 @@ Commands & Results:
 New open points:
 - DT-FIX-01 → Design/UX Backlog (decision: keep `text-amber-200` or create `text-price` token?)
 - TOKEN-FUTURE-* items → Roadmap for Section 6 or dedicated Design Token Evolution track
+
+### 2025-11-20 – Section 6A.1 – Inventory & Reality Check
+
+Date: 2025-11-20  
+Agent: Codex  
+Section: #6A.1 – Inventory & Reality Check  
+Branch: work
+
+Actions:
+- Inventar der V1 Pages erstellt (JournalPage.tsx, ChartPage.tsx, AnalyzePage.tsx, HomePage.tsx, FontTestPage.tsx).
+- V1 Layout-Komponenten (Layout.tsx, Header.tsx) und Sections (`src/sections/chart`, `src/sections/journal`, `src/sections/analyze`) dokumentiert.
+- RoutesRoot.tsx geprüft: nur V2 lazy imports aktiv; Redirects leiten auf V2-Flows.
+- Sidebar und BottomNav kontrolliert; BottomNav für `/settings-v2` vorbereitet.
+
+Commands & Results:
+- `ls src/pages`, `ls src/components/layout`, `ls src/sections` → vollständige V1-Liste festgehalten.
+- `rg "JournalPage" src`, `rg "AnalyzePage" src`, `rg "ChartPage" src` → keine V1-Routenabhängigkeiten außerhalb der Legacy-Dateien.
+
+New open points:
+- Archive-Moves und Dev-Noise-Deletes in 6A.2 durchführen.
+
+### 2025-11-20 – Section 6A.2 – Archive Moves & Deletions
+
+Date: 2025-11-20  
+Agent: Codex  
+Section: #6A.2 – Archive Moves & Deletions  
+Branch: work
+
+Actions:
+- Archivstruktur `docs/archive/v1-migration-backup/` mit README (Retention + Restore) angelegt.
+- V1 Pages (JournalPage, ChartPage, AnalyzePage), Layout (Layout.tsx, Header.tsx) und die chart/journal/analyze Sections ins Archiv verschoben.
+- Dev-/Test-Pages HomePage.tsx und FontTestPage.tsx gelöscht.
+- ChartPageV2 mit einer V2-konformen Migrationsansicht versehen, damit die Route ohne Legacy-Komponenten aktiv bleibt.
+
+Commands & Results:
+- `mv` der V1-Dateien in die Archiv-Unterordner; `rm` für Dev-Noise.
+
+New open points:
+- Nach dem Move V1-Referenzen entfernen und Builds/Lints laufen lassen (6A.3).
+
+### 2025-11-20 – Section 6A.3 – Orphaned Imports & Dead Code Sweep
+
+Date: 2025-11-20  
+Agent: Codex  
+Section: #6A.3 – Orphaned Imports & Dead Code Sweep  
+Branch: work
+
+Actions:
+- Layout-Wrapper aus `RoutesRoot.tsx` entfernt und BottomNav-Link auf `/settings-v2` korrigiert.
+- `rg`-Sweep auf JournalPage/AnalyzePage/ChartPage bestätigt: keine V1-Namen mehr im aktiven `src/`-Baum.
+- Lint/Typecheck/Build ausgeführt; Build akzeptiert bekannte MORALIS_API_KEY Warnung.
+- V2-Routen per Smoke-Test durchgescannt (keine offensichtlichen 404/Suspense-Hänger).
+
+Commands & Results:
+- `rg "JournalPage" src`, `rg "AnalyzePage" src`, `rg "ChartPage" src` → nur V2/Archive-Treffer.
+- `pnpm lint` → ⚠️ Warnungen zu bestehenden unused-vars in ai/api/diagnostics-Modulen (keine neuen Errors).  
+- `pnpm typecheck` → ✅  
+- `pnpm run build` → ✅ (inkl. MORALIS_API_KEY Hinweis, Build grün)
+
+New open points:
+- Chart V2 Implementierung ersetzen den Platzhalter, sobald neue Module bereitstehen.
