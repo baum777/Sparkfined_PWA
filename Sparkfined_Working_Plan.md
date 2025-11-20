@@ -282,19 +282,63 @@ Open Points:
 
 Goal: Enforce token-based styling throughout the UI, not just the core V2 pages.
 
-Primary agent: Codex
+**📖 Detailed Specification:** See `docs/design/Sparkfined_V2_Design_Tokens.md` for complete token schema, mapping tables, and implementation guide.
+
+**📝 Summary:** See `docs/design/Section_5A_Summary.md` for executive summary of Section 5A work.
+
+### 5A – Design Token & Visual Spec (Claude) — ✅ COMPLETE
+
+**Status:** Specification complete, ready for Codex implementation
+
+**Deliverables:**
+- ✅ Token inventory & mapping table (24+ opacity-based colors identified)
+- ✅ Enhanced token schema for `tailwind.config.ts`
+- ✅ 8 standard layout patterns with code snippets
+- ✅ 30+ acceptance criteria checkpoints
+- ✅ Implementation priority guide (Phase 1-3)
+
+**Key Findings:**
+- ✅ No hardcoded hex colors in V2 pages
+- ⚠️ Opacity-based colors (`white/5`, `black/30`) need semantic replacements
+- ⚠️ 1 hardcoded gradient in `DashboardShell.tsx`
+- ✅ Good foundation exists in `tailwind.config.ts`
+
+**Open Questions:**
+- **DT-01:** Backdrop blur token? → Keep as utility for now
+- **DT-02:** Skeleton color? → Use `bg-surface-skeleton`
+- **DT-03:** Active border token? → Keep sentiment borders
+
+### 5B – Token Implementation (Codex) — 🔄 PENDING
+
+**Primary agent:** Codex
 
 Checklist:
 
-- [ ] Run grep for raw color classes (bg-[#, text-zinc-*, border-white/*, etc.).
-- [ ] Replace remaining hardcoded colors in src/pages with semantic tokens.
-- [ ] Replace remaining hardcoded colors in core components (dashboard, journal, ui primitives).
-- [ ] Confirm tailwind.config contains all semantic tokens used.
-- [ ] Visual spot-check on key pages to confirm no regressions.
+- [ ] Update `tailwind.config.ts` with new color tokens (bg-surface-*, border-border-*, interactive-*, sentiment-*, status-*)
+- [ ] Add background gradients (`bg-app-gradient`, `bg-surface-gradient`)
+- [ ] Replace hardcoded gradient in `DashboardShell.tsx`
+- [ ] Replace opacity-based colors in all V2 pages using mapping table:
+  - [ ] `DashboardPageV2.tsx`
+  - [ ] `JournalPageV2.tsx`
+  - [ ] `WatchlistPageV2.tsx`
+  - [ ] `AlertsPageV2.tsx`
+  - [ ] `AnalysisPageV2.tsx`
+  - [ ] `ChartPageV2.tsx`
+  - [ ] `SettingsPageV2.tsx`
+- [ ] Replace opacity-based colors in core components:
+  - [ ] `DashboardShell.tsx`
+  - [ ] `DashboardKpiStrip.tsx`
+  - [ ] `JournalList.tsx`
+  - [ ] `WatchlistTable.tsx`
+  - [ ] `AlertsList.tsx`
+- [ ] Normalize spacing patterns across all V2 pages
+- [ ] Run visual regression checks (before/after screenshots)
+- [ ] Confirm no visual regressions on key pages
 
 Handoff to Claude:
 
 - [ ] Approve or propose minor color tweaks based on readability / contrast.
+- [ ] Review visual regression screenshots
 
 ---
 
