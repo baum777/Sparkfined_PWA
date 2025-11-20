@@ -11,11 +11,7 @@ import { pickProvider } from '@/lib/config/flags';
  * @param address - Solana token address
  * @returns TokenSnapshot with provider metadata
  *
- * TODO[P0] (Issue #4 - Provider Muxing):
- * - Implement primary provider fetch
- * - Add try/catch fallback to secondary
- * - Add SWR cache (300s TTL)
- * - Add telemetry events
+ * TODO[P0]: Implement provider muxing + SWR cache (Issue #4)
  */
 export async function getTokenSnapshot(
   address: string
@@ -24,7 +20,7 @@ export async function getTokenSnapshot(
   void config;
   void address;
 
-  // TODO[P0]: Implement provider muxing (Issue #4)
+  // TODO[P0]: Wire provider fetch + fallback and cache layer (Issue #4)
   throw new Error('Not implemented - Issue 4');
 }
 
@@ -34,5 +30,5 @@ export async function getTokenSnapshot(
  */
 export function clearSnapshotCache(address?: string): void {
   void address;
-  // TODO[P0]: Implement cache clearing (Issue #4)
+  // TODO[P1]: Implement cache clearing once SWR cache is added
 }

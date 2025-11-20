@@ -19,5 +19,7 @@ export function sanityCheck(
   payload?: SanityCheckInputPayload
 ): SanityCheckOutputBullets {
   // Placeholder: Pass through unchanged
+  // TODO[P1]: Implement validation rules (range checks, contradiction flags)
+  
   return bullets.map(b => b);
 }

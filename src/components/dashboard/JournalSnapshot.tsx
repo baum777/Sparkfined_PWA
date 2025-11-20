@@ -21,6 +21,8 @@ const directionStyles: Record<JournalEntry['direction'], string> = {
 export default function JournalSnapshot({ entries }: JournalSnapshotProps) {
   const navigate = useNavigate();
 
+  const handleNavigate = React.useCallback(() => navigate('/journal'), [navigate]);
+
   return (
     <div className="rounded-lg border border-border-moderate bg-surface p-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
@@ -43,7 +45,12 @@ export default function JournalSnapshot({ entries }: JournalSnapshotProps) {
       </div>
 
       <div className="mt-5">
-        <Button variant="ghost" size="sm" className="text-blue-300 hover:text-blue-200" onClick={() => navigate('/journal-v2')}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-blue-300 hover:text-blue-200"
+          onClick={handleNavigate}
+        >
           Open journal
         </Button>
       </div>

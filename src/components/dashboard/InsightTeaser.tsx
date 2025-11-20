@@ -18,6 +18,8 @@ const biasStyles: Record<InsightTeaserProps['bias'], string> = {
 export default function InsightTeaser({ title, bias, confidenceLabel, summary }: InsightTeaserProps) {
   const navigate = useNavigate();
 
+  const handleNavigate = React.useCallback(() => navigate('/analyze'), [navigate]);
+
   return (
     <div className="rounded-lg border border-border-moderate bg-surface p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
@@ -34,7 +36,7 @@ export default function InsightTeaser({ title, bias, confidenceLabel, summary }:
       <p className="mt-2 text-sm text-text-secondary line-clamp-3 leading-relaxed">{summary}</p>
 
       <div className="mt-4">
-        <Button size="sm" onClick={() => navigate('/analysis-v2')}>
+        <Button size="sm" onClick={handleNavigate}>
           View full analysis
         </Button>
       </div>

@@ -40,10 +40,10 @@ export async function getOrderflowSnapshot(
   // Alpha placeholder: always return neutral
   // Future: Call external API based on ORDERFLOW_PROVIDER env var
   const provider = import.meta.env.VITE_ORDERFLOW_PROVIDER || 'none'
-  
+
   if (provider !== 'none') {
     console.info('[orderflow] Provider configured but not implemented:', provider)
-    // Provider-specific logic tracked in Phase 6 roadmap
+    // NOTE(P2-backlog): Provider-specific logic will land in Phase 6+
   }
 
   return {

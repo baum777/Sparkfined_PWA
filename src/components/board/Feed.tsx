@@ -47,24 +47,9 @@ export default function Feed() {
   ];
 
   const handleFeedItemClick = (event: FeedEvent) => {
-    // Navigate to appropriate page based on event type
-    switch (event.type) {
-      case 'alert':
-        navigate('/alerts-v2');
-        break;
-      case 'analysis':
-        navigate('/analysis-v2');
-        break;
-      case 'journal':
-        navigate('/journal-v2');
-        break;
-      case 'export':
-      case 'error':
-      default:
-        // For export/error events, stay on dashboard
-        navigate('/dashboard-v2');
-        break;
-    }
+    // NOTE(P2-backlog): Navigate based on event type once deep-links are defined
+    console.log('Feed item clicked:', event.id, event.type);
+    // Example: if (event.type === 'alert') navigate('/notifications');
   };
   
   return (

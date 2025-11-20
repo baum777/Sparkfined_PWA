@@ -28,7 +28,8 @@ const dummyJournalEntries = [
 ];
 
 export default function DashboardPageV2() {
-  const [isLoading, setIsLoading] = useState(false); // TODO[P1]: Wire to real data fetch (dashboard store + data layer integration)
+  // TODO[P1]: Replace placeholder UI state with dashboard data store once available
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasData, setHasData] = useState(true);
 

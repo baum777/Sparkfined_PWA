@@ -398,7 +398,7 @@ export async function getReplayStats(): Promise<{
 
   return {
     totalSessions: sessions.length,
-    avgDuration: 0,
+    avgDuration: 0, // NOTE(P2-backlog): duration tracking will be added when sessions capture playback length
     totalBookmarks,
     linkedToJournal,
   }

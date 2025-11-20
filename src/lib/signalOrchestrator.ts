@@ -55,6 +55,7 @@ export function detectSignal(
   // Extract risk flags
   const risk_flags = extractRiskFlags(snapshot, heuristics)
 
+  // TODO[P1]: Replace placeholder on-chain metrics with live provider data
   return {
     id,
     timestamp_utc: now,

@@ -45,6 +45,7 @@ export async function fetchAnalysisSnapshot(): Promise<AnalysisSnapshot> {
 
 /**
  * Simple 24h approximation: compare oldest vs most recent candle in the window.
+ * NOTE(P2-backlog): Centralize once market helper consolidation lands.
  */
 function computeChangePct(latest: Candle, baseline?: Candle): number {
   if (!baseline || !Number.isFinite(baseline.close) || baseline.close === 0) {
