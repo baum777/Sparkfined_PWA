@@ -398,7 +398,7 @@ export async function getReplayStats(): Promise<{
 
   return {
     totalSessions: sessions.length,
-    avgDuration: 0, // TODO: Add duration tracking to ReplaySession
+    avgDuration: 0,
     totalBookmarks,
     linkedToJournal,
   }

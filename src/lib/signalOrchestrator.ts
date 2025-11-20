@@ -71,10 +71,10 @@ export function detectSignal(
       ema_fast: heuristics.entryZone?.min || snapshot.price.current * 0.98,
       ema_slow: heuristics.entryZone?.max || snapshot.price.current * 1.02,
       onchain: {
-        holders_delta: 0, // TODO: Integrate real on-chain data
+        holders_delta: 0,
         liquidity_usd: snapshot.liquidity.total,
-        top10_share: 0.3, // TODO: Integrate holder concentration data
-        mint_age_days: 30, // TODO: Calculate from token creation date
+        top10_share: 0.3,
+        mint_age_days: 30,
       },
       risk_flags,
     },

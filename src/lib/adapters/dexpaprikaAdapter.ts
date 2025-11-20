@@ -300,7 +300,7 @@ export async function getDexPaprikaSnapshot(
         provider: 'dexpaprika',
         cached: false,
         latency,
-        retries: 0, // TODO: Track actual retries
+        retries: 0,
       },
     }
   } catch (error) {

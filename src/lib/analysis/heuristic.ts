@@ -17,19 +17,11 @@ export interface HeuristicResult {
  * Calculate support/resistance levels using price action
  * @param snapshot - Token snapshot data
  * @returns Heuristic analysis result
- *
- * TODO (Issue 6 implementation):
- * - Calculate S/R ±(1.5-3.5)%
- * - Calculate SL at -5%
- * - Calculate TP at +5-10%
- * - Add seeded determinism
- * - Target <300ms execution time
  */
 export function heuristic(snapshot: TokenSnapshot): HeuristicResult {
   const { price } = snapshot;
 
   // Simple implementation: S/R within ±3% of current price
-  // TODO (Issue 6): Enhance with more sophisticated price action analysis
   const resistance = price * 1.03; // +3%
   const support = price * 0.97; // -3%
   const stop_loss = price * 0.95; // -5%
