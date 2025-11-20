@@ -500,46 +500,152 @@ Sweep status:
 
 **Checklist (Claude):**
 
-- [ ] Execution Log Einträge für 6A.1–6A.3 gelesen
-- [ ] Repo-Status gecheckt (Branch, Key-Files, Routing)
-- [ ] Kurzes Fazit in **Sparkfined_Working_Plan.md** eingefügt:
-  - [ ] “Fazit Section 6A”
-  - [ ] “Verifiziert: …”
-  - [ ] “Offene Punkte → in Backlog verschoben”
-- [ ] Abschluss-Entry in **Execution Log** unter “Section 6A Review” geschrieben
+- [x] Execution Log Einträge für 6A.1–6A.3 gelesen
+- [x] Repo-Status gecheckt (Branch, Key-Files, Routing)
+- [x] Kurzes Fazit in **Sparkfined_Working_Plan.md** eingefügt:
+  - [x] "Fazit Section 6A"
+  - [x] "Verifiziert: …"
+  - [x] "Offene Punkte → in Backlog verschoben"
+- [x] Abschluss-Entry in **Execution Log** unter "Section 6A Review" geschrieben
+
+**Fazit Section 6A (Claude Review 2025-11-20):**
+
+✅ **Section 6A COMPLETE – V1 Archive & Dead-Code Sweep erfolgreich abgeschlossen**
+
+**Verifiziert:**
+
+- ✅ **Archive Structure:** `docs/archive/v1-migration-backup/` mit klarer README (Retention Policy: 2 Monate nach V2 Stable Launch, Restore Instructions dokumentiert)
+- ✅ **V1 Pages archiviert:** JournalPage.tsx, ChartPage.tsx, AnalyzePage.tsx vollständig ins Archiv verschoben
+- ✅ **V1 Layout archiviert:** Layout.tsx, Header.tsx vollständig archiviert
+- ✅ **V1 Sections archiviert:** sections/chart/*, sections/journal/*, sections/analyze/* vollständig archiviert
+- ✅ **Dev-Noise gelöscht:** HomePage.tsx, FontTestPage.tsx entfernt (keine historische Bedeutung)
+- ✅ **Routing V2-only:** RoutesRoot.tsx enthält nur V2 lazy imports, alle Legacy-Routen redirecten zu V2
+- ✅ **Navigation V2-only:** Sidebar und BottomNav verweisen ausschließlich auf V2-Routen (/dashboard-v2, /journal-v2, /watchlist-v2, /alerts-v2, /analysis-v2, /chart-v2, /settings-v2)
+- ✅ **Keine aktiven V1-Referenzen:** Grep-Sweep bestätigt keine Imports von JournalPage/ChartPage/AnalyzePage in aktivem src/-Baum
+- ✅ **Build & Tests grün:**
+  - `pnpm typecheck` → ✅ Keine TypeScript-Errors
+  - `pnpm run build` → ✅ Erfolgreicher Build (nur erwarteter MORALIS_API_KEY Hinweis)
+  - `pnpm lint` → ⚠️ 58 Warnings (nur bestehende unused-vars, keine neuen Errors durch Archive-Moves)
+
+**Offene Punkte → Section 6B / Backlog:**
+
+- **6B-01:** 30 TODO/FIXME/HACK Kommentare in src/ (Code-Hygiene, nicht blockierend)
+- **6B-02:** 58 ESLint-Warnings (unused-vars, unused-imports) – Cleanup-Kandidaten
+- **6B-03:** 10 Legacy-Komponenten mit hardcoded colors (aus Section 5B/TOKEN-NOTE-01)
+- **6B-04:** ChartPageV2 ist aktuell Placeholder – wird durch volle V2-Chart-Implementierung ersetzt
+
+**Risiken / Empfehlungen:**
+
+- ✅ Keine kritischen Risiken identifiziert
+- ✅ V1→V2 Cut ist sauber und ohne "Zombie"-Referenzen
+- ℹ️ Archive kann nach 2 Monaten Stable-V2-Betrieb gelöscht werden (oder bei Bedarf früher)
 
 ---
 
-### 6B – Legacy UI & Modal Token Sweep (Backlog / Post-Launch)
+### 6B – Legacy Cleanup & Tech-Debt Consolidation (Post-Launch / Aktivierung nach 7–10)
 
-> **Status:** ⏳ Backlog – kein Blocker für V2 Launch, aber sinnvoller Cleanup nach Produktion.
+> **Status:** ⏳ Backlog – kein Blocker für V2 Launch, aber sinnvoller Cleanup nach Go-Live und vor E2E-Arbeit
 
-**Goal:**  
-Langfristig alle noch verbleibenden **Legacy-Komponenten** (z.B. `FeedbackModal`, `ReplayModal`, `UpdateBanner`, alte Banners / Toaster) auf das V2-Design-Tokensystem migrieren, damit die gesamte App visuell und technisch konsistent ist.
+**Goal:**
+Codebase-Hygiene und Design-Consistency langfristig verbessern durch:
+1. Migration verbleibender Legacy-Komponenten auf V2-Design-Tokens
+2. TODO/FIXME-Konsolidierung und Priorisierung
+3. ESLint-Cleanup (unused-vars, unused-imports)
+4. Finale "Zombie-Code"-Elimination
 
-**Primär-Agent:**  
-- **Future Codex + Claude** (kombiniert, in eigenem Iterationszyklus nach Go-Live)
+**Primär-Agent:**
+- **Codex** (Execution)
+- **Claude** (Review & Backlog-Triage nach Abschluss)
 
-**Scope (vorläufig):**
+**Scope & Sub-Sections:**
 
-- Identifizierte Kandidaten (aus 5B/TOKEN-NOTE-01):
-  - FeedbackModal
-  - ReplayModal
-  - UpdateBanner
-  - … plus weitere Hardcoded-Slate/Opacity-Komponenten
-- Migration von:
-  - `bg-slate-*` / `bg-black/40` → `bg-surface`, `bg-surface-subtle`, `bg-overlay`
-  - `text-slate-*` / `text-zinc-*` → `text-text-primary/secondary/tertiary`
-  - Ad-hoc Farben → Sentiment/Status Tokens, wo sinnvoll
+#### 6B.1 – Legacy Component Token Migration
 
-**Checklist (Backlog-Level, noch nicht zur Ausführung freigegeben):**
+Verbleibende 10 Komponenten (aus Section 5B/TOKEN-NOTE-01) auf V2-Token migrieren:
 
-- [ ] Vollständige Liste aller Legacy-Komponenten mit Hardcoded Colors
-- [ ] Mapping-Tabelle: Legacy-Farben → V2 Tokens
-- [ ] Geplanter Branch: `codex/section6b-legacy-token-sweep-01`
-- [ ] UX/Design-Abnahme für neue Token-Mappings
-- [ ] Iterative Umsetzung (Komponente für Komponente)
-- [ ] Finaler Review & Eintrag in `Sparkfined_Execution_Log.md` / `Working_Plan` als “Section 6B Complete”
+**Kandidaten:**
+- FeedbackModal
+- ReplayModal
+- UpdateBanner
+- ErrorBoundary
+- NotificationToast
+- … (vollständige Liste via grep erstellen)
+
+**Token-Migrations-Pattern:**
+- `bg-slate-*` / `bg-black/40` → `bg-surface`, `bg-surface-subtle`, `bg-overlay`
+- `text-slate-*` / `text-zinc-*` → `text-text-primary/secondary/tertiary`
+- Ad-hoc Farben → Sentiment/Status Tokens (wo sinnvoll)
+
+**Checklist:**
+- [ ] Vollständiges Inventar aller Legacy-Komponenten mit Hardcoded-Colors erstellen
+- [ ] Mapping-Tabelle: Legacy-Farben → V2 Tokens (analog Section 5A)
+- [ ] Komponente-für-Komponente Migration (1 commit pro Komponente)
+- [ ] Visual-Regression-Check (manual oder via Screenshot-Diff)
+- [ ] pnpm typecheck + build nach jeder Migration
+
+#### 6B.2 – TODO/FIXME Hygiene & Backlog-Priorisierung
+
+**Bestand:** 30 TODO/FIXME/HACK Kommentare in src/ (Stand 2025-11-20)
+
+**Aktionen:**
+- [ ] Vollständige Liste aller TODOs sammeln (mit File:Line, Kontext)
+- [ ] Kategorisierung:
+  - **P0 (Blocker):** Muss vor E2E/Produktion behoben werden
+  - **P1 (High):** Sollte zeitnah behoben werden (Q1 2025)
+  - **P2 (Nice-to-have):** Backlog, nicht dringend
+  - **P3 (Won't-Fix):** Entfernen oder als "Known Limitation" dokumentieren
+- [ ] P0/P1-TODOs in separate GitHub Issues/Tasks übertragen
+- [ ] P2/P3-TODOs entweder entfernen oder als ADR/Known-Limitation dokumentieren
+- [ ] TODO-Count-Ziel: <10 (nur echte "work-in-progress"-Marker)
+
+**Beispiel-Kategorien (aus Grep-Sample):**
+- Navigation-Wiring (Button onClick TODOs): P1 → in eigene Issues übertragen
+- Data-Fetch-TODOs (DashboardPageV2): P1 → mit Data-Layer-Arbeit verknüpfen
+- Provider-Muxing (getTokenSnapshot, walletFlow): P2 → in Issue #4/6-Implementierung einplanen
+- Export-Service-TODOs (ZIP, Share-Card): P2 → mit Issue #11 verknüpfen
+
+#### 6B.3 – ESLint Cleanup (Unused Vars/Imports)
+
+**Bestand:** 58 ESLint-Warnings (Stand 2025-11-20)
+
+**Kategorien:**
+1. **Unused Error-Variables** (häufig in catch-Blocks): Entweder nutzen für Logging oder `_error` prefix
+2. **Unused Function-Parameters** (z.B. `req` in API-Handlers): `_req` prefix oder entfernen
+3. **Unused Imports** (z.B. Type-Definitions): Entfernen
+4. **Unused Type-Definitions**: Entfernen oder in shared-types exportieren (falls zukünftig gebraucht)
+
+**Checklist:**
+- [ ] Kategorisierung der 58 Warnings (via `pnpm lint > lint-report.txt`)
+- [ ] Batch-1: Unused-Error-Variables (ca. 15–20 Warnings) → `_error` oder Logging
+- [ ] Batch-2: Unused-Params in API-Handlers (ca. 10 Warnings) → `_req` / `_res`
+- [ ] Batch-3: Unused-Imports (ca. 10–15 Warnings) → Entfernen
+- [ ] Batch-4: Unused-Types (ca. 10 Warnings) → Entfernen oder dokumentieren
+- [ ] Ziel: `pnpm lint` → 0 Warnings (oder <5, nur dokumentierte Ausnahmen)
+
+#### 6B.4 – Final Zombie-Code Sweep
+
+Nach 6B.1–6B.3 nochmal überprüfen:
+
+**Checklist:**
+- [ ] Grep nach weiteren V1-Artefakten (z.B. alte Kommentare mit "V1", "Legacy")
+- [ ] Grep nach unbenutzten Helfer-Funktionen (z.B. `export function foo() { … }` ohne Import)
+- [ ] Check: Gibt es noch alte Utility-Files ohne aktive Imports? (via dependency-cruiser oder manuell)
+- [ ] Check: Sind alle `sections/`-Unterordner (ai, ideas, notifications, telemetry) noch aktiv genutzt?
+- [ ] Abschließender Build-Size-Check (Bundle-Size sollte durch Cleanup sinken)
+
+**Ziel:**
+- Keine toten Exporte mehr (oder bewusst als "Public API" dokumentiert)
+- src/-Struktur aufgeräumt und wartbar
+
+---
+
+**Handoff nach 6B (an Claude):**
+- [ ] Review-Zusammenfassung: "Section 6B Complete – Codebase-Hygiene erreicht"
+- [ ] Vergleich: ESLint-Warnings vorher/nachher, TODO-Count vorher/nachher, Bundle-Size vorher/nachher
+- [ ] Backlog-Update: Nicht behobene P2/P3-TODOs in Roadmap übertragen
+
+**Primärer Branch (geplant):**
+- `codex/section6b-legacy-cleanup-01` (6B.1–6B.4 sequenziell oder in Sub-Branches)
 
 ---
 

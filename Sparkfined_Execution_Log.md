@@ -313,3 +313,52 @@ New open points:
 
 - Weiter mit **Section 6 – Dead Code & V1 Archive / Legacy Cleanup**, unter Berücksichtigung der bereits dokumentierten TOKEN-FUTURE-Backlogpunkte.
 
+### 2025-11-20 – Section 6A.4 – V1 Archive Review & Section 6B Planning (Claude)
+
+Date: 2025-11-20
+Agent: Claude 4.5 (Senior Repo Auditor & Architecture Steward)
+Section: #6A.4 – Section 6A Abschluss & Review + #6B Planning
+Branch: claude/review-archive-planning-0146MabuQxWLomTxd4iR6aGP
+
+Actions:
+- Conducted comprehensive review of Section 6A deliverables (6A.1 Inventory, 6A.2 Archive Moves, 6A.3 Dead-Code Sweep)
+- Verified archive structure in `docs/archive/v1-migration-backup/` (README, retention policy, restore instructions)
+- Confirmed all V1 pages (JournalPage, ChartPage, AnalyzePage), layouts (Layout.tsx, Header.tsx), and sections (chart/*, journal/*, analyze/*) are properly archived
+- Verified dev-noise pages (HomePage, FontTestPage) were deleted appropriately
+- Confirmed RoutesRoot.tsx contains only V2 lazy imports with proper redirects from legacy routes
+- Verified navigation components (Sidebar, BottomNav) point exclusively to V2 routes
+- Performed comprehensive V1-residue search (grep for JournalPage, ChartPage, AnalyzePage patterns) – no active imports found
+- Analyzed remaining tech debt for Section 6B planning:
+  - 30 TODO/FIXME/HACK comments in src/
+  - 58 ESLint warnings (unused-vars, unused-imports)
+  - 10 legacy components with hardcoded colors (from Section 5B/TOKEN-NOTE-01)
+- Designed comprehensive Section 6B scope with 4 sub-sections (6B.1 Legacy Token Migration, 6B.2 TODO Hygiene, 6B.3 ESLint Cleanup, 6B.4 Zombie-Code Sweep)
+- Updated `Sparkfined_Working_Plan.md` Section 6 with complete 6A review summary and expanded 6B definition
+- Created this Execution Log entry documenting review findings and Section 6B handoff
+
+Commands & Results:
+- `pnpm install` → ✅ (798 packages installed)
+- `pnpm lint` → ⚠️ 58 warnings (only pre-existing unused-vars, no new errors from V1 archive)
+- `pnpm typecheck` → ✅ (no TypeScript errors)
+- `pnpm run build` → ✅ (successful build, expected MORALIS_API_KEY warning only)
+- `find docs/archive/v1-migration-backup -type f` → ✅ (verified 30+ V1 files archived)
+- `ls src/pages` → ✅ (only V2 pages remain, no V1 pages)
+- `ls src/sections` → ✅ (only ai/, ideas/, notifications/, telemetry/ remain – no chart/, journal/, analyze/)
+- `grep -r "JournalPage\|ChartPage\|AnalyzePage" src/` → ✅ (no active imports, only comments and V2 function names)
+- `grep -r "from.*layout/Layout\|from.*layout/Header" src/` → ✅ (no imports found)
+- `grep -r "TODO\|FIXME\|XXX\|HACK" src/ | wc -l` → 30 occurrences (documented for Section 6B)
+
+New open points:
+- **6B-01:** 30 TODO/FIXME/HACK comments require triage and prioritization (Section 6B.2)
+- **6B-02:** 58 ESLint warnings require categorization and cleanup (Section 6B.3)
+- **6B-03:** 10 legacy components with hardcoded colors need token migration (Section 6B.1)
+- **6B-04:** ChartPageV2 placeholder requires replacement with full V2 implementation (tracked separately)
+
+Section 6A Status: ✅ **COMPLETE** – V1 Archive & Dead-Code Sweep erfolgreich abgeschlossen
+
+Handoff to Codex:
+- Section 6B is now fully scoped and ready for execution (post-launch / after Sections 7-10)
+- Detailed checklists and categorization guidance provided in `Sparkfined_Working_Plan.md` Section 6B
+- Recommended execution order: 6B.1 (Token Migration) → 6B.2 (TODO Hygiene) → 6B.3 (ESLint Cleanup) → 6B.4 (Final Zombie Sweep)
+- Branch naming convention: `codex/section6b-legacy-cleanup-01` (or sub-branches per 6B sub-section)
+
