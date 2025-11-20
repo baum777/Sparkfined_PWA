@@ -1,160 +1,309 @@
-# Sparkfined PWA - Dokumentation
+# Sparkfined PWA — Documentation
 
-**Version:** 3.0 (Konsolidiert & Bereinigt)  
-**Letzte Aktualisierung:** 2025-11-07  
+**Version:** 4.0 (Reorganized & Cleaned)
+**Last Updated:** 2025-11-20
 **Status:** ✅ Production-Ready
 
 ---
 
-## 📋 Hauptdokumentation
+## 📋 Quick Navigation
 
-### 🎯 [PROJEKT_ÜBERSICHT.md](./PROJEKT_ÜBERSICHT.md) ⭐ START HIER
+### 🎯 I want to...
 
-**Die zentrale Anlaufstelle für alle Informationen:**
-- ✅ Vollständige Projekt-Beschreibung
-- ✅ **Alle aktuellen Features** (detailliert)
-- ✅ **Alle geplanten Features** (Roadmap Q1-Q4 2025)
-- ✅ Tech Stack & Architektur
-- ✅ Quick Start Guide
-- ✅ Performance Metriken
-- ✅ Projekt-Status & Phasen
+**...understand the project**
+→ Start with `/README.md` (project root) for overview
 
-👉 **Beginne hier, wenn du einen Überblick über das Projekt brauchst!**
+**...set up the development environment**
+→ [`setup/environment-and-providers.md`](./setup/environment-and-providers.md)
 
----
+**...deploy the application**
+→ [`setup/build-and-deploy.md`](./setup/build-and-deploy.md)
+→ [`setup/vercel-deploy-checklist.md`](./setup/vercel-deploy-checklist.md)
 
-## 🔧 Technische Dokumentation
+**...understand the architecture**
+→ [`pwa-audit/01_repo_index.md`](./pwa-audit/01_repo_index.md)
+→ [`pwa-audit/02_feature_catalog.md`](./pwa-audit/02_feature_catalog.md)
 
-### Setup & Deployment
-| Dokument | Beschreibung | Wann brauchst du es? |
-|----------|--------------|----------------------|
-| **[API_KEYS_LIST.md](./API_KEYS_LIST.md)** | Liste aller benötigten API-Keys mit Links | Beim ersten Setup |
-| **[ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md)** | 60+ Environment-Variablen erklärt | Setup & Konfiguration |
-| **[DEPLOY_GUIDE.md](./DEPLOY_GUIDE.md)** | Schritt-für-Schritt Vercel Deployment | Vor dem ersten Deploy |
+**...work with AI features**
+→ [`ai/integration-recommendations.md`](./ai/integration-recommendations.md)
+→ [`ai/advanced-insight-ui-spec-beta-v0.9.md`](./ai/advanced-insight-ui-spec-beta-v0.9.md)
 
----
+**...understand onboarding strategy**
+→ [`process/onboarding-blueprint.md`](./process/onboarding-blueprint.md)
+→ [`lore/onboarding-dialogs.md`](./lore/onboarding-dialogs.md)
 
-## 🚀 Geplante Features (Details)
-
-### AI & Intelligence Features
-| Dokument | Beschreibung | Zeitplan |
-|----------|--------------|----------|
-| **[CORTEX_INTEGRATION_PLAN.md](./CORTEX_INTEGRATION_PLAN.md)** | Moralis Cortex AI (Risk Score, Sentiment, Trade Ideas) | Q1 2025 |
-| **[SIGNAL_ORCHESTRATOR_INTEGRATION.md](./SIGNAL_ORCHESTRATOR_INTEGRATION.md)** | Event Sourcing, Learning Architect, Lessons | Q1 2025 |
-| **[SIGNAL_UI_INTEGRATION.md](./SIGNAL_UI_INTEGRATION.md)** | UI-Integration für Signal-Features | Q1 2025 |
-| **[SIGNAL_ORCHESTRATOR_EXAMPLE.json](./SIGNAL_ORCHESTRATOR_EXAMPLE.json)** | Beispiel-Output-Datenstruktur | Referenz |
+**...find historical documentation**
+→ [`archive/README.md`](./archive/README.md) (organized by category)
 
 ---
 
-## 📁 Archiv
+## 📁 Documentation Structure
 
-Historische und phasen-spezifische Dokumentation wurde in **[archive/](./archive/)** verschoben:
-
-### Archiv-Kategorien
-- **`archive/phases/`** - Phasen-Abschluss-Dokumente (PHASE_4-8, PHASE_A-E)
-- **`archive/audits/`** - Test- und Audit-Berichte
-- **`archive/deployment/`** - Legacy Deployment-Dokumentation
-- **`archive/`** - Build-Notes, Setup-Guides, technische Notizen
-
----
-
-## 🗺️ Navigations-Guide
-
-### "Ich will..."
-
-**...das Projekt verstehen**
-→ Start: [PROJEKT_ÜBERSICHT.md](./PROJEKT_ÜBERSICHT.md)
-
-**...die App lokal starten**
-→ 1. [API_KEYS_LIST.md](./API_KEYS_LIST.md) (Keys besorgen)  
-→ 2. [PROJEKT_ÜBERSICHT.md#quick-start](./PROJEKT_ÜBERSICHT.md#quick-start) (Installation)
-
-**...die App deployen**
-→ 1. [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md) (ENV-Vars konfigurieren)  
-→ 2. [DEPLOY_GUIDE.md](./DEPLOY_GUIDE.md) (Deployment)
-
-**...das Onboarding-System verstehen**
-→ 1. [ONBOARDING_STRATEGY.md](./ONBOARDING_STRATEGY.md) (Strategie & Konzept)  
-→ 2. [ONBOARDING_IMPLEMENTATION_COMPLETE.md](./ONBOARDING_IMPLEMENTATION_COMPLETE.md) (Implementation Details)
-
-**...Onboarding-Features hinzufügen**
-→ [ONBOARDING_QUICK_START.md](./ONBOARDING_QUICK_START.md) (Developer Guide)
-
-**...wissen, welche Features geplant sind**
-→ [PROJEKT_ÜBERSICHT.md#geplante-features](./PROJEKT_ÜBERSICHT.md#geplante-features) (Roadmap)
-
-**...die Tech-Architektur verstehen**
-→ [PROJEKT_ÜBERSICHT.md#tech-stack](./PROJEKT_ÜBERSICHT.md#tech-stack) (Tech Stack)
-
-**...an AI-Features arbeiten**
-→ [CORTEX_INTEGRATION_PLAN.md](./CORTEX_INTEGRATION_PLAN.md) + [SIGNAL_ORCHESTRATOR_INTEGRATION.md](./SIGNAL_ORCHESTRATOR_INTEGRATION.md)
-
----
-
-## 📊 Dokument-Übersicht
-
-### Aktive Dokumentation (12 Dateien)
 ```
 docs/
-├── README.md                                # Diese Datei (Navigations-Guide)
-├── PROJEKT_ÜBERSICHT.md                     # ⭐ HAUPTDOKUMENTATION
-├── API_KEYS_LIST.md                         # API-Keys Liste
-├── ENVIRONMENT_VARIABLES.md                 # ENV-Vars Guide
-├── DEPLOY_GUIDE.md                          # Deployment-Anleitung
-├── ONBOARDING_STRATEGY.md                   # ⭐ Onboarding-Strategie
-├── ONBOARDING_IMPLEMENTATION_COMPLETE.md    # ✅ Implementation Details
-├── ONBOARDING_QUICK_START.md                # 🚀 Developer Quick Start
-├── CORTEX_INTEGRATION_PLAN.md               # Geplant: AI Features
-├── SIGNAL_ORCHESTRATOR_INTEGRATION.md       # Geplant: Learning Architect
-├── SIGNAL_UI_INTEGRATION.md                 # Geplant: UI Integration
-└── SIGNAL_ORCHESTRATOR_EXAMPLE.json         # Beispiel-Daten
+├── README.md                                   ← You are here (Navigation guide)
+├── index.md                                    ← Index of all documentation
+├── PR_RUN_SUMMARY.md                           ← Pull request summaries
+│
+├── setup/                                      ← 🔧 Installation & Deployment (5 files)
+│   ├── environment-and-providers.md            ← API keys, env vars, providers
+│   ├── build-and-deploy.md                     ← Build process & deployment steps
+│   ├── push-notifications.md                   ← Web Push setup guide
+│   ├── vercel-deploy-checklist.md              ← Pre-deploy verification checklist
+│   └── env-inventory.md                        ← Complete env variable inventory
+│
+├── process/                                    ← 📊 Product & Planning (2 files)
+│   ├── product-overview.md                     ← Product vision & features
+│   └── onboarding-blueprint.md                 ← User onboarding strategy
+│
+├── lore/                                       ← 🎭 Brand & Storytelling (7 files)
+│   ├── three-pillars.md                        ← Core product pillars
+│   ├── hero-journey-full.md                    ← User hero journey narrative
+│   ├── onboarding-dialogs.md                   ← Onboarding copy & dialogs
+│   ├── degens-creed.md                         ← Community manifesto
+│   ├── community-posts-templates.md            ← Social media templates
+│   ├── x-timeline-posts.md                     ← X/Twitter content calendar
+│   └── nft-meme-collection-concept.md          ← NFT collection concept
+│
+├── features/                                   ← 🚀 Feature Documentation (3 files)
+│   ├── advanced-insight-backend-wiring.md      ← Advanced Insight implementation
+│   ├── next-up.md                              ← Upcoming features
+│   └── production-ready.md                     ← Production readiness checklist
+│
+├── concepts/                                   ← 💡 Design Concepts (3 files)
+│   ├── ai-roadmap.md                           ← AI feature roadmap
+│   ├── journal-system.md                       ← Journal system design
+│   └── signal-orchestrator.md                  ← Signal orchestration concept
+│
+├── design/                                     ← 🎨 Design Documentation (2 files)
+│   ├── IMPLEMENTATION_GUIDE.md                 ← Design implementation guide
+│   └── LOGO_DESIGN_DOCUMENTATION.md            ← Logo design specs
+│
+├── guides/                                     ← 📖 User & Developer Guides (1 file)
+│   └── access-tabs.md                          ← Access gating tabs guide
+│
+├── pwa-audit/                                  ← 🔍 Architecture Audit (7 files)
+│   ├── 01_repo_index.md                        ← Repository structure overview
+│   ├── 02_feature_catalog.md                   ← Complete feature catalog
+│   ├── 03_core_flows.md                        ← Core user flows
+│   ├── 04_offline_sync_model.md                ← Offline-first architecture
+│   ├── 05_security_privacy.md                  ← Security & privacy design
+│   ├── 06_tests_observability_gaps.md          ← Testing & observability gaps
+│   └── 07_future_concepts.md                   ← Future enhancements
+│
+├── ai/                                         ← 🤖 AI Integration (8 files)
+│   ├── README_AI.md                            ← AI system overview
+│   ├── integration-recommendations.md          ← AI provider recommendations
+│   ├── advanced-insight-ui-spec-beta-v0.9.md   ← Advanced Insight UI spec
+│   ├── layered-analysis-model.md               ← L1-L5 analysis model
+│   ├── event-catalog-overview.md               ← Event system overview
+│   ├── ab-testing-plan.md                      ← A/B testing strategy
+│   ├── ADVANCED_INSIGHT_FILES_MANIFEST.md      ← File manifest
+│   └── HANDOVER_CODEX_ADVANCED_INSIGHT_UI.md   ← Codex handover checklist
+│
+└── archive/                                    ← 📦 Historical Documentation
+    ├── README.md                               ← Archive index & navigation
+    ├── cleanup/                                ← Cleanup history & reports
+    ├── features/                               ← Completed feature implementations
+    ├── audits/                                 ← Historical audit reports
+    ├── handovers/                              ← Completed handover checklists
+    ├── telemetry/                              ← Telemetry reports & findings
+    ├── phases/                                 ← Phase completion reports
+    ├── deployment/                             ← Legacy deployment docs
+    ├── ai-bundles/                             ← AI bundle archives
+    └── raw/                                    ← Unsorted historical docs
 ```
 
-### Archivierte Dokumentation (27 Dateien)
-```
-docs/archive/
-├── phases/                                # 9 Phasen-Berichte
-├── audits/                                # 3 Audit-Berichte
-├── deployment/                            # 2 Legacy Deployment-Docs
-└── [andere historische Docs]              # Build-Notes, Setup-Guides, etc.
-```
+---
 
-**Gesamt:** 9 aktive + 27 archivierte = 36 Dokumente (~5000 Zeilen)
+## 🔑 Key Documentation Files
+
+### Essential Reading (Start Here)
+
+| File | Purpose | When to Read |
+|------|---------|--------------|
+| `/README.md` | Project overview, quick start, scripts | First time setup |
+| `setup/environment-and-providers.md` | Environment configuration | Before first run |
+| `setup/build-and-deploy.md` | Build & deployment process | Before deployment |
+| `process/product-overview.md` | Product vision & features | Understanding the product |
+| `pwa-audit/01_repo_index.md` | Repository structure | Understanding the codebase |
+
+### Setup & Deployment
+
+| File | Purpose |
+|------|---------|
+| `setup/environment-and-providers.md` | Complete env var guide, API keys, provider setup |
+| `setup/build-and-deploy.md` | Build process, Vercel deployment, CI/CD |
+| `setup/push-notifications.md` | Web Push notifications setup (VAPID keys, testing) |
+| `setup/vercel-deploy-checklist.md` | Pre-deployment verification checklist |
+| `setup/env-inventory.md` | Inventory of all env variables with usage locations |
+
+### Architecture & Features
+
+| File | Purpose |
+|------|---------|
+| `pwa-audit/01_repo_index.md` | Repository structure and organization |
+| `pwa-audit/02_feature_catalog.md` | Complete catalog of implemented features |
+| `pwa-audit/03_core_flows.md` | Critical user flows and interactions |
+| `pwa-audit/04_offline_sync_model.md` | Offline-first architecture and sync strategy |
+| `features/advanced-insight-backend-wiring.md` | Advanced Insight implementation details |
+
+### AI Integration
+
+| File | Purpose |
+|------|---------|
+| `ai/README_AI.md` | AI system overview and architecture |
+| `ai/integration-recommendations.md` | AI provider selection & cost management |
+| `ai/advanced-insight-ui-spec-beta-v0.9.md` | Advanced Insight UI specification |
+| `ai/layered-analysis-model.md` | L1-L5 analysis model explanation |
+| `ai/event-catalog-overview.md` | Event-driven architecture for AI features |
 
 ---
 
-## 🎯 Dokumentations-Prinzipien
+## 📊 Documentation Statistics
 
-Diese Dokumentation folgt folgenden Prinzipien:
-
-1. **Eindeutige Hauptquelle:** [PROJEKT_ÜBERSICHT.md](./PROJEKT_ÜBERSICHT.md) ist die zentrale Anlaufstelle
-2. **Keine Duplikation:** Informationen existieren nur an einem Ort
-3. **Actionable:** Schritt-für-Schritt-Anleitungen mit Commands
-4. **Up-to-Date:** Letzte Aktualisierung immer im Header
-5. **Suchbar:** Klare Struktur mit Inhaltsverzeichnissen
-6. **Archivierung:** Historische Docs im `archive/`-Ordner
-
----
-
-## 🔗 Externe Ressourcen
-
-- **Repository:** https://github.com/baum777/Sparkfined_PWA
-- **Vercel Dashboard:** https://vercel.com/[team]/sparkfined-pwa
-- **Wireframes:** `../wireframes/` Verzeichnis
-- **Tests:** `../tests/` Verzeichnis (unit, integration, e2e)
+| Category | Files | Status |
+|----------|-------|--------|
+| **Setup & Deployment** | 5 | ✅ Current |
+| **Process & Product** | 2 | ✅ Current |
+| **Lore & Brand** | 7 | ✅ Current |
+| **Features** | 3 | ✅ Current |
+| **Concepts** | 3 | ✅ Current |
+| **Design** | 2 | ✅ Current |
+| **Guides** | 1 | ✅ Current |
+| **PWA Audit** | 7 | ✅ Current |
+| **AI Integration** | 8 | ✅ Current |
+| **Archive** | ~60 | 📦 Historical |
+| **Total Active** | ~38 | |
 
 ---
 
-## 📞 Support
+## 🗂️ Archive Organization
 
-**Bei Fragen:**
-1. Prüfe [PROJEKT_ÜBERSICHT.md](./PROJEKT_ÜBERSICHT.md) (FAQ im Text)
-2. Durchsuche `archive/` für historische Kontexte
-3. Schau in Code-Kommentare und Inline-Dokumentation
-4. Prüfe Test-Files für Usage-Beispiele
+The `archive/` directory contains historical documentation organized by category:
+
+- **cleanup/** — Repository cleanup history & reports (3 cleanup efforts: 2025-11-09, 2025-11-15, 2025-11-20)
+- **features/** — Completed feature implementation docs (Advanced Insight Beta v0.9, etc.)
+- **audits/** — Historical audit reports (repository audits, performance audits)
+- **handovers/** — Completed handover checklists (Codex handovers, quick starts)
+- **telemetry/** — Telemetry reports & findings (events mapping, QA checklists)
+- **phases/** — Phase completion reports (Phase 4-8, Phase A-E)
+- **deployment/** — Legacy deployment documentation
+- **ai-bundles/** — Archived AI bundle ZIP files (with extraction notes)
+- **raw/** — Unsorted historical documentation (snapshots from 2025-11-12)
+
+**See [`archive/README.md`](./archive/README.md) for complete archive index.**
 
 ---
 
-**Maintained by:** Sparkfined Team  
-**Dokumentations-Version:** 3.0 (Konsolidiert 2025-11-07)  
+## 🧭 Related Documentation
+
+### Tool Configurations (Root Level)
+
+These files configure AI coding assistants and should not be modified without understanding their purpose:
+
+- `.rulesync/` — **Single Source of Truth** for AI tool prompts (20 files: 11 SYSTEM + 6 ITERATIVE + 3 meta)
+- `.cursor/` — Cursor-specific rules (4 files, generated from `.rulesync/`)
+- `/CLAUDE.md` — Claude Code configuration (auto-generated from `.rulesync/`)
+- `/AGENTS.md` — Codex configuration (auto-generated from `.rulesync/`)
+
+**Rule:** Never edit tool configs directly. Modify `.rulesync/` files and regenerate.
+
+### Active Planning Documents (Root Level)
+
+- `/IMPROVEMENT_ROADMAP.md` — Product roadmap (R0, R1, R2, future phases)
+- `/RISK_REGISTER.md` — Risk tracking and mitigation strategies
+- `/PR_TEMPLATE.md` — GitHub pull request template
+
+### External Documentation
+
+- **Wireframes:** `../wireframes/` (35 files: mobile, desktop, flows, components)
+- **Tests:** `../tests/` (8 files: test docs, checklists, matrices)
+- **Tickets:** `../tickets/` (5 files: feature TODOs)
+- **Events:** `../events/` (4 files: event definitions for AI)
+- **AI Prompts:** `../ai/` (4 files: system prompts, task prompts)
+
+---
+
+## 📝 Documentation Principles
+
+This documentation follows these principles:
+
+1. **Single Source of Truth:** Each concept documented in one canonical location
+2. **No Duplication:** Information exists only once (linked, not repeated)
+3. **Up-to-Date:** Active docs reflect current codebase state
+4. **Historical Preservation:** Old docs archived (in `archive/`), not deleted
+5. **Actionable:** Step-by-step guides with actual commands
+6. **Searchable:** Clear structure, comprehensive navigation, keywords
+
+---
+
+## 🔄 Documentation Maintenance
+
+### When to Update
+
+- **After feature implementation:** Update feature docs, add to catalog
+- **After major refactoring:** Update architecture docs, audit reports
+- **After deployment changes:** Update setup/deployment docs
+- **Quarterly:** Review and archive outdated documentation
+
+### How to Archive
+
+When documentation becomes outdated or superseded:
+
+1. Move file to appropriate `archive/` subdirectory
+2. Update `archive/[category]/README.md` with entry
+3. Update links in active documentation (point to archive if needed)
+4. Commit with message: `docs: archive [filename] - [reason]`
+
+**See [`archive/cleanup/README.md`](./archive/cleanup/README.md) for cleanup guidelines.**
+
+---
+
+## 📞 Support & Questions
+
+**For Documentation Questions:**
+1. Check this README for navigation
+2. Search `docs/` for keywords
+3. Check `archive/` for historical context
+4. Review code comments and inline docs
+
+**For Technical Questions:**
+1. Check `/README.md` (project root) for scripts and quick start
+2. Review `setup/` docs for environment issues
+3. Check `pwa-audit/` for architecture questions
+4. Review `ai/` docs for AI integration questions
+
+**For Contributing:**
+1. Follow documentation principles above
+2. Update this README when adding new top-level sections
+3. Keep active docs current, archive outdated content
+4. Use clear, actionable language
+
+---
+
+## 🎯 Recent Changes
+
+### 2025-11-20: Major Documentation Restructuring
+
+**Cleanup #3:** Comprehensive markdown documentation refactoring
+
+**Changes:**
+- ✅ Reduced root-level .md files from 26 to 7 (-73%)
+- ✅ Created organized archive structure (cleanup/, features/, handovers/, telemetry/)
+- ✅ Moved 21 temporary summaries to appropriate locations
+- ✅ Consolidated Advanced Insight docs (6 files → index)
+- ✅ Consolidated cleanup reports (6 files → index)
+- ✅ Moved telemetry_output/ to docs/archive/telemetry/
+- ✅ Deleted tmp/ directory
+- ✅ Rewrote docs/README.md (this file) with current structure
+
+**Result:** Clean, organized documentation structure with proper historical archiving.
+
+**Details:** See [`/MARKDOWN_DOCS_REFACTORING_PLAN.md`](/MARKDOWN_DOCS_REFACTORING_PLAN.md)
+
+---
+
+**Maintained by:** Sparkfined Team
+**Documentation Version:** 4.0 (Reorganized 2025-11-20)
 **Status:** ✅ Production-Ready | 🚀 Launch-Ready

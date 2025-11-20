@@ -1,12 +1,82 @@
-# Documentation Archive
+# Documentation Archive — Index
 
-This directory contains historical documentation from the project's development phases.
+**Purpose:** Historical documentation preserved for reference and context.
 
-## 📁 Directory Structure
+**Last Updated:** 2025-11-20
 
-### `/phases/` - Phase Completion Documents
-Historical phase completion reports from the development process:
-- **PHASE_4_COMPLETE.md** - Page finalization (mobile-first padding, all 11 routed pages)
+---
+
+## 📋 Archive Categories
+
+### 🧹 cleanup/ — Repository Cleanup History
+
+**Description:** Documentation of repository cleanup and consolidation efforts.
+
+**Contents:**
+- `README.md` — Cleanup timeline and guidelines
+- `CLEANUP_SUMMARY.md` — Cleanup #1 summary (2025-11-09)
+- `CLEANUP_COMPLETE.md` — Cleanup #1 completion report
+- `REPO_CLEANUP_SUMMARY.md` — Cleanup #2 summary (2025-11-15)
+- `REPO_CLEANUP_INVENTORY.md` — Cleanup #2 inventory
+- `REPO_CLEANUP_DECISIONS.md` — Cleanup #2 decisions
+- `VERIFY_RULESYNC.md` — Rulesync verification
+
+**Timeline:**
+- **2025-11-09:** Cleanup #1 (Documentation consolidation)
+- **2025-11-15:** Cleanup #2 (AI bundle integration & rules consolidation)
+- **2025-11-20:** Cleanup #3 (Markdown documentation refactoring)
+
+**See:** [`cleanup/README.md`](./cleanup/README.md)
+
+---
+
+### 🚀 features/ — Feature Implementation Documentation
+
+**Description:** Completed feature implementation docs (historical snapshots).
+
+**Contents:**
+- `README.md` — Feature archive index
+- `ADVANCED_INSIGHT_BACKEND_WIRING_COMPLETE.md` — Backend wiring complete (2025-11-15)
+- `ADVANCED_INSIGHT_IMPLEMENTATION_SUMMARY.md` — Frontend UI implementation (2025-11-15)
+- `ADVANCED_INSIGHT_BACKEND_WIRING_SUMMARY_BETA_V09.md` — Backend wiring summary
+- `WIRING_SUMMARY.md` — Quick wiring summary
+- `IMPLEMENTATION_SUMMARY.md` — General implementation summary
+- `DELIVERABLES_MANIFEST.md` — Deliverables checklist
+
+**Key Feature:** Advanced Insight (Beta v0.9)
+- Implementation Date: 2025-11-15
+- Status: ✅ Complete
+- Components: Frontend UI, Backend heuristics, API endpoints
+
+**See:** [`features/README.md`](./features/README.md)
+
+---
+
+### 🔍 audits/ — Audit & Verification Reports
+
+**Description:** Historical audit reports and verification documents.
+
+**Contents:**
+- `REPOSITORY_AUDIT_2025-11-20.md` — Latest repository audit
+- `production-readiness-report.md` — Production readiness assessment
+- `verifications.md` — Verification checklist
+- `PERFORMANCE_AUDIT.md` — Performance audit
+- `PRODUCTION_READINESS_TEST_REPORT.md` — Test report
+- `TEST_AUDIT_REPORT.md` — Test coverage audit
+
+**Latest Audit:** 2025-11-20
+- Overall Health: 6.5/10
+- Key Issues: V1/V2 migration incomplete, layout inconsistencies
+- Recommended Actions: Complete V2 migration, unify layout system
+
+---
+
+### 📦 phases/ — Phase Completion Reports
+
+**Description:** Historical phase completion documentation (Phase 4-8, Phase A-E).
+
+**Contents:**
+- **PHASE_4_COMPLETE.md** — Page finalization (mobile-first padding, all 11 routed pages)
 - **PHASE_5_COMPLETE.md** - Production hardening (security headers, environment variables)
 - **PHASE_6_COMPLETE.md** - Final optimizations (skip link, sitemap, console.log cleanup)
 - **PHASE_8_COMPLETE.md** - Post-launch quick wins (structured data, README updates)
