@@ -230,3 +230,24 @@ Commands & Results:
 New open points:
 - DT-FIX-01 → Design/UX Backlog (decision: keep `text-amber-200` or create `text-price` token?)
 - TOKEN-FUTURE-* items → Roadmap for Section 6 or dedicated Design Token Evolution track
+  ### Fazit Section 5B – Design Token Implementation & UI Cleanup (Final)
+
+**Was wurde verifiziert:**
+
+- ✅ DT-FIX-02 korrekt implementiert in `WatchlistTable.tsx:68-80`
+- ✅ Semantische Tokens `text-sentiment-bull` / `text-sentiment-bear` / `text-text-secondary` für 24h Change
+- ✅ DT-FIX-01 bewusst als offener Design-Decision-Point dokumentiert (Price-Highlight `text-amber-200`)
+- ✅ Sparkfined_Working_Plan.md und Sparkfined_Execution_Log.md sind synchronisiert
+- ✅ Sauberer Handoff zu Section 6 und Design/UX-Backlog sichergestellt
+
+**Status:**
+
+- Section 5B ist **production-ready** und kann als **abgeschlossener Block** betrachtet werden.
+- Offene Punkte (Design/Backlog):
+  - DT-FIX-01 → Design-Entscheidung: `text-amber-200` behalten oder eigenen `text-price` Token definieren.
+  - TOKEN-FUTURE-* → bleiben im Design/UX-Backlog für spätere Iterationen (Flat-Background-Option, Info-Status, Light-Mode, Legacy-Modal-Sweep, Composite-Patterns).
+
+**Nächster Schritt im Plan:**
+
+- Weiter mit **Section 6 – Dead Code & V1 Archive / Legacy Cleanup**, unter Berücksichtigung der bereits dokumentierten TOKEN-FUTURE-Backlogpunkte.
+
