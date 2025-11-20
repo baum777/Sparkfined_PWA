@@ -41,7 +41,7 @@ export default function DashboardPageV2() {
   const kpiStripContent = isLoading ? (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="h-20 animate-pulse rounded-2xl bg-white/5" />
+        <div key={index} className="h-20 animate-pulse rounded-2xl bg-surface-skeleton" />
       ))}
     </div>
   ) : error ? null : (
@@ -53,8 +53,8 @@ export default function DashboardPageV2() {
       return (
         <div className="space-y-6">
           <DashboardMainGrid
-            primary={<div className="h-64 animate-pulse rounded-2xl bg-white/5" />}
-            secondary={<div className="h-64 animate-pulse rounded-2xl bg-white/5" />}
+            primary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
+            secondary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
           />
         </div>
       );
@@ -64,7 +64,7 @@ export default function DashboardPageV2() {
       return (
         <div className="space-y-6">
           <ErrorBanner message={error} onRetry={handleRetry} />
-          <div className="rounded-3xl border border-white/5 bg-black/40 p-6 text-sm text-zinc-300">
+          <div className="rounded-3xl border border-border-subtle bg-surface-elevated p-6 text-sm text-text-secondary">
             Please try again. If the issue persists, check your connection or reload the dashboard.
           </div>
         </div>
@@ -75,14 +75,14 @@ export default function DashboardPageV2() {
       return (
         <DashboardMainGrid
           primary={
-            <div className="space-y-3 text-sm text-zinc-300">
-              <p className="text-base font-semibold text-white">No insights yet</p>
+            <div className="space-y-3 text-sm text-text-secondary">
+              <p className="text-base font-semibold text-text-primary">No insights yet</p>
               <p>Analyze your first market to see advanced insights here.</p>
             </div>
           }
           secondary={
-            <div className="space-y-3 text-sm text-zinc-300">
-              <p className="text-base font-semibold text-white">No journal entries to show</p>
+            <div className="space-y-3 text-sm text-text-secondary">
+              <p className="text-base font-semibold text-text-primary">No journal entries to show</p>
               <p>Add a new journal entry to see recent trades and notes.</p>
             </div>
           }

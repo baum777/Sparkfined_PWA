@@ -314,26 +314,31 @@ Goal: Enforce token-based styling throughout the UI, not just the core V2 pages.
 
 Checklist:
 
-- [ ] Update `tailwind.config.ts` with new color tokens (bg-surface-*, border-border-*, interactive-*, sentiment-*, status-*)
-- [ ] Add background gradients (`bg-app-gradient`, `bg-surface-gradient`)
-- [ ] Replace hardcoded gradient in `DashboardShell.tsx`
-- [ ] Replace opacity-based colors in all V2 pages using mapping table:
-  - [ ] `DashboardPageV2.tsx`
-  - [ ] `JournalPageV2.tsx`
-  - [ ] `WatchlistPageV2.tsx`
-  - [ ] `AlertsPageV2.tsx`
-  - [ ] `AnalysisPageV2.tsx`
-  - [ ] `ChartPageV2.tsx`
-  - [ ] `SettingsPageV2.tsx`
-- [ ] Replace opacity-based colors in core components:
-  - [ ] `DashboardShell.tsx`
-  - [ ] `DashboardKpiStrip.tsx`
-  - [ ] `JournalList.tsx`
-  - [ ] `WatchlistTable.tsx`
-  - [ ] `AlertsList.tsx`
+- [x] Update `tailwind.config.ts` with new color tokens (bg-surface-*, border-border-*, interactive-*, sentiment-*, status-*)
+- [x] Add background gradients (`bg-app-gradient`, `bg-surface-gradient`)
+- [x] Replace hardcoded gradient in `DashboardShell.tsx`
+- [x] Replace opacity-based colors in all V2 pages using mapping table:
+  - [x] `DashboardPageV2.tsx`
+  - [x] `JournalPageV2.tsx`
+  - [x] `WatchlistPageV2.tsx`
+  - [x] `AlertsPageV2.tsx`
+  - [x] `AnalysisPageV2.tsx`
+  - [x] `ChartPageV2.tsx`
+  - [x] `SettingsPageV2.tsx`
+- [x] Replace opacity-based colors in core components:
+  - [x] `DashboardShell.tsx`
+  - [x] `DashboardKpiStrip.tsx`
+  - [x] `JournalList.tsx`
+  - [x] `WatchlistTable.tsx`
+  - [x] `AlertsList.tsx`
 - [ ] Normalize spacing patterns across all V2 pages
 - [ ] Run visual regression checks (before/after screenshots)
 - [ ] Confirm no visual regressions on key pages
+
+Summary of work completed in this run:
+- Tailwind token palette expanded with background, border, interactive, sentiment, and status definitions plus app/surface gradients.
+- V2 pages and core components now use semantic tokens for surfaces, borders, text, and sentiment/status badges.
+- Dialogs, lists, and tables adopt surface/border tokens to align with the standard card/table patterns.
 
 Handoff to Claude:
 

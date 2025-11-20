@@ -15,28 +15,83 @@ export default {
           hover: '#059669',
         },
         accent: '#00ff66',
-        
+
         // Background & Surface
-        bg: '#0a0a0a',
+        bg: {
+          DEFAULT: '#0a0a0a',
+          elevated: '#0b0b13',
+          surface: '#18181b',
+          'surface-subtle': '#0f0f12',
+          overlay: '#050505',
+        },
         surface: {
           DEFAULT: '#18181b',
           hover: '#27272a',
-          850: '#1c1c1e', // for hover states
+          elevated: '#1c1c1e',
+          subtle: '#131316',
+          skeleton: 'rgba(255,255,255,0.05)',
+          850: '#1c1c1e', // for hover states (legacy compatibility)
         },
-        
+
         // Borders
         border: {
           DEFAULT: '#27272a',
+          subtle: 'rgba(255,255,255,0.05)',
+          moderate: 'rgba(255,255,255,0.1)',
+          hover: 'rgba(255,255,255,0.15)',
           accent: '#0fb34c',
+          focus: '#10b981',
         },
-        
+
         // Text
         text: {
           primary: '#f4f4f5',
           secondary: '#a1a1aa',
           tertiary: '#71717a',
         },
-        
+
+        // Interactive states
+        interactive: {
+          hover: 'rgba(255,255,255,0.05)',
+          active: 'rgba(255,255,255,0.08)',
+          disabled: 'rgba(255,255,255,0.02)',
+        },
+
+        // Sentiment
+        sentiment: {
+          bull: {
+            DEFAULT: '#10b981',
+            bg: 'rgba(16,185,129,0.1)',
+            border: 'rgba(16,185,129,0.6)',
+          },
+          bear: {
+            DEFAULT: '#f43f5e',
+            bg: 'rgba(244,63,94,0.1)',
+            border: 'rgba(251,113,133,0.6)',
+          },
+          neutral: {
+            DEFAULT: '#f59e0b',
+            bg: 'rgba(245,158,11,0.1)',
+            border: 'rgba(251,191,36,0.6)',
+          },
+        },
+
+        // Status backgrounds (alerts)
+        status: {
+          armed: {
+            bg: 'rgba(245,158,11,0.1)',
+            text: '#fcd34d',
+          },
+          triggered: {
+            bg: 'rgba(16,185,129,0.1)',
+            text: '#6ee7b7',
+          },
+          snoozed: {
+            bg: 'rgba(14,165,233,0.1)',
+            text: '#7dd3fc',
+          },
+        },
+
         // Semantic
         success: '#10b981',
         danger: '#f43f5e',
@@ -219,6 +274,8 @@ export default {
         'brand-gradient': 'linear-gradient(135deg, #0fb34c 0%, #059669 100%)',
         'emerald-gradient': 'linear-gradient(to right, #34d399, #22d3ee)',
         'grid-pattern': 'linear-gradient(to right, #27272a 1px, transparent 1px), linear-gradient(to bottom, #27272a 1px, transparent 1px)',
+        'app-gradient': 'linear-gradient(to bottom, #050505 0%, #0b0b13 50%, #050505 100%)',
+        'surface-gradient': 'linear-gradient(135deg, #18181b 0%, #1c1c1e 100%)',
       },
       
       backgroundSize: {

@@ -9,26 +9,26 @@ interface WatchlistDetailPanelProps {
 export default function WatchlistDetailPanel({ row, trend }: WatchlistDetailPanelProps) {
   if (!row) {
     return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-black/20 px-6 py-10 text-center">
-        <p className="text-sm text-zinc-400">Select an asset on the left to see more context here.</p>
+      <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center">
+        <p className="text-sm text-text-secondary">Select an asset on the left to see more context here.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 rounded-2xl border border-white/10 bg-black/30 p-6">
+    <div className="space-y-6 rounded-2xl border border-border-moderate bg-surface p-6 text-text-secondary">
       <div className="space-y-2">
-        <h2 className="text-2xl font-semibold text-white">{row.symbol}</h2>
-        <p className="text-sm text-zinc-400">{row.name}</p>
+        <h2 className="text-2xl font-semibold text-text-primary">{row.symbol}</h2>
+        <p className="text-sm text-text-secondary">{row.name}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Price</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Price</p>
           <p className="mt-1 text-lg font-semibold text-amber-200">{row.price}</p>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">24h change</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">24h change</p>
           <p className={`mt-1 text-lg font-semibold ${getChangeAccent(row.change24h)}`}>
             {row.change24h}
           </p>
@@ -36,18 +36,18 @@ export default function WatchlistDetailPanel({ row, trend }: WatchlistDetailPane
       </div>
 
       <div>
-        <p className="mb-2 text-xs uppercase tracking-[0.3em] text-zinc-500">Session</p>
-        <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-zinc-200">
+        <p className="mb-2 text-xs uppercase tracking-[0.3em] text-text-tertiary">Session</p>
+        <span className="inline-flex items-center rounded-full border border-border-moderate bg-surface-skeleton px-3 py-1 text-xs font-semibold uppercase tracking-wide text-text-primary">
           {row.session}
         </span>
       </div>
 
-      <div className="space-y-4 border-t border-white/5 pt-6">
-        <div className="rounded-xl border border-dashed border-white/10 bg-black/20 p-4 text-center">
-          <p className="text-xs text-zinc-400">Mini chart coming soon.</p>
+      <div className="space-y-4 border-t border-border-subtle pt-6">
+        <div className="rounded-xl border border-dashed border-border-moderate bg-surface-subtle p-4 text-center">
+          <p className="text-xs text-text-secondary">Mini chart coming soon.</p>
         </div>
-        <div className="rounded-xl border border-dashed border-white/10 bg-black/20 p-4 text-center">
-          <p className="text-xs text-zinc-400">Links to Analysis and Journal will appear here.</p>
+        <div className="rounded-xl border border-dashed border-border-moderate bg-surface-subtle p-4 text-center">
+          <p className="text-xs text-text-secondary">Links to Analysis and Journal will appear here.</p>
         </div>
         <SocialTrendCard trend={trend} />
       </div>
@@ -72,27 +72,27 @@ function getChangeAccent(change: string) {
 function SocialTrendCard({ trend }: { trend?: WatchlistTrendSnapshot }) {
   if (!trend) {
     return (
-      <div className="rounded-xl border border-white/10 bg-gradient-to-r from-zinc-900/40 to-black/40 p-4 text-xs text-zinc-400">
+      <div className="rounded-xl border border-border-moderate bg-surface-gradient p-4 text-xs text-text-secondary">
         No recent social trend signals yet. When Grok spots movement, you’ll see it here.
       </div>
     );
   }
 
   return (
-    <div className="space-y-3 rounded-xl border border-emerald-400/30 bg-emerald-400/5 p-4">
+    <div className="space-y-3 rounded-xl border border-sentiment-bull-border bg-sentiment-bull-bg p-4 text-text-secondary">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Social trend</p>
-          <p className="text-sm text-white/80">{trend.lastSnippet ?? 'Fresh signal detected.'}</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-sentiment-bull">Social trend</p>
+          <p className="text-sm text-text-primary">{trend.lastSnippet ?? 'Fresh signal detected.'}</p>
         </div>
         {trend.sentimentLabel && trend.sentimentLabel !== 'unknown' ? (
-          <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-200">
+          <span className="inline-flex items-center rounded-full bg-sentiment-bull-bg px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-sentiment-bull">
             {trend.sentimentLabel}
           </span>
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide text-white/60">
+      <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide text-text-tertiary">
         {trend.hypeLevel && trend.hypeLevel !== 'unknown' ? (
           <Badge label={`Hype: ${trend.hypeLevel}`} />
         ) : null}
@@ -109,7 +109,7 @@ function SocialTrendCard({ trend }: { trend?: WatchlistTrendSnapshot }) {
           href={trend.lastTweetUrl}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-200 underline decoration-emerald-500/70 decoration-dotted underline-offset-4"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-sentiment-bull underline decoration-sentiment-bull/70 decoration-dotted underline-offset-4"
         >
           View source tweet
           <span aria-hidden="true">↗</span>
@@ -121,7 +121,7 @@ function SocialTrendCard({ trend }: { trend?: WatchlistTrendSnapshot }) {
 
 function Badge({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-white/80">
+    <span className="inline-flex items-center rounded-full border border-border-moderate bg-surface-skeleton px-2.5 py-1 text-[11px] font-semibold text-text-primary">
       {label}
     </span>
   );
