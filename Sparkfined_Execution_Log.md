@@ -384,3 +384,49 @@ Commands & Results:
 Open points:
 - 6B.1-X: Monitor for any remaining legacy-colored shared components (e.g., NotificationToast) in subsequent sweeps.
 
+### 2025-11-20 – Section 6B.1 – Legacy Component Token Migration Review (Claude)
+
+Date: 2025-11-20
+Agent: Claude 4.5 (UI/UX & Architecture Reviewer)
+Section: #6B.1 – Legacy Component Token Migration (Review)
+Branch: claude/review-legacy-components-01USZDBAKbCLmeG1Y7shdjPx
+
+Actions:
+- Reviewed Codex migration of 4 critical legacy components (FeedbackModal, ReplayModal, UpdateBanner, ErrorBoundary) for V2 design token compliance.
+- Cross-checked all 4 components against V2 token spec from `docs/design/Sparkfined_V2_Design_Tokens.md`.
+- Verified zero hardcoded hex colors, zero utility palette colors (slate/zinc), and consistent semantic token usage across all components.
+- Analyzed overlay patterns (`bg-bg-overlay/70`), surface tokens (`bg-surface*`), border tokens (`border-border-*`), text hierarchy (`text-text-*`), and interactive states (`hover:bg-interactive-hover`).
+- Confirmed UpdateBanner correctly uses `bg-app-gradient` token (replacing hardcoded gradient).
+- Scanned repository for remaining legacy components: identified 19 files with hardcoded/utility colors.
+- Categorized remaining legacy components into P2 (optional polish) and P3 (likely V1/archived) priorities.
+- Updated `Sparkfined_Working_Plan.md` Section 6B.1 with comprehensive review summary, migrated component checklist, token quality analysis, and remaining component inventory.
+- Documented 19 remaining legacy components as candidates for future 6B.1 continuation or 6B.4 Zombie-Code Sweep.
+
+Commands & Results:
+- `pnpm install` → ✅ (798 packages installed)
+- `pnpm typecheck` → ✅ (no TypeScript errors)
+- `pnpm run build` → ✅ (successful build, expected MORALIS_API_KEY warning only)
+- `pnpm lint` → ⚠️ 58 warnings (only pre-existing unused-var warnings, no new errors from 6B.1 migration)
+- `rg "bg-slate-|bg-zinc-|bg-black/|bg-white/|text-slate-|text-zinc-" src` → ✅ Identified 19 remaining legacy files
+- `rg "TODO|FIXME|HACK|XXX" src` → 30 occurrences (documented for Section 6B.2)
+
+Review Findings:
+- ✅ **FeedbackModal.tsx:** Perfect V2 token usage (overlay, surfaces, borders, text, interactive hovers, brand accents)
+- ✅ **ReplayModal.tsx:** Excellent V2 token usage (timeline, event list, active states with `border-brand bg-accent/10`)
+- ✅ **UpdateBanner.tsx:** Clean V2 token usage (app gradient, brand buttons, semantic text)
+- ✅ **ErrorBoundary.tsx:** Proper V2 token usage (diagnostic display, warning/danger buttons, surface tokens)
+- ✅ **No regressions:** No hardcoded colors, no utility palette leakage, all hover/active/focus states use V2 tokens
+
+New open points:
+- **6B.1-INVENTORY-01:** 19 remaining legacy components identified (14 P2 optional polish, 5 P3 likely V1/archived)
+- **6B.1-TRIAGE-01:** Remaining components need triage in 6B.4 Zombie-Code Sweep to determine active usage in V2
+- **6B.2-READY:** 30 TODO/FIXME/HACK comments ready for hygiene pass
+- **6B.3-READY:** 58 ESLint warnings ready for cleanup pass
+
+Section 6B.1 Status: ✅ **COMPLETE** (Initial Batch) – 4 critical components migrated and verified
+
+Handoff to Codex:
+- Section 6B.1 initial batch is production-ready; remaining 19 files can be addressed in future 6B.1 continuation or during 6B.4.
+- Section 6B.2 (TODO Hygiene) and 6B.3 (ESLint Cleanup) are ready for execution with documented baseline metrics.
+- Recommended execution order: 6B.2 → 6B.3 → 6B.4 (with 6B.1 continuation as optional polish)
+
