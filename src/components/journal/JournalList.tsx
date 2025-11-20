@@ -59,10 +59,17 @@ export default function JournalList({ entries, activeId, onSelect }: JournalList
               }`}
               aria-hidden="true"
             />
-            <div className="flex flex-col gap-2">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-sm font-medium text-white sm:text-base">{entry.title}</p>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-white sm:text-base">{entry.title}</p>
+                    {entry.isAuto ? (
+                      <span className="inline-flex items-center rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-200">
+                        Auto
+                      </span>
+                    ) : null}
+                  </div>
                   <p className="text-xs text-white/60">{entry.date}</p>
                 </div>
                 <span

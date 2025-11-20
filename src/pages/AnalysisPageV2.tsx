@@ -42,7 +42,14 @@ export default function AnalysisPageV2() {
   const [marketError, setMarketError] = React.useState<string | null>(null);
   const ingestAdvancedInsight = useAdvancedInsightStore((state) => state.ingest);
   const hasInsight = Boolean(useAdvancedInsightStore((state) => state.sections));
+  const trendSnapshots = useAdvancedInsightStore((state) => state.trendSnapshots);
   const hasLoadedMarketRef = React.useRef(false);
+  const trendInsight = React.useMemo(() => {
+    const keys = Object.keys(trendSnapshots);
+    const firstKey = keys[0];
+    if (!firstKey) return undefined;
+    return trendSnapshots[firstKey];
+  }, [trendSnapshots]);
 
   React.useEffect(() => {
     if (!tabFromUrl || tabFromUrl !== activeTab) {
@@ -150,6 +157,47 @@ export default function AnalysisPageV2() {
             {marketError && <p className="text-xs text-amber-300">{marketError}</p>}
           </div>
 
+          {trendInsight ? (
+            <div className="space-y-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/5 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Social trend</p>
+                  <p className="text-sm text-white/80">{trendInsight.tweet.snippet ?? trendInsight.tweet.fullText}</p>
+                </div>
+                {trendInsight.sentiment?.label ? (
+                  <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-200">
+                    {trendInsight.sentiment.label}
+                  </span>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide text-white/60">
+                {trendInsight.trading?.hypeLevel && trendInsight.trading.hypeLevel !== 'unknown' ? (
+                  <TrendBadge label={`Hype: ${trendInsight.trading.hypeLevel}`} />
+                ) : null}
+                {typeof trendInsight.sparkfined.trendingScore === 'number' ? (
+                  <TrendBadge label={`Score ${trendInsight.sparkfined.trendingScore.toFixed(2)}`} />
+                ) : null}
+                {typeof trendInsight.sparkfined.alertRelevance === 'number' ? (
+                  <TrendBadge label={`Relevance ${(trendInsight.sparkfined.alertRelevance * 100).toFixed(0)}%`} />
+                ) : null}
+                {trendInsight.trading?.callToAction && trendInsight.trading.callToAction !== 'unknown' ? (
+                  <TrendBadge label={`CTA: ${trendInsight.trading.callToAction}`} />
+                ) : null}
+              </div>
+              {trendInsight.source.tweetUrl ? (
+                <a
+                  href={trendInsight.source.tweetUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-200 underline decoration-emerald-500/70 decoration-dotted underline-offset-4"
+                >
+                  View tweet
+                  <span aria-hidden="true">↗</span>
+                </a>
+              ) : null}
+            </div>
+          ) : null}
+
           <div className="max-w-4xl">
             <AdvancedInsightCard />
           </div>
@@ -207,6 +255,14 @@ function ComingSoonBlock({ title, description }: ComingSoonBlockProps) {
       <p className="text-base font-semibold text-white">{title}</p>
       <p className="text-sm text-zinc-400">{description}</p>
     </div>
+  );
+}
+
+function TrendBadge({ label }: { label: string }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-white/80">
+      {label}
+    </span>
   );
 }
 

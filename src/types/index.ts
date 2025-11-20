@@ -60,4 +60,5 @@ export type {
   TrendHypeLevel,
   TrendCallToAction,
   TrendSearchTopic,
+  TrendTradingTimeframe,
 } from './events'

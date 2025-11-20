@@ -1,86 +1,37 @@
-import type { SolanaMemeTrendEvent } from '@/types/events';
-
+import { useAdvancedInsightStore } from '@/features/analysis';
 import { useEventBusStore } from '@/store/eventBus';
-import { useWatchlistStore } from '@/store/watchlistStore';
 import { useAlertsStore } from '@/store/alertsStore';
 import { useJournalStore } from '@/store/journalStore';
-import { useAdvancedInsightStore } from '@/features/analysis/advancedInsightStore';
+import { useWatchlistStore } from '@/store/watchlistStore';
+import type { SolanaMemeTrendEvent } from '@/types/events';
 
-let subscriptionsRegistered = false;
-let lastEventId: string | undefined;
+let hasInitialized = false;
 
-export function registerEventSubscriptionsOnce(): void {
-  if (subscriptionsRegistered) {
-    return;
-  }
-  subscriptionsRegistered = true;
+export function initializeEventSubscriptions(): void {
+  if (hasInitialized) return;
+  hasInitialized = true;
 
-  useEventBusStore.subscribe((state) => {
-    const latestEvent = state.events[0];
-    if (!latestEvent) {
-      return;
-    }
-    if (latestEvent.id === lastEventId) {
-      return;
-    }
-    lastEventId = latestEvent.id;
-    routeTrendEvent(latestEvent);
+  useEventBusStore.subscribe((state, prevState) => {
+    const [latest] = state.events;
+    const [prevLatest] = prevState.events;
+
+    if (!latest || latest === prevLatest) return;
+    if (latest.type !== 'SolanaMemeTrendEvent') return;
+
+    fanOutSolanaMemeTrendEvent(latest);
   });
 }
 
-function routeTrendEvent(event: SolanaMemeTrendEvent): void {
-  useWatchlistStore.getState().applyTrendEvent(event);
-  pushTrendAlert(event);
-  hydrateAnalysis(event);
-  autoTagJournal(event);
-}
-
-function pushTrendAlert(event: SolanaMemeTrendEvent): void {
-  const relevance = event.sparkfined.alertRelevance ?? 0;
-  const sentimentLabel = event.sentiment?.label;
-
-  const shouldAlert = relevance >= 0.7 || sentimentLabel === 'warning';
-  if (!shouldAlert) {
+function fanOutSolanaMemeTrendEvent(evt: SolanaMemeTrendEvent): void {
+  if (!evt?.token?.symbol || !evt.source?.tweetId) {
+    if (import.meta.env.DEV) {
+      console.warn('[eventSubscriptions] skipped invalid trend event');
+    }
     return;
   }
 
-  useAlertsStore.getState().pushAlert({
-    id: generateId(`trend-${event.token.symbol}`),
-    symbol: event.token.symbol,
-    condition:
-      relevance >= 0.7
-        ? `Grok relevance ${relevance.toFixed(2)}`
-        : `Grok sentiment ${sentimentLabel}`,
-    type: 'trend',
-    status: 'armed',
-    timeframe: 'social',
-    createdAt: event.receivedAt,
-    meta: {
-      source: event.source.platform,
-      cashtag: event.token.cashtag,
-      sentiment: sentimentLabel,
-    },
-  });
-}
-
-function hydrateAnalysis(event: SolanaMemeTrendEvent): void {
-  useAdvancedInsightStore.getState().applyTrendEvent?.(event);
-}
-
-function autoTagJournal(event: SolanaMemeTrendEvent): void {
-  const tags = event.sparkfined.journalContextTags;
-  if (!tags.length && !event.sparkfined.narrative) {
-    return;
-  }
-
-  void useJournalStore.getState().autoTagFromTrendEvent(event);
-}
-
-function generateId(prefix: string): string {
-  const uuid = globalThis.crypto?.randomUUID?.();
-  if (uuid) {
-    return `${prefix}-${uuid}`;
-  }
-
-  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  useWatchlistStore.getState().updateTrendFromEvent?.(evt);
+  useAlertsStore.getState().processTrendEvent?.(evt);
+  useAdvancedInsightStore.getState().applyTrendEvent?.(evt);
+  void useJournalStore.getState().autoTagFromTrendEvent?.(evt);
 }

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createEntry, queryEntries, updateEntryNotes } from '@/lib/JournalService';
 import type { JournalEntry as PersistedJournalEntry } from '@/types/journal';
-import type { SolanaMemeTrendEvent } from '@/types/events';
+import type { SolanaMemeTrendEvent, TrendSentimentLabel } from '@/types/events';
 
 export type JournalDirection = 'long' | 'short';
 
@@ -12,6 +12,10 @@ export interface JournalEntry {
   direction: JournalDirection;
   pnl?: string;
   notes?: string;
+  isAuto?: boolean;
+  sourceUrl?: string;
+  tags?: string[];
+  sentimentLabel?: TrendSentimentLabel;
 }
 
 interface JournalState {
@@ -158,6 +162,7 @@ function mapPersistedToJournalEntry(entry: PersistedJournalEntry): JournalEntry 
     direction: inferDirection(entry),
     pnl: formatPnl(entry.outcome?.pnlPercent, entry.outcome?.pnl),
     notes: entry.thesis || (entry.customTags?.length ? entry.customTags.join(', ') : undefined),
+    isAuto: false,
   };
 }
 
@@ -221,7 +226,7 @@ async function buildAutoJournalEntry(event: SolanaMemeTrendEvent): Promise<Journ
   const title = `[Auto] ${event.token.symbol} trend`;
   const notesSections = [
     event.sparkfined.narrative,
-    event.sparkfined.journalContextTags.length
+    event.sparkfined.journalContextTags?.length
       ? `Context: ${event.sparkfined.journalContextTags.join(', ')}`
       : undefined,
     event.sentiment?.label ? `Sentiment: ${event.sentiment.label}` : undefined,
@@ -234,7 +239,13 @@ async function buildAutoJournalEntry(event: SolanaMemeTrendEvent): Promise<Journ
     notes,
   });
 
-  return quickEntry;
+  return {
+    ...quickEntry,
+    isAuto: true,
+    sourceUrl: event.source.tweetUrl,
+    tags: event.sparkfined.journalContextTags,
+    sentimentLabel: event.sentiment?.label,
+  };
 }
 
 /**

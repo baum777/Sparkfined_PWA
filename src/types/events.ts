@@ -2,9 +2,18 @@ import type { SentimentLabel } from '@/types/ai';
 
 // --- Core enums & helper types ------------------------------------------------
 
-export type TrendSentimentLabel = SentimentLabel | 'warning' | 'opportunity';
+export type TrendSentimentLabel =
+  | SentimentLabel
+  | 'warning'
+  | 'opportunity'
+  | 'unknown';
 
-export type TrendHypeLevel = 'cooldown' | 'steady' | 'acceleration' | 'mania';
+export type TrendHypeLevel =
+  | 'cooldown'
+  | 'steady'
+  | 'acceleration'
+  | 'mania'
+  | 'unknown';
 
 export type TrendCallToAction =
   | 'watch'
@@ -14,6 +23,8 @@ export type TrendCallToAction =
   | 'avoid'
   | 'monitor'
   | 'unknown';
+
+export type TrendTradingTimeframe = 'scalp' | 'intraday' | 'swing' | 'position' | 'unknown';
 
 export type TrendSearchTopic = 'entry' | 'exit' | 'risk' | 'meme' | 'rotation' | 'unknown';
 
@@ -121,6 +132,7 @@ export interface SolanaMemeTrendSource {
 
 export interface SolanaMemeTrendAuthor {
   handle: string;
+  name?: string;
   displayName?: string;
   followers?: number;
   verified?: boolean;
@@ -136,6 +148,9 @@ export interface SolanaMemeTrendTweet {
   hashtags: string[];
   hasMedia: boolean;
   hasLinks: boolean;
+  mediaPresent?: boolean;
+  linksPresent?: boolean;
+  snippet?: string;
   metrics: GrokTweetMetrics;
 }
 
@@ -163,20 +178,24 @@ export interface SolanaMemeTrendSentiment {
   confidence?: number;
   keywords?: string[];
   hypeLevel?: TrendHypeLevel;
+  emotionTags?: string[];
 }
 
 export interface SolanaMemeTrendTrading {
   hypeLevel?: TrendHypeLevel;
   callToAction?: TrendCallToAction;
   volatilityRisk?: number;
+  timeframe?: TrendTradingTimeframe;
+  strengthHint?: 'low' | 'medium' | 'high';
+  tradeContext?: string;
 }
 
 export interface SolanaMemeTrendSparkfined {
-  trendingScore?: number;
-  alertRelevance?: number;
-  journalContextTags: string[];
-  emotionTags: string[];
-  replayFlag: boolean;
+  trendingScore: number;
+  alertRelevance: number;
+  journalContextTags?: string[];
+  emotionTags?: string[];
+  replayFlag?: boolean;
   narrative?: string;
   callToAction?: TrendCallToAction;
 }
@@ -212,9 +231,12 @@ export interface SolanaMemeTrendDerived {
   twitterScore?: number;
   volatilityHint?: 'calm' | 'building' | 'spiky';
   searchDocument?: SolanaMemeTrendSearchDocument;
+  latestTweetUrl?: string;
+  snippet?: string;
 }
 
 export interface SolanaMemeTrendEvent {
+  type: 'SolanaMemeTrendEvent';
   id: string;
   source: SolanaMemeTrendSource;
   author: SolanaMemeTrendAuthor;

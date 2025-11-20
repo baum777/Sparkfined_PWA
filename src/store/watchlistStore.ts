@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { WatchlistQuote } from '@/features/market/watchlistData';
 import type {
   SolanaMemeTrendEvent,
+  TrendCallToAction,
   TrendHypeLevel,
   TrendSentimentLabel,
 } from '@/types/events';
@@ -14,7 +15,7 @@ export type WatchlistRow = {
   session: string;
 };
 
-export type WatchlistTrendMeta = {
+export type WatchlistTrendSnapshot = {
   symbol: string;
   lastUpdated: string;
   sentimentLabel?: TrendSentimentLabel | 'unknown';
@@ -22,18 +23,21 @@ export type WatchlistTrendMeta = {
   trendingScore?: number;
   alertRelevance?: number;
   lastEventId?: string;
+  lastTweetUrl?: string;
+  lastSnippet?: string;
+  callToAction?: TrendCallToAction;
 };
 
 interface WatchlistState {
   rows: WatchlistRow[];
   isLoading: boolean;
   error: string | null;
-  trendBySymbol: Record<string, WatchlistTrendMeta>;
+  trends: Record<string, WatchlistTrendSnapshot>;
   setRows: (rows: WatchlistRow[]) => void;
   setLoading: (value: boolean) => void;
   setError: (message: string | null) => void;
   hydrateFromQuotes: (quotes: WatchlistQuote[]) => void;
-  applyTrendEvent: (event: SolanaMemeTrendEvent) => void;
+  updateTrendFromEvent: (event: SolanaMemeTrendEvent) => void;
 }
 
 const INITIAL_ROWS: WatchlistRow[] = [
@@ -71,7 +75,7 @@ export const useWatchlistStore = create<WatchlistState>((set) => ({
   rows: INITIAL_ROWS,
   isLoading: false,
   error: null,
-  trendBySymbol: {},
+  trends: {},
   setRows: (rows) => set({ rows }),
   setLoading: (value) => set({ isLoading: value }),
   setError: (message) => set({ error: message }),
@@ -98,28 +102,30 @@ export const useWatchlistStore = create<WatchlistState>((set) => ({
 
       return { rows };
       }),
-  applyTrendEvent: (event) =>
+  updateTrendFromEvent: (event) =>
     set((state) => {
       const symbol = event.token.symbol.toUpperCase();
-      const previous = state.trendBySymbol[symbol];
+      const previous = state.trends[symbol];
+      const sentimentLabel = event.sentiment?.label ?? previous?.sentimentLabel ?? 'unknown';
+      const hypeLevel =
+        event.trading?.hypeLevel ?? event.sentiment?.hypeLevel ?? previous?.hypeLevel ?? 'unknown';
 
-      const nextMeta: WatchlistTrendMeta = {
+      const nextMeta: WatchlistTrendSnapshot = {
         symbol,
         lastUpdated: event.receivedAt,
-        sentimentLabel: event.sentiment?.label ?? previous?.sentimentLabel ?? 'unknown',
-        hypeLevel:
-          event.trading?.hypeLevel ??
-          event.sentiment?.hypeLevel ??
-          previous?.hypeLevel ??
-          'unknown',
+        sentimentLabel,
+        hypeLevel,
         trendingScore: event.sparkfined.trendingScore ?? previous?.trendingScore,
         alertRelevance: event.sparkfined.alertRelevance ?? previous?.alertRelevance,
         lastEventId: event.id,
+        lastTweetUrl: event.source.tweetUrl ?? previous?.lastTweetUrl,
+        lastSnippet: event.tweet.snippet ?? event.derived?.snippet ?? previous?.lastSnippet,
+        callToAction: event.trading?.callToAction ?? event.sparkfined.callToAction ?? previous?.callToAction,
       };
 
       return {
-        trendBySymbol: {
-          ...state.trendBySymbol,
+        trends: {
+          ...state.trends,
           [symbol]: nextMeta,
         },
       };
