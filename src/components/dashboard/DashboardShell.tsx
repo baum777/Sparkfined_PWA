@@ -29,15 +29,15 @@ export default function DashboardShell({
   const hasTabs = Array.isArray(tabs) && tabs.length > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#050505] via-[#0b0b13] to-[#050505] text-zinc-100">
-      <header className="border-b border-white/5 bg-black/40 backdrop-blur-xl">
+    <div className="min-h-screen bg-app-gradient text-text-primary">
+      <header className="border-b border-border-subtle bg-surface-elevated/60 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <p className="text-sm uppercase tracking-[0.3em] text-zinc-500">Sparkfined</p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h1>
+              <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Sparkfined</p>
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight text-text-primary md:text-4xl">{title}</h1>
               {description ? (
-                <p className="mt-2 text-sm text-zinc-400 max-w-2xl">{description}</p>
+                <p className="mt-2 max-w-2xl text-sm text-text-secondary">{description}</p>
               ) : null}
             </div>
             {actions ? (
@@ -56,8 +56,8 @@ export default function DashboardShell({
                       onClick={() => onTabSelect?.(tab.id)}
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                         isActive
-                          ? 'border-blue-500/70 bg-blue-500/10 text-white'
-                          : 'border-white/5 text-zinc-400 hover:border-white/30 hover:text-white'
+                          ? 'border-brand bg-interactive-active text-text-primary'
+                          : 'border-border-subtle text-text-secondary hover:border-border-moderate hover:bg-interactive-hover hover:text-text-primary'
                       }`}
                     >
                       {tab.label}
@@ -71,7 +71,7 @@ export default function DashboardShell({
       </header>
 
       {kpiStrip ? (
-        <section className="border-b border-white/5 bg-black/30">
+        <section className="border-b border-border-subtle bg-surface/70">
           <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6 lg:px-8">{kpiStrip}</div>
         </section>
       ) : null}

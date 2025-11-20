@@ -8,9 +8,9 @@ interface AlertsListProps {
 }
 
 const STATUS_STYLES: Record<AlertStatus, string> = {
-  armed: 'bg-amber-500/10 text-amber-300',
-  triggered: 'bg-emerald-500/10 text-emerald-300',
-  snoozed: 'bg-sky-500/10 text-sky-300',
+  armed: 'bg-status-armed-bg text-status-armed-text',
+  triggered: 'bg-status-triggered-bg text-status-triggered-text',
+  snoozed: 'bg-status-snoozed-bg text-status-snoozed-text',
 };
 
 const TYPE_LABELS: Record<AlertType, string> = {
@@ -23,7 +23,7 @@ const TYPE_LABELS: Record<AlertType, string> = {
 export default function AlertsList({ alerts, activeAlertId, onSelectAlert }: AlertsListProps) {
   if (alerts.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-white/10 bg-black/20 px-6 py-10 text-center text-sm text-zinc-400">
+      <div className="rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center text-sm text-text-secondary">
         No alerts yet. Create your first trigger to stay ahead of market shifts.
       </div>
     );
@@ -40,30 +40,32 @@ export default function AlertsList({ alerts, activeAlertId, onSelectAlert }: Ale
           <article
             key={alert.id}
             onClick={() => onSelectAlert?.(alert.id)}
-            className={`rounded-2xl border px-4 py-3 text-sm text-zinc-200 transition sm:px-5 sm:py-4 ${
-              isActive ? 'border-emerald-400/60 bg-white/5' : 'border-white/10 bg-black/30 cursor-pointer hover:bg-white/5'
+            className={`rounded-2xl border px-4 py-3 text-sm text-text-secondary transition sm:px-5 sm:py-4 ${
+              isActive
+                ? 'border-sentiment-bull-border bg-interactive-active'
+                : 'border-border-moderate bg-surface cursor-pointer hover:bg-interactive-hover'
             }`}
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wide text-zinc-500">
+                <p className="text-xs uppercase tracking-wide text-text-tertiary">
                   {alert.symbol} &middot; {alert.timeframe}
                 </p>
-                <p className="mt-1 text-lg font-medium text-white">{alert.condition}</p>
+                <p className="mt-1 text-lg font-medium text-text-primary">{alert.condition}</p>
                 {alert.summary ? (
-                  <p className="mt-1 text-xs text-white/70">{alert.summary}</p>
+                  <p className="mt-1 text-xs text-text-secondary">{alert.summary}</p>
                 ) : null}
               </div>
               <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusClasses}`}>
                 {formatLabel(alert.status)}
               </span>
             </div>
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide text-zinc-400">
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-white/80">
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide text-text-tertiary">
+              <span className="inline-flex items-center rounded-full border border-border-moderate bg-surface-skeleton px-2.5 py-1 text-text-primary">
                 {typeLabel}
               </span>
               {alert.origin === 'grok-trend' ? (
-                <span className="inline-flex items-center rounded-full border border-emerald-300/50 bg-emerald-400/10 px-2.5 py-1 text-emerald-200">
+                <span className="inline-flex items-center rounded-full border border-sentiment-bull-border bg-sentiment-bull-bg px-2.5 py-1 text-sentiment-bull">
                   Grok trend
                 </span>
               ) : null}

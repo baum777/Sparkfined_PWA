@@ -143,3 +143,22 @@ Commands & Results:
 
 New open points:
 - None.
+
+### 2025-11-20 – Section 5B – Design Token Implementation & UI Cleanup
+
+Date: 2025-11-20
+Agent: Codex
+Section: #5B – Design Token Implementation & UI Cleanup
+Branch: codex/section5b-design-tokens-01
+
+Actions:
+- Wired Tailwind config to the finalized tokens from docs/design/Sparkfined_V2_Design_Tokens.md, including gradients.
+- Replaced opacity/hex-based colors in V2 pages and core components with semantic background, text, border, and sentiment/status tokens.
+- Updated sentiment/status badges, tables, and dialogs to follow the standard surface/border patterns.
+
+Commands & Results:
+- pnpm typecheck → ✅
+- pnpm run build → ✅ (MORALIS_API_KEY warning acceptable)
+
+New open points:
+- None.

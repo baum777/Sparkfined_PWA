@@ -10,7 +10,7 @@ export default function ChartPageV2() {
       description="Trade-ready chart workspace with indicators, replay, drawings and exports."
       actions={<ChartHeaderActions />}
     >
-      <div className="rounded-3xl border border-white/5 bg-black/30 p-4 sm:p-6">
+      <div className="rounded-3xl border border-border-subtle bg-surface p-4 sm:p-6">
         <LegacyChartPage />
       </div>
     </DashboardShell>
