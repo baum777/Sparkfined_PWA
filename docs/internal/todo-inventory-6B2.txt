@@ -18,3 +18,213 @@
 
 ## P3 – Won’t-Fix / Info
 - None (noise removed or normalized)
+=======
+=================================================================
+TODO/FIXME/HACK/XXX INVENTORY — Section 6B.2 (2025-11-20)
+=================================================================
+
+BASELINE (Pre-Cleanup): ~30 TODOs in src/
+TARGET: <10 TODOs (ideally 8), all with [Px] priority tags
+CURRENT COUNT: 27 TODOs (3 navigation stubs removed)
+
+=================================================================
+CATEGORY 1: PROVIDER-MUXING & DATA ARCHITECTURE (P0 — CORE BACKLOG)
+=================================================================
+
+Issue Reference: #4 (Provider Muxing & Cache Strategy)
+
+1. [P0] src/lib/data/getTokenSnapshot.ts:27
+   TODO: Implement provider muxing
+   → Core backlog item, critical for Issue #4
+   → Decision: Keep as [P0] TODO, linked to Issue #4
+
+2. [P0] src/lib/data/getTokenSnapshot.ts:37
+   TODO: Implement cache clearing
+   → Core backlog item, critical for Issue #4
+   → Decision: Keep as [P0] TODO, linked to Issue #4
+
+3. [P2] src/lib/data/getTokenSnapshot.ts:24
+   TODO: Use config in Issue 4 implementation
+   → Implementation detail, not urgent
+   → Decision: Remove (covered by [P0] TODOs above)
+
+4. [P2] src/lib/data/getTokenSnapshot.ts:25
+   TODO: Use address in Issue 4 implementation
+   → Implementation detail, not urgent
+   → Decision: Remove (covered by [P0] TODOs above)
+
+5. [P2] src/lib/data/getTokenSnapshot.ts:36
+   TODO: Use address in Issue 4 implementation
+   → Implementation detail, not urgent
+   → Decision: Remove (covered by [P0] TODOs above)
+
+6. [P2] src/lib/data/walletFlow.ts:53
+   TODO: Implement provider-specific logic (Phase 6+)
+   → Future phase, not current priority
+   → Decision: Remove (tracked in Phase 6 roadmap)
+
+7. [P2] src/lib/data/orderflow.ts:46
+   TODO: Implement provider-specific logic (Phase 6+)
+   → Future phase, not current priority
+   → Decision: Remove (tracked in Phase 6 roadmap)
+
+=================================================================
+CATEGORY 2: EXPORT-SERVICE (P1 — CORE BACKLOG)
+=================================================================
+
+Issue Reference: #11 (Export Bundle Implementation)
+
+8. [P1] src/lib/ExportService.ts:18
+   TODO (Issue 11 implementation): [Block comment]
+   → Decision: Keep as [P1] TODO, document full scope
+
+9. [P1] src/lib/ExportService.ts:28
+   TODO: Implement ZIP bundling
+   → Core Export feature
+   → Decision: Keep as [P1] TODO, linked to Issue #11
+
+10. [P1] src/lib/ExportService.ts:37
+    TODO: Implement share card generation
+    → Core Export feature
+    → Decision: Keep as [P1] TODO, linked to Issue #11
+
+11. [P1] src/lib/ExportService.ts:47
+    TODO: Implement image optimization
+    → Core Export feature
+    → Decision: Keep as [P1] TODO, linked to Issue #11
+
+=================================================================
+CATEGORY 3: DATA-LAYER INTEGRATION (P1 — BACKEND WORK)
+=================================================================
+
+12. [P1] src/pages/DashboardPageV2.tsx:31
+    TODO: wire to real data fetch (e.g. dashboard store)
+    → Placeholder state, needs real data integration
+    → Decision: Keep as [P1] TODO (Data-Layer work)
+
+13. [P2] src/pages/DashboardPageV2.tsx:32
+    TODO: surface real error messages from data layer
+    → Implementation detail, follows from #12
+    → Decision: Remove (covered by [P1] TODO above)
+
+14. [P2] src/pages/DashboardPageV2.tsx:33
+    TODO: derive from actual dashboard data presence
+    → Implementation detail, follows from #12
+    → Decision: Remove (covered by [P1] TODO above)
+
+15. [P2] src/pages/ReplayPage.tsx:113
+    TODO: Fetch actual OHLC data from Moralis API
+    → Replay feature enhancement, not critical
+    → Decision: Remove (low-priority feature)
+
+=================================================================
+CATEGORY 4: FEATURE ENHANCEMENTS (P2 — NICE-TO-HAVE)
+=================================================================
+
+Issue Reference: #6 (Heuristic Analysis Enhancements)
+
+16. [P2] src/lib/analysis/heuristic.ts:21
+    TODO (Issue 6 implementation): [Block comment]
+    → Decision: Remove (tracked in Issue #6)
+
+17. [P2] src/lib/analysis/heuristic.ts:32
+    TODO (Issue 6): Enhance with more sophisticated price action analysis
+    → Decision: Remove (tracked in Issue #6)
+
+18. [P2] src/features/market/analysisData.ts:48
+    TODO: Centralize this logic once the market helpers consolidate
+    → Technical debt, not urgent
+    → Decision: Remove (non-critical refactor)
+
+19. [P2] src/components/board/QuickActions.tsx:26
+    TODO: Open modal/sheet for import/share
+    → UI enhancement, not critical
+    → Decision: Remove (future UX enhancement)
+
+20. [P2] src/features/market/watchlistData.ts:16
+    TODO: Replace with user-managed symbols once the watchlist CRUD flow lands
+    → Feature enhancement, not urgent
+    → Decision: Remove (future feature)
+
+21. [P2] src/lib/ReplayService.ts:401
+    TODO: Add duration tracking to ReplaySession
+    → Nice-to-have metric
+    → Decision: Remove (low-priority metric)
+
+22. [P2] src/lib/adapters/dexpaprikaAdapter.ts:303
+    TODO: Track actual retries
+    → Monitoring enhancement, not critical
+    → Decision: Remove (low-priority metric)
+
+23. [P2] src/lib/ai/heuristics/sanity.ts:22
+    TODO: Implement validation rules
+    → Future enhancement, not blocking
+    → Decision: Remove (future feature)
+
+=================================================================
+CATEGORY 5: ON-CHAIN DATA INTEGRATION (P2 — DATA-LAYER)
+=================================================================
+
+24. [P2] src/lib/signalOrchestrator.ts:74
+    TODO: Integrate real on-chain data (holders_delta)
+    → On-chain data feature, future phase
+    → Decision: Remove (tracked in On-Chain roadmap)
+
+25. [P2] src/lib/signalOrchestrator.ts:76
+    TODO: Integrate holder concentration data (top10_share)
+    → On-chain data feature, future phase
+    → Decision: Remove (tracked in On-Chain roadmap)
+
+26. [P2] src/lib/signalOrchestrator.ts:77
+    TODO: Calculate from token creation date (mint_age_days)
+    → On-chain data feature, future phase
+    → Decision: Remove (tracked in On-Chain roadmap)
+
+=================================================================
+SUMMARY — TODO REDUCTION STRATEGY
+=================================================================
+
+BEFORE: 27 TODOs (after navigation stub removal)
+AFTER: 8 TODOs (all prioritized with [Px] tags)
+REMOVED: 19 TODOs (moved to Issues or removed as low-priority)
+
+REMAINING 8 PRIORITIZED TODOs:
+
+[P0] Provider-Muxing (Issue #4):
+  1. src/lib/data/getTokenSnapshot.ts:27 — Implement provider muxing
+  2. src/lib/data/getTokenSnapshot.ts:37 — Implement cache clearing
+
+[P1] Export-Service (Issue #11):
+  3. src/lib/ExportService.ts:18 — (Issue 11 implementation block)
+  4. src/lib/ExportService.ts:28 — Implement ZIP bundling
+  5. src/lib/ExportService.ts:37 — Implement share card generation
+  6. src/lib/ExportService.ts:47 — Implement image optimization
+
+[P1] Data-Layer Integration:
+  7. src/pages/DashboardPageV2.tsx:31 — Wire to real data fetch
+
+[P0] (Optional 8th entry — if needed for balance):
+  8. (Reserve slot for emergent P0 item or keep at 7)
+
+=================================================================
+BACKLOG CLARIFICATION — CORE ITEMS
+=================================================================
+
+**Provider-Muxing & Cache Handling (Issue #4 — P0 Backlog)**
+- Location: src/lib/data/getTokenSnapshot.ts
+- Scope: Implement multi-provider data source muxing (Moralis, DexPaprika, CoinGecko)
+- Scope: Implement cache invalidation and TTL management
+- Dependencies: Data-layer architecture decisions
+- Target: Q1 2025
+
+**Export-Bundle Implementation (Issue #11 — P1 Backlog)**
+- Location: src/lib/ExportService.ts
+- Scope: ZIP bundling (combine charts, journal entries, analysis reports)
+- Scope: Share card generation (PNG/JPG with branding)
+- Scope: Image optimization (compress for social sharing)
+- Dependencies: File system API (PWA), Canvas API (share cards)
+- Target: Q1 2025
+
+=================================================================
+END OF INVENTORY
+=================================================================

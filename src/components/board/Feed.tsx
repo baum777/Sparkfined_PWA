@@ -9,6 +9,7 @@
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FeedItem from './FeedItem';
 import StateView from '../ui/StateView';
 import { FeedItemSkeleton } from '../ui/Skeleton';
@@ -23,14 +24,15 @@ interface FeedEvent {
 }
 
 export default function Feed() {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<'all' | 'alerts' | 'journal'>('all');
-  const { 
-    data: events, 
-    loading, 
-    error, 
-    hasMore, 
-    loadMore, 
-    refresh 
+  const {
+    data: events,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+    refresh
   } = useBoardFeed({
     type: filter,
     limit: 20,

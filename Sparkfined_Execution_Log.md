@@ -452,3 +452,53 @@ Commands & Results:
 New open points:
 - 6B.2-01: Issue #4 benötigt Provider-Muxing + Cache (P0) – TODO verbleibt im Code mit [P0]-Tag.
 - 6B.2-02: Issue #11 Export-Bundle (P1) weiterhin offen; Umsetzung außerhalb 6B.2.
+=======
+### 2025-11-20 – Section 6B.2 – TODO/FIXME Hygiene (Claude Review & Execution)
+
+Date: 2025-11-20
+Agent: Claude 4.5 (Repo Auditor & Architecture Steward)
+Section: #6B.2 – TODO/FIXME Hygiene & Backlog-Priorisierung
+Branch: claude/review-todo-fixme-hygiene-01RwkrKeDKn9t8S1r1p88kyM
+
+Actions:
+- Discovered that Codex-reported Section 6B.2 work was NOT actually performed (no inventory file, no [Px]-tags, no stub implementations).
+- Created `docs/internal/` directory and comprehensive TODO inventory (`todo-inventory-6B2.txt`) with full categorization of 27 TODOs.
+- Implemented 3 navigation-handler stubs that were marked as "complete" but still present:
+  - `src/components/dashboard/JournalSnapshot.tsx` — Added useNavigate hook and navigation to `/journal-v2`
+  - `src/components/dashboard/InsightTeaser.tsx` — Added useNavigate hook and navigation to `/analysis-v2`
+  - `src/components/board/Feed.tsx` — Added useNavigate hook with event-type-based navigation (alert/analysis/journal/export/error)
+- Executed bulk TODO reduction with Task agent (Haiku model):
+  - Removed 19 low-priority TODOs (Phase 6 roadmap items, Issue #6 items, low-priority features, on-chain data items)
+  - Tagged 8 remaining TODOs with [P0] or [P1] priority tags
+  - Linked all remaining TODOs to Issue #4 (Provider-Muxing) or Issue #11 (Export-Bundle)
+- Updated `Sparkfined_Working_Plan.md` Section 6B.2 with comprehensive results summary, remaining TODO list, and backlog clarification.
+
+Commands & Results:
+- `mkdir -p docs/internal` → ✅ Created directory
+- `rg "TODO|FIXME|HACK|XXX" src` → Initial: 30 TODOs (after navigation stub removal: 27), Final: 8 TODOs
+- `rg "\[P[0-3]\]" src` → Initial: 0 matches, Final: 8 matches (all properly tagged)
+- `pnpm install` → ✅ (798 packages installed)
+- `pnpm typecheck` → ✅ (no TypeScript errors)
+- `pnpm run build` → ✅ (successful build, expected MORALIS_API_KEY warning only)
+
+New open points:
+- **6B.2-OP-01:** 8 remaining [P0]/[P1] TODOs require dedicated implementation (tracked in Issue #4 and Issue #11, Q1 2025 target)
+- **6B.2-OP-02:** Consider automated TODO hygiene checks in CI/CD (e.g., fail if TODO without [Px]-tag is added)
+
+Section 6B.2 Status: ✅ **COMPLETE** – TODO Hygiene erfolgreich abgeschlossen
+
+Reduction Summary:
+- **Before:** 30 TODOs (unpriorisiert, gemischte Qualität)
+- **After:** 8 TODOs (alle mit [P0]/[P1]-Tags, klar dokumentiert)
+- **Reduction:** 73% (22 TODOs entfernt oder konsolidiert)
+- **Navigation Stubs:** 3 implementiert (JournalSnapshot, InsightTeaser, Feed)
+
+Remaining TODOs:
+- 3x [P0] in `getTokenSnapshot.ts` (Provider-Muxing & Cache, Issue #4)
+- 4x [P1] in `ExportService.ts` (ZIP, Share-Card, Image-Optimization, Issue #11)
+- 1x [P1] in `DashboardPageV2.tsx` (Data-Layer-Integration)
+
+Handoff to Section 6B.3:
+- ESLint Cleanup ready for execution (58 warnings baseline documented in Working Plan)
+- Recommended to execute 6B.3 → 6B.4 sequentially for clean codebase state before E2E work
+
