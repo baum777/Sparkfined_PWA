@@ -340,24 +340,206 @@ Open Points (Review):
 
 ## 6. Dead Code & V1 Archive
 
-Goal: Remove or archive all obsolete V1 pages and dev-only files.
+---
 
-Primary agent: Codex
+## 6 – Dead Code Cleanup & V1 Archive / Legacy Sweep
 
-Checklist:
+**Goal:**  
+Remove remaining V1-era code, unused routes, and legacy UI scaffolding from the active app surface, while safely archiving historical files and keeping V2 fully stable. Prepare a clean, maintainable codebase for ongoing feature work.
 
-- [ ] Create docs/archive/v1-migration-backup/ if missing.
-- [ ] Move V1 pages and layouts into archive (JournalPage, ChartPage, AnalyzePage, Layout, Header, etc.).
-- [ ] Move or remove sections/* that only support V1.
-- [ ] Delete clearly dev-only pages (HomePage, FontTestPage, wireframes/) if no longer needed.
-- [ ] Clean up imports and routes referencing removed files.
-- [ ] Ensure pnpm run build still succeeds.
+**Scope:**  
+- Confirm and complete V1 → V2 code removal (pages, layouts, sections)
+- Archive important V1 artefacts under `docs/archive/`
+- Clean up unused imports / components / routes
+- (Optional 6B) Plan token migration for legacy modals & banners as post-launch task
 
-Handoff to Claude:
-
-- [ ] Confirm no needed V1 behaviour was lost and archive README is clear.
+**Primary Agent:**  
+- **Codex** – executor for code-level cleanup and archive moves  
+- **Claude** – reviewer for final Section 6 summary + backlog shaping (6B)
 
 ---
+
+### 6A – V1 Code Removal & Archive (Active Now)
+
+**Objective:**  
+Ensure that **no V1 pages or layouts are still wired into the runtime app**, and that all obsolete files are either removed or safely archived, without breaking any V2 flows.
+
+**Primary Agent:** Codex (Execution)  
+**Secondary Agent:** Claude (Quick sanity review after completion)
+
+#### 6A.1 – Inventory & Reality Check
+
+**Inhalt & Scope:**
+
+- Reconcile what the plan *sagt* vs. was im Repo *real* noch existiert:
+  - V1 Pages (JournalPage, ChartPage, AnalyzePage, HomePage, FontTestPage, etc.)
+  - V1 Layout components (Layout, Header)
+  - V1 Sections (`src/sections/chart`, `src/sections/journal`, `src/sections/analyze`)
+  - Legacy helpers/routes that still reference V1
+- Confirm that V2 routes (`/dashboard-v2`, `/journal-v2`, `/watchlist-v2`, `/alerts-v2`, `/analysis-v2`, `/chart-v2`, `/settings-v2`) are the *only* active app surfaces.
+
+**Checklist (Codex):**
+
+- [ ] Liste aller V1 Page-Files erstellt (grep / ripgrep, IDE search)
+- [ ] Liste aller V1 Layout-Files erstellt
+- [ ] Liste aller V1 Sections erstellt
+- [ ] Bestätigt: keine aktiven Routes referenzieren mehr V1 Pages
+- [ ] Bestätigt: Sidebar + BottomNav nutzen ausschließlich V2 routes
+- [ ] Kurze Zusammenfassung im `Sparkfined_Execution_Log.md` angelegt (Entry: “6A.1 – Inventory & Reality Check”)
+
+**Handoff:**  
+- [ ] Kurze Inventar-Zusammenfassung in **Sparkfined_Working_Plan.md** unter Section 6 ergänzt  
+- [ ] Claude erhält Summary-Snippet als Kontext für Review (kein PR nötig, nur Text)
+
+---
+
+#### 6A.2 – Archive Moves & Deletions
+
+**Inhalt & Scope:**
+
+- Alle bestätigten V1-Dateien, die nicht mehr aktiv genutzt werden, nach `docs/archive/v1-migration-backup/` verschieben oder löschen.
+- Saubere Trennung zwischen:
+  - “Historisch relevant, archivieren” vs.
+  - “Experiment / Dev-Noise, löschen”
+
+**Primär-Agent:** Codex
+
+**Checklist (Codex):**
+
+- [ ] `docs/archive/v1-migration-backup/` existiert mit einem `README.md` (Retention Policy, Restore-Hinweise)
+- [ ] Alle V1 Pages, die **vollständig** durch V2 ersetzt sind, ins Archive verschoben:
+  - [ ] `src/pages/JournalPage.tsx`
+  - [ ] `src/pages/ChartPage.tsx`
+  - [ ] `src/pages/AnalyzePage.tsx`
+  - [ ] `src/components/layout/Layout.tsx`
+  - [ ] `src/components/layout/Header.tsx`
+  - [ ] `src/sections/chart/*`
+  - [ ] `src/sections/journal/*`
+  - [ ] `src/sections/analyze/*`
+- [ ] Reine Dev-/Test-Pages, die keine historische Bedeutung haben, gelöscht:
+  - [ ] `src/pages/HomePage.tsx`
+  - [ ] `src/pages/FontTestPage.tsx`
+  - [ ] ggf. alte `wireframes/` oder ad-hoc Testdateien (wenn noch vorhanden)
+- [ ] Alle Import-Statements, die auf diese Files zeigen, entfernt oder angepasst
+- [ ] `pnpm typecheck` → ✅
+- [ ] `pnpm run build` → ✅ (MORALIS_API_KEY Warnung ist akzeptabel, solange Build durchläuft)
+
+**Handoff:**  
+
+- [ ] Abschnitt “6A.2 – Archive Moves & Deletions” im **Execution Log** mit Datum, Branch, Commands & Resulten befüllen  
+- [ ] Kurzes Fazit + “Before/After”-Liste (welche Files jetzt wo liegen) in **Working Plan** ergänzen  
+- [ ] Claude erhält den Log-Snippet für einen kompakten Review-Kommentar (“Section 6A finalized ✓ / any follow-ups”).
+
+---
+
+#### 6A.3 – Orphaned Imports / Dead Code Sweep
+
+**Inhalt & Scope:**
+
+- Sicherstellen, dass durch die Archivierung keine toten Imports, ungenutzten Komponenten oder “zombie routes” übrig bleiben.
+- Fokus: `src/routes/RoutesRoot.tsx`, globale Layouts, zentrale Components, alte Helpers.
+
+**Primär-Agent:** Codex
+
+**Checklist (Codex):**
+
+- [ ] `src/routes/RoutesRoot.tsx`: alle `lazy(() => import("../pages/…"))` Verweise auf V1 entfernt
+- [ ] Grep/Tooling-Lauf:
+  - [ ] `grep -r "JournalPage" src/` → keine aktiven Verwendungen
+  - [ ] `grep -r "AnalyzePage" src/` → keine aktiven Verwendungen
+  - [ ] `grep -r "ChartPage" src/` → nur V2 / Archive
+- [ ] Optional: ESLint/TS-Helfer (z.B. `no-unused-vars`, `no-unused-imports`) laufen lassen:
+  - [ ] `pnpm lint` → ✅ (oder nur bekannte, dokumentierte Warnungen)
+- [ ] Manuelle Stichprobe:
+  - [ ] /dashboard-v2
+  - [ ] /journal-v2
+  - [ ] /watchlist-v2
+  - [ ] /alerts-v2
+  - [ ] /analysis-v2
+  - [ ] /chart-v2
+  - [ ] /settings-v2  
+  Alle Seiten laden ohne Runtime-Error / 404 / Suspense-Hänger.
+
+**Handoff:**  
+
+- [ ] Kurzes “Dead Code Sweep – Result Summary” in **Execution Log**  
+- [ ] In **Working Plan** notieren:
+  - “6A.3 – Orphaned imports removed, V1 references cleared, V2 routes verified.”
+
+---
+
+#### 6A.4 – Section 6A Abschluss & Review
+
+**Primär-Agent:** Claude (Review)
+
+**Inhalt & Scope (Claude):**
+
+- Abgleich:  
+  - Was war laut Section 6A geplant?  
+  - Was wurde laut Execution Log tatsächlich erledigt?
+- Kurzes Fazit:  
+  - “6A abgeschlossen, Codebase V1-frei im aktiven Pfad, Archiv korrekt angelegt.”
+- Identifikation:  
+  - Eventuelle Restkanten (z.B. ein, zwei bewusst gelassene V1-Dateien) sauber als Backlog-Punkte markieren.
+
+**Checklist (Claude):**
+
+- [ ] Execution Log Einträge für 6A.1–6A.3 gelesen
+- [ ] Repo-Status gecheckt (Branch, Key-Files, Routing)
+- [ ] Kurzes Fazit in **Sparkfined_Working_Plan.md** eingefügt:
+  - [ ] “Fazit Section 6A”
+  - [ ] “Verifiziert: …”
+  - [ ] “Offene Punkte → in Backlog verschoben”
+- [ ] Abschluss-Entry in **Execution Log** unter “Section 6A Review” geschrieben
+
+---
+
+### 6B – Legacy UI & Modal Token Sweep (Backlog / Post-Launch)
+
+> **Status:** ⏳ Backlog – kein Blocker für V2 Launch, aber sinnvoller Cleanup nach Produktion.
+
+**Goal:**  
+Langfristig alle noch verbleibenden **Legacy-Komponenten** (z.B. `FeedbackModal`, `ReplayModal`, `UpdateBanner`, alte Banners / Toaster) auf das V2-Design-Tokensystem migrieren, damit die gesamte App visuell und technisch konsistent ist.
+
+**Primär-Agent:**  
+- **Future Codex + Claude** (kombiniert, in eigenem Iterationszyklus nach Go-Live)
+
+**Scope (vorläufig):**
+
+- Identifizierte Kandidaten (aus 5B/TOKEN-NOTE-01):
+  - FeedbackModal
+  - ReplayModal
+  - UpdateBanner
+  - … plus weitere Hardcoded-Slate/Opacity-Komponenten
+- Migration von:
+  - `bg-slate-*` / `bg-black/40` → `bg-surface`, `bg-surface-subtle`, `bg-overlay`
+  - `text-slate-*` / `text-zinc-*` → `text-text-primary/secondary/tertiary`
+  - Ad-hoc Farben → Sentiment/Status Tokens, wo sinnvoll
+
+**Checklist (Backlog-Level, noch nicht zur Ausführung freigegeben):**
+
+- [ ] Vollständige Liste aller Legacy-Komponenten mit Hardcoded Colors
+- [ ] Mapping-Tabelle: Legacy-Farben → V2 Tokens
+- [ ] Geplanter Branch: `codex/section6b-legacy-token-sweep-01`
+- [ ] UX/Design-Abnahme für neue Token-Mappings
+- [ ] Iterative Umsetzung (Komponente für Komponente)
+- [ ] Finaler Review & Eintrag in `Sparkfined_Execution_Log.md` / `Working_Plan` als “Section 6B Complete”
+
+---
+
+### Handoff & Flow für Section 6
+
+1. **Jetzt (Aktiv): 6A – V1 Cleanup & Archive**
+   - Codex arbeitet nacheinander an 6A.1 → 6A.2 → 6A.3  
+   - Jeder Schritt wird im `Sparkfined_Execution_Log.md` dokumentiert  
+   - **Nach Abschluss 6A**: Claude schreibt ein kurzes Review-Fazit und markiert 6A als “Complete” im Working Plan.
+
+2. **Später (Post-Launch / Backlog): 6B – Legacy UI Token Sweep**
+   - Wird als eigener Iterationsblock geplant, nicht nötig für initialen V2-Launch  
+   - Alle TOKEN-FUTURE-Notizen aus Section 5B dienen als Input.
+
+---
+
 
 ## 7. E2E Test Strategy
 
