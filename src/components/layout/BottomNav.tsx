@@ -9,10 +9,10 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { path: '/', label: 'Board', Icon: Home },
-  { path: '/analyze', label: 'Analyze', Icon: BarChart3 },
-  { path: '/journal', label: 'Journal', Icon: FileText },
-  { path: '/settings', label: 'Settings', Icon: Settings },
+  { path: '/dashboard-v2', label: 'Board', Icon: Home },
+  { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
+  { path: '/journal-v2', label: 'Journal', Icon: FileText },
+  { path: '/settings-v2', label: 'Settings', Icon: Settings },
 ]
 
 export default function BottomNav() {

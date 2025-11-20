@@ -8,9 +8,7 @@ import { initializeEventSubscriptions } from "@/ai/ingest/eventSubscriptions";
 
 // Route-level code splitting (reduziert initial bundle)
 const LandingPage = lazy(() => import("../pages/LandingPage"));
-const ChartPage = lazy(() => import("../pages/ChartPage"));
 const ReplayPage = lazy(() => import("../pages/ReplayPage"));
-const SettingsPage = lazy(() => import("../pages/SettingsPage"));
 const NotificationsPage = lazy(() => import("../pages/NotificationsPage"));
 const SignalsPage = lazy(() => import("../pages/SignalsPage"));
 const LessonsPage = lazy(() => import("../pages/LessonsPage"));
@@ -39,56 +37,66 @@ export default function RoutesRoot() {
     initializeEventSubscriptions();
   }, []);
 
-    return (
-      <ErrorBoundary>
-        {/* Läuft jetzt im Router-Kontext, da main.tsx wrappt */}
-        <SwipeNavGate />
-        <UpdateBanner />
-        <Suspense fallback={<Fallback />}>
-          <Routes>
+  return (
+    <ErrorBoundary>
+      {/* Läuft jetzt im Router-Kontext, da main.tsx wrappt */}
+      <SwipeNavGate />
+      <UpdateBanner />
+      <Suspense fallback={<Fallback />}>
+        <Routes>
           {/* Landing Page - No Layout (standalone) */}
           <Route path="/landing" element={<LandingPage />} />
 
           {/* App Routes - With Layout */}
           <Route path="/" element={<Navigate to="/dashboard-v2" replace />} />
+          <Route path="/dashboard" element={<Navigate to="/dashboard-v2" replace />} />
           <Route path="/board" element={<Navigate to="/dashboard-v2" replace />} />
           <Route path="/analyze" element={<Navigate to="/analysis-v2" replace />} />
-          <Route path="/chart" element={
-            <Layout>
-              <ChartPage />
-            </Layout>
-          } />
+          <Route path="/analysis" element={<Navigate to="/analysis-v2" replace />} />
+          <Route path="/chart" element={<Navigate to="/chart-v2" replace />} />
           <Route path="/journal" element={<Navigate to="/journal-v2" replace />} />
-          <Route path="/replay" element={
-            <Layout>
-              <ReplayPage />
-            </Layout>
-          } />
-          <Route path="/replay/:sessionId" element={
-            <Layout>
-              <ReplayPage />
-            </Layout>
-          } />
-          <Route path="/settings" element={
-            <Layout>
-              <SettingsPage />
-            </Layout>
-          } />
-          <Route path="/notifications" element={
-            <Layout>
-              <NotificationsPage />
-            </Layout>
-          } />
-          <Route path="/signals" element={
-            <Layout>
-              <SignalsPage />
-            </Layout>
-          } />
-          <Route path="/lessons" element={
-            <Layout>
-              <LessonsPage />
-            </Layout>
-          } />
+          <Route path="/watchlist" element={<Navigate to="/watchlist-v2" replace />} />
+          <Route path="/alerts" element={<Navigate to="/alerts-v2" replace />} />
+          <Route
+            path="/replay"
+            element={
+              <Layout>
+                <ReplayPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/replay/:sessionId"
+            element={
+              <Layout>
+                <ReplayPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <Layout>
+                <NotificationsPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/signals"
+            element={
+              <Layout>
+                <SignalsPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/lessons"
+            element={
+              <Layout>
+                <LessonsPage />
+              </Layout>
+            }
+          />
           <Route path="/dashboard-v2" element={<DashboardPageV2 />} />
           <Route path="/watchlist-v2" element={<WatchlistPageV2 />} />
           <Route path="/analysis-v2" element={<AnalysisPageV2 />} />
@@ -98,8 +106,8 @@ export default function RoutesRoot() {
           <Route path="/settings-v2" element={<SettingsPageV2 />} />
           <Route path="/icons" element={<IconShowcase />} />
           <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
-          </Routes>
-        </Suspense>
-      </ErrorBoundary>
-    );
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
+  );
 }

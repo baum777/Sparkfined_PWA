@@ -9,7 +9,7 @@ This document coordinates architecture, refactors, and production hardening of t
 | 1 | Status Sync & Architecture Freeze        | Confirm current repo state & decisions               | Claude       | Summary for 2+ |
 | 2 | Layout & Navigation Review               | UX review of new DashboardShell layout               | Claude       | Issues for 3   |
 | 3 | Chart & Settings V2 Completion           | Finish ChartPageV2 & SettingsPageV2, ensure parity   | Codex        | Review for 4   |
-| 4 | TS Strictness & API Types                | Reduce any, define adapter types                     | Codex        | Review for 5   |
+| 4 | Routing & Navigation Migration (UX-04 & UX-05) | Redirect legacy routes, update Sidebar/BottomNav to V2 | Codex        | UX check       |
 | 5 | Design Tokens Full Sweep                 | Remove remaining hardcoded colors                    | Codex        | Visual check   |
 | 6 | Dead Code & V1 Archive                   | Archive/remove V1 pages & dev-only files             | Codex        | Sanity check   |
 | 7 | E2E Test Strategy                        | Define scenarios + priorities                        | Claude       | Inputs for 8   |
@@ -255,6 +255,26 @@ Checklist:
 Handoff to Claude:
 
 - [ ] Sanity check API types and suggest improvements if needed.
+
+---
+
+## 4 – Routing & Navigation Migration (UX-04 & UX-05)
+
+Goal: Ensure all navigation elements route exclusively to V2 pages and legacy V1 paths are safely redirected, so users consistently land in the new layout.
+
+Summary: Section 4 migrates all primary navigation elements to the V2 routes and installs redirects for legacy paths like /board and /journal. Users with old bookmarks are now transparently taken to the new layout, and both sidebar and bottom navigation highlight the correct active pages. No direct links to V1 pages remain in the app shell.
+
+Checklist:
+
+- [x] Redirects: /board, /journal, /analyze, /chart, /settings → jeweilige V2-Routen.
+- [x] Sidebar links updated to V2 routes (UX-04).
+- [x] Bottom navigation updated to V2 routes (UX-05).
+- [x] Manual navigation smoke test on desktop and mobile.
+- [x] Any discovered edge-case routes documented as open points.
+
+Open Points:
+
+- None.
 
 ---
 

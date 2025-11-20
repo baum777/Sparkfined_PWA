@@ -22,13 +22,13 @@ interface NavItem {
 const primaryNavItems: NavItem[] = [
   { path: '/dashboard-v2', label: 'Board', Icon: Home },
   { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
-  { path: '/chart', label: 'Chart', Icon: TrendingUp },
+  { path: '/chart-v2', label: 'Chart', Icon: TrendingUp },
   { path: '/journal-v2', label: 'Journal', Icon: FileText },
   { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
 ];
 
 const secondaryNavItems: NavItem[] = [
-  { path: '/settings', label: 'Settings', Icon: Settings },
+  { path: '/settings-v2', label: 'Settings', Icon: Settings },
 ];
 
 export default function Sidebar() {
