@@ -571,6 +571,12 @@ Verbleibende 10 Komponenten (aus Section 5B/TOKEN-NOTE-01) auf V2-Token migriere
 - NotificationToast
 - … (vollständige Liste via grep erstellen)
 
+**Kandidaten (Stand: 2025-11-20):**
+- [x] src/components/FeedbackModal.tsx
+- [x] src/components/ReplayModal.tsx
+- [x] src/components/UpdateBanner.tsx
+- [x] src/components/ErrorBoundary.tsx
+
 **Token-Migrations-Pattern:**
 - `bg-slate-*` / `bg-black/40` → `bg-surface`, `bg-surface-subtle`, `bg-overlay`
 - `text-slate-*` / `text-zinc-*` → `text-text-primary/secondary/tertiary`

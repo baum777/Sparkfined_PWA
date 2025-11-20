@@ -57,11 +57,11 @@ export default function UpdateBanner() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+      className="fixed top-0 left-0 right-0 z-50 border-b border-border-moderate bg-app-gradient text-text-primary shadow-lg"
       role="alert"
       aria-live="polite"
     >
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <div className="container mx-auto flex items-center justify-between gap-4 px-4 py-3">
         <div className="flex items-center gap-3 flex-1">
           <svg
             className="w-5 h-5 flex-shrink-0"
@@ -78,10 +78,10 @@ export default function UpdateBanner() {
             />
           </svg>
           <div className="flex-1">
-            <p className="text-sm md:text-base font-medium">
+            <p className="text-sm md:text-base font-medium text-text-primary">
               New version available!
             </p>
-            <p className="text-xs md:text-sm opacity-90 hidden sm:block">
+            <p className="text-xs md:text-sm text-text-secondary hidden sm:block">
               Update now to get the latest features and improvements
             </p>
           </div>
@@ -91,7 +91,7 @@ export default function UpdateBanner() {
           <button
             onClick={handleUpdate}
             disabled={isUpdating}
-            className="px-4 py-2 bg-white text-blue-600 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-bg transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Update application now"
           >
             {isUpdating ? (
@@ -125,7 +125,7 @@ export default function UpdateBanner() {
 
           <button
             onClick={handleDismiss}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="rounded-lg p-2 text-text-primary transition-colors hover:bg-interactive-hover"
             aria-label="Dismiss update notification"
           >
             <svg

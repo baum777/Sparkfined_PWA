@@ -45,14 +45,14 @@ class ErrorBoundary extends Component<Props, State> {
   override render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-bg text-text-primary flex items-center justify-center p-6">
           <div className="max-w-2xl w-full">
             <div className="text-center mb-6">
               <div className="text-6xl mb-4">⚠️</div>
-              <h1 className="text-2xl font-bold text-emerald-400 mb-4">
+              <h1 className="text-2xl font-bold text-brand mb-4">
                 Etwas ist schiefgelaufen
               </h1>
-              <p className="text-slate-300 mb-6">
+              <p className="text-text-secondary mb-6">
                 Die App ist auf einen Fehler gestoßen. Bitte laden Sie die Seite neu.
               </p>
             </div>
@@ -60,7 +60,7 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="flex gap-4 justify-center mb-6">
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium transition-colors"
+                className="rounded-lg bg-brand px-6 py-3 font-medium text-bg transition-colors hover:bg-brand/90"
               >
                 Seite neu laden
               </button>
@@ -80,28 +80,28 @@ class ErrorBoundary extends Component<Props, State> {
                   localStorage.clear()
                   window.location.reload()
                 }}
-                className="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium transition-colors"
+                className="rounded-lg bg-warn px-6 py-3 font-medium text-bg transition-colors hover:bg-warn/90"
               >
                 Cache löschen & Neuladen
               </button>
               <a
                 href="/debug-blackscreen.html"
-                className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors inline-block"
+                className="inline-block rounded-lg border border-border px-6 py-3 font-medium text-text-primary transition-colors hover:bg-interactive-hover"
               >
                 Debug Tool
               </a>
             </div>
 
             {(this.state.error || this.state.errorInfo) && (
-              <details className="mt-6 text-left bg-slate-900 rounded-lg p-4">
-                <summary className="cursor-pointer text-sm text-slate-400 hover:text-slate-300 mb-2">
+              <details className="mt-6 rounded-lg bg-surface-subtle p-4 text-left">
+                <summary className="mb-2 cursor-pointer text-sm text-text-secondary hover:text-text-primary">
                   Fehlerdetails anzeigen {import.meta.env.DEV ? '(Dev Mode)' : ''}
                 </summary>
                 <div className="mt-2 space-y-4">
                   {this.state.error && (
                     <div>
-                      <h3 className="text-red-400 font-semibold mb-2">Error:</h3>
-                      <pre className="p-3 bg-slate-950 rounded text-xs overflow-auto text-red-300">
+                      <h3 className="mb-2 font-semibold text-danger">Error:</h3>
+                      <pre className="overflow-auto rounded bg-surface p-3 text-xs text-danger">
                         {this.state.error.toString()}
                         {this.state.error.stack && `\n\nStack:\n${this.state.error.stack}`}
                       </pre>
@@ -109,8 +109,8 @@ class ErrorBoundary extends Component<Props, State> {
                   )}
                   {this.state.errorInfo && (
                     <div>
-                      <h3 className="text-yellow-400 font-semibold mb-2">Component Stack:</h3>
-                      <pre className="p-3 bg-slate-950 rounded text-xs overflow-auto text-yellow-300 whitespace-pre-wrap">
+                      <h3 className="mb-2 font-semibold text-warn">Component Stack:</h3>
+                      <pre className="whitespace-pre-wrap overflow-auto rounded bg-surface p-3 text-xs text-warn">
                         {this.state.errorInfo.componentStack}
                       </pre>
                     </div>
