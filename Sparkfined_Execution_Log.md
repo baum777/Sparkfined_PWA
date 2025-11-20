@@ -362,3 +362,25 @@ Handoff to Codex:
 - Recommended execution order: 6B.1 (Token Migration) → 6B.2 (TODO Hygiene) → 6B.3 (ESLint Cleanup) → 6B.4 (Final Zombie Sweep)
 - Branch naming convention: `codex/section6b-legacy-cleanup-01` (or sub-branches per 6B sub-section)
 
+### 2025-11-20 – Section 6B.1 – Component Token Migration (Codex)
+
+Date: 2025-11-20
+Agent: Codex
+Section: #6B.1 – Legacy Component Token Migration
+Branch: codex/section6b-legacy-cleanup-01
+
+Actions:
+- Migrated FeedbackModal to V2 design tokens (overlay, surface, text, border mappings).
+- Migrated ReplayModal to V2 design tokens with brand-accented selection states and surface/border tokens.
+- Migrated UpdateBanner to V2 gradient/tokens and tokenized action buttons.
+- Migrated ErrorBoundary to V2 surface/text tokens and brand/warn button treatments.
+- Updated Working Plan Section 6B.1 with component checklist status.
+
+Commands & Results:
+- pnpm typecheck → ✅
+- pnpm run build → ✅ (expected MORALIS_API_KEY warning)
+- pnpm lint → ⚠️ (pre-existing unused-var warnings)
+
+Open points:
+- 6B.1-X: Monitor for any remaining legacy-colored shared components (e.g., NotificationToast) in subsequent sweeps.
+
