@@ -72,3 +72,33 @@ Commands & Results:
 
 New open points:
 - None.
+
+### 2025-11-20 – Section 2. Layout & Navigation Review (UX)
+
+Date: 2025-11-20
+Agent: Claude
+Section: #2. Layout & Navigation Review (UX)
+Branch: claude/review-layout-navigation-01SArQmxRsFefVySbzd9Xn2b
+
+Actions:
+- Conducted comprehensive UX review of V2 layout system across all pages (Dashboard, Journal, Watchlist, Alerts, Analysis).
+- Analyzed DashboardShell header structure, Feature-Layout wrappers (WatchlistLayout, AlertsLayout, AnalysisLayout, JournalLayout), Sidebar, and BottomNav.
+- Identified critical issue: Double headers in Watchlist/Alerts pages (DashboardShell + Feature-Layout headers).
+- Documented extensive hardcoded color usage blocking design token adoption (DashboardShell and Feature-Layouts).
+- Verified Sidebar and BottomNav link to correct V2 routes (except /chart and /settings which are pending V2 implementations).
+- Created prioritized "Must Fix" issue list (UX-01 through UX-06) and "Nice to Have" list (UX-NH-01 through UX-NH-04).
+- Updated Working Plan Section "Layout & Navigation Review (UX)" with summary, checklist completion, issue lists with IDs, and handoff instructions for Codex.
+
+Commands & Results:
+- pnpm typecheck → n/a (pure review, no code changes)
+- pnpm run build → n/a (pure review, no code changes)
+- Browser checks (descriptive analysis): Examined /dashboard-v2, /journal-v2, /watchlist-v2, /alerts-v2, /analysis-v2 routing and component structure
+
+New open points:
+- UX-01 (P0): Remove double headers in Watchlist/Alerts pages
+- UX-02 (P0): Replace hardcoded colors in DashboardShell with design tokens
+- UX-03 (P0): Replace hardcoded colors in Feature-Layouts with design tokens
+- UX-04 (P1): Update Sidebar links to V2 routes after Section 3 completion
+- UX-05 (P1): Update BottomNav links to V2 routes after Section 3 completion
+- UX-06 (P2): Standardize eyebrow typography across all headers
+- All issues documented in Working Plan with concrete file paths and solutions for Codex implementation.
