@@ -1,13 +1,14 @@
 import React from 'react';
-import type { WatchlistRow } from '@/store/watchlistStore';
+import type { WatchlistRow, WatchlistTrendSnapshot } from '@/store/watchlistStore';
 
 interface WatchlistTableProps {
   rows: ReadonlyArray<WatchlistRow>;
   activeSymbol?: string;
+  trends?: Record<string, WatchlistTrendSnapshot>;
   onSelect?: (symbol: string) => void;
 }
 
-export default function WatchlistTable({ rows, activeSymbol, onSelect }: WatchlistTableProps) {
+export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }: WatchlistTableProps) {
   return (
     <div className="rounded-2xl border border-white/10 bg-black/30">
       <div className="hidden grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-zinc-500 sm:grid">
@@ -20,6 +21,7 @@ export default function WatchlistTable({ rows, activeSymbol, onSelect }: Watchli
       <div className="divide-y divide-white/5">
         {rows.map((row) => {
           const isActive = activeSymbol === row.symbol;
+          const hasTrend = Boolean(trends?.[row.symbol]);
           return (
             <div
               key={`${row.symbol}-${row.session}`}
@@ -32,7 +34,10 @@ export default function WatchlistTable({ rows, activeSymbol, onSelect }: Watchli
             >
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 sm:hidden">Symbol</p>
-                <p className="text-base font-semibold text-white">{row.symbol}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-base font-semibold text-white">{row.symbol}</p>
+                  {hasTrend ? <span className="h-2 w-2 rounded-full bg-emerald-300" aria-label="Trend present" /> : null}
+                </div>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-zinc-500 sm:hidden">Name</p>

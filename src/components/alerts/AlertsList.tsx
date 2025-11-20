@@ -50,6 +50,9 @@ export default function AlertsList({ alerts, activeAlertId, onSelectAlert }: Ale
                   {alert.symbol} &middot; {alert.timeframe}
                 </p>
                 <p className="mt-1 text-lg font-medium text-white">{alert.condition}</p>
+                {alert.summary ? (
+                  <p className="mt-1 text-xs text-white/70">{alert.summary}</p>
+                ) : null}
               </div>
               <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusClasses}`}>
                 {formatLabel(alert.status)}
@@ -59,6 +62,11 @@ export default function AlertsList({ alerts, activeAlertId, onSelectAlert }: Ale
               <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-white/80">
                 {typeLabel}
               </span>
+              {alert.origin === 'grok-trend' ? (
+                <span className="inline-flex items-center rounded-full border border-emerald-300/50 bg-emerald-400/10 px-2.5 py-1 text-emerald-200">
+                  Grok trend
+                </span>
+              ) : null}
             </div>
           </article>
         );

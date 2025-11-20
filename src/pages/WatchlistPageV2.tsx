@@ -10,16 +10,15 @@ type SessionFilter = "all" | "London" | "NY" | "Asia";
 type SortMode = "default" | "top-movers";
 
 export default function WatchlistPageV2() {
-  const { rows, isLoading, error, hydrateFromQuotes, setLoading, setError } = useWatchlistStore(
-    (state) => ({
-      rows: state.rows,
-      isLoading: state.isLoading,
-      error: state.error,
-      hydrateFromQuotes: state.hydrateFromQuotes,
-      setLoading: state.setLoading,
-      setError: state.setError,
-    })
-  );
+  const { rows, isLoading, error, hydrateFromQuotes, setLoading, setError } = useWatchlistStore((state) => ({
+    rows: state.rows,
+    isLoading: state.isLoading,
+    error: state.error,
+    hydrateFromQuotes: state.hydrateFromQuotes,
+    setLoading: state.setLoading,
+    setError: state.setError,
+  }));
+  const trends = useWatchlistStore((state) => state.trends);
   const [sessionFilter, setSessionFilter] = React.useState<SessionFilter>("all");
   const [sortMode, setSortMode] = React.useState<SortMode>("default");
   const [activeSymbol, setActiveSymbol] = React.useState<string | undefined>(undefined);
@@ -71,6 +70,10 @@ export default function WatchlistPageV2() {
     () => rows.find((row) => row.symbol === activeSymbol),
     [rows, activeSymbol]
   );
+  const activeTrend = React.useMemo(() => {
+    if (!activeRow) return undefined;
+    return trends[activeRow.symbol];
+  }, [activeRow, trends]);
 
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-100">
@@ -140,10 +143,11 @@ export default function WatchlistPageV2() {
               <WatchlistTable
                 rows={visibleRows}
                 activeSymbol={activeSymbol}
+                trends={trends}
                 onSelect={setActiveSymbol}
               />
             </div>
-            <WatchlistDetailPanel row={activeRow} />
+            <WatchlistDetailPanel row={activeRow} trend={activeTrend} />
           </div>
         </WatchlistLayout>
       </div>

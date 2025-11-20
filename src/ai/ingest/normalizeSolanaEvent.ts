@@ -27,6 +27,7 @@ const CTA_BY_SENTIMENT: Record<TrendSentimentLabel, TrendCallToAction> = {
   mixed: 'watch',
   warning: 'avoid',
   opportunity: 'scalp',
+  unknown: 'watch',
 };
 
 const SENTIMENT_BASE_ALERT: Record<TrendSentimentLabel, number> = {
@@ -36,6 +37,7 @@ const SENTIMENT_BASE_ALERT: Record<TrendSentimentLabel, number> = {
   mixed: 0.5,
   warning: 0.85,
   opportunity: 0.6,
+  unknown: 0.4,
 };
 
 export function normalizeGrokTweet(tweet: GrokTweetPayload): SolanaMemeTrendEvent[] {
@@ -87,8 +89,10 @@ function buildEvent({ tweet, token, importedAt, platform }: BuildEventParams): S
   const sentiment = normalizeSentiment(tweet.sentiment, tweet.analytics);
   const trading = normalizeTrading(tweet.analytics, tweet.sentiment);
   const sparkfined = normalizeSparkfined(tweet, metrics, trading);
+  const snippet = buildSnippet(tweet.full_text ?? tweet.text ?? '');
 
   const event: SolanaMemeTrendEvent = {
+    type: 'SolanaMemeTrendEvent',
     id: `${tweet.id}::${normalizedSymbol}`,
     source: {
       platform,
@@ -98,6 +102,7 @@ function buildEvent({ tweet, token, importedAt, platform }: BuildEventParams): S
     },
     author: {
       handle: tweet.author?.handle ?? 'unknown',
+      name: tweet.author?.display_name ?? tweet.author?.handle,
       displayName: tweet.author?.display_name,
       followers: sanitizeNumber(tweet.author?.followers),
       verified: Boolean(tweet.author?.verified),
@@ -112,6 +117,9 @@ function buildEvent({ tweet, token, importedAt, platform }: BuildEventParams): S
       hashtags: tweetHashtags,
       hasMedia: Boolean(tweet.attachments?.has_media),
       hasLinks: Boolean(tweet.attachments?.has_links),
+      mediaPresent: Boolean(tweet.attachments?.has_media),
+      linksPresent: Boolean(tweet.attachments?.has_links),
+      snippet,
       metrics,
     },
     token: {
@@ -134,6 +142,8 @@ function buildEvent({ tweet, token, importedAt, platform }: BuildEventParams): S
       sparkfined,
       trading,
       metrics,
+      tweetUrl: tweet.url,
+      snippet,
     }),
     receivedAt: importedAt,
   };
@@ -268,6 +278,7 @@ function normalizeSentiment(
     confidence: sanitizeNumber(sentiment.confidence),
     keywords: sentiment.keywords ?? [],
     hypeLevel: analytics?.hype_level,
+    emotionTags: sentiment.emotion_tags ?? analytics?.journal_context_tags,
   };
 
   if (
@@ -289,6 +300,7 @@ function normalizeTrading(
 ): SolanaMemeTrendTrading | undefined {
   const hypeLevel = analytics?.hype_level;
   const callToAction = deriveCallToAction(sentiment?.label);
+  const timeframe = hypeLevel === 'mania' ? 'intraday' : hypeLevel === 'cooldown' ? 'swing' : 'scalp';
 
   const volatilityRisk =
     typeof analytics?.trending_score === 'number'
@@ -303,6 +315,8 @@ function normalizeTrading(
     hypeLevel,
     callToAction,
     volatilityRisk,
+    timeframe,
+    strengthHint: hypeLevel === 'mania' ? 'high' : hypeLevel ? 'medium' : undefined,
   };
 }
 
@@ -324,10 +338,10 @@ function normalizeSparkfined(
   const emotionTags = uniqueStringArray(tweet.sentiment?.emotion_tags ?? []);
 
   return {
-    trendingScore,
-    alertRelevance,
-    journalContextTags,
-    emotionTags,
+    trendingScore: trendingScore ?? 0,
+    alertRelevance: alertRelevance ?? 0,
+    journalContextTags: journalContextTags.length ? journalContextTags : undefined,
+    emotionTags: emotionTags.length ? emotionTags : undefined,
     replayFlag: Boolean(tweet.analytics?.replay_flag),
     narrative: tweet.analytics?.narrative,
     callToAction: trading?.callToAction,
@@ -373,6 +387,8 @@ type NormalizeDerivedArgs = {
   sparkfined: SolanaMemeTrendSparkfined;
   trading?: SolanaMemeTrendTrading;
   metrics: GrokTweetMetrics;
+  tweetUrl?: string;
+  snippet?: string;
 };
 
 function normalizeDerived({
@@ -383,6 +399,8 @@ function normalizeDerived({
   sparkfined,
   trading,
   metrics,
+  tweetUrl,
+  snippet,
 }: NormalizeDerivedArgs): SolanaMemeTrendDerived {
   const twitterScore = scoreFromMetrics(metrics) ?? sparkfined.trendingScore;
   return {
@@ -392,6 +410,8 @@ function normalizeDerived({
     authorCategory: authorType,
     twitterScore: twitterScore ?? undefined,
     volatilityHint: deriveVolatilityHint(trading?.volatilityRisk, sparkfined.trendingScore),
+    latestTweetUrl: tweetUrl,
+    snippet,
   };
 }
 
@@ -503,6 +523,14 @@ function scoreFromMetrics(metrics: GrokTweetMetrics): number | undefined {
     (views ? views * 0.001 : 0);
 
   return engagementScore > 0 ? engagementScore : undefined;
+}
+
+function buildSnippet(fullText: string): string {
+  if (!fullText) {
+    return '';
+  }
+
+  return fullText.length > 200 ? `${fullText.slice(0, 197)}…` : fullText;
 }
 
 function sanitizeNumber(value: number | undefined | null): number | undefined {

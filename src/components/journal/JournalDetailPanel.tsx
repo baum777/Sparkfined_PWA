@@ -87,7 +87,19 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold leading-tight">{entry.title}</h2>
-            <div className="text-xs text-muted-foreground">{entry.date}</div>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span>{entry.date}</span>
+              {entry.isAuto ? (
+                <span className="inline-flex items-center rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-200">
+                  Auto
+                </span>
+              ) : null}
+              {entry.sentimentLabel ? (
+                <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/80">
+                  {entry.sentimentLabel}
+                </span>
+              ) : null}
+            </div>
           </div>
           <div className="flex flex-col items-end gap-2">
             <span
@@ -159,6 +171,17 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
         ) : (
           <div className="text-sm text-muted-foreground">No notes for this entry yet.</div>
         )}
+        {entry.sourceUrl ? (
+          <a
+            href={entry.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-emerald-200 underline decoration-emerald-500/70 decoration-dotted underline-offset-4"
+          >
+            View source tweet
+            <span aria-hidden="true">↗</span>
+          </a>
+        ) : null}
       </div>
     </div>
   );

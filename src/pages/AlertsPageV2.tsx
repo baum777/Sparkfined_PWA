@@ -6,7 +6,7 @@ import { useAlertsStore } from '@/store/alertsStore';
 import { useSearchParams } from 'react-router-dom';
 
 type StatusFilter = 'all' | 'armed' | 'triggered' | 'snoozed';
-type TypeFilter = 'all' | 'price' | 'volume' | 'volatility';
+type TypeFilter = 'all' | 'price' | 'volume' | 'volatility' | 'trend';
 
 export default function AlertsPageV2() {
   const alerts = useAlertsStore((state) => state.alerts);
@@ -116,7 +116,7 @@ export default function AlertsPageV2() {
 }
 
 const STATUS_FILTERS: StatusFilter[] = ['all', 'armed', 'triggered', 'snoozed'];
-const TYPE_FILTERS: TypeFilter[] = ['all', 'price', 'volume', 'volatility'];
+const TYPE_FILTERS: TypeFilter[] = ['all', 'price', 'volume', 'volatility', 'trend'];
 
 function formatFilterLabel(value: string) {
   if (value === 'all') {

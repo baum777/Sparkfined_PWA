@@ -12,6 +12,7 @@ import { validateEnv } from '@/lib/env'
 import { autoCheckAssets } from '@/lib/debug-assets'
 import { installGlobalErrorHooks } from '@/diagnostics/crash-report'
 import { installBootguard } from '@/diagnostics/bootguard'
+import { initializeEventSubscriptions } from '@/ai/ingest/eventSubscriptions'
 
 // CRITICAL: Install boot guard FIRST (captures errors before React)
 installBootguard()
@@ -33,6 +34,19 @@ try {
 } catch (error) {
   console.warn('[main.tsx] Layout toggle initialization failed:', error)
   // Continue anyway - app should still work
+}
+
+// Initialize Grok trend subscriptions once on boot
+try {
+  initializeEventSubscriptions()
+} catch (error) {
+  console.warn('[main.tsx] Event subscription initialization failed:', error)
+}
+
+if (import.meta.env.DEV) {
+  import('@/ai/ingest/devIngest')
+    .then(({ registerDevTrendIngest }) => registerDevTrendIngest())
+    .catch((error) => console.warn('[main.tsx] Dev trend ingest hook failed:', error))
 }
 
 // Service Worker Registration - Manual Update Flow
