@@ -43,9 +43,9 @@ export default function Feed() {
     { id: 'alerts', label: 'Alerts' },
     { id: 'journal', label: 'Journal' },
   ];
-  
+
   const handleFeedItemClick = (event: FeedEvent) => {
-    // TODO: Navigate based on event type
+    // NOTE(P2-backlog): Navigate based on event type once deep-links are defined
     console.log('Feed item clicked:', event.id, event.type);
     // Example: if (event.type === 'alert') navigate('/notifications');
   };

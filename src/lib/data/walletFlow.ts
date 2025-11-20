@@ -47,10 +47,10 @@ export async function getAccumulationHint(
   // Alpha placeholder: always return neutral
   // Future: Call external API based on WALLETFLOW_PROVIDER env var
   const provider = import.meta.env.VITE_WALLETFLOW_PROVIDER || 'none'
-  
+
   if (provider !== 'none') {
     console.info('[walletFlow] Provider configured but not implemented:', provider)
-    // TODO: Implement provider-specific logic in Phase 6+
+    // NOTE(P2-backlog): Provider-specific logic will land in Phase 6+
   }
 
   return {

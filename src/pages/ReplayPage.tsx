@@ -110,7 +110,7 @@ export default function ReplayPage() {
   // Fetch and cache OHLC data
   const fetchAndCacheOhlc = async (sess: ReplaySession) => {
     try {
-      // TODO: Fetch actual OHLC data from Moralis API
+      // TODO[P1]: Fetch actual OHLC data from Moralis API instead of mock
       // For now, generate mock data
       const mockOhlc = Array.from({ length: 100 }, (_, i) => ({
         t: Date.now() - (100 - i) * 60000,

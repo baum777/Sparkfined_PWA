@@ -28,9 +28,10 @@ const dummyJournalEntries = [
 ];
 
 export default function DashboardPageV2() {
-  const [isLoading, setIsLoading] = useState(false); // TODO: wire to real data fetch (e.g. dashboard store)
-  const [error, setError] = useState<string | null>(null); // TODO: surface real error messages from data layer
-  const [hasData, setHasData] = useState(true); // TODO: derive from actual dashboard data presence
+  // TODO[P1]: Replace placeholder UI state with dashboard data store once available
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasData, setHasData] = useState(true);
 
   const handleRetry = () => {
     setError(null);

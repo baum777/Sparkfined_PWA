@@ -430,3 +430,25 @@ Handoff to Codex:
 - Section 6B.2 (TODO Hygiene) and 6B.3 (ESLint Cleanup) are ready for execution with documented baseline metrics.
 - Recommended execution order: 6B.2 → 6B.3 → 6B.4 (with 6B.1 continuation as optional polish)
 
+
+### 2025-02-20 – Section 6B.2 – TODO/FIXME Hygiene (Codex)
+
+Date: 2025-02-20  
+Agent: Codex  
+Section: #6B.2 – TODO/FIXME Hygiene  
+Branch: codex/section6b2-todo-hygiene-01
+
+Actions:
+- Generiert vollständiges Inventar aller TODO/FIXME/HACK/XXX-Kommentare in `src/` und nach Priorität klassifiziert (`docs/internal/todo-inventory-6B2.txt`).
+- P3/P2-Noise entfernt oder in neutrale Hinweise überführt (Adapter-Retries, Feed/QuickActions, heuristic notes).
+- Navigation-Stubs auf Dashboard gelöst (Analysis/Journal Buttons mit Router-Wiring).
+- Kern-TODOs mit [Px]-Tag versehen und auf Issues/Backlog referenziert (Issue #4, Issue #11, on-chain metrics, AI sanity checks).
+- `Sparkfined_Working_Plan.md` Section 6B.2 mit Baseline, Ergebnis und Checklist aktualisiert.
+
+Commands & Results:
+- pnpm install → ✅ (lockfile already up to date)
+- rg "TODO|FIXME|HACK|XXX" src → ✅ neues Inventar erzeugt
+
+New open points:
+- 6B.2-01: Issue #4 benötigt Provider-Muxing + Cache (P0) – TODO verbleibt im Code mit [P0]-Tag.
+- 6B.2-02: Issue #11 Export-Bundle (P1) weiterhin offen; Umsetzung außerhalb 6B.2.

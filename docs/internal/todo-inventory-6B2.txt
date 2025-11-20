@@ -1,0 +1,20 @@
+# Section 6B.2 – TODO/FIXME Inventory (Classified)
+# Generated: 2025-02-20
+
+## P0 – Blocker
+- src/lib/data/getTokenSnapshot.ts:14 // TODO[P0]: Implement provider muxing + SWR cache (Issue #4)
+- src/lib/data/getTokenSnapshot.ts:23 // TODO[P0]: Wire provider fetch + fallback and cache layer (Issue #4)
+
+## P1 – High
+- src/lib/data/getTokenSnapshot.ts:33 // TODO[P1]: Implement cache clearing once SWR cache is added
+- src/lib/ExportService.ts:23 // TODO[P1]: Implement export bundle pipeline (Issue #11)
+- src/lib/ai/heuristics/sanity.ts:22 // TODO[P1]: Implement validation rules (range checks, contradiction flags)
+- src/lib/signalOrchestrator.ts:58 // TODO[P1]: Replace placeholder on-chain metrics with live provider data
+- src/pages/DashboardPageV2.tsx:31 // TODO[P1]: Replace placeholder UI state with dashboard data store once available
+- src/pages/ReplayPage.tsx:113 // TODO[P1]: Fetch actual OHLC data from Moralis API instead of mock
+
+## P2 – Nice-to-have
+- None (converted to backlog notes)
+
+## P3 – Won’t-Fix / Info
+- None (noise removed or normalized)

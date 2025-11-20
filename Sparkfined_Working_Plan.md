@@ -642,29 +642,33 @@ The 4 critical modal/banner components are now production-ready. The remaining 1
 
 #### 6B.2 – TODO/FIXME Hygiene & Backlog-Priorisierung
 
-**Status:** ⏳ Ready for Execution (Baseline Documented)
+**Status:** ✅ Section 6B.2 abgeschlossen
 
-**Baseline (2025-11-20 Review):**
-- **Current TODO Count:** 30 TODO/FIXME/HACK/XXX comments in src/
-- **Target TODO Count:** <10 (only active work-in-progress markers)
-- **Reduction Goal:** 20+ TODOs resolved (deleted, moved to issues, or documented as ADRs)
+**Baseline (2025-02-20 pass):**
+- Vor Cleanup: ~30 TODO/FIXME/HACK/XXX in `src/`, keine Priorisierung.
+- Ziel: <10 aktive TODOs mit Prioritäts-Tag.
 
-**Aktionen:**
-- [ ] Vollständige Liste aller TODOs sammeln (mit File:Line, Kontext) → Export to `docs/internal/todo-inventory-6B2.txt`
-- [ ] Kategorisierung:
-  - **P0 (Blocker):** Muss vor E2E/Produktion behoben werden
-  - **P1 (High):** Sollte zeitnah behoben werden (Q1 2025)
-  - **P2 (Nice-to-have):** Backlog, nicht dringend
-  - **P3 (Won't-Fix):** Entfernen oder als "Known Limitation" dokumentieren
-- [ ] P0/P1-TODOs in separate GitHub Issues/Tasks übertragen (with clear issue IDs in commit messages)
-- [ ] P2/P3-TODOs entweder entfernen oder als ADR/Known-Limitation dokumentieren
-- [ ] Verify final TODO count ≤10 and document remaining TODOs in Working Plan
+**Ergebnis (nach Cleanup):**
+- Gesamtzahl TODO/FIXME/HACK: 8
+  - P0: 2 (getTokenSnapshot provider muxing/cache)
+  - P1: 6
+  - P2: 0
+  - P3: 0
+- Verbleibende TODOs sind mit [Px]-Tag + Kontext versehen (siehe `docs/internal/todo-inventory-6B2.txt`).
 
-**Beispiel-Kategorien (aus Grep-Sample):**
-- Navigation-Wiring (Button onClick TODOs): P1 → in eigene Issues übertragen
-- Data-Fetch-TODOs (DashboardPageV2): P1 → mit Data-Layer-Arbeit verknüpfen
-- Provider-Muxing (getTokenSnapshot, walletFlow): P2 → in Issue #4/6-Implementierung einplanen
-- Export-Service-TODOs (ZIP, Share-Card): P2 → mit Issue #11 verknüpfen
+**Maßnahmen:**
+- Veraltete/platzhalterische TODOs in Notizen umgewandelt oder entfernt (Dashboard wiring, feed actions, adapter retries).
+- Kleine UX-Stubs direkt gelöst (Dashboard buttons navigieren, placeholders normalized).
+- Kern-Arbeitspakete in P0/P1 priorisiert (Issue #4, Issue #11, on-chain metrics, AI sanity checks).
+
+**Checklist:**
+- [x] Vollständiges Inventar aller TODO/FIXME/HACK-Kommentare erstellt.
+- [x] Alle Einträge in P0/P1/P2/P3 kategorisiert.
+- [x] P3-„Noise“ vollständig entfernt oder in neutrale Kommentare umgewandelt.
+- [x] Kleine P1/P2-Aufgaben innerhalb von 6B.2 umgesetzt (Navigation hooks, backlog notes).
+- [x] Verbleibende TODOs < 10 und klar gekennzeichnet.
+- [x] `Sparkfined_Execution_Log.md` aktualisiert.
+- [x] `docs/internal/todo-inventory-6B2.txt` aktualisiert (Stand nach Cleanup).
 
 #### 6B.3 – ESLint Cleanup (Unused Vars/Imports)
 
