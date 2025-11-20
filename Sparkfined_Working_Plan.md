@@ -308,37 +308,20 @@ Goal: Enforce token-based styling throughout the UI, not just the core V2 pages.
 - **DT-02:** Skeleton color? → Use `bg-surface-skeleton`
 - **DT-03:** Active border token? → Keep sentiment borders
 
-### 5B – Token Implementation & Review — ✅ COMPLETE
+### 5B – Design Token Implementation & UI Cleanup (Review)
 
 **Status:** ✅ Complete – Ready for Production
-**Grade:** 95% Complete – Safe to Ship
 
-**Summary (Claude Review):**
+Summary (Claude Review):
 
 - Tailwind palette **fully matches** the V2 token spec for backgrounds, surfaces, borders, text, sentiment/status colors, and gradients.
 - DashboardShell and shared layouts now consistently use tokenized gradients (`bg-app-gradient`) and semantic surfaces; **no critical regressions** identified for legibility or contrast.
 - Watchlist, Alerts, and Journal lists correctly rely on semantic surfaces (`bg-surface`, `bg-surface-subtle`) and sentiment/status badges; empty states are tokenized and visually coherent.
 - Remaining issues are limited to **2 minor utility color residues** in WatchlistTable (DT-FIX-01, DT-FIX-02) and 10 legacy/modal components outside V2 scope.
+- **Overall Grade:** 95% Complete – Safe to Ship
 
-**Checklist (Implementation + Review):**
+Checklist (Review):
 
-- [x] Update `tailwind.config.ts` with new color tokens (bg-surface-*, border-border-*, interactive-*, sentiment-*, status-*)
-- [x] Add background gradients (`bg-app-gradient`, `bg-surface-gradient`)
-- [x] Replace hardcoded gradient in `DashboardShell.tsx`
-- [x] Replace opacity-based colors in all V2 pages using mapping table:
-  - [x] `DashboardPageV2.tsx`
-  - [x] `JournalPageV2.tsx`
-  - [x] `WatchlistPageV2.tsx`
-  - [x] `AlertsPageV2.tsx`
-  - [x] `AnalysisPageV2.tsx`
-  - [x] `ChartPageV2.tsx`
-  - [x] `SettingsPageV2.tsx`
-- [x] Replace opacity-based colors in core components:
-  - [x] `DashboardShell.tsx`
-  - [x] `DashboardKpiStrip.tsx`
-  - [x] `JournalList.tsx`
-  - [x] `WatchlistTable.tsx`
-  - [x] `AlertsList.tsx`
 - [x] Verified token palette vs. `Sparkfined_V2_Design_Tokens.md` – ✅ Full match
 - [x] Sampled V2 pages for hardcoded or utility-based color leakage – ✅ Zero hex colors found
 - [x] Reviewed DashboardShell gradients and typography for contrast/clarity – ✅ WCAG AA compliant
@@ -347,7 +330,7 @@ Goal: Enforce token-based styling throughout the UI, not just the core V2 pages.
 - [ ] DT-FIX-01: WatchlistTable price color (P2 – optional polish)
 - [ ] DT-FIX-02: WatchlistTable change colors use sentiment tokens (P2 – optional polish)
 
-**Open Points (Review):**
+Open Points (Review):
 
 - **DT-FIX-01** (P2): WatchlistTable uses `text-amber-200` for price display instead of semantic token. Recommendation: Keep as-is (special case) OR create `text-price` token if pattern repeats.
 - **DT-FIX-02** (P2): WatchlistTable uses `text-emerald-300` / `text-rose-300` for 24h change instead of `text-sentiment-bull` / `text-sentiment-bear`. Suggestion: Replace with semantic tokens for consistency.

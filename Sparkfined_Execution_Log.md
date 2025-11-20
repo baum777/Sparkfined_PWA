@@ -165,27 +165,47 @@ New open points:
 
 ### 2025-11-20 – Section 5B – Design Token Implementation Review (Claude)
 
-Date: 2025-11-20
-Agent: Claude 4.5 (UI/UX Architect)
-Section: #5B – Design Token Implementation & UI Cleanup (Review)
-Branch: claude/review-design-tokens-ui-01WyPejp6cT1BNaiFRcvL3QE
+Date: 2025-11-20  
+Agent: Claude 4.5 (UI/UX Architect)  
+Section: #5B – Design Token Implementation & UI Cleanup (Review)  
+Branch: (reviewed on) `codex/section5b-design-tokens-01`
 
 Actions:
-- Reviewed the updated Tailwind token palette against `docs/design/Sparkfined_V2_Design_Tokens.md` – confirmed full spec compliance (all background, surface, border, text, interactive, sentiment, status tokens present).
-- Evaluated DashboardShell and layout theming (gradients, surfaces, borders, text) – no contrast or legibility issues found. WCAG AA compliant.
+- Reviewed the updated Tailwind token palette against `docs/design/Sparkfined_V2_Design_Tokens.md` – confirmed full spec compliance.
+- Evaluated DashboardShell and layout theming (gradients, surfaces, borders, text) – no contrast or legibility issues found.
 - Inspected Watchlist/Alerts/Journal list theming, sentiment/status badges, and empty states – all use semantic tokens correctly.
-- Identified 2 minor utility-color residues in WatchlistTable (DT-FIX-01: `text-amber-200` for price, DT-FIX-02: `text-emerald/rose-300` for change %).
-- Confirmed 10 legacy/modal components (FeedbackModal, ReplayModal, etc.) still use hardcoded slate colors, but these are **out of V2 scope** and non-blocking.
-- Updated Section 5B in `Sparkfined_Working_Plan.md` with review summary, completion status, checklist, and open points.
+- Identified 2 minor utility-color residues in WatchlistTable (DT-FIX-01, DT-FIX-02) and 10 legacy components with hardcoded colors (out of V2 scope).
+- Updated Section 5B in `Sparkfined_Working_Plan.md` with review summary, checklist, and open points.
 - Confirmed V2 theming is **95% complete and safe to ship**.
 
 Commands & Results:
 - Grep searches for hardcoded hex colors (`#...`) in V2 pages → ✅ 0 matches
 - Grep searches for opacity-based colors (`white/X`, `black/X`) in V2 pages → ✅ 0 matches
 - Grep searches for utility palette usage in V2 components → ⚠️ 2 minor instances in WatchlistTable
-- File reads: DashboardShell, all 7 V2 pages, core components (DashboardKpiStrip, JournalList, AlertsList, WatchlistTable), feature layouts
+- File reads: DashboardShell, all V2 pages, core components (KPI strip, lists, badges)
 
 New open points:
 - **DT-FIX-01** (P2): WatchlistTable price color uses `text-amber-200` instead of semantic token
-- **DT-FIX-02** (P2): WatchlistTable change colors use utility palette (`text-emerald-300`, `text-rose-300`) instead of sentiment tokens (`text-sentiment-bull`, `text-sentiment-bear`)
-- **TOKEN-NOTE-01** (Informational): 10 legacy/modal components outside V2 scope still use hardcoded colors – acceptable for V2 launch
+- **DT-FIX-02** (P2): WatchlistTable change colors use utility palette instead of sentiment tokens
+- **TOKEN-NOTE-01** (Informational): 10 legacy/modal components outside V2 scope still use hardcoded colors
+
+### 2025-11-20 – Section 5B – Post-Review Fixes (Codex)
+
+Date: 2025-11-20  
+Agent: Codex  
+Section: #5B – Design Token Implementation & UI Cleanup (Post-Review)  
+Branch: codex/section5b-post-review-fixes-01
+
+Actions:
+- Synced `Sparkfined_Working_Plan.md` Section 5B with Claude’s review summary, checklist, and open points.
+- Recorded Claude’s design token review entry in `Sparkfined_Execution_Log.md`.
+- Implemented DT-FIX-02 in `src/components/watchlist/WatchlistTable.tsx` to replace utility palette colors for 24h change with semantic sentiment tokens (`text-sentiment-bull` / `text-sentiment-bear` / `text-text-secondary`).
+- Left DT-FIX-01 as a documented open point for a future design/system decision.
+
+Commands & Results:
+- pnpm typecheck → ✅
+- pnpm run build → ✅
+
+New open points:
+- DT-FIX-01: Watchlist price display uses `text-amber-200` (pending design decision or `text-price` token).
+- TOKEN-NOTE-01: Legacy/modal components with hardcoded colors remain out of scope for Section 5B.
