@@ -102,3 +102,23 @@ New open points:
 - UX-05 (P1): Update BottomNav links to V2 routes after Section 3 completion
 - UX-06 (P2): Standardize eyebrow typography across all headers
 - All issues documented in Working Plan with concrete file paths and solutions for Codex implementation.
+
+### 2025-11-20 – Section 3 – Chart & Settings V2 Completion + UX-01 Cleanup
+
+Date: 2025-11-20
+Agent: Codex
+Section: #3 – Chart & Settings V2 Completion
+Branch: codex/section3-chart-settings-ux01-01
+
+Actions:
+- Bereinigt doppelte Header in Watchlist/Alerts-Layouts, sodass DashboardShell allein die Seitenüberschrift liefert.
+- Eingebettete ChartPageV2 in DashboardShell mit Header-Actions und vollständigem V1-Chart-Funktionsumfang.
+- Eingebettete SettingsPageV2 in DashboardShell, reusing V1-Einstellungen ohne doppelte Überschrift.
+- Routen für /chart-v2 und /settings-v2 ergänzt; Working Plan Section 3 aktualisiert.
+
+Commands & Results:
+- pnpm typecheck → ✅
+- pnpm run build → ✅ (bekannter Hinweis zu MORALIS_API_KEY zur Laufzeit)
+
+New open points:
+- Keine; UX-04/UX-05 Navigation-Updates bleiben für spätere Section vorgesehen.

@@ -20,6 +20,8 @@ const AnalysisPageV2 = lazy(() => import("../pages/AnalysisPageV2"));
 const JournalPageV2 = lazy(() => import("../pages/JournalPageV2"));
 const WatchlistPageV2 = lazy(() => import("../pages/WatchlistPageV2"));
 const AlertsPageV2 = lazy(() => import("../pages/AlertsPageV2"));
+const ChartPageV2 = lazy(() => import("../pages/ChartPageV2"));
+const SettingsPageV2 = lazy(() => import("../pages/SettingsPageV2"));
 
 function Fallback() {
   return (
@@ -92,6 +94,8 @@ export default function RoutesRoot() {
           <Route path="/analysis-v2" element={<AnalysisPageV2 />} />
           <Route path="/journal-v2" element={<JournalPageV2 />} />
           <Route path="/alerts-v2" element={<AlertsPageV2 />} />
+          <Route path="/chart-v2" element={<ChartPageV2 />} />
+          <Route path="/settings-v2" element={<SettingsPageV2 />} />
           <Route path="/icons" element={<IconShowcase />} />
           <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
           </Routes>

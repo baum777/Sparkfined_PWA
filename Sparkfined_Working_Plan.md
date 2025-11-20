@@ -205,21 +205,30 @@ Goal: Ensure ChartPageV2 and SettingsPageV2 are fully implemented, routed, and o
 
 Primary agent: Codex
 
+Summary:
+- ChartPageV2 now wraps the full legacy chart experience inside DashboardShell with unified header/actions and the original replay/drawing/export tooling.
+- SettingsPageV2 reuses the complete V1 settings functionality inside DashboardShell while suppressing duplicate headings and exposing header actions.
+- Remaining V2 pages (Watchlist, Alerts) no longer render duplicate headers thanks to lean layouts.
+
 Checklist:
 
-- [ ] Verify ChartPageV2 exists and is routed (e.g. /chart-v2).
-- [ ] Verify SettingsPageV2 exists and is routed (e.g. /settings-v2).
-- [ ] For ChartPageV2:
-  - [ ] Timeframe controls wired.
-  - [ ] Indicator toggles wired.
-  - [ ] Any replay / tool features from V1 migrated (if still desired).
-- [ ] For SettingsPageV2:
-  - [ ] Account / wallet section.
-  - [ ] Preferences (theme, currency, etc.) section.
-  - [ ] Data / AI providers section.
-- [ ] Both pages wrapped in DashboardShell with consistent header and actions.
-- [ ] Both pages use design tokens, not hardcoded colors.
-- [ ] pnpm typecheck + pnpm run build succeed.
+- [x] Verify ChartPageV2 exists and is routed (e.g. /chart-v2).
+- [x] Verify SettingsPageV2 exists and is routed (e.g. /settings-v2).
+- [x] For ChartPageV2:
+  - [x] Timeframe controls wired.
+  - [x] Indicator toggles wired.
+  - [x] Replay / tool features from V1 migrated.
+- [x] For SettingsPageV2:
+  - [x] Account / wallet section.
+  - [x] Preferences (theme, currency, etc.) section.
+  - [x] Data / AI providers section.
+- [x] Both pages wrapped in DashboardShell with consistent header and actions.
+- [x] Both pages use design tokens, not hardcoded colors.
+- [x] pnpm typecheck + pnpm run build succeed.
+
+Open Points:
+
+- None identified for this section. Future navigation/link updates remain scheduled for UX-04/UX-05.
 
 Handoff to Claude:
 
