@@ -2,7 +2,6 @@ import React, { Suspense, lazy, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import UpdateBanner from "../components/UpdateBanner";
-import { AccessProvider } from "../store/AccessProvider";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { SwipeNavGate } from "../components/navigation/SwipeNavGate";
 import { initializeEventSubscriptions } from "@/ai/ingest/eventSubscriptions";
@@ -11,7 +10,6 @@ import { initializeEventSubscriptions } from "@/ai/ingest/eventSubscriptions";
 const LandingPage = lazy(() => import("../pages/LandingPage"));
 const ChartPage = lazy(() => import("../pages/ChartPage"));
 const ReplayPage = lazy(() => import("../pages/ReplayPage"));
-const AccessPage = lazy(() => import("../pages/AccessPage"));
 const SettingsPage = lazy(() => import("../pages/SettingsPage"));
 const NotificationsPage = lazy(() => import("../pages/NotificationsPage"));
 const SignalsPage = lazy(() => import("../pages/SignalsPage"));
@@ -43,68 +41,61 @@ export default function RoutesRoot() {
       <ErrorBoundary>
         {/* Läuft jetzt im Router-Kontext, da main.tsx wrappt */}
         <SwipeNavGate />
-        <AccessProvider>
-          <UpdateBanner />
-          <Suspense fallback={<Fallback />}>
-            <Routes>
-            {/* Landing Page - No Layout (standalone) */}
-            <Route path="/landing" element={<LandingPage />} />
+        <UpdateBanner />
+        <Suspense fallback={<Fallback />}>
+          <Routes>
+          {/* Landing Page - No Layout (standalone) */}
+          <Route path="/landing" element={<LandingPage />} />
 
-            {/* App Routes - With Layout */}
-            <Route path="/" element={<Navigate to="/dashboard-v2" replace />} />
-            <Route path="/board" element={<Navigate to="/dashboard-v2" replace />} />
-            <Route path="/analyze" element={<Navigate to="/analysis-v2" replace />} />
-            <Route path="/chart" element={
-              <Layout>
-                <ChartPage />
-              </Layout>
-            } />
-            <Route path="/journal" element={<Navigate to="/journal-v2" replace />} />
-            <Route path="/replay" element={
-              <Layout>
-                <ReplayPage />
-              </Layout>
-            } />
-            <Route path="/replay/:sessionId" element={
-              <Layout>
-                <ReplayPage />
-              </Layout>
-            } />
-            <Route path="/access" element={
-              <Layout>
-                <AccessPage />
-              </Layout>
-            } />
-            <Route path="/settings" element={
-              <Layout>
-                <SettingsPage />
-              </Layout>
-            } />
-            <Route path="/notifications" element={
-              <Layout>
-                <NotificationsPage />
-              </Layout>
-            } />
-            <Route path="/signals" element={
-              <Layout>
-                <SignalsPage />
-              </Layout>
-            } />
-            <Route path="/lessons" element={
-              <Layout>
-                <LessonsPage />
-              </Layout>
-            } />
-            <Route path="/dashboard-v2" element={<DashboardPageV2 />} />
-            <Route path="/watchlist-v2" element={<WatchlistPageV2 />} />
-            <Route path="/analysis-v2" element={<AnalysisPageV2 />} />
-            <Route path="/journal-v2" element={<JournalPageV2 />} />
-            <Route path="/alerts-v2" element={<AlertsPageV2 />} />
-            <Route path="/icons" element={<IconShowcase />} />
-            <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
-            </Routes>
-          </Suspense>
-        </AccessProvider>
+          {/* App Routes - With Layout */}
+          <Route path="/" element={<Navigate to="/dashboard-v2" replace />} />
+          <Route path="/board" element={<Navigate to="/dashboard-v2" replace />} />
+          <Route path="/analyze" element={<Navigate to="/analysis-v2" replace />} />
+          <Route path="/chart" element={
+            <Layout>
+              <ChartPage />
+            </Layout>
+          } />
+          <Route path="/journal" element={<Navigate to="/journal-v2" replace />} />
+          <Route path="/replay" element={
+            <Layout>
+              <ReplayPage />
+            </Layout>
+          } />
+          <Route path="/replay/:sessionId" element={
+            <Layout>
+              <ReplayPage />
+            </Layout>
+          } />
+          <Route path="/settings" element={
+            <Layout>
+              <SettingsPage />
+            </Layout>
+          } />
+          <Route path="/notifications" element={
+            <Layout>
+              <NotificationsPage />
+            </Layout>
+          } />
+          <Route path="/signals" element={
+            <Layout>
+              <SignalsPage />
+            </Layout>
+          } />
+          <Route path="/lessons" element={
+            <Layout>
+              <LessonsPage />
+            </Layout>
+          } />
+          <Route path="/dashboard-v2" element={<DashboardPageV2 />} />
+          <Route path="/watchlist-v2" element={<WatchlistPageV2 />} />
+          <Route path="/analysis-v2" element={<AnalysisPageV2 />} />
+          <Route path="/journal-v2" element={<JournalPageV2 />} />
+          <Route path="/alerts-v2" element={<AlertsPageV2 />} />
+          <Route path="/icons" element={<IconShowcase />} />
+          <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
+          </Routes>
+        </Suspense>
       </ErrorBoundary>
     );
 }

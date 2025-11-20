@@ -16,7 +16,6 @@ Sparkfined is a **Progressive Web App (PWA)** that brings professional-grade tra
 - 📊 **Advanced Charting:** 60fps canvas rendering, multi-timeframe analysis, 25+ indicators
 - 📝 **Integrated Journal:** OCR screenshot analysis, AI condensation, offline sync
 - 🔔 **Smart Alerts:** Visual rule builder, serverless evaluation, web push notifications
-- 🔐 **Access Gating:** Solana wallet-based authentication (OG Pass NFT + token holding)
 
 **Perfect for:** Day traders, meme coin researchers, trading educators, crypto analysts who demand speed, privacy, and offline capability.
 
@@ -34,7 +33,6 @@ Sparkfined is a **Progressive Web App (PWA)** that brings professional-grade tra
 | **Alerts & Signals** | Visual rule wizard, serverless evaluation, push notifications, alert history. |
 | **Board Dashboard** | KPI tiles, activity feed, quick actions, guided onboarding tour. |
 | **PWA Offline Mode** | 66 precached assets (~2.3 MB), offline fallback page, background sync. |
-| **Access Gating** | Solana wallet integration, OG Pass NFT validation, token holding requirements. |
 
 ### In Development 🚧
 
@@ -56,7 +54,7 @@ Sparkfined is a **Progressive Web App (PWA)** that brings professional-grade tra
 | **Persistence** | Dexie (IndexedDB), Offline-First Architecture |
 | **Backend** | Vercel Edge Functions (Serverless) |
 | **AI** | OpenAI (gpt-4o-mini), Grok (xAI) — Dual-provider strategy |
-| **Data** | Moralis, DexPaprika, Solana Web3.js |
+| **Data** | Moralis, DexPaprika |
 | **PWA** | Workbox, vite-plugin-pwa, Service Worker |
 | **Testing** | Vitest (unit), Playwright (E2E), ESLint, TypeScript strict mode |
 
@@ -135,11 +133,6 @@ MORALIS_BASE_URL=https://deep-index.moralis.io/api/v2.2
 # DexPaprika (recommended for OHLC data)
 DEXPAPRIKA_API_KEY=your_dexpaprika_key_here
 DEXPAPRIKA_BASE=https://api.dexpaprika.com
-
-# === Solana (for access gating) ===
-VITE_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
-VITE_ACCESS_TOKEN_MINT=your_token_mint_address
-VITE_METAPLEX_COLLECTION_MINT=your_collection_mint_address
 
 # === AI Providers (optional but recommended) ===
 OPENAI_API_KEY=sk-your_openai_key_here
