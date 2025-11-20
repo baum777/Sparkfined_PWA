@@ -122,3 +122,24 @@ Commands & Results:
 
 New open points:
 - Keine; UX-04/UX-05 Navigation-Updates bleiben für spätere Section vorgesehen.
+
+### 2025-11-20 – Section 4 – Routing & Navigation Migration (UX-04 & UX-05)
+
+Date: 2025-11-20
+Agent: Codex
+Section: #4 – Routing & Navigation Migration (UX-04 & UX-05)
+Branch: work
+
+Actions:
+- Added redirects from legacy V1 routes (/board, /dashboard, /analysis, /analyze, /chart, /journal, /watchlist, /alerts) to their V2 counterparts.
+- Updated Sidebar navigation to point exclusively to V2 routes and verified active state behaviour (UX-04).
+- Updated Bottom navigation to V2 routes and confirmed correct highlighting (UX-05).
+- Updated Sparkfined_Working_Plan.md Section 4 summary and checklist.
+
+Commands & Results:
+- pnpm typecheck → ✅
+- pnpm run build → ✅ (expected MORALIS_API_KEY warning only)
+- pnpm run preview → Not run (manual preview not executed in this session)
+
+New open points:
+- None.
