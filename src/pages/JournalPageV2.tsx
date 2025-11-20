@@ -28,6 +28,7 @@ export default function JournalPageV2() {
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createErrorMessage, setCreateErrorMessage] = useState<string | null>(null);
+  const entryIdFromUrl = useMemo(() => searchParams.get('entry') ?? undefined, [searchParams]);
 
   useEffect(() => {
     let isCurrent = true;
@@ -61,12 +62,11 @@ export default function JournalPageV2() {
   }, [setEntries, setError, setLoading, loadJournalEntries]);
 
   useEffect(() => {
-    const entryFromUrl = searchParams.get('entry');
-    const hasEntryInUrl = entryFromUrl ? entries.some((entry) => entry.id === entryFromUrl) : false;
+    const hasEntryInUrl = entryIdFromUrl ? entries.some((entry) => entry.id === entryIdFromUrl) : false;
 
-    if (entryFromUrl) {
-      if (hasEntryInUrl && entryFromUrl !== activeId) {
-        setActiveId(entryFromUrl);
+    if (entryIdFromUrl) {
+      if (hasEntryInUrl && entryIdFromUrl !== activeId) {
+        setActiveId(entryIdFromUrl);
       } else if (!hasEntryInUrl && activeId) {
         setActiveId(undefined);
       }
@@ -80,22 +80,30 @@ export default function JournalPageV2() {
         setActiveId(firstEntryId);
       }
     }
-  }, [activeId, entries, searchParams, setActiveId]);
+  }, [activeId, entries, entryIdFromUrl, setActiveId]);
 
   useEffect(() => {
     if (!activeId) {
+      if (entryIdFromUrl) {
+        setSearchParams((prev) => {
+          const nextParams = new URLSearchParams(prev);
+          nextParams.delete('entry');
+          return nextParams;
+        }, { replace: true });
+      }
       return;
     }
 
-    const currentEntry = searchParams.get('entry');
-    if (currentEntry === activeId) {
+    if (entryIdFromUrl === activeId) {
       return;
     }
 
-    const nextParams = new URLSearchParams(searchParams);
-    nextParams.set('entry', activeId);
-    setSearchParams(nextParams, { replace: true });
-  }, [activeId, searchParams, setSearchParams]);
+    setSearchParams((prev) => {
+      const nextParams = new URLSearchParams(prev);
+      nextParams.set('entry', activeId);
+      return nextParams;
+    }, { replace: true });
+  }, [activeId, entryIdFromUrl, setSearchParams]);
 
   const filteredEntries = useMemo(() => {
     if (directionFilter === 'all') {

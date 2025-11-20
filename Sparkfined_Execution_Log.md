@@ -40,16 +40,35 @@ New open points:
 
 ### Entry #1
 
-Date:  
-Agent:  
-Section:  
-Branch:  
+Date:
+Agent:
+Section:
+Branch:
 
 Actions:
-- 
+-
 
 Commands & Results:
-- 
+-
 
 New open points:
-- 
+-
+
+### 2025-11-20 – Section 2 – Journal Stabilization & Telemetry Dev Mode
+
+Date: 2025-11-20
+Agent: Codex
+Section: #2 – Journal Stabilization & Telemetry Dev Mode
+Branch: (current)
+
+Actions:
+- Stabilized JournalPageV2 URL/selection sync to prevent repeated state updates by deriving the entry param and using updater-based search param writes.
+- Adjusted telemetry drain to skip network sends in Vite dev while still clearing the buffer.
+- Updated Working Plan Section 2 checklist and notes.
+
+Commands & Results:
+- pnpm typecheck → ✅
+- pnpm run build → ⚠️ (warning about missing MORALIS_API_KEY; build succeeded)
+
+New open points:
+- None.
