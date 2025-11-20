@@ -359,13 +359,75 @@ Remove remaining V1-era code, unused routes, and legacy UI scaffolding from the 
 
 ---
 
-### 6A – V1 Code Removal & Archive (Active Now)
+### 6A – V1 Code Removal & Archive
 
-**Objective:**  
+**Status:** ⚠️ **INCOMPLETE** – Codex Canvas Summary did not match actual implementation
+
+**Objective:**
 Ensure that **no V1 pages or layouts are still wired into the runtime app**, and that all obsolete files are either removed or safely archived, without breaking any V2 flows.
 
-**Primary Agent:** Codex (Execution)  
+**Primary Agent:** Codex (Execution)
 **Secondary Agent:** Claude (Quick sanity review after completion)
+
+---
+
+#### 6A Review Findings (Claude – 2025-11-20)
+
+**Summary:**
+Despite Codex's Canvas summary claiming Section 6A was complete, **no actual archive work was performed**. All V1 pages, sections, and layouts remain in the active codebase.
+
+**What Was NOT Done:**
+- ❌ Archive directory `docs/archive/v1-migration-backup/` was not created
+- ❌ V1 Pages still exist in `src/pages/`:
+  - `JournalPage.tsx`
+  - `ChartPage.tsx`
+  - `AnalyzePage.tsx`
+  - `SettingsPage.tsx`
+- ❌ V1 Sections still exist in `src/sections/`:
+  - `sections/chart/*` (29 files)
+  - `sections/journal/*` (5 files)
+  - `sections/analyze/*` (files)
+- ❌ V1 Layout components still exist in `src/components/layout/`:
+  - `Layout.tsx` (still used by Replay/Notifications/Signals/Lessons routes)
+  - `Header.tsx` (imported by Layout.tsx)
+
+**What IS Working:**
+- ✅ Build/TypeCheck/Lint all pass without errors
+- ✅ No active imports of V1 Pages (they are dead code)
+- ✅ V1 Pages are not routed (all routes redirect to V2)
+- ✅ Sidebar links to V2 routes
+- ⚠️ BottomNav has 1 V1 link: `/settings` should be `/settings-v2` (line 26 in BottomNav.tsx)
+
+**Critical Decision Required:**
+- `Layout.tsx` and `Header.tsx` are **still actively used** by legacy routes:
+  - `/replay` (ReplayPage)
+  - `/notifications` (NotificationsPage)
+  - `/signals` (SignalsPage)
+  - `/lessons` (LessonsPage)
+- **Action:** Keep `Layout.tsx` and `Header.tsx` for now, do NOT archive them until these routes are migrated or deprecated.
+
+**Recommended Actions for Codex (6A Re-execution):**
+1. Create archive structure `docs/archive/v1-migration-backup/` with README
+2. Move V1 Pages to archive:
+   - `src/pages/JournalPage.tsx` → archive
+   - `src/pages/ChartPage.tsx` → archive
+   - `src/pages/AnalyzePage.tsx` → archive
+   - `src/pages/SettingsPage.tsx` → archive
+3. Move V1 Sections to archive:
+   - `src/sections/chart/*` → archive
+   - `src/sections/journal/*` → archive
+   - `src/sections/analyze/*` → archive
+4. Fix BottomNav V1 link:
+   - Change `/settings` to `/settings-v2` in `src/components/BottomNav.tsx:26`
+5. Verify build/typecheck/lint still pass
+6. Document what was archived in Execution Log
+
+**DO NOT Archive (Still In Use):**
+- `src/components/layout/Layout.tsx` (used by Replay/Notifications/Signals/Lessons)
+- `src/components/layout/Header.tsx` (imported by Layout.tsx)
+- `src/components/layout/AppHeader.tsx` (may be used elsewhere, needs verification)
+
+---
 
 #### 6A.1 – Inventory & Reality Check
 
@@ -494,49 +556,128 @@ Ensure that **no V1 pages or layouts are still wired into the runtime app**, and
 
 ---
 
-### 6B – Legacy UI & Modal Token Sweep (Backlog / Post-Launch)
+### 6B – TODO Hygiene, Legacy Components & Tech Debt Sweep
 
-> **Status:** ⏳ Backlog – kein Blocker für V2 Launch, aber sinnvoller Cleanup nach Produktion.
+**Status:** ⏳ Planned – Execute after 6A completion
 
-**Goal:**  
-Langfristig alle noch verbleibenden **Legacy-Komponenten** (z.B. `FeedbackModal`, `ReplayModal`, `UpdateBanner`, alte Banners / Toaster) auf das V2-Design-Tokensystem migrieren, damit die gesamte App visuell und technisch konsistent ist.
+**Goal:**
+Clean up remaining tech debt, consolidate TODO comments, and (optionally) migrate legacy components to V2 design tokens. Prepare codebase for long-term maintainability.
 
-**Primär-Agent:**  
-- **Future Codex + Claude** (kombiniert, in eigenem Iterationszyklus nach Go-Live)
+**Primary Agent:** Codex (Execution)
+**Secondary Agent:** Claude (Review & Prioritization)
 
-**Scope (vorläufig):**
+---
 
-- Identifizierte Kandidaten (aus 5B/TOKEN-NOTE-01):
-  - FeedbackModal
-  - ReplayModal
-  - UpdateBanner
-  - … plus weitere Hardcoded-Slate/Opacity-Komponenten
-- Migration von:
+#### 6B Scope
+
+**6B.1 – TODO Comment Audit & Consolidation**
+- Scan all `TODO`, `FIXME`, `HACK`, `XXX` comments in codebase
+- Categorize by priority (P0/P1/P2) and area (UI/API/Data/Testing)
+- Create tracking issues for P0/P1 TODOs
+- Remove or update stale/completed TODOs
+- Document remaining TODOs in a `docs/tech-debt/TODO-Registry.md`
+
+**6B.2 – Unused Code & Import Cleanup**
+- Run ESLint `no-unused-vars` and `no-unused-imports` with strict settings
+- Remove or document unused functions, types, constants
+- Clean up duplicate utility functions
+- Verify no "zombie" imports remain after 6A archive
+
+**6B.3 – Legacy Component Token Migration (Optional)**
+- Migrate remaining legacy components to V2 design tokens (from 5B/TOKEN-NOTE-01):
+  - `FeedbackModal`
+  - `ReplayModal`
+  - `UpdateBanner`
+  - Other modals/overlays with hardcoded `slate-*`/`zinc-*` colors
+- Replace:
   - `bg-slate-*` / `bg-black/40` → `bg-surface`, `bg-surface-subtle`, `bg-overlay`
   - `text-slate-*` / `text-zinc-*` → `text-text-primary/secondary/tertiary`
-  - Ad-hoc Farben → Sentiment/Status Tokens, wo sinnvoll
+  - Ad-hoc colors → Sentiment/Status tokens where applicable
 
-**Checklist (Backlog-Level, noch nicht zur Ausführung freigegeben):**
+**6B.4 – Documentation Updates**
+- Update `CLAUDE.md` with Section 6 learnings
+- Document V1→V2 migration completion in `docs/architecture/MIGRATION_V2.md`
+- Update component README files where structure changed
 
-- [ ] Vollständige Liste aller Legacy-Komponenten mit Hardcoded Colors
-- [ ] Mapping-Tabelle: Legacy-Farben → V2 Tokens
-- [ ] Geplanter Branch: `codex/section6b-legacy-token-sweep-01`
-- [ ] UX/Design-Abnahme für neue Token-Mappings
-- [ ] Iterative Umsetzung (Komponente für Komponente)
-- [ ] Finaler Review & Eintrag in `Sparkfined_Execution_Log.md` / `Working_Plan` als “Section 6B Complete”
+---
+
+#### 6B Checklist
+
+**6B.1 – TODO Audit:**
+- [ ] Scan codebase for TODO/FIXME/HACK comments
+- [ ] Categorize by priority (P0/P1/P2)
+- [ ] Create tracking issues for P0/P1 items
+- [ ] Create `docs/tech-debt/TODO-Registry.md`
+- [ ] Remove/update stale TODOs
+
+**6B.2 – Unused Code:**
+- [ ] Run ESLint with strict unused-var rules
+- [ ] Remove unused functions/types/constants
+- [ ] Clean up duplicate utilities
+- [ ] Verify no zombie imports post-6A
+
+**6B.3 – Legacy Component Tokens (Optional):**
+- [ ] Inventory legacy components with hardcoded colors
+- [ ] Create token migration plan
+- [ ] Migrate FeedbackModal to V2 tokens
+- [ ] Migrate ReplayModal to V2 tokens
+- [ ] Migrate UpdateBanner to V2 tokens
+- [ ] Verify visual consistency with V2 pages
+
+**6B.4 – Documentation:**
+- [ ] Update `CLAUDE.md` with V2 migration guidance
+- [ ] Update `docs/architecture/MIGRATION_V2.md`
+- [ ] Update component README files
+
+---
+
+#### 6B Open Points
+
+- **Decision:** Prioritize 6B.3 (Token Migration) vs. defer to post-launch?
+  - Recommendation: Defer if timeline is tight; legacy components are not user-facing priority
+- **Decision:** Should legacy routes (Replay/Signals/Lessons) be migrated to DashboardShell in 6B or later?
+  - Recommendation: Later (separate section); focus 6B on cleanup, not new features
+
+---
+
+#### 6B Handoff to Claude
+
+After Codex completes 6B:
+- [ ] Review TODO Registry for any critical items
+- [ ] Verify token migration (if done) maintains visual consistency
+- [ ] Sign off on Section 6 completion
+- [ ] Update Execution Log with 6B summary
 
 ---
 
 ### Handoff & Flow für Section 6
 
-1. **Jetzt (Aktiv): 6A – V1 Cleanup & Archive**
-   - Codex arbeitet nacheinander an 6A.1 → 6A.2 → 6A.3  
-   - Jeder Schritt wird im `Sparkfined_Execution_Log.md` dokumentiert  
-   - **Nach Abschluss 6A**: Claude schreibt ein kurzes Review-Fazit und markiert 6A als “Complete” im Working Plan.
+**Current Status (2025-11-20):**
+- ⚠️ **6A is INCOMPLETE** – Codex did not execute the planned archive work
+- ✅ Claude review completed (findings documented above)
+- 🔄 **Next:** Codex must re-execute 6A with clear action items
 
-2. **Später (Post-Launch / Backlog): 6B – Legacy UI Token Sweep**
-   - Wird als eigener Iterationsblock geplant, nicht nötig für initialen V2-Launch  
-   - Alle TOKEN-FUTURE-Notizen aus Section 5B dienen als Input.
+**Updated Flow:**
+
+1. **Now (Priority): 6A Re-execution – V1 Cleanup & Archive**
+   - Codex executes 6A based on Claude's review findings above
+   - Key tasks:
+     1. Create archive directory with README
+     2. Move V1 Pages to archive (Journal/Chart/Analyze/Settings)
+     3. Move V1 Sections to archive (chart/journal/analyze)
+     4. Fix BottomNav `/settings` → `/settings-v2`
+     5. Verify build/typecheck/lint pass
+   - Document all moves in `Sparkfined_Execution_Log.md`
+   - **After 6A completion:** Claude does final sign-off review
+
+2. **After 6A: 6B – Tech Debt & Legacy Cleanup**
+   - Codex executes 6B.1–6B.4 (TODO audit, unused code, optional token migration, docs)
+   - Claude reviews TODO Registry and signs off
+   - **Decision point:** Defer 6B.3 (legacy token migration) if timeline is tight
+
+3. **Post-Section 6:**
+   - Section 6 marked as "Complete" in Working Plan
+   - Ready to proceed to Section 7 (E2E Test Strategy)
 
 ---
 

@@ -230,3 +230,56 @@ Commands & Results:
 New open points:
 - DT-FIX-01 → Design/UX Backlog (decision: keep `text-amber-200` or create `text-price` token?)
 - TOKEN-FUTURE-* items → Roadmap for Section 6 or dedicated Design Token Evolution track
+
+### 2025-11-20 – Section 6A Review & 6B Planning (Claude)
+
+Date: 2025-11-20
+Agent: Claude 4.5
+Section: #6 – V1 Archive Review & Legacy Planning
+Branch: claude/review-archive-planning-01PfqzZn7sMmnmLfS7rCfLTm
+
+Actions:
+- Reviewed Codex's Section 6A Canvas summary against actual repo state
+- Discovered Section 6A was NOT executed despite Canvas claims
+- Inventoried all V1 residue:
+  - 4 V1 Pages still in src/pages/ (Journal/Chart/Analyze/Settings)
+  - 3 V1 Sections still in src/sections/ (chart/journal/analyze with 34+ files total)
+  - 3 V1 Layout files still in src/components/layout/ (Layout/Header/AppHeader)
+- Verified routing/navigation status:
+  - ✅ All V2 routes working correctly
+  - ✅ V1 routes redirect to V2
+  - ✅ Sidebar links to V2 routes
+  - ⚠️ BottomNav has 1 V1 link (/settings should be /settings-v2)
+- Identified critical decision: Layout.tsx/Header.tsx still used by legacy routes (Replay/Notifications/Signals/Lessons)
+- Defined comprehensive Section 6B scope (TODO audit, unused code cleanup, optional token migration, docs)
+- Updated Sparkfined_Working_Plan.md with:
+  - 6A Review Findings (what was NOT done, what IS working, recommended actions)
+  - Completely revised 6B definition (4 subsections with detailed checklists)
+  - Updated Handoff & Flow section with current status and next steps
+
+Commands & Results:
+- pnpm install --frozen-lockfile → ✅ (798 packages installed)
+- pnpm typecheck → ✅ (no errors)
+- pnpm lint → ✅ (only pre-existing unused-var warnings, no new issues)
+- pnpm run build → ✅ (MORALIS_API_KEY warning expected, build succeeded)
+- File inventory commands:
+  - ls src/pages/ → Found 4 V1 pages (should be archived)
+  - ls src/sections/ → Found 3 V1 section directories (should be archived)
+  - ls src/components/layout/ → Found 3 layout files (Layout/Header still in use, AppHeader TBD)
+  - find docs/archive/ → No v1-migration-backup directory exists
+- Grep searches:
+  - V1 Page imports → ✅ No active imports found (dead code)
+  - V1 Section imports → Found only in V1 Pages themselves (will be archived together)
+
+New open points:
+- **6A-ACTION-01** (P0): Codex must re-execute Section 6A with concrete action items:
+  1. Create docs/archive/v1-migration-backup/ with README
+  2. Move V1 Pages to archive (4 files)
+  3. Move V1 Sections to archive (3 directories, 34+ files)
+  4. Fix BottomNav.tsx line 26 (/settings → /settings-v2)
+  5. Verify build/typecheck/lint still pass
+  6. Document moves in Execution Log
+- **6A-DECISION-01** (P0): DO NOT archive Layout.tsx/Header.tsx yet (still used by Replay/Notifications/Signals/Lessons routes)
+- **6A-DECISION-02** (P2): AppHeader.tsx needs verification – is it used? Archive or keep?
+- **6B-DECISION-01** (P1): After 6A, decide whether to execute 6B.3 (legacy token migration) or defer to post-launch
+- **6B-DECISION-02** (P2): Should legacy routes (Replay/Signals/Lessons) be migrated to DashboardShell in Section 6 or later?
