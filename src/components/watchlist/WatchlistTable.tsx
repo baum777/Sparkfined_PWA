@@ -69,13 +69,13 @@ function getChangeAccent(change: string) {
   const trimmed = change.trim();
 
   if (trimmed.startsWith('-')) {
-    return 'text-rose-300';
+    return 'text-sentiment-bear';
   }
 
   if (trimmed.startsWith('+')) {
-    return 'text-emerald-300';
+    return 'text-sentiment-bull';
   }
 
-  return 'text-zinc-200';
+  return 'text-text-secondary';
 }
 
