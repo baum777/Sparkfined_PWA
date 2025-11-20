@@ -42,6 +42,26 @@ Checklist:
 
 ---
 
+## 2 – Journal Stabilization & Telemetry Dev Mode
+
+Goal: Stabilize Journal V2 render behaviour and silence telemetry noise during local development while keeping production telemetry intact.
+
+Summary: JournalPageV2 now guards URL/selection sync to prevent render loops, and telemetry buffering skips network sends in dev to avoid 500s. Verified that entries still load/create correctly and telemetry stays active for preview/prod paths.
+
+Checklist:
+
+- [x] JournalPageV2 no longer throws "Maximum update depth exceeded"
+- [x] Journal entries load and can be created
+- [x] Telemetry no longer produces 500 errors in dev
+- [x] Telemetry remains active in preview/prod
+- [ ] Any follow-up tasks (if discovered)
+
+Open Points:
+
+- None noted during this pass.
+
+---
+
 ## 2. Layout & Navigation Review (UX)
 
 Goal: Make sure the new DashboardShell layout feels coherent on desktop and mobile.

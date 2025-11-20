@@ -79,6 +79,13 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
 
   const drain = () => {
     if (buffer.length === 0) return;
+
+    if (import.meta.env.DEV) {
+      // Dev mode: avoid noisy 500s from the stub API but still clear the buffer.
+      setBuffer([]);
+      return;
+    }
+
     const payload = { source: "sparkfined", version: 1, events: buffer.slice().reverse() };
     const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
     const ok = !!navigator.sendBeacon && navigator.sendBeacon("/api/telemetry", blob);
