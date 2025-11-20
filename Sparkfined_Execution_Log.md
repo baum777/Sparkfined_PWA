@@ -209,3 +209,24 @@ Commands & Results:
 New open points:
 - DT-FIX-01: Watchlist price display uses `text-amber-200` (pending design decision or `text-price` token).
 - TOKEN-NOTE-01: Legacy/modal components with hardcoded colors remain out of scope for Section 5B.
+
+### 2025-11-20 – Section 5B – DT-FIX-02 Final Confirmation (Claude)
+
+Date: 2025-11-20
+Agent: Claude 4.5
+Section: #5B – Design Token Implementation & UI Cleanup (Final Review)
+Branch: (reviewed on) `codex/section5b-post-review-fixes-01`
+
+Actions:
+- Verified DT-FIX-02 implementation in `src/components/watchlist/WatchlistTable.tsx` (lines 68-80).
+- Confirmed `getChangeAccent()` correctly uses `text-sentiment-bull` / `text-sentiment-bear` / `text-text-secondary` as specified.
+- Confirmed DT-FIX-01 remains open as design decision (documented in Backlog).
+- Updated `Sparkfined_Working_Plan.md` Section 5B checklist and open points.
+- Section 5B is now **production-ready** with clear handoff to future sections.
+
+Commands & Results:
+- (No build required; semantic/logical review based on Codex's verified build ✅)
+
+New open points:
+- DT-FIX-01 → Design/UX Backlog (decision: keep `text-amber-200` or create `text-price` token?)
+- TOKEN-FUTURE-* items → Roadmap for Section 6 or dedicated Design Token Evolution track

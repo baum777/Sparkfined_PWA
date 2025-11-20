@@ -328,13 +328,13 @@ Checklist (Review):
 - [x] Reviewed Watchlist/Alerts/Journal lists for semantic sentiment/status usage – ✅ Consistent
 - [x] Confirmed empty states use tokenized surfaces and text levels – ✅ Canonical pattern followed
 - [ ] DT-FIX-01: WatchlistTable price color (P2 – optional polish)
-- [ ] DT-FIX-02: WatchlistTable change colors use sentiment tokens (P2 – optional polish)
+- [x] DT-FIX-02: WatchlistTable change colors use sentiment tokens (P2 – optional polish)
 
 Open Points (Review):
 
-- **DT-FIX-01** (P2): WatchlistTable uses `text-amber-200` for price display instead of semantic token. Recommendation: Keep as-is (special case) OR create `text-price` token if pattern repeats.
-- **DT-FIX-02** (P2): WatchlistTable uses `text-emerald-300` / `text-rose-300` for 24h change instead of `text-sentiment-bull` / `text-sentiment-bear`. Suggestion: Replace with semantic tokens for consistency.
-- **TOKEN-NOTE-01** (Informational): 10 legacy/modal components (FeedbackModal, ReplayModal, UpdateBanner, etc.) still use hardcoded slate/opacity colors. These are **out of V2 scope** and non-blocking for launch.
+- **DT-FIX-01** (P2): WatchlistTable uses `text-amber-200` for price display instead of semantic token. Recommendation: Keep as-is (special case) OR create `text-price` token if pattern repeats. **→ Backlog (Design Decision Pending)**
+- **DT-FIX-02** (P2): ✅ **RESOLVED** – WatchlistTable now uses `text-sentiment-bull` / `text-sentiment-bear` / `text-text-secondary` for 24h change display (implemented by Codex in `codex/section5b-post-review-fixes-01`).
+- **TOKEN-NOTE-01** (Informational): 10 legacy/modal components (FeedbackModal, ReplayModal, UpdateBanner, etc.) still use hardcoded slate/opacity colors. These are **out of V2 scope** and non-blocking for launch. **→ Future Section (e.g., Legacy Component Token Sweep)**
 
 ---
 
