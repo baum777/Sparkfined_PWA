@@ -4,6 +4,8 @@ import JournalLayout from '@/components/journal/JournalLayout';
 import JournalList from '@/components/journal/JournalList';
 import JournalDetailPanel from '@/components/journal/JournalDetailPanel';
 import JournalNewEntryDialog from '@/components/journal/JournalNewEntryDialog';
+import DashboardShell from '@/components/dashboard/DashboardShell';
+import { JournalHeaderActions } from '@/components/journal/JournalHeaderActions';
 import { createQuickJournalEntry, loadJournalEntries, useJournalStore } from '@/store/journalStore';
 
 type DirectionFilter = 'all' | 'long' | 'short';
@@ -153,44 +155,34 @@ export default function JournalPageV2() {
     [addEntry, searchParams, setActiveId, setSearchParams],
   );
 
+  const headerDescription = `${entries.length} recent entries · Focus on clarity, context, conviction`;
+
   return (
-    <div className="min-h-screen bg-[#050505] text-zinc-100">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 space-y-8">
-        <header className="space-y-2">
-          <p className="text-xs uppercase tracking-[0.4em] text-zinc-500">Daily practice</p>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-3xl font-semibold">Journal</h1>
-              <p className="text-sm text-zinc-400">
-                {entries.length} recent entries · Focus on clarity, context, conviction
-              </p>
-              <p className="text-xs text-zinc-500">Select any entry to review and edit notes inline.</p>
-              {isLoading && <p className="text-xs text-zinc-500">Loading entries…</p>}
-              {!isLoading && error && <p className="text-xs text-amber-300">{error}</p>}
-            </div>
-            <div className="flex flex-col items-end gap-3 text-right text-sm text-zinc-400 sm:flex-row sm:items-center">
-              <div>
-                <p>Next review in 2 days</p>
-                <p className="text-xs uppercase tracking-wide">Daily ritual: 06:30 UTC</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsNewDialogOpen(true)}
-                disabled={isLoading || isCreating}
-                className="rounded-full border border-white/20 bg-white/5 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/10 disabled:opacity-40"
-              >
-                New entry
-              </button>
-            </div>
-          </div>
-        </header>
+    <DashboardShell
+      title="Journal"
+      description={headerDescription}
+      actions={
+        <JournalHeaderActions
+          isLoading={isLoading}
+          isCreating={isCreating}
+          onNewEntry={() => setIsNewDialogOpen(true)}
+        />
+      }
+    >
+      <div className="space-y-6 text-text-primary">
+        <div className="space-y-2 text-sm text-text-tertiary">
+          <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Daily practice</p>
+          <p>Select any entry to review and edit notes inline.</p>
+          {isLoading && <p className="text-xs text-text-tertiary">Loading entries…</p>}
+          {!isLoading && error && <p className="text-xs text-warn">{error}</p>}
+        </div>
 
         <JournalLayout
           list={
             <div className="flex h-full flex-col space-y-3">
-              <p className="text-xs uppercase tracking-wider text-zinc-500">Entries</p>
-              <div className="flex h-full flex-col rounded-2xl border border-white/5 bg-black/20 backdrop-blur">
-                <div className="flex items-center gap-2 border-b border-white/5 px-3 py-2">
+              <p className="text-xs uppercase tracking-wider text-text-tertiary">Entries</p>
+              <div className="flex h-full flex-col rounded-2xl border border-border bg-surface/80 backdrop-blur">
+                <div className="flex items-center gap-2 border-b border-border px-3 py-2">
                   {directionFilters.map((filter) => {
                     const isActive = directionFilter === filter.value;
                     return (
@@ -198,8 +190,10 @@ export default function JournalPageV2() {
                         key={filter.value}
                         type="button"
                         onClick={() => setDirectionFilter(filter.value)}
-                        className={`rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 ${
-                          isActive ? 'border-white/30 bg-white/10 text-white' : 'border-white/10 text-white/60 hover:bg-white/5'
+                        className={`rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+                          isActive
+                            ? 'border-brand bg-surface-hover text-text-primary'
+                            : 'border-border text-text-secondary hover:bg-surface-hover'
                         }`}
                       >
                         {filter.label}
@@ -211,7 +205,7 @@ export default function JournalPageV2() {
                   {isLoading ? (
                     <div className="space-y-2">
                       {Array.from({ length: 3 }).map((_, idx) => (
-                        <div key={idx} className="h-16 animate-pulse rounded-2xl bg-white/5" />
+                        <div key={idx} className="h-16 animate-pulse rounded-2xl bg-surface" />
                       ))}
                     </div>
                   ) : (
@@ -236,6 +230,6 @@ export default function JournalPageV2() {
         isSubmitting={isCreating}
         errorMessage={createErrorMessage}
       />
-    </div>
+    </DashboardShell>
   );
 }

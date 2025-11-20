@@ -1,4 +1,5 @@
 import React from "react";
+import DashboardShell from "@/components/dashboard/DashboardShell";
 import AnalysisLayout from "@/components/analysis/AnalysisLayout";
 import {
   AdvancedInsightCard,
@@ -8,6 +9,7 @@ import {
 } from "@/features/analysis";
 import { fetchAnalysisSnapshot, type AnalysisSnapshot } from "@/features/market/analysisData";
 import { useSearchParams } from "react-router-dom";
+import { AnalysisHeaderActions } from "@/components/analysis/AnalysisHeaderActions";
 
 const tabs = [
   { id: "overview", label: "Overview" },
@@ -104,7 +106,7 @@ export default function AnalysisPageV2() {
           value: `${Math.round(overviewInsight.confidence * 100)}%`,
           accent: "text-amber-300",
         },
-        { label: "Timeframe", value: overviewInsight.timeFrame, accent: "text-zinc-100" },
+        { label: "Timeframe", value: overviewInsight.timeFrame, accent: "text-text-primary" },
       ];
 
       if (marketSnapshot) {
@@ -122,37 +124,37 @@ export default function AnalysisPageV2() {
         );
       } else if (isMarketLoading) {
         const placeholder = (
-          <span className="inline-flex h-5 w-20 rounded-full bg-white/10 animate-pulse" />
+          <span className="inline-flex h-5 w-20 rounded-full bg-surface-hover animate-pulse" />
         );
         stats.push(
-          { label: "Last price", value: placeholder, accent: "text-zinc-400" },
-          { label: "24h change", value: placeholder, accent: "text-zinc-400" }
+          { label: "Last price", value: placeholder, accent: "text-text-secondary" },
+          { label: "24h change", value: placeholder, accent: "text-text-secondary" }
         );
       }
 
       return (
         <div className="space-y-6">
           <div className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Current AI Insight</p>
-            <h2 className="text-2xl font-semibold text-white">
+            <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Current AI Insight</p>
+            <h2 className="text-2xl font-semibold text-text-primary">
               Bias remains {overviewInsight.bias.toLowerCase()} while liquidity builds.
             </h2>
-            <p className="text-sm text-zinc-400 max-w-3xl">{overviewInsight.summary}</p>
+            <p className="text-sm text-text-secondary max-w-3xl">{overviewInsight.summary}</p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
               {stats.map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-zinc-300"
+                  className="rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-text-secondary"
                 >
-                  <p className="text-xs uppercase tracking-wide text-zinc-500">{stat.label}</p>
-                  <p className={`mt-1 text-lg font-semibold ${stat.accent ?? "text-zinc-100"}`}>
+                  <p className="text-xs uppercase tracking-wide text-text-tertiary">{stat.label}</p>
+                  <p className={`mt-1 text-lg font-semibold ${stat.accent ?? "text-text-primary"}`}>
                     {stat.value}
                   </p>
                 </div>
               ))}
             </div>
             {isMarketLoading && !marketSnapshot && (
-              <p className="text-xs text-zinc-500">Fetching market snapshot…</p>
+              <p className="text-xs text-text-tertiary">Fetching market snapshot…</p>
             )}
             {marketError && <p className="text-xs text-amber-300">{marketError}</p>}
           </div>
@@ -162,7 +164,7 @@ export default function AnalysisPageV2() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Social trend</p>
-                  <p className="text-sm text-white/80">{trendInsight.tweet.snippet ?? trendInsight.tweet.fullText}</p>
+                  <p className="text-sm text-text-secondary">{trendInsight.tweet.snippet ?? trendInsight.tweet.fullText}</p>
                 </div>
                 {trendInsight.sentiment?.label ? (
                   <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-200">
@@ -170,7 +172,7 @@ export default function AnalysisPageV2() {
                   </span>
                 ) : null}
               </div>
-              <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide text-white/60">
+              <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wide text-text-tertiary">
                 {trendInsight.trading?.hypeLevel && trendInsight.trading.hypeLevel !== 'unknown' ? (
                   <TrendBadge label={`Hype: ${trendInsight.trading.hypeLevel}`} />
                 ) : null}
@@ -223,24 +225,33 @@ export default function AnalysisPageV2() {
   };
 
   return (
-    <div className="min-h-screen bg-[#030303] text-zinc-100">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-        <AnalysisLayout
-          title="Analysis"
-          subtitle="AI-backed market views, flows and playbooks."
-          tabs={tabs}
+    <DashboardShell
+      title="Analysis"
+      description="AI-backed market views, flows and playbooks."
+      actions={
+        <AnalysisHeaderActions
           activeTab={activeTab}
-          onTabChange={(id) => {
-            setActiveTab(id as AnalysisTabId);
-            const nextParams = new URLSearchParams(searchParams);
-            nextParams.set("tab", id);
-            setSearchParams(nextParams, { replace: true });
-          }}
-        >
-          {renderTabContent()}
-        </AnalysisLayout>
-      </div>
-    </div>
+          isMarketLoading={isMarketLoading}
+          marketError={marketError}
+        />
+      }
+    >
+      <AnalysisLayout
+        title="Analysis"
+        subtitle="AI-backed market views, flows and playbooks."
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={(id) => {
+          setActiveTab(id as AnalysisTabId);
+          const nextParams = new URLSearchParams(searchParams);
+          nextParams.set("tab", id);
+          setSearchParams(nextParams, { replace: true });
+        }}
+        showHeader={false}
+      >
+        {renderTabContent()}
+      </AnalysisLayout>
+    </DashboardShell>
   );
 }
 
@@ -251,16 +262,16 @@ interface ComingSoonBlockProps {
 
 function ComingSoonBlock({ title, description }: ComingSoonBlockProps) {
   return (
-    <div className="space-y-3 rounded-2xl border border-dashed border-white/10 bg-black/20 p-8 text-center">
-      <p className="text-base font-semibold text-white">{title}</p>
-      <p className="text-sm text-zinc-400">{description}</p>
+    <div className="space-y-3 rounded-2xl border border-dashed border-border bg-surface/70 p-8 text-center">
+      <p className="text-base font-semibold text-text-primary">{title}</p>
+      <p className="text-sm text-text-secondary">{description}</p>
     </div>
   );
 }
 
 function TrendBadge({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-semibold text-white/80">
+    <span className="inline-flex items-center rounded-full border border-border bg-surface px-2.5 py-1 text-[11px] font-semibold text-text-secondary">
       {label}
     </span>
   );
@@ -271,23 +282,23 @@ function OverviewInsightSkeleton() {
     <div className="space-y-6">
       <div className="space-y-4">
         <div className="space-y-2">
-          <div className="h-3 w-40 rounded-full bg-white/10 animate-pulse" />
-          <div className="h-6 w-3/4 rounded-full bg-white/10 animate-pulse" />
-          <div className="h-4 w-full rounded-full bg-white/5 animate-pulse" />
-          <div className="h-4 w-2/3 rounded-full bg-white/5 animate-pulse" />
+          <div className="h-3 w-40 rounded-full bg-surface-hover animate-pulse" />
+          <div className="h-6 w-3/4 rounded-full bg-surface-hover animate-pulse" />
+          <div className="h-4 w-full rounded-full bg-surface animate-pulse" />
+          <div className="h-4 w-2/3 rounded-full bg-surface animate-pulse" />
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {[0, 1, 2].map((key) => (
             <div
               key={key}
-              className="h-20 rounded-2xl border border-white/10 bg-white/5 animate-pulse"
+              className="h-20 rounded-2xl border border-border bg-surface animate-pulse"
             />
           ))}
         </div>
       </div>
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-        <div className="h-64 w-full animate-pulse rounded-2xl bg-white/10" />
-        <p className="mt-4 text-center text-sm text-zinc-500">
+      <div className="rounded-3xl border border-border bg-surface p-6">
+        <div className="h-64 w-full animate-pulse rounded-2xl bg-surface-hover" />
+        <p className="mt-4 text-center text-sm text-text-tertiary">
           No AI insight available yet. Fetching the latest market view…
         </p>
       </div>
@@ -311,5 +322,5 @@ function getChangeAccentFromNumber(value: number): string {
   if (value < 0) {
     return "text-rose-300";
   }
-  return "text-zinc-100";
+  return "text-text-primary";
 }

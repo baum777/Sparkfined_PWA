@@ -9,10 +9,7 @@ import { initializeEventSubscriptions } from "@/ai/ingest/eventSubscriptions";
 
 // Route-level code splitting (reduziert initial bundle)
 const LandingPage = lazy(() => import("../pages/LandingPage"));
-const BoardPage = lazy(() => import("../pages/BoardPage"));
-const AnalyzePage = lazy(() => import("../pages/AnalyzePage"));
 const ChartPage = lazy(() => import("../pages/ChartPage"));
-const JournalPage = lazy(() => import("../pages/JournalPage"));
 const ReplayPage = lazy(() => import("../pages/ReplayPage"));
 const AccessPage = lazy(() => import("../pages/AccessPage"));
 const SettingsPage = lazy(() => import("../pages/SettingsPage"));
@@ -55,26 +52,14 @@ export default function RoutesRoot() {
 
             {/* App Routes - With Layout */}
             <Route path="/" element={<Navigate to="/dashboard-v2" replace />} />
-            <Route path="/board" element={
-              <Layout>
-                <BoardPage />
-              </Layout>
-            } />
-            <Route path="/analyze" element={
-              <Layout>
-                <AnalyzePage />
-              </Layout>
-            } />
+            <Route path="/board" element={<Navigate to="/dashboard-v2" replace />} />
+            <Route path="/analyze" element={<Navigate to="/analysis-v2" replace />} />
             <Route path="/chart" element={
               <Layout>
                 <ChartPage />
               </Layout>
             } />
-            <Route path="/journal" element={
-              <Layout>
-                <JournalPage />
-              </Layout>
-            } />
+            <Route path="/journal" element={<Navigate to="/journal-v2" replace />} />
             <Route path="/replay" element={
               <Layout>
                 <ReplayPage />

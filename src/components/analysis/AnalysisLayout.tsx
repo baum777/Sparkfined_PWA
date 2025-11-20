@@ -8,6 +8,7 @@ interface AnalysisLayoutProps {
   activeTab: string;
   onTabChange: (id: string) => void;
   children: React.ReactNode;
+  showHeader?: boolean;
 }
 
 export default function AnalysisLayout({
@@ -17,9 +18,10 @@ export default function AnalysisLayout({
   activeTab,
   onTabChange,
   children,
+  showHeader = true,
 }: AnalysisLayoutProps) {
   return (
-    <div className="space-y-6 rounded-3xl border border-white/5 bg-black/20 p-4 sm:p-6">
+    <div className="space-y-6 rounded-3xl border border-border bg-surface/70 p-4 sm:p-6">
       <div className="md:hidden">
         <AnalysisSidebarTabs tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} orientation="horizontal" />
       </div>
@@ -30,14 +32,16 @@ export default function AnalysisLayout({
         </aside>
 
         <section className="space-y-6">
-          <header className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.4em] text-zinc-500">Sparkfined</p>
-            <div>
-              <h1 className="text-3xl font-semibold text-white">{title}</h1>
-              {subtitle ? <p className="mt-1 text-sm text-zinc-400">{subtitle}</p> : null}
-            </div>
-          </header>
-          <div className="rounded-2xl border border-white/5 bg-black/40 p-6 shadow-inner">{children}</div>
+          {showHeader ? (
+            <header className="space-y-2">
+              <p className="text-xs uppercase tracking-[0.4em] text-text-tertiary">Sparkfined</p>
+              <div>
+                <h1 className="text-3xl font-semibold text-text-primary">{title}</h1>
+                {subtitle ? <p className="mt-1 text-sm text-text-secondary">{subtitle}</p> : null}
+              </div>
+            </header>
+          ) : null}
+          <div className="rounded-2xl border border-border bg-surface p-6 shadow-inner">{children}</div>
         </section>
       </div>
     </div>

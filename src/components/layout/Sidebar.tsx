@@ -20,11 +20,11 @@ interface NavItem {
 }
 
 const primaryNavItems: NavItem[] = [
-  { path: '/', label: 'Board', Icon: Home },
-  { path: '/analyze', label: 'Analyze', Icon: BarChart3 },
+  { path: '/dashboard-v2', label: 'Board', Icon: Home },
+  { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
   { path: '/chart', label: 'Chart', Icon: TrendingUp },
-  { path: '/journal', label: 'Journal', Icon: FileText },
-  { path: '/notifications', label: 'Alerts', Icon: Bell },
+  { path: '/journal-v2', label: 'Journal', Icon: FileText },
+  { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
 ];
 
 const secondaryNavItems: NavItem[] = [
