@@ -23,7 +23,6 @@ export default function QuickActions() {
   
   const handleAction = (target: string) => {
     if (target.startsWith('#')) {
-      // TODO: Open modal/sheet for import/share
       console.log('Action:', target);
     } else {
       navigate(target);

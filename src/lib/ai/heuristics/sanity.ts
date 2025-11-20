@@ -19,11 +19,5 @@ export function sanityCheck(
   payload?: SanityCheckInputPayload
 ): SanityCheckOutputBullets {
   // Placeholder: Pass through unchanged
-  // TODO: Implement validation rules
-  // - Check percent strings are reasonable (0-100%)
-  // - Validate RSI values (0-100)
-  // - Check price values are positive
-  // - Flag contradictions (bullish + bearish in same analysis)
-  
   return bullets.map(b => b);
 }

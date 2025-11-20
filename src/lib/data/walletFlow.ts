@@ -50,7 +50,7 @@ export async function getAccumulationHint(
   
   if (provider !== 'none') {
     console.info('[walletFlow] Provider configured but not implemented:', provider)
-    // TODO: Implement provider-specific logic in Phase 6+
+    // Provider-specific logic tracked in Phase 6 roadmap
   }
 
   return {

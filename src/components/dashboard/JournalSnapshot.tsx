@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/ui/Button';
 
 interface JournalEntry {
@@ -18,6 +19,8 @@ const directionStyles: Record<JournalEntry['direction'], string> = {
 };
 
 export default function JournalSnapshot({ entries }: JournalSnapshotProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="rounded-lg border border-border-moderate bg-surface p-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
@@ -40,7 +43,7 @@ export default function JournalSnapshot({ entries }: JournalSnapshotProps) {
       </div>
 
       <div className="mt-5">
-        <Button variant="ghost" size="sm" className="text-blue-300 hover:text-blue-200" onClick={() => { /* TODO: wire navigation to journal */ }}>
+        <Button variant="ghost" size="sm" className="text-blue-300 hover:text-blue-200" onClick={() => navigate('/journal-v2')}>
           Open journal
         </Button>
       </div>

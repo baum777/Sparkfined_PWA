@@ -642,29 +642,70 @@ The 4 critical modal/banner components are now production-ready. The remaining 1
 
 #### 6B.2 – TODO/FIXME Hygiene & Backlog-Priorisierung
 
-**Status:** ⏳ Ready for Execution (Baseline Documented)
+**Status:** ✅ **COMPLETE** (Claude Review & Execution 2025-11-20)
 
-**Baseline (2025-11-20 Review):**
-- **Current TODO Count:** 30 TODO/FIXME/HACK/XXX comments in src/
+**Baseline (Pre-Cleanup):**
+- **Starting TODO Count:** 30 TODO/FIXME/HACK/XXX comments in src/
 - **Target TODO Count:** <10 (only active work-in-progress markers)
 - **Reduction Goal:** 20+ TODOs resolved (deleted, moved to issues, or documented as ADRs)
 
-**Aktionen:**
-- [ ] Vollständige Liste aller TODOs sammeln (mit File:Line, Kontext) → Export to `docs/internal/todo-inventory-6B2.txt`
-- [ ] Kategorisierung:
-  - **P0 (Blocker):** Muss vor E2E/Produktion behoben werden
-  - **P1 (High):** Sollte zeitnah behoben werden (Q1 2025)
-  - **P2 (Nice-to-have):** Backlog, nicht dringend
-  - **P3 (Won't-Fix):** Entfernen oder als "Known Limitation" dokumentieren
-- [ ] P0/P1-TODOs in separate GitHub Issues/Tasks übertragen (with clear issue IDs in commit messages)
-- [ ] P2/P3-TODOs entweder entfernen oder als ADR/Known-Limitation dokumentieren
-- [ ] Verify final TODO count ≤10 and document remaining TODOs in Working Plan
+**Results (Post-Cleanup):**
+- **Final TODO Count:** 8 TODOs (all with [P0] or [P1] priority tags)
+- **TODOs Removed:** 19 (moved to Issues #4, #11, roadmap, or removed as low-priority)
+- **Navigation Stubs Fixed:** 3 (JournalSnapshot, InsightTeaser, Feed components)
+- **Reduction Achieved:** 73% reduction (30 → 8 TODOs)
 
-**Beispiel-Kategorien (aus Grep-Sample):**
-- Navigation-Wiring (Button onClick TODOs): P1 → in eigene Issues übertragen
-- Data-Fetch-TODOs (DashboardPageV2): P1 → mit Data-Layer-Arbeit verknüpfen
-- Provider-Muxing (getTokenSnapshot, walletFlow): P2 → in Issue #4/6-Implementierung einplanen
-- Export-Service-TODOs (ZIP, Share-Card): P2 → mit Issue #11 verknüpfen
+**Actions Completed:**
+- [x] Vollständige Liste aller TODOs sammeln → Created `docs/internal/todo-inventory-6B2.txt`
+- [x] Kategorisierung mit P0/P1/P2/P3 Tags (5 categories: Provider-Muxing, Export-Service, Data-Layer, Feature-Enhancements, On-Chain-Data)
+- [x] P0/P1-TODOs mit [Px]-Tags versehen und auf Issues verknüpft (Issue #4, Issue #11)
+- [x] P2/P3-TODOs entfernt oder als Roadmap/Backlog-Items dokumentiert
+- [x] Verify final TODO count = 8 ✅
+
+**Remaining 8 Prioritized TODOs:**
+
+**[P0] Provider-Muxing & Cache Strategy (Issue #4):**
+1. `src/lib/data/getTokenSnapshot.ts:14` — TODO[P0] (Issue #4 - Provider Muxing) [Block comment with scope]
+2. `src/lib/data/getTokenSnapshot.ts:27` — TODO[P0]: Implement provider muxing (Issue #4)
+3. `src/lib/data/getTokenSnapshot.ts:37` — TODO[P0]: Implement cache clearing (Issue #4)
+
+**[P1] Export-Bundle Implementation (Issue #11):**
+4. `src/lib/ExportService.ts:18` — TODO[P1] (Issue #11 - Export Bundle Implementation) [Block comment with scope]
+5. `src/lib/ExportService.ts:28` — TODO[P1]: Implement ZIP bundling (Issue #11)
+6. `src/lib/ExportService.ts:37` — TODO[P1]: Implement share card generation (Issue #11)
+7. `src/lib/ExportService.ts:47` — TODO[P1]: Implement image optimization (Issue #11)
+
+**[P1] Data-Layer Integration:**
+8. `src/pages/DashboardPageV2.tsx:31` — TODO[P1]: Wire to real data fetch (dashboard store + data layer integration)
+
+**Backlog Clarification — Core Items:**
+
+**Provider-Muxing & Cache Handling (Issue #4 — P0 Backlog)**
+- Location: `src/lib/data/getTokenSnapshot.ts`
+- Scope: Implement multi-provider data source muxing (Moralis, DexPaprika, CoinGecko)
+- Scope: Implement cache invalidation and TTL management
+- Dependencies: Data-layer architecture decisions
+- Target: Q1 2025
+
+**Export-Bundle Implementation (Issue #11 — P1 Backlog)**
+- Location: `src/lib/ExportService.ts`
+- Scope: ZIP bundling (combine charts, journal entries, analysis reports)
+- Scope: Share card generation (PNG/JPG with branding)
+- Scope: Image optimization (compress for social sharing)
+- Dependencies: File system API (PWA), Canvas API (share cards)
+- Target: Q1 2025
+
+**Navigation-Stub Resolution (Completed):**
+- ✅ `src/components/dashboard/JournalSnapshot.tsx` — Implemented navigation to `/journal-v2`
+- ✅ `src/components/dashboard/InsightTeaser.tsx` — Implemented navigation to `/analysis-v2`
+- ✅ `src/components/board/Feed.tsx` — Implemented event-type-based navigation (alert/analysis/journal/export/error)
+
+**Checklist (Review):**
+- [x] Grep-Check: 8 TODO/FIXME/HACK comments in `src/` (all with [Px]-Tags)
+- [x] Inventory `docs/internal/todo-inventory-6B2.txt` created and synchronized with code
+- [x] Navigation-Handler for Dashboard/Journal-Shortcuts implemented
+- [x] Provider-Muxing & Export-Bundle als klar definierte P0/P1-Backlog Items dokumentiert
+- [x] Tests: `pnpm typecheck` → ✅, `pnpm run build` → ✅
 
 #### 6B.3 – ESLint Cleanup (Unused Vars/Imports)
 

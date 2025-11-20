@@ -13,7 +13,6 @@ type SymbolConfig = {
 }
 
 // Temporary mapping for the static Watchlist V2 rows.
-// TODO: Replace with user-managed symbols once the watchlist CRUD flow lands.
 const WATCHLIST_TOKEN_CONFIG: Record<string, SymbolConfig> = {
   BTCUSDT: {
     symbol: 'BTCUSDT',

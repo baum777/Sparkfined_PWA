@@ -15,7 +15,7 @@ export interface ExportOptions {
  * Create ZIP bundle with CSV and PNG share cards
  * Target: <800ms p95
  *
- * TODO (Issue 11 implementation):
+ * TODO[P1] (Issue #11 - Export Bundle Implementation):
  * - Generate CSV from entries
  * - Create PNG share cards
  * - Pre-scale large images
@@ -25,7 +25,7 @@ export interface ExportOptions {
 export async function createExportBundle(
   _options: ExportOptions
 ): Promise<Blob> {
-  // TODO: Implement ZIP bundling
+  // TODO[P1]: Implement ZIP bundling (Issue #11)
   throw new Error('Not implemented - Issue 11');
 }
 
@@ -34,7 +34,7 @@ export async function createExportBundle(
  * Dimensions: 1200x630 (Open Graph standard)
  */
 export async function generateShareCard(_entry: JournalEntry): Promise<Blob> {
-  // TODO: Implement share card generation
+  // TODO[P1]: Implement share card generation (Issue #11)
   // Use canvas API or similar
   throw new Error('Not implemented - Issue 11');
 }
@@ -44,6 +44,6 @@ export async function generateShareCard(_entry: JournalEntry): Promise<Blob> {
  * Max dimensions: 2048x2048
  */
 export async function optimizeImage(_blob: Blob): Promise<Blob> {
-  // TODO: Implement image optimization
+  // TODO[P1]: Implement image optimization (Issue #11)
   throw new Error('Not implemented - Issue 11');
 }

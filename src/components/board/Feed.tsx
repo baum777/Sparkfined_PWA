@@ -9,6 +9,7 @@
  */
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FeedItem from './FeedItem';
 import StateView from '../ui/StateView';
 import { FeedItemSkeleton } from '../ui/Skeleton';
@@ -23,14 +24,15 @@ interface FeedEvent {
 }
 
 export default function Feed() {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<'all' | 'alerts' | 'journal'>('all');
-  const { 
-    data: events, 
-    loading, 
-    error, 
-    hasMore, 
-    loadMore, 
-    refresh 
+  const {
+    data: events,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+    refresh
   } = useBoardFeed({
     type: filter,
     limit: 20,
@@ -43,11 +45,26 @@ export default function Feed() {
     { id: 'alerts', label: 'Alerts' },
     { id: 'journal', label: 'Journal' },
   ];
-  
+
   const handleFeedItemClick = (event: FeedEvent) => {
-    // TODO: Navigate based on event type
-    console.log('Feed item clicked:', event.id, event.type);
-    // Example: if (event.type === 'alert') navigate('/notifications');
+    // Navigate to appropriate page based on event type
+    switch (event.type) {
+      case 'alert':
+        navigate('/alerts-v2');
+        break;
+      case 'analysis':
+        navigate('/analysis-v2');
+        break;
+      case 'journal':
+        navigate('/journal-v2');
+        break;
+      case 'export':
+      case 'error':
+      default:
+        // For export/error events, stay on dashboard
+        navigate('/dashboard-v2');
+        break;
+    }
   };
   
   return (
