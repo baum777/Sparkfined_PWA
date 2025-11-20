@@ -17,3 +17,4 @@ telemetry/ai/*.jsonl
 # OS
 .DS_Store
 Thumbs.db
+*.tsbuildinfo
