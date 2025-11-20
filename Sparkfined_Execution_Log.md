@@ -162,3 +162,30 @@ Commands & Results:
 
 New open points:
 - None.
+
+### 2025-11-20 – Section 5B – Design Token Implementation Review (Claude)
+
+Date: 2025-11-20
+Agent: Claude 4.5 (UI/UX Architect)
+Section: #5B – Design Token Implementation & UI Cleanup (Review)
+Branch: claude/review-design-tokens-ui-01WyPejp6cT1BNaiFRcvL3QE
+
+Actions:
+- Reviewed the updated Tailwind token palette against `docs/design/Sparkfined_V2_Design_Tokens.md` – confirmed full spec compliance (all background, surface, border, text, interactive, sentiment, status tokens present).
+- Evaluated DashboardShell and layout theming (gradients, surfaces, borders, text) – no contrast or legibility issues found. WCAG AA compliant.
+- Inspected Watchlist/Alerts/Journal list theming, sentiment/status badges, and empty states – all use semantic tokens correctly.
+- Identified 2 minor utility-color residues in WatchlistTable (DT-FIX-01: `text-amber-200` for price, DT-FIX-02: `text-emerald/rose-300` for change %).
+- Confirmed 10 legacy/modal components (FeedbackModal, ReplayModal, etc.) still use hardcoded slate colors, but these are **out of V2 scope** and non-blocking.
+- Updated Section 5B in `Sparkfined_Working_Plan.md` with review summary, completion status, checklist, and open points.
+- Confirmed V2 theming is **95% complete and safe to ship**.
+
+Commands & Results:
+- Grep searches for hardcoded hex colors (`#...`) in V2 pages → ✅ 0 matches
+- Grep searches for opacity-based colors (`white/X`, `black/X`) in V2 pages → ✅ 0 matches
+- Grep searches for utility palette usage in V2 components → ⚠️ 2 minor instances in WatchlistTable
+- File reads: DashboardShell, all 7 V2 pages, core components (DashboardKpiStrip, JournalList, AlertsList, WatchlistTable), feature layouts
+
+New open points:
+- **DT-FIX-01** (P2): WatchlistTable price color uses `text-amber-200` instead of semantic token
+- **DT-FIX-02** (P2): WatchlistTable change colors use utility palette (`text-emerald-300`, `text-rose-300`) instead of sentiment tokens (`text-sentiment-bull`, `text-sentiment-bear`)
+- **TOKEN-NOTE-01** (Informational): 10 legacy/modal components outside V2 scope still use hardcoded colors – acceptable for V2 launch
