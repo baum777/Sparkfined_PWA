@@ -1,6 +1,5 @@
 import React, { Suspense, lazy, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Layout from "../components/layout/Layout";
 import UpdateBanner from "../components/UpdateBanner";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { SwipeNavGate } from "../components/navigation/SwipeNavGate";
@@ -57,46 +56,11 @@ export default function RoutesRoot() {
           <Route path="/journal" element={<Navigate to="/journal-v2" replace />} />
           <Route path="/watchlist" element={<Navigate to="/watchlist-v2" replace />} />
           <Route path="/alerts" element={<Navigate to="/alerts-v2" replace />} />
-          <Route
-            path="/replay"
-            element={
-              <Layout>
-                <ReplayPage />
-              </Layout>
-            }
-          />
-          <Route
-            path="/replay/:sessionId"
-            element={
-              <Layout>
-                <ReplayPage />
-              </Layout>
-            }
-          />
-          <Route
-            path="/notifications"
-            element={
-              <Layout>
-                <NotificationsPage />
-              </Layout>
-            }
-          />
-          <Route
-            path="/signals"
-            element={
-              <Layout>
-                <SignalsPage />
-              </Layout>
-            }
-          />
-          <Route
-            path="/lessons"
-            element={
-              <Layout>
-                <LessonsPage />
-              </Layout>
-            }
-          />
+          <Route path="/replay" element={<ReplayPage />} />
+          <Route path="/replay/:sessionId" element={<ReplayPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/signals" element={<SignalsPage />} />
+          <Route path="/lessons" element={<LessonsPage />} />
           <Route path="/dashboard-v2" element={<DashboardPageV2 />} />
           <Route path="/watchlist-v2" element={<WatchlistPageV2 />} />
           <Route path="/analysis-v2" element={<AnalysisPageV2 />} />

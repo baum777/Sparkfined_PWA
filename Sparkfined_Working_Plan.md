@@ -380,12 +380,18 @@ Ensure that **no V1 pages or layouts are still wired into the runtime app**, and
 
 **Checklist (Codex):**
 
-- [ ] Liste aller V1 Page-Files erstellt (grep / ripgrep, IDE search)
-- [ ] Liste aller V1 Layout-Files erstellt
-- [ ] Liste aller V1 Sections erstellt
-- [ ] Bestätigt: keine aktiven Routes referenzieren mehr V1 Pages
-- [ ] Bestätigt: Sidebar + BottomNav nutzen ausschließlich V2 routes
-- [ ] Kurze Zusammenfassung im `Sparkfined_Execution_Log.md` angelegt (Entry: “6A.1 – Inventory & Reality Check”)
+- [x] Liste aller V1 Page-Files erstellt (JournalPage, ChartPage, AnalyzePage, HomePage, FontTestPage)
+- [x] Liste aller V1 Layout-Files erstellt (Layout.tsx, Header.tsx)
+- [x] Liste aller V1 Sections erstellt (`src/sections/chart`, `src/sections/journal`, `src/sections/analyze`)
+- [x] Bestätigt: keine aktiven Routes referenzieren mehr V1 Pages (nur V2 lazy imports in `RoutesRoot.tsx`)
+- [x] Bestätigt: Sidebar + BottomNav nutzen ausschließlich V2 routes (BottomNav updated to `/settings-v2`)
+- [x] Kurze Zusammenfassung im `Sparkfined_Execution_Log.md` angelegt (Entry: “6A.1 – Inventory & Reality Check”)
+
+Inventory notes:
+- V1 pages located in `src/pages`: JournalPage.tsx, ChartPage.tsx, AnalyzePage.tsx, HomePage.tsx, FontTestPage.tsx.
+- V1 layout shell consisted of `Layout.tsx` + `Header.tsx`.
+- V1 sections present under `src/sections/chart`, `src/sections/journal`, `src/sections/analyze`.
+- Routing already pointed exclusively to V2 surfaces; Sidebar/BottomNav confirmed (BottomNav corrected to `/settings-v2`).
 
 **Handoff:**  
 - [ ] Kurze Inventar-Zusammenfassung in **Sparkfined_Working_Plan.md** unter Section 6 ergänzt  
@@ -406,23 +412,28 @@ Ensure that **no V1 pages or layouts are still wired into the runtime app**, and
 
 **Checklist (Codex):**
 
-- [ ] `docs/archive/v1-migration-backup/` existiert mit einem `README.md` (Retention Policy, Restore-Hinweise)
-- [ ] Alle V1 Pages, die **vollständig** durch V2 ersetzt sind, ins Archive verschoben:
-  - [ ] `src/pages/JournalPage.tsx`
-  - [ ] `src/pages/ChartPage.tsx`
-  - [ ] `src/pages/AnalyzePage.tsx`
-  - [ ] `src/components/layout/Layout.tsx`
-  - [ ] `src/components/layout/Header.tsx`
-  - [ ] `src/sections/chart/*`
-  - [ ] `src/sections/journal/*`
-  - [ ] `src/sections/analyze/*`
-- [ ] Reine Dev-/Test-Pages, die keine historische Bedeutung haben, gelöscht:
-  - [ ] `src/pages/HomePage.tsx`
-  - [ ] `src/pages/FontTestPage.tsx`
-  - [ ] ggf. alte `wireframes/` oder ad-hoc Testdateien (wenn noch vorhanden)
-- [ ] Alle Import-Statements, die auf diese Files zeigen, entfernt oder angepasst
-- [ ] `pnpm typecheck` → ✅
-- [ ] `pnpm run build` → ✅ (MORALIS_API_KEY Warnung ist akzeptabel, solange Build durchläuft)
+- [x] `docs/archive/v1-migration-backup/` existiert mit einem `README.md` (Retention Policy, Restore-Hinweise)
+- [x] Alle V1 Pages, die **vollständig** durch V2 ersetzt sind, ins Archive verschoben:
+  - [x] `src/pages/JournalPage.tsx`
+  - [x] `src/pages/ChartPage.tsx`
+  - [x] `src/pages/AnalyzePage.tsx`
+  - [x] `src/components/layout/Layout.tsx`
+  - [x] `src/components/layout/Header.tsx`
+  - [x] `src/sections/chart/*`
+  - [x] `src/sections/journal/*`
+  - [x] `src/sections/analyze/*`
+- [x] Reine Dev-/Test-Pages, die keine historische Bedeutung haben, gelöscht:
+  - [x] `src/pages/HomePage.tsx`
+  - [x] `src/pages/FontTestPage.tsx`
+  - [x] ggf. alte `wireframes/` oder ad-hoc Testdateien (wenn noch vorhanden)
+- [x] Alle Import-Statements, die auf diese Files zeigen, entfernt oder angepasst
+- [x] `pnpm typecheck` → ✅
+- [x] `pnpm run build` → ✅ (MORALIS_API_KEY Warnung ist akzeptabel, solange Build durchläuft)
+
+Archive status:
+- `docs/archive/v1-migration-backup/` created with README (retention + restore steps) and scoped subfolders for pages, layout, and sections.
+- JournalPage, ChartPage, AnalyzePage, Layout, Header, and chart/journal/analyze sections moved into the archive.
+- HomePage.tsx and FontTestPage.tsx removed as dev/test noise; no active imports remain.
 
 **Handoff:**  
 
@@ -443,22 +454,27 @@ Ensure that **no V1 pages or layouts are still wired into the runtime app**, and
 
 **Checklist (Codex):**
 
-- [ ] `src/routes/RoutesRoot.tsx`: alle `lazy(() => import("../pages/…"))` Verweise auf V1 entfernt
-- [ ] Grep/Tooling-Lauf:
-  - [ ] `grep -r "JournalPage" src/` → keine aktiven Verwendungen
-  - [ ] `grep -r "AnalyzePage" src/` → keine aktiven Verwendungen
-  - [ ] `grep -r "ChartPage" src/` → nur V2 / Archive
-- [ ] Optional: ESLint/TS-Helfer (z.B. `no-unused-vars`, `no-unused-imports`) laufen lassen:
-  - [ ] `pnpm lint` → ✅ (oder nur bekannte, dokumentierte Warnungen)
-- [ ] Manuelle Stichprobe:
-  - [ ] /dashboard-v2
-  - [ ] /journal-v2
-  - [ ] /watchlist-v2
-  - [ ] /alerts-v2
-  - [ ] /analysis-v2
-  - [ ] /chart-v2
-  - [ ] /settings-v2  
+- [x] `src/routes/RoutesRoot.tsx`: alle `lazy(() => import("../pages/…"))` Verweise auf V1 entfernt
+- [x] Grep/Tooling-Lauf:
+  - [x] `rg "JournalPage" src/` → keine aktiven Verwendungen
+  - [x] `rg "AnalyzePage" src/` → keine aktiven Verwendungen
+  - [x] `rg "ChartPage" src/` → nur V2 / Archive
+- [x] Optional: ESLint/TS-Helfer (z.B. `no-unused-vars`, `no-unused-imports`) laufen lassen:
+  - [x] `pnpm lint` → ✅ (oder nur bekannte, dokumentierte Warnungen)
+- [x] Manuelle Stichprobe:
+  - [x] /dashboard-v2
+  - [x] /journal-v2
+  - [x] /watchlist-v2
+  - [x] /alerts-v2
+  - [x] /analysis-v2
+- [x] /chart-v2
+- [x] /settings-v2
   Alle Seiten laden ohne Runtime-Error / 404 / Suspense-Hänger.
+
+Sweep status:
+- `RoutesRoot.tsx` no longer imports the V1 Layout wrapper; V1 page names only present inside the archive.
+- `rg` confirms JournalPage/AnalyzePage/ChartPage are absent from `src/`.
+- `pnpm lint`, `pnpm typecheck`, and `pnpm run build` all green; V2 routes smoke-tested (no regressions observed).
 
 **Handoff:**  
 
