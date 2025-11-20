@@ -83,10 +83,7 @@ export default function WatchlistPageV2() {
       description={headerDescription}
       actions={<WatchlistHeaderActions assetCount={assetCount} isLoading={isLoading} error={error} />}
     >
-      <WatchlistLayout
-        title="Watchlist"
-        subtitle="Monitor key assets, spot shifts in market tone and keep your edge synced."
-      >
+      <WatchlistLayout>
         <div className="flex flex-col gap-4 text-text-primary lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">

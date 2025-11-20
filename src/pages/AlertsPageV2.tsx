@@ -52,10 +52,7 @@ export default function AlertsPageV2() {
       description={headerDescription}
       actions={<AlertsHeaderActions alerts={alerts} />}
     >
-      <AlertsLayout
-        title="Alerts"
-        subtitle="Centralize signals, key levels and volatility triggers."
-      >
+      <AlertsLayout>
         <div className="flex flex-col gap-4 text-text-primary lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">

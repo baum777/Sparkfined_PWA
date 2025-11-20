@@ -6,7 +6,15 @@ import { useAISettings } from "../state/ai";
 import { useAIContext } from "../state/aiContext";
 import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from "../lib/walletMonitor";
 
-export default function SettingsPage() {
+interface SettingsPageProps {
+  showHeading?: boolean;
+  wrapperClassName?: string;
+}
+
+export default function SettingsPage({
+  showHeading = true,
+  wrapperClassName = "mx-auto max-w-3xl p-4 pb-20 md:p-6 md:pb-6",
+}: SettingsPageProps) {
   const { settings, setSettings } = useSettings();
   const { flags, setFlags, buffer, drain } = useTelemetry();
   const { ai, setAI } = useAISettings();
@@ -78,8 +86,10 @@ export default function SettingsPage() {
     <button onClick={()=>onChange(!checked)} className={`rounded px-2 py-1 text-sm border ${checked?"border-emerald-700 bg-emerald-900/30 text-emerald-100":"border-zinc-700 text-zinc-200 hover:bg-zinc-800"}`}>{checked?"ON":"OFF"}</button>;
 
   return (
-    <div className="mx-auto max-w-3xl p-4 pb-20 md:p-6 md:pb-6">
-      <h1 className="mb-4 text-lg font-semibold text-zinc-100 md:text-xl">Einstellungen</h1>
+    <div className={wrapperClassName}>
+      {showHeading ? (
+        <h1 className="mb-4 text-lg font-semibold text-zinc-100 md:text-xl">Einstellungen</h1>
+      ) : null}
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
         <Row label="Theme">
           <Select value={settings.theme} onChange={(e)=>setSettings({theme:e.target.value as ThemeMode})}>
