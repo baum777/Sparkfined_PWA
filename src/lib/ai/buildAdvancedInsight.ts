@@ -10,11 +10,8 @@ import type {
   AdvancedInsightCard,
   AdvancedInsightSections,
   RangeStructure,
-  KeyLevel,
-  PriceZone,
   BiasReading,
   FlowVolumeSnapshot,
-  MacroTag,
   EditableField,
   AnalysisLayerId,
 } from '@/types/ai';

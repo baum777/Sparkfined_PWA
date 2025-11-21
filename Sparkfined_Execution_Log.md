@@ -577,3 +577,26 @@ Handoff to Section 6B.3:
 - 6B.2-FIX-01 can be addressed in 6B.3 pass or as standalone quick fix
 - Recommended execution order: 6B.3 (ESLint Cleanup) → 6B.4 (Final Zombie Sweep)
 
+### 2025-11-23 – Section 6B.3 – ESLint Cleanup (Codex)
+
+Date: 2025-11-23  
+Agent: Codex  
+Section: #6B.3 – ESLint Cleanup  
+Branch: work (local)
+
+Actions:
+- Implemented 6B.2-FIX-01 by routing JournalSnapshot to `/journal-v2` and InsightTeaser to `/analysis-v2`.
+- Captured baseline lint output (58 warnings) in `docs/internal/lint-report-6B3-before.txt` and resolved all `no-unused-vars` findings (params, imports, types, stale eslint directives).
+- Added lightweight error logging or safe ignores for previously unused catch variables; trimmed dead imports and unused helper interfaces across AI clients, API handlers, diagnostics, and utilities.
+- Recorded final lint output with zero warnings in `docs/internal/lint-report-6B3-after.txt` and confirmed typecheck/build remain green.
+- Updated `Sparkfined_Working_Plan.md` Section 6B.3 with results and completion notes.
+
+Commands & Results:
+- pnpm lint (before)  → ⚠️ 58 warnings captured (see `docs/internal/lint-report-6B3-before.txt`).
+- pnpm lint (after)   → ✅ 0 warnings (see `docs/internal/lint-report-6B3-after.txt`).
+- pnpm typecheck      → ✅
+- pnpm run build      → ✅ (expected MORALIS_API_KEY warning only)
+
+New open points:
+- None for 6B.3; proceed to Section 6B.4 sweep with clean lint baseline.
+

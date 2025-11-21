@@ -91,7 +91,8 @@ export class OpenAIClient {
     try {
       parsed = text ? JSON.parse(text) : {};
     } catch (error) {
-      throw new Error(`OpenAI returned non-JSON payload: ${text}`);
+      const reason = error instanceof Error ? error.message : "unknown parse error";
+      throw new Error(`OpenAI returned non-JSON payload: ${text} (${reason})`);
     }
 
     const usage = response?.usage;

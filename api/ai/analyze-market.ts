@@ -134,6 +134,7 @@ export default async function handler(req: Request) {
         }
         ohlcCandles = fetchedCandles ?? [];
       } catch (err) {
+        console.error("[analyze-market] OHLC fetch failed", err);
         return json(
           { ok: false, error: "Failed to fetch OHLC data", code: "UPSTREAM_ERROR" },
           502
@@ -215,7 +216,7 @@ export default async function handler(req: Request) {
 /**
  * Check access gating for Advanced Insight
  */
-async function checkAccessGating(req: Request): Promise<any> {
+async function checkAccessGating(_req: Request): Promise<any> {
   // Beta v0.9: Mock access check
   // TODO: Implement real NFT-based access gating
   

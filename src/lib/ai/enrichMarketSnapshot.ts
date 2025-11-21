@@ -7,8 +7,6 @@
 
 import type {
   MarketSnapshotPayload,
-  OhlcCandle,
-  MarketMeta,
   RangeStructure,
   KeyLevel,
   PriceZone,

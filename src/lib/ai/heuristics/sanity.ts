@@ -16,7 +16,7 @@ import type { SanityCheckInputBullets, SanityCheckInputPayload, SanityCheckOutpu
  */
 export function sanityCheck(
   bullets: SanityCheckInputBullets,
-  payload?: SanityCheckInputPayload
+  _payload?: SanityCheckInputPayload
 ): SanityCheckOutputBullets {
   // Placeholder: Pass through unchanged
   // TODO[P1]: Implement validation rules (range checks, contradiction flags)

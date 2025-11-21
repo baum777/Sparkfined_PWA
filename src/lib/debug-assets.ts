@@ -52,7 +52,7 @@ export async function checkAsset(url: string, timeout = 5000): Promise<AssetChec
  * Check all critical assets for PWA load
  * Returns array of results, logs to console in preview mode
  */
-export async function checkCriticalAssets(baseUrl = ''): Promise<AssetCheckResult[]> {
+export async function checkCriticalAssets(): Promise<AssetCheckResult[]> {
   const isPreview = (import.meta as any).env?.VERCEL_ENV === 'preview';
   const isProd = import.meta.env.PROD;
 

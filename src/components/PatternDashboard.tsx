@@ -28,20 +28,6 @@ export default function PatternDashboard({
 }: PatternDashboardProps) {
   const [activeTab, setActiveTab] = React.useState<"overview" | "setup" | "emotion" | "library">("overview");
 
-  // Calculate win rate for a specific setup
-  const getSetupWinRate = (setup: SetupTag) => {
-    const setupStats = stats.bySetup.find((s) => s.setup === setup);
-    if (!setupStats || setupStats.totalTrades === 0) return 0;
-    return (setupStats.winCount / setupStats.totalTrades) * 100;
-  };
-
-  // Calculate win rate for a specific emotion
-  const getEmotionWinRate = (emotion: EmotionTag) => {
-    const emotionStats = stats.byEmotion.find((e) => e.emotion === emotion);
-    if (!emotionStats || emotionStats.totalTrades === 0) return 0;
-    return (emotionStats.winCount / emotionStats.totalTrades) * 100;
-  };
-
   // Get best performing patterns (setup + emotion combo)
   const bestPatterns = React.useMemo(() => {
     const patterns: Array<{

@@ -18,7 +18,6 @@ import type {
   ReplayBookmark,
   OhlcPoint,
   JournalEntry,
-  PatternStats,
 } from '@/types/journal'
 
 // ============================================================================

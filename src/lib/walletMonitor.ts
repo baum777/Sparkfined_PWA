@@ -54,14 +54,6 @@ interface MoralisTokenTransfersResponse {
   result: MoralisTokenTransfer[]
 }
 
-interface DetectedBuy {
-  ticker: string
-  address: string
-  txHash: string
-  timestamp: number
-  amount: number
-}
-
 // ============================================================================
 // WALLET MONITOR CLASS
 // ============================================================================

@@ -105,7 +105,8 @@ export class GrokClient {
     try {
       parsed = text ? JSON.parse(text) : {};
     } catch (error) {
-      throw new Error(`Grok returned non-JSON payload: ${text}`);
+      const reason = error instanceof Error ? error.message : "unknown parse error";
+      throw new Error(`Grok returned non-JSON payload: ${text} (${reason})`);
     }
 
     const assessedPosts = posts.map((post, index) => {

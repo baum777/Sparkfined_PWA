@@ -20,7 +20,6 @@ import type {
   MarketRegime,
   TradeOutcome,
   RiskCheck,
-  ExpectancyCalc,
   SignalEventType,
 } from '@/types/signal'
 import type { MarketSnapshot } from '@/types/market'

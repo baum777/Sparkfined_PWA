@@ -18,7 +18,7 @@ const biasStyles: Record<InsightTeaserProps['bias'], string> = {
 export default function InsightTeaser({ title, bias, confidenceLabel, summary }: InsightTeaserProps) {
   const navigate = useNavigate();
 
-  const handleNavigate = React.useCallback(() => navigate('/analyze'), [navigate]);
+  const handleNavigate = React.useCallback(() => navigate('/analysis-v2'), [navigate]);
 
   return (
     <div className="rounded-lg border border-border-moderate bg-surface p-4 shadow-sm">

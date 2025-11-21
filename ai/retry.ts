@@ -6,7 +6,6 @@ export async function withExponentialBackoff<T>(
 ): Promise<T> {
   let attempt = 0;
   let delay = options.baseDelayMs;
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
       return await fn();

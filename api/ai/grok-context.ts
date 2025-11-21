@@ -27,8 +27,6 @@
  * }
  */
 
-import type { VercelRequest, VercelResponse } from '@vercel/node'
-
 export const config = { runtime: 'edge' }
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' } as const
@@ -67,10 +65,6 @@ interface GrokContextResponse {
 const XAI_API_KEY = process.env.XAI_API_KEY || ''
 const XAI_BASE_URL = process.env.XAI_BASE_URL || 'https://api.x.ai/v1'
 
-// Twitter/X search parameters
-const TWEET_LOOKBACK_HOURS = 48 // Search tweets from last 48h
-const TWEETS_PER_CATEGORY = 10 // 10 oldest + 10 newest + 10 top = 30 total
-
 // ============================================================================
 // GROK API CLIENT
 // ============================================================================
@@ -93,7 +87,6 @@ async function searchTwitterViaGrok(
   try {
     // Calculate search time window (±24h around timestamp)
     const startTime = new Date(timestamp - 24 * 60 * 60 * 1000).toISOString()
-    const endTime = new Date(timestamp + 24 * 60 * 60 * 1000).toISOString()
 
     // Build search query
     const query = `(${ticker} OR $${ticker} OR ${address.slice(0, 8)}) 
@@ -102,7 +95,7 @@ async function searchTwitterViaGrok(
 
     // Call Grok API to fetch tweets
     // Note: This is a placeholder - actual implementation depends on X API access
-    const tweets = await fetchTweetsFromXAPI(query, startTime, endTime)
+    const tweets = await fetchTweetsFromXAPI(query, startTime)
 
     return tweets
   } catch (error) {
@@ -117,8 +110,7 @@ async function searchTwitterViaGrok(
  */
 async function fetchTweetsFromXAPI(
   query: string,
-  startTime: string,
-  endTime: string
+  startTime: string
 ): Promise<GrokTweet[]> {
   // PLACEHOLDER: Actual implementation requires Twitter API credentials
   // For now, return mock data for development
