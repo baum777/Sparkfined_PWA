@@ -27,14 +27,14 @@ export default function Button({
 }: ButtonProps) {
   const isLoadingState = isLoading || loading;
   
-  const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 disabled:opacity-50 disabled:pointer-events-none rounded-lg touch-manipulation';
+  const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg disabled:opacity-50 disabled:pointer-events-none rounded-lg touch-manipulation';
 
   const variants: Record<string, string> = {
-    primary: 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95',
-    secondary: 'bg-zinc-800 text-zinc-100 border border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600 active:scale-95',
-    ghost: 'bg-transparent text-zinc-300 hover:bg-zinc-800/50 hover:text-zinc-100 active:scale-95',
-    destructive: 'bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20 active:scale-95',
-    danger: 'bg-rose-500 text-white hover:bg-rose-600 active:scale-95', // Keep for backward compatibility
+    primary: 'bg-brand text-text-primary hover:bg-brand-hover active:scale-95',
+    secondary: 'bg-surface text-text-primary border border-border hover:bg-surface-hover hover:border-border-hover active:scale-95',
+    ghost: 'bg-transparent text-text-secondary hover:bg-interactive-hover hover:text-text-primary active:scale-95',
+    destructive: 'bg-danger/10 text-danger border border-danger/30 hover:bg-danger/20 active:scale-95',
+    danger: 'bg-danger text-text-primary hover:bg-danger/90 active:scale-95', // Keep for backward compatibility
   };
 
   // Touch-optimized sizes (iOS HIG: min 44px, Material: min 48px)

@@ -1,27 +1,74 @@
 /* Design Tokens — Sparkfined PWA Board */
+/*
+ * Tailwind config is the single source of truth. These CSS variables mirror
+ * the semantic colors defined in `tailwind.config.ts` so both utility classes
+ * and raw CSS share the same values.
+ */
 
 :root {
   /* === Colors === */
-  /* Background & Surface */
-  --color-bg: #0a0a0a;              /* zinc-950 */
-  --color-surface: #18181b;         /* zinc-900 */
-  --color-border: #27272a;          /* zinc-800 */
-  
-  /* Text */
-  --color-text-primary: #f4f4f5;    /* zinc-100 */
-  --color-text-secondary: #a1a1aa;  /* zinc-400 */
-  --color-text-tertiary: #71717a;   /* zinc-500 */
-  
   /* Brand & Accent */
-  --color-brand: #0fb34c;           /* emerald-500 */
-  --color-brand-hover: #059669;     /* emerald-600 */
-  
+  --color-brand: #0fb34c;
+  --color-brand-hover: #059669;
+  --color-accent: #00ff66;
+
+  /* Background & Surface */
+  --color-bg: #0a0a0a;
+  --color-bg-elevated: #0b0b13;
+  --color-bg-surface: #18181b;
+  --color-bg-surface-subtle: #0f0f12;
+  --color-bg-overlay: #050505;
+
+  /* Surface variants */
+  --color-surface: #18181b;
+  --color-surface-hover: #27272a;
+  --color-surface-elevated: #1c1c1e;
+  --color-surface-subtle: #131316;
+  --color-surface-skeleton: rgba(255, 255, 255, 0.05);
+
+  /* Borders */
+  --color-border: #27272a;
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-moderate: rgba(255, 255, 255, 0.1);
+  --color-border-hover: rgba(255, 255, 255, 0.15);
+  --color-border-accent: #0fb34c;
+  --color-border-focus: #10b981;
+
+  /* Text */
+  --color-text-primary: #f4f4f5;
+  --color-text-secondary: #a1a1aa;
+  --color-text-tertiary: #71717a;
+
+  /* Interactive */
+  --color-interactive-hover: rgba(255, 255, 255, 0.05);
+  --color-interactive-active: rgba(255, 255, 255, 0.08);
+  --color-interactive-disabled: rgba(255, 255, 255, 0.02);
+
   /* Semantic */
-  --color-success: #10b981;         /* emerald-500 */
-  --color-danger: #f43f5e;          /* rose-500 */
-  --color-info: #06b6d4;            /* cyan-500 */
-  --color-warn: #f59e0b;            /* amber-500 */
-  
+  --color-success: #10b981;
+  --color-danger: #f43f5e;
+  --color-info: #06b6d4;
+  --color-warn: #f59e0b;
+
+  /* Sentiment */
+  --color-bull: #10b981;
+  --color-bear: #f43f5e;
+  --color-neutral: #f59e0b;
+  --color-bull-bg: rgba(16, 185, 129, 0.1);
+  --color-bull-border: rgba(16, 185, 129, 0.6);
+  --color-bear-bg: rgba(244, 63, 94, 0.1);
+  --color-bear-border: rgba(251, 113, 133, 0.6);
+  --color-neutral-bg: rgba(245, 158, 11, 0.1);
+  --color-neutral-border: rgba(251, 191, 36, 0.6);
+
+  /* Alerts / Status */
+  --color-status-armed-bg: rgba(245, 158, 11, 0.1);
+  --color-status-armed-text: #fcd34d;
+  --color-status-triggered-bg: rgba(16, 185, 129, 0.1);
+  --color-status-triggered-text: #6ee7b7;
+  --color-status-snoozed-bg: rgba(14, 165, 233, 0.1);
+  --color-status-snoozed-text: #7dd3fc;
+
   /* === Spacing (8px Grid, rem for scalability) === */
   --space-1: 0.25rem;   /* 4px */
   --space-2: 0.5rem;    /* 8px */
@@ -30,48 +77,48 @@
   --space-6: 1.5rem;    /* 24px */
   --space-8: 2rem;      /* 32px */
   --space-12: 3rem;     /* 48px */
-  
+
   /* === Radius (Default: Rund) === */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-full: 9999px;
-  
+
   /* === Shadows (Default: Rund/Weich) === */
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
   --shadow-md: 0 4px 8px rgba(0,0,0,0.16), 0 2px 4px rgba(0,0,0,0.08);
   --shadow-lg: 0 10px 20px rgba(0,0,0,0.20), 0 4px 8px rgba(0,0,0,0.12);
   --shadow-xl: 0 20px 25px rgba(0,0,0,0.25);
-  
+
   /* === Typography === */
   --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-  
+
   --text-xs: 0.75rem;   /* 12px */
   --text-sm: 0.875rem;  /* 14px */
   --text-base: 1rem;    /* 16px */
   --text-lg: 1.125rem;  /* 18px */
   --text-xl: 1.25rem;   /* 20px */
   --text-2xl: 1.5rem;   /* 24px */
-  
+
   --leading-xs: 1.33;   /* 16px at 12px */
   --leading-sm: 1.43;   /* 20px at 14px */
   --leading-base: 1.5;  /* 24px at 16px */
   --leading-lg: 1.56;   /* 28px at 18px */
   --leading-xl: 1.4;    /* 28px at 20px */
   --leading-2xl: 1.33;  /* 32px at 24px */
-  
+
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
-  
+
   /* === Motion === */
   --duration-micro: 75ms;
   --duration-short: 150ms;
   --duration-medium: 250ms;
   --duration-long: 350ms;
-  
+
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
@@ -83,7 +130,7 @@
   --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
-  
+
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.18);
   --shadow-md: 0 2px 4px rgba(0,0,0,0.24);
   --shadow-lg: 0 4px 8px rgba(0,0,0,0.32);

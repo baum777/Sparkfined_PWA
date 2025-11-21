@@ -29,7 +29,7 @@ export default async function handler(req: Request): Promise<Response> {
   let payload: any = {};
   try {
     payload = await req.json();
-  } catch (error) {
+  } catch {
     return json({ ok: false, error: "Invalid JSON" }, 400);
   }
 

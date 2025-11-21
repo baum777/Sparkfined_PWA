@@ -100,11 +100,11 @@ export default function AnalysisPageV2() {
       }
 
       const stats: Array<{ label: string; value: React.ReactNode; accent?: string }> = [
-        { label: "Bias", value: overviewInsight.bias, accent: "text-emerald-300" },
+        { label: "Bias", value: overviewInsight.bias, accent: "text-success" },
         {
           label: "Confidence",
           value: `${Math.round(overviewInsight.confidence * 100)}%`,
-          accent: "text-amber-300",
+          accent: "text-warn",
         },
         { label: "Timeframe", value: overviewInsight.timeFrame, accent: "text-text-primary" },
       ];
@@ -114,7 +114,7 @@ export default function AnalysisPageV2() {
           {
             label: "Last price",
             value: formatUsd(marketSnapshot.price),
-            accent: "text-amber-200",
+            accent: "text-warn",
           },
           {
             label: "24h change",
@@ -156,18 +156,18 @@ export default function AnalysisPageV2() {
             {isMarketLoading && !marketSnapshot && (
               <p className="text-xs text-text-tertiary">Fetching market snapshot…</p>
             )}
-            {marketError && <p className="text-xs text-amber-300">{marketError}</p>}
+            {marketError && <p className="text-xs text-warn">{marketError}</p>}
           </div>
 
           {trendInsight ? (
-            <div className="space-y-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/5 p-4">
+            <div className="space-y-2 rounded-2xl border border-success/30 bg-success/5 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Social trend</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-success/80">Social trend</p>
                   <p className="text-sm text-text-secondary">{trendInsight.tweet.snippet ?? trendInsight.tweet.fullText}</p>
                 </div>
                 {trendInsight.sentiment?.label ? (
-                  <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-200">
+                  <span className="inline-flex items-center rounded-full bg-success/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-success">
                     {trendInsight.sentiment.label}
                   </span>
                 ) : null}
@@ -191,7 +191,7 @@ export default function AnalysisPageV2() {
                   href={trendInsight.source.tweetUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-200 underline decoration-emerald-500/70 decoration-dotted underline-offset-4"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-success underline decoration-success/70 decoration-dotted underline-offset-4"
                 >
                   View tweet
                   <span aria-hidden="true">↗</span>
@@ -317,10 +317,10 @@ function formatChangePct(value: number): string {
 
 function getChangeAccentFromNumber(value: number): string {
   if (value > 0) {
-    return "text-emerald-300";
+    return "text-success";
   }
   if (value < 0) {
-    return "text-rose-300";
+    return "text-danger";
   }
   return "text-text-primary";
 }

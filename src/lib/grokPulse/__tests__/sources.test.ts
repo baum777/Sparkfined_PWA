@@ -17,6 +17,19 @@ const restoreGlobals = () => {
   vi.unstubAllGlobals();
 };
 
+const toHref = (url: RequestInfo) => {
+  if (typeof url === "string") return url;
+  if (url instanceof URL) return url.toString();
+  if (typeof Request !== "undefined" && url instanceof Request) return url.url;
+  if (typeof url === "object" && url && "url" in url && typeof (url as { url?: unknown }).url === "string") {
+    return (url as { url: string }).url;
+  }
+  if (typeof url === "object" && url && "href" in url && typeof (url as { href?: unknown }).href === "string") {
+    return (url as { href: string }).href;
+  }
+  throw new Error("Unsupported fetch input for tests");
+};
+
 describe("grokPulse sources", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -28,7 +41,7 @@ describe("grokPulse sources", () => {
 
   test("buildGlobalTokenList dedupes across sources and respects maxUnique", async () => {
     const mockFetch = vi.fn((url: RequestInfo) => {
-      const href = String(url);
+      const href = toHref(url);
       if (href.includes("dexscreener.com") && href.includes("gainers")) {
         return Promise.resolve(
           createResponse(true, {
@@ -111,7 +124,7 @@ describe("grokPulse sources", () => {
     let birdeyeCall = 0;
 
     const mockFetch = vi.fn((url: RequestInfo) => {
-      const href = String(url);
+      const href = toHref(url);
       if (href.includes("dexscreener.com") && href.includes("gainers")) {
         return Promise.resolve({
           ok: false,

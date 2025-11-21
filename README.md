@@ -62,6 +62,12 @@ Sparkfined is a **Progressive Web App (PWA)** that brings professional-grade tra
 
 **For detailed architecture, see [`docs/pwa-audit/01_repo_index.md`](docs/pwa-audit/01_repo_index.md) and [`docs/process/product-overview.md`](docs/process/product-overview.md).**
 
+### Design tokens & styling
+
+- **Source of truth:** `tailwind.config.ts` holds the semantic palette (brand, surface, border, text, status). Use these utility names instead of raw palette values.
+- **CSS parity:** `src/styles/tokens.css` mirrors the same values as CSS custom properties for non-Tailwind contexts (charts, overlays, etc.).
+- **Component guidance:** Prefer semantic classes such as `bg-brand`, `bg-surface`, `text-text-primary`, `border-border`, `text-success`, and `text-danger` to avoid hardcoded hex values. See ADR [`docs/design/adr-0001-design-token-source.md`](docs/design/adr-0001-design-token-source.md) for rationale.
+
 ---
 
 ## Getting Started
