@@ -652,3 +652,49 @@ Commands & Results:
 New open points:
 - None.
 
+### 2025-11-21 – Section 6B.4 – Final Zombie-Code Sweep (Claude Review)
+
+Date: 2025-11-21  
+Agent: Claude 4.5 (Senior Repo Auditor & Architecture Steward)  
+Section: #6B.4 – Final Zombie-Code Sweep (Review)  
+Branch: claude/zombie-code-sweep-01Ctsx13oxtxfbPyEGbRn4eT
+
+Actions:
+- Verified that all navigation shortcuts and deep links (Landing CTA, Dashboard Quick Actions, Replay view, notifications, lessons CTA, rule wizard preview, BottomNav tests) now target V2 routes directly (`/dashboard-v2`, `/journal-v2`, `/analysis-v2`, `/chart-v2`, `/settings-v2`, `/watchlist-v2`, `/alerts-v2`).
+- Confirmed that the legacy V1 BoardPage has been removed from `src/pages` and only exists in `docs/archive/v1-migration-backup/pages/BoardPage.tsx` with proper restore/retention notes documented in archive README.md.
+- Spot-checked selected hooks and helpers for unused "zombie" exports; no unsafe or undocumented dead code found. Retained components (`board/` components, `useBoardFeed`, `useBoardKPIs`) and lib utilities (`shortlink.ts`, `timeframeLogic.ts`) are intentionally preserved for future use.
+- Re-ran lint, typecheck, and build to ensure that the zombie-sweep introduced no regressions.
+- Updated `Sparkfined_Working_Plan.md` Section 6B.4 with the review summary, checklist, and final Section-6 completion note.
+
+Commands & Results:
+- pnpm install    → ✅ (798 packages installed)
+- pnpm lint       → ✅ (0 warnings, only expected .eslintignore deprecation notice)
+- pnpm typecheck  → ✅ (no TypeScript errors)
+- pnpm run build  → ✅ (successful, expected MORALIS_API_KEY warning only)
+
+Verification Results:
+- ✅ **Navigation & Deep Links:** All key navigation components use V2 routes directly
+  - Landing CTA → `/dashboard-v2`
+  - Dashboard Quick Actions → `/dashboard-v2`, `/journal-v2`, `/analysis-v2`
+  - Replay View → `/journal-v2`, `/chart-v2`
+  - Notifications → `/chart-v2`
+  - Lessons CTA → `/chart-v2`
+  - BottomNav → `/dashboard-v2`, `/analysis-v2`, `/journal-v2`, `/settings-v2`
+  - BottomNav Tests verify V2 routes
+
+- ✅ **BoardPage & V1-Residuen:** 
+  - No BoardPage in active `src/pages/` (only DashboardPageV2)
+  - No active imports or references to BoardPage
+  - BoardPage properly archived with documentation
+
+- ✅ **Retained Hooks & Exports:**
+  - Active hooks in use: `useAdvancedInsightStore`, `useSignals`
+  - Retained for future use: `useBoardFeed`, `useBoardKPIs`, board components
+  - Public API utilities retained: `shortlink.ts`, `timeframeLogic.ts`
+
+- ✅ **Pipeline Verification:** All checks pass with no regressions
+
+- ✅ **Section 6 Complete:** Entire Section 6 (6A + 6B.1–6B.4) marked as complete in Working Plan
+
+New open points:
+- None – Section 6B.4 and damit die gesamte Section 6 sind abgeschlossen und produktionsreif.
