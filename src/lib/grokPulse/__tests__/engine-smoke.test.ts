@@ -4,6 +4,7 @@ import type { GrokSentimentSnapshot, PulseGlobalToken } from "../types";
 import * as kv from "../kv";
 import * as sources from "../sources";
 import * as grokClient from "../grokClient";
+import * as contextBuilder from "../contextBuilder";
 
 type MockFn = ReturnType<typeof vi.fn>;
 
@@ -39,6 +40,11 @@ vi.mock("../grokClient", () => {
   return { fetchAndValidateGrokSentiment };
 });
 
+vi.mock("../contextBuilder", () => {
+  const buildTokenContext = vi.fn();
+  return { buildTokenContext };
+});
+
 describe("grokPulse engine smoke test", () => {
   const tokens: PulseGlobalToken[] = [
     { address: "addrA", symbol: "AAA" },
@@ -63,6 +69,7 @@ describe("grokPulse engine smoke test", () => {
     (grokClient.fetchAndValidateGrokSentiment as MockFn).mockResolvedValue(
       snapshot
     );
+    (contextBuilder.buildTokenContext as MockFn).mockResolvedValue("ctx");
 
     let counter = 0;
     (kv.getAndIncrementDailyCallCounter as MockFn).mockImplementation(
@@ -82,6 +89,8 @@ describe("grokPulse engine smoke test", () => {
 
     expect(sources.buildGlobalTokenList).toHaveBeenCalledTimes(1);
     expect(kv.setPulseGlobalList).toHaveBeenCalledWith(tokens);
+
+    expect(contextBuilder.buildTokenContext).toHaveBeenCalledTimes(tokens.length);
 
     expect(grokClient.fetchAndValidateGrokSentiment).toHaveBeenCalledTimes(
       tokens.length
