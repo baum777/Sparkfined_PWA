@@ -7,6 +7,9 @@ import type {
   PulseMetaLastRun,
 } from "./types";
 
+const CONTEXT_TTL_SECONDS = 20 * 60; // 20 minutes
+const WATCHLIST_TTL_SECONDS = 15 * 60; // 15 minutes
+
 const SNAPSHOT_TTL_SECONDS = 2700; // 45 minutes
 const HISTORY_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 const GLOBAL_LIST_TTL_SECONDS = 30 * 60; // 30 minutes
@@ -24,6 +27,20 @@ export async function setCurrentSnapshot(
   snapshot: GrokSentimentSnapshot
 ): Promise<void> {
   await kv.set(`sentiment:${address}`, snapshot, { ex: SNAPSHOT_TTL_SECONDS });
+}
+
+export async function cacheTokenContext(
+  address: string,
+  context: string
+): Promise<void> {
+  await kv.set(`sentiment:context:${address}`, context, { ex: CONTEXT_TTL_SECONDS });
+}
+
+export async function getCachedTokenContext(
+  address: string
+): Promise<string | null> {
+  const cached = await kv.get<string | null>(`sentiment:context:${address}`);
+  return cached ?? null;
 }
 
 export async function getHistory(
@@ -71,6 +88,15 @@ export async function setPulseGlobalList(
 export async function getPulseGlobalList(): Promise<PulseGlobalToken[]> {
   const list = await kv.get<PulseGlobalToken[] | null>("pulse:global_list");
   return list ?? [];
+}
+
+export async function setWatchlistTokens(tokens: PulseGlobalToken[]): Promise<void> {
+  await kv.set("pulse:watchlist:tokens", tokens, { ex: WATCHLIST_TTL_SECONDS });
+}
+
+export async function getWatchlistTokens(): Promise<PulseGlobalToken[]> {
+  const tokens = await kv.get<PulseGlobalToken[] | null>("pulse:watchlist:tokens");
+  return tokens ?? [];
 }
 
 export async function pushDeltaEvent(event: PulseDeltaEvent): Promise<void> {

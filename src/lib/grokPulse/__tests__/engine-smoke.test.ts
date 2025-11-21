@@ -16,6 +16,7 @@ vi.mock("../kv", () => {
   const setPulseMetaLastRun = vi.fn();
   const getCurrentSnapshot = vi.fn();
   const getHistory = vi.fn();
+  const getWatchlistTokens = vi.fn();
   const getAndIncrementDailyCallCounter = vi.fn();
 
   return {
@@ -26,6 +27,7 @@ vi.mock("../kv", () => {
     setPulseMetaLastRun,
     getCurrentSnapshot,
     getHistory,
+    getWatchlistTokens,
     getAndIncrementDailyCallCounter,
   };
 });
@@ -41,8 +43,8 @@ vi.mock("../grokClient", () => {
 });
 
 vi.mock("../contextBuilder", () => {
-  const buildTokenContext = vi.fn();
-  return { buildTokenContext };
+  const buildEnhancedGrokContext = vi.fn();
+  return { buildEnhancedGrokContext };
 });
 
 describe("grokPulse engine smoke test", () => {
@@ -69,7 +71,12 @@ describe("grokPulse engine smoke test", () => {
     (grokClient.fetchAndValidateGrokSentiment as MockFn).mockResolvedValue(
       snapshot
     );
-    (contextBuilder.buildTokenContext as MockFn).mockResolvedValue("ctx");
+    (contextBuilder.buildEnhancedGrokContext as MockFn).mockResolvedValue({
+      context: "ctx",
+      onchain: null,
+      social: { entries: [], twitterEntries: [], total: 0 },
+      watchlistHit: false,
+    });
 
     let counter = 0;
     (kv.getAndIncrementDailyCallCounter as MockFn).mockImplementation(
@@ -90,7 +97,9 @@ describe("grokPulse engine smoke test", () => {
     expect(sources.buildGlobalTokenList).toHaveBeenCalledTimes(1);
     expect(kv.setPulseGlobalList).toHaveBeenCalledWith(tokens);
 
-    expect(contextBuilder.buildTokenContext).toHaveBeenCalledTimes(tokens.length);
+    expect(contextBuilder.buildEnhancedGrokContext).toHaveBeenCalledTimes(
+      tokens.length
+    );
 
     expect(grokClient.fetchAndValidateGrokSentiment).toHaveBeenCalledTimes(
       tokens.length
