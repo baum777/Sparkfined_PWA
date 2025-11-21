@@ -652,3 +652,23 @@ Commands & Results:
 New open points:
 - None.
 
+
+### 2025-11-21 – Section 7 – Grok Pulse Engine & Read API (7A–7F)
+
+Date: 2025-11-21
+Agent: Codex
+Section: #7 – Grok Pulse Engine & Read API
+Branch: work
+
+Actions:
+- Added Grok Pulse sentiment types, KV contract helpers, and ambient @vercel/kv typings for server-only access.
+- Stubbed global token sources list builder, implemented Grok client with prompt + SHA-256 validation, and built cron engine with delta events/history handling.
+- Exposed secured cron endpoint (/api/grok-pulse/cron) and read endpoint (/api/grok-pulse/state); updated Working Plan Section 7 with status and TODOs.
+
+Commands & Results:
+- pnpm lint → ✅
+- pnpm typecheck → ✅
+- pnpm run build → ✅ (expected MORALIS_API_KEY warning; npm registry blocked fetching @vercel/kv so ambient types were added)
+
+New open points:
+- Implement real DexScreener/Birdeye adapters for token sources and revisit installing @vercel/kv when registry access is available.
