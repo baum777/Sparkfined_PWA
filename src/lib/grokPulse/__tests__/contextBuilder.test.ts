@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { buildTokenContext } from "../contextBuilder";
+import { buildEnhancedGrokContext, buildTokenContext } from "../contextBuilder";
 import type { PulseGlobalToken } from "../types";
 
 const token: PulseGlobalToken = {
@@ -87,5 +87,50 @@ describe("contextBuilder", () => {
     expect(context).toContain("missing live market metrics");
     expect(context).toContain("No live mentions fetched");
     expect(warnSpy).toHaveBeenCalled();
+  });
+
+  test("includes twitter and watchlist hints in enhanced builder", async () => {
+    const fetchMock = vi
+      .fn()
+      // Dexscreener detail
+      .mockResolvedValueOnce(
+        createResponse(true, {
+          pairs: [
+            {
+              priceUsd: "0.02",
+              liquidity: { usd: 75000 },
+              volume: { h24: 200000 },
+              priceChange: { h24: 10 },
+            },
+          ],
+        })
+      )
+      // Birdeye detail
+      .mockResolvedValueOnce(createResponse(true, { data: {} }))
+      // Social search
+      .mockResolvedValueOnce(createResponse(true, { results: [] }))
+      // Twitter search
+      .mockResolvedValueOnce(
+        createResponse(true, {
+          results: [
+            { text: "bonk trending again", score: 0.7 },
+            { summary: "community pushing bonk" },
+          ],
+        })
+      );
+
+    vi.stubGlobal("fetch", fetchMock as unknown as typeof fetch);
+
+    const context = await buildEnhancedGrokContext(token, {
+      dexscreenerBaseUrl: "https://dex.test",
+      birdeyeBaseUrl: "https://bird.test",
+      socialBaseUrl: "https://social.test",
+      twitterBaseUrl: "https://twitter.test",
+      watchlistTokens: [{ ...token }],
+    });
+
+    expect(context.context).toContain("Watchlist: token is tracked");
+    expect(context.social.total).toBe(2);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
   });
 });

@@ -1,6 +1,12 @@
 import { sanitizeSymbol } from "./sources";
 import type { GlobalTokenSourceArgs, PulseGlobalToken } from "./sources";
 
+export interface EnhancedSocialContext {
+  entries: SocialContextEntry[];
+  twitterEntries: SocialContextEntry[];
+  total: number;
+}
+
 interface SocialContextEntry {
   text: string;
   score?: number;
@@ -17,23 +23,42 @@ interface OnchainSnapshot {
 export interface TokenContextBuilderArgs extends GlobalTokenSourceArgs {
   socialBaseUrl?: string;
   socialApiKey?: string;
+  twitterBaseUrl?: string;
+  twitterApiKey?: string;
+  watchlistTokens?: PulseGlobalToken[];
 }
 
 const MAX_SOCIAL_ENTRIES = 4;
 const MAX_SNIPPET_LENGTH = 220;
 
-export async function buildTokenContext(
+export interface EnhancedGrokContext {
+  context: string;
+  onchain?: OnchainSnapshot | null;
+  social: EnhancedSocialContext;
+  watchlistHit: boolean;
+}
+
+export async function buildEnhancedGrokContext(
   token: PulseGlobalToken,
   args: TokenContextBuilderArgs
-): Promise<string> {
-  const [dexSnapshot, birdeyeSnapshot, socialMentions] = await Promise.all([
-    fetchDexscreenerSnapshot(token, args),
-    fetchBirdeyeSnapshot(token, args),
-    fetchSocialMentions(token, args),
-  ]);
+): Promise<EnhancedGrokContext> {
+  const [dexSnapshot, birdeyeSnapshot, socialMentions, twitterMentions] =
+    await Promise.all([
+      fetchDexscreenerSnapshot(token, args),
+      fetchBirdeyeSnapshot(token, args),
+      fetchSocialMentions(token, args),
+      fetchTwitterMentions(token, args),
+    ]);
 
   const onchain = dexSnapshot ?? birdeyeSnapshot;
   const contextParts: string[] = [];
+
+  const watchlistHit = Boolean(
+    args.watchlistTokens?.some(
+      (candidate) => candidate.address === token.address ||
+        sanitizeSymbol(candidate.symbol) === sanitizeSymbol(token.symbol)
+    )
+  );
 
   contextParts.push(`Token: ${sanitizeSymbol(token.symbol)} (${token.address})`);
 
@@ -64,15 +89,23 @@ export async function buildTokenContext(
     );
   }
 
-  if (socialMentions.length > 0) {
-    const snippets = socialMentions
-      .slice(0, MAX_SOCIAL_ENTRIES)
-      .map((entry) => formatSocialEntry(entry))
-      .filter(Boolean)
-      .join(" | ");
+  if (watchlistHit) {
+    contextParts.push("Watchlist: token is tracked by Sparkfined users.");
+  }
 
+  const socialEntries = [...socialMentions, ...twitterMentions];
+  const totalSocial = socialEntries.length;
+  const combinedSnippets = socialEntries
+    .slice(0, MAX_SOCIAL_ENTRIES)
+    .map((entry) => formatSocialEntry(entry))
+    .filter(Boolean)
+    .join(" | ");
+
+  if (totalSocial > 0) {
     contextParts.push(
-      `Social (${socialMentions.length}): ${snippets || "unable to parse snippets"}`
+      `Social (${totalSocial}): ${
+        combinedSnippets || "unable to parse snippets"
+      }`
     );
   } else {
     contextParts.push(
@@ -84,7 +117,24 @@ export async function buildTokenContext(
     "Guidance: Prioritize meme/retail sentiment. If context is thin, lower confidence to 70-75."
   );
 
-  return contextParts.join("\n");
+  return {
+    context: contextParts.join("\n"),
+    onchain,
+    social: {
+      entries: socialMentions,
+      twitterEntries: twitterMentions,
+      total: totalSocial,
+    },
+    watchlistHit,
+  };
+}
+
+export async function buildTokenContext(
+  token: PulseGlobalToken,
+  args: TokenContextBuilderArgs
+): Promise<string> {
+  const enhanced = await buildEnhancedGrokContext(token, args);
+  return enhanced.context;
 }
 
 async function fetchDexscreenerSnapshot(
@@ -216,6 +266,48 @@ async function fetchSocialMentions(
       .filter((entry): entry is SocialContextEntry => Boolean(entry?.text));
   } catch (error) {
     console.warn("[grokPulse] Social context error", error);
+    return [];
+  }
+}
+
+async function fetchTwitterMentions(
+  token: PulseGlobalToken,
+  args: TokenContextBuilderArgs
+): Promise<SocialContextEntry[]> {
+  const baseUrl = args.twitterBaseUrl?.trim();
+  if (!baseUrl) return [];
+
+  const headers: Record<string, string> = { accept: "application/json" };
+  if (args.twitterApiKey) {
+    headers["authorization"] = `Bearer ${args.twitterApiKey}`;
+  }
+
+  const url = new URL("/v1/twitter/search", baseUrl);
+  url.searchParams.set("symbol", sanitizeSymbol(token.symbol));
+  url.searchParams.set("address", token.address);
+  url.searchParams.set("limit", String(MAX_SOCIAL_ENTRIES));
+
+  try {
+    const res = await fetch(url.toString(), {
+      headers,
+      signal: AbortSignal.timeout(8_000),
+    });
+
+    if (!res.ok) {
+      console.warn(
+        `[grokPulse] Twitter context failed: ${res.status} ${res.statusText}`
+      );
+      return [];
+    }
+
+    const data = await res.json().catch(() => null);
+    const results = Array.isArray(data?.results) ? data.results : [];
+
+    return results
+      .map((entry: unknown) => normalizeSocialEntry(entry))
+      .filter((entry): entry is SocialContextEntry => Boolean(entry?.text));
+  } catch (error) {
+    console.warn("[grokPulse] Twitter context error", error);
     return [];
   }
 }

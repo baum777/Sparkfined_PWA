@@ -3,6 +3,7 @@ import {
   getAndIncrementDailyCallCounter,
   getCurrentSnapshot,
   getHistory,
+  getWatchlistTokens,
   pushDeltaEvent,
   setCurrentSnapshot,
   setPulseGlobalList,
@@ -10,8 +11,9 @@ import {
 } from "./kv";
 import { buildGlobalTokenList } from "./sources";
 import { fetchAndValidateGrokSentiment } from "./grokClient";
-import { buildTokenContext } from "./contextBuilder";
+import { buildEnhancedGrokContext } from "./contextBuilder";
 import type { PulseRunResult } from "./types";
+import { buildKeywordSentimentFallback } from "./sentimentFallback";
 
 const MAX_CONCURRENCY = 20;
 const MAX_GROK_CALLS_PER_RUN = 150;
@@ -29,10 +31,20 @@ export async function runGrokPulseCron(): Promise<PulseRunResult> {
   const socialArgs = {
     socialApiKey: process.env.PULSE_SOCIAL_API_KEY?.trim(),
     socialBaseUrl: process.env.PULSE_SOCIAL_API_URL?.trim(),
+    twitterApiKey: process.env.PULSE_TWITTER_API_KEY?.trim(),
+    twitterBaseUrl: process.env.PULSE_TWITTER_API_URL?.trim(),
   } as const;
 
   const tokens = await buildGlobalTokenList(sourceArgs, MAX_GROK_CALLS_PER_RUN);
   await setPulseGlobalList(tokens);
+
+  let watchlistTokens = [] as Awaited<ReturnType<typeof getWatchlistTokens>>;
+  try {
+    watchlistTokens = await getWatchlistTokens();
+  } catch (error) {
+    console.warn("[grokPulse] failed to load watchlist tokens", error);
+    watchlistTokens = [];
+  }
 
   let success = 0;
   let failed = 0;
@@ -92,25 +104,26 @@ export async function runGrokPulseCron(): Promise<PulseRunResult> {
         tokensProcessed += 1;
 
         try {
-          const context = await buildTokenContext(token, {
+          const context = await buildEnhancedGrokContext(token, {
             ...sourceArgs,
             ...socialArgs,
+            watchlistTokens,
           }).catch((error) => {
             console.warn("[grokPulse] context builder failed", error);
-            return `Token: ${token.symbol} (${token.address})\nNo live context; return low confidence score.`;
+            return {
+              context: `Token: ${token.symbol} (${token.address})\nNo live context; return low confidence score.`,
+              onchain: null,
+              social: { entries: [], twitterEntries: [], total: 0 },
+              watchlistHit: false,
+            };
           });
 
-          const snapshot = await fetchAndValidateGrokSentiment({
-            symbol: token.symbol,
-            address: token.address,
-            context,
-          });
-
-          if (!snapshot) {
-            failed += 1;
-            // TODO: implement keyword-based fallback sentiment
-            return;
-          }
+          const snapshot =
+            (await fetchAndValidateGrokSentiment({
+              symbol: token.symbol,
+              address: token.address,
+              context: context.context,
+            })) ?? buildKeywordSentimentFallback(token, context.context);
 
           const previousSnapshot = await getCurrentSnapshot(token.address);
           const history = previousSnapshot ? [] : await getHistory(token.address);

@@ -1,3 +1,4 @@
+import { getWatchlistTokens } from "./kv";
 import type {
   BirdeyeTokenListResponse,
   DexscreenerPairEntry,
@@ -116,7 +117,31 @@ export async function fetchBirdeyeTopVolume(
 }
 
 export async function fetchWatchlistTokens(): Promise<PulseGlobalToken[]> {
-  // TODO: Wire watchlist-backed token selection when available
+  try {
+    const tokens = await getWatchlistTokens();
+    if (Array.isArray(tokens) && tokens.length) {
+      return dedupeTokens(tokens);
+    }
+  } catch (error) {
+    console.warn("[grokPulse] watchlist fetch failed", error);
+  }
+
+  const envList = process.env.PULSE_WATCHLIST_TOKENS?.trim();
+  if (envList) {
+    const parsed = envList
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+      .map((entry) => {
+        const [symbol, address] = entry.split(":");
+        if (!address) return null;
+        return { symbol: sanitizeSymbol(symbol), address: address.trim() };
+      })
+      .filter((token): token is PulseGlobalToken => Boolean(token?.address));
+
+    if (parsed.length) return dedupeTokens(parsed);
+  }
+
   return [];
 }
 
