@@ -4,7 +4,7 @@
 >
 > **Purpose:** Unified prompt-system for Claude Code (Anthropic), optimised for complex-refactoring, architecture-planning, and documentation-writing.
 >
-> **Last-Update:** 2025-11-12
+> **Last-Update:** 2025-11-21
 
 ---
 
@@ -61,6 +61,32 @@ Full `.rulesync/` structure (11 SYSTEM + 6 ITERATIVE files):
 | `_experiments.md` | Tech-spikes, A/B-tests, prototypes (10 documented) |
 | `_log.md` | Timeline, significant-commits, releases (30+ entries) |
 | `_agents.md` | Multi-tool-routing-map (Cursor, Claude Code, Codex) |
+
+---
+
+## Codebase Statistics
+
+**Scale:**
+- 253+ TypeScript files in `src/`
+- 15+ API endpoints in `api/`
+- 428KB precached assets (66 files)
+- 11 SYSTEM documentation files
+- 6 ITERATIVE documentation files
+
+**Test Coverage:**
+- Overall: >80%
+- Critical modules: >90% (`src/lib/`, `api/`, `src/hooks/`)
+- E2E tests: Playwright-based critical flow coverage
+
+**Build Performance:**
+- Build time: ~1.6s (TypeScript + Vite)
+- Bundle size: 428KB gzipped (target: <400KB)
+- Lighthouse Score: ≥90 (Performance, PWA, Accessibility, Best Practices)
+
+**Key Dependencies:**
+- React 18.3, TypeScript 5.6, Vite 5.4
+- TailwindCSS 4.1, Zustand 5.0, Dexie 3.2
+- Vitest (testing), Playwright (E2E), ESLint (linting)
 
 ---
 
@@ -169,6 +195,7 @@ type LoadingState<T> =
 src/
   pages/          — Full-page components (Market.tsx, Journal.tsx)
   sections/       — Page-sections (ChartSection, SignalMatrix)
+  features/       — Feature modules (analysis/, market/)
   components/
     ui/           — Primitives (Button, Input, Card)
   hooks/          — Custom hooks (useTokenData, useAccessGate)
@@ -176,7 +203,16 @@ src/
   state/          — React-Context (settings, ai-provider)
   store/          — Zustand stores (accessStore)
   types/          — Type definitions
+  ai/             — AI orchestration logic
+  app/            — Application core setup
+  config/         — Configuration files
+  diagnostics/    — Diagnostic and monitoring tools
+  routes/         — Routing configuration
+  styles/         — Global styles
+  utils/          — Utility functions
 ```
+
+**Stats:** 253+ TypeScript files, organized in modular architecture
 
 ### State-Management
 
@@ -281,6 +317,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 }
 ```
+
+### Key API Endpoints
+
+**Market Data:**
+- `/api/market/ohlc` — OHLC chart data
+- `/api/data/ohlc` — Legacy OHLC endpoint
+- `/api/board/kpis` — Dashboard KPI tiles
+- `/api/board/feed` — Activity feed data
+
+**AI & Analysis:**
+- `/api/ai/analyze-market` — Market analysis with AI insights
+- `/api/grok-pulse/context` — Grok Pulse context builder
+- `/api/grok-pulse/sentiment` — Sentiment analysis
+- `/api/grok-pulse/state` — State management
+- `/api/grok-pulse/cron` — Scheduled updates
+
+**Alerts & Rules:**
+- `/api/alerts/dispatch` — Alert dispatch handler
+- `/api/alerts/worker` — Alert worker
+- `/api/rules/index` — Rule evaluation
+- `/api/rules/eval-cron` — Scheduled rule evaluation
+
+**Infrastructure:**
+- `/api/telemetry` — Event tracking
+- `/api/cron/cleanup-temp-entries` — Maintenance tasks
+- `/api/wallet/webhook` — Wallet event handling
 
 ### fetchWithRetry (Client-Side)
 
@@ -428,22 +490,31 @@ const result = await callAI({
 
 ## Current-Context (from _context.md)
 
-### Session-Focus (2025-11-12)
+### Session-Focus (2025-11-21)
 
-**Primary-Task:** Multi-Tool-Prompt-System setup (Phase 4: Tool-Configs)
+**Recent-Work:** Advanced features implementation and Grok Pulse integration
 
 **Status:**
-- ✅ Phase 1: Audit completed
-- ✅ Phase 2: Rulesync-structure designed
-- ✅ Phase 3: 11 SYSTEM + 6 ITERATIVE files generated
-- ⏳ Phase 4: Tool-configs in progress
+- ✅ Multi-Tool-Prompt-System (SYSTEM-Files, ITERATIVE-Files complete)
+- ✅ Grok Pulse API integration (context and sentiment endpoints)
+- ✅ UI Error Report generated (comprehensive Codex review)
+- ✅ E2E Test Strategy implemented (Grok Pulse v1 coverage)
+- ✅ Advanced Insight Card UI development (Store, Telemetry, Tests)
+- ✅ AI-Schicht stable (sanityCheck + botScore heuristics)
+
+**Next-Steps:**
+1. Advanced Insight UI refinement (Tabs, Override-Model, Token-Lock)
+2. Bundle-Size-Optimisation (<400KB target)
+3. Lint-Warnings-Cleanup
+4. Playwright-CI-Setup (GitHub Actions)
 
 ### Open-Questions
 
 1. **Chart-Library:** Lightweight-Charts vs. TradingView? (Decision: End Q1 2025)
-2. **Real-Time-Data:** WebSocket vs. Polling? (Decision: When Real-Time-Alerts goes live)
+2. **Real-Time-Data:** WebSocket vs. SSE vs. Polling? (Decision: When Real-Time-Alerts goes live)
 3. **Backend-DB:** Supabase vs. Stay-Client-Only? (Decision: After On-Chain-Access-Gating)
 4. **AI-Provider:** Add Claude as third option? (Decision: Q2 2025)
+5. **Accessibility:** Canvas charts - Data table alternative approach (In Discussion)
 
 ---
 
@@ -475,17 +546,66 @@ const result = await callAI({
 
 ### Active-Sprint: S0 — Foundation Cleanup (2025-11-12 → 2025-11-26)
 
+**Status:** Nearly Complete
+
 **Tasks:**
 - ✅ Multi-Tool-Prompt-System (SYSTEM-Files, ITERATIVE-Files)
-- ⏳ PWA-Offline-Mode-Audit
-- ⏳ Bundle-Size-Optimisation (<400KB)
-- ⏳ E2E-Test-Coverage (15-20 tests)
+- ✅ PWA-Offline-Mode-Audit (Service-Worker stable, 428KB precache)
+- ✅ Grok Pulse API Integration (context and sentiment endpoints)
+- ✅ E2E Test Strategy (Grok Pulse v1 coverage)
+- ✅ UI Error Report (comprehensive Codex review)
+- ⏳ Bundle-Size-Optimisation (<400KB target, current: 428KB)
+- ⏳ Advanced Insight Card UI refinement
+- ⏳ Playwright-CI-Setup (GitHub Actions)
 
 ### Q1 2025 Roadmap (P0)
 
 1. **On-Chain-Access-Gating** (Solana-Wallet, NFT-Check)
 2. **Real-Time-Alerts** (Push-Notifications)
 3. **Background-Sync** (Offline-Queue)
+4. **Signal Orchestrator** (Multi-indicator confluence engine)
+5. **Moralis Cortex Integration** (Advanced on-chain analytics)
+
+---
+
+## Recent Developments (2025-11-21)
+
+### Completed Features
+
+**Grok Pulse Integration:**
+- ✅ Context builder API (`/api/grok-pulse/context`)
+- ✅ Sentiment analysis API (`/api/grok-pulse/sentiment`)
+- ✅ State management endpoint
+- ✅ Automated cron jobs for updates
+- ✅ E2E test coverage for all endpoints
+- ✅ Live adapters for DexScreener and Birdeye
+
+**Advanced Insight System:**
+- ✅ Advanced Insight Card UI component
+- ✅ Store implementation with Zustand
+- ✅ Telemetry integration for tracking
+- ✅ AI heuristics (sanityCheck + botScore)
+- ✅ Market structure analysis
+- ✅ Flow/Volume analysis tabs
+
+**Quality & Documentation:**
+- ✅ Comprehensive UI Error Report generated
+- ✅ E2E test strategy implemented
+- ✅ Production-ready feature documentation
+- ✅ Multi-tool prompt system complete
+
+### In Progress
+
+**UI Refinements:**
+- ⏳ Advanced Insight tabs (Market Structure, Flow/Volume, Playbook)
+- ⏳ Override model with EditableField<T>
+- ⏳ Token-Lock overlay for premium features
+- ⏳ Dirty-flags for user modifications
+
+**Infrastructure:**
+- ⏳ Bundle size optimization (target: <400KB)
+- ⏳ Lint warnings cleanup
+- ⏳ Playwright CI setup for automated testing
 
 ---
 
@@ -531,6 +651,57 @@ Before asking complex-questions, load 10-15 relevant files:
 
 ---
 
+## Key Repository Files
+
+### Documentation Hub
+- **`README.md`** — Main project overview, getting started, deployment
+- **`CLAUDE.md`** — This file, AI assistant guide
+- **`AGENTS.md`** — Multi-tool coordination (Cursor, Claude Code, Codex)
+- **`docs/README.md`** — Documentation navigation hub
+- **`docs/process/product-overview.md`** — Product vision and architecture
+- **`IMPROVEMENT_ROADMAP.md`** — Detailed feature roadmap
+- **`UI_ERROR_REPORT.md`** — Comprehensive UI error analysis
+
+### Configuration
+- **`package.json`** — Dependencies and scripts
+- **`tsconfig.json`** — TypeScript configuration (strict mode)
+- **`vite.config.ts`** — Vite build config, PWA plugin setup
+- **`tailwind.config.ts`** — TailwindCSS 4.1 configuration
+- **`vercel.json`** — Vercel deployment configuration
+- **`.env.example`** — Environment variable template
+
+### Core Application Files
+- **`src/main.tsx`** — Application entry point
+- **`src/App.tsx`** — Root component with routing
+- **`src/routes/`** — Route definitions
+- **`src/pages/`** — Page components (Market, Journal, Board, etc.)
+- **`src/features/`** — Feature modules (analysis, market)
+- **`src/lib/`** — Utility functions and core logic
+- **`src/hooks/`** — Custom React hooks
+- **`src/store/`** — Zustand global stores
+- **`src/components/ui/`** — Reusable UI primitives
+- **`src/types/`** — TypeScript type definitions
+
+### Backend API
+- **`api/grok-pulse/`** — Grok Pulse integration endpoints
+- **`api/market/`** — Market data endpoints
+- **`api/alerts/`** — Alert system endpoints
+- **`api/board/`** — Dashboard data endpoints
+- **`api/rules/`** — Rule evaluation endpoints
+
+### Testing
+- **`tests/`** — E2E tests (Playwright)
+- **`vitest.config.ts`** — Vitest unit test configuration
+- **`playwright.config.ts`** — Playwright E2E test configuration
+
+### Scripts & Tools
+- **`scripts/check-bundle-size.mjs`** — Bundle size verification
+- **`scripts/check-env.js`** — Environment validation
+- **`verify-deployment.sh`** — Post-deployment verification
+
+---
+
 ## Revision-History
 
+- **2025-11-21:** Updated with recent developments (Grok Pulse integration, Advanced Insight Card, UI error report, E2E tests, current sprint status)
 - **2025-11-12:** Initial creation, Phase 4 (Auto-generated from `.rulesync/`, optimised for Claude Code)
