@@ -766,3 +766,19 @@ Recommendation:
 - **✅ Mark Section 7 as COMPLETE** (7A–7F all verified and production-ready)
 - **⏭️ Proceed with Section 8** (E2E Test Strategy) or Section 7B (Context-Builder + Adapters implementation)
 - **📋 Backlog:** Track GP-TODO-01 to GP-TODO-05 in Q1 2025 roadmap
+---
+Date: 2025-11-21
+Agent: Codex
+Branch: work
+Section: 7B – Grok Pulse Adapters Test Pass
+
+Actions:
+- Added Grok Pulse sources unit tests covering normalization, deduplication, maxUnique cap, and adapter error handling.
+- Added engine smoke test with stubbed sources/KV/Grok client to verify snapshot/history/meta writes under caps.
+- Hardened token symbol sanitation (uppercase, length cap, UNKNOWN fallback) and documented status in Working Plan.
+
+Commands & Results:
+- pnpm lint (pass; expected ESLintIgnoreWarning noise)
+- pnpm typecheck (pass)
+- pnpm test -- src/lib/grokPulse/__tests__/sources.test.ts (pass)
+- pnpm test -- src/lib/grokPulse/__tests__/engine-smoke.test.ts (pass)

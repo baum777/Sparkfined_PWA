@@ -5,6 +5,8 @@ import type {
   PulseGlobalToken,
 } from "./types";
 
+const MAX_SYMBOL_LENGTH = 12;
+
 export interface GlobalTokenSourceArgs {
   dexscreenerApiKey?: string;
   dexscreenerBaseUrl?: string;
@@ -84,7 +86,7 @@ export async function fetchBirdeyeTopVolume(
         .filter((token) => Boolean(token?.address) && Boolean(token?.symbol))
         .map((token) => ({
           address: token.address.trim(),
-          symbol: token.symbol.trim(),
+          symbol: sanitizeSymbol(token.symbol),
         }))
     );
   } catch (error) {
@@ -122,7 +124,7 @@ function normalizeDexscreenerPair(
   pair: DexscreenerPairEntry
 ): PulseGlobalToken | null {
   const address = pair?.baseToken?.address?.trim();
-  const symbol = pair?.baseToken?.symbol?.trim();
+  const symbol = sanitizeSymbol(pair?.baseToken?.symbol);
   if (!address) return null;
 
   return { address, symbol: symbol ?? "UNKNOWN" };
@@ -133,9 +135,19 @@ function dedupeTokens(tokens: PulseGlobalToken[]): PulseGlobalToken[] {
   for (const token of tokens) {
     const address = token.address.trim();
     if (!address || deduped.has(address)) continue;
-    const symbol = token.symbol?.trim() || "UNKNOWN";
+    const symbol = sanitizeSymbol(token.symbol);
     deduped.set(address, { address, symbol });
   }
 
   return Array.from(deduped.values());
+}
+
+function sanitizeSymbol(input?: string | null): string {
+  const trimmed = input?.trim();
+  if (!trimmed) return "UNKNOWN";
+
+  const normalized = trimmed.toUpperCase().slice(0, MAX_SYMBOL_LENGTH);
+  if (!normalized) return "UNKNOWN";
+
+  return normalized;
 }

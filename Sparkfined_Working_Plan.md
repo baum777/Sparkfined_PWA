@@ -878,6 +878,15 @@ Die Grok Pulse Engine (7A–7F) ist vollständig, konsistent und produktionsreif
 
 ---
 
+#### Section 7B – Tests & Hardening
+
+- Unit-Tests für DexScreener/Birdeye-Normalisierung, Dedupe und Fehlerpfade ergänzt.
+- Engine-Smoke-Test mit gestubbten Sources/KV/Grok-Client hinzugefügt.
+- API-State-Check als optionalen Future-Test notiert.
+
+- [x] Unit tests for sources
+- [x] Engine smoke test
+
 
 ## 7. E2E Test Strategy
 

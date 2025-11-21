@@ -32,6 +32,9 @@ export function initializeEventSubscriptions(): void {
     // Fan out price updates to watchlist
     fanOutLivePriceUpdates(state.prices, prevState.prices);
   });
+
+  // Keep reference for potential teardown hooks
+  void livePriceUnsubscribe;
 }
 
 function fanOutSolanaMemeTrendEvent(evt: SolanaMemeTrendEvent): void {
