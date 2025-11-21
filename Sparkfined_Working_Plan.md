@@ -4,18 +4,19 @@ This document coordinates architecture, refactors, and production hardening of t
 
 ## Section Overview
 
-| # | Section                                  | Scope                                                | Primary Agent | Handoff        |
-|---|------------------------------------------|------------------------------------------------------|--------------|----------------|
+| # | Section                                  | Scope                                                | Primary Agent | Handoff       |
+|---|------------------------------------------|------------------------------------------------------|--------------|-----------|
 | 1 | Status Sync & Architecture Freeze        | Confirm current repo state & decisions               | Claude       | Summary for 2+ |
 | 2 | Layout & Navigation Review               | UX review of new DashboardShell layout               | Claude       | Issues for 3   |
 | 3 | Chart & Settings V2 Completion           | Finish ChartPageV2 & SettingsPageV2, ensure parity   | Codex        | Review for 4   |
 | 4 | Routing & Navigation Migration (UX-04 & UX-05) | Redirect legacy routes, update Sidebar/BottomNav to V2 | Codex        | UX check       |
 | 5 | Design Tokens Full Sweep                 | Remove remaining hardcoded colors                    | Codex        | Visual check   |
 | 6 | Dead Code & V1 Archive                   | Archive/remove V1 pages & dev-only files             | Codex        | Sanity check   |
-| 7 | E2E Test Strategy                        | Define scenarios + priorities                        | Claude       | Inputs for 8   |
-| 8 | E2E Implementation & CI Gates            | Implement Playwright tests & CI quality gates        | Codex        | Review for 9   |
-| 9 | Docs & Governance                        | Update CLAUDE.md, README, MIGRATION_V2.md            | Claude       | Final review   |
-|10 | Final Pre-Prod Check & Monitoring        | Lighthouse, smoke tests, monitoring plan             | Claude+Codex | Deploy         |
+| 7 | Grok Pulse Engine & Read API             | Server-side Grok sentiment engine + state endpoints  | Codex        | PR summary     |
+| 8 | E2E Test Strategy                        | Define scenarios + priorities                        | Claude       | Inputs for 9   |
+| 9 | E2E Implementation & CI Gates            | Implement Playwright tests & CI quality gates        | Codex        | Review for 10  |
+|10 | Docs & Governance                        | Update CLAUDE.md, README, MIGRATION_V2.md            | Claude       | Final review   |
+|11 | Final Pre-Prod Check & Monitoring        | Lighthouse, smoke tests, monitoring plan             | Claude+Codex | Deploy      |
 
 ---
 
@@ -788,7 +789,35 @@ The 4 critical modal/banner components are now production-ready. The remaining 1
 ---
 
 
-## 7. E2E Test Strategy
+## 7. Grok Pulse Engine & Read API (Sections 7A–7F)
+
+Goal: Build the Grok-powered sentiment pipeline (types, KV contract, token sources, Grok client, cron engine, and read API) for Solana tokens.
+
+Status Summary:
+
+- 7A – Types & KV Contract: ✅ Types defined for sentiment, CTA, history, deltas, and KV wrapper functions for snapshots/meta/history/events/daily counter.
+- 7B – Global Token Sources: ✅ Source API stubbed and deduplicating list builder; TODO to add real DexScreener/Birdeye adapters.
+- 7C – Grok Client & Hash-Validation: ✅ Prompt builder, JSON parsing, strict range checks, SHA-256 validation hash; safe null fallback when GROK_API_KEY is missing.
+- 7D – Grok Pulse Engine: ✅ Concurrency + daily/run caps, KV writes, history append, delta events queued; TODO keyword-fallback/context enrichment.
+- 7E – Cron HTTP Endpoint: ✅ /api/grok-pulse/cron with Bearer secret guard.
+- 7F – Read Endpoint: ✅ /api/grok-pulse/state returning snapshots, history, and last-run metadata.
+
+Checklist:
+
+- [x] Grok/KV access confined to server-side modules and api handlers.
+- [x] Pulse cron secured via PULSE_CRON_SECRET header.
+- [x] State endpoint read-only and independent of Grok calls.
+- [x] Working Plan and Execution Log updated for Section 7A–7F.
+
+Open Points / Next Steps:
+
+- TODO: Implement real DexScreener/Birdeye HTTP adapters for 7B.
+- TODO: Add keyword-based fallback path when Grok is unavailable (7D follow-up).
+- ENV: GROK_API_KEY (required for Grok), GROK_API_URL (optional), PULSE_CRON_SECRET (cron auth), MAX_DAILY_GROK_CALLS (optional, default 900).
+
+---
+
+## 8. E2E Test Strategy
 
 Goal: Define which flows will be covered by E2E testing before any code is written.
 
@@ -807,7 +836,7 @@ Checklist:
 
 ---
 
-## 8. E2E Implementation & CI Gates
+## 9. E2E Implementation & CI Gates
 
 Goal: Implement Playwright tests and wire them into CI.
 
@@ -827,7 +856,7 @@ Handoff to Claude:
 
 ---
 
-## 9. Docs & Governance
+## 10. Docs & Governance
 
 Goal: Align documentation and governance with actual code state.
 
@@ -843,7 +872,7 @@ Checklist:
 
 ---
 
-## 10. Final Pre-Prod Check & Monitoring
+## 11. Final Pre-Prod Check & Monitoring
 
 Goal: Verify the app is production-ready and define monitoring & rollback strategies.
 
