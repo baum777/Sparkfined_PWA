@@ -41,9 +41,9 @@ describe('BottomNav', () => {
     const journalLink = screen.getByRole('link', { name: /journal/i })
     const settingsLink = screen.getByRole('link', { name: /settings/i })
 
-    expect(boardLink.getAttribute('href')).toBe('/')
-    expect(analyzeLink.getAttribute('href')).toBe('/analyze')
-    expect(journalLink.getAttribute('href')).toBe('/journal')
-    expect(settingsLink.getAttribute('href')).toBe('/settings')
+    expect(boardLink.getAttribute('href')).toBe('/dashboard-v2')
+    expect(analyzeLink.getAttribute('href')).toBe('/analysis-v2')
+    expect(journalLink.getAttribute('href')).toBe('/journal-v2')
+    expect(settingsLink.getAttribute('href')).toBe('/settings-v2')
   })
 })

@@ -184,7 +184,7 @@ export default function LessonsPage() {
               Start detecting signals and tracking trades to build your lesson library
             </p>
             <a
-              href="/chart"
+              href="/chart-v2"
               className="inline-block rounded-lg bg-cyan-600 px-6 py-3 text-sm font-medium text-white hover:bg-cyan-700 transition-colors"
             >
               Analyze Your First Chart

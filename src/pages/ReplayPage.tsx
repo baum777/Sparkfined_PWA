@@ -188,7 +188,7 @@ export default function ReplayPage() {
   };
 
   const handleViewEntry = (entryId: string) => {
-    navigate(`/journal?entry=${entryId}`);
+    navigate(`/journal-v2?entry=${entryId}`);
   };
 
   // Toggle view mode
@@ -234,7 +234,7 @@ export default function ReplayPage() {
 
             {/* Back Button */}
             <button
-              onClick={() => navigate("/journal")}
+              onClick={() => navigate("/journal-v2")}
               className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
             >
               ← Journal
@@ -253,7 +253,7 @@ export default function ReplayPage() {
                     📈 Chart View
                   </h3>
                   <button
-                    onClick={() => navigate(`/chart?replaySession=${session.id}`)}
+                    onClick={() => navigate(`/chart-v2?replaySession=${session.id}`)}
                     className="rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-400 transition-colors hover:bg-cyan-500/20"
                   >
                     Open in Chart →
@@ -339,7 +339,7 @@ export default function ReplayPage() {
                 📊 View Dashboard
               </button>
               <button
-                onClick={() => navigate("/journal")}
+                onClick={() => navigate("/journal-v2")}
                 className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
               >
                 ← Back to Journal

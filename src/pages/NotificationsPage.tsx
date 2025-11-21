@@ -170,7 +170,7 @@ export default function NotificationsPage() {
                   URL.revokeObjectURL(url);
                 }}>Export Pack (MD)</button>
                 <button className={btn} onClick={()=>{
-                  const chartURL=`${location.origin}/chart?idea=${it.id}`;
+                  const chartURL=`${location.origin}/chart-v2?idea=${it.id}`;
                   navigator.clipboard.writeText(chartURL);
                   alert("Chart-Link kopiert!");
                 }}>Copy Chart Link</button>

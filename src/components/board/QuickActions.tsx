@@ -14,9 +14,9 @@ export default function QuickActions() {
   const navigate = useNavigate();
   
   const actions = [
-    { id: 'analyze', label: 'New Analysis', icon: Search, target: '/analyze' },
-    { id: 'chart', label: 'Open Chart', icon: BarChart3, target: '/chart' },
-    { id: 'journal', label: 'Add Journal', icon: FileText, target: '/journal' },
+    { id: 'analyze', label: 'New Analysis', icon: Search, target: '/analysis-v2' },
+    { id: 'chart', label: 'Open Chart', icon: BarChart3, target: '/chart-v2' },
+    { id: 'journal', label: 'Add Journal', icon: FileText, target: '/journal-v2' },
     { id: 'import', label: 'Import Data', icon: Upload, target: '#import' },
     { id: 'share', label: 'Share Session', icon: Share2, target: '#share' },
   ];
