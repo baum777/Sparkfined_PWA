@@ -798,8 +798,46 @@ The 4 critical modal/banner components are now production-ready. The remaining 1
    - **Nach Abschluss 6A**: Claude schreibt ein kurzes Review-Fazit und markiert 6A als “Complete” im Working Plan.
 
 2. **Später (Post-Launch / Backlog): 6B – Legacy UI Token Sweep**
-   - Wird als eigener Iterationsblock geplant, nicht nötig für initialen V2-Launch  
+   - Wird als eigener Iterationsblock geplant, nicht nötig für initialen V2-Launch
    - Alle TOKEN-FUTURE-Notizen aus Section 5B dienen als Input.
+
+---
+
+
+## 7. Grok Pulse Engine & Read API (Section 7A–7F)
+
+Goal: Ship the Grok Pulse Engine backend (KV contract, Grok client, cron runner, read endpoint) without exposing KV/Grok access to the client. All work lives server-side under `src/lib/grokPulse` and Vercel Edge functions under `api/grok-pulse/`.
+
+Status: ✅ **7A–7F complete** (types, KV wrappers, source stubs, Grok client + hash validation, engine, cron endpoint, read endpoint).
+
+Highlights / Decisions:
+
+- Defined sentiment domain model (`GrokSentimentSnapshot`, labels/CTA enums, history/meta/run/delta types) in `src/lib/grokPulse/types.ts`.
+- KV wrapper centralizes reads/writes with TTLs for snapshots (45m) and history (7d), meta, global token list (30m), delta event queue, and daily call counter (48h expiry).
+- Global token sources stubbed (`sources.ts`) with deterministic dedupe/cap; TODO: real DexScreener/Birdeye/watchlist adapters.
+- Grok client enforces structured JSON prompt, strict range checks, and SHA-256 validation hash (sorted keys) before accepting responses; missing GROK_API_KEY gracefully returns null.
+- Pulse engine batches tokens (max concurrency 20, per-run 150 calls, daily cap from env), writes snapshots/history, emits delta events when |Δ| ≥ 30, and records last run meta.
+- Cron endpoint `/api/grok-pulse/cron` protected via `Authorization: Bearer <PULSE_CRON_SECRET>`; read endpoint `/api/grok-pulse/state` serves snapshots/history/meta without Grok calls or counters.
+
+Checklist 7A–7F:
+
+- [x] 7A: Sentiment types + KV contract implemented with TTLs and counters.
+- [x] 7B: Global token source builder stub with deterministic dedupe/cap.
+- [x] 7C: Grok client with prompt + JSON/hash validation and safe fallback on missing API key.
+- [x] 7D: Pulse engine with per-run/daily caps, delta detection, KV writes, meta recording.
+- [x] 7E: Cron Edge endpoint with bearer secret auth.
+- [x] 7F: Read-only state endpoint (snapshots/history/meta) without Grok calls or counters.
+
+Environment variables:
+
+- `GROK_API_KEY` (required for Grok calls), `GROK_API_URL` (optional, default `https://api.x.ai/v1/chat/completions`), `GROK_MODEL` (optional, default `grok-2-latest`).
+- `PULSE_CRON_SECRET` (required to trigger cron endpoint).
+- `MAX_DAILY_GROK_CALLS` (optional, default `900`).
+
+Open points / TODO:
+
+- Implement real HTTP adapters for DexScreener, Birdeye, and watchlist-backed sources.
+- Wire actual context builder for Grok prompt (social/keyword fallback) and optional fallback sentiment path when Grok returns null.
 
 ---
 
