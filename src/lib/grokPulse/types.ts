@@ -41,6 +41,32 @@ export interface PulseGlobalToken {
   symbol: string;
 }
 
+export interface DexscreenerTokenRef {
+  address: string;
+  symbol?: string;
+}
+
+export interface DexscreenerPairEntry {
+  baseToken: DexscreenerTokenRef;
+  quoteToken?: DexscreenerTokenRef;
+}
+
+export interface DexscreenerResponse {
+  pairs?: DexscreenerPairEntry[];
+}
+
+export interface BirdeyeTokenEntry {
+  address: string;
+  symbol: string;
+}
+
+export interface BirdeyeTokenListResponse {
+  success?: boolean;
+  data?: {
+    tokens?: BirdeyeTokenEntry[];
+  };
+}
+
 export interface PulseRunResult {
   success: number;
   failed: number;
