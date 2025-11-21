@@ -698,3 +698,26 @@ Verification Results:
 
 New open points:
 - None – Section 6B.4 and damit die gesamte Section 6 sind abgeschlossen und produktionsreif.
+
+### 2025-11-21 – Section 7 – Grok Pulse Engine (7A–7F)
+
+Date: 2025-11-21
+Agent: Codex
+Section: #7 – Grok Pulse Engine (7A–7F)
+Branch: work
+
+Actions:
+- Added Grok Pulse sentiment types and KV wrapper contract with TTLs, history trimming, meta/delta helpers, and daily counter.
+- Stubbed global token source builder with deterministic dedupe/capping and TODO markers for real adapters.
+- Implemented Grok client with structured prompt, validation hash check, and safe null fallback when GROK_API_KEY is missing.
+- Built pulse engine with per-run/daily caps, delta event emission, KV writes, and batched processing; added cron and state Edge endpoints.
+- Updated Working Plan Section 7 with completion notes, env vars, and remaining TODOs.
+
+Commands & Results:
+- pnpm lint → ✅ (expected .eslintignore deprecation warning)【4731c5†L2-L6】
+- pnpm typecheck → ✅【789b89†L1-L4】
+- pnpm run build → ✅ (expected MORALIS_API_KEY warning from check-env)【6403ac†L1-L11】【0490d8†L1-L23】【823b20†L2-L9】
+
+New open points:
+- Implement live DexScreener/Birdeye/watchlist adapters for global token sourcing.
+- Add real context builder / fallback sentiment path once Grok connectivity and data sources are wired.
