@@ -38,6 +38,7 @@ interface WatchlistState {
   setError: (message: string | null) => void;
   hydrateFromQuotes: (quotes: WatchlistQuote[]) => void;
   updateTrendFromEvent: (event: SolanaMemeTrendEvent) => void;
+  updateLivePrice: (symbol: string, price: number, change24h: number | null) => void;
 }
 
 const INITIAL_ROWS: WatchlistRow[] = [
@@ -129,6 +130,22 @@ export const useWatchlistStore = create<WatchlistState>((set) => ({
           [symbol]: nextMeta,
         },
       };
+    }),
+  updateLivePrice: (symbol, price, change24h) =>
+    set((state) => {
+      const symbolUpper = symbol.toUpperCase();
+      const rows = state.rows.map((row) => {
+        if (row.symbol.toUpperCase() === symbolUpper) {
+          return {
+            ...row,
+            price: formatPrice(price),
+            change24h: change24h !== null ? formatChange(change24h) : row.change24h,
+          };
+        }
+        return row;
+      });
+
+      return { rows };
     }),
 }));
 

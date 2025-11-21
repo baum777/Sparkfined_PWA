@@ -5,11 +5,20 @@
 
 export type DataProvider = 'dexpaprika' | 'moralis' | 'mock';
 export type AIProvider = 'none' | 'openai' | 'grok' | 'anthropic';
+export type LiveDataMode = 'polling' | 'websocket' | 'auto';
 
 export interface ProviderConfig {
   primary: DataProvider;
   secondary: DataProvider | 'none';
   ai: AIProvider;
+}
+
+export interface LiveDataConfig {
+  enabled: boolean;
+  mode: LiveDataMode;
+  activePollIntervalMs: number;
+  passivePollIntervalMs: number;
+  solanaWsUrl: string | null;
 }
 
 /**
@@ -33,6 +42,32 @@ export function pickProvider(): ProviderConfig {
  */
 export function isAITeaserEnabled(): boolean {
   return import.meta.env.VITE_ENABLE_AI_TEASER === 'true';
+}
+
+/**
+ * Get Live Data v1 configuration
+ */
+export function getLiveDataConfig(): LiveDataConfig {
+  const enabled = import.meta.env.VITE_LIVE_V1_ENABLED === 'true';
+  const mode = (import.meta.env.VITE_LIVE_DATA_MODE || 'auto') as LiveDataMode;
+  const activePollIntervalMs = Number(import.meta.env.VITE_LIVE_POLL_INTERVAL_MS) || 3000;
+  const passivePollIntervalMs = Number(import.meta.env.VITE_LIVE_PASSIVE_INTERVAL_MS) || 15000;
+  const solanaWsUrl = import.meta.env.VITE_SOLANA_WS_URL || null;
+
+  return {
+    enabled,
+    mode,
+    activePollIntervalMs,
+    passivePollIntervalMs,
+    solanaWsUrl,
+  };
+}
+
+/**
+ * Check if Live Data v1 is enabled
+ */
+export function isLiveDataEnabled(): boolean {
+  return getLiveDataConfig().enabled;
 }
 
 /**
