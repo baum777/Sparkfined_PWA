@@ -631,3 +631,24 @@ Verification Results:
 New open points:
 - None for 6B.3; section fully verified as complete. Ready for Section 6B.4 (Final Zombie-Code Sweep).
 
+### 2025-11-23 – Section 6B.4 – Final Zombie-Code Sweep (Codex)
+
+Date: 2025-11-23  
+Agent: Codex (Executor – Repo Surgeon & Cleanup Engineer)  
+Section: #6B.4 – Final Zombie-Code Sweep  
+Branch: codex/section6b4-zombie-sweep-01
+
+Actions:
+- Scanned `src/` and docs for remaining V1/legacy references; archived the unused `BoardPage` V1 shell to `docs/archive/v1-migration-backup/pages` and kept Chart/Journal messaging aligned with V2 routes.
+- Reviewed `sections/ai/useAssist` and kept it as a public/test hook while confirming the rest of `src/sections` remains active.
+- Updated navigation targets (Landing CTA buttons, QuickActions, Replay deep-links, notification share links, lessons CTA, and rule wizard preview links) plus BottomNav tests to point directly at V2 routes instead of redirects.
+- Re-ran lint/typecheck/build after cleanup; build output unchanged aside from the expected MORALIS_API_KEY warning; no bundle regression observed.
+
+Commands & Results:
+- pnpm lint       → ✅
+- pnpm typecheck  → ✅
+- pnpm run build  → ✅ (MORALIS_API_KEY warning only)
+
+New open points:
+- None.
+

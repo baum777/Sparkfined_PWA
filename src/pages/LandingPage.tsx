@@ -43,7 +43,7 @@ export default function LandingPage() {
               Pricing
             </a>
             <button
-              onClick={() => navigate('/board')}
+              onClick={() => navigate('/dashboard-v2')}
               className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-emerald-600 hover:scale-105 active:scale-95"
             >
               Launch App
@@ -89,7 +89,7 @@ export default function LandingPage() {
 
           <div className="animate-fade-in flex flex-col items-center justify-center gap-4 sm:flex-row" style={{ animationDelay: '0.4s' }}>
             <button
-              onClick={() => navigate('/board')}
+              onClick={() => navigate('/dashboard-v2')}
               className="group flex items-center gap-2 rounded-lg bg-emerald-500 px-8 py-4 text-lg font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-600 hover:scale-105 hover:shadow-[0_0_50px_rgba(16,185,129,0.5)] active:scale-95"
             >
               Get Started - It's Free
@@ -246,7 +246,7 @@ export default function LandingPage() {
                 ))}
               </ul>
               <button
-                onClick={() => navigate('/board')}
+                onClick={() => navigate('/dashboard-v2')}
                 className="w-full rounded-lg bg-zinc-800 px-6 py-3 font-semibold transition-all hover:bg-zinc-700"
               >
                 Start Free
@@ -326,7 +326,7 @@ export default function LandingPage() {
           </p>
 
           <button
-            onClick={() => navigate('/board')}
+            onClick={() => navigate('/dashboard-v2')}
             className="mb-8 rounded-lg bg-emerald-500 px-12 py-5 text-xl font-bold text-white shadow-[0_0_50px_rgba(16,185,129,0.4)] transition-all hover:bg-emerald-400 hover:scale-105 hover:shadow-[0_0_70px_rgba(16,185,129,0.6)]"
           >
             Launch Sparkfined →

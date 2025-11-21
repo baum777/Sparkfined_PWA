@@ -91,7 +91,7 @@ export default function RuleWizard({ onCreate }: { onCreate: (rule:any)=>void })
           onClick={()=>{
             if (!rule || !addr) return;
             const token = encodeRuleToken({ rule, address: addr, tf });
-            const url = `${location.origin}/chart?address=${encodeURIComponent(addr)}&tf=${tf}&test=${token}`;
+            const url = `${location.origin}/chart-v2?address=${encodeURIComponent(addr)}&tf=${tf}&test=${token}`;
             window.open(url, "_blank");
           }}
         >Im Chart testen</button>
