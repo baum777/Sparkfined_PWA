@@ -4,6 +4,7 @@ import WatchlistLayout from "@/components/watchlist/WatchlistLayout";
 import WatchlistTable from "@/components/watchlist/WatchlistTable";
 import WatchlistDetailPanel from "@/components/watchlist/WatchlistDetailPanel";
 import { WatchlistHeaderActions } from "@/components/watchlist/WatchlistHeaderActions";
+import { LiveStatusBadge } from "@/components/live/LiveStatusBadge";
 import { fetchWatchlistQuotes } from "@/features/market/watchlistData";
 import { useWatchlistStore } from "@/store/watchlistStore";
 import type { WatchlistRow } from "@/store/watchlistStore";
@@ -108,6 +109,7 @@ export default function WatchlistPageV2() {
               </div>
 
               <div className="flex items-center gap-3">
+                <LiveStatusBadge showLabel={true} />
                 <button
                   type="button"
                   onClick={() =>

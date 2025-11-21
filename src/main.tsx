@@ -13,6 +13,7 @@ import { autoCheckAssets } from '@/lib/debug-assets'
 import { installGlobalErrorHooks } from '@/diagnostics/crash-report'
 import { installBootguard } from '@/diagnostics/bootguard'
 import { initializeEventSubscriptions } from '@/ai/ingest/eventSubscriptions'
+import { initializeLiveData } from '@/lib/live/liveDataManager'
 
 // CRITICAL: Install boot guard FIRST (captures errors before React)
 installBootguard()
@@ -41,6 +42,13 @@ try {
   initializeEventSubscriptions()
 } catch (error) {
   console.warn('[main.tsx] Event subscription initialization failed:', error)
+}
+
+// Initialize Live Data v1 (if enabled via feature flag)
+try {
+  initializeLiveData()
+} catch (error) {
+  console.warn('[main.tsx] Live data initialization failed:', error)
 }
 
 if (import.meta.env.DEV) {
