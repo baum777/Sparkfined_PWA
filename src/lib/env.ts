@@ -28,7 +28,6 @@ export function getEnv(): EnvConfig {
  * Returns list of missing vars for UI warning banner
  */
 export function getMissingEnvVars(): string[] {
-  const env = getEnv();
   const missing: string[] = [];
   
   // Optional vars - only warn in preview/prod

@@ -16,7 +16,7 @@
  * - timestamp: Last Analysis (symbol, timeframe, time)
  */
 
-import { TrendingUp, TrendingDown, Bell, Wifi, Clock, AlertTriangle } from '@/lib/icons';
+import { TrendingUp, TrendingDown, Bell, Wifi, Clock } from '@/lib/icons';
 import StateView from '../ui/StateView';
 import { KPITileSkeleton } from '../ui/Skeleton';
 
@@ -33,7 +33,7 @@ interface KPITileProps {
 }
 
 export default function KPITile({
-  type,
+  type: _type,
   label,
   value,
   trend,

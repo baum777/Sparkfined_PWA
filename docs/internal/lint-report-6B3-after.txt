@@ -1,0 +1,4 @@
+
+> extracted@0.1.0 lint /workspace/Sparkfined_PWA
+> eslint .
+

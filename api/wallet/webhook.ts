@@ -38,8 +38,6 @@
  * }
  */
 
-import type { VercelRequest, VercelResponse } from '@vercel/node'
-
 export const config = { runtime: 'edge' }
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' } as const

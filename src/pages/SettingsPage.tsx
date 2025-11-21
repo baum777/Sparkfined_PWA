@@ -214,7 +214,7 @@ export default function SettingsPage({
       <div className="rounded-xl border border-rose-900 bg-rose-950/30 p-4">
         <div className="text-xs text-rose-100">Gezieltes Löschen</div>
         <div className="mt-2 grid grid-cols-2 gap-2 text-xs md:grid-cols-3">
-          {Object.entries(KEYS).map(([ns, k])=>(
+          {Object.entries(KEYS).map(([ns, _key])=>(
             <button key={ns}
               className="rounded border border-rose-900 px-2 py-1 text-rose-100 hover:bg-rose-900/20"
               onClick={()=>{ if(confirm(`Lösche ${ns}?`)) { clearNs(ns as NamespaceKey); alert(`${ns} gelöscht.`);} }}>

@@ -9,7 +9,7 @@
  * - Clickable (hover, navigate)
  */
 
-import { Bell, Save, Download, AlertTriangle, Search, FileText } from '@/lib/icons';
+import { Bell, Download, AlertTriangle, Search, FileText } from '@/lib/icons';
 
 interface FeedItemProps {
   id: string;

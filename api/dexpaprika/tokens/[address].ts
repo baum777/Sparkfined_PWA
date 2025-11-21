@@ -18,13 +18,6 @@ const DEXPAPRIKA_API_KEY = process.env.DEXPAPRIKA_API_KEY || '';
 const TIMEOUT_MS = 5000;
 const MAX_RETRIES = 1;
 
-interface DexPaprikaProxyResponse {
-  success: boolean;
-  data?: unknown;
-  error?: string;
-  provider: 'dexpaprika';
-}
-
 /**
  * Validate Solana address (Base58, 32-44 chars)
  */

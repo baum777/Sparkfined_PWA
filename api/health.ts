@@ -1,7 +1,7 @@
 // Edge Runtime Health Check Endpoint for Vercel
 export const config = { runtime: "edge" };
 
-export default async function handler(req: Request) {
+export default async function handler(_req: Request) {
   const checks = {
     timestamp: new Date().toISOString(),
     env: {

@@ -33,7 +33,7 @@ interface KPI {
   timestamp?: number;
 }
 
-export default async function handler(req: Request) {
+export default async function handler(_req: Request) {
   try {
     // TODO: In Phase D4, replace with real data from:
     // - IndexedDB queries (journal, rules, charts)

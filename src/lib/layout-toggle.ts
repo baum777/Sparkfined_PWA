@@ -26,7 +26,7 @@ export function getLayoutStyle(): LayoutStyle {
   try {
     const stored = localStorage.getItem(LAYOUT_KEY);
     return (stored === 'sharp' ? 'sharp' : 'rounded') as LayoutStyle;
-  } catch (error) {
+  } catch {
     // localStorage might not be available (SSR, private mode, etc.)
     return 'rounded';
   }
@@ -39,7 +39,7 @@ export function getLayoutStyle(): LayoutStyle {
 export function setLayoutStyle(style: LayoutStyle) {
   try {
     localStorage.setItem(LAYOUT_KEY, style);
-  } catch (error) {
+  } catch {
     // localStorage might not be available - continue anyway
   }
   if (typeof document !== 'undefined' && document.body) {
@@ -55,7 +55,7 @@ export function getOledMode(): OledMode {
   try {
     const stored = localStorage.getItem(OLED_KEY);
     return (stored === 'on' ? 'on' : 'off') as OledMode;
-  } catch (error) {
+  } catch {
     // localStorage might not be available (SSR, private mode, etc.)
     return 'off';
   }
@@ -68,7 +68,7 @@ export function getOledMode(): OledMode {
 export function setOledMode(mode: OledMode) {
   try {
     localStorage.setItem(OLED_KEY, mode);
-  } catch (error) {
+  } catch {
     // localStorage might not be available - continue anyway
   }
   if (typeof document !== 'undefined' && document.body) {

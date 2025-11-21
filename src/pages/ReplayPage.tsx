@@ -13,16 +13,14 @@
  */
 
 import React from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ReplayPlayer from "@/components/ReplayPlayer";
 import PatternDashboard from "@/components/PatternDashboard";
 import type { ReplaySession, JournalEntry, ReplayBookmark, SetupTag, EmotionTag } from "@/types/journal";
 import {
   getSession,
-  updateSession,
   addBookmark,
   deleteBookmark,
-  listSessions,
   cacheOhlcData,
 } from "@/lib/ReplayService";
 import { calculatePatternStats, queryEntries } from "@/lib/JournalService";
@@ -32,7 +30,6 @@ type ViewMode = "player" | "dashboard";
 export default function ReplayPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
 
   // State
   const [viewMode, setViewMode] = React.useState<ViewMode>(
@@ -47,8 +44,6 @@ export default function ReplayPage() {
   // Dashboard state
   const [entries, setEntries] = React.useState<JournalEntry[]>([]);
   const [patternStats, setPatternStats] = React.useState<any>(null);
-  const [filteredSetup, setFilteredSetup] = React.useState<SetupTag | undefined>();
-  const [filteredEmotion, setFilteredEmotion] = React.useState<EmotionTag | undefined>();
 
   // Load session if sessionId provided
   React.useEffect(() => {
@@ -181,9 +176,6 @@ export default function ReplayPage() {
 
   // Dashboard controls
   const handleFilterByPattern = (setup?: SetupTag, emotion?: EmotionTag) => {
-    setFilteredSetup(setup);
-    setFilteredEmotion(emotion);
-    
     // Filter entries
     const filtered = entries.filter((e) => {
       if (setup && e.setup !== setup) return false;

@@ -24,7 +24,7 @@ export interface ErrorReport {
 function logError(type: string, payload: ErrorReport) {
   try {
     console.error(`[${type}]`, payload);
-  } catch (e) {
+  } catch {
     // Console might be blocked (CSP), continue anyway
   }
   
@@ -37,7 +37,7 @@ function logError(type: string, payload: ErrorReport) {
     const history = JSON.parse(localStorage.getItem(historyKey) || '[]') as ErrorReport[];
     history.unshift(payload);
     localStorage.setItem(historyKey, JSON.stringify(history.slice(0, 5)));
-  } catch (e) {
+  } catch {
     // Storage might be full or blocked, continue anyway
   }
 }

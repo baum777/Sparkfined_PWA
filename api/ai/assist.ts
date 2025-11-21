@@ -23,8 +23,8 @@ export default async function handler(req: Request) {
     const cacheTtlSec = Number(process.env.AI_CACHE_TTL_SEC || "0") || 0;
     const { provider, model, system, user, templateId, vars, maxOutputTokens, maxCostUsd } = (await req.json()) as Req;
     if (!provider) return json({ ok:false, error:"provider required" }, 400);
-    const prompt = user ?? (templateId ? render(templateId, vars || {}) : null);
-    if (!prompt) return json({ ok:false, error:"user or templateId required" }, 400);
+    const prompt = templateId ? render(templateId, vars || {}) : { system, user };
+    if (!prompt.user) return json({ ok:false, error:"user or templateId required" }, 400);
     const caps = { maxCostUsd: Math.min(...[maxOrInf(maxCostUsd), maxOrInf(envCap)].filter(n=>Number.isFinite(n))) };
     // Preflight: grobe Kostenabschätzung (chars/4 ≈ tokens)
     const est = estimatePromptCost(provider, model, prompt.system, prompt.user);

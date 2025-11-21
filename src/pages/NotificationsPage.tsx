@@ -102,6 +102,7 @@ export default function NotificationsPage() {
           )}
           <button className={btn} onClick={()=>addManualTrigger(Date.now(), { ruleId: "test", address: "test", title: "Test Trigger" })}>Test-Trigger</button>
         </div>
+        <div className="text-[11px] text-zinc-400">Push-Status: {subState}</div>
       </div>
       {lastErr && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-2 text-[12px] text-rose-200">Push-Fehler: {lastErr}</div>}
 

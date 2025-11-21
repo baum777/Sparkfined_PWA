@@ -713,12 +713,18 @@ The 4 critical modal/banner components are now production-ready. The remaining 1
 
 #### 6B.3 – ESLint Cleanup (Unused Vars/Imports)
 
-**Status:** ⏳ Ready for Execution (Baseline Documented)
+**Status:** ✅ Completed (Baseline cleared)
 
 **Baseline (2025-11-20 Review):**
 - **Current ESLint Warnings:** 58 (all @typescript-eslint/no-unused-vars)
 - **Target Warnings:** 0–5 (only documented exceptions with justification)
 - **Reduction Goal:** 53+ warnings resolved
+
+**Result (Executed 2025-11-23):**
+- **pnpm lint:** 0 warnings (reports saved: `docs/internal/lint-report-6B3-before.txt`, `docs/internal/lint-report-6B3-after.txt`)
+- **Navigation:** JournalSnapshot → `/journal-v2`, InsightTeaser → `/analysis-v2` (6B.2-FIX-01 resolved)
+- **Build Checks:** `pnpm typecheck` ✅, `pnpm run build` ✅ (expected MORALIS_API_KEY warning only)
+- **Cleanup Scope:** Removed unused vars/imports/types, trimmed obsolete eslint directives, and normalized unused params with `_` prefixes or logging where helpful
 
 **Warning Distribution (Estimated from lint output):**
 1. **Unused Error-Variables:** ~15–20 (catch blocks without error handling)
@@ -728,14 +734,14 @@ The 4 critical modal/banner components are now production-ready. The remaining 1
 5. **Unused eslint-disable Directives:** ~3 (directives that no longer apply)
 
 **Aktionen:**
-- [ ] Export full lint report: `pnpm lint > docs/internal/lint-report-6B3.txt`
-- [ ] Kategorisierung der 58 Warnings (group by file and warning type)
-- [ ] **Batch-1:** Unused-Error-Variables (ca. 15–20 Warnings) → Prefix with `_error` or add proper error logging
-- [ ] **Batch-2:** Unused-Params in API-Handlers (ca. 10 Warnings) → Prefix with `_req` / `_res` or remove if truly unused
-- [ ] **Batch-3:** Unused-Imports (ca. 10–15 Warnings) → Remove completely
-- [ ] **Batch-4:** Unused-Types (ca. 10 Warnings) → Remove or move to shared types with usage comment
-- [ ] **Batch-5:** Unused eslint-disable Directives (~3 Warnings) → Remove directives
-- [ ] Verify `pnpm lint` → 0–5 warnings and document any remaining justified exceptions
+- [x] Export full lint report: `pnpm lint > docs/internal/lint-report-6B3-before.txt`
+- [x] Kategorisierung der 58 Warnings (group by file and warning type)
+- [x] **Batch-1:** Unused-Error-Variables (ca. 15–20 Warnings) → Prefix with `_` or add proper error logging
+- [x] **Batch-2:** Unused-Params in API-Handlers (ca. 10 Warnings) → Prefix with `_req` / `_res` or remove if truly unused
+- [x] **Batch-3:** Unused-Imports (ca. 10–15 Warnings) → Remove completely
+- [x] **Batch-4:** Unused-Types (ca. 10 Warnings) → Remove or move to shared types with usage comment
+- [x] **Batch-5:** Unused eslint-disable Directives (~3 Warnings) → Remove directives
+- [x] Verify `pnpm lint` → 0–5 warnings and document any remaining justified exceptions
 
 #### 6B.4 – Final Zombie-Code Sweep
 

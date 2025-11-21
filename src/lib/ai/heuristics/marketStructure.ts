@@ -11,7 +11,6 @@ import type {
   PriceZone,
   BiasReading,
   OhlcCandle,
-  LevelType,
 } from '@/types/ai';
 
 /**

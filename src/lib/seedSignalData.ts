@@ -126,7 +126,7 @@ export async function seedDemoSignals() {
   return signals
 }
 
-export async function seedDemoPlans(signals: Signal[]) {
+export async function seedDemoPlans(_signals: Signal[]) {
   console.log('🌱 Seeding demo trade plans...')
 
   const plans: TradePlan[] = [
@@ -173,7 +173,7 @@ export async function seedDemoPlans(signals: Signal[]) {
   return plans
 }
 
-export async function seedDemoNodes(signals: Signal[], plans: TradePlan[]) {
+export async function seedDemoNodes(_signals: Signal[], _plans: TradePlan[]) {
   console.log('🌱 Seeding demo action nodes...')
 
   const nodes: ActionNode[] = [

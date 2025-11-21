@@ -12,7 +12,7 @@ export default function TokenOverlay() {
     const handler = (e: Event) => {
       const any = e as CustomEvent<{ text: string }>;
       const t = estimateTokens(any.detail?.text || "");
-      setNow(n => t); // current message tokens
+      setNow(() => t); // current message tokens
       setAvg(a => a === 0 ? t : Math.round(a * 0.7 + t * 0.3));
     };
     window.addEventListener("token:observe" as any, handler as any);

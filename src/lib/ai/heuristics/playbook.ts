@@ -37,7 +37,6 @@ export function generatePlaybookEntries(params: {
   // Find key zones
   const supportZone = zones.find(z => z.label === 'support');
   const tp1Zone = zones.find(z => z.label === 'target_tp1');
-  const tp2Zone = zones.find(z => z.label === 'target_tp2');
   const stopZone = zones.find(z => z.label === 'stop_loss');
   
   // Find key levels

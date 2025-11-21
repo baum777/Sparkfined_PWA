@@ -51,7 +51,7 @@ export function installBootguard() {
       const history = JSON.parse(localStorage.getItem(historyKey) || '[]') as BootError[];
       history.unshift(bootError);
       localStorage.setItem(historyKey, JSON.stringify(history.slice(0, 5)));
-    } catch (e) {
+    } catch {
       // Storage might be full/blocked, continue anyway
     }
   };

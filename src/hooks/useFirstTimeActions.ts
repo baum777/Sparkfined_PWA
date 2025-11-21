@@ -8,12 +8,6 @@
 
 import { useOnboardingStore } from '@/store/onboardingStore';
 
-interface FirstTimeAction {
-  key: string;
-  message: string;
-  featureId?: string; // Optional: Link to checklist item
-}
-
 export function useFirstTimeActions() {
   const { discoverFeature } = useOnboardingStore();
 
