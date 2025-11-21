@@ -70,7 +70,7 @@ describe("grokPulse sources", () => {
 
     vi.stubGlobal("fetch", mockFetch as unknown as typeof fetch);
 
-    const result = await buildGlobalTokenList({}, 3);
+    const result = await buildGlobalTokenList({}, 3, false);
 
     expect(result).toEqual([
       { address: "addr1", symbol: "SAMPLE" },

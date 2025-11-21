@@ -12,7 +12,24 @@ export interface GlobalTokenSourceArgs {
   dexscreenerBaseUrl?: string;
   birdeyeApiKey?: string;
   birdeyeBaseUrl?: string;
+  staticTokens?: PulseGlobalToken[];
+  includeStaticTokens?: boolean;
 }
+
+const DEFAULT_STATIC_TOKENS: PulseGlobalToken[] = [
+  { symbol: "BONK", address: "DezXAZ8z7Pnrn1SUSGLJhWnG8tA1sx9eES1ifBht7Prs" },
+  { symbol: "JUP", address: "JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB" },
+  { symbol: "SOL", address: "So11111111111111111111111111111111111111112" },
+  { symbol: "USDC", address: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" },
+  { symbol: "USDT", address: "Es9vMFrzaCERrYjBf9d7Yk2uCUXaY3dTz4mB3x5p7VJ" },
+  { symbol: "SAMO", address: "7xKXjQpX9d2QkZ4XXCtK9pwrKyYVJZZzUboZhoaq2BD" },
+  { symbol: "MSOL", address: "mSoLzCr9uNZh8Y6AqFV3U8rQxYYbMhmZtaLe7eN9BXw" },
+  { symbol: "RAY", address: "4k3Dyjzvzp8eMZWUXb7GF9w2Z9CZcMZ2z7amDV12vHf5" },
+  { symbol: "ORCA", address: "orcaEKTdK7LKz57vaAYr9Qe7G1dFA5p7kS3dAXJ9UG8" },
+  { symbol: "PYTH", address: "FsRiAgFmx7ug8QDXGrQoygbL6iRhK3rR9LMV8uJkmZs5" },
+  { symbol: "WIF", address: "8s5QAVcPpAUMf27YgLdPFkjo1szh8QcJMcJUG7WnP6Je" },
+  { symbol: "KIN", address: "KinXdEcpDQeHPEuQnqmGxBhw1wN8B5GD7e2w1WB9W3x" },
+];
 
 export async function fetchDexScreenerTopGainers(
   args: GlobalTokenSourceArgs
@@ -33,7 +50,10 @@ export async function fetchDexScreenerTopGainers(
 
   for (const path of endpoints) {
     try {
-      const res = await fetch(`${baseUrl}${path}`, { headers });
+      const res = await fetch(`${baseUrl}${path}`, {
+        headers,
+        signal: AbortSignal.timeout(10_000),
+      });
       if (!res.ok) {
         console.warn(
           `[grokPulse] DexScreener request failed: ${res.status} ${res.statusText}`
@@ -41,7 +61,7 @@ export async function fetchDexScreenerTopGainers(
         continue;
       }
 
-      const data = (await res.json()) as DexscreenerResponse;
+      const data = (await res.json().catch(() => null)) as DexscreenerResponse;
       const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
 
       for (const pair of pairs) {
@@ -70,7 +90,7 @@ export async function fetchBirdeyeTopVolume(
   }
 
   try {
-    const res = await fetch(url, { headers });
+    const res = await fetch(url, { headers, signal: AbortSignal.timeout(10_000) });
     if (!res.ok) {
       console.warn(
         `[grokPulse] Birdeye request failed: ${res.status} ${res.statusText}`
@@ -78,7 +98,7 @@ export async function fetchBirdeyeTopVolume(
       return [];
     }
 
-    const data = (await res.json()) as BirdeyeTokenListResponse;
+    const data = (await res.json().catch(() => null)) as BirdeyeTokenListResponse;
     const tokens = data?.data?.tokens ?? [];
 
     return dedupeTokens(
@@ -102,7 +122,8 @@ export async function fetchWatchlistTokens(): Promise<PulseGlobalToken[]> {
 
 export async function buildGlobalTokenList(
   args: GlobalTokenSourceArgs,
-  maxUnique = 120
+  maxUnique = 120,
+  includeStatic = true
 ): Promise<PulseGlobalToken[]> {
   const [dexscreener, birdeye, watchlist] = await Promise.all([
     fetchDexScreenerTopGainers(args),
@@ -110,8 +131,10 @@ export async function buildGlobalTokenList(
     fetchWatchlistTokens(),
   ]);
 
+  const staticTokens = includeStatic ? resolveStaticTokens(args) : [];
+
   const deduped = new Map<string, PulseGlobalToken>();
-  for (const token of [...dexscreener, ...birdeye, ...watchlist]) {
+  for (const token of [...staticTokens, ...dexscreener, ...birdeye, ...watchlist]) {
     const address = token.address.trim();
     if (!address || deduped.has(address)) continue;
     deduped.set(address, { address, symbol: token.symbol });
@@ -142,7 +165,7 @@ function dedupeTokens(tokens: PulseGlobalToken[]): PulseGlobalToken[] {
   return Array.from(deduped.values());
 }
 
-function sanitizeSymbol(input?: string | null): string {
+export function sanitizeSymbol(input?: string | null): string {
   const trimmed = input?.trim();
   if (!trimmed) return "UNKNOWN";
 
@@ -150,4 +173,27 @@ function sanitizeSymbol(input?: string | null): string {
   if (!normalized) return "UNKNOWN";
 
   return normalized;
+}
+
+function resolveStaticTokens(args: GlobalTokenSourceArgs): PulseGlobalToken[] {
+  if (args.includeStaticTokens === false) return [];
+  if (Array.isArray(args.staticTokens)) return dedupeTokens(args.staticTokens);
+
+  const envList = process.env.PULSE_STATIC_TOKENS?.trim();
+  if (envList) {
+    const parsed = envList
+      .split(",")
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+      .map((entry) => {
+        const [symbol, address] = entry.split(":");
+        if (!address) return null;
+        return { symbol: sanitizeSymbol(symbol), address: address.trim() };
+      })
+      .filter((token): token is PulseGlobalToken => Boolean(token?.address));
+
+    if (parsed.length) return dedupeTokens(parsed);
+  }
+
+  return dedupeTokens(DEFAULT_STATIC_TOKENS);
 }

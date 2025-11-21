@@ -10,6 +10,7 @@ import {
 } from "./kv";
 import { buildGlobalTokenList } from "./sources";
 import { fetchAndValidateGrokSentiment } from "./grokClient";
+import { buildTokenContext } from "./contextBuilder";
 import type { PulseRunResult } from "./types";
 
 const MAX_CONCURRENCY = 20;
@@ -18,7 +19,19 @@ const MAX_DAILY_GROK_CALLS = Number(process.env.MAX_DAILY_GROK_CALLS ?? "900");
 const DELTA_THRESHOLD = 30;
 
 export async function runGrokPulseCron(): Promise<PulseRunResult> {
-  const tokens = await buildGlobalTokenList({}, MAX_GROK_CALLS_PER_RUN);
+  const sourceArgs = {
+    dexscreenerApiKey: process.env.DEXSCREENER_API_KEY?.trim(),
+    dexscreenerBaseUrl: process.env.DEXSCREENER_BASE_URL?.trim(),
+    birdeyeApiKey: process.env.BIRDEYE_API_KEY?.trim(),
+    birdeyeBaseUrl: process.env.BIRDEYE_BASE_URL?.trim(),
+  } as const;
+
+  const socialArgs = {
+    socialApiKey: process.env.PULSE_SOCIAL_API_KEY?.trim(),
+    socialBaseUrl: process.env.PULSE_SOCIAL_API_URL?.trim(),
+  } as const;
+
+  const tokens = await buildGlobalTokenList(sourceArgs, MAX_GROK_CALLS_PER_RUN);
   await setPulseGlobalList(tokens);
 
   let success = 0;
@@ -79,7 +92,14 @@ export async function runGrokPulseCron(): Promise<PulseRunResult> {
         tokensProcessed += 1;
 
         try {
-          const context = "TODO: replace with social/keyword context";
+          const context = await buildTokenContext(token, {
+            ...sourceArgs,
+            ...socialArgs,
+          }).catch((error) => {
+            console.warn("[grokPulse] context builder failed", error);
+            return `Token: ${token.symbol} (${token.address})\nNo live context; return low confidence score.`;
+          });
+
           const snapshot = await fetchAndValidateGrokSentiment({
             symbol: token.symbol,
             address: token.address,
