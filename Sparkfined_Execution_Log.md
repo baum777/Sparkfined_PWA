@@ -600,3 +600,34 @@ Commands & Results:
 New open points:
 - None for 6B.3; proceed to Section 6B.4 sweep with clean lint baseline.
 
+### 2025-11-21 – Section 6B.3 – ESLint Cleanup Verification (Claude)
+
+Date: 2025-11-21
+Agent: Claude Code (Verification)
+Section: #6B.3 – ESLint Cleanup (Verification)
+Branch: claude/eslint-cleanup-0128Z1pU2YiCuEEK6BJ8WtjE
+
+Actions:
+- Verified Section 6B.3 completion status by re-running all quality checks.
+- Confirmed 6B.2-FIX-01 remains implemented (JournalSnapshot → `/journal-v2`, InsightTeaser → `/analysis-v2`).
+- Validated ESLint baseline remains clean with 0 warnings.
+- Confirmed all build checks continue to pass without regressions.
+- Verified lint report files exist in `docs/internal/` (before/after snapshots from 2025-11-23 run).
+
+Commands & Results:
+- pnpm install → ✅ 798 packages installed
+- pnpm lint → ✅ 0 warnings (only Node.js .eslintignore deprecation notice)
+- pnpm typecheck → ✅ No TypeScript errors
+- pnpm run build → ✅ Successful build (expected MORALIS_API_KEY warning only)
+- Verified navigation routes in JournalSnapshot.tsx:24 and InsightTeaser.tsx:21 → ✅ Both using V2 routes
+
+Verification Results:
+- ✅ **All Section 6B.3 acceptance criteria met**
+- ✅ **0 ESLint warnings** (down from baseline of 58)
+- ✅ **Navigation routes correct** (6B.2-FIX-01 implemented)
+- ✅ **No regressions** in typecheck or build
+- ✅ **Documentation current** (Working Plan and previous Execution Log entries accurate)
+
+New open points:
+- None for 6B.3; section fully verified as complete. Ready for Section 6B.4 (Final Zombie-Code Sweep).
+
