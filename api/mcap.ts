@@ -5,6 +5,8 @@
  * Future: Fetch real-time MCAP from Pyth Network
  */
 
+export const runtime = 'nodejs';
+
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(

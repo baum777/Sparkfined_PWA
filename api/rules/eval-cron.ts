@@ -1,5 +1,5 @@
-// Edge CRON: Lädt aktive Server-Rules, gruppiert nach (address, tf), evaluiert & dispatcht Treffer
-export const config = { runtime: "edge" };
+// Node CRON: Lädt aktive Server-Rules, gruppiert nach (address, tf), evaluiert & dispatcht Treffer
+export const runtime = "nodejs";
 import type { ServerRule } from "../../src/lib/serverRules";
 
 async function j(r: Response){ try{ return await r.json(); } catch{ return null; } }

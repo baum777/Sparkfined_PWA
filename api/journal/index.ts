@@ -1,5 +1,5 @@
 // Edge: Journal CRUD (KV) – per userId
-export const config = { runtime: "edge" };
+export const config = { runtime: "nodejs" };
 import { kvGet, kvSet, kvDel, kvSAdd, kvSMembers } from "../../src/lib/kv";
 import {
   computeTradeMetrics,

@@ -1,5 +1,5 @@
 // Edge: Case-Study Export als Markdown (eine oder mehrere Ideen)
-export const config = { runtime: "edge" };
+export const config = { runtime: "nodejs" };
 import { kvSMembers, kvGet } from "../../src/lib/kv";
 import type { Idea } from "../../src/lib/ideas";
 const uid = (req:Request)=> (new URL(req.url)).searchParams.get("userId") || (req.headers.get("x-user-id") || "anon");

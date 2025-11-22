@@ -1,4 +1,4 @@
-export const config = { runtime: "edge" };
+export const config = { runtime: "nodejs" };
 
 import { runGrokPulseCron } from "../../src/lib/grokPulse/engine";
 

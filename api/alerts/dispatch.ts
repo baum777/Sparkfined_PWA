@@ -1,5 +1,5 @@
 // Edge: nimmt lokale Trigger entgegen, dedupliziert, enqueued zur Verarbeitung
-export const config = { runtime: "edge" };
+export const config = { runtime: "nodejs" };
 import { kvSet, kvLPush } from "../../src/lib/kv";
 import { sha256Url } from "../../src/lib/sha";
 

@@ -1,3 +1,5 @@
+export const runtime = 'nodejs'
+
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
 const DEFAULT_MORALIS_BASE = 'https://deep-index.moralis.io/api/v2.2'

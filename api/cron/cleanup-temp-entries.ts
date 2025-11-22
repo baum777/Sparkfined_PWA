@@ -17,7 +17,7 @@
  *   -H "Authorization: Bearer YOUR_CRON_SECRET"
  */
 
-export const config = { runtime: 'edge' }
+export const runtime = 'nodejs'
 
 interface CleanupResult {
   success: boolean
