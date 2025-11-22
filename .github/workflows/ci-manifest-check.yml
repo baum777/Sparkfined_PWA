@@ -31,5 +31,3 @@ jobs:
           status2=$(curl -s -o /dev/null -w "%{http_code}" "${DEPLOY_URL}/_next/static" || echo 404)
           echo "_next/static status: $status2"
           echo "Smoke test passed for manifest."
-*** End Patch
-
