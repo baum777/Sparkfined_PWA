@@ -281,22 +281,34 @@ Sobald Codex die YAML-Fixes implementiert, sollten pnpm/Node-Setup-Fehler behobe
   - Bundle-Size-Checks
   - Artifact-Uploads
 
+### Phase 4: API Runtime Landscape & Edge/Node Classification
+- **Datei:** `docs/API_LANDSCAPE.md`
+- **Status:** ✅ Dokumentiert, bereit für Codex
+- **Umfang:**
+  - 35 API-Routen analysiert
+  - **14 kritische Runtime-Fixes** (Edge → Node wegen KV)
+  - 10-13 Explizite Runtime-Deklarationen
+  - 7 APIs für Code-Review
+  - Import-Boundary-Empfehlungen
+- **Kritisch:** GrokPulse, Ideas, Journal, Alerts, Push-APIs nutzen @vercel/kv → MUSS Node sein
+
 ---
 
 ## 🎯 Kritischer Pfad für CI-Stabilisierung
 
 ```
-Phase 1 (Workflow)  →  Phase 2 (TypeScript/Tests/Lint)  →  Phase 3 (Build/E2E)
-      ↓                          ↓                                  ↓
-  YAML-Fixes           Code-Fixes (10 TS + 2 Tests)      Build + Playwright
-   (Codex)                   (Codex)                         (Codex)
-      ↓                          ↓                                  ↓
- pnpm install OK        pnpm typecheck OK              pnpm build OK
-                        pnpm test OK                    Playwright OK
-                        pnpm lint OK
+Phase 1       →  Phase 2           →  Phase 3        →  Phase 4
+(Workflow)       (TS/Tests/Lint)       (Build/E2E)       (API Runtime)
+    ↓                ↓                     ↓                 ↓
+YAML-Fixes      Code-Fixes          Build + PW        Edge/Node Fix
+(Codex)         (10 TS + 2 Tests)   (Codex)           (14 Runtime-Fixes)
+    ↓                ↓                     ↓                 ↓
+pnpm install    pnpm typecheck      pnpm build        Vercel Deploy OK
+    OK          pnpm test OK        Playwright OK     KV-APIs funktional
+                pnpm lint OK
 ```
 
-**Aktueller Stand:** Phase 1-3 vollständig dokumentiert, bereit für sequentielle Codex-Implementierung.
+**Aktueller Stand:** Phase 1-4 vollständig dokumentiert, bereit für sequentielle Codex-Implementierung.
 
 ---
 
@@ -349,4 +361,36 @@ Siehe `docs/CI_FIX_PHASE_3_HEAVY_STEPS.md` für vollständigen Plan.
 
 ---
 
-**Status-Update:** Phase 1-3 ✅ Vollständig dokumentiert | Bereit für sequentielle Codex-Implementierung
+## 🌐 Phase 4 Status — API Runtime Landscape
+
+**Update:** 2025-11-22
+
+### API-Landschaft analysiert
+
+**Scope:** 35 API-Routen im `/api`-Verzeichnis
+
+**Kritisches Finding:**
+
+| Kategorie | Anzahl | Status |
+|-----------|--------|--------|
+| **Edge + KV-Import (BROKEN)** | 14 APIs | 🔴 KRITISCH |
+| **Implicit Node** | 13 APIs | ⚠️ Sollte explizit sein |
+| **Edge (OK)** | 3 APIs | ✅ Stateless |
+| **Zu prüfen** | 5 APIs | ⚠️ Code-Review nötig |
+
+**Problem:**
+- 14 APIs sind als `edge` konfiguriert, importieren aber `@vercel/kv` → **Deployment fehlschlägt!**
+- Betroffene Bereiche: GrokPulse (4 APIs), Ideas (5 APIs), Journal (2 APIs), Alerts (1 API), Push (2 APIs)
+
+**Lösung:**
+- Alle KV-nutzenden APIs MÜSSEN auf `runtime: "nodejs"` umgestellt werden
+- Implizite Node-APIs sollten explizite Runtime-Deklaration bekommen
+- Import-Boundaries zwischen Node-only und Edge-safe Modulen einführen
+
+**Aufwand:** 1.5-2.5 Stunden (Phase 4A+B+C)
+
+Siehe `docs/API_LANDSCAPE.md` für vollständigen Analyse-Report und TODO-Backlog.
+
+---
+
+**Status-Update:** Phase 1-4 ✅ Vollständig dokumentiert | Bereit für sequentielle Codex-Implementierung
