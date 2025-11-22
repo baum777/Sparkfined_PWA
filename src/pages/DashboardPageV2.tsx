@@ -42,7 +42,12 @@ export default function DashboardPageV2() {
   const kpiStripContent = isLoading ? (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="h-20 animate-pulse rounded-2xl bg-surface-skeleton" />
+        <div
+          key={index}
+          className="h-20 animate-pulse rounded-2xl bg-surface-skeleton"
+          role="status"
+          aria-label="Loading dashboard KPI"
+        />
       ))}
     </div>
   ) : error ? null : (
@@ -54,8 +59,20 @@ export default function DashboardPageV2() {
       return (
         <div className="space-y-6">
           <DashboardMainGrid
-            primary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
-            secondary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
+            primary={(
+              <div
+                className="h-64 animate-pulse rounded-2xl bg-surface-skeleton"
+                role="status"
+                aria-label="Loading primary dashboard content"
+              />
+            )}
+            secondary={(
+              <div
+                className="h-64 animate-pulse rounded-2xl bg-surface-skeleton"
+                role="status"
+                aria-label="Loading secondary dashboard content"
+              />
+            )}
           />
         </div>
       );

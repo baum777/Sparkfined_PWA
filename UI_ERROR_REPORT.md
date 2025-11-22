@@ -20,6 +20,11 @@ Nach einer umfassenden Überprüfung des Sparkfined PWA wurden **23 UI-bezogene 
 - 🟡 **Mittel (P2):** 10 Fehler
 - 🟢 **Niedrig (P3):** 3 Fehler
 
+## ✅ Status-Update (2025-02-18)
+- Design-Tokens zwischen `tailwind.config.ts` und `src/styles/tokens.css` wurden synchronisiert (Brand, Surface, Border, Text, Status, Sentiment). Tailwind bleibt die Quelle der Wahrheit, CSS-Variablen spiegeln die gleichen Werte wider.
+- UI-Primitiven (Button, Input, Card, Select, Badge, EmptyState, ErrorState) nutzen jetzt semantische Tokens (`bg-brand`, `bg-surface`, `text-text-primary`, `text-success`, `text-danger`), Hardcoded-Farben wurden entfernt.
+- V2-Seiten: Analysis nutzt jetzt semantische Erfolgs-/Warn-/Danger-Farben, Dashboard-Ladezustände besitzen explizite `aria-label`/`role="status"` für Skeletons.
+
 ---
 
 ## 🔴 KRITISCHE FEHLER (P0)

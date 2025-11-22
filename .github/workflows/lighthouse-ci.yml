@@ -30,8 +30,7 @@ jobs:
       - name: Build app
         run: pnpm build
         env:
-          # Prevent build from failing on missing env vars
-          VITE_MORALIS_API_KEY: 'test-key'
+          MORALIS_API_KEY: 'test-key'
 
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v11
@@ -73,7 +72,7 @@ jobs:
       - name: Build app
         run: pnpm build
         env:
-          VITE_MORALIS_API_KEY: 'test-key'
+          MORALIS_API_KEY: 'test-key'
 
       - name: Check bundle size
         run: pnpm run check:size

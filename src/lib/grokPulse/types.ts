@@ -46,9 +46,37 @@ export interface DexscreenerTokenRef {
   symbol?: string;
 }
 
+export interface DexscreenerTxns24h {
+  volumeUSD?: number;
+  buys?: number;
+  sells?: number;
+}
+
+export interface DexscreenerTxns {
+  h24?: DexscreenerTxns24h;
+}
+
+export interface DexscreenerVolume {
+  h24?: number;
+}
+
+export interface DexscreenerLiquidity {
+  usd?: number;
+}
+
+export interface DexscreenerPriceChange {
+  h24?: number;
+}
+
 export interface DexscreenerPairEntry {
   baseToken: DexscreenerTokenRef;
   quoteToken?: DexscreenerTokenRef;
+  liquidity?: DexscreenerLiquidity;
+  volume?: DexscreenerVolume;
+  txns?: DexscreenerTxns;
+  priceUsd?: number;
+  priceChange?: DexscreenerPriceChange;
+  priceChange24h?: number;
 }
 
 export interface DexscreenerResponse {

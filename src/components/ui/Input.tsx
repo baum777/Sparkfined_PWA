@@ -26,10 +26,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   const generatedErrorId = errorId || `error-${Math.random().toString(36).substr(2, 9)}`;
   const helperTextValue = helperText || hint;
   
-  const baseStyles = 'w-full bg-zinc-800 border text-zinc-100 placeholder-zinc-500 transition-all focus:outline-none focus:ring-2 rounded-lg touch-manipulation';
+  const baseStyles = 'w-full bg-surface border text-text-primary placeholder:text-text-tertiary transition-all focus:outline-none focus:ring-2 rounded-lg touch-manipulation';
   const stateStyles = error
-    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50'
-    : 'border-zinc-700 focus:border-blue-500 focus:ring-blue-500/50';
+    ? 'border-danger focus:border-danger focus:ring-danger/50'
+    : 'border-border focus:border-brand focus:ring-brand/50';
   // Touch-optimized: h-12 = 48px (exceeds iOS HIG 44px minimum)
   const sizeStyles = 'px-4 py-3 text-sm h-12';
   const fontClass = mono ? 'font-mono tabular-nums' : '';
@@ -38,13 +38,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   return (
     <div className="w-full">
       {label && (
-        <label className="block text-sm font-medium text-zinc-300 mb-2">
+        <label className="block text-sm font-medium text-text-secondary mb-2">
           {label}
         </label>
       )}
       <div className="relative">
         {leftIcon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 flex items-center">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary flex items-center">
             {leftIcon}
           </div>
         )}
@@ -56,13 +56,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
           {...props}
         />
         {rightIcon && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 flex items-center">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary flex items-center">
             {rightIcon}
           </div>
         )}
       </div>
       {error && (
-        <p id={generatedErrorId} className="mt-1 text-xs text-red-500 flex items-center gap-1" role="alert">
+        <p id={generatedErrorId} className="mt-1 text-xs text-danger flex items-center gap-1" role="alert">
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
@@ -70,7 +70,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({
         </p>
       )}
       {helperTextValue && !error && (
-        <p className="mt-1 text-xs text-zinc-400">{helperTextValue}</p>
+        <p className="mt-1 text-xs text-text-secondary">{helperTextValue}</p>
       )}
     </div>
   );

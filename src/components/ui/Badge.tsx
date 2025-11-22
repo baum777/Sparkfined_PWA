@@ -9,11 +9,11 @@ interface BadgeProps {
 }
 
 const variantStyles: Record<BadgeVariant, string> = {
-  success: 'px-2 py-0.5 bg-green-500/10 text-green-500 text-xs font-medium rounded-full border border-green-500/20',
-  warning: 'px-2 py-0.5 bg-amber-500/10 text-amber-500 text-xs font-medium rounded-full border border-amber-500/20',
-  error: 'px-2 py-0.5 bg-red-500/10 text-red-500 text-xs font-medium rounded-full border border-red-500/20',
-  info: 'px-2 py-0.5 bg-cyan-500/10 text-cyan-500 text-xs font-medium rounded-full border border-cyan-500/20',
-  neutral: 'px-2 py-0.5 bg-zinc-800 text-zinc-300 text-xs font-medium rounded-full border border-zinc-700',
+  success: 'px-2 py-0.5 bg-success/10 text-success text-xs font-medium rounded-full border border-success/20',
+  warning: 'px-2 py-0.5 bg-warn/10 text-warn text-xs font-medium rounded-full border border-warn/20',
+  error: 'px-2 py-0.5 bg-danger/10 text-danger text-xs font-medium rounded-full border border-danger/20',
+  info: 'px-2 py-0.5 bg-info/10 text-info text-xs font-medium rounded-full border border-info/20',
+  neutral: 'px-2 py-0.5 bg-surface text-text-secondary text-xs font-medium rounded-full border border-border',
 };
 
 export function Badge({

@@ -6,6 +6,8 @@ import type {
   PulseGlobalToken,
 } from "./types";
 
+export type { PulseGlobalToken } from "./types";
+
 const MAX_SYMBOL_LENGTH = 12;
 
 export interface GlobalTokenSourceArgs {

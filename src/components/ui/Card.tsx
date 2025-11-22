@@ -10,9 +10,9 @@ interface CardProps {
 }
 
 const variantStyles: Record<CardVariant, string> = {
-  default: 'bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6 shadow-lg',
-  elevated: 'bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 hover:bg-zinc-800/50 transition-all duration-200 shadow-lg cursor-pointer',
-  glass: 'bg-zinc-900/80 backdrop-blur-md border border-zinc-700 rounded-xl p-4 shadow-2xl',
+  default: 'bg-surface border border-border rounded-xl p-4 md:p-6 shadow-card-subtle',
+  elevated: 'bg-surface border border-border rounded-xl p-4 hover:border-border-hover hover:bg-surface-hover transition-all duration-200 shadow-card-subtle cursor-pointer',
+  glass: 'bg-surface/80 backdrop-blur-md border border-border-subtle rounded-xl p-4 shadow-2xl',
 };
 
 export function Card({
@@ -61,7 +61,7 @@ interface CardTitleProps {
 
 export function CardTitle({ children, className = '' }: CardTitleProps) {
   return (
-    <h3 className={`text-lg font-medium text-zinc-100 ${className}`}>
+    <h3 className={`text-lg font-medium text-text-primary ${className}`}>
       {children}
     </h3>
   );

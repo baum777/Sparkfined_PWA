@@ -10,13 +10,13 @@ export default function ErrorState({ error, onRetry }: ErrorStateProps) {
 
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      <AlertTriangle className="w-16 h-16 text-red-500 mb-4" aria-hidden="true" />
-      <h3 className="text-lg font-semibold text-slate-200 mb-2">Something went wrong</h3>
-      <p className="text-slate-400 mb-6 max-w-md">{message}</p>
+      <AlertTriangle className="w-16 h-16 text-danger mb-4" aria-hidden="true" />
+      <h3 className="text-lg font-semibold text-text-primary mb-2">Something went wrong</h3>
+      <p className="text-text-secondary mb-6 max-w-md">{message}</p>
       {onRetry && (
         <button
           onClick={onRetry}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          className="px-4 py-2 bg-brand hover:bg-brand-hover text-text-primary rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
         >
           Try Again
         </button>
