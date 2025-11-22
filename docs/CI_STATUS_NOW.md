@@ -393,4 +393,57 @@ Siehe `docs/API_LANDSCAPE.md` für vollständigen Analyse-Report und TODO-Backlo
 
 ---
 
-**Status-Update:** Phase 1-4 ✅ Vollständig dokumentiert | Bereit für sequentielle Codex-Implementierung
+**Status-Update:** Phase 1-4 ✅ Vollständig dokumentiert | Phase 4 Review abgeschlossen (2025-11-22)
+
+---
+
+## 🔍 Phase 4 Review — Aktueller CI-Check-Status
+
+**Review-Datum:** 2025-11-22
+
+**Branch:** `claude/ci-diagnostics-stabilize-01NRRLWGEJWX71DQi8XnAe2f`
+
+### Quick-Status-Übersicht
+
+| Check | Status | Root Cause | Blocker? |
+|-------|--------|------------|----------|
+| Vercel Deploy | ❌ | TypeCheck/Lint-Fehler (vermutet) | JA |
+| Lighthouse CI / bundle-size | ❌ | Lint-Fehler blockieren Pipeline | JA |
+| CI / lint-test-build | ❌ | 6 TS-Errors + 2 Lint-Errors | JA |
+| CI — Analyze Hardening / test | ❌ | TypeCheck/Lint-Fehler | JA |
+| Lighthouse CI / lighthouse | ⏭ | Bewusst disabled (`if: false`) | NEIN |
+| Manifest-Smoke | ✅ | Funktioniert | NEIN |
+
+### Hauptergebnisse
+
+**✅ ERFOLGE:**
+- Phase 4A/B (API Runtime-Fixes) erfolgreich angewendet
+  - 14 APIs von Edge → Node umgestellt
+  - Alle KV-nutzenden APIs haben jetzt `runtime: "nodejs"`
+  - Kein Edge/KV-Konflikt mehr erwartet
+- Build funktioniert lokal ✅ (mit tsconfig.build.json)
+- Bundle-Size lokal OK ✅ (443KB / 460KB, 96%)
+
+**❌ BLOCKER:**
+- Phase 2-Fixes NOCH NICHT angewendet:
+  - 6 TypeScript-Errors (identisch zu Phase-2-Dokumentation)
+  - 2 Lint-Errors + 1 Warning (identisch)
+  - 2 Test-Failures (aus Phase 2 bekannt)
+- Diese Fehler blockieren ALL E CI-Workflows
+
+### Merge-Empfehlung
+
+❌ **PR ist NICHT merge-ready**
+
+**Nächste Schritte:**
+1. Codex: Phase 2 Fixes anwenden (C1+C2+C3, ~30 Min)
+2. Lokal verifizieren: `pnpm typecheck && pnpm lint && pnpm test`
+3. Commit + Push
+4. CI grün abwarten
+5. Falls Vercel OK → Merge zu `main`
+
+**Vollständiger Review:** Siehe `docs/CI_REVIEW_PHASE_4.md`
+
+---
+
+**Status-Update (2025-11-22):** Phase 1-4 ✅ Vollständig dokumentiert | Phase 4 Review abgeschlossen | Phase 2 Fixes ausstehend
