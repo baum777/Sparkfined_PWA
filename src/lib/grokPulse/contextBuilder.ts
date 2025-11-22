@@ -1,5 +1,6 @@
 import { sanitizeSymbol } from "./sources";
 import type { GlobalTokenSourceArgs, PulseGlobalToken } from "./sources";
+import type { DexscreenerPairEntry } from "./types";
 
 export interface EnhancedSocialContext {
   entries: SocialContextEntry[];
@@ -162,14 +163,18 @@ async function fetchDexscreenerSnapshot(
     }
 
     const data = await res.json().catch(() => null);
-    const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
+    const pairs: DexscreenerPairEntry[] = Array.isArray(data?.pairs) ? data.pairs : [];
     if (!pairs.length) return null;
 
-    const primary = pairs.reduce((best, current) => {
-      const bestLiq = Number(best?.liquidity?.usd ?? 0);
-      const liq = Number(current?.liquidity?.usd ?? 0);
-      return liq > bestLiq ? current : best;
-    });
+    const primary = pairs.reduce(
+      (best: DexscreenerPairEntry | null, current: DexscreenerPairEntry) => {
+        if (!best) return current;
+        const bestLiq = Number(best.liquidity?.usd ?? 0);
+        const liq = Number(current?.liquidity?.usd ?? 0);
+        return liq > bestLiq ? current : best;
+      },
+      null as DexscreenerPairEntry | null
+    );
 
     if (!primary) return null;
 
@@ -259,10 +264,10 @@ async function fetchSocialMentions(
     }
 
     const data = await res.json().catch(() => null);
-    const results = Array.isArray(data?.results) ? data.results : [];
+    const results: unknown[] = Array.isArray(data?.results) ? data.results : [];
 
     return results
-      .map((entry: unknown) => normalizeSocialEntry(entry))
+      .map((entry: unknown): SocialContextEntry | null => normalizeSocialEntry(entry))
       .filter((entry): entry is SocialContextEntry => Boolean(entry?.text));
   } catch (error) {
     console.warn("[grokPulse] Social context error", error);
@@ -301,10 +306,10 @@ async function fetchTwitterMentions(
     }
 
     const data = await res.json().catch(() => null);
-    const results = Array.isArray(data?.results) ? data.results : [];
+    const results: unknown[] = Array.isArray(data?.results) ? data.results : [];
 
     return results
-      .map((entry: unknown) => normalizeSocialEntry(entry))
+      .map((entry: unknown): SocialContextEntry | null => normalizeSocialEntry(entry))
       .filter((entry): entry is SocialContextEntry => Boolean(entry?.text));
   } catch (error) {
     console.warn("[grokPulse] Twitter context error", error);
