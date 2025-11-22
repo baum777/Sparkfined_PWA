@@ -6,29 +6,23 @@ import * as contextBuilder from "../../src/lib/grokPulse/contextBuilder";
 import * as grokClient from "../../src/lib/grokPulse/grokClient";
 import type { GrokSentimentSnapshot } from "../../src/lib/grokPulse/types";
 
-vi.mock("../../src/lib/grokPulse/kv", () => {
-  const getPulseGlobalList = vi.fn().mockResolvedValue([]);
-  const getWatchlistTokens = vi.fn().mockResolvedValue([]);
-  const getCachedTokenContext = vi.fn().mockResolvedValue(null);
-  const cacheTokenContext = vi.fn();
-  const appendHistory = vi.fn();
-  const setCurrentSnapshot = vi.fn();
-  const getCurrentSnapshot = vi.fn().mockResolvedValue(null);
-  const getHistory = vi.fn().mockResolvedValue([]);
-
-  return {
-    getPulseGlobalList,
-    getWatchlistTokens,
-    getCachedTokenContext,
-    cacheTokenContext,
-    appendHistory,
-    setCurrentSnapshot,
-    getCurrentSnapshot,
-    getHistory,
-  };
-});
+vi.mock("../../src/lib/grokPulse/kv", () => ({
+  getPulseGlobalList: vi.fn().mockResolvedValue([]),
+  getWatchlistTokens: vi.fn().mockResolvedValue([]),
+  getCachedTokenContext: vi.fn().mockResolvedValue(null),
+  cacheTokenContext: vi.fn().mockResolvedValue(undefined),
+  appendHistory: vi.fn().mockResolvedValue(undefined),
+  setCurrentSnapshot: vi.fn().mockResolvedValue(undefined),
+  getCurrentSnapshot: vi.fn().mockResolvedValue(null),
+  getHistory: vi.fn().mockResolvedValue([]),
+  getPulseMetaLastRun: vi.fn().mockResolvedValue(null),
+}));
 
 describe("grok-pulse API handlers", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
     vi.clearAllMocks();
