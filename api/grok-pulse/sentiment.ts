@@ -55,7 +55,9 @@ export default async function handler(req: Request): Promise<Response> {
     twitterBaseUrl: process.env.PULSE_TWITTER_API_URL?.trim(),
   } as const;
 
-  const watchlistTokens = await getWatchlistTokens().catch(() => []);
+  const watchlistTokens = await Promise.resolve(
+    typeof getWatchlistTokens === "function" ? getWatchlistTokens() : []
+  ).catch(() => []);
 
   const cachedContext = await getCachedTokenContext(address);
   const context = cachedContext
@@ -94,8 +96,16 @@ async function persistSnapshot(
   token: PulseGlobalToken,
   snapshot: GrokSentimentSnapshot
 ) {
-  const previousSnapshot = await getCurrentSnapshot(token.address).catch(() => null);
-  const history = previousSnapshot ? [] : await getHistory(token.address).catch(() => []);
+  const previousSnapshot = await Promise.resolve(
+    typeof getCurrentSnapshot === "function"
+      ? getCurrentSnapshot(token.address)
+      : null
+  ).catch(() => null);
+  const history = previousSnapshot
+    ? []
+    : (await Promise.resolve(
+        typeof getHistory === "function" ? getHistory(token.address) : []
+      ).catch(() => [])) ?? [];
   const previousScore = previousSnapshot
     ? previousSnapshot.score
     : history.at(-1)?.score ?? null;
