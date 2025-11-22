@@ -11,6 +11,8 @@
  * - Forwards 4xx/5xx status codes
  */
 
+export const runtime = 'nodejs';
+
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const DEXPAPRIKA_BASE = process.env.DEXPAPRIKA_BASE || 'https://api.dexpaprika.com';

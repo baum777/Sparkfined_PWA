@@ -1,5 +1,5 @@
 // Edge: Export als JSON oder Markdown (flattened)
-export const config = { runtime: "edge" };
+export const config = { runtime: "nodejs" };
 import { kvSMembers, kvGet } from "../../src/lib/kv";
 import type { JournalNote } from "../../src/lib/journal";
 const uid = (req:Request)=> (new URL(req.url)).searchParams.get("userId") || (req.headers.get("x-user-id") || "anon");

@@ -1,3 +1,5 @@
+export const runtime = "nodejs";
+
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Providers } from "../../src/config/providers";
 import { incrementFallback } from "../../src/lib/metrics/providerFallback";

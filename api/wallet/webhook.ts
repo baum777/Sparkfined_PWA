@@ -38,7 +38,7 @@
  * }
  */
 
-export const config = { runtime: 'edge' }
+export const runtime = 'nodejs'
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' } as const
 

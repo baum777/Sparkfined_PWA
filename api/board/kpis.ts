@@ -15,12 +15,10 @@
  * - IndexedDB (journal, rules, charts) - via client
  * - Moralis Cortex (sentiment, risk) - future
  * 
- * Edge Function: Fast response, minimal compute
+ * Node Function: Accesses KV-backed metrics and performs aggregation
  */
 
-export const config = {
-  runtime: 'edge',
-};
+export const runtime = 'nodejs';
 
 interface KPI {
   id: string;

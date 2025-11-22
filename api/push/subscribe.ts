@@ -1,6 +1,6 @@
 // Optionaler Stub zum Persistieren – aktuell NO-OP (dev-freundlich).
 // Später: Upstash/KV integrieren.
-export const config = { runtime: "edge" };
+export const config = { runtime: "nodejs" };
 import { kvSAdd, kvSet } from "../../src/lib/kv";
 import { sha256Url } from "../../src/lib/sha";
 export default async function handler(req: Request) {

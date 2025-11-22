@@ -1,4 +1,6 @@
 // Node Runtime: zieht Items aus Queue & sendet Web-Push an alle Subs (oder pro userId)
+export const runtime = "nodejs";
+
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import webpush from "web-push";
 

@@ -1,4 +1,4 @@
-export const config = { runtime: "edge" };
+export const config = { runtime: "nodejs" };
 import { kvGet, kvSet, kvDel, kvSAdd, kvSMembers } from "../../src/lib/kv";
 import type { Idea } from "../../src/lib/ideas";
 const json = (o:any,s=200)=>new Response(JSON.stringify(o),{status:s,headers:{"content-type":"application/json"}});

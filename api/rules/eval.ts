@@ -1,6 +1,6 @@
-// Edge: Optionale Server-Evaluation einer einzelnen Regel gegen aktuellen Kontext
+// Node: Optionale Server-Evaluation einer einzelnen Regel gegen aktuellen Kontext
 // Nutze dieselbe Semantik wie Client-Eval; nützt für Offload/Double-Check
-export const config = { runtime: "edge" };
+export const runtime = "nodejs";
 type Rule =
   | { id:string; kind:"price-cross"; op:">"|"<"; value:number }
   | { id:string; kind:"pct-change-24h"; op:">"|"<"; value:number }
