@@ -1,4 +1,6 @@
 // Node-Runtime (nicht Edge), sendet eine Test-Push an die übergebene Subscription.
+export const runtime = "nodejs";
+
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import webpush from "web-push";
 

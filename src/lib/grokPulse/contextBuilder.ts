@@ -1,5 +1,6 @@
 import { sanitizeSymbol } from "./sources";
-import type { GlobalTokenSourceArgs, PulseGlobalToken } from "./sources";
+import type { GlobalTokenSourceArgs } from "./sources";
+import type { PulseGlobalToken } from "./types";
 
 export interface EnhancedSocialContext {
   entries: SocialContextEntry[];
@@ -18,6 +19,15 @@ interface OnchainSnapshot {
   liquidityUsd?: number;
   priceChange24hPct?: number;
   source: "dexscreener" | "birdeye";
+}
+
+interface DexscreenerDetailPair {
+  liquidity?: { usd?: number | string };
+  priceUsd?: number | string;
+  volume?: { h24?: number | string };
+  txns?: { h24?: { volumeUSD?: number | string } };
+  priceChange?: { h24?: number | string };
+  priceChange24h?: number | string;
 }
 
 export interface TokenContextBuilderArgs extends GlobalTokenSourceArgs {
@@ -161,15 +171,22 @@ async function fetchDexscreenerSnapshot(
       return null;
     }
 
-    const data = await res.json().catch(() => null);
-    const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
+    const data = (await res.json().catch(() => null)) as
+      | { pairs?: DexscreenerDetailPair[] }
+      | null;
+    const pairs: DexscreenerDetailPair[] = Array.isArray(data?.pairs)
+      ? data?.pairs ?? []
+      : [];
     if (!pairs.length) return null;
 
-    const primary = pairs.reduce((best, current) => {
-      const bestLiq = Number(best?.liquidity?.usd ?? 0);
-      const liq = Number(current?.liquidity?.usd ?? 0);
-      return liq > bestLiq ? current : best;
-    });
+    const primary = pairs.reduce<DexscreenerDetailPair | null>(
+      (best, current) => {
+        const bestLiq = Number(best?.liquidity?.usd ?? 0);
+        const liq = Number(current?.liquidity?.usd ?? 0);
+        return liq > bestLiq ? current : best;
+      },
+      null
+    );
 
     if (!primary) return null;
 
@@ -261,9 +278,14 @@ async function fetchSocialMentions(
     const data = await res.json().catch(() => null);
     const results = Array.isArray(data?.results) ? data.results : [];
 
-    return results
-      .map((entry: unknown) => normalizeSocialEntry(entry))
-      .filter((entry): entry is SocialContextEntry => Boolean(entry?.text));
+    const normalized: Array<SocialContextEntry | null> = results.map(
+      (entry: unknown) => normalizeSocialEntry(entry)
+    );
+
+    return normalized.filter(
+      (entry: SocialContextEntry | null): entry is SocialContextEntry =>
+        Boolean(entry?.text)
+    );
   } catch (error) {
     console.warn("[grokPulse] Social context error", error);
     return [];
@@ -303,9 +325,14 @@ async function fetchTwitterMentions(
     const data = await res.json().catch(() => null);
     const results = Array.isArray(data?.results) ? data.results : [];
 
-    return results
-      .map((entry: unknown) => normalizeSocialEntry(entry))
-      .filter((entry): entry is SocialContextEntry => Boolean(entry?.text));
+    const normalized: Array<SocialContextEntry | null> = results.map(
+      (entry: unknown) => normalizeSocialEntry(entry)
+    );
+
+    return normalized.filter(
+      (entry: SocialContextEntry | null): entry is SocialContextEntry =>
+        Boolean(entry?.text)
+    );
   } catch (error) {
     console.warn("[grokPulse] Twitter context error", error);
     return [];

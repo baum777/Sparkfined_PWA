@@ -17,12 +17,10 @@
  * - offset: number (default: 0)
  * - type: 'all' | 'alerts' | 'journal' | 'analysis' | 'export' | 'error' (default: 'all')
  * 
- * Edge Function: Fast response, minimal compute
+ * Node Function: Aggregates KV-backed feed items
  */
 
-export const config = {
-  runtime: 'edge',
-};
+export const runtime = 'nodejs';
 
 interface FeedEvent {
   id: string;

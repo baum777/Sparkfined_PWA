@@ -1,5 +1,5 @@
-// Edge CRUD für Server-Rules (KV)
-export const config = { runtime: "edge" };
+// Node CRUD für Server-Rules (KV)
+export const runtime = "nodejs";
 import { kvGet, kvSet, kvDel, kvSAdd, kvSMembers } from "../../src/lib/kv";
 import type { ServerRule } from "../../src/lib/serverRules";
 

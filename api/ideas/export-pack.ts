@@ -1,5 +1,5 @@
 // Edge: erstellt ein Execution-Pack (Idea + Order + Ladder + Chart-Link)
-export const config = { runtime: "edge" };
+export const config = { runtime: "nodejs" };
 import { kvGet } from "../../src/lib/kv";
 import type { Idea } from "../../src/lib/ideas";
 import { buildOrderText, buildLadder, LADDERS } from "../../src/lib/execution";

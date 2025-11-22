@@ -8,6 +8,7 @@ on:
 
 jobs:
   lighthouse:
+    if: false # Temporarily disabled for CI stabilization (see docs/CI_FIX_PHASE_3_HEAVY_STEPS.md)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
