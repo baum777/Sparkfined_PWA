@@ -164,4 +164,133 @@ Siehe `docs/CI_FIX_PHASE_1_WORKFLOW.md` für konkreten Aktionsplan.
 
 ---
 
-**Status-Update:** Bereit für Phase 1 — Workflow-Fix
+## 🔄 Phase 2 Status — TypeScript & Error-Diagnostik
+
+**Update:** 2025-11-22 (nach Phase 1 Analyse)
+
+**Lokale Test-Ergebnisse:**
+
+### ✅ Phase 1 — Setup-Probleme (gelöst via Plan)
+
+Die in Phase 1 identifizierten Workflow-Setup-Probleme sind dokumentiert in:
+- `docs/CI_FIX_PHASE_1_WORKFLOW.md`
+
+Sobald Codex die YAML-Fixes implementiert, sollten pnpm/Node-Setup-Fehler behoben sein.
+
+---
+
+### 🔴 Phase 2 — Verbleibende Blocker (aktiv)
+
+**Lokale Diagnostik durchgeführt am 2025-11-22:**
+
+| Kategorie | Status | Anzahl Fehler | Blocker? |
+|-----------|--------|---------------|----------|
+| **TypeScript** | 🔴 FAIL | 10 Fehler | JA |
+| **Tests** | 🔴 FAIL | 2 Failed Tests | JA |
+| **Lint** | 🟡 WARN | 2 Errors + 1 Warning | MEDIUM |
+
+---
+
+### TypeScript-Fehler (10 Total)
+
+**Kategorie A — Import/Export:**
+1. `contextBuilder.ts:2` — `PulseGlobalToken` nicht aus `sources` exportiert
+
+**Kategorie B — Implizite any:**
+2-5. `contextBuilder.ts:168,266,308` — Parameter ohne explizite Typen
+
+**Kategorie C — String Literal Mismatches:**
+6-10. `grokPulse.e2e.test.tsx:67,96,99,100,105` — Test-Daten mit falschen Union-Werten
+
+**Kategorie D — undefined-Probleme:**
+11. `grokPulse.e2e.test.tsx:221` — `| undefined` nicht abgesichert
+
+**Gesamtstatus:** `pnpm typecheck` → **EXIT CODE 2** ❌
+
+---
+
+### Test-Failures (2 Total)
+
+**Failing Tests:**
+1. `tests/grokPulse/grokPulse.api.test.ts > sentiment handler stores grok snapshot`
+   - **Error:** `TypeError: Cannot read properties of undefined (reading 'catch')`
+   - **Location:** `api/grok-pulse/sentiment.ts:58`
+   - **Ursache:** Mock für `getWatchlistTokens()` falsch definiert
+
+2. `tests/grokPulse/grokPulse.api.test.ts > sentiment handler falls back when grok fails`
+   - **Error:** Gleicher Fehler wie oben
+   - **Ursache:** Gleicher Mock-Fehler
+
+**Test-Statistik:**
+- ✅ **Passed:** 150 Tests
+- ❌ **Failed:** 2 Tests
+- ⏭️ **Skipped:** 40 Tests
+- **Duration:** 35.38s
+
+**Gesamtstatus:** `pnpm test` → **EXIT CODE 1** ❌
+
+---
+
+### Lint-Fehler (2 Errors + 1 Warning)
+
+**Errors:**
+1. `sources.test.ts:31` — Object-to-String Conversion-Warnung
+2. `sources.test.ts:114` — Object-to-String Conversion-Warnung
+
+**Warning:**
+3. `sentiment.ts:32` — Unused variable `error`
+
+**Gesamtstatus:** `pnpm lint` → **EXIT CODE 1** ⚠️
+
+---
+
+### 🔐 Security / Secrets — Status
+
+**✅ Keine kritischen Security-Issues gefunden**
+
+- `.env` Files: Nur `.env.example` vorhanden (korrekt)
+- Secrets im Code: Keine Client-Side-Leaks
+- API-Keys: Korrekt in Server-Side-Handlern (process.env)
+
+**Keine Aktion nötig in Phase 2.**
+
+---
+
+## 📋 Aktionsplan-Übersicht
+
+### Phase 1: Workflow-Fix
+- **Datei:** `docs/CI_FIX_PHASE_1_WORKFLOW.md`
+- **Status:** ✅ Dokumentiert, bereit für Codex
+
+### Phase 2: TypeScript & Error-Fixes
+- **Datei:** `docs/TS_FIX_PLAN.md`
+- **Status:** ✅ Dokumentiert, bereit für Codex
+- **Umfang:**
+  - 10 TypeScript-Fehler
+  - 2 Test-Failures
+  - 3 Lint-Issues
+
+### Phase 3: Build & E2E (geplant)
+- **Datei:** `docs/CI_FIX_PHASE_3_BUILD.md` (noch nicht erstellt)
+- **Status:** 🔜 Nach Phase 2
+
+---
+
+## 🎯 Kritischer Pfad für CI-Stabilisierung
+
+```
+Phase 1 (Workflow)  →  Phase 2 (TypeScript/Tests/Lint)  →  Phase 3 (Build/E2E)
+      ↓                          ↓                                  ↓
+  YAML-Fixes           Code-Fixes (10 TS + 2 Tests)      Build + Playwright
+   (Codex)                   (Codex)                         (Codex)
+      ↓                          ↓                                  ↓
+ pnpm install OK        pnpm typecheck OK              pnpm build OK
+                        pnpm test OK                    Playwright OK
+                        pnpm lint OK
+```
+
+**Aktueller Stand:** Phase 1 dokumentiert, Phase 2 dokumentiert, bereit für Codex-Implementierung.
+
+---
+
+**Status-Update:** Phase 1 ✅ Dokumentiert | Phase 2 ✅ Dokumentiert | Bereit für Codex
