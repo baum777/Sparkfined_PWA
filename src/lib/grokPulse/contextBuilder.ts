@@ -1,5 +1,15 @@
 import { sanitizeSymbol } from "./sources";
 import type { GlobalTokenSourceArgs, PulseGlobalToken } from "./sources";
+import type { DexscreenerPairEntry } from "./types";
+
+type DexscreenerPairWithMetrics = DexscreenerPairEntry & {
+  liquidity?: { usd?: number | string };
+  priceUsd?: number | string;
+  volume?: { h24?: number | string };
+  txns?: { h24?: { volumeUSD?: number | string } };
+  priceChange?: { h24?: number | string };
+  priceChange24h?: number | string;
+};
 
 export interface EnhancedSocialContext {
   entries: SocialContextEntry[];
@@ -162,14 +172,21 @@ async function fetchDexscreenerSnapshot(
     }
 
     const data = await res.json().catch(() => null);
-    const pairs = Array.isArray(data?.pairs) ? data.pairs : [];
+    const pairs = Array.isArray(data?.pairs)
+      ? (data.pairs as DexscreenerPairWithMetrics[])
+      : [];
     if (!pairs.length) return null;
 
-    const primary = pairs.reduce((best, current) => {
-      const bestLiq = Number(best?.liquidity?.usd ?? 0);
-      const liq = Number(current?.liquidity?.usd ?? 0);
-      return liq > bestLiq ? current : best;
-    });
+    const primary = pairs.reduce(
+      (
+        best: DexscreenerPairWithMetrics,
+        current: DexscreenerPairWithMetrics
+      ): DexscreenerPairWithMetrics => {
+        const bestLiq = Number(best?.liquidity?.usd ?? 0);
+        const liq = Number(current?.liquidity?.usd ?? 0);
+        return liq > bestLiq ? current : best;
+      }
+    );
 
     if (!primary) return null;
 
@@ -261,9 +278,14 @@ async function fetchSocialMentions(
     const data = await res.json().catch(() => null);
     const results = Array.isArray(data?.results) ? data.results : [];
 
-    return results
-      .map((entry: unknown) => normalizeSocialEntry(entry))
-      .filter((entry): entry is SocialContextEntry => Boolean(entry?.text));
+    const normalized = results
+      .map((entry: unknown): SocialContextEntry | null => normalizeSocialEntry(entry))
+      .filter(
+        (entry: SocialContextEntry | null): entry is SocialContextEntry =>
+          Boolean(entry?.text)
+      );
+
+    return normalized;
   } catch (error) {
     console.warn("[grokPulse] Social context error", error);
     return [];
@@ -303,9 +325,14 @@ async function fetchTwitterMentions(
     const data = await res.json().catch(() => null);
     const results = Array.isArray(data?.results) ? data.results : [];
 
-    return results
-      .map((entry: unknown) => normalizeSocialEntry(entry))
-      .filter((entry): entry is SocialContextEntry => Boolean(entry?.text));
+    const normalized = results
+      .map((entry: unknown): SocialContextEntry | null => normalizeSocialEntry(entry))
+      .filter(
+        (entry: SocialContextEntry | null): entry is SocialContextEntry =>
+          Boolean(entry?.text)
+      );
+
+    return normalized;
   } catch (error) {
     console.warn("[grokPulse] Twitter context error", error);
     return [];
