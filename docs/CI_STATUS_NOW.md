@@ -270,9 +270,16 @@ Sobald Codex die YAML-Fixes implementiert, sollten pnpm/Node-Setup-Fehler behobe
   - 2 Test-Failures
   - 3 Lint-Issues
 
-### Phase 3: Build & E2E (geplant)
-- **Datei:** `docs/CI_FIX_PHASE_3_BUILD.md` (noch nicht erstellt)
-- **Status:** 🔜 Nach Phase 2
+### Phase 3: Heavy CI Steps & Hardening
+- **Datei:** `docs/CI_FIX_PHASE_3_HEAVY_STEPS.md`
+- **Status:** ✅ Dokumentiert, bereit für Codex (nach Phase 1+2)
+- **Umfang:**
+  - Build-Stabilisierung
+  - Playwright E2E-Tests
+  - Coverage-Generation
+  - Lighthouse CI (optional)
+  - Bundle-Size-Checks
+  - Artifact-Uploads
 
 ---
 
@@ -289,8 +296,57 @@ Phase 1 (Workflow)  →  Phase 2 (TypeScript/Tests/Lint)  →  Phase 3 (Build/E2
                         pnpm lint OK
 ```
 
-**Aktueller Stand:** Phase 1 dokumentiert, Phase 2 dokumentiert, bereit für Codex-Implementierung.
+**Aktueller Stand:** Phase 1-3 vollständig dokumentiert, bereit für sequentielle Codex-Implementierung.
 
 ---
 
-**Status-Update:** Phase 1 ✅ Dokumentiert | Phase 2 ✅ Dokumentiert | Bereit für Codex
+## 📊 Phase 3 Status — Heavy CI Steps
+
+**Update:** 2025-11-22 (nach Phase 1+2 Planung)
+
+### Heavy Steps Analyse
+
+**Workflow-Übersicht:**
+
+| Workflow | Heavy Steps | Aktueller Status | Blocker |
+|----------|-------------|------------------|---------|
+| ci-analyze.yml | Build, Playwright Install, Playwright Tests, Coverage, Artifacts | 🔴 BLOCKED | Phase 1+2 |
+| ci.yml | Build, Bundle-Size | 🔴 BLOCKED | Phase 1+2 |
+| lighthouse-ci.yml | Build, Lighthouse CI, Bundle Analysis | 🔴 BLOCKED | Phase 1+2 + Server-Start fehlt |
+| ci-manifest-check.yml | Manifest Smoke Test | ⚠️ READY (skip wenn DEPLOY_URL fehlt) | Keine |
+
+**Kritische Erkenntnisse:**
+
+1. **Alle Heavy Steps sind AKTIV** (keine `if: false` im Code)
+   - Nach Phase 1+2 werden diese Steps erstmals durchlaufen
+   - Erwartete Probleme dokumentiert in `docs/CI_FIX_PHASE_3_HEAVY_STEPS.md`
+
+2. **Lighthouse CI fehlt Server-Start:**
+   - Workflow versucht `http://localhost:4173` zu testen
+   - Kein `vite preview &` Step vorhanden
+   - **Fix:** Server-Start-Steps hinzufügen oder Lighthouse deaktivieren
+
+3. **Bundle-Size-Thresholds könnten zu streng sein:**
+   - Aktuelles Budget: 400KB total, verschiedene Chunk-Limits
+   - Nach Phase 2: Lokal testen mit `pnpm run check:size`
+
+4. **Playwright-Tests ungetestet:**
+   - ~10-15 E2E-Tests vorhanden
+   - Unbekannt ob alle mit `DEV_USE_MOCKS=true` funktionieren
+   - **Empfehlung:** Lokal testen vor CI-Aktivierung
+
+**Reaktivierungs-Strategie (3A-3E):**
+
+- **3A (30-60 Min):** Build + Bundle-Size stabilisieren
+- **3B (20-30 Min):** Coverage + Artifacts
+- **3C (1-2 Std):** Playwright E2E-Tests
+- **3D (Optional):** Lighthouse CI (Server-Fix oder Deaktivierung)
+- **3E (5 Min):** Manifest Smoke Test (bereits abgesichert)
+
+**Gesamt-Aufwand:** 3-5 Stunden (inkl. Debugging)
+
+Siehe `docs/CI_FIX_PHASE_3_HEAVY_STEPS.md` für vollständigen Plan.
+
+---
+
+**Status-Update:** Phase 1-3 ✅ Vollständig dokumentiert | Bereit für sequentielle Codex-Implementierung
