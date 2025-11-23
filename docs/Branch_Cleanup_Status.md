@@ -4,6 +4,27 @@
 
 ---
 
+## 🚨 BATCH-ZOMBIE-SCAN ABGESCHLOSSEN!
+
+**Scan-Datum:** 2025-11-23
+**Methode:** Automated ahead/behind analysis (58 branches)
+
+### 📊 Ergebnis:
+
+| Status | Count | % | Aktion |
+|--------|-------|---|--------|
+| 🧟 **ZOMBIES** | **28** | **48%** | ✅ DELETE via GitHub UI |
+| ✅ **ACTIVE** | **12** | **21%** | → Integration empfohlen |
+| ⚠️ **FAR_BEHIND** | **18** | **31%** | → Review erforderlich |
+
+**CRITICAL:** Fast die Hälfte aller Branches sind ZOMBIES! 🚨
+
+**Vollständiger Report:** `docs/Batch_Zombie_Scan_Report.md`
+
+**DELETE-Liste (28 Branches):** Siehe Batch_Zombie_Scan_Report.md → Copy-Paste Ready
+
+---
+
 ## ✅ Abgeschlossene Cleanup-Aktionen
 
 ### 1. hardening/F-02-analyze — ZOMBIE-BRANCH
