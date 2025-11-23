@@ -12,7 +12,7 @@
 **Gesamt-Branches erfasst:** 65+ remote branches
 **Kritische Findings:**
 
-1. 🚨 **`hardening/F-02-analyze`**: 202 commits ahead, 0 behind → **MASSIVE Arbeit**, muss priorisiert werden!
+1. ❌ **`hardening/F-02-analyze`**: 0 ahead, 202 behind → **ZOMBIE-BRANCH** (bereits gemerged in PR #86, bereit für Löschung!)
 2. ⚠️ **`codex/implement-grok-pulse-engine-and-read-api`**: 33 commits ahead, 1 behind → Wichtige Feature-Arbeit
 3. ✅ **`codex/implement-grok-pulse-api-integration`**: 16 commits ahead, 0 behind → Clean integration candidate
 4. 🔄 **Viele `claude/*` review branches**: Meistens merged, können archiviert werden
@@ -28,7 +28,6 @@
 
 | Branch | Ahead/Behind | Letzter Commit | Inhalt/Zweck | Empfehlung | Risk |
 |--------|--------------|----------------|--------------|------------|------|
-| **hardening/F-02-analyze** | **202 / 0** | 2025-11-18 | Massive Hardening-Arbeit (202 commits!) | **PRIORITY-REVIEW:** Detaillierte Analyse erforderlich, dann schrittweise Integration oder Feature-Branch | 🔴 HIGH |
 | **codex/implement-grok-pulse-engine-and-read-api** | **33 / 1** | 2025-11-21 | Grok Pulse Engine + State Endpoints | Rebase auf main, dann PR | 🟡 MEDIUM |
 | **codex/implement-grok-pulse-api-integration** | **16 / 0** | 2025-11-21 | Enhanced Grok Pulse Context/Sentiment APIs | Direkter PR → main | 🟢 LOW |
 
@@ -45,6 +44,7 @@
 
 | Branch-Pattern | Anzahl | Status | Empfehlung |
 |----------------|--------|--------|------------|
+| **hardening/F-02-analyze** | 1 | ❌ ZOMBIE (0 ahead, 202 behind, gemerged in PR #86) | **DELETE:** Siehe Branch_Analysis_hardening_F-02.md |
 | `claude/review-*` | ~10 | Meistens merged | Safety-Archive, dann löschen |
 | `claude/refactor-*` | ~3 | Meistens merged | Safety-Archive, dann löschen |
 | `cursor/*` (alte) | ~15 | Teilweise veraltet | Audit: Wertvolle commits identifizieren, Rest archivieren |
@@ -90,56 +90,32 @@ git push origin $SAFETY_NAME  # Wenn möglich
 
 ## 📋 Per-Branch-Playbooks für Codex
 
-### 🔴 PRIORITY 1: `hardening/F-02-analyze` (202 commits!)
+### ❌ ZOMBIE-BRANCH DELETE: `hardening/F-02-analyze`
 
-**Ziel:** Verstehen, was in den 202 commits enthalten ist, dann strategische Integration planen.
+**Status:** ✅ Analyse abgeschlossen (siehe `docs/Branch_Analysis_hardening_F-02.md`)
 
-**Warum kritisch?** 202 Commits sind zu viel für Blind-Merge. Könnte:
-- Kritische Bug-Fixes enthalten
-- Breaking Changes enthalten
-- Experimente enthalten
-- Veraltete Arbeit enthalten
+**Finding:** 0 commits ahead, 202 behind — Bereits gemerged in PR #86, sicher zu löschen!
 
-#### Schritt 1: Detaillierte Analyse (Codex)
+#### DELETE-Playbook (Codex)
 
 ```bash
-# 1. Safety-First
-git status
-git stash push -m "safety-before-hardening-analyze"
-git branch safety/2025-11-23-before-hardening-analyze
-git push origin safety/2025-11-23-before-hardening-analyze
-
-# 2. Branch auschecken (read-only)
+# 1. Safety-Check: Verifiziere 0 ahead
 git fetch origin
-git switch hardening/F-02-analyze
+git rev-list --left-right --count origin/main...origin/hardening/F-02-analyze
+# Erwartung: "202 0" (main ist 202 ahead, hardening 0 ahead)
 
-# 3. Commit-Historie analysieren
-git log --oneline --graph main..HEAD | head -50
-git log --oneline --graph main..HEAD > /tmp/hardening-F-02-commits.txt
+# 2. Lokale Branch löschen (falls vorhanden)
+git branch -D hardening/F-02-analyze 2>/dev/null || echo "Branch nicht lokal vorhanden"
 
-# 4. Datei-Änderungen zusammenfassen
-git diff --stat main...HEAD
+# 3. Remote-Branch löschen
+git push origin --delete hardening/F-02-analyze
 
-# 5. Hauptthemen identifizieren (Top 20 geänderte Dateien)
-git diff --stat main...HEAD | sort -rn -k1 | head -20
-
-# 6. Commit-Nachrichten nach Kategorien gruppieren
-git log --oneline main..HEAD | grep -E "(feat|fix|refactor|docs|test|chore)" | wc -l
+# 4. Verifikation
+echo "✅ hardening/F-02-analyze gelöscht"
+git branch -r | grep hardening/F-02-analyze || echo "✅ Branch erfolgreich entfernt"
 ```
 
-#### Schritt 2: Kategorisierung & Entscheidung
-
-Nach Analyse kategorisieren:
-- **Keep (Must-Have):** Critical fixes, neue Features
-- **Review (Maybe):** Refactorings, experimentelle Änderungen
-- **Archive (Nice-to-Have):** Docs, minor tweaks
-
-**Entscheidungs-Optionen:**
-1. **Full Integration:** Wenn Arbeit kohärent & aktuell → Rebase + PR
-2. **Selective Cherry-Pick:** Wenn gemischt → Neue Integrations-Branch + ausgewählte commits
-3. **Feature-Branch-Keep:** Wenn experimentell → Als Feature-Branch behalten, später entscheiden
-
-**→ Hand-off an Claude nach Analyse:** Codex liefert `/tmp/hardening-F-02-commits.txt` + Statistiken, Claude entscheidet Strategie.
+**Risk:** 🟢 NONE — Alle commits in main via PR #86
 
 ---
 
@@ -327,18 +303,13 @@ done
 
 ### Immediate Next Steps (Phase 2 Start)
 
-#### Task 1: `hardening/F-02-analyze` Analyse
+#### Task 1: ~~`hardening/F-02-analyze` Analyse~~ ✅ ABGESCHLOSSEN
 
-```bash
-[ ] Safety-Branch erstellen (safety/2025-11-23-before-hardening-analyze)
-[ ] Branch auschecken: git switch hardening/F-02-analyze
-[ ] Commit-Log exportieren: git log --oneline main..HEAD > /tmp/hardening-commits.txt
-[ ] File-Stats generieren: git diff --stat main...HEAD > /tmp/hardening-stats.txt
-[ ] Top-Kategorien zählen: git log --oneline main..HEAD | grep -oE "(feat|fix|refactor)" | sort | uniq -c
-[ ] Ergebnisse an Claude liefern für Strategie-Entscheidung
-```
+**Status:** ✅ Analyse komplett — Branch ist ZOMBIE, bereit für Löschung
+**Dokumentation:** `docs/Branch_Analysis_hardening_F-02.md`
+**Nächster Schritt:** Optional: Branch löschen (siehe DELETE-Playbook oben)
 
-#### Task 2: `codex/implement-grok-pulse-api-integration` PR
+#### Task 2: `codex/implement-grok-pulse-api-integration` PR (EMPFOHLEN als nächstes)
 
 ```bash
 [ ] Safety-Branch: safety/2025-11-23-grok-api
@@ -383,6 +354,13 @@ done
 - **Claude:** Per-Branch-Playbooks erstellt
 - **Status:** Ready for Codex hand-off (Phase 2)
 
+### 2025-11-23 — Update nach hardening/F-02-analyze Deep-Dive
+- **Claude:** hardening/F-02-analyze detailliert analysiert
+- **Finding:** ❌ ZOMBIE-BRANCH (0 ahead, 202 behind, bereits gemerged in PR #86)
+- **Action:** Branch aus Priority 1 → Priority 3 (DELETE) verschoben
+- **Dokumentation:** Branch_Analysis_hardening_F-02.md erstellt
+- **Status:** Bereit für Phase 2 (Grok Pulse Integration)
+
 ---
 
 ## 🔗 Referenzen
@@ -391,7 +369,8 @@ done
 - **Current Working Branch:** `claude/plan-repo-strategy-013zrjS1YJ8RDoo8KmJ1foEB`
 - **Main Branch:** `origin/main` (HEAD: f5b07ca)
 - **Safety-Branches:** Alle safety/* branches im Repo
+- **Detaillierte Branch-Analysen:** docs/Branch_Analysis_*.md
 
 ---
 
-**Nächster Schritt:** Codex führt Task 1 aus (hardening/F-02-analyze Analyse) und liefert Ergebnisse an Claude.
+**Nächster Schritt:** Grok Pulse Integration (codex/implement-grok-pulse-api-integration PR)
