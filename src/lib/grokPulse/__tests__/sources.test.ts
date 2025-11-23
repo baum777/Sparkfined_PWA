@@ -32,10 +32,12 @@ describe("grokPulse sources", () => {
         typeof url === "string"
           ? url
           : url instanceof URL
-            ? url.href
-            : url instanceof Request
-              ? url.url
-              : "";
+          ? url.href
+          : url instanceof Request
+          ? url.url
+          : (() => {
+              throw new Error("Unsupported request url");
+            })();
       if (href.includes("dexscreener.com") && href.includes("gainers")) {
         return Promise.resolve(
           createResponse(true, {
@@ -122,10 +124,12 @@ describe("grokPulse sources", () => {
         typeof url === "string"
           ? url
           : url instanceof URL
-            ? url.href
-            : url instanceof Request
-              ? url.url
-              : "";
+          ? url.href
+          : url instanceof Request
+          ? url.url
+          : (() => {
+              throw new Error("Unsupported request url");
+            })();
       if (href.includes("dexscreener.com") && href.includes("gainers")) {
         return Promise.resolve({
           ok: false,
