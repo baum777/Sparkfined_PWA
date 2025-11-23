@@ -45,7 +45,7 @@ export default function NotificationsPage() {
     await loadSrv();
   };
   const evalNow = async ()=> {
-    const r = await fetch("/api/rules/eval-cron").then((r): any=>r.json()).catch((): any=>null);
+    const r = await fetch("/api/rules?action=eval-cron").then((r): any=>r.json()).catch((): any=>null);
     alert(r?.ok ? `Eval: groups=${r.groups} evaluated=${r.evaluated} dispatched=${r.dispatched}` : "Eval failed");
   };
   const exportIdeas = async ()=>{

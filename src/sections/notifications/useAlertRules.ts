@@ -66,7 +66,7 @@ export function useAlertRules() {
     setTriggers(ts => [{ ts:t, ...payload }, ...ts].slice(0, 2000));
     // zus?tzlich serverseitig dispatchen
     try {
-      fetch("/api/alerts/dispatch", {
+      fetch("/api/alerts?action=dispatch", {
         method:"POST",
         headers:{ "content-type":"application/json" },
         body: JSON.stringify({
