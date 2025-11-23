@@ -86,7 +86,7 @@ export function useAlertRules() {
     // optional: falls Idea-ID bekannt ? Event an Idea anh?ngen
     if (payload?.ideaId) {
       try {
-        fetch("/api/ideas/attach-trigger", {
+        fetch("/api/ideas?action=attach-trigger", {
           method:"POST", headers:{ "content-type":"application/json" },
           body: JSON.stringify({
             ideaId: payload.ideaId,
