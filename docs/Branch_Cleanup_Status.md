@@ -34,6 +34,39 @@ https://github.com/baum777/Sparkfined_PWA/branches
 
 ---
 
+### 2. codex/implement-grok-pulse-api-integration — ZOMBIE-BRANCH
+
+**Datum:** 2025-11-23
+**Analyst:** Claude (Repo Branch Strategist)
+
+**Status:**
+- ✅ **Analyse:** Komplett (Task 2 attempt revealed already merged)
+- ❌ **Integration unnötig:** Bereits gemerged in PR #158
+- ⚠️ **Remote:** Wartet auf manuelle Löschung
+
+**Merge-Details:**
+```
+PR #158: Merge pull request from codex/implement-grok-pulse-api-integration
+Commit: 7665e1c (in main)
+Message: "Add enhanced Grok Pulse context and sentiment APIs"
+```
+
+**Ahead/Behind:** 0 ahead, 16 behind → ZOMBIE
+
+**Manuelle Aktion erforderlich:**
+```
+Repo-Owner sollte via GitHub UI löschen:
+https://github.com/baum777/Sparkfined_PWA/branches
+→ Suche: codex/implement-grok-pulse-api-integration
+→ Klick: Delete-Button 🗑️
+```
+
+**Safety:**
+- Alle Commits bereits in main via PR #158
+- Risk: 🟢 NONE
+
+---
+
 ## 📋 Pending Cleanup (Empfohlen)
 
 ### Remote-Branches zum Löschen
@@ -41,6 +74,8 @@ https://github.com/baum777/Sparkfined_PWA/branches
 | Branch | Status | Grund | Risk | Aktion |
 |--------|--------|-------|------|--------|
 | hardening/F-02-analyze | ⏳ Pending | ZOMBIE (0 ahead, 202 behind, gemerged PR #86) | 🟢 NONE | Manual delete via GitHub UI |
+| codex/implement-grok-pulse-api-integration | ⏳ Pending | ZOMBIE (0 ahead, 16 behind, gemerged PR #158) | 🟢 NONE | Manual delete via GitHub UI |
+| codex/implement-grok-pulse-engine-and-read-api | 🔍 Check | Vermutlich auch gemerged? | 🟡 UNKNOWN | Analyse erforderlich (Task 3) |
 | claude/review-* (~10) | 🔜 Next | Meistens gemerged | 🟢 LOW | Batch-Analyse erforderlich |
 | cursor/* (alte) | 🔜 Next | Teilweise veraltet | 🟡 MEDIUM | Selektive Analyse |
 
@@ -48,9 +83,18 @@ https://github.com/baum777/Sparkfined_PWA/branches
 
 ## 🎯 Nächste Schritte
 
-1. **Repo-Owner:** hardening/F-02-analyze via GitHub UI löschen
-2. **Claude/Codex:** Grok Pulse Integration starten (Task 2)
-3. **Später:** claude/review-* Batch-Cleanup
+1. **Repo-Owner:** Batch-Delete via GitHub UI:
+   - hardening/F-02-analyze
+   - codex/implement-grok-pulse-api-integration
+2. **Claude:** Nächsten Branch prüfen (codex/implement-grok-pulse-engine-and-read-api)
+3. **Pattern erkannt:** Viele Branches sind vermutlich ZOMBIES — Batch-Analyse sinnvoll
+4. **Später:** claude/review-* + cursor/* Batch-Cleanup
+
+## 📊 Erkenntnisse
+
+**Zombie-Pattern:** Viele Branches wurden via PR gemerged, aber nicht gelöscht.
+
+**Empfehlung:** Batch-Analyse aller codex/* und claude/* Branches auf "already merged" Status.
 
 ---
 
