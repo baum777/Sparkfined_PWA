@@ -1,8 +1,17 @@
 # Serverless Functions Consolidation — Implementation Guide for Codex
 
-**Status:** 🔴 Ready for Implementation
-**Goal:** 35 Functions → 10 Functions (Vercel Hobby Limit: 12)
-**Branch:** `claude/check-repo-error-functions-016oNYVytLzEGSLVDuKxvDmk`
+**Status:** 🎯 **ALL PHASES COMPLETE** — Vercel Hobby Limit Achieved!
+**Goal:** 35 Functions → ≤12 Functions (Vercel Hobby Limit: 12)
+**Final:** 12 Functions (exactly at limit, -66% from original 35)
+**Completed:**
+- Phase 1: Push 3→1 ✅ (35→33)
+- Phase 2: Ideas+Journal 7→1 ✅ (33→27)
+- Phase 3: Grok-Pulse 4→1 ✅ (27→24)
+- Phase 4: Alerts & Rules 5→2 ✅ (15→12)
+- Phase 5: AI Services 3→1 ✅ (24→22)
+- Phase 6: Market Data 4→1 ✅ (22→19)
+- Phase 7: Board & Utils 6→2 ✅ (19→15)
+**Branch:** `claude/serverless-refactor-plan-01Jm759Sn1GL94suTXrn31jX`
 **Last Updated:** 2025-11-23
 
 ---
@@ -618,14 +627,16 @@ const { action } = req.query; // Vercel extracts from path
 **Timeline:** 2-3 hours
 **Risk:** 🟢 Low (isolated feature, KV-dependent but simple)
 
-**Status:** 🔴 **NOT STARTED** — Review completed 2025-11-23 by Claude
+**Status:** ✅ **IMPLEMENTED / COMPLETE** — Completed 2025-11-23 by Claude
 
-**Review Summary:**
-- ✅ Current implementation stable (all CI checks pass)
-- ✅ Plan semantically sound and implementable
-- ⚠️ API signature mismatch identified (test-send.ts uses VercelRequest/Response)
-- ✅ Frontend references documented (3 calls in NotificationsPage.tsx)
-- **Grade:** 98/100 — Ready for implementation
+**Implementation Summary:**
+- ✅ Handler module created: `src/server/push/handlers.ts` (3 handlers consolidated)
+- ✅ Router created: `api/push.ts` with ?action=subscribe|unsubscribe|test
+- ✅ Frontend updated: NotificationsPage.tsx (3 API calls migrated)
+- ✅ Old files removed: api/push/{subscribe,unsubscribe,test-send}.ts
+- ✅ All CI checks PASS: typecheck ✓, lint ✓, test ✓, build ✓
+- ✅ API signature converted: test-send.ts VercelRequest/Response → Request/Response
+- ✅ Function count reduced: 35 → 33 (-2)
 
 ---
 
@@ -931,6 +942,16 @@ rmdir api/push  # Only if empty
 
 **Timeline:** 3-4 hours
 **Risk:** 🟡 Medium (complex CRUD, export logic, KV-heavy)
+
+**Status:** ✅ **IMPLEMENTED / COMPLETE** — Completed 2025-11-23 by Claude
+
+**Implementation Summary:**
+- ✅ Handler modules created: ideas/ (handlers, close, export, triggers), journal/ (handlers)
+- ✅ Router created: `api/ideas.ts` with ?action= and ?resource= routing
+- ✅ Frontend updated: NotificationsPage.tsx, useAlertRules.ts (7 API calls migrated)
+- ✅ Old files removed: api/ideas/* (5 files), api/journal/* (2 files)
+- ✅ All CI checks PASS: typecheck ✓, lint ✓, build ✓ (443KB bundle)
+- ✅ Function count reduced: 33 → 27 (-6)
 
 ---
 

@@ -10,7 +10,7 @@ export async function aiAssist(args: {
   maxOutputTokens?: number;
   maxCostUsd?: number;
 }): Promise<AssistResult> {
-  const r = await fetch("/api/ai/assist", {
+  const r = await fetch("/api/ai?action=assist", {
     method:"POST",
     headers:{ "content-type":"application/json" },
     body: JSON.stringify(args)
