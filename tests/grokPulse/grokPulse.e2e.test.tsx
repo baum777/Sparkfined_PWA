@@ -64,7 +64,7 @@ const sampleTrendEvent: SolanaMemeTrendEvent = {
   },
   author: {
     handle: "tester",
-    authorType: "human",
+    authorType: "influencer",
     followers: 42000,
     verified: true,
   },
@@ -93,16 +93,16 @@ const sampleTrendEvent: SolanaMemeTrendEvent = {
     label: "bullish",
     score: 0.82,
     confidence: 0.9,
-    hypeLevel: "high",
+    hypeLevel: "acceleration",
   },
   trading: {
-    hypeLevel: "high",
-    callToAction: "buy",
+    hypeLevel: "acceleration",
+    callToAction: "scalp",
   },
   sparkfined: {
     trendingScore: 0.77,
     alertRelevance: 0.65,
-    callToAction: "buy",
+    callToAction: "watch",
   },
   derived: {
     normalizedSymbol: "SOLUSDT",
@@ -218,7 +218,14 @@ describe("Grok Pulse state endpoint", () => {
   });
 
   test("gracefully handles KV read failures per address", async () => {
-    vi.spyOn(kv, "getPulseGlobalList").mockResolvedValue([sampleTokens[0]]);
+    const token = sampleTokens[0];
+
+    expect(token).toBeDefined();
+    if (!token) {
+      throw new Error("Expected PulseGlobalToken in test setup");
+    }
+
+    vi.spyOn(kv, "getPulseGlobalList").mockResolvedValue([token]);
     vi
       .spyOn(kv, "getCurrentSnapshot")
       .mockRejectedValue(new Error("kv unavailable"));
@@ -293,7 +300,7 @@ describe("Client live sentiment and price updates", () => {
 
     expect(screen.getByText(/Social trend/i)).toBeInTheDocument();
     expect(screen.getByText(/bullish/i)).toBeInTheDocument();
-    expect(screen.getByText(/CTA: buy/i)).toBeInTheDocument();
-    expect(screen.getByText(/Hype: high/i)).toBeInTheDocument();
+    expect(screen.getByText(/CTA: scalp/i)).toBeInTheDocument();
+    expect(screen.getByText(/Hype: acceleration/i)).toBeInTheDocument();
   });
 });
