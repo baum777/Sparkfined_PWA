@@ -27,8 +27,17 @@ describe("grokPulse sources", () => {
   });
 
   test("buildGlobalTokenList dedupes across sources and respects maxUnique", async () => {
-    const mockFetch = vi.fn((url: RequestInfo) => {
-      const href = String(url);
+    const mockFetch = vi.fn((url: RequestInfo | URL) => {
+      const href =
+        typeof url === "string"
+          ? url
+          : url instanceof URL
+          ? url.href
+          : url instanceof Request
+          ? url.url
+          : (() => {
+              throw new Error("Unsupported request url");
+            })();
       if (href.includes("dexscreener.com") && href.includes("gainers")) {
         return Promise.resolve(
           createResponse(true, {
@@ -110,8 +119,17 @@ describe("grokPulse sources", () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     let birdeyeCall = 0;
 
-    const mockFetch = vi.fn((url: RequestInfo) => {
-      const href = String(url);
+    const mockFetch = vi.fn((url: RequestInfo | URL) => {
+      const href =
+        typeof url === "string"
+          ? url
+          : url instanceof URL
+          ? url.href
+          : url instanceof Request
+          ? url.url
+          : (() => {
+              throw new Error("Unsupported request url");
+            })();
       if (href.includes("dexscreener.com") && href.includes("gainers")) {
         return Promise.resolve({
           ok: false,
