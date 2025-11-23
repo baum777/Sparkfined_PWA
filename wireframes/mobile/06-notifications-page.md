@@ -243,9 +243,9 @@
 | Component | Event | Action | Animation |
 |-----------|-------|--------|-----------|
 | Button: Browser Notif. | onClick | Notification.requestPermission() | prompt |
-| Button: Subscribe Push | onClick | subscribePush() → POST /api/push/subscribe | state update |
-| Button: Test Push | onClick | POST /api/push/test-send | notification |
-| Button: Unsubscribe | onClick | unsubscribePush() → POST /api/push/unsubscribe | state update |
+| Button: Subscribe Push | onClick | subscribePush() → POST /api/push?action=subscribe | state update |
+| Button: Test Push | onClick | POST /api/push?action=test-send | notification |
+| Button: Unsubscribe | onClick | unsubscribePush() → POST /api/push?action=unsubscribe | state update |
 | Button: Test-Trigger | onClick | addManualTrigger() | adds to history |
 | Preset Button | onClick | Pre-fill wizard form | form expand |
 | Button: Create Rule | onClick | create(draft) → adds to localStorage | telemetry |
@@ -299,9 +299,9 @@
 2. Browser prompts for permission
 3. User allows
 4. Service worker registers subscription
-5. POST /api/push/subscribe
+5. POST /api/push?action=subscribe
 6. User clicks "Test Push"
-7. POST /api/push/test-send
+7. POST /api/push?action=test-send
 8. Notification appears: "Test notification"
 
 ---

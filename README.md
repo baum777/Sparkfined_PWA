@@ -205,7 +205,7 @@ pnpm preview
 2. **Service Worker:** Check "activated" status in DevTools → Application → Service Workers
 3. **Installation:** Look for browser "Install" button in address bar, click to install
 4. **Offline Mode:** Disconnect network → reload → verify custom offline page appears
-5. **Push Notifications:** Grant notification permission → test via `/api/push/test-send`
+5. **Push Notifications:** Grant notification permission → test via `/api/push?action=test-send`
 
 **For detailed PWA testing, see [`docs/pwa-audit/03_core_flows.md`](docs/pwa-audit/03_core_flows.md).**
 
