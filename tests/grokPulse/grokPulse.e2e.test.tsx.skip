@@ -16,8 +16,7 @@ vi.mock("@vercel/kv", () => {
   return { kv: kvMock };
 });
 
-import cronHandler from "../../api/grok-pulse/cron";
-import stateHandler from "../../api/grok-pulse/state";
+import grokPulseHandler from "../../api/grok-pulse";
 import * as engine from "../../src/lib/grokPulse/engine";
 import * as kv from "../../src/lib/grokPulse/kv";
 import type { PulseGlobalToken } from "../../src/lib/grokPulse/types";

@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import contextHandler from "../../api/grok-pulse/context";
-import sentimentHandler from "../../api/grok-pulse/sentiment";
+import grokPulseHandler from "../../api/grok-pulse";
 import * as kv from "../../src/lib/grokPulse/kv";
 import * as contextBuilder from "../../src/lib/grokPulse/contextBuilder";
 import * as grokClient from "../../src/lib/grokPulse/grokClient";

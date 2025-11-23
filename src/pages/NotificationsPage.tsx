@@ -24,7 +24,7 @@ export default function NotificationsPage() {
     const r = await fetch("/api/rules").then((r): any=>r.json()).catch((): any=>null);
     setSrvRules(r?.rules ?? []);
     // Load ideas too
-    const iRes = await fetch("/api/ideas").then((r): any=>r.json()).catch((): any=>null);
+    const iRes = await fetch("/api/ideas?action=list").then((r): any=>r.json()).catch((): any=>null);
     setIdeas(iRes?.ideas ?? []);
   };
   const uploadAll = async ()=> {
@@ -49,7 +49,7 @@ export default function NotificationsPage() {
     alert(r?.ok ? `Eval: groups=${r.groups} evaluated=${r.evaluated} dispatched=${r.dispatched}` : "Eval failed");
   };
   const exportIdeas = async ()=>{
-    const blob = await fetch("/api/ideas/export").then(r=>r.blob());
+    const blob = await fetch("/api/ideas?action=export").then(r=>r.blob());
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = `ideas-case-studies.md`; a.click();
     URL.revokeObjectURL(url);
@@ -78,7 +78,7 @@ export default function NotificationsPage() {
                   if (sub) {
                     setSubState("on");
                     // persist
-                    fetch("/api/push/subscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub, userId: "anon" })});
+                    fetch("/api/push?action=subscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub, userId: "anon" })});
                   }
                 } catch(e:any){
                   setSubState(e?.message==="permission-denied" ? "denied" : "error");
@@ -88,12 +88,12 @@ export default function NotificationsPage() {
               <button className={btn} onClick={async()=>{
                 const sub = await currentSubscription();
                 if (!sub) { alert("Keine Subscription"); return; }
-                await fetch("/api/push/test-send", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub }) });
+                await fetch("/api/push?action=test", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub }) });
               }}>Test Push</button>
               <button className={btn} onClick={async()=>{
                 const sub = await currentSubscription();
                 if (!sub) return;
-                await fetch("/api/push/unsubscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) });
+                await fetch("/api/push?action=unsubscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) });
                 await unsubscribePush(); setSubState("off");
               }}>Hard Unsubscribe</button>
             </>
@@ -164,7 +164,7 @@ export default function NotificationsPage() {
               ) : null}
               <div className="mt-1 flex gap-2">
                 <button className={btn} onClick={async()=>{
-                  const blob = await fetch(`/api/ideas/export-pack?id=${it.id}`).then((r): any=>r.blob());
+                  const blob = await fetch(`/api/ideas?action=export-pack&id=${it.id}`).then((r): any=>r.blob());
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement("a"); a.href=url; a.download=`execution-pack-${it.id}.md`; a.click();
                   URL.revokeObjectURL(url);
@@ -180,13 +180,13 @@ export default function NotificationsPage() {
                   <button className={btn} onClick={async()=>{
                     const p = Number(prompt("Exit-Preis eingeben:",""));
                     if (!p) return;
-                    const r = await fetch("/api/ideas/close",{ method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: it.id, exitPrice: p })}).then((r): any=>r.json()).catch((): any=>null);
+                    const r = await fetch("/api/ideas?action=close",{ method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: it.id, exitPrice: p })}).then((r): any=>r.json()).catch((): any=>null);
                     alert(r?.ok ? "Idea geschlossen" : "Fehler beim Schließen");
                     await loadSrv();
                   }}>Schließen</button>
                   <button className={btn} onClick={async()=>{
                     const note = prompt("Kurze Outcome-Notiz:","") || "";
-                    await fetch("/api/ideas",{ method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: it.id, outcome:{ note } })});
+                    await fetch("/api/ideas?action=update",{ method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ id: it.id, outcome:{ note } })});
                     await loadSrv();
                   }}>Outcome-Notiz</button>
                 </div>
@@ -211,7 +211,7 @@ export default function NotificationsPage() {
                       },
                       targets: res.rrTargets
                     };
-                    await fetch("/api/ideas", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify(payload) });
+                    await fetch("/api/ideas?action=create", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify(payload) });
                     await loadSrv();
                   }}
                 />
