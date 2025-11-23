@@ -64,6 +64,7 @@ const sampleTrendEvent: SolanaMemeTrendEvent = {
   },
   author: {
     handle: "tester",
+    authorType: "retail",
     authorType: "influencer",
     followers: 42000,
     verified: true,
@@ -93,6 +94,11 @@ const sampleTrendEvent: SolanaMemeTrendEvent = {
     label: "bullish",
     score: 0.82,
     confidence: 0.9,
+    hypeLevel: "mania",
+  },
+  trading: {
+    hypeLevel: "mania",
+    callToAction: "watch",
     hypeLevel: "acceleration",
   },
   trading: {
@@ -218,6 +224,7 @@ describe("Grok Pulse state endpoint", () => {
   });
 
   test("gracefully handles KV read failures per address", async () => {
+    vi.spyOn(kv, "getPulseGlobalList").mockResolvedValue([sampleTokens[0]!]);
     const token = sampleTokens[0];
 
     expect(token).toBeDefined();
@@ -300,6 +307,8 @@ describe("Client live sentiment and price updates", () => {
 
     expect(screen.getByText(/Social trend/i)).toBeInTheDocument();
     expect(screen.getByText(/bullish/i)).toBeInTheDocument();
+    expect(screen.getByText(/CTA: watch/i)).toBeInTheDocument();
+    expect(screen.getByText(/Hype: mania/i)).toBeInTheDocument();
     expect(screen.getByText(/CTA: scalp/i)).toBeInTheDocument();
     expect(screen.getByText(/Hype: acceleration/i)).toBeInTheDocument();
   });
