@@ -78,7 +78,7 @@ export default function NotificationsPage() {
                   if (sub) {
                     setSubState("on");
                     // persist
-                    fetch("/api/push/subscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub, userId: "anon" })});
+                    fetch("/api/push?action=subscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub, userId: "anon" })});
                   }
                 } catch(e:any){
                   setSubState(e?.message==="permission-denied" ? "denied" : "error");
@@ -88,12 +88,12 @@ export default function NotificationsPage() {
               <button className={btn} onClick={async()=>{
                 const sub = await currentSubscription();
                 if (!sub) { alert("Keine Subscription"); return; }
-                await fetch("/api/push/test-send", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub }) });
+                await fetch("/api/push?action=test", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ subscription: sub }) });
               }}>Test Push</button>
               <button className={btn} onClick={async()=>{
                 const sub = await currentSubscription();
                 if (!sub) return;
-                await fetch("/api/push/unsubscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) });
+                await fetch("/api/push?action=unsubscribe", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ endpoint: sub.endpoint }) });
                 await unsubscribePush(); setSubState("off");
               }}>Hard Unsubscribe</button>
             </>
