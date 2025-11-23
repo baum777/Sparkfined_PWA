@@ -218,7 +218,7 @@ describe("Grok Pulse state endpoint", () => {
   });
 
   test("gracefully handles KV read failures per address", async () => {
-    const token = sampleTokens[0];
+    const token = sampleTokens.at(0);
 
     expect(token).toBeDefined();
     if (!token) {
