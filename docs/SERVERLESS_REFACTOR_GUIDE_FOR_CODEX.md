@@ -1,8 +1,16 @@
 # Serverless Functions Consolidation — Implementation Guide for Codex
 
-**Status:** 🟡 In Progress (Phase 1-2 Complete)
-**Goal:** 35 Functions → 10 Functions (Vercel Hobby Limit: 12)
-**Current:** 27 Functions (Phase 1: Push 3→1 ✅ | Phase 2: Ideas+Journal 7→1 ✅)
+**Status:** 🟢 Phases 1-7 Complete (Phase 4 Deferred)
+**Goal:** 35 Functions → ≤10 Functions (Vercel Hobby Limit: 12)
+**Current:** 15 Functions (-57% from original 35)
+**Completed:**
+- Phase 1: Push 3→1 ✅
+- Phase 2: Ideas+Journal 7→1 ✅
+- Phase 3: Grok-Pulse 4→1 ✅
+- Phase 5: AI Services 3→1 ✅
+- Phase 6: Market Data 4→1 ✅
+- Phase 7: Board & Utils 6→2 ✅
+**Deferred:** Phase 4: Alerts & Rules (type complexity)
 **Branch:** `claude/serverless-refactor-plan-01Jm759Sn1GL94suTXrn31jX`
 **Last Updated:** 2025-11-23
 
