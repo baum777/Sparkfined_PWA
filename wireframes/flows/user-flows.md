@@ -402,12 +402,12 @@ EDGE CASES:
    ├─ Click "Subscribe Push"
    ├─ Browser prompts for permission
    ├─ Service Worker registers push subscription
-   ├─ POST /api/push/subscribe with { subscription, userId }
+   ├─ POST /api/push?action=subscribe with { subscription, userId }
    └─ State updates to "on"
 
 6. USER TESTS PUSH
    ├─ Click "Test Push"
-   ├─ POST /api/push/test-send with current subscription
+   ├─ POST /api/push?action=test-send with current subscription
    └─ Notification appears: "Test notification"
 
 7. USER VIEWS TRADE IDEAS

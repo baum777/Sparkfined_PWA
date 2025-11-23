@@ -3,9 +3,8 @@ title: "F-07 Notifications Center — Production Readiness"
 sources:
   - src/pages/NotificationsPage.tsx
   - src/sections/notifications/useAlertRules.ts
-  - api/push/subscribe.ts
-  - api/push/unsubscribe.ts
-  - api/push/test-send.ts
+  - api/push.ts
+  - src/server/push/handlers.ts
   - api/rules/index.ts
 ---
 
@@ -16,7 +15,7 @@ sources:
 
 ## Blocker
 1. No tests for `useAlertRules` store (create/update/remove flows).
-2. `/api/push/*` endpoints untested; VAPID key path unverified.
+2. `/api/push?action=*` endpoints untested; VAPID key path unverified.
 3. PushManager + subscription error handling lacks coverage; UI surfaces manual alerts only.
 
 ## Tasks
@@ -25,9 +24,9 @@ sources:
   - [ ] Manual trigger appended to history
   - [ ] Clear triggers empties buffer
 - [ ] Write contract tests for push endpoints with mocked Web Push:
-  - [ ] `/api/push/subscribe` storing subscription
-  - [ ] `/api/push/unsubscribe` cleanup path
-  - [ ] `/api/push/test-send` handles success/error
+  - [ ] `/api/push?action=subscribe` storing subscription
+  - [ ] `/api/push?action=unsubscribe` cleanup path
+  - [ ] `/api/push?action=test-send` handles success/error
 - [ ] Mock `PushManager` + `Notification` for component tests:
   - [ ] Subscribe button success → telemetry event
   - [ ] Permission denied path surfaces error banner

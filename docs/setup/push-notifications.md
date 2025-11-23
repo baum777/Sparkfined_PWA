@@ -11,7 +11,7 @@ It covers the VAPID key pairs, admin secret, and how to validate the wiring with
 | `VAPID_PUBLIC_KEY` | Server | ✅ for sending pushes | Public key for signing payloads with Web Push. |
 | `VAPID_PRIVATE_KEY` | Server | ✅ for sending pushes | Private key for signing payloads (never exposed to the client). |
 | `VAPID_SUBJECT` or `VAPID_CONTACT` | Server | Recommended | Contact email passed to the Web Push library. |
-| `ALERTS_ADMIN_SECRET` | Server | Recommended | Bearer token required by `/api/push/test-send` to guard test sends in production. |
+| `ALERTS_ADMIN_SECRET` | Server | Recommended | Bearer token required by `/api/push?action=test-send` to guard test sends in production. |
 
 > Tip: `VITE_VAPID_PUBLIC_KEY` can be omitted in non-push builds. The Notifications page will surface a warning when it is missing.
 
@@ -33,7 +33,7 @@ VAPID_SUBJECT=mailto:alerts@sparkfined.com
 ALERTS_ADMIN_SECRET=<strong_random_token>
 ```
 
-- **Local dev:** You may reuse the same pair and secret in `.env.local`. The `/api/push/test-send` handler allows requests without `ALERTS_ADMIN_SECRET` in non-production environments but setting it avoids surprises in CI.
+- **Local dev:** You may reuse the same pair and secret in `.env.local`. The `/api/push?action=test-send` handler allows requests without `ALERTS_ADMIN_SECRET` in non-production environments but setting it avoids surprises in CI.
 - **Production:** Store `VAPID_PRIVATE_KEY` and `ALERTS_ADMIN_SECRET` in a server-only secret store. Never expose the private key to the client bundle.
 
 ## Mocking and verification
@@ -45,7 +45,7 @@ ALERTS_ADMIN_SECRET=<strong_random_token>
 3) **Manual probe** — Trigger a guarded send using curl:
 
 ```bash
-curl -X POST http://localhost:3000/api/push/test-send \
+curl -X POST http://localhost:3000/api/push?action=test-send \
   -H "Authorization: Bearer $ALERTS_ADMIN_SECRET" \
   -H "content-type: application/json" \
   -d @tests/data/mock-push-subscription.json
