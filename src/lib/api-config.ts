@@ -13,9 +13,9 @@
 export const API_ENDPOINTS = {
   // Internal Vercel Functions (Proxies)
   moralis: '/api/moralis/token',
-  dexpaprika: '/api/dexpaprika/tokens',
-  ohlc: '/api/data/ohlc',
-  
+  dexpaprika: '/api/market?action=token',
+  ohlc: '/api/market?action=ohlc&auth=true',
+
   // External (Fallback, client-side)
   dexscreener: 'https://api.dexscreener.com/latest/dex',
 } as const;

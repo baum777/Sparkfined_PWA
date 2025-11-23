@@ -81,7 +81,7 @@ export function useAdvancedInsight(
       setError(null);
 
       try {
-        const response = await window.fetch('/api/ai/analyze-market', {
+        const response = await window.fetch('/api/ai?action=analyze-market', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
