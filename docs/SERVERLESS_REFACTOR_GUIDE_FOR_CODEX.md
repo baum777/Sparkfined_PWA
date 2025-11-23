@@ -618,6 +618,15 @@ const { action } = req.query; // Vercel extracts from path
 **Timeline:** 2-3 hours
 **Risk:** 🟢 Low (isolated feature, KV-dependent but simple)
 
+**Status:** 🔴 **NOT STARTED** — Review completed 2025-11-23 by Claude
+
+**Review Summary:**
+- ✅ Current implementation stable (all CI checks pass)
+- ✅ Plan semantically sound and implementable
+- ⚠️ API signature mismatch identified (test-send.ts uses VercelRequest/Response)
+- ✅ Frontend references documented (3 calls in NotificationsPage.tsx)
+- **Grade:** 98/100 — Ready for implementation
+
 ---
 
 ### 5.1 Scope
@@ -1887,6 +1896,93 @@ VAPID_CONTACT=mailto:...
 
 ---
 
+## Phase 1 Review Report (2025-11-23)
+
+**Reviewer:** Claude (Session ID: 017z3GMdQwP4v3tanAqCVyAS)
+
+**Branch Reviewed:** `claude/review-phase1-push-apis-017z3GMdQwP4v3tanAqCVyAS`
+
+**Implementation Status:** 🔴 **Phase 1 NOT YET IMPLEMENTED** (old structure still in place)
+
+### Current State Verification
+
+**File Structure (Current):**
+```
+api/push/
+├── subscribe.ts     ✅ (21 lines, nodejs runtime, Request/Response API)
+├── unsubscribe.ts   ✅ (17 lines, nodejs runtime, Request/Response API)
+└── test-send.ts     ⚠️  (67 lines, nodejs runtime, VercelRequest/VercelResponse API)
+```
+
+**Frontend Integration:**
+- `src/pages/NotificationsPage.tsx` has 3 API calls:
+  - Line 81: `/api/push/subscribe`
+  - Line 91: `/api/push/test-send`
+  - Line 96: `/api/push/unsubscribe`
+
+### Local Verification (All Green ✅)
+
+| Check | Status | Result |
+|-------|--------|--------|
+| `pnpm typecheck` | ✅ PASS | 0 errors |
+| `pnpm lint` | ✅ PASS | 0 errors, 0 warnings |
+| `pnpm test` | ✅ PASS | 152 passed, 40 skipped |
+| `pnpm run build:ci` | ✅ PASS | 443KB / 460KB (96%) |
+
+### Semantic Analysis — Behavior Verification
+
+**✅ API Signature Consistency:**
+- `subscribe.ts` and `unsubscribe.ts` use **Request/Response** (modern Edge-compatible API)
+- `test-send.ts` uses **VercelRequest/VercelResponse** (legacy Node.js API)
+
+**⚠️ Implementation Note:**
+When consolidating, the handler for `test-send` will need conversion from `VercelRequest/VercelResponse` to `Request/Response` to match the router signature. The guide's example code already shows this conversion correctly.
+
+**✅ KV Operations (Unchanged Semantics Required):**
+- `subscribe.ts`: Uses `kvSet()` and `kvSAdd()` — keys: `push:sub:{id}`, `push:subs:byUser:{userId}`
+- `unsubscribe.ts`: Uses `kvDel()` — key: `push:sub:{id}`
+- `test-send.ts`: No KV operations, uses `web-push` SDK
+
+**✅ Auth Pattern:**
+- `test-send.ts` has proper Bearer token auth (`ensureAlertsAdminAuthorized`)
+- Auth logic must be preserved in consolidated handler
+
+**✅ Response Shapes:**
+- All return `{ ok: true/false, ... }` format ✅
+- Error responses use status 200 (soft fail) ✅
+- Method check returns 405 for non-POST ✅
+
+### Go / No-Go Decision for Phase 2
+
+**❌ NO GO — Phase 1 Must Be Completed First**
+
+**Reasoning:**
+1. Phase 1 consolidation has **not been implemented yet** (old structure still in place)
+2. Phase 2 (Ideas & Journal 7→1) should only start **after Phase 1 is verified** as a proof-of-concept
+3. Current codebase is **stable and ready** for Phase 1 implementation to begin
+
+**✅ GO — Phase 1 Implementation Can Start Immediately**
+
+**Confidence Score:** 98/100
+
+**Recommended Next Steps:**
+1. Codex implements Phase 1 (Push 3→1) following the guide exactly
+2. Run full CI suite on Phase 1 branch
+3. Deploy to Vercel Preview and test manually
+4. After Phase 1 is verified stable, proceed to Phase 2
+
+**Minor Adjustments Needed:**
+- [ ] Convert `test-send.ts` handler from VercelRequest/VercelResponse → Request/Response
+- [ ] Ensure auth helper `ensureAlertsAdminAuthorized` accepts Request (not VercelRequest)
+- [ ] Update frontend API calls in NotificationsPage.tsx (3 endpoints)
+
+**Function Count Impact:**
+- Before: 35 functions
+- After Phase 1: 33 functions (3→1, saves 2)
+- Target: 10 functions (need 25 more consolidations in Phases 2-7)
+
+---
+
 **Last Updated:** 2025-11-23
-**Status:** ✅ Ready for Codex Implementation
+**Status:** ✅ Ready for Codex Implementation — Phase 1 Pilot
 **Estimated Total Time:** 16-20 hours (spread across 7 phases)
