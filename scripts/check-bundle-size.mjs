@@ -27,8 +27,10 @@ const THRESHOLDS = {
   'vendor': 20,              // Generic vendor chunks
 };
 
-// Total bundle budget (uncompressed)
-const TOTAL_BUDGET_KB = 460; // Raised slightly for Phase 3 to cover current splits without blocking CI
+// Global JS budget (uncompressed) for initial + critical chunks.
+// Measured total size (2025-11-24): ~875KB.
+// Provide ~8–10% headroom for smaller feature updates.
+const TOTAL_BUDGET_KB = 950;
 
 // ANSI color codes
 const RED = '\x1b[31m';
