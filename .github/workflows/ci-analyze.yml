@@ -57,8 +57,8 @@ jobs:
           ANALYZE_IDEA_PACKET: 'true'
           CI: 'true'
         run: |
-          pnpm test --coverage --run
-          pnpm test -t "journal|contract|ABA|priceAdapter" --run
+          pnpm test
+          pnpm test -- -t "journal|contract|ABA|priceAdapter"
 
       - name: Playwright @analyze
         env:
