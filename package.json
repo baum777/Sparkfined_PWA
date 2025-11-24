@@ -19,7 +19,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier . --write",
-    "test": "vitest run --coverage",
+    "test": "vitest",                 // lokal: pnpm test
+    "test:ci": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "check:size": "node scripts/check-bundle-size.mjs",
