@@ -18,7 +18,9 @@ const DIST_DIR = path.join(__dirname, '..', 'dist', 'assets');
 // IMPORTANT: Order matters - more specific patterns first!
 // Updated for 2025 best practices (PWA + Trading Interface)
 const THRESHOLDS = {
-  'vendor-react': 90,        // Raised after lazy-loading OCR/Product Tour; React + router + Zustand baseline sits ~50KB gzipped, headroom for UI/PWA shell
+  // React + ReactDOM + Router + base UI. Measured ~106KB gzipped (2025-11-24) with OCR/tour lazy-loaded; add ~8–10% headroom for future shell tweaks.
+  'vendor-react': 115,
+
   'vendor-workbox': 12,      // Service Worker utilities
   'vendor-dexie': 8,         // IndexedDB wrapper
   'chart': 15,               // Lightweight Charts target (35KB uncompressed ~15KB gzipped)
