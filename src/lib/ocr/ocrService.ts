@@ -8,7 +8,7 @@
  * DoD: OCR < 1s, returns at least 1 label or "none"
  */
 
-import { createWorker, type Worker } from 'tesseract.js'
+import type { Worker } from 'tesseract.js'
 import type { OCRResult } from '@/types/analysis'
 
 // Singleton worker instance
@@ -22,6 +22,8 @@ async function getWorker(): Promise<Worker> {
   if (workerInstance) {
     return workerInstance
   }
+
+  const { createWorker } = await import('tesseract.js')
 
   const worker = await createWorker('eng', 1, {
     logger: (m) => {

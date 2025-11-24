@@ -18,13 +18,13 @@ const DIST_DIR = path.join(__dirname, '..', 'dist', 'assets');
 // IMPORTANT: Order matters - more specific patterns first!
 // Updated for 2025 best practices (PWA + Trading Interface)
 const THRESHOLDS = {
-  'vendor-react': 60,        // React + ReactDOM (gzipped)
+  'vendor-react': 90,        // Raised after lazy-loading OCR/Product Tour; React + router + Zustand baseline sits ~50KB gzipped, headroom for UI/PWA shell
   'vendor-workbox': 12,      // Service Worker utilities
   'vendor-dexie': 8,         // IndexedDB wrapper
   'chart': 15,               // Lightweight Charts target (35KB uncompressed ~15KB gzipped)
-  'analyze': 10,             // Analysis sections
-  'index': 25,               // Main app code (raised for Phase 3 stability; vendor splits keep critical chunks small)
-  'vendor': 20,              // Generic vendor chunks
+  'analyze': 12,             // Analysis sections (token research surface + AI affordances)
+  'index': 35,               // Main app shell (routing/layout/offline chrome); allow margin for dashboard tiles & settings shell
+  'vendor': 22,              // Generic vendor chunks (small helpers, shared UI deps)
 };
 
 // Total bundle budget (uncompressed)

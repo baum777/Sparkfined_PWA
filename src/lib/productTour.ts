@@ -7,14 +7,20 @@
  * - Advanced: 1 step (feature showcase)
  */
 
-import { driver, DriveStep, Config } from 'driver.js';
-import 'driver.js/dist/driver.css';
+import type { DriveStep, Config } from 'driver.js';
 import { UserLevel } from '@/store/onboardingStore';
 
-export function createProductTour(
+type DriverInstance = ReturnType<typeof import('driver.js').driver>;
+
+export async function createProductTour(
   level: UserLevel,
   onComplete: () => void
-): ReturnType<typeof driver> {
+): Promise<DriverInstance> {
+  const [{ driver }] = await Promise.all([
+    import('driver.js'),
+    import('driver.js/dist/driver.css'),
+  ]);
+
   const steps = getTourSteps(level);
 
   const config: Config = {
