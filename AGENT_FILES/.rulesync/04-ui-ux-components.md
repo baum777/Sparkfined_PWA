@@ -765,6 +765,7 @@ function KPITile({ data }: { data: KPIData }) {
 - `08-performance.md` – Component-Optimization (memo, lazy)
 - `src/components/ui/` – Design-System-Primitives
 - `src/styles/` – Global-Styles & Tailwind-Config
+- **`docs/design/STYLE_SPRINT_PLAN.md`** – UI/Style Sprint Specifications (Detailed implementation plan)
 
 ---
 
