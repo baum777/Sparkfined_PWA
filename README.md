@@ -661,3 +661,22 @@ All rights reserved. This is a private repository owned by the Sparkfined team.
 **Maintained by:** Sparkfined Team
 **Version:** 0.1.0 (Beta)
 **Status:** ✅ Production-Ready | 🚀 Launch-Ready
+
+
+---
+
+## 📚 Documentation
+
+**Complete Documentation Hub:** [docs/README.md](./docs/README.md)
+
+### Quick Links
+
+- **[Active Sprint & Roadmap](./docs/active/Working_Plan.md)** — Current development status
+- **[Setup Guide](./docs/core/setup/environment-and-providers.md)** — Get started with development
+- **[Architecture](./docs/core/architecture/01_repo_index.md)** — System design & structure
+- **[AI Integration](./docs/core/ai/README_AI.md)** — AI features & configuration
+- **[Agent Configs](./AGENT_FILES/README.md)** — AI tool configurations (Cursor, Claude, Codex)
+
+**For detailed navigation, see [docs/README.md](./docs/README.md)**
+
+
