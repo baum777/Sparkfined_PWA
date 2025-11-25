@@ -19,6 +19,20 @@ description: "Current working context, session focus, open questions, blockers a
 ---
 
 ## Current Focus
+### Session: 2025-11-25 (Style Sprint Implementation)
+
+**Primary Task:** UI-Refactor gemäß Style-Sprint-Plan
+
+**Reference:** Siehe `docs/design/STYLE_SPRINT_PLAN.md` für alle UI-/Style-Spezifikationen
+<!-- TODO: Diesen Verweis nach Fertigstellung des Style-Sprints entfernen und in _log.md archivieren -->
+
+**Current Step:** [In Arbeit]
+
+**Status:**
+- ⏳ Style-Sprint in Planung/Umsetzung
+
+---
+
 ### Session: 2025-11-15 (Loop P0-UI – Advanced Insight Card)
 
 **Primary Task:** Frontend-Flow & UI für `AdvancedInsightCard` auf Basis der stabilen AI-Schicht (sanityCheck + botScore).
