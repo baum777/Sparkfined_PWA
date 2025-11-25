@@ -1,5 +1,13 @@
 import React, { useEffect, useMemo, useRef } from 'react'
-import type { CandlestickSeriesOptions, HistogramSeriesOptions, IChartApi, ISeriesApi } from 'lightweight-charts'
+import type {
+  CandlestickData,
+  CandlestickSeriesOptions,
+  HistogramData,
+  HistogramSeriesOptions,
+  IChartApi,
+  ISeriesApi,
+  UTCTimestamp,
+} from 'lightweight-charts'
 import { createChart, CrosshairMode } from 'lightweight-charts'
 import type {
   ChartAnnotation,
@@ -47,18 +55,22 @@ const chartOptions = {
   },
 }
 
-function toSeriesData(candles: OhlcCandle[]) {
+const toUtcTimestamp = (ms: number): UTCTimestamp => Math.floor(ms / 1000) as UTCTimestamp
+
+function toSeriesData(
+  candles: OhlcCandle[]
+): { candleData: CandlestickData[]; volumeData: HistogramData[] } {
   const limited = candles.length > 2000 ? candles.slice(-2000) : candles
-  const candleData = limited.map((candle) => ({
-    time: candle.t / 1000 as const,
+  const candleData: CandlestickData[] = limited.map((candle) => ({
+    time: toUtcTimestamp(candle.t),
     open: candle.o,
     high: candle.h,
     low: candle.l,
     close: candle.c,
   }))
 
-  const volumeData = limited.map((candle) => ({
-    time: candle.t / 1000 as const,
+  const volumeData: HistogramData[] = limited.map((candle) => ({
+    time: toUtcTimestamp(candle.t),
     value: candle.v ?? 0,
     color: candle.c >= candle.o ? '#42f5b3' : '#ef476f',
   }))
@@ -197,7 +209,7 @@ export default function AdvancedChart({
     if (!candleSeriesRef.current) return
     const markers = (annotations ?? []).map((annotation) => ({
       id: annotation.id,
-      time: Math.floor(annotation.candleTime / 1000),
+      time: toUtcTimestamp(annotation.candleTime),
       position: 'aboveBar' as const,
       color: annotation.kind === 'alert' ? '#f43f5e' : annotation.kind === 'signal' ? '#c084fc' : '#22d3ee',
       shape: annotation.kind === 'alert' ? 'arrowDown' : annotation.kind === 'signal' ? 'arrowUp' : 'circle',
