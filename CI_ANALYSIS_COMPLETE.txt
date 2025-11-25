@@ -1,0 +1,69 @@
+================================================================================
+  CI ANALYSIS — COMPLETE ✅
+================================================================================
+Date: 2025-11-25
+Analyst: Claude (CI Diagnostics & Technical Debt Auditor)
+Status: READY FOR CODEX IMPLEMENTATION
+
+================================================================================
+  QUICK SUMMARY
+================================================================================
+
+ROOT CAUSE IDENTIFIED:
+• pnpm-lock.yaml out of sync with package.json
+• Invalid dependency: @types/lightweight-charts (404 - doesn't exist in npm)
+
+IMPACT:
+• 3 of 4 CI workflows failing at install step (75% failure rate)
+• Main branch merge blocked
+
+FIX:
+• Remove 1 dependency line from package.json
+• Regenerate lockfile with pnpm install
+• Time: 5-10 minutes
+
+CONFIDENCE: 99% (clear root cause, straightforward fix)
+
+================================================================================
+  DELIVERABLES
+================================================================================
+
+1. docs/ci/CI_DIAGNOSTICS.md (667 lines)
+   → Full technical analysis, error catalog, risk register
+
+2. docs/ci/CI_FIX_PLAN_FOR_CODEX.md (517 lines)
+   → Step-by-step fix guide, 3-phase plan, copy-paste checklist
+
+3. docs/ci/CI_ANALYSIS_SUMMARY.md (274 lines)
+   → Executive brief for quick reference
+
+4. HANDOFF_CI_ANALYSIS.md (Top-level handoff doc)
+   → Complete mission summary
+
+TOTAL: 1,814 lines of documentation
+
+================================================================================
+  NEXT STEPS FOR CODEX
+================================================================================
+
+1. Read: docs/ci/CI_FIX_PLAN_FOR_CODEX.md
+2. Execute: Phase 1 (remove dependency + regenerate lockfile)
+3. Monitor: Wait for CI run (~2 min)
+4. Execute: Phase 2 (if new issues appear)
+5. Execute: Phase 3 (optional - add docs + pre-commit hook)
+
+Expected Total Time: 30-50 minutes
+Expected Outcome: All CI workflows passing (🟢 GREEN)
+
+================================================================================
+  QUICK FIX (FOR IMMEDIATE ACTION)
+================================================================================
+
+$ pnpm remove @types/lightweight-charts
+$ git add package.json pnpm-lock.yaml
+$ git commit -m "fix(ci): remove non-existent @types/lightweight-charts"
+$ git push origin HEAD
+
+Result: CI unblocked in ~5 minutes
+
+================================================================================
