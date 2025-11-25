@@ -110,29 +110,14 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
             >
               {directionLabel}
             </span>
-            <div className="flex items-center gap-2">
-              {/* TODO Codex: Implement snapshot capture logic using @/lib/chart/snapshot.ts */}
-              <button
-                type="button"
-                onClick={() => {
-                  // TODO Codex: Call captureChartSnapshot() and attach to entry
-                  console.log('[JournalDetailPanel] Snapshot button clicked - TODO: Implement');
-                }}
-                disabled={!entry}
-                className="rounded-full border border-border-subtle bg-interactive-hover px-3 py-1 text-xs font-medium text-text-primary transition hover:border-border-hover hover:bg-interactive-active disabled:opacity-40"
-                title="Capture chart snapshot"
-              >
-                📸 Snapshot
-              </button>
-              <button
-                type="button"
-                onClick={handleStartEdit}
-                disabled={!entry || isSaving}
-                className="rounded-full border border-border-subtle bg-interactive-hover px-3 py-1 text-xs font-medium text-text-primary transition hover:border-border-hover hover:bg-interactive-active disabled:opacity-40"
-              >
-                Edit notes
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleStartEdit}
+              disabled={!entry || isSaving}
+              className="rounded-full border border-border-subtle bg-interactive-hover px-3 py-1 text-xs font-medium text-text-primary transition hover:border-border-hover hover:bg-interactive-active disabled:opacity-40"
+            >
+              Edit notes
+            </button>
           </div>
         </div>
       </div>
