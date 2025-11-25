@@ -12,6 +12,7 @@
  */
 
 import Dexie, { type Table } from 'dexie';
+import type { BoardChartSnapshot } from '@/domain/chart';
 
 // ===== Interfaces =====
 
@@ -76,6 +77,7 @@ export class BoardDatabase extends Dexie {
   rules!: Table<AlertRule, number>;
   feedCache!: Table<FeedEventCache, string>;
   kpiCache!: Table<KPICache, string>;
+  chartSnapshots!: Table<BoardChartSnapshot, number>;
 
   constructor() {
     super('sparkfined-board');
@@ -85,6 +87,14 @@ export class BoardDatabase extends Dexie {
       rules: '++id, symbol, status, createdAt',
       feedCache: 'id, type, timestamp, cachedAt',
       kpiCache: 'id, cachedAt',
+    });
+
+    this.version(2).stores({
+      charts: '++id, symbol, timeframe, timestamp',
+      rules: '++id, symbol, status, createdAt',
+      feedCache: 'id, type, timestamp, cachedAt',
+      kpiCache: 'id, cachedAt',
+      chartSnapshots: '++id, [address+timeframe], metadata.lastFetchedAt',
     });
   }
 }
