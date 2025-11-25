@@ -9,7 +9,6 @@
 
 import type {
   MonitoredTransaction,
-  AutoJournalSource,
   AutoJournalOptions,
   SetupDetectionResult,
   SessionInfo,
@@ -221,7 +220,7 @@ export async function matchTransactionPairs(
   });
 
   // Match pairs for each token
-  byToken.forEach((txs, tokenAddress) => {
+  byToken.forEach((txs, _tokenAddress) => {
     const buys = txs.filter((t) => t.type === 'buy').sort((a, b) => a.timestamp - b.timestamp);
     const sells = txs.filter((t) => t.type === 'sell').sort((a, b) => a.timestamp - b.timestamp);
 
@@ -231,6 +230,9 @@ export async function matchTransactionPairs(
     while (buyIndex < buys.length && sellIndex < sells.length) {
       const buy = buys[buyIndex];
       const sell = sells[sellIndex];
+      if (!buy || !sell) {
+        break;
+      }
 
       // Calculate PnL
       const pnl = (sell.priceUsd - buy.priceUsd) * Math.min(buy.tokenAmount, sell.tokenAmount);

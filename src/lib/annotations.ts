@@ -13,13 +13,20 @@ function parseTimestamp(value?: string | number): number {
   return Date.now()
 }
 
+function isPersistedJournal(entry: JournalType | JournalStoreEntry): entry is JournalType {
+  return 'timestamp' in entry
+}
+
 export function mapJournalEntryToAnnotation(entry: JournalType | JournalStoreEntry): ChartAnnotation {
-  const baseTime = 'timestamp' in entry ? (entry as JournalType).timestamp : parseTimestamp((entry as JournalStoreEntry).date)
+  const isPersisted = isPersistedJournal(entry)
+  const baseTime = isPersisted ? entry.timestamp : parseTimestamp(entry.date)
+  const description = isPersisted ? entry.thesis ?? '' : entry.notes ?? ''
+
   return {
     id: `journal-${entry.id}`,
     candleTime: baseTime,
     label: 'Journal',
-    description: 'notes' in entry ? entry.notes : (entry as JournalType).thesis ?? '',
+    description,
     severity: 'low',
     kind: 'journal',
   }
