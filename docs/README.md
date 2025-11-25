@@ -1,309 +1,286 @@
 # Sparkfined PWA — Documentation
 
-**Version:** 4.0 (Reorganized & Cleaned)
-**Last Updated:** 2025-11-20
-**Status:** ✅ Production-Ready
+**Version:** 4.1 (Restructured 2025-11-25)
+**Purpose:** Centralized documentation hub for developers, AI agents, and contributors.
 
 ---
 
-## 📋 Quick Navigation
-
-### 🎯 I want to...
-
-**...understand the project**
-→ Start with `/README.md` (project root) for overview
-
-**...set up the development environment**
-→ [`setup/environment-and-providers.md`](./setup/environment-and-providers.md)
-
-**...deploy the application**
-→ [`setup/build-and-deploy.md`](./setup/build-and-deploy.md)
-→ [`setup/vercel-deploy-checklist.md`](./setup/vercel-deploy-checklist.md)
-
-**...understand the architecture**
-→ [`pwa-audit/01_repo_index.md`](./pwa-audit/01_repo_index.md)
-→ [`pwa-audit/02_feature_catalog.md`](./pwa-audit/02_feature_catalog.md)
-
-**...work with AI features**
-→ [`ai/integration-recommendations.md`](./ai/integration-recommendations.md)
-→ [`ai/advanced-insight-ui-spec-beta-v0.9.md`](./ai/advanced-insight-ui-spec-beta-v0.9.md)
-
-**...understand onboarding strategy**
-→ [`process/onboarding-blueprint.md`](./process/onboarding-blueprint.md)
-→ [`lore/onboarding-dialogs.md`](./lore/onboarding-dialogs.md)
-
-**...find historical documentation**
-→ [`archive/README.md`](./archive/README.md) (organized by category)
-
----
-
-## 📁 Documentation Structure
+## 📂 Documentation Structure
 
 ```
 docs/
-├── README.md                                   ← You are here (Navigation guide)
-├── index.md                                    ← Index of all documentation
-├── PR_RUN_SUMMARY.md                           ← Pull request summaries
-│
-├── setup/                                      ← 🔧 Installation & Deployment (5 files)
-│   ├── environment-and-providers.md            ← API keys, env vars, providers
-│   ├── build-and-deploy.md                     ← Build process & deployment steps
-│   ├── push-notifications.md                   ← Web Push setup guide
-│   ├── vercel-deploy-checklist.md              ← Pre-deploy verification checklist
-│   └── env-inventory.md                        ← Complete env variable inventory
-│
-├── process/                                    ← 📊 Product & Planning (2 files)
-│   ├── product-overview.md                     ← Product vision & features
-│   └── onboarding-blueprint.md                 ← User onboarding strategy
-│
-├── lore/                                       ← 🎭 Brand & Storytelling (7 files)
-│   ├── three-pillars.md                        ← Core product pillars
-│   ├── hero-journey-full.md                    ← User hero journey narrative
-│   ├── onboarding-dialogs.md                   ← Onboarding copy & dialogs
-│   ├── degens-creed.md                         ← Community manifesto
-│   ├── community-posts-templates.md            ← Social media templates
-│   ├── x-timeline-posts.md                     ← X/Twitter content calendar
-│   └── nft-meme-collection-concept.md          ← NFT collection concept
-│
-├── features/                                   ← 🚀 Feature Documentation (3 files)
-│   ├── advanced-insight-backend-wiring.md      ← Advanced Insight implementation
-│   ├── next-up.md                              ← Upcoming features
-│   └── production-ready.md                     ← Production readiness checklist
-│
-├── concepts/                                   ← 💡 Design Concepts (3 files)
-│   ├── ai-roadmap.md                           ← AI feature roadmap
-│   ├── journal-system.md                       ← Journal system design
-│   └── signal-orchestrator.md                  ← Signal orchestration concept
-│
-├── design/                                     ← 🎨 Design Documentation (2 files)
-│   ├── IMPLEMENTATION_GUIDE.md                 ← Design implementation guide
-│   └── LOGO_DESIGN_DOCUMENTATION.md            ← Logo design specs
-│
-├── guides/                                     ← 📖 User & Developer Guides (1 file)
-│   └── access-tabs.md                          ← Access gating tabs guide
-│
-├── pwa-audit/                                  ← 🔍 Architecture Audit (7 files)
-│   ├── 01_repo_index.md                        ← Repository structure overview
-│   ├── 02_feature_catalog.md                   ← Complete feature catalog
-│   ├── 03_core_flows.md                        ← Core user flows
-│   ├── 04_offline_sync_model.md                ← Offline-first architecture
-│   ├── 05_security_privacy.md                  ← Security & privacy design
-│   ├── 06_tests_observability_gaps.md          ← Testing & observability gaps
-│   └── 07_future_concepts.md                   ← Future enhancements
-│
-├── ai/                                         ← 🤖 AI Integration (8 files)
-│   ├── README_AI.md                            ← AI system overview
-│   ├── integration-recommendations.md          ← AI provider recommendations
-│   ├── advanced-insight-ui-spec-beta-v0.9.md   ← Advanced Insight UI spec
-│   ├── layered-analysis-model.md               ← L1-L5 analysis model
-│   ├── event-catalog-overview.md               ← Event system overview
-│   ├── ab-testing-plan.md                      ← A/B testing strategy
-│   ├── ADVANCED_INSIGHT_FILES_MANIFEST.md      ← File manifest
-│   └── HANDOVER_CODEX_ADVANCED_INSIGHT_UI.md   ← Codex handover checklist
-│
-└── archive/                                    ← 📦 Historical Documentation
-    ├── README.md                               ← Archive index & navigation
-    ├── cleanup/                                ← Cleanup history & reports
-    ├── features/                               ← Completed feature implementations
-    ├── audits/                                 ← Historical audit reports
-    ├── handovers/                              ← Completed handover checklists
-    ├── telemetry/                              ← Telemetry reports & findings
-    ├── phases/                                 ← Phase completion reports
-    ├── deployment/                             ← Legacy deployment docs
-    ├── ai-bundles/                             ← AI bundle archives
-    └── raw/                                    ← Unsorted historical docs
+├── README.md (this file)       — Documentation navigation hub
+├── active/                     — Active working documents & current development
+├── core/                       — Stable reference documentation
+└── archive/                    — Historical documentation & completed work
 ```
 
 ---
 
-## 🔑 Key Documentation Files
+## 🟢 Active Documentation
 
-### Essential Reading (Start Here)
+**Purpose:** Current working documents, sprint plans, reports, and ongoing feature development.
 
-| File | Purpose | When to Read |
-|------|---------|--------------|
-| `/README.md` | Project overview, quick start, scripts | First time setup |
-| `setup/environment-and-providers.md` | Environment configuration | Before first run |
-| `setup/build-and-deploy.md` | Build & deployment process | Before deployment |
-| `process/product-overview.md` | Product vision & features | Understanding the product |
-| `pwa-audit/01_repo_index.md` | Repository structure | Understanding the codebase |
+**Location:** [`docs/active/`](./active/README.md)
+
+### Key Documents
+
+| Document | Purpose | Update Frequency |
+|----------|---------|------------------|
+| [Working_Plan.md](./active/Working_Plan.md) | Active sprint plan & sections | Daily |
+| [Execution_Log.md](./active/Execution_Log.md) | Session-by-session log (all agents) | Per session |
+| [Roadmap.md](./active/Roadmap.md) | Product roadmap (R0, R1, R2) | Weekly |
+| [Risk_Register.md](./active/Risk_Register.md) | Risk tracking & mitigation | Weekly |
+
+### Active Subdirectories
+
+- **[features/](./active/features/)** — Current feature specs (next-up, production-ready, advanced-insight)
+- **[migrations/](./active/migrations/)** — Ongoing technical migrations (serverless-consolidation)
+- **[reports/](./active/reports/)** — Current status reports (ui-errors)
+- **[audits/](./active/audits/)** — Active audits (markdown-categorization)
+
+---
+
+## 🔵 Core Documentation
+
+**Purpose:** Stable reference documentation for architecture, setup, concepts, and design.
+
+**Location:** [`docs/core/`](./core/)
+
+### Architecture & System Design
+
+- **[architecture/](./core/architecture/)** — System architecture, features, flows, security
+  - Repo index, feature catalog, core flows
+  - Offline/sync model, security/privacy
+  - Tests & observability gaps, future concepts
 
 ### Setup & Deployment
 
-| File | Purpose |
-|------|---------|
-| `setup/environment-and-providers.md` | Complete env var guide, API keys, provider setup |
-| `setup/build-and-deploy.md` | Build process, Vercel deployment, CI/CD |
-| `setup/push-notifications.md` | Web Push notifications setup (VAPID keys, testing) |
-| `setup/vercel-deploy-checklist.md` | Pre-deployment verification checklist |
-| `setup/env-inventory.md` | Inventory of all env variables with usage locations |
+- **[setup/](./core/setup/)** — Environment setup, build process, deployment
+  - Environment variables & data providers
+  - Build & deploy guide
+  - Push notifications setup
+  - Vercel deployment checklist
 
-### Architecture & Features
+### Concepts & Roadmaps
 
-| File | Purpose |
-|------|---------|
-| `pwa-audit/01_repo_index.md` | Repository structure and organization |
-| `pwa-audit/02_feature_catalog.md` | Complete catalog of implemented features |
-| `pwa-audit/03_core_flows.md` | Critical user flows and interactions |
-| `pwa-audit/04_offline_sync_model.md` | Offline-first architecture and sync strategy |
-| `features/advanced-insight-backend-wiring.md` | Advanced Insight implementation details |
+- **[concepts/](./core/concepts/)** — Design concepts & feature roadmaps
+  - AI integration roadmap
+  - Journal system specification
+  - Signal orchestrator concept
+
+### Process & Product
+
+- **[process/](./core/process/)** — Product vision & onboarding
+  - Product overview & architecture
+  - Onboarding blueprint
+
+### Design System
+
+- **[design/](./core/design/)** — Design implementation & brand assets
+  - Implementation guide
+  - Logo design documentation
+  - Design tokens & section summaries
+
+### Guides & How-Tos
+
+- **[guides/](./core/guides/)** — Practical how-to guides
+  - Access tabs guide
 
 ### AI Integration
 
-| File | Purpose |
-|------|---------|
-| `ai/README_AI.md` | AI system overview and architecture |
-| `ai/integration-recommendations.md` | AI provider selection & cost management |
-| `ai/advanced-insight-ui-spec-beta-v0.9.md` | Advanced Insight UI specification |
-| `ai/layered-analysis-model.md` | L1-L5 analysis model explanation |
-| `ai/event-catalog-overview.md` | Event-driven architecture for AI features |
+- **[ai/](./core/ai/)** — AI system documentation
+  - AI system README
+  - Integration recommendations
+  - Advanced Insight UI spec (Beta v0.9)
+  - Layered analysis model (L1-L5)
+  - Event catalog overview
+  - A/B testing plan
+  - File manifests & handovers
+
+### Brand & Storytelling
+
+- **[lore/](./core/lore/)** — Brand narrative & community content
+  - Three Pillars of Sparkfined
+  - Hero's Journey narrative
+  - Onboarding dialogs
+  - The Degen's Creed
+  - Community post templates
+  - X/Twitter timeline posts
+  - NFT/Meme collection concept
 
 ---
 
-## 📊 Documentation Statistics
+## ⚫ Archive Documentation
 
-| Category | Files | Status |
-|----------|-------|--------|
-| **Setup & Deployment** | 5 | ✅ Current |
-| **Process & Product** | 2 | ✅ Current |
-| **Lore & Brand** | 7 | ✅ Current |
-| **Features** | 3 | ✅ Current |
-| **Concepts** | 3 | ✅ Current |
-| **Design** | 2 | ✅ Current |
-| **Guides** | 1 | ✅ Current |
-| **PWA Audit** | 7 | ✅ Current |
-| **AI Integration** | 8 | ✅ Current |
-| **Archive** | ~60 | 📦 Historical |
-| **Total Active** | ~38 | |
+**Purpose:** Historical documentation, completed work, and deprecated docs.
 
----
+**Location:** [`docs/archive/`](./archive/README.md)
 
-## 🗂️ Archive Organization
+### Archive Categories
 
-The `archive/` directory contains historical documentation organized by category:
+- **[cleanup/](./archive/cleanup/)** — Documentation cleanup history
+  - Cleanup #1, #2, #3 summaries
+  - Rulesync verification
+  - Restructuring plans
 
-- **cleanup/** — Repository cleanup history & reports (3 cleanup efforts: 2025-11-09, 2025-11-15, 2025-11-20)
-- **features/** — Completed feature implementation docs (Advanced Insight Beta v0.9, etc.)
-- **audits/** — Historical audit reports (repository audits, performance audits)
-- **handovers/** — Completed handover checklists (Codex handovers, quick starts)
-- **telemetry/** — Telemetry reports & findings (events mapping, QA checklists)
-- **phases/** — Phase completion reports (Phase 4-8, Phase A-E)
-- **deployment/** — Legacy deployment documentation
-- **ai-bundles/** — Archived AI bundle ZIP files (with extraction notes)
-- **raw/** — Unsorted historical documentation (snapshots from 2025-11-12)
+- **[features/](./archive/features/)** — Completed feature implementations
+  - Advanced Insight implementation history
+  - Wiring summaries & deliverables
 
-**See [`archive/README.md`](./archive/README.md) for complete archive index.**
+- **[audits/](./archive/audits/)** — Historical audit reports
+  - Repository audits
+  - Production readiness reports
+  - Performance & test audits
 
----
+- **[telemetry/](./archive/telemetry/)** — Telemetry implementation history
+  - Events mapping
+  - QA checklists
+  - Summary findings
 
-## 🧭 Related Documentation
+- **[phases/](./archive/phases/)** — Phase completion reports
+  - PHASE_4-8 completions
+  - PHASE_A-E progress trackers
 
-### Tool Configurations (Root Level)
+- **[deployment/](./archive/deployment/)** — Deployment history
+  - Vercel deployment checklists
+  - Deployment ready reports
 
-These files configure AI coding assistants and should not be modified without understanding their purpose:
+- **[deprecated/](./archive/deprecated/)** — Deprecated documentation
+  - Old CI/CD workflows
+  - Superseded plans & specs
+  - Legacy READMEs
 
-- `.rulesync/` — **Single Source of Truth** for AI tool prompts (20 files: 11 SYSTEM + 6 ITERATIVE + 3 meta)
-- `.cursor/` — Cursor-specific rules (4 files, generated from `.rulesync/`)
-- `/CLAUDE.md` — Claude Code configuration (auto-generated from `.rulesync/`)
-- `/AGENTS.md` — Codex configuration (auto-generated from `.rulesync/`)
+- **[raw/](./archive/raw/)** — Raw snapshots by date
+  - 2025-11-12 consolidation
+  - Historical project overviews
 
-**Rule:** Never edit tool configs directly. Modify `.rulesync/` files and regenerate.
-
-### Active Planning Documents (Root Level)
-
-- `/IMPROVEMENT_ROADMAP.md` — Product roadmap (R0, R1, R2, future phases)
-- `/RISK_REGISTER.md` — Risk tracking and mitigation strategies
-- `/PR_TEMPLATE.md` — GitHub pull request template
-
-### External Documentation
-
-- **Wireframes:** `../wireframes/` (35 files: mobile, desktop, flows, components)
-- **Tests:** `../tests/` (8 files: test docs, checklists, matrices)
-- **Tickets:** `../tickets/` (5 files: feature TODOs)
-- **Events:** `../events/` (4 files: event definitions for AI)
-- **AI Prompts:** `../ai/` (4 files: system prompts, task prompts)
+- **[removed/](./archive/removed/)** — Index of removed docs
 
 ---
 
-## 📝 Documentation Principles
+## 🤖 AI Agent Configurations
 
-This documentation follows these principles:
+**Purpose:** Centralized AI tool configurations (Cursor, Claude Code, Codex, Rulesync).
 
-1. **Single Source of Truth:** Each concept documented in one canonical location
-2. **No Duplication:** Information exists only once (linked, not repeated)
-3. **Up-to-Date:** Active docs reflect current codebase state
-4. **Historical Preservation:** Old docs archived (in `archive/`), not deleted
-5. **Actionable:** Step-by-step guides with actual commands
-6. **Searchable:** Clear structure, comprehensive navigation, keywords
+**Location:** [`../AGENT_FILES/`](../AGENT_FILES/README.md)
 
----
+### Tools
 
-## 🔄 Documentation Maintenance
+- **[.rulesync/](../AGENT_FILES/.rulesync/)** — Multi-tool prompt system (Source of Truth)
+  - 11 SYSTEM files (stable rules)
+  - 6 ITERATIVE files (dynamic context)
 
-### When to Update
-
-- **After feature implementation:** Update feature docs, add to catalog
-- **After major refactoring:** Update architecture docs, audit reports
-- **After deployment changes:** Update setup/deployment docs
-- **Quarterly:** Review and archive outdated documentation
-
-### How to Archive
-
-When documentation becomes outdated or superseded:
-
-1. Move file to appropriate `archive/` subdirectory
-2. Update `archive/[category]/README.md` with entry
-3. Update links in active documentation (point to archive if needed)
-4. Commit with message: `docs: archive [filename] - [reason]`
-
-**See [`archive/cleanup/README.md`](./archive/cleanup/README.md) for cleanup guidelines.**
+- **[.cursor/](../AGENT_FILES/.cursor/)** — Cursor IDE rules (auto-generated)
+- **[CLAUDE.md](../AGENT_FILES/CLAUDE.md)** — Claude Code config (auto-generated)
+- **[AGENTS.md](../AGENT_FILES/AGENTS.md)** — Codex config (auto-generated)
+- **[Global_Rules.md](../AGENT_FILES/Global_Rules.md)** — Cross-tool coding rules
 
 ---
 
-## 📞 Support & Questions
+## 🗺️ Quick Navigation
 
-**For Documentation Questions:**
-1. Check this README for navigation
-2. Search `docs/` for keywords
-3. Check `archive/` for historical context
-4. Review code comments and inline docs
+### For Developers
 
-**For Technical Questions:**
-1. Check `/README.md` (project root) for scripts and quick start
-2. Review `setup/` docs for environment issues
-3. Check `pwa-audit/` for architecture questions
-4. Review `ai/` docs for AI integration questions
+**Getting Started:**
+1. [Environment Setup](./core/setup/environment-and-providers.md)
+2. [Build & Deploy](./core/setup/build-and-deploy.md)
+3. [Product Overview](./core/process/product-overview.md)
 
-**For Contributing:**
-1. Follow documentation principles above
-2. Update this README when adding new top-level sections
-3. Keep active docs current, archive outdated content
-4. Use clear, actionable language
+**Development:**
+- [Architecture Overview](./core/architecture/01_repo_index.md)
+- [Core Flows](./core/architecture/03_core_flows.md)
+- [AI Integration](./core/ai/README_AI.md)
+
+**Current Work:**
+- [Active Sprint Plan](./active/Working_Plan.md)
+- [Execution Log](./active/Execution_Log.md)
+- [Roadmap](./active/Roadmap.md)
+
+### For AI Agents
+
+**Configuration:**
+- [Rulesync System](../AGENT_FILES/.rulesync/README_RULESYNC.md)
+- [Claude Code Rules](../AGENT_FILES/CLAUDE.md)
+- [Codex Rules](../AGENT_FILES/AGENTS.md)
+
+**Context:**
+- [Current Planning](../AGENT_FILES/.rulesync/_planning-current.md)
+- [Session Context](../AGENT_FILES/.rulesync/_context-session.md)
+- [Design Decisions (ADRs)](../AGENT_FILES/.rulesync/_intentions.md)
+
+### For Contributors
+
+**Understanding the Project:**
+1. [Product Overview](./core/process/product-overview.md)
+2. [Hero's Journey Narrative](./core/lore/hero-journey-full.md)
+3. [Three Pillars](./core/lore/three-pillars.md)
+
+**Contributing:**
+- [Onboarding Blueprint](./core/process/onboarding-blueprint.md)
+- [Feature Catalog](./core/architecture/02_feature_catalog.md)
+- [Next Up Features](./active/features/next-up.md)
 
 ---
 
-## 🎯 Recent Changes
+## 📈 Documentation Lifecycle
 
-### 2025-11-20: Major Documentation Restructuring
+### Active → Core → Archive
 
-**Cleanup #3:** Comprehensive markdown documentation refactoring
+**Active:**
+- Current working documents
+- Updated daily/weekly
+- Moved to core when stable
 
-**Changes:**
-- ✅ Reduced root-level .md files from 26 to 7 (-73%)
-- ✅ Created organized archive structure (cleanup/, features/, handovers/, telemetry/)
-- ✅ Moved 21 temporary summaries to appropriate locations
-- ✅ Consolidated Advanced Insight docs (6 files → index)
-- ✅ Consolidated cleanup reports (6 files → index)
-- ✅ Moved telemetry_output/ to docs/archive/telemetry/
-- ✅ Deleted tmp/ directory
-- ✅ Rewrote docs/README.md (this file) with current structure
+**Core:**
+- Stable reference documentation
+- Updated monthly/quarterly
+- Rarely archived (unless superseded)
 
-**Result:** Clean, organized documentation structure with proper historical archiving.
+**Archive:**
+- Completed work
+- Historical context
+- Retained for reference (6 months minimum)
 
-**Details:** See [`/MARKDOWN_DOCS_REFACTORING_PLAN.md`](/MARKDOWN_DOCS_REFACTORING_PLAN.md)
+### Automation
+
+**Quarterly Review:**
+```bash
+# Archive documents older than 6 months
+./scripts/archive-old-docs.sh
+
+# Validate all links
+./scripts/check-markdown-links.sh
+```
 
 ---
 
-**Maintained by:** Sparkfined Team
-**Documentation Version:** 4.0 (Reorganized 2025-11-20)
-**Status:** ✅ Production-Ready | 🚀 Launch-Ready
+## 🔗 External Links
+
+- **GitHub Repository:** https://github.com/baum777/Sparkfined_PWA
+- **Live Demo:** https://sparkfined-pwa.vercel.app
+- **Deployment:** https://vercel.com/baum777/sparkfined-pwa
+
+---
+
+## 📝 Changelog
+
+### v4.1 (2025-11-25) — Documentation Restructuring
+- **Added:** `active/`, `core/` subdirectories
+- **Moved:** pwa-audit → core/architecture
+- **Moved:** features/, setup/, etc. → core/
+- **Created:** AGENT_FILES/ for centralized AI configs
+- **Result:** Root 90% cleaner (13 → 3 files)
+
+### v4.0 (2025-11-20) — Documentation Consolidation
+- Migrated raw/ docs to core/ structure
+- Improved navigation with README.md hub
+
+### v3.0 (2025-11-12) — Rulesync Integration
+- Added .rulesync/ multi-tool prompt system
+- Generated CLAUDE.md, AGENTS.md configs
+
+---
+
+**Last Updated:** 2025-11-25
+**Maintained by:** AI Agents (Claude, Codex) + Human Oversight
