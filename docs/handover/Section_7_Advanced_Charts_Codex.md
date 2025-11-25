@@ -1021,7 +1021,7 @@ const mockOhlc = Array.from({ length: 100 }, (_, i) => ({
 
 ```bash
 pnpm add lightweight-charts
-pnpm add -D @types/lightweight-charts
+# Typings are bundled with the package since v4
 ```
 
 **Import:**
@@ -1096,12 +1096,10 @@ time: Math.floor(candle.t / 1000) as any, // TS workaround: Lightweight Charts e
 {
   "dependencies": {
     "lightweight-charts": "^4.1.0"
-  },
-  "devDependencies": {
-    "@types/lightweight-charts": "^3.8.0"
   }
 }
 ```
+> Die offiziellen Typdefinitionen sind im Paket enthalten; kein separates `@types`-Modul notwendig.
 
 **Bestehende Packages (müssen vorhanden sein):**
 - `dexie@^4.0.0` ✅
