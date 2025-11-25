@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { createEntry, queryEntries, updateEntryNotes } from '@/lib/JournalService';
 import type { JournalEntry as PersistedJournalEntry } from '@/types/journal';
 import type { SolanaMemeTrendEvent, TrendSentimentLabel } from '@/types/events';
+import type { ChartCreationContext } from '@/domain/chart';
 
 export type JournalDirection = 'long' | 'short';
 
@@ -23,12 +24,14 @@ interface JournalState {
   activeId?: string;
   isLoading: boolean;
   error: string | null;
+  lastDraftFromChart?: ChartCreationContext;
   setEntries: (entries: JournalEntry[]) => void;
   setActiveId: (id?: string) => void;
   setLoading: (value: boolean) => void;
   setError: (message: string | null) => void;
   addEntry: (entry: JournalEntry) => void;
   updateEntry: (entry: JournalEntry) => void;
+  createDraftFromChart: (context: ChartCreationContext) => Promise<JournalEntry>;
   autoTagFromTrendEvent: (event: SolanaMemeTrendEvent) => Promise<void>;
 }
 
@@ -72,6 +75,7 @@ export const useJournalStore = create<JournalState>((set) => ({
   activeId: undefined,
   isLoading: false,
   error: null,
+  lastDraftFromChart: undefined,
   setEntries: (entries) => set(() => ({ entries })),
   setActiveId: (id) => set({ activeId: id }),
   setLoading: (value) => set({ isLoading: value }),
@@ -84,6 +88,16 @@ export const useJournalStore = create<JournalState>((set) => ({
     set((state) => ({
       entries: state.entries.map((entry) => (entry.id === nextEntry.id ? nextEntry : entry)),
       })),
+  createDraftFromChart: async (context) => {
+    const title = `${context.symbol} · ${context.timeframe} journal`
+    const notes = `Created from chart at ${new Date(context.time).toUTCString()} @ ${context.price}`
+    const draft = await createQuickJournalEntry({ title, notes })
+    set((state) => ({
+      entries: [draft, ...state.entries],
+      lastDraftFromChart: context,
+    }))
+    return draft
+  },
     autoTagFromTrendEvent: async (event) => {
       try {
         const entry = await buildAutoJournalEntry(event);

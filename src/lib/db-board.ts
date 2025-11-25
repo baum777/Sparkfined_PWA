@@ -12,19 +12,54 @@
  */
 
 import Dexie, { type Table } from 'dexie';
+import type { BoardChartSnapshot, ChartTimeframe, ChartViewState } from '@/domain/chart';
 
 // ===== Interfaces =====
 
-export interface ChartSession {
-  id?: number;
-  symbol: string; // e.g., "BTC", "SOL"
-  timeframe: string; // e.g., "15m", "1h", "4h"
-  timestamp: number; // Unix timestamp
-  sessionDuration?: number; // Duration in ms
-  metadata?: {
-    entryPrice?: number;
-    exitPrice?: number;
-    notes?: string;
+export type ChartSession = BoardChartSnapshot & { timestamp?: number };
+
+const KNOWN_TIMEFRAMES: ChartTimeframe[] = ['1m', '5m', '15m', '1h', '4h', '1d', '1w'];
+
+const DEFAULT_VISUAL_SETTINGS: ChartViewState['visual'] = {
+  showVolume: true,
+  showGrid: false,
+  candleStyle: 'candle',
+};
+
+function coerceTimeframe(timeframe?: string | ChartTimeframe): ChartTimeframe {
+  if (timeframe && KNOWN_TIMEFRAMES.includes(timeframe as ChartTimeframe)) {
+    return timeframe as ChartTimeframe;
+  }
+
+  return '15m';
+}
+
+function createDefaultViewState(timeframe: ChartTimeframe): ChartViewState {
+  return {
+    timeframe,
+    indicators: {},
+    visual: { ...DEFAULT_VISUAL_SETTINGS },
+  };
+}
+
+function withSnapshotDefaults(snapshot: Omit<ChartSession, 'id'>): Omit<ChartSession, 'id'> {
+  const timeframe = coerceTimeframe(snapshot.timeframe);
+  const createdAt = snapshot.metadata?.createdAt ?? Date.now();
+  const lastFetchedAt = snapshot.metadata?.lastFetchedAt ?? createdAt;
+
+  return {
+    ...snapshot,
+    address: snapshot.address ?? snapshot.symbol,
+    timeframe,
+    ohlc: snapshot.ohlc ?? [],
+    timestamp: snapshot.timestamp ?? lastFetchedAt,
+    viewState: snapshot.viewState ?? createDefaultViewState(timeframe),
+    metadata: {
+      fetchedFrom: snapshot.metadata?.fetchedFrom ?? 'cache',
+      candleCount: snapshot.metadata?.candleCount ?? snapshot.ohlc?.length ?? 0,
+      createdAt,
+      lastFetchedAt,
+    },
   };
 }
 
@@ -79,13 +114,36 @@ export class BoardDatabase extends Dexie {
 
   constructor() {
     super('sparkfined-board');
-    
+
     this.version(1).stores({
       charts: '++id, symbol, timeframe, timestamp',
       rules: '++id, symbol, status, createdAt',
       feedCache: 'id, type, timestamp, cachedAt',
       kpiCache: 'id, cachedAt',
     });
+
+    this.version(2)
+      .stores({
+        charts: '++id, symbol, address, timeframe, [address+timeframe], metadata.lastFetchedAt',
+        rules: '++id, symbol, status, createdAt',
+        feedCache: 'id, type, timestamp, cachedAt',
+        kpiCache: 'id, cachedAt',
+      })
+      .upgrade(async (tx) => {
+        await tx.table('charts').toCollection().modify((chart: ChartSession) => {
+          const timeframe = coerceTimeframe(chart.timeframe as ChartTimeframe);
+
+          chart.address = chart.address ?? chart.symbol;
+          chart.ohlc = Array.isArray(chart.ohlc) ? chart.ohlc : [];
+          chart.viewState = chart.viewState ?? createDefaultViewState(timeframe);
+          chart.metadata = {
+            createdAt: chart.metadata?.createdAt ?? chart.timestamp ?? Date.now(),
+            lastFetchedAt: chart.metadata?.lastFetchedAt ?? chart.timestamp ?? Date.now(),
+            fetchedFrom: chart.metadata?.fetchedFrom ?? 'cache',
+            candleCount: chart.metadata?.candleCount ?? chart.ohlc.length ?? 0,
+          };
+        });
+      });
   }
 }
 
@@ -97,12 +155,13 @@ export const boardDB = new BoardDatabase();
 export async function saveChartSession(
   session: Omit<ChartSession, 'id'>
 ): Promise<number> {
-  return await boardDB.charts.add(session);
+  const snapshot = withSnapshotDefaults(session);
+  return await boardDB.charts.add(snapshot);
 }
 
 export async function getRecentChartSessions(limit = 10): Promise<ChartSession[]> {
   return await boardDB.charts
-    .orderBy('timestamp')
+    .orderBy('metadata.lastFetchedAt')
     .reverse()
     .limit(limit)
     .toArray();
@@ -113,7 +172,7 @@ export async function getChartSessionsBySymbol(symbol: string): Promise<ChartSes
     .where('symbol')
     .equals(symbol)
     .reverse()
-    .sortBy('timestamp');
+    .sortBy('metadata.lastFetchedAt');
 }
 
 export async function deleteChartSession(id: number): Promise<void> {

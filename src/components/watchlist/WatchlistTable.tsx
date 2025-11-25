@@ -31,6 +31,8 @@ export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }:
                   ? 'cursor-pointer border-l-4 border-sentiment-bull-border bg-interactive-active'
                   : 'cursor-pointer hover:bg-interactive-hover'
               }`}
+              data-testid="watchlist-token-row"
+              data-symbol={row.symbol}
             >
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Symbol</p>

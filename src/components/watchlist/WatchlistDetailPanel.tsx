@@ -4,9 +4,11 @@ import type { WatchlistRow, WatchlistTrendSnapshot } from '@/store/watchlistStor
 interface WatchlistDetailPanelProps {
   row?: WatchlistRow;
   trend?: WatchlistTrendSnapshot;
+  onOpenChart?: (row?: WatchlistRow) => void;
+  onOpenReplay?: (row?: WatchlistRow) => void;
 }
 
-export default function WatchlistDetailPanel({ row, trend }: WatchlistDetailPanelProps) {
+export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenReplay }: WatchlistDetailPanelProps) {
   if (!row) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center">
@@ -43,11 +45,26 @@ export default function WatchlistDetailPanel({ row, trend }: WatchlistDetailPane
       </div>
 
       <div className="space-y-4 border-t border-border-subtle pt-6">
-        <div className="rounded-xl border border-dashed border-border-moderate bg-surface-subtle p-4 text-center">
-          <p className="text-xs text-text-secondary">Mini chart coming soon.</p>
-        </div>
-        <div className="rounded-xl border border-dashed border-border-moderate bg-surface-subtle p-4 text-center">
-          <p className="text-xs text-text-secondary">Links to Analysis and Journal will appear here.</p>
+        <div className="rounded-xl border border-border-moderate bg-surface-subtle p-4 text-center">
+          <p className="text-xs text-text-secondary">Quick actions</p>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => onOpenChart?.(row)}
+              className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-text-primary transition hover:border-brand hover:text-text-primary"
+              data-testid="button-open-chart"
+            >
+              Open chart
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenReplay?.(row)}
+              className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-text-primary transition hover:border-brand hover:text-text-primary"
+              data-testid="button-open-replay-from-watchlist"
+            >
+              Replay
+            </button>
+          </div>
         </div>
         <SocialTrendCard trend={trend} />
       </div>
