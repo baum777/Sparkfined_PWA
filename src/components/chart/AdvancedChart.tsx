@@ -1,14 +1,28 @@
 import React, { useEffect, useMemo, useRef } from 'react'
-import type { CandlestickSeriesOptions, HistogramSeriesOptions, IChartApi, ISeriesApi } from 'lightweight-charts'
+import type {
+  CandlestickData,
+  CandlestickSeriesOptions,
+  DeepPartial,
+  HistogramData,
+  HistogramSeriesOptions,
+  IChartApi,
+  ISeriesApi,
+  LineData,
+  SeriesMarker,
+  UTCTimestamp,
+} from 'lightweight-charts'
 import { createChart, CrosshairMode } from 'lightweight-charts'
 import type {
   ChartAnnotation,
   ChartFetchStatus,
   ComputedIndicator,
+  IndicatorSeriesPoint,
   ChartViewState,
   OhlcCandle,
 } from '@/domain/chart'
 import type { ChartDataSource } from '@/hooks/useOhlcData'
+
+type ChartTime = UTCTimestamp
 
 export type AdvancedChartProps = {
   candles: OhlcCandle[]
@@ -47,24 +61,43 @@ const chartOptions = {
   },
 }
 
+const toTimestampFromMs = (valueMs: number): ChartTime => Math.floor(valueMs / 1000) as ChartTime
+const toTimestampFromSeconds = (seconds: number): ChartTime => Math.floor(seconds) as ChartTime
+
 function toSeriesData(candles: OhlcCandle[]) {
   const limited = candles.length > 2000 ? candles.slice(-2000) : candles
-  const candleData = limited.map((candle) => ({
-    time: candle.t / 1000 as const,
+  const candleData: CandlestickData<ChartTime>[] = limited.map((candle) => ({
+    time: toTimestampFromMs(candle.t),
     open: candle.o,
     high: candle.h,
     low: candle.l,
     close: candle.c,
   }))
 
-  const volumeData = limited.map((candle) => ({
-    time: candle.t / 1000 as const,
+  const volumeData: HistogramData<ChartTime>[] = limited.map((candle) => ({
+    time: toTimestampFromMs(candle.t),
     value: candle.v ?? 0,
     color: candle.c >= candle.o ? '#42f5b3' : '#ef476f',
   }))
 
   return { candleData, volumeData }
 }
+
+const toLineSeriesPoints = (points: IndicatorSeriesPoint[]): LineData<ChartTime>[] =>
+  points.map((point) => ({
+    time: toTimestampFromSeconds(point.time),
+    value: point.value,
+  }))
+
+const toSeriesMarkers = (annotations: ChartAnnotation[]): SeriesMarker<ChartTime>[] =>
+  annotations.map((annotation) => ({
+    id: annotation.id,
+    time: toTimestampFromMs(annotation.candleTime),
+    position: 'aboveBar',
+    color: annotation.kind === 'alert' ? '#f43f5e' : annotation.kind === 'signal' ? '#c084fc' : '#22d3ee',
+    shape: annotation.kind === 'alert' ? 'arrowDown' : annotation.kind === 'signal' ? 'arrowUp' : 'circle',
+    text: annotation.label,
+  }))
 
 export default function AdvancedChart({
   candles,
@@ -112,16 +145,16 @@ export default function AdvancedChart({
       borderUpColor: '#42f5b3',
       wickDownColor: '#ef476f',
       wickUpColor: '#42f5b3',
-    } as CandlestickSeriesOptions)
+    } satisfies DeepPartial<CandlestickSeriesOptions>)
 
     const volumeSeries = chart.addHistogramSeries({
       priceFormat: { type: 'volume' },
       priceScaleId: 'volume',
+      base: 0,
       color: '#293247',
-      lineWidth: 1,
-      overlay: true,
-      scaleMargins: { top: 0.8, bottom: 0 },
-    } as HistogramSeriesOptions)
+    } satisfies DeepPartial<HistogramSeriesOptions>)
+
+    chart.priceScale('volume').applyOptions({ scaleMargins: { top: 0.8, bottom: 0 } })
 
     candleSeriesRef.current = candleSeries
     volumeSeriesRef.current = volumeSeries
@@ -168,41 +201,32 @@ export default function AdvancedChart({
 
     Object.values(indicatorSeriesRef.current).forEach((seriesList) => {
       seriesList.forEach((series) => {
-        // removeSeries is available at runtime; guard for mock compatibility
-        // @ts-expect-error - mocked chart may not type this method
-        chart.removeSeries?.(series)
+        chart.removeSeries(series)
       })
     })
     indicatorSeriesRef.current = {}
 
     indicators?.forEach((indicator) => {
       if (indicator.type === 'bb') {
-        const basis = chart.addLineSeries({ color: indicator.color ?? '#fbbf24', lineWidth: 1.5 })
+        const basis = chart.addLineSeries({ color: indicator.color ?? '#fbbf24', lineWidth: 2 })
         const upper = chart.addLineSeries({ color: '#f59e0b', lineWidth: 1 })
         const lower = chart.addLineSeries({ color: '#f59e0b', lineWidth: 1 })
-        basis.setData(indicator.basis)
-        upper.setData(indicator.upper)
-        lower.setData(indicator.lower)
+        basis.setData(toLineSeriesPoints(indicator.basis))
+        upper.setData(toLineSeriesPoints(indicator.upper))
+        lower.setData(toLineSeriesPoints(indicator.lower))
         indicatorSeriesRef.current[indicator.id] = [basis, upper, lower]
         return
       }
 
       const line = chart.addLineSeries({ color: indicator.color ?? '#22d3ee', lineWidth: 2 })
-      line.setData(indicator.points)
+      line.setData(toLineSeriesPoints(indicator.points))
       indicatorSeriesRef.current[indicator.id] = [line]
     })
   }, [indicators])
 
   useEffect(() => {
     if (!candleSeriesRef.current) return
-    const markers = (annotations ?? []).map((annotation) => ({
-      id: annotation.id,
-      time: Math.floor(annotation.candleTime / 1000),
-      position: 'aboveBar' as const,
-      color: annotation.kind === 'alert' ? '#f43f5e' : annotation.kind === 'signal' ? '#c084fc' : '#22d3ee',
-      shape: annotation.kind === 'alert' ? 'arrowDown' : annotation.kind === 'signal' ? 'arrowUp' : 'circle',
-      text: annotation.label,
-    }))
+    const markers = toSeriesMarkers(annotations ?? [])
     candleSeriesRef.current.setMarkers?.(markers)
   }, [annotations])
 
