@@ -133,6 +133,7 @@ function detectFVG(ohlc: OhlcPoint[]): FVGDetails | null {
     const candle1 = ohlc[i - 2];
     const candle2 = ohlc[i - 1];
     const candle3 = ohlc[i];
+    if (!candle1 || !candle2 || !candle3) continue;
 
     // Bullish FVG
     if (candle3.l > candle1.h) {
@@ -185,6 +186,7 @@ function detectOrderBlock(ohlc: OhlcPoint[]): OrderblockDetails | null {
     const currentCandle = ohlc[i];
     const prevCandle = ohlc[i - 1];
     const prev2Candle = ohlc[i - 2];
+    if (!currentCandle || !prevCandle || !prev2Candle) continue;
 
     const movePercent = Math.abs((currentCandle.c - prev2Candle.c) / prev2Candle.c) * 100;
 
@@ -195,6 +197,7 @@ function detectOrderBlock(ohlc: OhlcPoint[]): OrderblockDetails | null {
       // Find last bearish candle before move
       for (let j = i - 1; j >= 0; j--) {
         const candle = ohlc[j];
+        if (!candle) continue;
         if (candle.c < candle.o) {
           return {
             type: 'bullish',
@@ -212,6 +215,7 @@ function detectOrderBlock(ohlc: OhlcPoint[]): OrderblockDetails | null {
     if (currentCandle.c < prev2Candle.c) {
       for (let j = i - 1; j >= 0; j--) {
         const candle = ohlc[j];
+        if (!candle) continue;
         if (candle.c > candle.o) {
           return {
             type: 'bearish',
@@ -244,11 +248,15 @@ function detectLiquiditySweep(ohlc: OhlcPoint[]): LiquidityDetails | null {
   if (ohlc.length < 10) return null;
 
   const recent = ohlc.slice(-10);
+  if (recent.length < 2) return null;
   const lastCandle = recent[recent.length - 1];
+  if (!lastCandle) return null;
+  const history = recent.slice(0, -1);
+  if (history.length === 0) return null;
 
   // Find recent high/low (excluding last candle)
-  const recentHigh = Math.max(...recent.slice(0, -1).map((c) => c.h));
-  const recentLow = Math.min(...recent.slice(0, -1).map((c) => c.l));
+  const recentHigh = Math.max(...history.map((c) => c.h));
+  const recentLow = Math.min(...history.map((c) => c.l));
 
   // Buy-side sweep (broke high, now reversing down)
   if (lastCandle.h > recentHigh && lastCandle.c < lastCandle.o) {
@@ -289,16 +297,22 @@ function detectStructureBreak(ohlc: OhlcPoint[]): 'bos' | 'choch' | null {
   // Simple trend detection (20-candle SMA)
   const closes = ohlc.map((c) => c.c);
   const sma20 = closes.slice(-20).reduce((sum, c) => sum + c, 0) / 20;
-  const currentPrice = ohlc[ohlc.length - 1].c;
+  const currentCandle = ohlc[ohlc.length - 1];
+  if (!currentCandle) return null;
+  const currentPrice = currentCandle.c;
 
   const isUptrend = currentPrice > sma20;
 
   // Recent swing high/low
   const recent = ohlc.slice(-20);
-  const recentHigh = Math.max(...recent.slice(0, -1).map((c) => c.h));
-  const recentLow = Math.min(...recent.slice(0, -1).map((c) => c.l));
+  if (recent.length < 2) return null;
+  const history = recent.slice(0, -1);
+  if (history.length === 0) return null;
+  const recentHigh = Math.max(...history.map((c) => c.h));
+  const recentLow = Math.min(...history.map((c) => c.l));
 
-  const lastCandle = ohlc[ohlc.length - 1];
+  const lastCandle = recent[recent.length - 1];
+  if (!lastCandle) return null;
 
   // Break of high
   if (lastCandle.h > recentHigh) {
@@ -336,7 +350,7 @@ function calculateConfidence(setups: ICTSetupType[], ohlc: OhlcPoint[]): number 
     const lastCandle = ohlc[ohlc.length - 1];
     const prevCandle = ohlc[ohlc.length - 2];
 
-    if (lastCandle.v && prevCandle.v && lastCandle.v > prevCandle.v * 1.5) {
+    if (lastCandle?.v && prevCandle?.v && lastCandle.v > prevCandle.v * 1.5) {
       confidence += 0.15;
     }
   }
@@ -344,10 +358,12 @@ function calculateConfidence(setups: ICTSetupType[], ohlc: OhlcPoint[]): number 
   // Price action strength
   if (ohlc.length >= 1) {
     const lastCandle = ohlc[ohlc.length - 1];
-    const bodyPercent = Math.abs(lastCandle.c - lastCandle.o) / lastCandle.o * 100;
+    if (lastCandle) {
+      const bodyPercent = (Math.abs(lastCandle.c - lastCandle.o) / lastCandle.o) * 100;
 
-    if (bodyPercent > 2) {
-      confidence += 0.10;
+      if (bodyPercent > 2) {
+        confidence += 0.1;
+      }
     }
   }
 
@@ -367,10 +383,10 @@ function calculateConfidence(setups: ICTSetupType[], ohlc: OhlcPoint[]): number 
  * - Your own OHLC endpoint
  */
 async function fetchOhlcData(
-  tokenAddress: string,
-  timestamp: number,
-  timeframe: string,
-  lookback: number,
+  _tokenAddress: string,
+  _timestamp: number,
+  _timeframe: string,
+  _lookback: number,
 ): Promise<OhlcPoint[] | null> {
   try {
     console.warn('[SetupDetector] fetchOhlcData not yet implemented, returning mock data');

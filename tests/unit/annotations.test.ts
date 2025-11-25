@@ -39,7 +39,8 @@ describe('annotations mapping', () => {
       [],
       []
     )
-    expect(merged[0].id).toBe('2')
+    const first = merged[0]!
+    expect(first.id).toBe('2')
   })
 
   it('maps pulse delta events to signal annotations', () => {

@@ -131,7 +131,7 @@ export class BoardDatabase extends Dexie {
       })
       .upgrade(async (tx) => {
         await tx.table('charts').toCollection().modify((chart: ChartSession) => {
-          const timeframe = coerceTimeframe(chart.timeframe as ChartTimeframe);
+          const timeframe = coerceTimeframe(chart.timeframe);
 
           chart.address = chart.address ?? chart.symbol;
           chart.ohlc = Array.isArray(chart.ohlc) ? chart.ohlc : [];

@@ -12,6 +12,7 @@ vi.mock('lightweight-charts', () => {
       addHistogramSeries: () => ({ setData }),
       addLineSeries: () => ({ setData }),
       applyOptions: vi.fn(),
+      priceScale: () => ({ applyOptions: vi.fn() }),
       removeSeries: vi.fn(),
       remove: vi.fn(),
     }),
