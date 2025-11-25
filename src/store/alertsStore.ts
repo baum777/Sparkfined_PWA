@@ -28,6 +28,7 @@ interface AlertsState {
   setAlerts: (alerts: Alert[]) => void;
   pushAlert: (alert: Alert) => void;
   processTrendEvent?: (evt: SolanaMemeTrendEvent) => void;
+  createDraftFromChart: (input: { address: string; symbol: string; price: number; time: number; timeframe: string }) => Alert;
 }
 
 const INITIAL_ALERTS: Alert[] = [
@@ -88,6 +89,20 @@ export const useAlertsStore = create<AlertsState>((set) => ({
     set((state) => ({
       alerts: dedupeAlerts([alert, ...state.alerts]).slice(0, 50),
     })),
+  createDraftFromChart: (input) => {
+    const alert: Alert = {
+      id: `chart-${input.symbol}-${input.time}`,
+      symbol: input.symbol.toUpperCase(),
+      condition: `Create alert @ ${input.price} on ${new Date(input.time).toUTCString()}`,
+      type: 'price',
+      status: 'armed',
+      timeframe: input.timeframe,
+      createdAt: new Date(input.time).toISOString(),
+      origin: 'manual',
+    }
+    set((state) => ({ alerts: dedupeAlerts([alert, ...state.alerts]).slice(0, 50) }))
+    return alert
+  },
   processTrendEvent: (evt) =>
     set((state) => {
       const nextAlerts = buildTrendAlerts(evt).reduce<Alert[]>((acc, alert) => {

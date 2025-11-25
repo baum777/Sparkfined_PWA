@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import WatchlistLayout from "@/components/watchlist/WatchlistLayout";
 import WatchlistTable from "@/components/watchlist/WatchlistTable";
@@ -8,6 +9,8 @@ import { LiveStatusBadge } from "@/components/live/LiveStatusBadge";
 import { fetchWatchlistQuotes } from "@/features/market/watchlistData";
 import { useWatchlistStore } from "@/store/watchlistStore";
 import type { WatchlistRow } from "@/store/watchlistStore";
+import { DEFAULT_TIMEFRAME } from "@/domain/chart";
+import { buildChartUrl, buildReplayUrl } from "@/lib/chartLinks";
 
 type SessionFilter = "all" | "London" | "NY" | "Asia";
 type SortMode = "default" | "top-movers";
@@ -26,6 +29,7 @@ export default function WatchlistPageV2() {
   const [sortMode, setSortMode] = React.useState<SortMode>("default");
   const [activeSymbol, setActiveSymbol] = React.useState<string | undefined>(undefined);
   const hasHydratedRef = React.useRef(false);
+  const navigate = useNavigate();
   const loadQuotes = React.useCallback(
     async (symbols: string[]) => {
       if (!symbols.length) {
@@ -77,6 +81,28 @@ export default function WatchlistPageV2() {
     if (!activeRow) return undefined;
     return trends[activeRow.symbol];
   }, [activeRow, trends]);
+
+  const openChart = React.useCallback(
+    (row?: WatchlistRow) => {
+      if (!row) return;
+      const url = buildChartUrl(row.address ?? "", DEFAULT_TIMEFRAME);
+      navigate(url);
+    },
+    [navigate]
+  );
+
+  const openReplay = React.useCallback(
+    (row?: WatchlistRow) => {
+      if (!row) return;
+      const now = Date.now();
+      const url = buildReplayUrl(row.address ?? "", DEFAULT_TIMEFRAME, now - 6 * 60 * 60 * 1000, now, {
+        symbol: row.symbol,
+        network: row.network ?? "solana",
+      });
+      navigate(url);
+    },
+    [navigate]
+  );
 
   return (
     <DashboardShell
@@ -131,17 +157,17 @@ export default function WatchlistPageV2() {
                 )}
               </div>
             </div>
-            <WatchlistTable
-              rows={visibleRows}
-              activeSymbol={activeSymbol}
-              trends={trends}
-              onSelect={setActiveSymbol}
-            />
-          </div>
-          <WatchlistDetailPanel row={activeRow} trend={activeTrend} />
+          <WatchlistTable
+            rows={visibleRows}
+            activeSymbol={activeSymbol}
+            trends={trends}
+            onSelect={setActiveSymbol}
+          />
         </div>
-      </WatchlistLayout>
-    </DashboardShell>
+        <WatchlistDetailPanel row={activeRow} trend={activeTrend} onOpenChart={openChart} onOpenReplay={openReplay} />
+      </div>
+    </WatchlistLayout>
+  </DashboardShell>
   );
 }
 

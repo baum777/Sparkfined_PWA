@@ -1,200 +1,282 @@
-/**
- * ReplayPage.tsx
- * 
- * Main page for Replay feature - combines:
- * - ReplayPlayer (playback controls)
- * - Chart visualization (synced with replay frame)
- * - PatternDashboard (analytics & pattern library)
- * 
- * Can be accessed:
- * - From Journal entry with "View Replay" button
- * - Directly from navigation for pattern analysis
- * - From PatternDashboard by clicking a pattern
- */
+import React from "react"
+import { useParams, useNavigate, useSearchParams } from "react-router-dom"
+import ReplayPlayer from "@/components/ReplayPlayer"
+import PatternDashboard from "@/components/PatternDashboard"
+import type { ReplaySession, JournalEntry, ReplayBookmark, SetupTag, EmotionTag } from "@/types/journal"
+import { getSession, addBookmark, deleteBookmark } from "@/lib/ReplayService"
+import { calculatePatternStats, queryEntries } from "@/lib/JournalService"
+import AdvancedChart from "@/components/chart/AdvancedChart"
+import { DEFAULT_TIMEFRAME, type ChartAnnotation, type ChartMode, type ChartTimeframe } from "@/domain/chart"
+import useOhlcData from "@/hooks/useOhlcData"
+import { useIndicators } from "@/hooks/useIndicators"
+import { useAlertsStore } from "@/store/alertsStore"
+import { useJournalStore } from "@/store/journalStore"
+import { useChartUiStore } from "@/store/chartUiStore"
+import { mapAlertToAnnotation, mapJournalEntryToAnnotation, mergeAnnotations } from "@/lib/annotations"
+import { buildChartUrl, buildReplayUrl } from "@/lib/chartLinks"
+import { useChartTelemetry } from "@/lib/chartTelemetry"
 
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import ReplayPlayer from "@/components/ReplayPlayer";
-import PatternDashboard from "@/components/PatternDashboard";
-import type { ReplaySession, JournalEntry, ReplayBookmark, SetupTag, EmotionTag } from "@/types/journal";
-import {
-  getSession,
-  addBookmark,
-  deleteBookmark,
-  cacheOhlcData,
-} from "@/lib/ReplayService";
-import { calculatePatternStats, queryEntries } from "@/lib/JournalService";
+type ViewMode = "player" | "dashboard"
 
-type ViewMode = "player" | "dashboard";
+const DEFAULT_ASSET = {
+  symbol: "SOLUSDT",
+  address: "So11111111111111111111111111111111111111112",
+  network: "solana",
+}
+
+const SYMBOL_TO_ASSET: Record<string, { address: string; network: string; symbol: string }> = {
+  SOLUSDT: DEFAULT_ASSET,
+}
+
+function resolveTimeframe(candidate?: string | null): ChartTimeframe {
+  const maybe = candidate as ChartTimeframe | undefined
+  if (maybe && ["15m", "1h", "4h", "1d"].includes(maybe)) return maybe
+  return DEFAULT_TIMEFRAME
+}
+
+function resolveAsset(symbol?: string | null, address?: string | null, network?: string | null) {
+  if (address) {
+    return { address, network: network || DEFAULT_ASSET.network, symbol: symbol || DEFAULT_ASSET.symbol }
+  }
+  if (symbol) {
+    const normalized = symbol.toUpperCase()
+    if (SYMBOL_TO_ASSET[normalized]) return SYMBOL_TO_ASSET[normalized]
+  }
+  return DEFAULT_ASSET
+}
 
 export default function ReplayPage() {
-  const { sessionId } = useParams<{ sessionId: string }>();
-  const navigate = useNavigate();
+  const { sessionId } = useParams<{ sessionId: string }>()
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   // State
-  const [viewMode, setViewMode] = React.useState<ViewMode>(
-    sessionId ? "player" : "dashboard"
-  );
-  const [session, setSession] = React.useState<ReplaySession | null>(null);
-  const [currentFrame, setCurrentFrame] = React.useState(0);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [speed, setSpeed] = React.useState(1);
-  const [loading, setLoading] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<ViewMode>(sessionId ? "player" : "dashboard")
+  const [session, setSession] = React.useState<ReplaySession | null>(null)
+  const [currentFrame, setCurrentFrame] = React.useState(0)
+  const [isPlaying, setIsPlaying] = React.useState(false)
+  const [speed, setSpeed] = React.useState(1)
+  const [loading, setLoading] = React.useState(false)
+  const [timeframe, setTimeframe] = React.useState<ChartTimeframe>(resolveTimeframe(searchParams.get("timeframe")))
+  const [mode, setMode] = React.useState<ChartMode>("replay")
+
+  const asset = React.useMemo(
+    () => resolveAsset(searchParams.get("symbol"), searchParams.get("address"), searchParams.get("network")),
+    [searchParams]
+  )
+
+  const indicatorConfig = useChartUiStore((state) => state.getConfigFor(asset.address))
+  const overlays = indicatorConfig.overlays
+  const { track } = useChartTelemetry()
 
   // Dashboard state
-  const [entries, setEntries] = React.useState<JournalEntry[]>([]);
-  const [patternStats, setPatternStats] = React.useState<any>(null);
+  const [entries, setEntries] = React.useState<JournalEntry[]>([])
+  const [patternStats, setPatternStats] = React.useState<any>(null)
+
+  const { candles, status, error, source, lastUpdatedAt, viewState, refresh } = useOhlcData({
+    address: asset.address,
+    symbol: asset.symbol,
+    timeframe,
+    network: asset.network,
+  })
+  const indicators = useIndicators(candles, overlays)
+  const alerts = useAlertsStore((state) => state.alerts)
+  const createAlertDraft = useAlertsStore((state) => state.createDraftFromChart)
+  const journalEntries = useJournalStore((state) => state.entries)
+  const createJournalDraft = useJournalStore((state) => state.createDraftFromChart)
+  const annotations = React.useMemo(() => {
+    const alertAnnotations = alerts
+      .filter((alert) => alert.symbol?.toUpperCase() === asset.symbol.toUpperCase())
+      .map(mapAlertToAnnotation)
+    const journalAnnotations = journalEntries.map(mapJournalEntryToAnnotation)
+    return mergeAnnotations(journalAnnotations, alertAnnotations)
+  }, [alerts, asset.symbol, journalEntries])
+  const hasFrames = candles.length > 0
+
+  const replayViewState = React.useMemo(
+    () => ({ ...viewState, mode, currentIndex: currentFrame, playbackSpeed: speed }),
+    [currentFrame, mode, speed, viewState]
+  )
+
+  React.useEffect(() => {
+    const nextTimeframe = resolveTimeframe(searchParams.get("timeframe"))
+    setTimeframe((prev) => (prev === nextTimeframe ? prev : nextTimeframe))
+  }, [searchParams])
+
+  React.useEffect(() => {
+    track('chart.view_opened', { address: asset.address, timeframe, mode: 'replay' })
+  }, [asset.address, timeframe, track])
+
+  React.useEffect(() => {
+    if (!hasFrames) {
+      setIsPlaying(false)
+      setCurrentFrame(0)
+    } else if (currentFrame >= candles.length) {
+      setCurrentFrame(0)
+    }
+  }, [candles.length, currentFrame, hasFrames])
 
   // Load session if sessionId provided
   React.useEffect(() => {
     if (sessionId) {
-      loadSession(sessionId);
+      loadSession(sessionId)
     }
-  }, [sessionId]);
+  }, [sessionId])
 
   // Load dashboard data
   React.useEffect(() => {
     if (viewMode === "dashboard") {
-      loadDashboardData();
+      loadDashboardData()
     }
-  }, [viewMode]);
+  }, [viewMode])
 
   // Playback loop
   React.useEffect(() => {
-    if (!isPlaying || !session || !session.ohlcCache) return;
+    if (!isPlaying || candles.length === 0) return
 
     const interval = setInterval(() => {
       setCurrentFrame((prev) => {
-        const next = prev + 1;
-        if (next >= session.ohlcCache!.length) {
-          setIsPlaying(false);
-          return session.ohlcCache!.length - 1;
+        const next = prev + 1
+        if (next >= candles.length) {
+          setIsPlaying(false)
+          return candles.length - 1
         }
-        return next;
-      });
-    }, 1000 / speed); // Adjust speed
+        return next
+      })
+    }, 1000 / speed) // Adjust speed
 
-    return () => clearInterval(interval);
-  }, [isPlaying, speed, session]);
+    return () => clearInterval(interval)
+  }, [isPlaying, speed, candles])
 
   // Load session
   const loadSession = async (id: string) => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const loaded = await getSession(id);
+      const loaded = await getSession(id)
       if (loaded) {
-        setSession(loaded);
-        setCurrentFrame(0);
-        
-        // If no OHLC cache, fetch and cache it
-        if (!loaded.ohlcCache) {
-          await fetchAndCacheOhlc(loaded);
-        }
+        setSession(loaded)
+        setCurrentFrame(0)
       } else {
-        console.error("Session not found:", id);
+        console.error("Session not found:", id)
         // Fallback to dashboard
-        setViewMode("dashboard");
+        setViewMode("dashboard")
       }
     } catch (error) {
-      console.error("Error loading session:", error);
+      console.error("Error loading session:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
-
-  // Fetch and cache OHLC data
-  const fetchAndCacheOhlc = async (sess: ReplaySession) => {
-    try {
-      // TODO[P1]: Fetch actual OHLC data from Moralis API instead of mock
-      // For now, generate mock data
-      const mockOhlc = Array.from({ length: 100 }, (_, i) => ({
-        t: Date.now() - (100 - i) * 60000,
-        o: 0.001 + Math.random() * 0.0001,
-        h: 0.001 + Math.random() * 0.0001 + 0.00001,
-        l: 0.001 + Math.random() * 0.0001 - 0.00001,
-        c: 0.001 + Math.random() * 0.0001,
-        v: Math.random() * 1000,
-      }));
-
-      const updated = await cacheOhlcData(sess.id, mockOhlc);
-      if (updated) {
-        setSession(updated);
-      }
-    } catch (error) {
-      console.error("Error caching OHLC:", error);
-    }
-  };
+  }
 
   // Load dashboard data
   const loadDashboardData = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const allEntries = await queryEntries({ status: "all" });
-      setEntries(allEntries);
+      const allEntries = await queryEntries({ status: "all" })
+      setEntries(allEntries)
 
-      const stats = await calculatePatternStats(allEntries);
-      setPatternStats(stats);
+      const stats = await calculatePatternStats(allEntries)
+      setPatternStats(stats)
     } catch (error) {
-      console.error("Error loading dashboard data:", error);
+      console.error("Error loading dashboard data:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // Playback controls
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
+  const handlePlay = () => {
+    if (!hasFrames) return
+    setIsPlaying(true)
+    track('chart.replay_started', { address: asset.address, timeframe })
+  }
+  const handlePause = () => {
+    setIsPlaying(false)
+    track('chart.replay_stopped', { address: asset.address, timeframe })
+  }
   const handleSeek = (frame: number) => {
-    setCurrentFrame(frame);
-    setIsPlaying(false);
-  };
-  const handleSpeedChange = (newSpeed: number) => setSpeed(newSpeed);
+    if (!hasFrames) return
+    setCurrentFrame(frame)
+    setIsPlaying(false)
+  }
+  const handleSpeedChange = (newSpeed: number) => setSpeed(newSpeed)
+  const handleOpenChart = () => {
+    const url = buildChartUrl(asset.address, timeframe, { to: Date.now() })
+    navigate(url)
+  }
+  const handleTimeframeChange = (next: ChartTimeframe) => {
+    setTimeframe(next)
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.set("timeframe", next)
+    nextParams.set("symbol", asset.symbol)
+    nextParams.set("address", asset.address)
+    nextParams.set("network", asset.network)
+    setSearchParams(nextParams)
+  }
+
+  const handleGoLive = () => {
+    if (!candles.length) return
+    setMode("live")
+    setCurrentFrame(Math.max(0, candles.length - 1))
+    setIsPlaying(false)
+    track('chart.replay_go_live', { address: asset.address, timeframe })
+  }
+
+  const handleJumpToAnnotation = (annotation: ChartAnnotation) => {
+    const targetIndex = candles.findIndex((candle) => candle.t >= annotation.candleTime)
+    if (targetIndex >= 0) {
+      setMode("replay")
+      setCurrentFrame(targetIndex)
+      setIsPlaying(false)
+      track('chart.annotation_jump', { address: asset.address, timeframe, kind: annotation.kind })
+    }
+  }
 
   // Bookmark controls
   const handleAddBookmark = async (bookmark: Omit<ReplayBookmark, "id">) => {
-    if (!session) return;
-    
-    const updated = await addBookmark(session.id, bookmark);
+    if (!session) return
+
+    const updated = await addBookmark(session.id, bookmark)
     if (updated) {
-      setSession(updated);
+      setSession(updated)
     }
-  };
+  }
 
   const handleDeleteBookmark = async (bookmarkId: string) => {
-    if (!session) return;
-    
-    const updated = await deleteBookmark(session.id, bookmarkId);
+    if (!session) return
+
+    const updated = await deleteBookmark(session.id, bookmarkId)
     if (updated) {
-      setSession(updated);
+      setSession(updated)
     }
-  };
+  }
 
   const handleJumpToBookmark = (frame: number) => {
-    setCurrentFrame(frame);
-    setIsPlaying(false);
-  };
+    setCurrentFrame(frame)
+    setIsPlaying(false)
+  }
 
   // Dashboard controls
   const handleFilterByPattern = (setup?: SetupTag, emotion?: EmotionTag) => {
     // Filter entries
     const filtered = entries.filter((e) => {
-      if (setup && e.setup !== setup) return false;
-      if (emotion && e.emotion !== emotion) return false;
-      return true;
-    });
-    
+      if (setup && e.setup !== setup) return false
+      if (emotion && e.emotion !== emotion) return false
+      return true
+    })
+
     // Update stats with filtered entries
-    calculatePatternStats(filtered).then(setPatternStats);
-  };
+    calculatePatternStats(filtered).then(setPatternStats)
+  }
 
   const handleViewEntry = (entryId: string) => {
-    navigate(`/journal-v2?entry=${entryId}`);
-  };
+    navigate(`/journal-v2?entry=${entryId}`)
+  }
 
   // Toggle view mode
   const toggleViewMode = () => {
-    setViewMode((prev) => (prev === "player" ? "dashboard" : "player"));
-  };
+    setViewMode((prev) => (prev === "player" ? "dashboard" : "player"))
+  }
 
   if (loading) {
     return (
@@ -204,11 +286,11 @@ export default function ReplayPage() {
           <p className="text-sm text-zinc-500">Loading replay...</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-4">
+    <div className="min-h-screen bg-zinc-950 p-4" data-testid="replay-page">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
@@ -222,7 +304,7 @@ export default function ReplayPage() {
                 : "Discover patterns and insights from your trading history"}
             </p>
           </div>
-          
+
           <div className="flex items-center gap-2">
             {/* View Toggle */}
             <button
@@ -242,6 +324,55 @@ export default function ReplayPage() {
           </div>
         </div>
 
+        {viewMode === "player" && (
+          <div
+            className="mb-4 rounded-xl border border-zinc-800 bg-zinc-900/70 px-4 py-3 text-sm text-zinc-300"
+            data-testid="replay-mode-banner"
+          >
+            You’re in replay mode — scrub historical candles, jump to annotations and signals, then hit “Go live” to return to the
+            latest price action.
+          </div>
+        )}
+
+        {/* Player View */}
+        {viewMode === "player" && (
+          <div className="mb-4 flex flex-wrap items-center gap-2 text-sm text-zinc-300">
+            {(["15m", "1h", "4h", "1d"] as ChartTimeframe[]).map((tf) => (
+              <button
+                key={tf}
+                onClick={() => handleTimeframeChange(tf)}
+                className={`rounded-full px-3 py-1 ${
+                  timeframe === tf
+                    ? "bg-cyan-600 text-white"
+                    : "border border-zinc-800 bg-zinc-900/80 text-zinc-300"
+                }`}
+              >
+                {tf}
+              </button>
+            ))}
+            <button
+              onClick={() => refresh()}
+              className="rounded-full border border-zinc-800 bg-zinc-900/80 px-3 py-1 text-zinc-300"
+              disabled={status === "loading"}
+            >
+              Refresh data
+            </button>
+            <button
+              onClick={handleGoLive}
+              className="rounded-full border border-emerald-700 bg-emerald-900/40 px-3 py-1 text-emerald-200"
+              disabled={!candles.length}
+              data-testid="button-go-live"
+              title="Jump to the latest candle"
+            >
+              Go live
+            </button>
+            {status === "stale" && <span className="text-amber-300">Using cached data</span>}
+            {status === "no-data" && <span className="text-zinc-400">No candles yet</span>}
+            {status === "error" && <span className="text-rose-300">{error}</span>}
+            <span className="rounded-full border border-zinc-800 px-2 py-0.5 text-xs uppercase text-zinc-400">{mode}</span>
+          </div>
+        )}
+
         {/* Player View */}
         {viewMode === "player" && session && (
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -253,51 +384,55 @@ export default function ReplayPage() {
                     📈 Chart View
                   </h3>
                   <button
-                    onClick={() => navigate(`/chart-v2?replaySession=${session.id}`)}
+                    onClick={handleOpenChart}
                     className="rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-400 transition-colors hover:bg-cyan-500/20"
+                    title="Open this asset in the live chart"
                   >
                     Open in Chart →
                   </button>
                 </div>
-                
-                {/* Chart Canvas (placeholder) */}
-                <div className="relative aspect-video rounded-lg bg-zinc-950">
-                  {session.ohlcCache && session.ohlcCache[currentFrame] && (
-                    <div className="flex h-full flex-col items-center justify-center">
-                      <p className="mb-2 text-xs text-zinc-600">
-                        Frame {currentFrame + 1} / {session.ohlcCache.length}
-                      </p>
-                      <div className="text-center">
-                        <p className="text-sm text-zinc-400">
-                          O: {session.ohlcCache[currentFrame].o.toFixed(6)}
-                        </p>
-                        <p className="text-sm text-zinc-400">
-                          H: {session.ohlcCache[currentFrame].h.toFixed(6)}
-                        </p>
-                        <p className="text-sm text-zinc-400">
-                          L: {session.ohlcCache[currentFrame].l.toFixed(6)}
-                        </p>
-                        <p className="text-lg font-bold text-zinc-200">
-                          C: {session.ohlcCache[currentFrame].c.toFixed(6)}
-                        </p>
-                        <p className="mt-2 text-xs text-zinc-600">
-                          Vol: {session.ohlcCache[currentFrame].v?.toFixed(2) || 'N/A'}
-                        </p>
-                      </div>
-                      <p className="mt-4 text-xs text-zinc-700">
-                        🎨 Chart integration coming next...
-                      </p>
-                    </div>
-                  )}
-                  
-                  {!session.ohlcCache && (
-                    <div className="flex h-full items-center justify-center">
-                      <p className="text-xs text-zinc-600">
-                        No OHLC data cached
-                      </p>
-                    </div>
-                  )}
-                </div>
+
+                <AdvancedChart
+                  candles={candles}
+                  status={status}
+                  source={source}
+                  viewState={replayViewState}
+                  error={error}
+                  replayLabel={`Replay: ${session.name ?? session.id}`}
+                  lastUpdatedAt={lastUpdatedAt}
+                  indicators={indicators}
+                  annotations={annotations}
+                  onCreateJournalAtPoint={() => {
+                    void createJournalDraft({
+                      address: asset.address,
+                      symbol: asset.symbol,
+                      price: candles[candles.length - 1]?.c ?? 0,
+                      time: candles[candles.length - 1]?.t ?? Date.now(),
+                      timeframe,
+                    })
+                    track('chart.journal_created_from_chart', { address: asset.address, timeframe })
+                  }}
+                  onCreateAlertAtPoint={() => {
+                    createAlertDraft({
+                      address: asset.address,
+                      symbol: asset.symbol,
+                      price: candles[candles.length - 1]?.c ?? 0,
+                      time: candles[candles.length - 1]?.t ?? Date.now(),
+                      timeframe,
+                    })
+                    track('chart.alert_created_from_chart', { address: asset.address, timeframe })
+                  }}
+                  onAnnotationClick={(annotation) => handleJumpToAnnotation(annotation)}
+                />
+
+                {candles.length > 0 && (
+                  <div className="mt-3 text-xs text-zinc-500">
+                    Frame {currentFrame + 1} / {candles.length}
+                  </div>
+                )}
+                {candles.length === 0 && status === "no-data" && (
+                  <div className="mt-3 text-xs text-zinc-500">No replay frames yet for this timeframe.</div>
+                )}
               </div>
             </div>
 
@@ -306,8 +441,8 @@ export default function ReplayPage() {
               <ReplayPlayer
                 session={session}
                 currentFrame={currentFrame}
-                totalFrames={session.ohlcCache?.length || 0}
-                isPlaying={isPlaying}
+                totalFrames={candles.length}
+                isPlaying={hasFrames && isPlaying}
                 speed={speed}
                 onPlay={handlePlay}
                 onPause={handlePause}
@@ -373,5 +508,5 @@ export default function ReplayPage() {
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -18,6 +18,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@vercel/kv': path.resolve(__dirname, './tests/mocks/vercel-kv.ts'),
+      'lightweight-charts': path.resolve(__dirname, './tests/mocks/lightweight-charts.ts'),
     },
   },
 })
