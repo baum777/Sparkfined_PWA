@@ -48,6 +48,7 @@ jobs:
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v11
         with:
+          configPath: ./lighthouserc.json
           urls: |
             ${{ env.TARGET_BASE_URL }}
             ${{ format('{0}/dashboard-v2', env.TARGET_BASE_URL) }}

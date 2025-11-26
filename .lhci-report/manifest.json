@@ -1,0 +1,41 @@
+[
+  {
+    "url": "https://sparkfined-pwa.vercel.app/",
+    "isRepresentativeRun": true,
+    "htmlPath": "/workspace/.lhci-report/sparkfined_pwa_vercel_app-_-2025_11_26_11_59_14.report.html",
+    "jsonPath": "/workspace/.lhci-report/sparkfined_pwa_vercel_app-_-2025_11_26_11_59_14.report.json",
+    "summary": {
+      "performance": 0.67,
+      "accessibility": 0.92,
+      "best-practices": 1,
+      "seo": 0.9,
+      "pwa": 1
+    }
+  },
+  {
+    "url": "https://sparkfined-pwa.vercel.app/dashboard-v2",
+    "isRepresentativeRun": true,
+    "htmlPath": "/workspace/.lhci-report/sparkfined_pwa_vercel_app-_dashboard_v2-2025_11_26_11_59_27.report.html",
+    "jsonPath": "/workspace/.lhci-report/sparkfined_pwa_vercel_app-_dashboard_v2-2025_11_26_11_59_27.report.json",
+    "summary": {
+      "performance": 0.66,
+      "accessibility": 0.92,
+      "best-practices": 1,
+      "seo": 0.9,
+      "pwa": 1
+    }
+  },
+  {
+    "url": "https://sparkfined-pwa.vercel.app/journal-v2",
+    "isRepresentativeRun": true,
+    "htmlPath": "/workspace/.lhci-report/sparkfined_pwa_vercel_app-_journal_v2-2025_11_26_11_59_40.report.html",
+    "jsonPath": "/workspace/.lhci-report/sparkfined_pwa_vercel_app-_journal_v2-2025_11_26_11_59_40.report.json",
+    "summary": {
+      "performance": 0.73,
+      "accessibility": 0.94,
+      "best-practices": 0.96,
+      "seo": 0.9,
+      "pwa": 1
+    }
+  }
+]
