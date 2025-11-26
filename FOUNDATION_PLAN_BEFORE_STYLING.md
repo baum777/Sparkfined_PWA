@@ -743,6 +743,8 @@ All UI Primitives should:
 - Tailwind classes: `dark:` prefix for dark-mode variants
 ```
 
+> For hands-on examples of each primitive (variants, sizing, migration tips) see `docs/ui/PRIMITIVES_GUIDE.md`.
+
 ---
 
 ### Definition of Done — Loop B
@@ -752,6 +754,7 @@ All UI Primitives should:
 - [ ] `BottomNav.tsx` refactored (uses Design Tokens consistently)
 - [ ] `useDarkMode` Hook implemented (or existing one used)
 - [ ] `docs/COMPONENT_GUIDELINES.md` created
+- [ ] `docs/ui/PRIMITIVES_GUIDE.md` created (usage examples & migration notes)
 
 **Handoff:** Loop B fertig → Loop C starten
 
@@ -1187,6 +1190,7 @@ test('Journal A11y', async ({ page }) => {
 - `LOOP_1_BASELINE.md`, `LOOP_2_DESIGN.md`, `LOOP_3_REVIEW.md` — CI-Hardening-Loops
 - `.rulesync/` — System-Rules & Context
 - `docs/COMPONENT_GUIDELINES.md` — (wird in Loop B erstellt)
+- `docs/ui/PRIMITIVES_GUIDE.md` — UI primitives usage guide (Loop B)
 - `BASELINE_METRICS.md` — (wird in Loop A erstellt)
 
 ---

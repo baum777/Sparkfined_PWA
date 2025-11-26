@@ -18,7 +18,12 @@ export default function ErrorBanner({ message, onRetry }: ErrorBannerProps) {
           </div>
         </div>
         {onRetry ? (
-          <Button size="sm" variant="destructive" onClick={onRetry}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-danger/60 text-danger hover:bg-danger/10"
+            onClick={onRetry}
+          >
             Retry
           </Button>
         ) : null}

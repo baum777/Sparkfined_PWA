@@ -29,14 +29,14 @@ export function LiveStatusBadge({
 
   // Determine status and variant
   let statusText = 'OFF';
-  let variant: BadgeVariant = 'neutral';
+  let variant: BadgeVariant = 'default';
 
   if (!isEnabled) {
     statusText = 'OFF';
-    variant = 'neutral';
+    variant = 'default';
   } else if (pollingStatus === 'paused') {
     statusText = 'PAUSED';
-    variant = 'info';
+    variant = 'outline';
   } else if (pollingStatus === 'error' || errorCount > 10) {
     statusText = 'DEGRADED';
     variant = 'warning';
@@ -45,7 +45,7 @@ export function LiveStatusBadge({
     variant = 'success';
   } else {
     statusText = 'IDLE';
-    variant = 'neutral';
+    variant = 'default';
   }
 
   return (

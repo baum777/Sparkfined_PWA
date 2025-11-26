@@ -1,84 +1,72 @@
-import React from 'react';
+import React from 'react'
+import { cn } from '@/lib/ui/cn'
 
-export type CardVariant = 'default' | 'elevated' | 'glass';
+export type CardVariant = 'default' | 'muted' | 'interactive'
 
-interface CardProps {
-  variant?: CardVariant;
-  className?: string;
-  children: React.ReactNode;
-  onClick?: () => void;
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: CardVariant
+  interactive?: boolean
 }
 
-const variantStyles: Record<CardVariant, string> = {
-  default: 'bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-6 shadow-lg',
-  elevated: 'bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-zinc-700 hover:bg-zinc-800/50 transition-all duration-200 shadow-lg cursor-pointer',
-  glass: 'bg-zinc-900/80 backdrop-blur-md border border-zinc-700 rounded-xl p-4 shadow-2xl',
-};
+const variantClasses: Record<CardVariant, string> = {
+  default: 'bg-surface border-border-subtle',
+  muted: 'bg-surface-subtle border-border-moderate',
+  interactive: 'bg-surface border-border-subtle hover:border-border-accent hover:shadow-emerald-glow transition-shadow',
+}
 
-export function Card({
-  variant = 'default',
-  className = '',
-  children,
-  onClick,
-}: CardProps) {
-  const baseStyles = variantStyles[variant];
+export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
+  { variant = 'default', className, interactive, onClick, onKeyDown, tabIndex, ...props },
+  ref
+) {
+  const isInteractive = interactive ?? typeof onClick === 'function'
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    onKeyDown?.(event)
+    if (!isInteractive || event.defaultPrevented) return
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onClick?.(event as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>)
+    }
+  }
 
   return (
     <div
-      className={`${baseStyles} ${className}`.trim()}
+      ref={ref}
+      className={cn(
+        'rounded-2xl border p-6 shadow-card-subtle',
+        variantClasses[variant],
+        isInteractive && 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+        className
+      )}
+      tabIndex={isInteractive ? tabIndex ?? 0 : tabIndex}
+      role={isInteractive ? 'button' : props.role}
+      onKeyDown={handleKeyDown}
       onClick={onClick}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={onClick ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      } : undefined}
-    >
-      {children}
-    </div>
-  );
+      {...props}
+    />
+  )
+})
+
+interface CardSectionProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function CardHeader({ className, ...props }: CardSectionProps) {
+  return <div className={cn('mb-4 flex flex-col gap-1', className)} {...props} />
 }
 
-interface CardHeaderProps {
-  children: React.ReactNode;
-  className?: string;
+export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
+  return <h3 className={cn('text-lg font-semibold text-text-primary', className)} {...props} />
 }
 
-export function CardHeader({ children, className = '' }: CardHeaderProps) {
-  return (
-    <div className={`mb-4 ${className}`}>
-      {children}
-    </div>
-  );
+export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
+  return <p className={cn('text-sm text-text-secondary', className)} {...props} />
 }
 
-interface CardTitleProps {
-  children: React.ReactNode;
-  className?: string;
+export function CardContent({ className, ...props }: CardSectionProps) {
+  return <div className={cn('flex flex-col gap-3 text-sm text-text-secondary', className)} {...props} />
 }
 
-export function CardTitle({ children, className = '' }: CardTitleProps) {
-  return (
-    <h3 className={`text-lg font-medium text-zinc-100 ${className}`}>
-      {children}
-    </h3>
-  );
+export function CardFooter({ className, ...props }: CardSectionProps) {
+  return <div className={cn('mt-6 flex items-center justify-between gap-3', className)} {...props} />
 }
 
-interface CardContentProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-export function CardContent({ children, className = '' }: CardContentProps) {
-  return (
-    <div className={className}>
-      {children}
-    </div>
-  );
-}
-
-// Default export for backward compatibility
-export default Card;
+export default Card
