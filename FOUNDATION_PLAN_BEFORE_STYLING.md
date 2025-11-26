@@ -402,6 +402,27 @@
 
 ---
 
+## 📝 Review Status (2025-11-26)
+
+**Reviewer:** Claude (Senior-Architekt & QA-Lead)  
+**Review-Dokument:** `FOUNDATION_LOOPS_REVIEW.md`
+
+**Status:**
+- **Loop A:** ✅ Accepted mit Follow-ups (Lighthouse reaktiviert, Scores dokumentiert)
+- **Loop B:** ⚠️ Accepted mit Follow-ups (UI-Primitives fertig, BottomNav-Migration fehlt)
+- **Loop C:** ✅ Accepted (15 neue E2E-Tests, CI integriert)
+- **Loop D:** ⏳ Pending (PWA-Offline-Tests, Node-SDK-Refactor)
+
+**Styling-Readiness:** **YES** (92/100 Punkte)
+
+**Follow-ups vor Styling:**
+1. ⚠️ Lighthouse-Scores in `BASELINE_METRICS.md` eintragen (15 min)
+2. ⚠️ `BottomNav.tsx` zu Design-Tokens migrieren (30 min)
+
+**Details:** Siehe `FOUNDATION_LOOPS_REVIEW.md`
+
+---
+
 ## 🔧 Foundation Loop A — CI & Workflow Cleanup
 
 **Ziel:** CI/Workflows stabilisieren, Performance-Baseline etablieren
@@ -1180,14 +1201,14 @@ test('Journal A11y', async ({ page }) => {
 
 | Loop | Ziel | Duration | Priority | Status |
 |------|------|----------|----------|--------|
-| **Loop A** | CI & Workflow Cleanup | 1-2 Tage | 🔴 HIGH | ⏳ Pending |
-| **Loop B** | UI Primitives & Design-Token Wiring | 2-3 Tage | 🔴 HIGH | ⏳ Pending |
-| **Loop C** | Core-Flow Tests (15 neue E2E-Tests) | 3-4 Tage | 🔴 HIGH | ⏳ Pending |
-| **Loop D** | PWA/Offline-Sanity & Security-Checks | 1-2 Tage | 🟡 MEDIUM | ⏳ Pending |
+| **Loop A** | CI & Workflow Cleanup | 1-2 Tage | 🔴 HIGH | ✅ **Accepted** (Follow-ups: Baseline-Docs) |
+| **Loop B** | UI Primitives & Design-Token Wiring | 2-3 Tage | 🔴 HIGH | ⚠️ **Accepted** (Follow-up: BottomNav-Migration) |
+| **Loop C** | Core-Flow Tests (15 neue E2E-Tests) | 3-4 Tage | 🔴 HIGH | ✅ **Accepted** (Vollständig) |
+| **Loop D** | PWA/Offline-Sanity & Security-Checks | 1-2 Tage | 🟡 MEDIUM | ⏳ **Pending** |
 
-**Total Duration:** 7-11 Tage (1.5-2 Sprints)
+**Total Duration (A–C):** ~7 Tage (completed 2025-11-26)
 
-**After Completion:** ✅ **Foundation stable → Ready for Styling**
+**Status:** ✅ **Foundation stable (92/100) → Ready for Styling** (nach minor Follow-ups)
 
 ---
 
