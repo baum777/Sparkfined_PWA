@@ -10,7 +10,6 @@
  * DoD: Response < 2s, UI non-blocking
  */
 
-import OpenAI from 'openai'
 import type {
   AITeaserAnalysis,
   OCRResult,
@@ -114,14 +113,10 @@ async function getOpenAITeaser(payload: TeaserPayload): Promise<AITeaserAnalysis
     throw new Error('OpenAI API key not configured')
   }
 
-  const openai = new OpenAI({ apiKey: OPENAI_API_KEY, dangerouslyAllowBrowser: true })
-
   const systemPrompt = buildSystemPrompt(payload)
   const userPrompt = buildUserPrompt(payload)
 
-  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-    { role: 'system', content: systemPrompt },
-  ]
+  const messages: ChatMessage[] = [{ role: 'system', content: systemPrompt }]
 
   // Add image if available
   if (payload.imageDataUrl) {
@@ -136,15 +131,20 @@ async function getOpenAITeaser(payload: TeaserPayload): Promise<AITeaserAnalysis
     messages.push({ role: 'user', content: userPrompt })
   }
 
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    messages,
-    temperature: 0.7,
-    max_tokens: 500,
-    response_format: { type: 'json_object' },
-  })
+  const response = await callChatCompletion(
+    {
+      model: 'gpt-4o-mini',
+      messages,
+      temperature: 0.7,
+      max_tokens: 500,
+      response_format: { type: 'json_object' },
+    },
+    {
+      apiKey: OPENAI_API_KEY,
+    }
+  )
 
-  const content = response.choices[0]?.message?.content || '{}'
+  const content = response.choices?.[0]?.message?.content ?? '{}'
   return parseAIResponse(content, 'openai')
 }
 
@@ -156,19 +156,10 @@ async function getGrokTeaser(payload: TeaserPayload): Promise<AITeaserAnalysis> 
     throw new Error('Grok API key not configured')
   }
 
-  // Grok uses OpenAI-compatible API
-  const grok = new OpenAI({
-    apiKey: GROK_API_KEY,
-    baseURL: 'https://api.x.ai/v1',
-    dangerouslyAllowBrowser: true,
-  })
-
   const systemPrompt = buildSystemPrompt(payload)
   const userPrompt = buildUserPrompt(payload)
 
-  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-    { role: 'system', content: systemPrompt },
-  ]
+  const messages: ChatMessage[] = [{ role: 'system', content: systemPrompt }]
 
   // Add image if available
   if (payload.imageDataUrl) {
@@ -183,14 +174,20 @@ async function getGrokTeaser(payload: TeaserPayload): Promise<AITeaserAnalysis> 
     messages.push({ role: 'user', content: userPrompt })
   }
 
-  const response = await grok.chat.completions.create({
-    model: 'grok-vision-beta',
-    messages,
-    temperature: 0.7,
-    max_tokens: 500,
-  })
+  const response = await callChatCompletion(
+    {
+      model: 'grok-vision-beta',
+      messages,
+      temperature: 0.7,
+      max_tokens: 500,
+    },
+    {
+      apiKey: GROK_API_KEY,
+      baseUrl: 'https://api.x.ai/v1',
+    }
+  )
 
-  const content = response.choices[0]?.message?.content || '{}'
+  const content = response.choices?.[0]?.message?.content ?? '{}'
   return parseAIResponse(content, 'grok')
 }
 
@@ -328,5 +325,56 @@ function parseAIResponse(content: string, provider: AIProvider): AITeaserAnalysi
       processingTime: 0,
       provider: provider === 'none' ? 'heuristic' as const : provider,
     }
+  }
+}
+
+type ChatContentItem =
+  | { type: 'text'; text: string }
+  | { type: 'image_url'; image_url: { url: string } }
+
+type ChatMessage =
+  | { role: 'system'; content: string }
+  | { role: 'user'; content: string | ChatContentItem[] }
+
+interface ChatCompletionRequest {
+  model: string
+  messages: ChatMessage[]
+  temperature?: number
+  max_tokens?: number
+  response_format?: { type: 'json_object' | string }
+}
+
+interface ChatCompletionResponse {
+  choices?: Array<{
+    message?: {
+      content?: string
+    }
+  }>
+}
+
+async function callChatCompletion(request: ChatCompletionRequest, options: { apiKey: string; baseUrl?: string }) {
+  const baseUrl = options.baseUrl ?? 'https://api.openai.com/v1'
+  const response = await fetch(`${baseUrl}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${options.apiKey}`,
+    },
+    body: JSON.stringify(request),
+  })
+
+  if (!response.ok) {
+    const errorText = await safeReadText(response)
+    throw new Error(`AI provider error (${response.status}): ${errorText}`)
+  }
+
+  return (await response.json()) as ChatCompletionResponse
+}
+
+async function safeReadText(response: Response): Promise<string> {
+  try {
+    return await response.text()
+  } catch {
+    return '<unreadable response>'
   }
 }
