@@ -130,10 +130,12 @@ export default function AdvancedChart({
       priceFormat: { type: 'volume' },
       priceScaleId: 'volume',
       color: '#293247',
-      lineWidth: 1,
-      overlay: true,
-      scaleMargins: { top: 0.8, bottom: 0 },
     } as HistogramSeriesOptions)
+    
+    // Configure volume scale margins via priceScale API
+    volumeSeries.priceScale().applyOptions({
+      scaleMargins: { top: 0.8, bottom: 0 },
+    })
 
     candleSeriesRef.current = candleSeries
     volumeSeriesRef.current = volumeSeries
@@ -189,18 +191,20 @@ export default function AdvancedChart({
 
     indicators?.forEach((indicator) => {
       if (indicator.type === 'bb') {
-        const basis = chart.addLineSeries({ color: indicator.color ?? '#fbbf24', lineWidth: 1.5 })
+        const basis = chart.addLineSeries({ color: indicator.color ?? '#fbbf24', lineWidth: 2 })
         const upper = chart.addLineSeries({ color: '#f59e0b', lineWidth: 1 })
         const lower = chart.addLineSeries({ color: '#f59e0b', lineWidth: 1 })
-        basis.setData(indicator.basis)
-        upper.setData(indicator.upper)
-        lower.setData(indicator.lower)
+        // Cast indicator data to LineData for type compatibility
+        // IndicatorSeriesPoint.time is already in UTC seconds, matching lightweight-charts Time
+        basis.setData(indicator.basis as any)
+        upper.setData(indicator.upper as any)
+        lower.setData(indicator.lower as any)
         indicatorSeriesRef.current[indicator.id] = [basis, upper, lower]
         return
       }
 
       const line = chart.addLineSeries({ color: indicator.color ?? '#22d3ee', lineWidth: 2 })
-      line.setData(indicator.points)
+      line.setData(indicator.points as any)
       indicatorSeriesRef.current[indicator.id] = [line]
     })
   }, [indicators])

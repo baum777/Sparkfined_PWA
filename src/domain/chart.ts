@@ -125,8 +125,12 @@ export interface ChartCreationContext {
   timeframe: ChartTimeframe
 }
 
+/**
+ * Data point for indicator series, compatible with lightweight-charts
+ * time is in UTC seconds (not milliseconds)
+ */
 export type IndicatorSeriesPoint = {
-  time: number;
+  time: number; // UTC timestamp in seconds, compatible with lightweight-charts Time
   value: number;
 };
 
