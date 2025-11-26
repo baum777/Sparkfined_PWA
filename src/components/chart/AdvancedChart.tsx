@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type {
   CandlestickData,
   CandlestickSeriesOptions,
@@ -10,8 +10,8 @@ import type {
   SeriesMarkerShape,
   SeriesMarker,
   Time,
+  CrosshairMode as CrosshairModeType,
 } from 'lightweight-charts'
-import { createChart, CrosshairMode } from 'lightweight-charts'
 import type {
   ChartAnnotation,
   ChartFetchStatus,
@@ -38,7 +38,8 @@ export type AdvancedChartProps = {
   testId?: string
 }
 
-const chartOptions = {
+// Chart options (crosshair mode will be set dynamically after chart lib loads)
+const getChartOptions = (crosshairMode: CrosshairModeType) => ({
   layout: {
     background: { color: '#0b1221' },
     textColor: '#d3d8e8',
@@ -48,7 +49,7 @@ const chartOptions = {
     horzLines: { color: '#1c2435' },
   },
   crosshair: {
-    mode: CrosshairMode.Normal,
+    mode: crosshairMode,
   },
   rightPriceScale: {
     borderColor: '#293247',
@@ -56,7 +57,7 @@ const chartOptions = {
   timeScale: {
     borderColor: '#293247',
   },
-}
+})
 
 const toUtcTimestamp = (ms: number): UTCTimestamp => Math.floor(ms / 1000) as UTCTimestamp
 
@@ -102,6 +103,7 @@ export default function AdvancedChart({
   const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null)
   const indicatorSeriesRef = useRef<Record<string, ISeriesApi<'Line'>[]>>({})
+  const [chartLibLoaded, setChartLibLoaded] = useState(false)
 
   const { candleData, volumeData } = useMemo(() => toSeriesData(candles), [candles])
   const lastCandle = useMemo(() => candles[candles.length - 1], [candles])
@@ -110,61 +112,96 @@ export default function AdvancedChart({
     [annotations, indicators]
   )
 
+  // CRITICAL: Dynamic import of lightweight-charts library
+  // Loads chart library on-demand (only when chart component mounts)
   useEffect(() => {
     if (!containerRef.current) return
 
-    const chartHeight = Math.max(280, Math.min(500, Math.round(window.innerHeight * 0.55)))
-    const chart = createChart(containerRef.current, {
-      width: containerRef.current.clientWidth,
-      height: chartHeight,
-      ...chartOptions,
-    })
+    let disposed = false
+    let chart: IChartApi | null = null
 
-    const candleSeries = chart.addCandlestickSeries({
-      upColor: '#42f5b3',
-      downColor: '#ef476f',
-      borderDownColor: '#ef476f',
-      borderUpColor: '#42f5b3',
-      wickDownColor: '#ef476f',
-      wickUpColor: '#42f5b3',
-    } as CandlestickSeriesOptions)
+    ;(async () => {
+      try {
+        // Dynamic import: Load lightweight-charts only when needed
+        const { createChart, CrosshairMode } = await import('lightweight-charts')
 
-    const volumeSeries = chart.addHistogramSeries({
-      priceFormat: { type: 'volume' },
-      priceScaleId: 'volume',
-      color: '#293247',
-      base: 0,
-    })
+        if (disposed || !containerRef.current) return
 
-    // Apply scale margins via priceScale API
-    volumeSeries.priceScale().applyOptions({
-      scaleMargins: { top: 0.8, bottom: 0 },
-    })
-
-    candleSeriesRef.current = candleSeries
-    volumeSeriesRef.current = volumeSeries
-    chartRef.current = chart
-
-    const handleResize = () => {
-      if (containerRef.current) {
-        chart.applyOptions({
+        const chartHeight = Math.max(280, Math.min(500, Math.round(window.innerHeight * 0.55)))
+        chart = createChart(containerRef.current, {
           width: containerRef.current.clientWidth,
-          height: Math.max(260, Math.min(520, containerRef.current.clientHeight || chartHeight)),
+          height: chartHeight,
+          ...getChartOptions(CrosshairMode.Normal),
         })
-      }
-    }
 
-    const resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(handleResize) : undefined
-    resizeObserver?.observe(containerRef.current)
-    window.addEventListener('resize', handleResize)
+        const candleSeries = chart.addCandlestickSeries({
+          upColor: '#42f5b3',
+          downColor: '#ef476f',
+          borderDownColor: '#ef476f',
+          borderUpColor: '#42f5b3',
+          wickDownColor: '#ef476f',
+          wickUpColor: '#42f5b3',
+        } as CandlestickSeriesOptions)
+
+        const volumeSeries = chart.addHistogramSeries({
+          priceFormat: { type: 'volume' },
+          priceScaleId: 'volume',
+          color: '#293247',
+          base: 0,
+        })
+
+        // Apply scale margins via priceScale API
+        volumeSeries.priceScale().applyOptions({
+          scaleMargins: { top: 0.8, bottom: 0 },
+        })
+
+        candleSeriesRef.current = candleSeries
+        volumeSeriesRef.current = volumeSeries
+        chartRef.current = chart
+        setChartLibLoaded(true)
+
+        const handleResize = () => {
+          if (containerRef.current && chart) {
+            chart.applyOptions({
+              width: containerRef.current.clientWidth,
+              height: Math.max(260, Math.min(520, containerRef.current.clientHeight || chartHeight)),
+            })
+          }
+        }
+
+        const resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(handleResize) : undefined
+        if (containerRef.current) {
+          resizeObserver?.observe(containerRef.current)
+        }
+        window.addEventListener('resize', handleResize)
+
+        // Cleanup function stored for return
+        return () => {
+          window.removeEventListener('resize', handleResize)
+          resizeObserver?.disconnect()
+          if (chart) {
+            chart.remove()
+          }
+        }
+      } catch (err) {
+        console.error('[AdvancedChart] Failed to load chart library:', err)
+      }
+    })().then((cleanup) => {
+      if (!disposed && cleanup) {
+        // Store cleanup for later disposal
+        return cleanup
+      }
+    })
 
     return () => {
-      window.removeEventListener('resize', handleResize)
-      resizeObserver?.disconnect()
-      chart.remove()
+      disposed = true
+      if (chart) {
+        chart.remove()
+      }
       chartRef.current = null
       candleSeriesRef.current = null
       volumeSeriesRef.current = null
+      setChartLibLoaded(false)
     }
   }, [])
 

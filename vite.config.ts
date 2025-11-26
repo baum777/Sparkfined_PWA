@@ -145,6 +145,7 @@ export default defineConfig(({ mode }) => ({
         manualChunks(id) {
           // CRITICAL: Granular vendor splitting for CI bundle size limits
           // Target: Keep main vendor chunks < 22 KB each
+          // NOTE: lightweight-charts is NOT included here - it's loaded dynamically on-demand
           if (id.includes('node_modules')) {
             // React ecosystem (react + react-dom + scheduler)
             if (id.includes('react') || id.includes('scheduler')) {
@@ -153,10 +154,6 @@ export default defineConfig(({ mode }) => ({
             // Dexie (IndexedDB wrapper) - separate chunk
             if (id.includes('dexie')) {
               return 'vendor-dexie';
-            }
-            // Lightweight Charts - separate chunk (chart-heavy)
-            if (id.includes('lightweight-charts')) {
-              return 'vendor-charts';
             }
             // Lucide Icons - separate chunk for tree-shaking
             if (id.includes('lucide-react')) {
