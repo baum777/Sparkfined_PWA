@@ -372,8 +372,25 @@ export function calculateMaxDrawdown(equityCurve: EquityPoint[]): DrawdownAnalys
     };
   }
 
-  let peak = equityCurve[0].balance;
-  let peakTimestamp = equityCurve[0].timestamp;
+  const firstPoint = equityCurve[0];
+  const lastPoint = equityCurve[equityCurve.length - 1];
+  
+  // Strict mode guards
+  if (!firstPoint || !lastPoint) {
+    return {
+      maxDrawdown: 0,
+      maxDrawdownPercent: 0,
+      currentDrawdown: 0,
+      currentDrawdownPercent: 0,
+      maxDrawdownStart: 0,
+      maxDrawdownEnd: 0,
+      maxDrawdownDuration: 0,
+      isRecovered: true,
+    };
+  }
+
+  let peak = firstPoint.balance;
+  let peakTimestamp = firstPoint.timestamp;
   let maxDD = 0;
   let maxDDPercent = 0;
   let maxDDStart = 0;
@@ -396,7 +413,7 @@ export function calculateMaxDrawdown(equityCurve: EquityPoint[]): DrawdownAnalys
     }
   }
 
-  const currentBalance = equityCurve[equityCurve.length - 1].balance;
+  const currentBalance = lastPoint.balance;
   const currentDD = Math.max(0, peak - currentBalance);
   const currentDDPercent = peak === 0 ? 0 : (currentDD / peak) * 100;
 

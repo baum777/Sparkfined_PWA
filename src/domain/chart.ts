@@ -3,6 +3,8 @@
  * Consolidates chart, replay, and OHLC concepts in a single type system.
  */
 
+import type { UTCTimestamp } from 'lightweight-charts'
+
 // ===== Timeframes =====
 export type ChartTimeframe = '1m' | '5m' | '15m' | '1h' | '4h' | '1d' | '1w';
 
@@ -126,7 +128,7 @@ export interface ChartCreationContext {
 }
 
 export type IndicatorSeriesPoint = {
-  time: number;
+  time: UTCTimestamp;
   value: number;
 };
 

@@ -231,6 +231,13 @@ export async function matchTransactionPairs(
     while (buyIndex < buys.length && sellIndex < sells.length) {
       const buy = buys[buyIndex];
       const sell = sells[sellIndex];
+      
+      // Strict mode guard
+      if (!buy || !sell) {
+        buyIndex++;
+        sellIndex++;
+        continue;
+      }
 
       // Calculate PnL
       const pnl = (sell.priceUsd - buy.priceUsd) * Math.min(buy.tokenAmount, sell.tokenAmount);
