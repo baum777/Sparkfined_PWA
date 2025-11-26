@@ -138,10 +138,10 @@
    - **Problem:** Nur `workflow_dispatch` (gut!), aber könnte optimiert werden
    - **Empfehlung:** Job in separate Steps splitten (z. B. "Unit", "E2E", "Coverage")
 
-4. **Manifest-Check ist redundant**
-   - `ci-manifest-check.yml` prüft nur, ob Manifest erreichbar ist
-   - **Problem:** Könnte in Haupt-CI integriert werden (als leichter Check)
-   - **Empfehlung:** In `ci.yml` als optionaler Step, oder als Post-Deploy-Webhook
+4. **Post-Deploy-Smoke manuell halten**
+   - `post-deploy-smoke.yml` pingt Root, Manifest, SW, Offline-Fallback & `/api/health`
+   - **Zweck:** Nach Deploy oder vor Prod-Promo einmal manuell laufen lassen
+   - **Empfehlung:** Manuellen Trigger behalten (läuft schnell durch, braucht Prod-URL)
 
 #### 🟢 Low Priority
 
@@ -163,8 +163,8 @@
 |----------|---------|-------|--------|------------|
 | **ci.yml** | `push` (main, develop), `pull_request` | Haupt-CI: lint, test, build, check:size | ✅ Aktiv | **KEEP AUTO** (core checks) |
 | **ci-analyze.yml** | `workflow_dispatch` | Heavy testing: Playwright + Coverage | 🔵 Manual | **KEEP MANUAL** (zu heavy für jeden PR) |
-| **ci-manifest-check.yml** | `workflow_dispatch` | Manifest-Smoke-Test (POST-deploy) | 🔵 Manual | **OPTIONAL**: In ci.yml integrieren oder Post-Deploy-Hook |
-| **lighthouse-ci.yml** | `workflow_dispatch` | Lighthouse (DISABLED) + Bundle-Size | ⚠️ Teilweise deaktiviert | **FIX**: Lighthouse-Job wieder aktivieren (manual) |
+| **post-deploy-smoke.yml** | `workflow_dispatch` | Post-Deploy smoke (Root + Manifest + SW + API) | 🔵 Manual | **KEEP MANUAL** (läuft nach Deploy auf Wunsch) |
+| **lighthouse-ci.yml** | `workflow_dispatch` | Lighthouse baseline (Prod URLs, Budgets, Assertions) | 🔵 Manual | **KEEP MANUAL** (vor Releases / Baseline-Runs) |
 
 ### Detaillierte Analyse
 
@@ -217,48 +217,42 @@
 
 ---
 
-#### 🔵 ci-manifest-check.yml (Manifest-Smoke)
+#### 🔵 post-deploy-smoke.yml (Post-Deploy Smoke)
 
-**Zweck:** Check, ob Manifest nach Deploy erreichbar ist
+**Zweck:** Schnelltest nach einem Deploy (oder vor Go-Live eines Preview-Links).
 
 **Steps:**
-1. cURL `${DEPLOY_URL}/manifest.webmanifest`
-2. Check HTTP 200
+1. Validate Base URL (Input `deploy_url` oder Secret `DEPLOY_URL`).
+2. `curl` Root (`/`) → 200 expected.
+3. `curl` `/manifest.webmanifest`, `/sw.js`, `/offline.html`.
+4. `curl` `/api/health` → 200 expected.
+5. Ergebnisse landen im Step-Summary, Fehlstatus → sofortiger Fail.
 
 **Assessment:**
-- ⚠️ **Redundant** (könnte in ci.yml als leichter Check)
-- ⚠️ **Braucht Secret** (`DEPLOY_URL`) → nur nach Deploy sinnvoll
+- ✅ Deckt die wichtigsten statischen + API-Routen in <5 Sekunden ab.
+- ✅ Manuell triggbar → keine Abhängigkeit von Deploy-Automatik.
+- ⚠️ Benötigt gültige Prod-/Preview-URL (Secret oder Input).
 
-**Empfehlung:**
-- **OPTION A:** In `ci.yml` integrieren (als optional check, nur wenn `DEPLOY_URL` gesetzt)
-- **OPTION B:** Als Vercel Post-Deploy-Hook statt GitHub Action
-- **OPTION C:** Behalten, aber umbenennen → `post-deploy-smoke.yml`
-
-**Entscheidung:** **OPTION C** (behalten, umbenennen, nur auf `workflow_dispatch` lassen)
+**Empfehlung:** Als manuellen Post-Deploy-Smoke behalten; optional via Vercel-Hook auslösen, sobald Deploy promoted wurde.
 
 ---
 
-#### ⚠️ lighthouse-ci.yml (Performance)
+#### 🔵 lighthouse-ci.yml (Performance)
 
-**Zweck:** Lighthouse-Scores + Bundle-Size-Analysis
+**Zweck:** Performante PWA-Baseline gegen eine bereits deployte URL messen (ohne Preview-Server im Workflow).
 
 **Steps:**
-1. **Job 1 (lighthouse):** Lighthouse-CI auf localhost:4173 (DISABLED via `if: false`)
-2. **Job 2 (bundle-size):** Build + `check:size` + Artifact-Upload
+1. `workflow_dispatch` → Inputs `base_url` & `runs`.
+2. Checkout (für `lighthouse-budget.json`), Job-Summary zeigt Config.
+3. `treosh/lighthouse-ci-action@v11` auditiert `/`, `/dashboard-v2`, `/journal-v2`, lädt Artefakte & Budgets.
 
 **Assessment:**
-- ❌ **Lighthouse-Job deaktiviert** → Keine Performance-Baseline!
-- ✅ **Bundle-Size-Job funktioniert** (aber redundant mit ci.yml)
+- ✅ Reaktiviert, keine lokalen Preview-Server nötig.
+- ✅ Assertions (Perf ≥ 0.75, A11y ≥ 0.90, etc.) + Budgets bremsen Regressionen.
+- ✅ Bundle-Size-Job entfernt (bleibt in `ci.yml`).
+- ⚠️ Bleibt manueller Run → Baseline regelmäßig anstoßen (mind. vor jedem Styling-Go).
 
-**Empfehlung:**
-1. **Lighthouse-Job wieder aktivieren:**
-   - Als `workflow_dispatch` (manual trigger)
-   - Oder: Nur auf PRs, die `src/pages/**` oder `src/components/**` ändern
-2. **Bundle-Size-Job:**
-   - Entfernen (wird bereits in ci.yml gemacht)
-   - ODER: Behalten, aber nur Artifact-Upload (nicht check:size)
-
-**Fix-Priority:** 🔴 **HIGH** (Performance-Baseline vor Styling wichtig!)
+**Empfehlung:** Als manuellen Workflow behalten; nach Bedarf um `schedule` oder `workflow_run` erweitern, sobald Baseline stabil ist.
 
 ---
 
@@ -268,8 +262,8 @@
 |----------|--------|------------|
 | `ci.yml` | **KEINE ÄNDERUNG** | Perfekt für Haupt-CI |
 | `ci-analyze.yml` | **BEHALTEN (manual)** | Heavy testing, gut als manual trigger |
-| `ci-manifest-check.yml` | **UMBENENNEN** → `post-deploy-smoke.yml` | Klarerer Name |
-| `lighthouse-ci.yml` | **FIX**: Lighthouse-Job wieder aktivieren | Wichtig für Performance-Baseline |
+| `post-deploy-smoke.yml` | **KEEP MANUAL** | Schneller Root/Manifest/SW/API-Smoke nach Deploy |
+| `lighthouse-ci.yml` | **KEEP MANUAL (reaktiviert)** | Budgets + Assertions liefern Baseline vor Styling |
 
 ---
 
@@ -420,47 +414,38 @@
 
 **File:** `.github/workflows/lighthouse-ci.yml`
 
-**Change:**
-```yaml
-jobs:
-  lighthouse:
-    if: false # REMOVE THIS LINE
-    runs-on: ubuntu-latest
+**Change:** Single-Job Workflow wieder aktiv, gesteuert über `workflow_dispatch` (manuell) und ohne Preview-Server im CI-Container.
+
+**Highlights:**
+- Inputs: `base_url` (Default Prod) & `runs` (Default 2) → man kann jede Preview/Prod-URL auditieren.
+- Auditiert `/`, `/dashboard-v2`, `/journal-v2` via `treosh/lighthouse-ci-action@v11` + `lighthouse-budget.json`.
+- Assertions: Performance ≥ 0.75 (Warn), Accessibility ≥ 0.90 (Error), Best Practices ≥ 0.90 (Warn), SEO ≥ 0.90 (Warn), LCP ≤ 3000 ms, CLS ≤ 0.15.
+- Artefakte + temporäre Public Links werden hochgeladen; Job-Summary listet Basiskonfiguration.
+
+**Trigger/Test:**
+```text
+GitHub → Actions → Lighthouse CI → Run workflow → optional eigene URL + Run count angeben.
 ```
 
-**Add:** Trigger auf `workflow_dispatch` (manual) oder PR-Filter:
-```yaml
-on:
-  workflow_dispatch:
-  pull_request:
-    paths:
-      - 'src/pages/**'
-      - 'src/components/**'
-      - 'src/sections/**'
-```
-
-**Test:**
-```bash
-# Manually trigger workflow on GitHub
-# GitHub → Actions → Lighthouse CI → Run workflow
-```
-
-**Expected:** Lighthouse-Report als Artifact, Scores dokumentiert
+**Expected:** Stabiler Lighthouse-Report mit Budget-/Assertion-Checks als Grundlage für die Baseline.
 
 ---
 
 ### A2 — Manifest-Check umbenennen
 
-**File:** `.github/workflows/ci-manifest-check.yml`
+**File:** `.github/workflows/post-deploy-smoke.yml`
 
-**Change:** Rename file → `post-deploy-smoke.yml`
+**Change:** Rename das Manifest-Check-Playbook zu einem echten Post-Deploy-Smoketest inkl. klarer Inputs.
 
-**Update `name`:**
+**Details:**
+- `workflow_dispatch` input `deploy_url` (fällt auf `DEPLOY_URL` Secret zurück).
+- Prüft jetzt Root, `manifest.webmanifest`, `sw.js`, `offline.html` sowie `/api/health`.
+- Jeder Check schreibt ins Job-Summary; non-2xx führt zu sofortigem Fail.
+
+**Name bleibt:**
 ```yaml
 name: Post-Deploy Smoke Test
 ```
-
-**No functional changes**, nur klarerer Name.
 
 ---
 
@@ -513,6 +498,8 @@ name: Post-Deploy Smoke Test
 
 _Baseline established before Design-Token & Styling refactor._
 ```
+
+**Status (Loop A · 2025-11-26):** Template liegt bereits als `BASELINE_METRICS.md` im Repo und wartet auf Befüllung nach dem ersten manuellen Lighthouse-Run.
 
 ---
 
@@ -1016,6 +1003,11 @@ const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 ```
 
 **Priority:** 🔴 **HIGH** (Security + Bundle-Size)
+
+#### Loop A — Quick Scan (2025-11-26)
+
+- `src/lib/ai/teaserAdapter.ts` importiert `openai` (samt `dangerouslyAllowBrowser`) direkt im Client, um OpenAI/Grok Vision aufzurufen. → Muss nach Loop D in eine Edge-/Server-Funktion ausgelagert werden.
+- Für `web-push`, `@aws-sdk/*`, `supabase` etc. wurden **keine** Treffer in `src/` gefunden.
 
 ---
 
