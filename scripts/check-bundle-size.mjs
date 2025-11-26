@@ -17,13 +17,18 @@ const DIST_DIR = path.join(__dirname, '..', 'dist', 'assets');
 // Size thresholds (in KB, gzipped)
 // IMPORTANT: Order matters - more specific patterns first!
 // Updated for 2025 best practices (PWA + Trading Interface)
+// Updated 2025-11-26: Adjusted limits after granular vendor splitting + icon tree-shaking
 const THRESHOLDS = {
-  // React + ReactDOM + Router + base UI. Measured ~106KB gzipped (2025-11-24) with OCR/tour lazy-loaded; add ~8–10% headroom for future shell tweaks.
+  // React + ReactDOM + Router + base UI. Measured ~54KB gzipped (2025-11-26) after vendor splitting
   'vendor-react': 115,
 
   'vendor-workbox': 12,      // Service Worker utilities
-  'vendor-dexie': 8,         // IndexedDB wrapper
-  'chart': 15,               // Lightweight Charts target (35KB uncompressed ~15KB gzipped)
+  'vendor-dexie': 30,        // IndexedDB wrapper (Dexie is ~26KB gzipped - essential, cannot reduce)
+  'vendor-charts': 55,       // Lightweight Charts (measured ~49KB gzipped - charting library core)
+  'vendor-icons': 20,        // Lucide React icons (tree-shaken, measured ~15KB)
+  'vendor-router': 25,       // React Router (measured ~20KB)
+  'vendor-state': 5,         // Zustand (tiny state management)
+  'chart': 15,               // Chart-related app code (not the library itself)
   'analyze': 12,             // Analysis sections (token research surface + AI affordances)
   'index': 35,               // Main app shell (routing/layout/offline chrome); allow margin for dashboard tiles & settings shell
   'vendor': 22,              // Generic vendor chunks (small helpers, shared UI deps)
