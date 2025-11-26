@@ -2,9 +2,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import AdvancedChart from '@/components/chart/AdvancedChart'
 import ChartHeaderActions from '@/components/chart/ChartHeaderActions'
+import DashboardShell from '@/components/dashboard/DashboardShell'
+import Button from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge'
+import { Card, CardFooter, CardHeader } from '@/components/ui/Card'
 import { DEFAULT_TIMEFRAME, TIMEFRAME_ORDER, type ChartTimeframe, type IndicatorPresetId } from '@/domain/chart'
 import useOhlcData from '@/hooks/useOhlcData'
-import DashboardShell from '@/components/dashboard/DashboardShell'
 import { useIndicators } from '@/hooks/useIndicators'
 import { useAlertsStore } from '@/store/alertsStore'
 import { useJournalStore } from '@/store/journalStore'
@@ -186,10 +189,8 @@ export default function ChartPageV2() {
       description="Trade-ready chart workspace with indicators, replay, drawings and exports."
       actions={<ChartHeaderActions />}
     >
-      <div className="space-y-6 rounded-3xl border border-border-subtle bg-surface p-6" data-testid="chart-page">
-        {!hasSeenIntro && (
-          <ChartIntroBanner onDismiss={dismissIntro} />
-        )}
+      <Card className="space-y-6 rounded-3xl" data-testid="chart-page">
+        {!hasSeenIntro && <ChartIntroBanner onDismiss={dismissIntro} />}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-text-primary">Advanced chart</h2>
@@ -197,38 +198,40 @@ export default function ChartPageV2() {
               Lightweight chart backed by cached OHLC snapshots for offline resilience.
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {timeframeButtons.map((item) => (
-              <button
+              <Button
                 key={item.value}
+                size="sm"
+                variant={timeframe === item.value ? 'primary' : 'ghost'}
+                className="rounded-full px-4"
                 onClick={() => handleTimeframeChange(item.value)}
-                className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                  timeframe === item.value
-                    ? 'bg-primary text-surface'
-                    : 'bg-surface-subtle text-text-secondary hover:text-text-primary'
-                }`}
                 title={`Switch to ${item.label} candles`}
               >
                 {item.label}
-              </button>
+              </Button>
             ))}
-            <button
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full px-4"
               onClick={() => refresh()}
-              className="rounded-full bg-surface-subtle px-3 py-1 text-sm text-text-secondary hover:text-text-primary"
               disabled={status === 'loading'}
               data-testid="button-refresh-chart"
               title="Refetch candles"
             >
               Refresh
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full px-4"
               onClick={handleOpenReplay}
-              className="rounded-full bg-surface-subtle px-3 py-1 text-sm text-text-secondary hover:text-text-primary"
               data-testid="button-open-replay"
               title="Open replay with current asset/timeframe"
             >
               Open replay
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -237,8 +240,11 @@ export default function ChartPageV2() {
           {indicatorButtons.map((button) => {
             const isActive = overlays.some((item) => JSON.stringify(item) === JSON.stringify(button.overlay))
             return (
-              <button
+              <Button
                 key={button.key}
+                size="sm"
+                variant={isActive ? 'secondary' : 'ghost'}
+                className="rounded-full px-4 text-xs"
                 onClick={() => {
                   toggleOverlay(asset.address, button.overlay)
                   track('chart.indicator_toggled', {
@@ -248,9 +254,6 @@ export default function ChartPageV2() {
                     timeframe,
                   })
                 }}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                  isActive ? 'bg-primary text-surface' : 'bg-surface-subtle text-text-secondary'
-                }`}
                 data-testid={`indicator-toggle-${button.key}`}
                 title={
                   button.overlay.type === 'bb'
@@ -259,7 +262,7 @@ export default function ChartPageV2() {
                 }
               >
                 {button.label}
-              </button>
+              </Button>
             )
           })}
           <div className="flex items-center gap-2 text-xs text-text-secondary">
@@ -270,20 +273,18 @@ export default function ChartPageV2() {
                 { id: 'swing', label: 'Swing' },
                 { id: 'position', label: 'Position' },
               ] satisfies Array<{ id: IndicatorPresetId; label: string }>
-              ).map((preset) => (
-              <button
+            ).map((preset) => (
+              <Button
                 key={preset.id}
+                size="sm"
+                variant={indicatorConfig.preset === preset.id ? 'secondary' : 'ghost'}
+                className="rounded-full px-3 text-[11px]"
                 onClick={() => handlePreset(preset.id)}
-                className={`rounded-full px-2 py-1 text-[11px] transition ${
-                  indicatorConfig.preset === preset.id
-                    ? 'bg-surface-strong text-text-primary'
-                    : 'bg-surface-subtle text-text-secondary'
-                }`}
                 data-testid={`indicator-preset-${preset.id}`}
                 title={`Apply ${preset.label} indicator mix`}
               >
                 {preset.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -338,55 +339,64 @@ export default function ChartPageV2() {
             No candles available yet for {asset.symbol} on {timeframe}. Try another timeframe.
           </div>
         )}
-      </div>
+      </Card>
     </DashboardShell>
   )
 }
 
 function ChartIntroBanner({ onDismiss }: { onDismiss: () => void }) {
   return (
-    <div
-      className="flex flex-col gap-3 rounded-2xl border border-border-moderate bg-surface-subtle p-4 text-sm text-text-secondary"
-      data-testid="chart-intro-banner"
-    >
-      <div className="flex items-start justify-between gap-3">
+    <Card variant="muted" className="p-4" data-testid="chart-intro-banner">
+      <CardHeader className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Chart workspace tips</p>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-text-secondary">
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-text-secondary">
             <li>Toggle indicators in the toolbar to switch between scalper/swing presets.</li>
             <li>Open Replay to scrub past price action and CT signals, then hop back live.</li>
             <li>Create journal notes or alerts directly from the latest candle.</li>
           </ul>
         </div>
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="rounded-full px-3 text-xs font-semibold"
           onClick={onDismiss}
-          className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-text-secondary hover:text-text-primary"
           data-testid="button-dismiss-chart-intro"
           title="Hide intro tips"
         >
           Dismiss
-        </button>
-      </div>
-      <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-tertiary">
-        <span className="rounded-full bg-surface px-2 py-1">📓 Journal markers</span>
-        <span className="rounded-full bg-surface px-2 py-1">⚠️ Price alerts</span>
-        <span className="rounded-full bg-surface px-2 py-1">✨ Signals from Grok/Pulse</span>
-      </div>
-    </div>
+        </Button>
+      </CardHeader>
+      <CardFooter className="flex flex-wrap items-center gap-2 text-[11px] text-text-tertiary">
+        <Badge variant="outline" className="bg-surface px-2 py-1">
+          📓 Journal markers
+        </Badge>
+        <Badge variant="outline" className="bg-surface px-2 py-1">
+          ⚠️ Price alerts
+        </Badge>
+        <Badge variant="outline" className="bg-surface px-2 py-1">
+          ✨ Signals from Grok/Pulse
+        </Badge>
+      </CardFooter>
+    </Card>
   )
 }
 
 function ChartLegend() {
   return (
-    <div
-      className="flex flex-wrap items-center gap-3 text-[11px] text-text-secondary"
-      data-testid="chart-legend"
-    >
-      <span className="rounded-full bg-surface-subtle px-2 py-1">⚡ Signals</span>
-      <span className="rounded-full bg-surface-subtle px-2 py-1">⚠️ Alerts</span>
-      <span className="rounded-full bg-surface-subtle px-2 py-1">📝 Journal</span>
-      <span className="rounded-full bg-surface-subtle px-2 py-1">Replay + Go Live in toolbar</span>
+    <div className="flex flex-wrap items-center gap-2" data-testid="chart-legend">
+      <Badge variant="outline" className="bg-surface-subtle px-3 py-1">
+        ⚡ Signals
+      </Badge>
+      <Badge variant="outline" className="bg-surface-subtle px-3 py-1">
+        ⚠️ Alerts
+      </Badge>
+      <Badge variant="outline" className="bg-surface-subtle px-3 py-1">
+        📝 Journal
+      </Badge>
+      <Badge variant="outline" className="bg-surface-subtle px-3 py-1">
+        Replay + Go Live in toolbar
+      </Badge>
     </div>
   )
 }

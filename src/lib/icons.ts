@@ -48,6 +48,8 @@ export { default as Menu } from 'lucide-react/dist/esm/icons/menu';
 export { default as MoreVertical } from 'lucide-react/dist/esm/icons/more-vertical';
 export { default as MoreHorizontal } from 'lucide-react/dist/esm/icons/more-horizontal';
 export { default as Check } from 'lucide-react/dist/esm/icons/check';
+export { default as Sun } from 'lucide-react/dist/esm/icons/sun';
+export { default as Moon } from 'lucide-react/dist/esm/icons/moon';
 
 // Specific
 export { default as TrendingUp } from 'lucide-react/dist/esm/icons/trending-up';

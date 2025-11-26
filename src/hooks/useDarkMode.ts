@@ -1,21 +1,19 @@
-import { useState, useEffect } from 'react'
-import { getJSON, setJSON } from '@/lib/safeStorage'
+import { useCallback } from 'react'
+import { useTheme, type ThemeMode } from '@/lib/theme/useTheme'
 
 export function useDarkMode() {
-  const [darkMode, setDarkMode] = useState(() => {
-    return getJSON('darkMode', false)
-  })
+  const { resolvedTheme, setTheme } = useTheme()
 
-  useEffect(() => {
-    setJSON('darkMode', darkMode)
-    if (typeof document !== 'undefined') {
-      if (darkMode) {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
+  const updateTheme = useCallback(
+    (next: boolean | ThemeMode) => {
+      if (typeof next === 'string') {
+        setTheme(next)
+        return
       }
-    }
-  }, [darkMode])
+      setTheme(next ? 'dark' : 'light')
+    },
+    [setTheme]
+  )
 
-  return [darkMode, setDarkMode] as const
+  return [resolvedTheme === 'dark', updateTheme] as const
 }
