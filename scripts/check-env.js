@@ -13,15 +13,13 @@ const isProd = nodeEnv === 'production'
 const strictMode = isCI || isProd
 
 const missing = REQUIRED_SERVER_VARS.filter((key) => !process.env[key])
-const leaked = Object.keys(process.env).filter(
-  (key) => key.startsWith(DISALLOWED_CLIENT_PREFIX) && process.env[key]
-)
+const leaked = Object.keys(process.env).filter((key) => key.startsWith(DISALLOWED_CLIENT_PREFIX) && process.env[key])
 
 if (leaked.length > 0) {
   console.error(
-    `[security] Remove client-prefixed Moralis secrets before building: ${leaked.join(
+    `[security] Remove client-prefixed Moralis secrets: ${leaked.join(
       ', '
-    )} (server-only MORALIS_API_KEY is required).`
+    )}. Use MORALIS_API_KEY as a server-side GitHub Action secret instead.`
   )
   process.exit(2)
 }
@@ -29,13 +27,13 @@ if (leaked.length > 0) {
 if (missing.length > 0) {
   const message = `Missing required server env vars: ${missing.join(', ')}`
   if (strictMode) {
-    console.error(`[env] ${message} — failing build (CI/production context detected).`)
+    console.error(
+      `[env] ${message}. In CI set MORALIS_API_KEY (server secret) and delete any VITE_MORALIS_API_KEY GitHub Secret to avoid client exposure.`
+    )
     process.exit(2)
   } else {
-    console.warn(
-      `[env] ${message}. Local build will continue, but Moralis-backed endpoints will fail at runtime.`
-    )
-    console.warn('Set MORALIS_API_KEY in .env.local or rely on DEV_USE_MOCKS=true for proxy endpoints.')
+    console.warn(`[env] ${message}. Local build will continue, but Moralis-backed endpoints will fail at runtime.`)
+    console.warn('Set MORALIS_API_KEY in .env.local; never expose VITE_MORALIS_API_KEY in client configs or GitHub Secrets.')
   }
 } else {
   console.log('[env] All required server env vars present.')

@@ -98,6 +98,7 @@ Die Phasen werden **der Reihe nach** durchgearbeitet. Jede Phase kann als eigene
 * [ ] OPTIONAL_PATTERNS einführen
 
   * [ ] Muster wie `vendor-workbox`, `vendor-icons`, `vendor-router`, `vendor-state`, `analyze` als optional kennzeichnen, sodass fehlende Dateien nur als Info/Warning, nicht als Hard-Fail gewertet werden
+  * [ ] Bei zusätzlichen Splits wie `vendor-ocr` (tesseract.js) oder `vendor-onboarding` (driver.js) dieselbe Optional-Logik anwenden, solange die Features noch nicht überall aktiv sind
 * [ ] Optional: Top-N-Reporting
 
   * [ ] Beim Überschreiten von Limits die Top 5 größten Bundles inkl. Größe im Log ausgeben (hilft beim Debuggen)

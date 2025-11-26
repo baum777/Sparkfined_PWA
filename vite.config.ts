@@ -1,4 +1,4 @@
-import { defineConfig, splitVendorChunkPlugin, type PluginOption } from 'vite'
+import { defineConfig, type PluginOption } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -8,7 +8,6 @@ export default defineConfig(({ mode }) => ({
   base: '/',
   plugins: [
     react(),
-    splitVendorChunkPlugin(),
     process.env.ANALYZE ? visualizer({ open: true, gzipSize: true, filename: 'dist/stats.html' }) as unknown as PluginOption : undefined,
     VitePWA({
       registerType: 'autoUpdate',
@@ -143,44 +142,38 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // CRITICAL: Granular vendor splitting for CI bundle size limits
-          // Target: Keep main vendor chunks < 22 KB each
-          // NOTE: lightweight-charts is NOT included here - it's loaded dynamically on-demand
-          if (id.includes('node_modules')) {
-            // React ecosystem (react + react-dom + scheduler)
-            if (id.includes('react') || id.includes('scheduler')) {
-              return 'vendor-react';
-            }
-            // Dexie (IndexedDB wrapper) - separate chunk
-            if (id.includes('dexie')) {
-              return 'vendor-dexie';
-            }
-            // Lucide Icons - separate chunk for tree-shaking
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-            // React Router
-            if (id.includes('react-router')) {
-              return 'vendor-router';
-            }
-            // Zustand (state management)
-            if (id.includes('zustand')) {
-              return 'vendor-state';
-            }
-            // Workbox (PWA/Service Worker)
-            if (id.includes('workbox')) {
-              return 'vendor-workbox';
-            }
-            // All other node_modules (driver.js, tesseract, etc.)
-            return 'vendor';
+          const vendorDefinitions: Record<string, string[]> = {
+            'vendor-react': ['react', 'react-dom', 'scheduler'],
+            'vendor-router': ['react-router-dom'],
+            'vendor-state': ['zustand'],
+            'vendor-icons': ['lucide-react'],
+            'vendor-workbox': ['workbox-window'],
+            'vendor-ocr': ['tesseract.js'],
+            'vendor-onboarding': ['driver.js'],
           }
-          
-          // App code splitting (route-based lazy loading)
-          if (id.includes('/sections/chart/')) return 'chunk-chart';
-          if (id.includes('/sections/analyze/')) return 'chunk-analyze';
-          if (id.includes('/sections/signals/')) return 'chunk-signals';
-          
-          return undefined;
+
+          if (id.includes('node_modules')) {
+            if (id.includes('lightweight-charts')) {
+              // Keep lightweight-charts out of eager vendor chunks; it is loaded via dynamic import only.
+              return undefined
+            }
+
+            const match = Object.entries(vendorDefinitions).find(([, deps]) =>
+              deps.some((dep) => id.includes(`/node_modules/${dep}/`) || id.includes(`\\node_modules\\${dep}\\`))
+            )
+
+            if (match) {
+              return match[0]
+            }
+
+            return 'vendor'
+          }
+
+          if (id.includes('/sections/chart/')) return 'chunk-chart'
+          if (id.includes('/sections/analyze/')) return 'chunk-analyze'
+          if (id.includes('/sections/signals/')) return 'chunk-signals'
+
+          return undefined
         },
       },
     },
