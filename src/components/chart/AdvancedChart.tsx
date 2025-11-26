@@ -130,10 +130,13 @@ export default function AdvancedChart({
       priceFormat: { type: 'volume' },
       priceScaleId: 'volume',
       color: '#293247',
-      lineWidth: 1,
-      overlay: true,
+      base: 0,
+    })
+
+    // Apply scale margins via priceScale API
+    volumeSeries.priceScale().applyOptions({
       scaleMargins: { top: 0.8, bottom: 0 },
-    } as HistogramSeriesOptions)
+    })
 
     candleSeriesRef.current = candleSeries
     volumeSeriesRef.current = volumeSeries
@@ -180,8 +183,7 @@ export default function AdvancedChart({
 
     Object.values(indicatorSeriesRef.current).forEach((seriesList) => {
       seriesList.forEach((series) => {
-        // removeSeries is available at runtime; guard for mock compatibility
-        // @ts-expect-error - mocked chart may not type this method
+        // removeSeries is available at runtime; guard for mock compatibility with optional chaining
         chart.removeSeries?.(series)
       })
     })
@@ -189,7 +191,7 @@ export default function AdvancedChart({
 
     indicators?.forEach((indicator) => {
       if (indicator.type === 'bb') {
-        const basis = chart.addLineSeries({ color: indicator.color ?? '#fbbf24', lineWidth: 1.5 })
+        const basis = chart.addLineSeries({ color: indicator.color ?? '#fbbf24', lineWidth: 2 })
         const upper = chart.addLineSeries({ color: '#f59e0b', lineWidth: 1 })
         const lower = chart.addLineSeries({ color: '#f59e0b', lineWidth: 1 })
         basis.setData(indicator.basis)

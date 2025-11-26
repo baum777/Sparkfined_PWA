@@ -1,7 +1,8 @@
 import type { ChartIndicatorOverlay, ComputedIndicator, IndicatorSeriesPoint, OhlcCandle } from '@/domain/chart'
+import type { UTCTimestamp } from 'lightweight-charts'
 
 function toPoint(timeMs: number, value: number): IndicatorSeriesPoint {
-  return { time: Math.floor(timeMs / 1000), value }
+  return { time: Math.floor(timeMs / 1000) as UTCTimestamp, value }
 }
 
 export function computeSma(candles: OhlcCandle[], period: number): IndicatorSeriesPoint[] {

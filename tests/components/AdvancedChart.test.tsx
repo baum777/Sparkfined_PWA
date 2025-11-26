@@ -6,10 +6,14 @@ import type { ChartViewState, OhlcCandle } from '@/domain/chart'
 vi.mock('lightweight-charts', () => {
   const setData = vi.fn()
   const setMarkers = vi.fn()
+  const applyOptions = vi.fn()
   return {
     createChart: () => ({
       addCandlestickSeries: () => ({ setData, setMarkers }),
-      addHistogramSeries: () => ({ setData }),
+      addHistogramSeries: () => ({ 
+        setData, 
+        priceScale: () => ({ applyOptions }) 
+      }),
       addLineSeries: () => ({ setData }),
       applyOptions: vi.fn(),
       removeSeries: vi.fn(),

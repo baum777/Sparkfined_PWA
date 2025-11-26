@@ -13,6 +13,7 @@ describe('indicator calculations', () => {
   it('computes SMA over closing prices', () => {
     const points = computeSma(candles, 2)
     expect(points.map((p) => p.value)).toEqual([1.5, 2.5, 3.5])
+    // time is now UTCTimestamp (seconds since epoch)
     expect(points[0].time).toBe(2)
   })
 
