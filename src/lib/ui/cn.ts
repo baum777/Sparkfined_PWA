@@ -1,6 +1,7 @@
 type ClassValue =
   | string
   | number
+  | boolean
   | null
   | undefined
   | ClassDictionary
@@ -20,6 +21,10 @@ export function cn(...inputs: ClassValue[]): string {
 
     if (typeof input === 'string' || typeof input === 'number') {
       classes.push(String(input))
+      continue
+    }
+
+    if (typeof input === 'boolean') {
       continue
     }
 
