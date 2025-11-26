@@ -53,7 +53,10 @@ export default function AlertsPageV2() {
       actions={<AlertsHeaderActions alerts={alerts} />}
     >
       <AlertsLayout>
-        <div className="flex flex-col gap-4 text-text-primary lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
+        <div
+          className="flex flex-col gap-4 text-text-primary lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6"
+          data-testid="alerts-page"
+        >
           <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
               <div className="flex flex-wrap items-center gap-2">
@@ -69,6 +72,7 @@ export default function AlertsPageV2() {
                           ? 'border-brand bg-surface-hover text-text-primary'
                           : 'border-border text-text-secondary hover:bg-surface-hover'
                       }`}
+                      data-testid={`alerts-status-filter-${filter}`}
                     >
                       {formatFilterLabel(filter)}
                     </button>
@@ -88,6 +92,7 @@ export default function AlertsPageV2() {
                           ? 'border-brand bg-surface-hover text-text-primary'
                           : 'border-border text-text-secondary hover:bg-surface-hover'
                       }`}
+                      data-testid={`alerts-type-filter-${filter}`}
                     >
                       {formatFilterLabel(filter)}
                     </button>

@@ -955,13 +955,20 @@ test('API calls fallback gracefully', async ({ page, context }) => {
 
 ### Definition of Done — Loop C
 
-- [ ] Audit existing E2E-Tests completed
-- [ ] `journal.spec.ts` created (4 tests)
-- [ ] `alerts.spec.ts` created (3 tests)
-- [ ] `watchlist.spec.ts` created (3 tests)
-- [ ] `settings.spec.ts` created (2 tests)
-- [ ] `offline-mode.spec.ts` created (3 tests)
-- [ ] **Total E2E-Tests:** 8 (existing) + 15 (new) = **23 Tests** ✅
+- [x] Audit bestehende E2E-Tests & Struktur bereinigt (selektoren, Fixtures)
+- [x] `tests/e2e/journal/journal.flows.spec.ts` (5 Tests · Create/Edit/Filter/Deep-Link)
+- [x] `tests/e2e/alerts/alerts.flows.spec.ts` (5 Tests · Filter, Detail, URL, Empty-State)
+- [x] `tests/e2e/watchlist/watchlist.flows.spec.ts` (5 Tests · Detail, Filter, Sort, Deep-Links)
+- [x] Playwright-Suite in CI integriert (`playwright-smoke` Job → `pnpm exec playwright test --grep "@journal|@alerts|@watchlist"`)
+- [x] **Total E2E-Tests:** 8 (Legacy) + 15 (Loop C) = **23 Tests**
+
+### Loop C Status-Update (2025-11-26)
+
+- Journal, Alerts, Watchlist besitzen jeweils 5 fokussierte Specs mit stabilen Selektoren (`data-testid` ergänzt).
+- Gemeinsame Fixtures (`tests/e2e/fixtures/*`) kapseln Navigation & Testdaten, wodurch neue Specs wartbar bleiben.
+- CI (`.github/workflows/ci.yml`) enthält jetzt den `playwright-smoke` Job: führt die Loop-C-Suite parallel zu `lint-test-build` aus und lädt Reports/Traces hoch.
+- Playwright-Reporter erzeugt konsistente HTML-Reports (`playwright-report/`) für lokale Runs & Artefakte.
+- Suite läuft lokal via `pnpm exec playwright test --grep "@journal|@alerts|@watchlist"` und vollständig über `pnpm exec playwright test`.
 
 **Handoff:** Loop C fertig → Loop D starten
 

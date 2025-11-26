@@ -23,14 +23,17 @@ const TYPE_LABELS: Record<AlertType, string> = {
 export default function AlertsList({ alerts, activeAlertId, onSelectAlert }: AlertsListProps) {
   if (alerts.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center text-sm text-text-secondary">
+      <div
+        className="rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center text-sm text-text-secondary"
+        data-testid="alerts-empty-state"
+      >
         No alerts yet. Create your first trigger to stay ahead of market shifts.
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" data-testid="alerts-list">
       {alerts.map((alert) => {
         const isActive = activeAlertId === alert.id;
         const statusClasses = STATUS_STYLES[alert.status];
@@ -45,6 +48,10 @@ export default function AlertsList({ alerts, activeAlertId, onSelectAlert }: Ale
                 ? 'border-sentiment-bull-border bg-interactive-active'
                 : 'border-border-moderate bg-surface cursor-pointer hover:bg-interactive-hover'
             }`}
+            data-testid="alerts-list-item"
+            data-alert-id={alert.id}
+            data-alert-status={alert.status}
+            data-alert-type={alert.type}
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>

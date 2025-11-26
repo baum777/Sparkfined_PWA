@@ -54,10 +54,12 @@ export default function JournalNewEntryDialog({
       role="dialog"
       aria-modal="true"
       onClick={handleOverlayClick}
+      data-testid="journal-new-entry-dialog"
     >
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md rounded-2xl border border-border-moderate bg-surface-elevated p-6 text-text-primary shadow-2xl"
+        data-testid="journal-new-entry-form"
       >
         <div className="flex items-start justify-between">
           <div>
@@ -69,6 +71,7 @@ export default function JournalNewEntryDialog({
             onClick={onClose}
             disabled={isSubmitting}
             className="rounded-full border border-border-moderate px-3 py-1 text-xs text-text-secondary transition hover:border-border-hover hover:bg-interactive-hover disabled:opacity-40"
+            data-testid="journal-close-entry-button"
           >
             Close
           </button>
@@ -85,6 +88,7 @@ export default function JournalNewEntryDialog({
               className="w-full rounded-xl border border-border-moderate bg-surface-subtle px-3 py-2 text-sm text-text-primary outline-none transition focus:border-border-hover focus:ring-2 focus:ring-border-focus disabled:opacity-60"
               disabled={isSubmitting}
               autoFocus
+              data-testid="journal-new-entry-title"
             />
           </label>
 
@@ -97,11 +101,14 @@ export default function JournalNewEntryDialog({
               rows={5}
               className="w-full rounded-xl border border-border-moderate bg-surface-subtle px-3 py-2 text-sm text-text-primary outline-none transition focus:border-border-hover focus:ring-2 focus:ring-border-focus disabled:opacity-60"
               disabled={isSubmitting}
+              data-testid="journal-new-entry-notes"
             />
           </label>
 
           {(localError || errorMessage) && (
-            <p className="text-sm text-status-armed-text">{localError ?? errorMessage}</p>
+            <p className="text-sm text-status-armed-text" data-testid="journal-new-entry-error">
+              {localError ?? errorMessage}
+            </p>
           )}
         </div>
 
@@ -111,6 +118,7 @@ export default function JournalNewEntryDialog({
             onClick={onClose}
             disabled={isSubmitting}
             className="rounded-full border border-border-subtle px-4 py-2 text-sm text-text-secondary transition hover:border-border-hover hover:bg-interactive-hover disabled:opacity-40"
+            data-testid="journal-cancel-entry-button"
           >
             Cancel
           </button>
@@ -118,6 +126,7 @@ export default function JournalNewEntryDialog({
             type="submit"
             disabled={isSubmitting}
             className="rounded-full border border-brand bg-interactive-active px-4 py-2 text-sm font-medium text-text-primary transition hover:bg-sentiment-bull-bg disabled:opacity-40"
+            data-testid="journal-save-entry-button"
           >
             {isSubmitting ? 'Saving…' : 'Save entry'}
           </button>
