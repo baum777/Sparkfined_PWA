@@ -177,7 +177,7 @@ export default function JournalPageV2() {
         />
       }
     >
-      <div className="space-y-6 text-text-primary">
+      <div className="space-y-6 text-text-primary" data-testid="journal-page">
         <div className="space-y-2 text-sm text-text-tertiary">
           <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Daily practice</p>
           <p>Select any entry to review and edit notes inline.</p>
@@ -203,6 +203,7 @@ export default function JournalPageV2() {
                             ? 'border-brand bg-surface-hover text-text-primary'
                             : 'border-border text-text-secondary hover:bg-surface-hover'
                         }`}
+                        data-testid={`journal-filter-${filter.value}`}
                       >
                         {filter.label}
                       </button>

@@ -11,16 +11,24 @@ interface WatchlistDetailPanelProps {
 export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenReplay }: WatchlistDetailPanelProps) {
   if (!row) {
     return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center">
+      <div
+        className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center"
+        data-testid="watchlist-detail-empty"
+      >
         <p className="text-sm text-text-secondary">Select an asset on the left to see more context here.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 rounded-2xl border border-border-moderate bg-surface p-6 text-text-secondary">
+    <div
+      className="space-y-6 rounded-2xl border border-border-moderate bg-surface p-6 text-text-secondary"
+      data-testid="watchlist-detail-panel"
+    >
       <div className="space-y-2">
-        <h2 className="text-2xl font-semibold text-text-primary">{row.symbol}</h2>
+        <h2 className="text-2xl font-semibold text-text-primary" data-testid="watchlist-detail-symbol">
+          {row.symbol}
+        </h2>
         <p className="text-sm text-text-secondary">{row.name}</p>
       </div>
 

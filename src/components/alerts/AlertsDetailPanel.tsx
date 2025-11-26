@@ -14,7 +14,10 @@ const STATUS_STYLES: Record<AlertStatus, string> = {
 export default function AlertsDetailPanel({ alert }: AlertsDetailPanelProps) {
   if (!alert) {
     return (
-      <div className="min-h-[280px] rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-8 text-sm text-text-secondary">
+      <div
+        className="min-h-[280px] rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-8 text-sm text-text-secondary"
+        data-testid="alerts-detail-empty"
+      >
         Select an alert on the left to see more detail and context here.
       </div>
     );
@@ -23,12 +26,17 @@ export default function AlertsDetailPanel({ alert }: AlertsDetailPanelProps) {
   const statusClass = STATUS_STYLES[alert.status];
 
   return (
-    <section className="space-y-6 rounded-2xl border border-border-moderate bg-surface p-5 text-sm text-text-secondary">
+    <section
+      className="space-y-6 rounded-2xl border border-border-moderate bg-surface p-5 text-sm text-text-secondary"
+      data-testid="alerts-detail-panel"
+    >
       <header className="space-y-1">
         <p className="text-xs uppercase tracking-wide text-text-tertiary">
           {alert.symbol} &middot; {alert.timeframe}
         </p>
-        <h2 className="text-2xl font-semibold text-text-primary">{alert.condition}</h2>
+        <h2 className="text-2xl font-semibold text-text-primary" data-testid="alerts-detail-condition">
+          {alert.condition}
+        </h2>
         {alert.summary ? <p className="text-sm text-text-secondary">{alert.summary}</p> : null}
       </header>
 

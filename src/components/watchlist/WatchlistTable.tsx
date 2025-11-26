@@ -10,7 +10,7 @@ interface WatchlistTableProps {
 
 export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }: WatchlistTableProps) {
   return (
-    <div className="rounded-2xl border border-border-moderate bg-surface">
+    <div className="rounded-2xl border border-border-moderate bg-surface" data-testid="watchlist-table">
       <div className="hidden grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary sm:grid">
         <span>Symbol</span>
         <span>Name</span>
@@ -33,6 +33,8 @@ export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }:
               }`}
               data-testid="watchlist-token-row"
               data-symbol={row.symbol}
+              data-session={row.session}
+              data-active={String(isActive)}
             >
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Symbol</p>

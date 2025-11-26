@@ -24,7 +24,10 @@ export default function JournalList({ entries, activeId, onSelect }: JournalList
 
   if (!entries.length) {
     return (
-      <div className="flex min-h-[240px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center">
+      <div
+        className="flex min-h-[240px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center"
+        data-testid="journal-empty-state"
+      >
         <p className="text-base font-medium text-text-primary">No journal entries yet.</p>
         <p className="mt-2 max-w-sm text-sm text-text-secondary">
           Your trades and notes will appear here once you create them.
@@ -37,7 +40,7 @@ export default function JournalList({ entries, activeId, onSelect }: JournalList
   }
 
   return (
-    <div className="space-y-2" role="list">
+    <div className="space-y-2" role="list" data-testid="journal-entry-list">
       {entries.map((entry) => {
         const isActive = entry.id === activeId;
         return (
@@ -52,6 +55,10 @@ export default function JournalList({ entries, activeId, onSelect }: JournalList
             }`}
             role="listitem"
             aria-pressed={isActive}
+            data-testid="journal-list-item"
+            data-entry-id={entry.id}
+            data-direction={entry.direction}
+            data-active={String(isActive)}
           >
             <span
               className={`absolute inset-y-3 left-3 w-1 rounded-full transition ${

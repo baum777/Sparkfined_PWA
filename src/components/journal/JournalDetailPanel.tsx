@@ -74,19 +74,24 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
 
   if (!entry) {
     return (
-      <div className="flex h-full items-center justify-center px-4 text-sm text-text-secondary">
+      <div
+        className="flex h-full items-center justify-center px-4 text-sm text-text-secondary"
+        data-testid="journal-detail-empty"
+      >
         Select a journal entry on the left to see full details and notes here.
       </div>
     );
   }
 
   return (
-    <div className="flex h-full flex-col p-4 text-text-primary">
+    <div className="flex h-full flex-col p-4 text-text-primary" data-testid="journal-detail-panel">
       {/* Header: title, direction badge, date */}
       <div className="flex flex-col gap-2 border-b border-border-subtle pb-3">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold leading-tight">{entry.title}</h2>
+            <h2 className="text-lg font-semibold leading-tight" data-testid="journal-detail-title">
+              {entry.title}
+            </h2>
             <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
               <span>{entry.date}</span>
               {entry.isAuto ? (
@@ -115,6 +120,7 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
               onClick={handleStartEdit}
               disabled={!entry || isSaving}
               className="rounded-full border border-border-subtle bg-interactive-hover px-3 py-1 text-xs font-medium text-text-primary transition hover:border-border-hover hover:bg-interactive-active disabled:opacity-40"
+              data-testid="journal-edit-notes-button"
             >
               Edit notes
             </button>
@@ -139,6 +145,7 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
               rows={6}
               className="w-full rounded-xl border border-border-moderate bg-surface-elevated p-3 text-sm text-text-primary shadow-inner outline-none transition focus:border-border-hover focus:ring-2 focus:ring-border-focus"
               disabled={isSaving}
+              data-testid="journal-detail-notes-input"
             />
             {(errorMessage || draftNotes.trim().length === 0) && (
               <p className="mt-2 text-sm text-status-armed-text">
@@ -151,6 +158,7 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
                 onClick={handleCancelEdit}
                 disabled={isSaving}
                 className="rounded-full border border-border-subtle px-4 py-2 text-sm text-text-secondary transition hover:border-border-hover hover:bg-interactive-hover disabled:opacity-40"
+                data-testid="journal-detail-cancel-edit"
               >
                 Cancel
               </button>
@@ -159,13 +167,17 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
                 onClick={handleSaveNotes}
                 disabled={isSaving}
                 className="rounded-full border border-sentiment-bull-border bg-sentiment-bull-bg px-4 py-2 text-sm font-medium text-sentiment-bull transition hover:bg-interactive-active disabled:opacity-40"
+                data-testid="journal-detail-save-notes"
               >
                 {isSaving ? 'Saving…' : 'Save'}
               </button>
             </div>
           </>
         ) : entry.notes ? (
-          <div className="max-h-64 overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed">
+          <div
+            className="max-h-64 overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed"
+            data-testid="journal-notes-content"
+          >
             {entry.notes}
           </div>
         ) : (
