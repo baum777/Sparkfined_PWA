@@ -16,32 +16,67 @@ const DIST_DIR = path.join(__dirname, '..', 'dist', 'assets');
 
 // Size thresholds (in KB, gzipped)
 // IMPORTANT: Order matters - more specific patterns first!
-// Updated for 2025 best practices (PWA + Trading Interface)
-// Updated 2025-11-26: Adjusted limits after granular vendor splitting + icon tree-shaking
-// Updated 2025-11-26: Removed vendor-charts - lightweight-charts now loaded dynamically
+// Updated 2025-11-26: Granular vendor splitting (ocr, onboarding) + optional chunks
 const THRESHOLDS = {
-  // React + ReactDOM + Router + base UI. Measured ~54KB gzipped (2025-11-26) after vendor splitting
+  // === VENDOR CHUNKS ===
+  
+  // React + ReactDOM + Scheduler + React-Router
+  // Current: ~55KB gzipped, allow headroom for React 19
   'vendor-react': 115,
 
-  'vendor-workbox': 12,      // Service Worker utilities
-  'vendor-dexie': 30,        // IndexedDB wrapper (Dexie is ~26KB gzipped - essential, cannot reduce)
-  'vendor-icons': 20,        // Lucide React icons (tree-shaken, measured ~15KB)
-  'vendor-router': 25,       // React Router (measured ~20KB)
-  'vendor-state': 5,         // Zustand (tiny state management)
-  'chart': 15,               // Chart-related app code (not the library itself)
-  'analyze': 12,             // Analysis sections (token research surface + AI affordances)
-  'index': 35,               // Main app shell (routing/layout/offline chrome); allow margin for dashboard tiles & settings shell
-  'vendor': 60,              // Generic vendor chunks - increased to 60KB (router, icons, state, workbox, driver.js, etc. consolidate here when not split)
+  // Dexie (IndexedDB wrapper)
+  // Current: ~27KB gzipped, Dexie is ~26KB - cannot reduce
+  'vendor-dexie': 30,
+  
+  // Generic vendor (Zustand, Lucide-Icons, etc.)
+  // Current: ~50KB gzipped (stable, Tesseract/Driver.js already lazy-loaded)
+  // Includes: Zustand (~3KB), Lucide-React (~15KB), misc utilities
+  'vendor': 56,
+  
+  // Tesseract.js (OCR) - NEW, isolated for lazy loading
+  // Estimated: 25-30KB gzipped (lazy-loaded)
+  'vendor-ocr': 35,
+  
+  // Driver.js (Onboarding tour) - NEW, isolated for lazy loading
+  // Estimated: 15-20KB gzipped (lazy-loaded)
+  'vendor-onboarding': 25,
+  
+  // === APP CHUNKS ===
+  
+  // Main app shell (routing, layout, offline chrome, dashboard tiles)
+  // Current: ~23KB gzipped
+  'index': 35,
+  
+  // Analysis Page (token research + AI affordances)
+  // Current: ~8KB gzipped
+  // FIXED: Pattern was 'analyze', actual chunk is 'AnalysisPageV2'
+  'AnalysisPageV2': 15,
+  
+  // Chart-related app code (not the library itself!)
+  // Current: ~6KB (chartTelemetry) + 0.3KB (chartLinks)
+  'chartTelemetry': 15,
+  'chartLinks': 5,
 };
 
+// Chunks that may not exist in all builds (don't fail if missing)
+const OPTIONAL_CHUNKS = [
+  'vendor-ocr',         // Only if OCR feature is imported
+  'vendor-onboarding',  // Only if onboarding tour is imported
+  'chartLinks',         // Only if chart links exist
+  'chunk-chart',        // App code split (may be bundled with page)
+  'chunk-analyze',      // App code split (may be bundled with page)
+  'chunk-signals',      // App code split (may be bundled with page)
+];
+
 // Global JS budget (uncompressed) for initial + critical chunks.
-// Measured total (2025-11-24) ~875KB after lazy-loading OCR/tour; allow ~8–10% headroom for minor feature updates.
-const TOTAL_BUDGET_KB = 950;
+// Updated 2025-11-26: Guardrail mode (current ~703KB + ~12% headroom)
+const TOTAL_BUDGET_KB = 800;
 
 // ANSI color codes
 const RED = '\x1b[31m';
 const GREEN = '\x1b[32m';
 const YELLOW = '\x1b[33m';
+const BLUE = '\x1b[34m';
 const RESET = '\x1b[0m';
 const BOLD = '\x1b[1m';
 
@@ -78,10 +113,14 @@ function checkBundleSizes() {
     const matchingFiles = files.filter(f => f.includes(pattern) && !checkedFiles.has(f));
     
     if (matchingFiles.length === 0) {
-      // Only warn if pattern is expected (not just a generic pattern)
-      if (pattern !== 'vendor') {
-        warnings.push(`${YELLOW}⚠️  No files found matching pattern "${pattern}"${RESET}`);
+      // Check if this is an optional chunk
+      if (OPTIONAL_CHUNKS.includes(pattern)) {
+        console.log(`${BLUE}ℹ️  Optional chunk "${pattern}" not found (this is OK)${RESET}`);
+        continue;
       }
+      
+      // Required chunk missing - warning (not hard fail yet)
+      warnings.push(`${YELLOW}⚠️  No files found matching pattern "${pattern}"${RESET}`);
       continue;
     }
 

@@ -144,43 +144,52 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           // CRITICAL: Granular vendor splitting for CI bundle size limits
-          // Target: Keep main vendor chunks < 22 KB each
+          // Strategy: Split large/lazy-loadable libs, keep small libs together
           // NOTE: lightweight-charts is NOT included here - it's loaded dynamically on-demand
-          if (id.includes('node_modules')) {
-            // React ecosystem (react + react-dom + scheduler)
-            if (id.includes('react') || id.includes('scheduler')) {
-              return 'vendor-react';
-            }
-            // Dexie (IndexedDB wrapper) - separate chunk
-            if (id.includes('dexie')) {
-              return 'vendor-dexie';
-            }
-            // Lucide Icons - separate chunk for tree-shaking
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-            // React Router
-            if (id.includes('react-router')) {
-              return 'vendor-router';
-            }
-            // Zustand (state management)
-            if (id.includes('zustand')) {
-              return 'vendor-state';
-            }
-            // Workbox (PWA/Service Worker)
-            if (id.includes('workbox')) {
-              return 'vendor-workbox';
-            }
-            // All other node_modules (driver.js, tesseract, etc.)
-            return 'vendor';
+          
+          // Only process node_modules
+          if (!id.includes('node_modules')) {
+            // App code splitting (optional, Vite handles this automatically)
+            if (id.includes('/sections/chart/')) return 'chunk-chart';
+            if (id.includes('/sections/analyze/')) return 'chunk-analyze';
+            if (id.includes('/sections/signals/')) return 'chunk-signals';
+            return undefined;
           }
+
+          // === VENDOR SPLITTING ===
           
-          // App code splitting (route-based lazy loading)
-          if (id.includes('/sections/chart/')) return 'chunk-chart';
-          if (id.includes('/sections/analyze/')) return 'chunk-analyze';
-          if (id.includes('/sections/signals/')) return 'chunk-signals';
-          
-          return undefined;
+          // 1. React Ecosystem (React + ReactDOM + Scheduler + React-Router)
+          // Note: React-Router is bundled with React (always used together)
+          // Current: ~55KB gzip
+          if (id.includes('react') || id.includes('scheduler') || id.includes('react-router')) {
+            return 'vendor-react';
+          }
+
+          // 2. Dexie (IndexedDB wrapper)
+          // Core feature (Journal, Watchlist), always loaded
+          // Current: ~27KB gzip
+          if (id.includes('dexie')) {
+            return 'vendor-dexie';
+          }
+
+          // 3. Tesseract.js (OCR) - Heavy library, isolate for lazy loading
+          // Used only in SettingsPageV2 (OCR scan feature)
+          // Estimated: ~30KB gzip
+          if (id.includes('tesseract')) {
+            return 'vendor-ocr';
+          }
+
+          // 4. Driver.js (Onboarding tour) - Isolate for lazy loading
+          // Used only when user starts onboarding
+          // Estimated: ~20KB gzip
+          if (id.includes('driver.js')) {
+            return 'vendor-onboarding';
+          }
+
+          // 5. Generic vendor (everything else: zustand, lucide-react, etc.)
+          // Small libraries that don't need separate chunks
+          // Expected: ~30KB gzip (after OCR/Onboarding split)
+          return 'vendor';
         },
       },
     },
