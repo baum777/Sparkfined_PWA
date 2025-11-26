@@ -11,7 +11,7 @@
  * Used in: LessonsPage, Signal Detail
  */
 
-import { BookOpen, TrendingUp, CheckCircle2, XCircle, Target } from 'lucide-react'
+import { BookOpen, TrendingUp, CheckCircle2, XCircle, Target } from '@/lib/icons'
 import type { Lesson } from '@/types/signal'
 
 interface LessonCardProps {

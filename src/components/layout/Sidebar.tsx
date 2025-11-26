@@ -10,8 +10,7 @@
  */
 
 import { NavLink } from 'react-router-dom';
-import { Home, BarChart3, FileText, Bell, TrendingUp, Settings } from '@/lib/icons';
-import type { LucideIcon } from 'lucide-react';
+import { Home, BarChart3, FileText, Bell, TrendingUp, Settings, type LucideIcon } from '@/lib/icons';
 
 interface NavItem {
   path: string;

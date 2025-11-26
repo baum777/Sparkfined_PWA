@@ -143,15 +143,46 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // libs auf eigene Chunks (bessere Caching-Trennung)
+          // CRITICAL: Granular vendor splitting for CI bundle size limits
+          // Target: Keep main vendor chunks < 22 KB each
           if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'vendor-react';
-            if (id.includes('workbox')) return 'vendor-workbox';
-            if (id.includes('dexie')) return 'vendor-dexie';
+            // React ecosystem (react + react-dom + scheduler)
+            if (id.includes('react') || id.includes('scheduler')) {
+              return 'vendor-react';
+            }
+            // Dexie (IndexedDB wrapper) - separate chunk
+            if (id.includes('dexie')) {
+              return 'vendor-dexie';
+            }
+            // Lightweight Charts - separate chunk (chart-heavy)
+            if (id.includes('lightweight-charts')) {
+              return 'vendor-charts';
+            }
+            // Lucide Icons - separate chunk for tree-shaking
+            if (id.includes('lucide-react')) {
+              return 'vendor-icons';
+            }
+            // React Router
+            if (id.includes('react-router')) {
+              return 'vendor-router';
+            }
+            // Zustand (state management)
+            if (id.includes('zustand')) {
+              return 'vendor-state';
+            }
+            // Workbox (PWA/Service Worker)
+            if (id.includes('workbox')) {
+              return 'vendor-workbox';
+            }
+            // All other node_modules (driver.js, tesseract, etc.)
             return 'vendor';
           }
-          if (id.includes('/sections/chart/')) return 'chart';
-          if (id.includes('/sections/analyze/')) return 'analyze';
+          
+          // App code splitting (route-based lazy loading)
+          if (id.includes('/sections/chart/')) return 'chunk-chart';
+          if (id.includes('/sections/analyze/')) return 'chunk-analyze';
+          if (id.includes('/sections/signals/')) return 'chunk-signals';
+          
           return undefined;
         },
       },

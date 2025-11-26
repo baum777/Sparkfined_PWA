@@ -10,7 +10,7 @@
  */
 
 import { useState } from 'react'
-import { TrendingUp, Filter, AlertCircle } from 'lucide-react'
+import { TrendingUp, Filter, AlertCircle } from '@/lib/icons'
 import { useSignals } from '@/hooks/useSignals'
 import SignalCard from '@/components/signals/SignalCard'
 import SignalReviewCard from '@/components/signals/SignalReviewCard'

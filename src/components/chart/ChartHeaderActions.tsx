@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '@/components/ui/Button';
-import { BookmarkPlus, Share2, RefreshCw } from 'lucide-react';
+import { BookmarkPlus, Share2, RefreshCw } from '@/lib/icons';
 
 export function ChartHeaderActions() {
   return (

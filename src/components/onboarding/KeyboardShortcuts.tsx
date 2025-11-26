@@ -4,7 +4,7 @@
  * Triggered by pressing '?' (Shift + /)
  */
 
-import { X } from 'lucide-react';
+import { X } from '@/lib/icons';
 import { useEffect, useRef, useId } from 'react';
 import type { MouseEvent } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';

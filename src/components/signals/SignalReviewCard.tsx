@@ -7,7 +7,7 @@
  * Used in: SignalDetailPage, ChartPage (after analysis)
  */
 
-import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, XCircle } from 'lucide-react'
+import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2, XCircle } from '@/lib/icons'
 import type { Signal, TradePlan } from '@/types/signal'
 import { useState } from 'react'
 

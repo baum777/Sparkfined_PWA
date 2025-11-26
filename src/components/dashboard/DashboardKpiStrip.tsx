@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowDownRight, ArrowUpRight, Minus } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, Minus } from '@/lib/icons';
 import DataFreshness from '@/components/pwa/DataFreshness';
 
 type Trend = 'up' | 'down' | 'flat';

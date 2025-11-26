@@ -6,7 +6,7 @@
  * - Desktop: Full-width (icon-left, label-left)
  */
 
-import type { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from '@/lib/icons';
 
 interface QuickActionCardProps {
   label: string;

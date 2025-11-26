@@ -10,7 +10,7 @@
  * />
  */
 
-import { Lightbulb, X } from 'lucide-react';
+import { Lightbulb, X } from '@/lib/icons';
 import { useOnboardingStore } from '@/store/onboardingStore';
 import { useEffect, useState } from 'react';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '@/components/ui/Button';
-import { Download, RotateCw } from 'lucide-react';
+import { Download, RotateCw } from '@/lib/icons';
 
 export function SettingsHeaderActions() {
   return (

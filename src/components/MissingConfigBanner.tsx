@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react'
 import { validateEnv, type EnvValidationResult } from '../lib/validateEnv'
-import { X, AlertTriangle, ExternalLink } from 'lucide-react'
+import { X, AlertTriangle, ExternalLink } from '@/lib/icons'
 
 export default function MissingConfigBanner() {
   const [validation, setValidation] = useState<EnvValidationResult | null>(null)

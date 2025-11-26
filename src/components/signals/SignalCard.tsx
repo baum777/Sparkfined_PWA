@@ -7,7 +7,7 @@
  * Used in: SignalsPage, Board Feed
  */
 
-import { TrendingUp, TrendingDown, AlertCircle } from 'lucide-react'
+import { TrendingUp, TrendingDown, AlertCircle } from '@/lib/icons'
 import type { Signal } from '@/types/signal'
 
 interface SignalCardProps {
