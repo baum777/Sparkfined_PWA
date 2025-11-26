@@ -14,7 +14,7 @@ function parseTimestamp(value?: string | number): number {
 }
 
 export function mapJournalEntryToAnnotation(entry: JournalType | JournalStoreEntry): ChartAnnotation {
-  const baseTime = 'timestamp' in entry ? (entry as JournalType).timestamp : parseTimestamp((entry as JournalStoreEntry).date)
+  const baseTime = 'timestamp' in entry ? entry.timestamp : parseTimestamp(entry.date)
   return {
     id: `journal-${entry.id}`,
     candleTime: baseTime,

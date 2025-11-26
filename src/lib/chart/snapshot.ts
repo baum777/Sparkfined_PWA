@@ -13,8 +13,8 @@
  * @returns Base64 encoded screenshot or undefined if capture failed
  */
 export async function captureChartSnapshot(
-  tokenAddress: string,
-  timestamp: number
+  _tokenAddress: string,
+  _timestamp: number
 ): Promise<string | undefined> {
   try {
     console.warn('[ChartSnapshot] captureChartSnapshot not yet implemented');

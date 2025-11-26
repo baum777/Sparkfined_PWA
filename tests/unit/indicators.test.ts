@@ -14,7 +14,7 @@ describe('indicator calculations', () => {
     const points = computeSma(candles, 2)
     expect(points.map((p) => p.value)).toEqual([1.5, 2.5, 3.5])
     // time is now UTCTimestamp (seconds since epoch)
-    expect(points[0].time).toBe(2)
+    expect(points[0]!.time).toBe(2)
   })
 
   it('computes EMA smoothing correctly', () => {
@@ -28,8 +28,8 @@ describe('indicator calculations', () => {
     expect(basis.length).toBe(2)
     expect(upper.length).toBe(2)
     expect(lower.length).toBe(2)
-    expect(Number(upper[0].value.toFixed(4))).toBeGreaterThan(Number(basis[0].value.toFixed(4)))
-    expect(Number(lower[0].value.toFixed(4))).toBeLessThan(Number(basis[0].value.toFixed(4)))
+    expect(Number(upper[0]!.value.toFixed(4))).toBeGreaterThan(Number(basis[0]!.value.toFixed(4)))
+    expect(Number(lower[0]!.value.toFixed(4))).toBeLessThan(Number(basis[0]!.value.toFixed(4)))
   })
 
   it('buildIndicators maps overlays into computed indicator payloads', () => {

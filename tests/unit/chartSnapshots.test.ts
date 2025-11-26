@@ -178,6 +178,6 @@ describe('chartSnapshots Dexie helpers', () => {
 
     const remaining = await boardDB.charts.toArray();
     expect(remaining).toHaveLength(1);
-    expect(remaining[0].symbol).toBe(recentSnapshot.symbol);
+    expect(remaining[0]!.symbol).toBe(recentSnapshot.symbol);
   });
 });

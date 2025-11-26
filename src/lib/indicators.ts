@@ -126,7 +126,7 @@ export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicato
 
 export function buildIndicators(
   candles: OhlcCandle[],
-  overlays?: ChartIndicatorOverlay[] | undefined
+  overlays?: ChartIndicatorOverlay[]
 ): ComputedIndicator[] {
   if (!overlays || overlays.length === 0) return []
   return computeIndicators(candles, overlays)
