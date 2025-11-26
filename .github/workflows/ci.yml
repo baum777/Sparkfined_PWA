@@ -9,25 +9,15 @@ on:
 jobs:
   lint-test-build:
     runs-on: ubuntu-latest
+
     env:
+      # Required API keys (adjust if needed)
       MORALIS_API_KEY: ${{ secrets.MORALIS_API_KEY }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.10.0
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9.0.0
-
+      # ------------------------------------------------------------------
+      # 0. Clear pnpm store & disable cache to prevent stale CI bundles
+      # ------------------------------------------------------------------
       - name: Clear pnpm store
         run: pnpm store prune || true
 
@@ -39,17 +29,53 @@ jobs:
             node_modules
           key: no-cache-${{ github.run_id }}
 
-      - name: Install dependencies (fresh)
-        run: pnpm install --frozen-lockfile
+      # ------------------------------------------------------------------
+      # 1. Checkout repository
+      # ------------------------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # IMPORTANT: ensures correct build on PRs
 
+      # ------------------------------------------------------------------
+      # 2. Setup Node + pnpm
+      # ------------------------------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.10.0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.0.0
+
+      # ------------------------------------------------------------------
+      # 3. Fresh install without cache restoration (critical!)
+      # ------------------------------------------------------------------
+      - name: Install dependencies (fresh, no cache)
+        run: pnpm install --no-frozen-lockfile
+
+      # ------------------------------------------------------------------
+      # 4. TypeScript
+      # ------------------------------------------------------------------
       - name: Typecheck
         run: pnpm run typecheck
 
+      # ------------------------------------------------------------------
+      # 5. ESLint
+      # ------------------------------------------------------------------
       - name: Lint
         run: pnpm run lint
 
+      # ------------------------------------------------------------------
+      # 6. Unit Tests
+      # ------------------------------------------------------------------
       - name: Test
         run: pnpm test
 
+      # ------------------------------------------------------------------
+      # 7. Build (with bundle-size check included)
+      # ------------------------------------------------------------------
       - name: Build
         run: pnpm run build:ci
