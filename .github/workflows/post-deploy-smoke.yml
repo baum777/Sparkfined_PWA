@@ -1,0 +1,61 @@
+name: Post-Deploy Smoke Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_url:
+        description: 'Fully qualified base URL (e.g. https://sparkfined.app)'
+        required: false
+        default: ''
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      TARGET_URL: ${{ inputs.deploy_url != '' && inputs.deploy_url || secrets.DEPLOY_URL || '' }}
+    steps:
+      - name: Validate configuration
+        run: |
+          if [ -z "${TARGET_URL}" ]; then
+            echo "Set the DEPLOY_URL secret or provide the deploy_url input when dispatching the workflow."
+            exit 1
+          fi
+          base="${TARGET_URL%/}"
+          {
+            echo "### Post-deploy smoke configuration"
+            echo ""
+            echo "- Target: ${base}"
+            echo "- Checks: /, /manifest.webmanifest, /sw.js, /offline.html, /api/health"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run smoke checks
+        run: |
+          set -euo pipefail
+          base="${TARGET_URL%/}"
+
+          check_url() {
+            local path="$1"
+            local label="$2"
+            local status
+            status=$(curl -s -o /dev/null -w "%{http_code}" "${base}${path}")
+            if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+              echo "❌ ${label} (${path}) returned HTTP ${status}" >&2
+              exit 1
+            else
+              echo "✅ ${label} (${path}) responded with HTTP ${status}"
+            fi
+            {
+              echo "- ${label} (${path}): ${status}"
+            } >> "$GITHUB_STEP_SUMMARY"
+          }
+
+          echo "Running smoke checks against ${base}"
+          check_url "/" "Root"
+          check_url "/manifest.webmanifest" "Manifest"
+          check_url "/sw.js" "Service worker"
+          check_url "/offline.html" "Offline fallback"
+          check_url "/api/health" "API health"
+
+          echo "All post-deploy smoke checks passed."
