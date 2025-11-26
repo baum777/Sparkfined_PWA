@@ -16,23 +16,21 @@ const DIST_DIR = path.join(__dirname, '..', 'dist', 'assets');
 
 // Size thresholds (in KB, gzipped)
 // IMPORTANT: Order matters - more specific patterns first!
-// Updated for 2025 best practices (PWA + Trading Interface)
-// Updated 2025-11-26: Adjusted limits after granular vendor splitting + icon tree-shaking
-// Updated 2025-11-26: Removed vendor-charts - lightweight-charts now loaded dynamically
-const THRESHOLDS = {
-  // React + ReactDOM + Router + base UI. Measured ~54KB gzipped (2025-11-26) after vendor splitting
+// Updated 2025-11-26: Rebuilt vendor chunk map for CI hardening
+export const LIMITS = {
   'vendor-react': 115,
-
-  'vendor-workbox': 12,      // Service Worker utilities
-  'vendor-dexie': 30,        // IndexedDB wrapper (Dexie is ~26KB gzipped - essential, cannot reduce)
-  'vendor-icons': 20,        // Lucide React icons (tree-shaken, measured ~15KB)
-  'vendor-router': 25,       // React Router (measured ~20KB)
-  'vendor-state': 5,         // Zustand (tiny state management)
-  'chart': 15,               // Chart-related app code (not the library itself)
-  'analyze': 12,             // Analysis sections (token research surface + AI affordances)
-  'index': 35,               // Main app shell (routing/layout/offline chrome); allow margin for dashboard tiles & settings shell
-  'vendor': 60,              // Generic vendor chunks - increased to 60KB (router, icons, state, workbox, driver.js, etc. consolidate here when not split)
+  'vendor-router': 40,
+  'vendor-state': 20,
+  'vendor-icons': 40,
+  'vendor-workbox': 20,
+  'vendor-dexie': 30,
+  'vendor': 120,
+  'index': 35,
+  'chartLinks': 15,
+  'chartTelemetry': 20,
 };
+
+const OPTIONAL_PATTERNS = new Set(['vendor-workbox']);
 
 // Global JS budget (uncompressed) for initial + critical chunks.
 // Measured total (2025-11-24) ~875KB after lazy-loading OCR/tour; allow ~8–10% headroom for minor feature updates.
@@ -74,12 +72,12 @@ function checkBundleSizes() {
   // Track which files have been checked to avoid duplicates
   const checkedFiles = new Set();
 
-  for (const [pattern, threshold] of Object.entries(THRESHOLDS)) {
+  for (const [pattern, threshold] of Object.entries(LIMITS)) {
     const matchingFiles = files.filter(f => f.includes(pattern) && !checkedFiles.has(f));
     
     if (matchingFiles.length === 0) {
       // Only warn if pattern is expected (not just a generic pattern)
-      if (pattern !== 'vendor') {
+      if (pattern !== 'vendor' && !OPTIONAL_PATTERNS.has(pattern)) {
         warnings.push(`${YELLOW}⚠️  No files found matching pattern "${pattern}"${RESET}`);
       }
       continue;

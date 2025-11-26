@@ -3,6 +3,20 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { visualizer } from 'rollup-plugin-visualizer'
 
+const VENDOR_CHUNKS: Record<string, string[]> = {
+  'vendor-react': ['react', 'react-dom', 'scheduler'],
+  'vendor-router': ['react-router-dom'],
+  'vendor-state': ['zustand'],
+  'vendor-workbox': ['workbox-window'],
+  'vendor-icons': ['lucide-react'],
+  'vendor-dexie': ['dexie'],
+}
+
+const matchDependency = (id: string, dep: string): boolean => {
+  const normalizedDep = dep.replace(/\\/g, '/')
+  return id.includes(`/node_modules/${normalizedDep}/`) || id.includes(`\\node_modules\\${normalizedDep}\\`)
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   base: '/',
@@ -144,43 +158,24 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           // CRITICAL: Granular vendor splitting for CI bundle size limits
-          // Target: Keep main vendor chunks < 22 KB each
           // NOTE: lightweight-charts is NOT included here - it's loaded dynamically on-demand
           if (id.includes('node_modules')) {
-            // React ecosystem (react + react-dom + scheduler)
-            if (id.includes('react') || id.includes('scheduler')) {
-              return 'vendor-react';
+            for (const [chunkName, dependencies] of Object.entries(VENDOR_CHUNKS)) {
+              if (dependencies.some(dep => matchDependency(id, dep))) {
+                return chunkName
+              }
             }
-            // Dexie (IndexedDB wrapper) - separate chunk
-            if (id.includes('dexie')) {
-              return 'vendor-dexie';
-            }
-            // Lucide Icons - separate chunk for tree-shaking
-            if (id.includes('lucide-react')) {
-              return 'vendor-icons';
-            }
-            // React Router
-            if (id.includes('react-router')) {
-              return 'vendor-router';
-            }
-            // Zustand (state management)
-            if (id.includes('zustand')) {
-              return 'vendor-state';
-            }
-            // Workbox (PWA/Service Worker)
-            if (id.includes('workbox')) {
-              return 'vendor-workbox';
-            }
+
             // All other node_modules (driver.js, tesseract, etc.)
-            return 'vendor';
+            return 'vendor'
           }
           
           // App code splitting (route-based lazy loading)
-          if (id.includes('/sections/chart/')) return 'chunk-chart';
-          if (id.includes('/sections/analyze/')) return 'chunk-analyze';
-          if (id.includes('/sections/signals/')) return 'chunk-signals';
+          if (id.includes('/sections/chart/')) return 'chunk-chart'
+          if (id.includes('/sections/analyze/')) return 'chunk-analyze'
+          if (id.includes('/sections/signals/')) return 'chunk-signals'
           
-          return undefined;
+          return undefined
         },
       },
     },
