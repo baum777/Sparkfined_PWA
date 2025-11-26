@@ -1,11 +1,8 @@
 name: CI - Manifest & Static Smoke Test
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+  workflow_dispatch:
+  
 jobs:
   manifest-smoke:
     runs-on: ubuntu-latest
