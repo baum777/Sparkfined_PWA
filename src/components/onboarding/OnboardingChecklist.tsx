@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { CheckCircle2, Circle, ChevronUp, ChevronDown, X } from 'lucide-react';
+import { CheckCircle2, Circle, ChevronUp, ChevronDown, X } from '@/lib/icons';
 import { useOnboardingStore, ONBOARDING_CHECKLIST } from '@/store/onboardingStore';
 
 export function OnboardingChecklist() {

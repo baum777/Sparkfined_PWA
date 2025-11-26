@@ -5,7 +5,7 @@
  * <TooltipIcon content="RSI measures momentum. > 70 is overbought." />
  */
 
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle } from '@/lib/icons';
 import { useState } from 'react';
 
 interface TooltipIconProps {

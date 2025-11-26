@@ -15,7 +15,7 @@
  */
 
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
-import { WifiOff } from 'lucide-react';
+import { WifiOff } from '@/lib/icons';
 
 export default function OfflineIndicator() {
   const isOnline = useOnlineStatus();

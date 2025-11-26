@@ -9,7 +9,7 @@
 
 import { useRef, useId, useState } from 'react';
 import type { MouseEvent } from 'react';
-import { Zap, GraduationCap, TrendingUp, Rocket, X } from 'lucide-react';
+import { Zap, GraduationCap, TrendingUp, Rocket, X } from '@/lib/icons';
 import { useOnboardingStore, UserLevel } from '@/store/onboardingStore';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 

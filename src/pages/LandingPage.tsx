@@ -12,7 +12,7 @@ import {
   Lock,
   Wifi,
   Clock
-} from 'lucide-react';
+} from '@/lib/icons';
 
 export default function LandingPage() {
   const navigate = useNavigate();

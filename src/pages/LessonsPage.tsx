@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react'
-import { BookOpen, TrendingUp, Filter } from 'lucide-react'
+import { BookOpen, TrendingUp, Filter } from '@/lib/icons'
 import { useLessons } from '@/hooks/useSignals'
 import LessonCard from '@/components/signals/LessonCard'
 import StateView from '@/components/ui/StateView'
