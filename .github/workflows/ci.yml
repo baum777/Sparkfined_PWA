@@ -15,31 +15,31 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.10.0'
+          node-version: 20.10.0
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 9.0.0
 
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - name: Clear pnpm store
+        run: pnpm store prune || true
 
-      - name: Setup pnpm cache
+      - name: Disable restore cache
         uses: actions/cache@v4
         with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          path: |
+            ~/.pnpm-store
+            node_modules
+          key: no-cache-${{ github.run_id }}
 
-      - name: Install dependencies
+      - name: Install dependencies (fresh)
         run: pnpm install --frozen-lockfile
 
       - name: Typecheck
