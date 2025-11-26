@@ -13,7 +13,9 @@ export function computeSma(candles: OhlcCandle[], period: number): IndicatorSeri
     if (i + 1 < period) continue
     const slice = candles.slice(i + 1 - period, i + 1)
     const avg = slice.reduce((sum, candle) => sum + candle.c, 0) / period
-    values.push(toPoint(candles[i].t, avg))
+    const currentCandle = candles[i]
+    if (!currentCandle) continue
+    values.push(toPoint(currentCandle.t, avg))
   }
 
   return values
@@ -64,7 +66,9 @@ export function computeBollingerBands(
       slice.reduce((sum, candle) => sum + (candle.c - mean) ** 2, 0) / (period > 1 ? period - 1 : 1)
     const stdDev = Math.sqrt(variance)
     const offset = stdDev * deviation
-    const time = candles[i].t
+    const currentCandle = candles[i]
+    if (!currentCandle) continue
+    const time = currentCandle.t
 
     upper.push(toPoint(time, mean + offset))
     lower.push(toPoint(time, mean - offset))

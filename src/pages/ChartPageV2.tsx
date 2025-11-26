@@ -94,7 +94,8 @@ export default function ChartPageV2() {
       .filter((alert) => alert.symbol?.toUpperCase() === asset.symbol.toUpperCase())
       .map(mapAlertToAnnotation)
     const journalAnnotations = journalEntries.map(mapJournalEntryToAnnotation)
-    const pulseAnnotations: PulseDeltaEvent[] = candles.length
+    const lastCandle = candles[candles.length - 1]
+    const pulseAnnotations: PulseDeltaEvent[] = lastCandle
       ? [
           {
             address: asset.address,
@@ -102,7 +103,7 @@ export default function ChartPageV2() {
             previousScore: 45,
             newScore: 55,
             delta: 10,
-            ts: candles[candles.length - 1].t,
+            ts: lastCandle.t,
           },
         ]
       : []

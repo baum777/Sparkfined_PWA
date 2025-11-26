@@ -7,6 +7,9 @@ import type {
   IChartApi,
   ISeriesApi,
   UTCTimestamp,
+  SeriesMarkerShape,
+  SeriesMarker,
+  Time,
 } from 'lightweight-charts'
 import { createChart, CrosshairMode } from 'lightweight-charts'
 import type {
@@ -209,14 +212,20 @@ export default function AdvancedChart({
 
   useEffect(() => {
     if (!candleSeriesRef.current) return
-    const markers = (annotations ?? []).map((annotation) => ({
-      id: annotation.id,
-      time: toUtcTimestamp(annotation.candleTime),
-      position: 'aboveBar' as const,
-      color: annotation.kind === 'alert' ? '#f43f5e' : annotation.kind === 'signal' ? '#c084fc' : '#22d3ee',
-      shape: annotation.kind === 'alert' ? 'arrowDown' : annotation.kind === 'signal' ? 'arrowUp' : 'circle',
-      text: annotation.label,
-    }))
+    const markers: SeriesMarker<Time>[] = (annotations ?? []).map((annotation) => {
+      const shape: SeriesMarkerShape = 
+        annotation.kind === 'alert' ? 'arrowDown' 
+        : annotation.kind === 'signal' ? 'arrowUp' 
+        : 'circle'
+      
+      return {
+        time: toUtcTimestamp(annotation.candleTime),
+        position: 'aboveBar' as const,
+        color: annotation.kind === 'alert' ? '#f43f5e' : annotation.kind === 'signal' ? '#c084fc' : '#22d3ee',
+        shape,
+        text: annotation.label,
+      }
+    })
     candleSeriesRef.current.setMarkers?.(markers)
   }, [annotations])
 
