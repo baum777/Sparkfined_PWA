@@ -9,7 +9,6 @@
 
 import type {
   MonitoredTransaction,
-  AutoJournalSource,
   AutoJournalOptions,
   SetupDetectionResult,
   SessionInfo,
@@ -221,7 +220,7 @@ export async function matchTransactionPairs(
   });
 
   // Match pairs for each token
-  byToken.forEach((txs, tokenAddress) => {
+  byToken.forEach((txs, _tokenAddress) => {
     const buys = txs.filter((t) => t.type === 'buy').sort((a, b) => a.timestamp - b.timestamp);
     const sells = txs.filter((t) => t.type === 'sell').sort((a, b) => a.timestamp - b.timestamp);
 

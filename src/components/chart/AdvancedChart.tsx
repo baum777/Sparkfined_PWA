@@ -3,7 +3,6 @@ import type {
   CandlestickData,
   CandlestickSeriesOptions,
   HistogramData,
-  HistogramSeriesOptions,
   IChartApi,
   ISeriesApi,
   UTCTimestamp,
@@ -103,7 +102,7 @@ export default function AdvancedChart({
   const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null)
   const indicatorSeriesRef = useRef<Record<string, ISeriesApi<'Line'>[]>>({})
-  const [chartLibLoaded, setChartLibLoaded] = useState(false)
+  const [_chartLibLoaded, setChartLibLoaded] = useState(false)
 
   const { candleData, volumeData } = useMemo(() => toSeriesData(candles), [candles])
   const lastCandle = useMemo(() => candles[candles.length - 1], [candles])

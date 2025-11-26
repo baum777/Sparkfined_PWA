@@ -385,10 +385,10 @@ function calculateConfidence(setups: ICTSetupType[], ohlc: OhlcPoint[]): number 
  * - Your own OHLC endpoint
  */
 async function fetchOhlcData(
-  tokenAddress: string,
-  timestamp: number,
-  timeframe: string,
-  lookback: number,
+  _tokenAddress: string,
+  _timestamp: number,
+  _timeframe: string,
+  _lookback: number,
 ): Promise<OhlcPoint[] | null> {
   try {
     console.warn('[SetupDetector] fetchOhlcData not yet implemented, returning mock data');
