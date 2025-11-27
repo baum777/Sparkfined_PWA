@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { visitWatchlist } from '../fixtures/navigation';
 import { WATCHLIST_SYMBOLS } from '../fixtures/testData';
+import { stubNoisyAPIs } from '../fixtures/api-stubs';
 
 test.describe('watchlist flows', () => {
   test.beforeEach(async ({ page }) => {
+    await stubNoisyAPIs(page);
     await visitWatchlist(page);
   });
 
