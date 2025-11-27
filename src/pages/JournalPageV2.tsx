@@ -61,24 +61,32 @@ export default function JournalPageV2() {
     // loadJournalEntries is a stable import, setters are stable from zustand
   }, []);
 
-  // Initialize activeId from URL or select first entry (runs once on mount/entries load)
+  // Mount-only: respect deep link param during first paint without reacting to future URL changes here.
   useEffect(() => {
-    if (entries.length === 0 || activeId) {
-      return;
-    }
-    
     const entryParam = searchParams.get('entry');
     if (entryParam && entries.some((e) => e.id === entryParam)) {
       setActiveId(entryParam);
-    } else {
-      const firstEntry = entries[0];
-      if (firstEntry) {
-        setActiveId(firstEntry.id);
-      }
     }
-    // Note: searchParams is read but NOT in deps - this runs only when entries load or activeId clears
-    // This prevents infinite loop (searchParams object recreated on every URL change)
-  }, [entries, activeId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Ensure there is always an active entry once entries are present.
+  useEffect(() => {
+    if (entries.length > 0 && !activeId) {
+      setActiveId(entries[0]!.id);
+    }
+  }, [entries.length, entries, activeId, setActiveId]);
+
+  // Listen for history/back-button changes and sync state when the URL entry changes.
+  useEffect(() => {
+    const entryParam = searchParams.get('entry');
+    if (!entryParam) {
+      return;
+    }
+    if (entryParam !== activeId && entries.some((entry) => entry.id === entryParam)) {
+      setActiveId(entryParam);
+    }
+  }, [searchParams, entries, activeId, setActiveId]);
 
   const filteredEntries = useMemo(() => {
     if (directionFilter === 'all') {

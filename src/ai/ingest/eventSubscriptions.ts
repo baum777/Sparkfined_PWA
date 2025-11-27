@@ -1,4 +1,5 @@
 import { useAdvancedInsightStore } from '@/features/analysis';
+import { initializeJournalEventSubscriptions } from '@/lib/journal/journalEventSubscriptions';
 import { useEventBusStore } from '@/store/eventBus';
 import { useAlertsStore } from '@/store/alertsStore';
 import { useJournalStore } from '@/store/journalStore';
@@ -32,6 +33,8 @@ export function initializeEventSubscriptions(): void {
     // Fan out price updates to watchlist
     fanOutLivePriceUpdates(state.prices, prevState.prices);
   });
+
+  initializeJournalEventSubscriptions();
 
   // Keep reference for potential teardown hooks
   void livePriceUnsubscribe;
