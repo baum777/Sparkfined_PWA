@@ -2,9 +2,23 @@ import { expect, test } from '@playwright/test';
 import { visitJournal } from '../fixtures/navigation';
 import { makeJournalTestEntry } from '../fixtures/testData';
 import { awaitStableUI } from '../utils/wait';
+import { stubNoisyAPIs } from '../fixtures/api-stubs';
 
 test.describe('journal flows', () => {
   test.beforeEach(async ({ page }) => {
+    // Capture console errors to debug
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        console.log(`[Browser Error] ${msg.text()}`);
+      }
+    });
+    
+    // Capture page errors
+    page.on('pageerror', (error) => {
+      console.log(`[Page Error] ${error.message}`);
+    });
+    
+    await stubNoisyAPIs(page);
     await visitJournal(page);
   });
 

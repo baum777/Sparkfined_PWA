@@ -28,7 +28,6 @@ export default function JournalPageV2() {
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createErrorMessage, setCreateErrorMessage] = useState<string | null>(null);
-  const entryIdFromUrl = useMemo(() => searchParams.get('entry') ?? undefined, [searchParams]);
 
   useEffect(() => {
     let isCurrent = true;
@@ -59,51 +58,27 @@ export default function JournalPageV2() {
     return () => {
       isCurrent = false;
     };
-  }, [setEntries, setError, setLoading, loadJournalEntries]);
+    // loadJournalEntries is a stable import, setters are stable from zustand
+  }, []);
 
+  // Initialize activeId from URL or select first entry (runs once on mount/entries load)
   useEffect(() => {
-    const hasEntryInUrl = entryIdFromUrl ? entries.some((entry) => entry.id === entryIdFromUrl) : false;
-
-    if (entryIdFromUrl) {
-      if (hasEntryInUrl && entryIdFromUrl !== activeId) {
-        setActiveId(entryIdFromUrl);
-      } else if (!hasEntryInUrl && activeId) {
-        setActiveId(undefined);
-      }
+    if (entries.length === 0 || activeId) {
       return;
     }
-
-    const activeExistsInEntries = activeId ? entries.some((entry) => entry.id === activeId) : false;
-    if (!activeExistsInEntries && entries.length) {
-      const firstEntryId = entries[0]?.id;
-      if (firstEntryId && firstEntryId !== activeId) {
-        setActiveId(firstEntryId);
+    
+    const entryParam = searchParams.get('entry');
+    if (entryParam && entries.some((e) => e.id === entryParam)) {
+      setActiveId(entryParam);
+    } else {
+      const firstEntry = entries[0];
+      if (firstEntry) {
+        setActiveId(firstEntry.id);
       }
     }
-  }, [activeId, entries, entryIdFromUrl, setActiveId]);
-
-  useEffect(() => {
-    if (!activeId) {
-      if (entryIdFromUrl) {
-        setSearchParams((prev) => {
-          const nextParams = new URLSearchParams(prev);
-          nextParams.delete('entry');
-          return nextParams;
-        }, { replace: true });
-      }
-      return;
-    }
-
-    if (entryIdFromUrl === activeId) {
-      return;
-    }
-
-    setSearchParams((prev) => {
-      const nextParams = new URLSearchParams(prev);
-      nextParams.set('entry', activeId);
-      return nextParams;
-    }, { replace: true });
-  }, [activeId, entryIdFromUrl, setSearchParams]);
+    // searchParams is read but NOT in deps - this runs only when entries load or activeId clears
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entries, activeId]);
 
   const filteredEntries = useMemo(() => {
     if (directionFilter === 'all') {
@@ -123,11 +98,13 @@ export default function JournalPageV2() {
   const handleSelectEntry = useCallback(
     (id: string) => {
       setActiveId(id);
-      const nextParams = new URLSearchParams(searchParams);
-      nextParams.set('entry', id);
-      setSearchParams(nextParams, { replace: true });
+      setSearchParams((prev) => {
+        const nextParams = new URLSearchParams(prev);
+        nextParams.set('entry', id);
+        return nextParams;
+      }, { replace: true });
     },
-    [searchParams, setActiveId, setSearchParams],
+    [setActiveId, setSearchParams],
   );
 
   const activeEntry = useMemo(() => entries.find((entry) => entry.id === activeId), [entries, activeId]);
@@ -149,9 +126,11 @@ export default function JournalPageV2() {
         const newEntry = await createQuickJournalEntry({ title, notes });
         addEntry(newEntry);
         setActiveId(newEntry.id);
-        const nextParams = new URLSearchParams(searchParams);
-        nextParams.set('entry', newEntry.id);
-        setSearchParams(nextParams, { replace: true });
+        setSearchParams((prev) => {
+          const nextParams = new URLSearchParams(prev);
+          nextParams.set('entry', newEntry.id);
+          return nextParams;
+        }, { replace: true });
         setIsNewDialogOpen(false);
       } catch (createError) {
         console.warn('[Journal V2] Failed to create entry', createError);
@@ -160,7 +139,7 @@ export default function JournalPageV2() {
         setIsCreating(false);
       }
     },
-    [addEntry, searchParams, setActiveId, setSearchParams],
+    [addEntry, setActiveId, setSearchParams],
   );
 
   const headerDescription = `${entries.length} recent entries · Focus on clarity, context, conviction`;
