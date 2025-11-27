@@ -1,298 +1,105 @@
-# Foundation Check — Executive Summary
+# Foundation Loops A–C — Executive Summary
 
-**Datum:** 2025-11-26  
-**Architekt:** Claude (Senior-Architekt & QA-Lead)  
-**Status:** ✅ **ABGESCHLOSSEN**
-
----
-
-## 🎯 Auftrag
-
-**Ziel:** Technisches Fundament prüfen & Foundation-Plan erstellen, bevor massiv in Styling/Layout investiert wird.
-
-**Ergebnis:** `FOUNDATION_PLAN_BEFORE_STYLING.md` — Konkreter, priorisierter Fahrplan für Codex (4 Loops, 7-11 Tage)
+**Review Date:** 2025-11-26  
+**Reviewer:** Claude (Senior-Architekt & QA-Lead)  
+**Full Review:** `FOUNDATION_LOOPS_REVIEW.md`
 
 ---
 
-## 📊 Gesamt-Assessment
+## TL;DR
 
-### ✅ Stärken (Was bereits stabil ist)
-
-1. **CI-Hardening abgeschlossen** ✅
-   - Bundle: 703 KB / 800 KB (88%)
-   - Lazy-Loading: Tesseract, Driver.js, Lightweight-Charts
-   - Vendor-Splitting optimiert
-   - Check-Script sauber (keine falschen Warnings)
-
-2. **Build-Setup vorbildlich** ✅
-   - TypeScript strict mode (noUncheckedIndexedAccess, noImplicitOverride)
-   - ESLint flat config mit A11y-Rules
-   - Scripts konsistent (build:ci = build:local + check:size)
-
-3. **PWA-Core stabil** ✅
-   - Service Worker konfiguriert (cleanupOutdatedCaches, skipWaiting)
-   - Manifest vorhanden (9 Icon-Sizes)
-   - Runtime-Caching für APIs (StaleWhileRevalidate, NetworkFirst)
-
-4. **Security-Basics solide** ✅
-   - check-env.js validiert Secrets (fail-fast in CI/Prod)
-   - Server-only Secrets (MORALIS_API_KEY, nicht VITE_)
-   - Proxy-Pattern für APIs
-
-5. **Design-System-Fundament** ✅
-   - Tailwind 4.1 mit umfangreichen Design Tokens
-   - Color-Palette: Zinc, Emerald, Rose, Cyan, Amber
-   - Spacing: 8px-Grid + extended values
-   - Animations: fade-in, slide-up, shimmer
-
-### ⚠️ Lücken (Was vor Styling geschlossen werden sollte)
-
-#### 🔴 High Priority (Blocking für Styling)
-
-1. **Lighthouse-CI deaktiviert**
-   - **Problem:** Keine Performance-Baseline vor Styling
-   - **Fix:** Lighthouse-Job wieder aktivieren (Loop A)
-
-2. **Keine zentralen UI-Primitives**
-   - **Problem:** Components nutzen Tailwind-Classes direkt
-   - **Risiko:** Styling-Changes erfordern Änderungen in vielen Dateien
-   - **Fix:** Button, Card, Badge, Input erstellen (Loop B)
-
-3. **E2E-Test-Coverage lückenhaft**
-   - **Ist:** 8 Tests
-   - **Ziel:** 15-20 Tests (laut CI-Hardening)
-   - **Fehlt:** Journal CRUD, Alerts, Watchlist, Offline-Mode
-   - **Fix:** 15 neue Tests (Loop C)
-
-4. **Node-SDKs im Client?**
-   - **Risiko:** openai, web-push, ws könnten im Client-Bundle sein
-   - **Fix:** Prüfen (Loop D)
-
-#### 🟡 Medium Priority (Nice-to-have)
-
-5. **Dark-Mode nicht zentral**
-   - **Problem:** Header.tsx macht manuelles classList.toggle
-   - **Fix:** useDarkMode Hook nutzen (Loop B)
-
-6. **Component-Ownership unklar**
-   - **Problem:** Wann Component, wann Section?
-   - **Fix:** COMPONENT_GUIDELINES.md (Loop B)
-
-7. **Pre-Commit-Hooks fehlen**
-   - **Risiko:** Ungültige Commits (TypeScript-Fehler, Lint-Fehler)
-   - **Fix:** Husky + lint-staged (Loop A, optional)
-
-#### 🟢 Low Priority (Post-Styling)
-
-8. **Visual-Regression-Testing fehlt**
-   - Kein Chromatic/Percy Setup
-   - **Fix:** Nach Styling-Pass einrichten
-
-9. **A11y-Audit unvollständig**
-   - board-a11y.spec.ts existiert
-   - **Fehlt:** Axe-core auf alle Pages (Loop D, optional)
+✅ **Loops A–C sind erfolgreich umgesetzt und in `main` gemerged.**  
+✅ **Foundation-Readiness:** **92/100** (von 60/100)  
+✅ **Styling-Phase kann starten** (nach 2 minor Follow-ups, ~45 min)
 
 ---
 
-## 🗺️ Foundation-Fahrplan (4 Loops)
+## Loop-Status
 
-### Loop A — CI & Workflow Cleanup (1-2 Tage) 🔴
-
-**Ziel:** CI/Workflows stabilisieren, Performance-Baseline etablieren
-
-**Tasks:**
-- A1: Lighthouse-CI wieder aktivieren (if: false entfernen)
-- A2: Manifest-Check umbenennen → post-deploy-smoke.yml
-- A3: Bundle-Size-Job aus lighthouse-ci.yml entfernen (redundant)
-- A4: BASELINE_METRICS.md erstellen (Lighthouse-Scores dokumentieren)
-- A5: (Optional) Husky + lint-staged installieren
-
-**Handoff:** BASELINE_METRICS.md + Lighthouse-Job aktiv
+| Loop | Status | Kommentar |
+|------|--------|-----------|
+| **A — CI & Lighthouse** | ✅ Accepted | Lighthouse reaktiviert, Baseline-Scores dokumentiert (Performance 0.66–0.73, A11y 0.92+, PWA 1.0) |
+| **B — UI Primitives** | ⚠️ Accepted | Button, Card, Badge, Input fertig; ThemeProvider robust; Header migriert; **BottomNav fehlt** |
+| **C — E2E Tests** | ✅ Accepted | +15 neue Tests (Journal: 5, Alerts: 5, Watchlist: 5), CI integriert, total 45 Test-Cases |
 
 ---
 
-### Loop B — UI Primitives & Design-Token Wiring (2-3 Tage) 🔴
+## Lighthouse Baseline (2025-11-26)
 
-**Ziel:** Zentrale UI-Primitives erstellen, Tailwind-Abstraktion
+| Page | Performance | Accessibility | Best Practices | SEO | PWA |
+|------|-------------|---------------|----------------|-----|-----|
+| `/` | 0.67 | **0.92** ✅ | **1.0** ✅ | **0.9** ✅ | **1.0** ✅ |
+| `/dashboard-v2` | 0.66 | **0.92** ✅ | **1.0** ✅ | **0.9** ✅ | **1.0** ✅ |
+| `/journal-v2` | 0.73 | **0.94** ✅ | **0.96** ✅ | **0.9** ✅ | **1.0** ✅ |
 
-**Tasks:**
-- B1: src/components/ui/ erstellen (Button, Card, Badge, Input, Spinner)
-- B2: Header.tsx refactoren (Primitives + Lucide-Icons + useDarkMode)
-- B3: BottomNav.tsx refactoren (Design-Tokens konsistent)
-- B4: useDarkMode Hook implementieren (oder existing nutzen)
-- B5: docs/COMPONENT_GUIDELINES.md erstellen
-
-**Handoff:** UI-Primitives + Guidelines + refactored Header/BottomNav
-
----
-
-### Loop C — Core-Flow Tests (3-4 Tage) 🔴
-
-**Ziel:** E2E-Test-Coverage auf 15-20 Tests erhöhen
-
-**Tasks:**
-- C1: Audit bestehende E2E-Tests (8 Tests)
-- C2: journal.spec.ts erstellen (4 Tests: CRUD + Filter)
-- C3: alerts.spec.ts erstellen (3 Tests: Create, Trigger, Snooze)
-- C4: watchlist.spec.ts erstellen (3 Tests: Add, Remove, Offline-Persist)
-- C5: settings.spec.ts erstellen (2 Tests: Dark-Mode, AI-Provider)
-- C6: offline-mode.spec.ts erstellen (3 Tests: Navigate, CRUD, Fallback)
-
-**Handoff:** 23 E2E-Tests total (8 existing + 15 new)
+**Analyse:**
+- ✅ A11y, Best Practices, SEO, PWA: **Alle Targets erreicht!**
+- ⚠️ Performance: 0.66–0.73 (unter 0.75 Target, aber akzeptabel für Pre-Styling)
 
 ---
 
-### Loop D — PWA/Offline-Sanity & Security-Checks (1-2 Tage) 🟡
+## Follow-ups vor Styling (45 min)
 
-**Ziel:** PWA-Offline-Flow validieren, Node-SDKs im Client prüfen
+1. **BottomNav zu Design-Tokens migrieren** (30 min)
+   - File: `src/components/BottomNav.tsx`
+   - Change: `text-emerald-500` → `text-brand`, `border-brand`
+   - **Warum:** Konsistenz mit Header, zentrale Token-Verwaltung
 
-**Tasks:**
-- D1: Node-SDKs im Client-Bundle prüfen (rg "import.*openai" src/)
-- D2: PWA-Offline-Smoke-Test (Manual, dokumentieren)
-- D3: Service-Worker-Update-Flow testen (UpdateBanner)
-- D4: A11y-Audit mit axe-core auf alle Pages (optional)
-- D5: docs/PWA_OFFLINE_FEATURES.md erstellen
-
-**Handoff:** Security-Check ✅ + PWA-Sanity ✅ + Dokumentation
+2. **Lighthouse-Scores dokumentieren** (15 min) ✅ DONE
+   - File: `BASELINE_METRICS.md`
+   - **Status:** Bereits aktualisiert in diesem Review
 
 ---
 
-### Total Duration: 7-11 Tage (1.5-2 Sprints)
+## Follow-ups für Loop D (parallel zu Styling)
 
-**After Completion:** ✅ Foundation stable → **Ready for Styling!**
+3. **teaserAdapter zu Server-Side refactoren** (1-2 h)
+   - File: `src/lib/ai/teaserAdapter.ts` → `api/ai/teaser-vision.ts`
+   - **Warum:** Node-SDK (`openai`) sollte nicht im Client-Bundle landen
 
----
-
-## 📋 Prioritäts-Matrix
-
-| Loop | Ziel | Dauer | Prio | Blocking? |
-|------|------|-------|------|-----------|
-| **Loop A** | CI & Workflow Cleanup | 1-2d | 🔴 HIGH | ✅ JA (Performance-Baseline) |
-| **Loop B** | UI Primitives | 2-3d | 🔴 HIGH | ✅ JA (Styling-Abstraktion) |
-| **Loop C** | E2E-Tests | 3-4d | 🔴 HIGH | ⚠️ TEILWEISE (Core-Features) |
-| **Loop D** | PWA-Sanity | 1-2d | 🟡 MEDIUM | ❌ NEIN (nice-to-have) |
-
-**Empfehlung:**
-- **Vor Styling ZWINGEND:** Loop A + Loop B (3-5 Tage)
-- **Parallel zu Styling MÖGLICH:** Loop C + Loop D (4-6 Tage)
+4. **PWA-Offline-Smoke-Test** (30 min)
+   - Manual Test: Dashboard → Journal → Chart (offline)
+   - Dokumentation: `docs/PWA_SMOKE_TEST.md`
 
 ---
 
-## 🎨 Styling-Readiness-Score
+## Key-Wins
 
-### Vorher (Jetzt): 🟡 **60/100**
+✅ **CI ist production-ready:**
+- Lighthouse-CI reaktiviert (workflow_dispatch)
+- Post-Deploy-Smoke-Test implementiert
+- Playwright-Smoke-Suite läuft automatisch (45 Test-Cases!)
 
-**Breakdown:**
-- ✅ Tailwind + Design Tokens: **40/40**
-- ❌ Abstraktion fehlt: **0/30** (direkte Tailwind-Classes)
-- ❌ Dark-Mode nicht zentral: **0/15** (manuelles Toggle)
-- ✅ Layout-Struktur: **15/15** (Header, BottomNav, Pages)
+✅ **UI-Primitives-Layer etabliert:**
+- Button, Card, Badge, Input + 10 weitere
+- ThemeProvider mit `system` Mode (SSR-safe)
+- Header ist perfekte Pilot-Migration
 
-### Nach Loop A+B: 🟢 **95/100**
+✅ **E2E-Coverage tripled:**
+- 8 → 23+ Tests (11 Specs, 45 Test-Cases)
+- Journal, Alerts, Watchlist vollständig abgedeckt
+- Fixtures & Utils abstrahiert, wartbar
 
-**Breakdown:**
-- ✅ Tailwind + Design Tokens: **40/40**
-- ✅ Abstraktion vorhanden: **30/30** (UI-Primitives)
-- ✅ Dark-Mode zentral: **15/15** (useDarkMode Hook)
-- ✅ Layout-Struktur: **15/15** (Header, BottomNav, Pages)
-
-**Missing -5:** Visual-Regression (wird nach Styling eingerichtet)
-
----
-
-## 🚦 Ampel-Status
-
-### CI/Build 🟢
-- ✅ TypeScript strict mode
-- ✅ ESLint + A11y-Rules
-- ✅ Bundle-Size-Check
-- ⚠️ Lighthouse deaktiviert (Fix: Loop A)
-
-### PWA/Offline 🟢
-- ✅ Service Worker konfiguriert
-- ✅ Manifest + Icons
-- ✅ Runtime-Caching
-- ⚠️ Offline-Flow nicht vollständig getestet (Fix: Loop D)
-
-### Security 🟢
-- ✅ Secrets-Validation (check-env.js)
-- ✅ Server-only Secrets
-- ⚠️ Node-SDKs im Client unklar (Fix: Loop D)
-
-### Frontend-Arch 🟡
-- ✅ Tailwind + Design Tokens
-- ✅ Layout-Struktur
-- ❌ UI-Primitives fehlen (Fix: Loop B)
-- ❌ Dark-Mode nicht zentral (Fix: Loop B)
-
-### Testing 🟡
-- ✅ Unit-Tests vorhanden
-- ✅ E2E-Tests vorhanden (8 Tests)
-- ❌ Coverage zu niedrig (Fix: Loop C)
-- ❌ Visual-Regression fehlt (Post-Styling)
-
-### Gesamt: 🟡 **Gelb** (Fundament stabil, aber Lücken vor Styling)
-
-**Nach Loop A+B:** 🟢 **Grün** (Ready for Styling)
+✅ **Performance-Baseline dokumentiert:**
+- Lighthouse-Scores für alle Hauptseiten
+- Bundle-Size: 703 KB / 800 KB (88% Auslastung)
 
 ---
 
-## ✅ Definition of Done
+## Empfehlung
 
-Die Foundation gilt als "Ready for Styling", wenn:
+✅ **GO FOR STYLING** nach BottomNav-Migration (30 min)
 
-- [x] **Phase 0-5 abgeschlossen** (Analyse + Plan erstellt)
-- [ ] **Loop A abgeschlossen** (Lighthouse aktiv + Baseline dokumentiert)
-- [ ] **Loop B abgeschlossen** (UI-Primitives + Guidelines + Refactorings)
-- [ ] **Loop C abgeschlossen** (15 neue E2E-Tests)
-- [ ] **Loop D abgeschlossen** (Security-Check + PWA-Sanity)
+**Styling-Reihenfolge:**
+1. Design-Token-Refinement (Farben, Spacing, Typography)
+2. Component-Library-Erweiterung (20-30 Components)
+3. Page-Layout-Refactor (Grid, Flex, Responsive)
+4. Visual-Regression-Setup (Chromatic/Percy)
 
-**Minimal-Viable-Foundation (MVP):**
-- [x] Phase 0-5 (Plan erstellt) ✅
-- [ ] **Loop A + Loop B** (CI + UI-Primitives) ← **MUST-HAVE vor Styling**
-- [ ] Loop C + Loop D (Tests + PWA) ← **SHOULD-HAVE, kann parallel**
+**Loop D (PWA-Sanity) kann parallel laufen.**
 
 ---
 
-## 🔗 Deliverables
-
-### Bereits erstellt:
-1. ✅ `FOUNDATION_PLAN_BEFORE_STYLING.md` (Detaillierter Fahrplan)
-2. ✅ `FOUNDATION_EXECUTIVE_SUMMARY.md` (dieses Dokument)
-
-### Werden in Loops erstellt:
-3. `BASELINE_METRICS.md` (Loop A — Lighthouse-Scores)
-4. `docs/COMPONENT_GUIDELINES.md` (Loop B — Component-Konventionen)
-5. `docs/PWA_OFFLINE_FEATURES.md` (Loop D — Offline-Dokumentation)
-6. `src/components/ui/` (Loop B — UI-Primitives)
-7. 15 neue E2E-Tests (Loop C — Journal, Alerts, Watchlist, etc.)
-
----
-
-## 📞 Handoff an Codex
-
-**Nächste Schritte:**
-
-1. **Review:** Codex liest `FOUNDATION_PLAN_BEFORE_STYLING.md`
-2. **Start Loop A:** CI & Workflow Cleanup (1-2 Tage)
-3. **Start Loop B:** UI Primitives (2-3 Tage)
-4. **Checkpoint:** Nach Loop A+B → Claude reviewed → ✅ "Ready for Styling"
-5. **Optional:** Loop C+D parallel zu Styling
-
-**Kommunikation:**
-- Nach jedem Loop: Status-Update + Commit-Message mit Loop-Nummer
-- Nach Loop A+B: Codex informiert Claude → Claude validiert → Go/No-Go für Styling
-
----
-
-## ✍️ Signature
-
-**Architekt:** Claude (Senior-Architekt & QA-Lead)  
-**Datum:** 2025-11-26  
-**Status:** ✅ Foundation-Check abgeschlossen, Plan erstellt
-
-**Handoff:** Codex kann jetzt mit Loop A beginnen!
-
----
-
-**Ende der Executive Summary** 🎉
+**Full Review:** `FOUNDATION_LOOPS_REVIEW.md`  
+**Foundation Plan:** `FOUNDATION_PLAN_BEFORE_STYLING.md`  
+**Baseline Metrics:** `BASELINE_METRICS.md`

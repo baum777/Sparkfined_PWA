@@ -1,18 +1,18 @@
 # Baseline Metrics (Pre-Styling)
 
-**Date:** _Pending (fill after first rerun)_  
-**Branch:** _Pending_  
-**Base URL:** _Pending_
+**Date:** 2025-11-26  
+**Branch:** main (after Loops A–C)  
+**Base URL:** https://sparkfined-pwa.vercel.app
 
-> 📝 **How to update:** Run `Lighthouse CI` workflow (manual dispatch), download the HTML/JSON artifacts, and copy the median scores into the table below. Keep the table sorted by page priority.
+> 📝 **Source:** `.lhci-report/manifest.json` (Lighthouse CI run from 2025-11-26 11:59 UTC)
 
 ## Lighthouse Scores
 
-| Page / Route   | Performance | Accessibility | Best Practices | SEO | Notes |
-|----------------|-------------|---------------|----------------|-----|-------|
-| `/` (Dashboard) | TBD | TBD | TBD | TBD | Reference run ID: _TBD_ |
-| `/dashboard-v2` | TBD | TBD | TBD | TBD |  |
-| `/journal-v2` | TBD | TBD | TBD | TBD |  |
+| Page / Route   | Performance | Accessibility | Best Practices | SEO | PWA | Notes |
+|----------------|-------------|---------------|----------------|-----|-----|-------|
+| `/` (Root) | **0.67** | **0.92** ✅ | **1.0** ✅ | **0.9** ✅ | **1.0** ✅ | Below perf target (0.75) |
+| `/dashboard-v2` | **0.66** | **0.92** ✅ | **1.0** ✅ | **0.9** ✅ | **1.0** ✅ | Below perf target (0.75) |
+| `/journal-v2` | **0.73** | **0.94** ✅ | **0.96** ✅ | **0.9** ✅ | **1.0** ✅ | Closest to perf target |
 
 ## Bundle Size Snapshot
 
