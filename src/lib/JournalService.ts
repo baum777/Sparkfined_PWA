@@ -22,6 +22,8 @@ import type {
   EmotionTag,
   TradeOutcome,
 } from '@/types/journal'
+import { useEventBusStore } from '@/store/eventBus'
+import type { JournalEvent } from '@/types/journalEvents'
 
 // Re-export types for external use
 export type { JournalEntry, PatternStats, SetupTag, EmotionTag }
@@ -53,7 +55,15 @@ export async function createEntry(
     const store = transaction.objectStore('journal_entries')
     const request = store.add(newEntry)
 
-    request.onsuccess = () => resolve(newEntry)
+    request.onsuccess = () => {
+      emitJournalEvent({
+        type: 'JournalEntryCreated',
+        entryId: newEntry.id,
+        entry: newEntry,
+      })
+      maybeEmitReflexionCompleted(undefined, newEntry)
+      resolve(newEntry)
+    }
     request.onerror = () => reject(request.error)
   })
 }
@@ -83,7 +93,15 @@ export async function updateEntry(
     const store = transaction.objectStore('journal_entries')
     const request = store.put(updated)
 
-    request.onsuccess = () => resolve(updated)
+    request.onsuccess = () => {
+      emitJournalEvent({
+        type: 'JournalEntryUpdated',
+        entryId: updated.id,
+        entry: updated,
+      })
+      maybeEmitReflexionCompleted(existing, updated)
+      resolve(updated)
+    }
     request.onerror = () => reject(request.error)
   })
 }
@@ -131,13 +149,24 @@ export async function getEntry(id: string): Promise<JournalEntry | undefined> {
  */
 export async function deleteEntry(id: string): Promise<void> {
   const db = await initDB()
+  const existing = await getEntry(id)
+  if (!existing) {
+    return
+  }
 
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(['journal_entries'], 'readwrite')
     const store = transaction.objectStore('journal_entries')
     const request = store.delete(id)
 
-    request.onsuccess = () => resolve()
+    request.onsuccess = () => {
+      emitJournalEvent({
+        type: 'JournalEntryDeleted',
+        entryId: id,
+        entrySnapshot: existing,
+      })
+      resolve()
+    }
     request.onerror = () => reject(request.error)
   })
 }
@@ -401,10 +430,25 @@ export async function cleanupTempEntries(ttlDays: number = 7): Promise<number> {
 export async function markAsActive(
   id: string
 ): Promise<JournalEntry | undefined> {
-  return updateEntry(id, {
+  const previous = await getEntry(id)
+  if (!previous) {
+    return undefined
+  }
+  const updated = await updateEntry(id, {
     status: 'active',
     markedActiveAt: Date.now(),
   })
+
+  if (updated) {
+    emitJournalEvent({
+      type: 'JournalTradeMarkedActive',
+      entryId: updated.id,
+      entry: updated,
+      previousStatus: previous?.status,
+    })
+  }
+
+  return updated
 }
 
 /**
@@ -417,13 +461,24 @@ export async function closeEntry(
   id: string,
   outcome: TradeOutcome
 ): Promise<JournalEntry | undefined> {
-  return updateEntry(id, {
+  const updated = await updateEntry(id, {
     status: 'closed',
     outcome: {
       ...outcome,
       closedAt: outcome.closedAt || Date.now(),
     },
   })
+
+  if (updated && updated.outcome) {
+    emitJournalEvent({
+      type: 'JournalTradeClosed',
+      entryId: updated.id,
+      entry: updated,
+      outcome: updated.outcome,
+    })
+  }
+
+  return updated
 }
 
 // ============================================================================
@@ -507,4 +562,37 @@ export async function exportEntries(
   }
 
   throw new Error(`Unsupported format: ${format}`)
+}
+
+type DispatchableJournalEvent = Omit<JournalEvent, 'domain' | 'occurredAt'> & { occurredAt?: number }
+
+function emitJournalEvent(event: DispatchableJournalEvent): void {
+  const { pushJournalEvent } = useEventBusStore.getState()
+  pushJournalEvent({
+    ...event,
+    domain: 'journal',
+    occurredAt: event.occurredAt ?? Date.now(),
+  })
+}
+
+function isReflexionComplete(entry?: JournalEntry | null): boolean {
+  if (!entry) return false
+  return Boolean(entry.setup && entry.emotion && entry.thesis?.trim())
+}
+
+function maybeEmitReflexionCompleted(
+  previous: JournalEntry | undefined,
+  next: JournalEntry | undefined
+): void {
+  if (!next) return
+  if (isReflexionComplete(previous)) {
+    return
+  }
+  if (isReflexionComplete(next)) {
+    emitJournalEvent({
+      type: 'JournalReflexionCompleted',
+      entryId: next.id,
+      entry: next,
+    })
+  }
 }

@@ -22,6 +22,7 @@ export type JournalEntry = {
   setup: SetupTag;               // Predefined setup type
   emotion: EmotionTag;           // Predefined emotion
   customTags?: string[];         // User-defined tags (optional)
+  behavioralTags?: string[];     // Behavioral insights (derived or AI-tagged)
   thesis?: string;               // Manual reasoning/hypothesis (3a)
   
   // Auto-Fetched Context (3b - Grok Integration)
