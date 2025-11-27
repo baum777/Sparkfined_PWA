@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import JournalLayout from '@/components/journal/JournalLayout';
 import JournalList from '@/components/journal/JournalList';
@@ -28,6 +28,7 @@ export default function JournalPageV2() {
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createErrorMessage, setCreateErrorMessage] = useState<string | null>(null);
+  const hasInitializedFromUrl = useRef(false);
 
   useEffect(() => {
     let isCurrent = true;
@@ -63,12 +64,15 @@ export default function JournalPageV2() {
 
   // Mount-only: respect deep link param during first paint without reacting to future URL changes here.
   useEffect(() => {
+    if (hasInitializedFromUrl.current || entries.length === 0) {
+      return;
+    }
+    hasInitializedFromUrl.current = true;
     const entryParam = searchParams.get('entry');
     if (entryParam && entries.some((e) => e.id === entryParam)) {
       setActiveId(entryParam);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [entries, searchParams, setActiveId]);
 
   // Ensure there is always an active entry once entries are present.
   useEffect(() => {
