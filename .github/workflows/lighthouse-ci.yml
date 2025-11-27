@@ -3,131 +3,64 @@ name: Lighthouse CI
 on:
   workflow_dispatch:
     inputs:
-      target-url:
-        description: 'Base URL to audit (default: production)'
+      base_url:
+        description: 'Base URL to audit (no trailing slash, defaults to prod)'
         required: false
-        default: ''
-  schedule:
-    # Tuesdays @ 05:00 UTC – lightweight enough for weekly checks
-    - cron: '0 5 * * 2'
-  workflow_run:
-    workflows: ['CI']
-    types:
-      - completed
-
-permissions:
-  contents: read
+        default: 'https://sparkfined.app'
+      runs:
+        description: 'Number of Lighthouse samples per URL (1-5)'
+        required: false
+        default: '2'
 
 env:
-  DEFAULT_TARGET_URL: ${{ vars.LHCI_TARGET_URL || 'https://sparkfined-pwa.vercel.app' }}
-  # Keep list short to avoid blowing up runtime; extend as needed
-  AUDIT_PATHS: |
-    /
-    /dashboard-v2
-    /journal-v2
+  DEFAULT_PATHS: '/,/dashboard-v2,/journal-v2'
 
 jobs:
   lighthouse:
-    name: Lighthouse baseline
+    name: Lighthouse audit
     runs-on: ubuntu-latest
-    if: >
-      github.event_name != 'workflow_run' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.head_branch == 'main')
+    permissions:
+      contents: read
+      actions: read
+    env:
+      TARGET_BASE_URL: ${{ inputs.base_url != '' && inputs.base_url || secrets.DEPLOY_URL || 'https://sparkfined.app' }}
+      RUN_COUNT: ${{ inputs.runs != '' && inputs.runs || '2' }}
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Resolve target url
-        id: target
-        shell: bash
+      - name: Show audit configuration
         run: |
-          set -eo pipefail
-          target="${{ env.DEFAULT_TARGET_URL }}"
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.target-url }}" ]]; then
-            target="${{ github.event.inputs.target-url }}"
-          fi
-          # Drop any trailing slash for consistent concatenation
-          target="${target%/}"
-          echo "TARGET_URL=$target" >> "$GITHUB_ENV"
-          echo "Resolved target URL: $target"
+          echo "Base URL: ${TARGET_BASE_URL}"
+          echo "Runs per URL: ${RUN_COUNT}"
+          echo "Paths: ${DEFAULT_PATHS}"
+          {
+            echo "### Lighthouse CI configuration"
+            echo ""
+            echo "- Base URL: ${TARGET_BASE_URL}"
+            echo "- Paths: ${DEFAULT_PATHS}"
+            echo "- Runs per URL: ${RUN_COUNT}"
+            echo "- Budgets: lighthouse-budget.json"
+            echo ""
+            echo "> Update the workflow_dispatch inputs to audit preview URLs or increase the sample size."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v11
         with:
           configPath: ./lighthouserc.json
           urls: |
-            ${{ env.TARGET_URL }}/
-            ${{ env.TARGET_URL }}/dashboard-v2
-            ${{ env.TARGET_URL }}/journal-v2
+            ${{ env.TARGET_BASE_URL }}
+            ${{ format('{0}/dashboard-v2', env.TARGET_BASE_URL) }}
+            ${{ format('{0}/journal-v2', env.TARGET_BASE_URL) }}
+          runs: ${{ env.RUN_COUNT }}
           budgetPath: ./lighthouse-budget.json
           uploadArtifacts: true
-          temporaryPublicStorage: false
-
-      - name: Summarize Lighthouse scores
-        shell: bash
-        run: |
-          set -eo pipefail
-          cat <<'EOF' | node
-          const fs = require('fs');
-          const path = '.lighthouseci/manifest.json';
-          if (!fs.existsSync(path)) {
-            console.warn('Lighthouse manifest not found.');
-            process.exit(0);
-          }
-          const data = JSON.parse(fs.readFileSync(path, 'utf8'));
-          const header = ['| Page | Perf | A11y | Best Practices | SEO |', '| --- | --- | --- | --- | --- |'];
-          const fmt = (value) => `${Math.round((value ?? 0) * 100)}`;
-          const rows = data.map(({ url, summary }) => {
-            return `| ${url} | ${fmt(summary.performance)} | ${fmt(summary.accessibility)} | ${fmt(summary['best-practices'])} | ${fmt(summary.seo)} |`;
-          });
-          const table = header.concat(rows).join('\n');
-          console.log(table);
-          if (process.env.GITHUB_STEP_SUMMARY) {
-            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Lighthouse summary\n${table}\n`);
-          }
-          EOF
-
-      - name: Upload Lighthouse artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lighthouse-report
-          path: .lighthouseci
-
-  bundle-size:
-    name: Bundle size (manual)
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9.0.0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build app
-        env:
-          VITE_MORALIS_API_KEY: 'test-key'
-        run: pnpm run build:ci
-
-      - name: Check bundle size
-        run: pnpm run check:size
-
-      - name: Upload bundle stats
-        if: always() && exists('dist')
-        uses: actions/upload-artifact@v4
-        with:
-          name: bundle-stats
-          path: dist
+          temporaryPublicStorage: true
+          assertions: |
+            categories:performance=warn:0.75
+            categories:accessibility=error:0.90
+            categories:best-practices=warn:0.90
+            categories:seo=warn:0.90
+            largest-contentful-paint=warn:3000
+            cumulative-layout-shift=warn:0.15

@@ -1,10 +1,11 @@
 import React from "react";
-import { useSettings, type ThemeMode } from "../state/settings";
+import { useSettings } from "../state/settings";
 import { KEYS, exportAppData, downloadJson, importAppData, clearNs, clearCaches, pokeServiceWorker, type NamespaceKey } from "../lib/datastore";
 import { useTelemetry } from "../state/telemetry";
 import { useAISettings } from "../state/ai";
 import { useAIContext } from "../state/aiContext";
 import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from "../lib/walletMonitor";
+import { useTheme, type ThemeMode } from "@/lib/theme/useTheme";
 
 interface SettingsPageProps {
   showHeading?: boolean;
@@ -16,6 +17,7 @@ export default function SettingsPage({
   wrapperClassName = "mx-auto max-w-3xl p-4 pb-20 md:p-6 md:pb-6",
 }: SettingsPageProps) {
   const { settings, setSettings } = useSettings();
+  const { theme, setTheme } = useTheme();
   const { flags, setFlags, buffer, drain } = useTelemetry();
   const { ai, setAI } = useAISettings();
   const [busy, setBusy] = React.useState<string | null>(null);
@@ -92,7 +94,7 @@ export default function SettingsPage({
       ) : null}
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
         <Row label="Theme">
-          <Select value={settings.theme} onChange={(e)=>setSettings({theme:e.target.value as ThemeMode})}>
+          <Select value={theme} onChange={(e)=>setTheme(e.target.value as ThemeMode)}>
             <option value="system">System</option>
             <option value="dark">Dark</option>
             <option value="light">Light</option>

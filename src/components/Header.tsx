@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import FeedbackModal from './FeedbackModal'
 import MetricsPanel from './MetricsPanel'
+import Button from '@/components/ui/Button'
+import { BarChart3, MessageCircle, Moon, Sun } from '@/lib/icons'
+import { useTheme } from '@/lib/theme/useTheme'
 
 interface HeaderProps {
   title?: string
@@ -9,43 +12,54 @@ interface HeaderProps {
 export default function Header({ title = 'Sparkfined' }: HeaderProps) {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false)
   const [isMetricsOpen, setIsMetricsOpen] = useState(false)
+  const { resolvedTheme, setTheme } = useTheme()
+
+  const handleToggleTheme = () => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+  }
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+      <header className="sticky top-0 z-40 border-b border-border-moderate bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/75">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">S</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-gradient text-white shadow-glow-accent">
+              <span className="text-base font-semibold">S</span>
             </div>
-            <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h1>
+            <h1 className="text-lg font-semibold text-text-primary">{title}</h1>
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setIsFeedbackOpen(true)}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               aria-label="Share feedback"
-              title="Share Feedback"
+              title="Share feedback"
             >
-              💬
-            </button>
-            <button
+              <MessageCircle className="h-4 w-4" aria-hidden />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => setIsMetricsOpen(true)}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               aria-label="View metrics"
-              title="Metrics & Export"
+              title="Metrics & export"
             >
-              📊
-            </button>
-            <button
-              onClick={() => document.documentElement.classList.toggle('dark')}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              aria-label="Toggle dark mode"
+              <BarChart3 className="h-4 w-4" aria-hidden />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleToggleTheme}
+              aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
             >
-              <span className="dark:hidden">🌙</span>
-              <span className="hidden dark:inline">☀️</span>
-            </button>
+              {resolvedTheme === 'dark' ? (
+                <Sun className="h-4 w-4" aria-hidden />
+              ) : (
+                <Moon className="h-4 w-4" aria-hidden />
+              )}
+            </Button>
           </div>
         </div>
       </header>

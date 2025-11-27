@@ -1,81 +1,87 @@
-import React from 'react';
+import React from 'react'
+import { cn } from '@/lib/ui/cn'
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  error?: string;
-  helperText?: string;
-  hint?: string; // Backward compatibility alias for helperText
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  mono?: boolean; // For CA/Number inputs
-  errorId?: string; // For aria-describedby
+  label?: string
+  error?: string
+  helperText?: string
+  hint?: string // Backward compatibility alias for helperText
+  leftIcon?: React.ReactNode
+  rightIcon?: React.ReactNode
+  mono?: boolean
+  errorId?: string
 }
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(({
-  label,
-  error,
-  helperText,
-  hint, // Backward compatibility
-  leftIcon,
-  rightIcon,
-  mono = false,
-  errorId,
-  className = '',
-  ...props
-}, ref) => {
-  const generatedErrorId = errorId || `error-${Math.random().toString(36).substr(2, 9)}`;
-  const helperTextValue = helperText || hint;
-  
-  const baseStyles = 'w-full bg-zinc-800 border text-zinc-100 placeholder-zinc-500 transition-all focus:outline-none focus:ring-2 rounded-lg touch-manipulation';
-  const stateStyles = error
-    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/50'
-    : 'border-zinc-700 focus:border-blue-500 focus:ring-blue-500/50';
-  // Touch-optimized: h-12 = 48px (exceeds iOS HIG 44px minimum)
-  const sizeStyles = 'px-4 py-3 text-sm h-12';
-  const fontClass = mono ? 'font-mono tabular-nums' : '';
-  const iconPadding = leftIcon ? 'pl-11' : rightIcon ? 'pr-11' : '';
-  
+const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    label,
+    error,
+    helperText,
+    hint,
+    leftIcon,
+    rightIcon,
+    mono = false,
+    errorId,
+    className,
+    id,
+    ...props
+  },
+  ref
+) {
+  const generatedId = React.useId()
+  const inputId = id ?? generatedId
+  const helperTextValue = helperText ?? hint
+  const computedErrorId = error ? errorId ?? `${inputId}-error` : undefined
+  const helperId = !error && helperTextValue ? `${inputId}-helper` : undefined
+
   return (
     <div className="w-full">
-      {label && (
-        <label className="block text-sm font-medium text-zinc-300 mb-2">
+      {label ? (
+        <label htmlFor={inputId} className="mb-2 block text-sm font-medium text-text-secondary">
           {label}
         </label>
-      )}
+      ) : null}
+
       <div className="relative">
-        {leftIcon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 flex items-center">
-            {leftIcon}
-          </div>
-        )}
+        {leftIcon ? (
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-text-tertiary">{leftIcon}</span>
+        ) : null}
+
         <input
+          id={inputId}
           ref={ref}
-          aria-invalid={!!error}
-          aria-describedby={error ? generatedErrorId : undefined}
-          className={`${baseStyles} ${stateStyles} ${sizeStyles} ${fontClass} ${iconPadding} ${className}`}
+          aria-invalid={Boolean(error)}
+          aria-describedby={computedErrorId ?? helperId}
+          className={cn(
+            'h-12 w-full rounded-xl border bg-surface-subtle px-4 text-sm text-text-primary placeholder:text-text-tertiary transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
+            error ? 'border-danger focus-visible:ring-danger/40' : 'border-border-moderate focus-visible:ring-border-focus',
+            leftIcon && 'pl-11',
+            rightIcon && 'pr-11',
+            mono && 'font-mono tabular-nums',
+            className
+          )}
           {...props}
         />
-        {rightIcon && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 flex items-center">
-            {rightIcon}
-          </div>
-        )}
+
+        {rightIcon ? (
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-tertiary">{rightIcon}</span>
+        ) : null}
       </div>
-      {error && (
-        <p id={generatedErrorId} className="mt-1 text-xs text-red-500 flex items-center gap-1" role="alert">
-          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
+
+      {error ? (
+        <p id={computedErrorId} className="mt-1 flex items-center gap-1 text-xs text-danger" role="alert">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-danger" aria-hidden />
           {error}
         </p>
-      )}
-      {helperTextValue && !error && (
-        <p className="mt-1 text-xs text-zinc-400">{helperTextValue}</p>
-      )}
+      ) : null}
+
+      {!error && helperTextValue ? (
+        <p id={helperId} className="mt-1 text-xs text-text-tertiary">
+          {helperTextValue}
+        </p>
+      ) : null}
     </div>
-  );
-});
+  )
+})
 
-Input.displayName = 'Input';
-
-export default Input;
+export default Input

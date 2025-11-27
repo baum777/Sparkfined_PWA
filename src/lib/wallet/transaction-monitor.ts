@@ -25,8 +25,8 @@ import type {
  * - Raydium program logs
  */
 export async function parseTransaction(
-  signature: string,
-  walletAddress: string,
+  _signature: string,
+  _walletAddress: string,
 ): Promise<MonitoredTransaction | null> {
   try {
     // TODO: Implement actual transaction parsing via Helius/QuickNode
@@ -121,7 +121,7 @@ export async function fetchTokenPriceUsd(tokenAddress: string): Promise<number |
 /**
  * Fetch market data for token (market cap, volume, price change)
  */
-export async function fetchMarketData(tokenAddress: string): Promise<{
+export async function fetchMarketData(_tokenAddress: string): Promise<{
   marketCap?: number;
   volume24h?: number;
   priceChange24h?: number;
@@ -153,7 +153,7 @@ export async function fetchMarketData(tokenAddress: string): Promise<{
  */
 export function subscribeToWalletTransactions(
   walletAddresses: string[],
-  onTransaction: (tx: MonitoredTransaction) => void,
+  _onTransaction: (tx: MonitoredTransaction) => void,
 ): () => void {
   const HELIUS_API_KEY = import.meta.env.VITE_HELIUS_API_KEY;
 
@@ -198,7 +198,7 @@ export function subscribeToWalletTransactions(
 export async function fetchTransactionHistory(
   walletAddress: string,
   beforeSignature?: string,
-  limit = 100,
+  _limit = 100,
 ): Promise<MonitoredTransaction[]> {
   try {
     const HELIUS_API_KEY = import.meta.env.VITE_HELIUS_API_KEY;

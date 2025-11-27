@@ -1,16 +1,33 @@
-import React from 'react';
+import React from 'react'
+import { Loader2 } from '@/lib/icons'
+import { cn } from '@/lib/ui/cn'
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'danger';
-export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline'
+export type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  isLoading?: boolean;
-  loading?: boolean; // Backward compatibility alias
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  children: React.ReactNode;
+  variant?: ButtonVariant
+  size?: ButtonSize
+  isLoading?: boolean
+  loading?: boolean // Backward compatibility alias
+  leftIcon?: React.ReactNode
+  rightIcon?: React.ReactNode
+  children: React.ReactNode
+}
+
+const variantClasses: Record<ButtonVariant, string> = {
+  primary: 'bg-brand text-white shadow-glow-accent hover:bg-brand-hover focus-visible:ring-brand/60',
+  secondary:
+    'bg-surface-subtle text-text-primary border border-border-moderate hover:bg-surface-hover focus-visible:ring-border-focus',
+  ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface-subtle focus-visible:ring-border-focus/50',
+  outline:
+    'bg-transparent text-text-primary border border-border-moderate hover:border-border-hover hover:bg-surface-subtle focus-visible:ring-border-focus',
+}
+
+const sizeClasses: Record<ButtonSize, string> = {
+  sm: 'h-9 px-3 text-xs',
+  md: 'h-11 px-4 text-sm',
+  lg: 'h-12 px-5 text-base',
 }
 
 export default function Button({
@@ -22,49 +39,36 @@ export default function Button({
   rightIcon,
   disabled,
   children,
-  className = '',
+  className,
+  type = 'button',
   ...props
 }: ButtonProps) {
-  const isLoadingState = isLoading || loading;
-  
-  const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 disabled:opacity-50 disabled:pointer-events-none rounded-lg touch-manipulation';
+  const isLoadingState = isLoading || loading
 
-  const variants: Record<string, string> = {
-    primary: 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95',
-    secondary: 'bg-zinc-800 text-zinc-100 border border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600 active:scale-95',
-    ghost: 'bg-transparent text-zinc-300 hover:bg-zinc-800/50 hover:text-zinc-100 active:scale-95',
-    destructive: 'bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20 active:scale-95',
-    danger: 'bg-rose-500 text-white hover:bg-rose-600 active:scale-95', // Keep for backward compatibility
-  };
-
-  // Touch-optimized sizes (iOS HIG: min 44px, Material: min 48px)
-  const sizes = {
-    sm: 'px-4 py-2 text-sm h-11 min-w-[44px]',  // 44px height (iOS standard)
-    md: 'px-5 py-2.5 text-base h-12 min-w-[48px]',  // 48px height (Material standard)
-    lg: 'px-6 py-3 text-lg h-14 min-w-[56px]',  // 56px height (comfortable)
-  };
-  
   return (
     <button
+      type={type}
       disabled={disabled || isLoadingState}
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
+      className={cn(
+        'inline-flex select-none items-center justify-center gap-2 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60',
+        variantClasses[variant],
+        sizeClasses[size],
+        className
+      )}
       {...props}
     >
       {isLoadingState ? (
-        <>
-          <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
+        <span className="inline-flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
           <span>{children}</span>
-        </>
+        </span>
       ) : (
         <>
-          {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
+          {leftIcon ? <span className="flex-shrink-0">{leftIcon}</span> : null}
           <span>{children}</span>
-          {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+          {rightIcon ? <span className="flex-shrink-0">{rightIcon}</span> : null}
         </>
       )}
     </button>
-  );
+  )
 }
