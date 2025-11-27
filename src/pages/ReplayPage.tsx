@@ -13,7 +13,7 @@ import { useAlertsStore } from "@/store/alertsStore"
 import { useJournalStore } from "@/store/journalStore"
 import { useChartUiStore } from "@/store/chartUiStore"
 import { mapAlertToAnnotation, mapJournalEntryToAnnotation, mergeAnnotations } from "@/lib/annotations"
-import { buildChartUrl, buildReplayUrl } from "@/lib/chartLinks"
+import { buildChartUrl } from "@/lib/chartLinks"
 import { useChartTelemetry } from "@/lib/chartTelemetry"
 
 type ViewMode = "player" | "dashboard"
