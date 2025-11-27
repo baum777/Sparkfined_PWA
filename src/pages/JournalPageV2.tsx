@@ -76,8 +76,8 @@ export default function JournalPageV2() {
         setActiveId(firstEntry.id);
       }
     }
-    // searchParams is read but NOT in deps - this runs only when entries load or activeId clears
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Note: searchParams is read but NOT in deps - this runs only when entries load or activeId clears
+    // This prevents infinite loop (searchParams object recreated on every URL change)
   }, [entries, activeId]);
 
   const filteredEntries = useMemo(() => {
