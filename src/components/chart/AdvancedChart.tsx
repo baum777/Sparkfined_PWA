@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import type {
   CandlestickData,
   CandlestickSeriesOptions,
@@ -102,7 +102,6 @@ export default function AdvancedChart({
   const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null)
   const indicatorSeriesRef = useRef<Record<string, ISeriesApi<'Line'>[]>>({})
-  const [_chartLibLoaded, setChartLibLoaded] = useState(false)
 
   const { candleData, volumeData } = useMemo(() => toSeriesData(candles), [candles])
   const lastCandle = useMemo(() => candles[candles.length - 1], [candles])
@@ -157,7 +156,6 @@ export default function AdvancedChart({
         candleSeriesRef.current = candleSeries
         volumeSeriesRef.current = volumeSeries
         chartRef.current = chart
-        setChartLibLoaded(true)
 
         const handleResize = () => {
           if (containerRef.current && chart) {
@@ -200,7 +198,6 @@ export default function AdvancedChart({
       chartRef.current = null
       candleSeriesRef.current = null
       volumeSeriesRef.current = null
-      setChartLibLoaded(false)
     }
   }, [])
 

@@ -13,7 +13,9 @@ export default [
       "*.config.ts",
       "scripts/**",
       "wireframes/**",
-      "docs/archive/**"
+      "docs/archive/**",
+      "ai/**",
+      "middleware.ts"
     ]
   },
   {

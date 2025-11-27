@@ -25,6 +25,7 @@ const DEFAULTS: Settings = {
 type StoredSettings = Settings & { theme?: string }
 
 function read(): Settings {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { theme: _legacyTheme, ...settings } = getJSON<StoredSettings>(KEY, DEFAULTS)
   return settings
 }
