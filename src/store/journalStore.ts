@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createEntry, queryEntries, updateEntryNotes } from '@/lib/JournalService';
-import type { JournalEntry as PersistedJournalEntry } from '@/types/journal';
+import type { JournalEntry as PersistedJournalEntry, ChartSnapshot, GrokContext } from '@/types/journal';
 import type { SolanaMemeTrendEvent, TrendSentimentLabel } from '@/types/events';
 import type { ChartCreationContext } from '@/domain/chart';
 
@@ -17,6 +17,10 @@ export interface JournalEntry {
   sourceUrl?: string;
   tags?: string[];
   sentimentLabel?: TrendSentimentLabel;
+  grokContext?: GrokContext;
+  chartSnapshot?: ChartSnapshot;
+  replaySessionId?: string;
+  behavioralTags?: string[];
 }
 
 interface JournalState {
@@ -177,6 +181,10 @@ function mapPersistedToJournalEntry(entry: PersistedJournalEntry): JournalEntry 
     pnl: formatPnl(entry.outcome?.pnlPercent, entry.outcome?.pnl),
     notes: entry.thesis || (entry.customTags?.length ? entry.customTags.join(', ') : undefined),
     isAuto: false,
+    grokContext: entry.grokContext,
+    chartSnapshot: entry.chartSnapshot,
+    replaySessionId: entry.replaySessionId,
+    behavioralTags: entry.behavioralTags ?? entry.customTags,
   };
 }
 

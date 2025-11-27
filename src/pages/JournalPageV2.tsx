@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import JournalLayout from '@/components/journal/JournalLayout';
 import JournalList from '@/components/journal/JournalList';
@@ -24,6 +24,9 @@ export default function JournalPageV2() {
       addEntry: state.addEntry,
     }));
   const [searchParams, setSearchParams] = useSearchParams();
+  // Snapshot the initial ?entry param exactly once to avoid useEffect dependency churn (React #185 guard).
+  const initialEntryIdRef = useRef<string | null>(searchParams.get('entry'));
+  const hasResolvedInitialEntryRef = useRef(false);
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -61,24 +64,22 @@ export default function JournalPageV2() {
     // loadJournalEntries is a stable import, setters are stable from zustand
   }, []);
 
-  // Initialize activeId from URL or select first entry (runs once on mount/entries load)
+  // Initialize activeId from the initial URL param or first entry.
   useEffect(() => {
-    if (entries.length === 0 || activeId) {
+    if (entries.length === 0 || activeId || hasResolvedInitialEntryRef.current) {
       return;
     }
-    
-    const entryParam = searchParams.get('entry');
-    if (entryParam && entries.some((e) => e.id === entryParam)) {
-      setActiveId(entryParam);
-    } else {
-      const firstEntry = entries[0];
-      if (firstEntry) {
-        setActiveId(firstEntry.id);
-      }
+
+    const initialEntryId = initialEntryIdRef.current;
+    const hasMatchingInitialEntry = initialEntryId && entries.some((entry) => entry.id === initialEntryId);
+    const nextActiveId = hasMatchingInitialEntry ? initialEntryId : entries[0]?.id;
+
+    if (nextActiveId) {
+      setActiveId(nextActiveId);
     }
-    // Note: searchParams is read but NOT in deps - this runs only when entries load or activeId clears
-    // This prevents infinite loop (searchParams object recreated on every URL change)
-  }, [entries, activeId]);
+    hasResolvedInitialEntryRef.current = true;
+    // Intentionally omitting searchParams – we only read the initial value via ref to keep URL sync one-way.
+  }, [entries, activeId, setActiveId]);
 
   const filteredEntries = useMemo(() => {
     if (directionFilter === 'all') {
@@ -97,6 +98,10 @@ export default function JournalPageV2() {
 
   const handleSelectEntry = useCallback(
     (id: string) => {
+      if (id === activeId) {
+        return;
+      }
+
       setActiveId(id);
       setSearchParams((prev) => {
         const nextParams = new URLSearchParams(prev);
@@ -104,7 +109,7 @@ export default function JournalPageV2() {
         return nextParams;
       }, { replace: true });
     },
-    [setActiveId, setSearchParams],
+    [activeId, setActiveId, setSearchParams],
   );
 
   const activeEntry = useMemo(() => entries.find((entry) => entry.id === activeId), [entries, activeId]);

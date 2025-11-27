@@ -1,4 +1,5 @@
 import { useAdvancedInsightStore } from '@/features/analysis';
+import { initializeJournalEventSubscriptions } from '@/lib/journal/journalEventSubscriptions';
 import { useEventBusStore } from '@/store/eventBus';
 import { useAlertsStore } from '@/store/alertsStore';
 import { useJournalStore } from '@/store/journalStore';
@@ -12,6 +13,7 @@ let livePriceUnsubscribe: (() => void) | null = null;
 export function initializeEventSubscriptions(): void {
   if (hasInitialized) return;
   hasInitialized = true;
+  initializeJournalEventSubscriptions();
 
   // Subscribe to trend events
   useEventBusStore.subscribe((state, prevState) => {

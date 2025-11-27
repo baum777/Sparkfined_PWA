@@ -32,6 +32,11 @@ sources:
 - `useJournal` verwaltet lokalen Store (`sparkfined.journal.v1`), normalisiert Werte, berechnet Kennzahlen bei `create/update`.
 - Events: `journal:draft` (Chart → Draft), `journal:insert` (AI-Assistent) werden via `window` Dispatch verarbeitet.
 
+## Loop J1 Stabilisierung (2025-11)
+- JournalPageV2 synchronisiert `activeId` jetzt einseitig: URL-Parameter `?entry=` wird nur bei User-Aktionen geschrieben, womit React #185 Loops verschwinden.
+- Der EventBus empfängt neue JournalEvents (`JournalEntryCreated/Updated/Deleted`, `JournalReflexionCompleted`, `JournalTradeMarkedActive`, `JournalTradeClosed`) und leitet sie Fire-and-Forget an `/api/telemetry` weiter.
+- Der UI-Store reicht grokContext, chartSnapshot, replaySessionId und behavioralTags aus der Persistence-Schicht durch, damit Folge-Loops (Journey/AI/Social) sofort auf die Daten zugreifen können.
+
 ## API-Verhalten
 - `/api/journal` akzeptiert `POST` zum Erstellen/Aktualisieren (JSON), `GET` für Sync, `delete` Flag für Entfernen.
 - `saveServer` nutzt Merge-Strategie (lokaler Draft + Overrides) und aktualisiert `serverNotes` nach Erfolg.
