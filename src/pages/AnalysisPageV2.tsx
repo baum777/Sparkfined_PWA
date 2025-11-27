@@ -59,7 +59,9 @@ export default function AnalysisPageV2() {
       nextParams.set("tab", activeTab);
       setSearchParams(nextParams, { replace: true });
     }
-  }, [activeTab, tabFromUrl, searchParams, setSearchParams]);
+    // Note: searchParams and setSearchParams are intentionally omitted from deps
+    // to prevent infinite loop (searchParams is recreated on every URL change)
+  }, [activeTab, tabFromUrl]);
 
   React.useEffect(() => {
     if (activeTab !== "overview" || hasLoadedMarketRef.current) {
