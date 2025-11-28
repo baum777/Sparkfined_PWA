@@ -3,7 +3,7 @@
  * Provider fallback flow test
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/baseTest';
 
 test.describe('Provider Fallback', () => {
   test.skip('falls back to secondary provider on primary failure', async ({ page, context }) => {

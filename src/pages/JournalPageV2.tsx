@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import JournalLayout from '@/components/journal/JournalLayout';
 import JournalList from '@/components/journal/JournalList';
 import JournalDetailPanel from '@/components/journal/JournalDetailPanel';
@@ -23,11 +23,19 @@ export default function JournalPageV2() {
       setError: state.setError,
       addEntry: state.addEntry,
     }));
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createErrorMessage, setCreateErrorMessage] = useState<string | null>(null);
+  const entryFromUrl = useMemo(() => {
+    if (!location.search) {
+      return null;
+    }
+    const params = new URLSearchParams(location.search);
+    return params.get('entry');
+  }, [location.search]);
 
   useEffect(() => {
     let isCurrent = true;
@@ -61,24 +69,26 @@ export default function JournalPageV2() {
     // loadJournalEntries is a stable import, setters are stable from zustand
   }, []);
 
-  // Initialize activeId from URL or select first entry (runs once on mount/entries load)
+  // Keep URL state in sync with the active entry while preventing re-render loops.
   useEffect(() => {
-    if (entries.length === 0 || activeId) {
+    if (!entries.length) {
       return;
     }
-    
-    const entryParam = searchParams.get('entry');
-    if (entryParam && entries.some((e) => e.id === entryParam)) {
-      setActiveId(entryParam);
-    } else {
-      const firstEntry = entries[0];
-      if (firstEntry) {
-        setActiveId(firstEntry.id);
+
+    if (entryFromUrl && entries.some((entry) => entry.id === entryFromUrl)) {
+      if (entryFromUrl !== activeId) {
+        setActiveId(entryFromUrl);
+      }
+      return;
+    }
+
+    const fallbackEntry = entries[0];
+    if (fallbackEntry && (!activeId || !entries.some((entry) => entry.id === activeId))) {
+      if (fallbackEntry.id !== activeId) {
+        setActiveId(fallbackEntry.id);
       }
     }
-    // Note: searchParams is read but NOT in deps - this runs only when entries load or activeId clears
-    // This prevents infinite loop (searchParams object recreated on every URL change)
-  }, [entries, activeId]);
+  }, [entries, entryFromUrl, activeId, setActiveId]);
 
   const filteredEntries = useMemo(() => {
     if (directionFilter === 'all') {

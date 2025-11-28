@@ -3,7 +3,7 @@
  * Replay scrubber functionality test
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/baseTest';
 
 test.describe('Replay Modal', () => {
   test.skip('opens replay modal from journal', async ({ page }) => {

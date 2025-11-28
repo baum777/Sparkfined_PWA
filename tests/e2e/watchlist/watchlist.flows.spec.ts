@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../fixtures/baseTest';
 import { visitWatchlist } from '../fixtures/navigation';
 import { WATCHLIST_SYMBOLS } from '../fixtures/testData';
 

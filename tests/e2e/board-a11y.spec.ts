@@ -12,7 +12,7 @@
  * Run: npm run test:e2e
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/baseTest';
 import { awaitStableUI } from './utils/wait';
 import AxeBuilder from '@axe-core/playwright';
 

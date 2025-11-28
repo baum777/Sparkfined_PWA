@@ -12,6 +12,7 @@
  */
 
 import { initDB } from './db'
+import { useEventBusStore } from '@/store/eventBus'
 import type {
   JournalEntry,
   JournalQueryOptions,
@@ -22,9 +23,58 @@ import type {
   EmotionTag,
   TradeOutcome,
 } from '@/types/journal'
+import type { JournalEvent } from '@/types/journalEvents'
 
 // Re-export types for external use
 export type { JournalEntry, PatternStats, SetupTag, EmotionTag }
+
+const REFLEXION_FIELD_KEYS = new Set(['thesis', 'setup', 'emotion', 'status'])
+
+function emitJournalEvent(event: JournalEvent): void {
+  try {
+    useEventBusStore.getState().pushEvent(event)
+  } catch {
+    // Store not ready yet (SSR / tests) - safe to ignore
+  }
+}
+
+function estimateReflexionQuality(entry: JournalEntry): number {
+  let score = 40
+  if (entry.thesis) score += 30
+  if (entry.grokContext) score += 10
+  if (entry.chartSnapshot) score += 10
+  if (entry.outcome) score += 10
+  return Math.min(100, score)
+}
+
+function maybeEmitReflexionCompleted(
+  existing: JournalEntry,
+  updated: JournalEntry,
+  updatedFields: string[],
+): void {
+  const touchedReflexionField = updatedFields.some((field) =>
+    REFLEXION_FIELD_KEYS.has(field),
+  )
+  const hasCoreReflectionData =
+    Boolean(updated.thesis?.trim()) &&
+    Boolean(updated.setup) &&
+    Boolean(updated.emotion) &&
+    updated.status !== 'temp'
+
+  if (!touchedReflexionField || !hasCoreReflectionData) {
+    return
+  }
+
+  emitJournalEvent({
+    type: 'JournalReflexionCompleted',
+    domain: 'journal',
+    timestamp: Date.now(),
+    payload: {
+      entryId: updated.id,
+      qualityScore: estimateReflexionQuality(updated),
+    },
+  })
+}
 
 // ============================================================================
 // CRUD OPERATIONS
@@ -53,7 +103,19 @@ export async function createEntry(
     const store = transaction.objectStore('journal_entries')
     const request = store.add(newEntry)
 
-    request.onsuccess = () => resolve(newEntry)
+    request.onsuccess = () => {
+      emitJournalEvent({
+        type: 'JournalEntryCreated',
+        domain: 'journal',
+        timestamp: Date.now(),
+        payload: {
+          entryId: newEntry.id,
+          snapshot: newEntry,
+          source: 'manual',
+        },
+      })
+      resolve(newEntry)
+    }
     request.onerror = () => reject(request.error)
   })
 }
@@ -72,6 +134,7 @@ export async function updateEntry(
   const existing = await getEntry(id)
   if (!existing) return undefined
 
+  const updatedFields = Object.keys(updates)
   const updated: JournalEntry = {
     ...existing,
     ...updates,
@@ -83,7 +146,22 @@ export async function updateEntry(
     const store = transaction.objectStore('journal_entries')
     const request = store.put(updated)
 
-    request.onsuccess = () => resolve(updated)
+    request.onsuccess = () => {
+      if (updatedFields.length > 0) {
+        emitJournalEvent({
+          type: 'JournalEntryUpdated',
+          domain: 'journal',
+          timestamp: Date.now(),
+          payload: {
+            entryId: updated.id,
+            snapshot: updated,
+            updatedFields,
+          },
+        })
+        maybeEmitReflexionCompleted(existing, updated, updatedFields)
+      }
+      resolve(updated)
+    }
     request.onerror = () => reject(request.error)
   })
 }
@@ -130,6 +208,7 @@ export async function getEntry(id: string): Promise<JournalEntry | undefined> {
  * @param id - Entry ID
  */
 export async function deleteEntry(id: string): Promise<void> {
+  const existing = await getEntry(id)
   const db = await initDB()
 
   return new Promise((resolve, reject) => {
@@ -137,7 +216,17 @@ export async function deleteEntry(id: string): Promise<void> {
     const store = transaction.objectStore('journal_entries')
     const request = store.delete(id)
 
-    request.onsuccess = () => resolve()
+    request.onsuccess = () => {
+      if (existing) {
+        emitJournalEvent({
+          type: 'JournalEntryDeleted',
+          domain: 'journal',
+          timestamp: Date.now(),
+          payload: { entryId: existing.id },
+        })
+      }
+      resolve()
+    }
     request.onerror = () => reject(request.error)
   })
 }
@@ -401,10 +490,24 @@ export async function cleanupTempEntries(ttlDays: number = 7): Promise<number> {
 export async function markAsActive(
   id: string
 ): Promise<JournalEntry | undefined> {
-  return updateEntry(id, {
+  const updated = await updateEntry(id, {
     status: 'active',
     markedActiveAt: Date.now(),
   })
+
+  if (updated) {
+    emitJournalEvent({
+      type: 'JournalTradeMarkedActive',
+      domain: 'journal',
+      timestamp: Date.now(),
+      payload: {
+        entryId: updated.id,
+        markedAt: updated.markedActiveAt ?? Date.now(),
+      },
+    })
+  }
+
+  return updated
 }
 
 /**
@@ -417,13 +520,27 @@ export async function closeEntry(
   id: string,
   outcome: TradeOutcome
 ): Promise<JournalEntry | undefined> {
-  return updateEntry(id, {
+  const updated = await updateEntry(id, {
     status: 'closed',
     outcome: {
       ...outcome,
       closedAt: outcome.closedAt || Date.now(),
     },
   })
+
+  if (updated?.outcome) {
+    emitJournalEvent({
+      type: 'JournalTradeClosed',
+      domain: 'journal',
+      timestamp: Date.now(),
+      payload: {
+        entryId: updated.id,
+        outcome: updated.outcome,
+      },
+    })
+  }
+
+  return updated
 }
 
 // ============================================================================
