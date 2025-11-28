@@ -62,3 +62,11 @@ export type {
   TrendSearchTopic,
   TrendTradingTimeframe,
 } from './events'
+
+// Journal Insights types (Loop J3-A)
+export type {
+  JournalInsight,
+  JournalInsightCategory,
+  JournalInsightSeverity,
+  JournalInsightResult,
+} from './journalInsights'

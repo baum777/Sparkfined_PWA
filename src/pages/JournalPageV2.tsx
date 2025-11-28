@@ -9,6 +9,7 @@ import { JournalJourneyBanner } from '@/components/journal/JournalJourneyBanner'
 import { JournalHeaderActions } from '@/components/journal/JournalHeaderActions';
 import { computeUserJourneySnapshotFromEntries } from '@/lib/journal/journey-snapshot';
 import { createQuickJournalEntry, loadJournalEntries, useJournalStore } from '@/store/journalStore';
+import { JournalInsightsPanel } from '@/components/journal/JournalInsightsPanel';
 
 type DirectionFilter = 'all' | 'long' | 'short';
 
@@ -195,6 +196,7 @@ export default function JournalPageV2() {
         </div>
 
         {hasJourneyMeta && journeySnapshot && <JournalJourneyBanner snapshot={journeySnapshot} />}
+        <JournalInsightsPanel entries={entries} />
 
         <JournalLayout
           list={
