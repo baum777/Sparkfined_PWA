@@ -199,7 +199,12 @@ describe('sendJournalInsightsGeneratedEvent', () => {
       body: expect.stringContaining('"kind":"journal_insight"'),
     })
 
-    const callBody = JSON.parse(mockFetch.mock.calls[0][1].body)
+    const firstCall = mockFetch.mock.calls[0]
+    expect(firstCall).toBeTruthy()
+    const requestInit = firstCall?.[1] as RequestInit
+    expect(requestInit?.body).toBeTruthy()
+    
+    const callBody = JSON.parse(requestInit.body as string)
     expect(callBody.source).toBe('sparkfined')
     expect(callBody.events).toHaveLength(1)
     expect(callBody.events[0].kind).toBe('journal_insight')
