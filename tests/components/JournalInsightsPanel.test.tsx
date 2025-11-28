@@ -135,6 +135,9 @@ describe('JournalInsightsPanel', () => {
 
     const card = await screen.findByTestId('journal-insight-card')
     expect(card.textContent).to.contain('FOMO entries spike')
+
+    const preview = await screen.findByTestId('journal-social-preview')
+    expect(preview).to.exist
   })
 
   it('surfaces an error when service throws', async () => {

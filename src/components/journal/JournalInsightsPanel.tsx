@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import Button from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { JournalInsightCard } from '@/components/journal/JournalInsightCard'
+import { JournalSocialPreview } from '@/components/journal/JournalSocialPreview'
 import { getJournalInsightsForEntries } from '@/lib/journal/ai'
 import { mapStoreEntriesToDomain } from '@/lib/journal/journal-mapping'
 import { 
@@ -11,6 +12,7 @@ import {
   recordToInsight 
 } from '@/lib/journal/journal-insights-store'
 import { sendJournalInsightsGeneratedEvent } from '@/lib/journal/journal-insights-telemetry'
+import { computeSocialStatsFromInsights } from '@/lib/journal/journal-social-analytics'
 import type { JournalEntry as StoreJournalEntry } from '@/store/journalStore'
 import type { JournalInsight } from '@/types/journalInsights'
 
@@ -24,6 +26,10 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hasCachedInsights, setHasCachedInsights] = useState(false)
+  const socialSnapshot = useMemo(
+    () => (insights && insights.length > 0 ? computeSocialStatsFromInsights(insights) : null),
+    [insights]
+  )
 
   // Convert store entries to domain entries
   const domainEntries = useMemo(
@@ -140,11 +146,15 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
       {loading && <p className="text-sm text-text-tertiary">Generating insights…</p>}
 
       {insights && insights.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2">
-          {insights.map((insight) => (
-            <JournalInsightCard key={insight.id} insight={insight} />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 md:grid-cols-2">
+            {insights.map((insight) => (
+              <JournalInsightCard key={insight.id} insight={insight} />
+            ))}
+          </div>
+
+          {socialSnapshot && <JournalSocialPreview snapshot={socialSnapshot} />}
+        </>
       )}
 
       {insights && insights.length === 0 && !loading && !error && (
