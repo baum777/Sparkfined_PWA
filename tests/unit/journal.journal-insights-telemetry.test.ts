@@ -12,6 +12,8 @@ import {
 import type { JournalInsightResult } from '@/types/journalInsights'
 import type { TelemetryJournalInsightPayloadV1 } from '@/types/telemetry'
 
+const PROMPT_VERSION = 'journal-insights-v1.0'
+
 function isJournalInsightPayload(
   payload: unknown
 ): payload is TelemetryJournalInsightPayloadV1 {
@@ -56,6 +58,7 @@ describe('buildJournalInsightsTelemetryEvent', () => {
       ],
       generatedAt: Date.now(),
       modelUsed: 'gpt-4o-mini',
+      promptVersion: PROMPT_VERSION,
     }
 
     const event = buildJournalInsightsTelemetryEvent(analysisKey, result)
@@ -75,6 +78,7 @@ describe('buildJournalInsightsTelemetryEvent', () => {
     expect(payload.severities).toEqual(['WARNING', 'INFO'])
     expect(payload.modelUsed).toBe('gpt-4o-mini')
     expect(payload.generatedAt).toBeTruthy()
+    expect(payload.promptVersion).toBe(PROMPT_VERSION)
   })
 
   it('deduplicates categories and severities', () => {
@@ -114,6 +118,7 @@ describe('buildJournalInsightsTelemetryEvent', () => {
       ],
       generatedAt: Date.now(),
       modelUsed: 'gpt-4o-mini',
+      promptVersion: PROMPT_VERSION,
     }
 
     const event = buildJournalInsightsTelemetryEvent(analysisKey, result)
@@ -137,6 +142,7 @@ describe('buildJournalInsightsTelemetryEvent', () => {
       insights: [],
       generatedAt: Date.now(),
       modelUsed: 'gpt-4o-mini',
+      promptVersion: PROMPT_VERSION,
     }
 
     const event = buildJournalInsightsTelemetryEvent(analysisKey, result)
@@ -181,6 +187,7 @@ describe('sendJournalInsightsGeneratedEvent', () => {
       ],
       generatedAt: Date.now(),
       modelUsed: 'gpt-4o-mini',
+      promptVersion: PROMPT_VERSION,
     }
 
     const mockFetch = global.fetch as ReturnType<typeof vi.fn>
@@ -216,6 +223,7 @@ describe('sendJournalInsightsGeneratedEvent', () => {
       insights: [],
       generatedAt: Date.now(),
       modelUsed: 'gpt-4o-mini',
+      promptVersion: PROMPT_VERSION,
     }
 
     const mockFetch = global.fetch as ReturnType<typeof vi.fn>
@@ -244,6 +252,7 @@ describe('sendJournalInsightsGeneratedEvent', () => {
       ],
       generatedAt: Date.now(),
       modelUsed: 'gpt-4o-mini',
+      promptVersion: PROMPT_VERSION,
     }
 
     const mockFetch = global.fetch as ReturnType<typeof vi.fn>

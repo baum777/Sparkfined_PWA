@@ -115,6 +115,7 @@ describe('saveInsightsForAnalysisKey', () => {
       ],
       generatedAt: Date.now(),
       modelUsed: 'gpt-4o-mini',
+      promptVersion: 'journal-insights-v1.0',
     }
 
     // Mock cursor for delete operation

@@ -12,6 +12,8 @@ import { buildJournalInsightsPrompt, type JournalInsightPromptInput } from './jo
 // Re-use existing AI client infrastructure
 import { OpenAIClient } from '../../../../ai/model_clients/openai_client'
 
+const JOURNAL_INSIGHTS_PROMPT_VERSION = 'journal-insights-v1.0'
+
 export interface JournalInsightRequest {
   entries: JournalEntry[]
   maxEntries?: number
@@ -69,6 +71,7 @@ export async function getJournalInsightsForEntries(
       insights: [],
       generatedAt: Date.now(),
       modelUsed,
+      promptVersion: JOURNAL_INSIGHTS_PROMPT_VERSION,
       rawResponse: { error: error instanceof Error ? error.message : 'Unknown error' },
     }
   }
@@ -81,6 +84,7 @@ export async function getJournalInsightsForEntries(
     insights,
     generatedAt: Date.now(),
     modelUsed,
+    promptVersion: JOURNAL_INSIGHTS_PROMPT_VERSION,
     costUsd,
     rawResponse: aiResponse,
   }

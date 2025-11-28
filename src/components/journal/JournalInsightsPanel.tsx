@@ -3,6 +3,7 @@ import Button from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { JournalInsightCard } from '@/components/journal/JournalInsightCard'
 import { getJournalInsightsForEntries } from '@/lib/journal/ai'
+import { mapStoreEntriesToDomain } from '@/lib/journal/journal-mapping'
 import { 
   buildAnalysisKey, 
   saveInsightsForAnalysisKey, 
@@ -11,62 +12,7 @@ import {
 } from '@/lib/journal/journal-insights-store'
 import { sendJournalInsightsGeneratedEvent } from '@/lib/journal/journal-insights-telemetry'
 import type { JournalEntry as StoreJournalEntry } from '@/store/journalStore'
-import type { JournalEntry as DomainJournalEntry } from '@/types/journal'
 import type { JournalInsight } from '@/types/journalInsights'
-
-const FALLBACK_TICKER = 'MANUAL'
-const FALLBACK_ADDRESS = 'manual-entry'
-const FALLBACK_SETUP: DomainJournalEntry['setup'] = 'custom'
-const FALLBACK_EMOTION: DomainJournalEntry['emotion'] = 'custom'
-const FALLBACK_STATUS: DomainJournalEntry['status'] = 'active'
-
-function parseStoreDateToTimestamp(date?: string): number {
-  if (!date) {
-    return Date.now()
-  }
-  const sanitized = date.replace(/·/g, ' ')
-  const parsed = Date.parse(sanitized)
-  return Number.isNaN(parsed) ? Date.now() : parsed
-}
-
-function deriveTicker(entry: StoreJournalEntry): string {
-  if (entry.tags?.length) {
-    return entry.tags[0]?.toUpperCase() ?? FALLBACK_TICKER
-  }
-  const firstToken = entry.title?.trim().split(/\s+/)[0]
-  if (firstToken) {
-    const sanitized = firstToken.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
-    if (sanitized) {
-      return sanitized.slice(0, 12)
-    }
-  }
-  return FALLBACK_TICKER
-}
-
-function mapStoreEntryToDomain(entry: StoreJournalEntry): DomainJournalEntry {
-  const timestamp = parseStoreDateToTimestamp(entry.date)
-  // Best-effort mapping: fallback defaults preserve type safety when store data is sparse.
-  return {
-    id: entry.id,
-    timestamp,
-    ticker: deriveTicker(entry),
-    address: FALLBACK_ADDRESS,
-    setup: FALLBACK_SETUP,
-    emotion: FALLBACK_EMOTION,
-    customTags: entry.tags,
-    thesis: entry.notes,
-    grokContext: undefined,
-    chartSnapshot: undefined,
-    outcome: undefined,
-    status: FALLBACK_STATUS,
-    createdAt: timestamp,
-    updatedAt: timestamp,
-    markedActiveAt: undefined,
-    replaySessionId: undefined,
-    walletAddress: undefined,
-    journeyMeta: entry.journeyMeta,
-  }
-}
 
 interface JournalInsightsPanelProps {
   entries: StoreJournalEntry[]
@@ -81,7 +27,7 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
 
   // Convert store entries to domain entries
   const domainEntries = useMemo(
-    () => entries.map(mapStoreEntryToDomain),
+    () => mapStoreEntriesToDomain(entries),
     [entries]
   )
 

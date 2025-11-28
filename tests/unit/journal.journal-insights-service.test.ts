@@ -50,6 +50,8 @@ describe('getJournalInsightsForEntries', () => {
     },
   }
 
+  const PROMPT_VERSION = 'journal-insights-v1.0'
+
   const validAIResponse = {
     choices: [
       {
@@ -125,6 +127,7 @@ describe('getJournalInsightsForEntries', () => {
 
     expect(result.generatedAt).toBeDefined()
     expect(result.modelUsed).toBe('gpt-4o-mini')
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
     expect(result.costUsd).toBeDefined()
     expect(result.rawResponse).toBeDefined()
   })
@@ -136,6 +139,7 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     expect(result.insights).toHaveLength(0)
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
   })
 
   it('should handle invalid JSON from AI', async () => {
@@ -158,6 +162,7 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     expect(result.insights).toHaveLength(0)
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
     expect(result.rawResponse).toBeDefined()
   })
 
@@ -181,6 +186,7 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     expect(result.insights).toHaveLength(0)
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
   })
 
   it('should filter out insights with invalid categories', async () => {
@@ -296,6 +302,7 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     expect(result.insights).toHaveLength(0)
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
     expect(result.rawResponse).toBeDefined()
   })
 
@@ -307,6 +314,7 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     expect(result.insights).toHaveLength(0)
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
   })
 
   it('should generate stable IDs for insights', async () => {

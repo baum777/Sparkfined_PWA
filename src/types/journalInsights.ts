@@ -37,6 +37,7 @@ export interface JournalInsightResult {
   insights: JournalInsight[];
   generatedAt: number;             // Unix timestamp
   modelUsed?: string;              // e.g., "gpt-4o-mini"
+  promptVersion?: string;          // Prompt schema identifier
   costUsd?: number;                // Optional: AI API cost
   rawResponse?: unknown;           // Optional: raw AI response for debugging
 }
