@@ -70,3 +70,6 @@ export type {
   JournalInsightSeverity,
   JournalInsightResult,
 } from './journalInsights'
+
+// Social insight aggregations (Loop J4-A)
+export type { SocialInsightMetric, SocialStatsSnapshot } from './journalSocial'
