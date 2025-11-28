@@ -1,4 +1,4 @@
-import type { JournalEntry, TradeOutcome } from '@/types/journal';
+import type { JournalEntry, JournalJourneyMeta, TradeOutcome } from '@/types/journal';
 
 export type JournalEntryCreatedEvent = {
   type: 'JournalEntryCreated';
@@ -38,6 +38,7 @@ export type JournalReflexionCompletedEvent = {
   payload: {
     entryId: string;
     qualityScore: number;
+    journeyMeta?: JournalJourneyMeta;
   };
 };
 
@@ -48,6 +49,7 @@ export type JournalTradeMarkedActiveEvent = {
   payload: {
     entryId: string;
     markedAt: number;
+    journeyMeta?: JournalJourneyMeta;
   };
 };
 
@@ -58,6 +60,7 @@ export type JournalTradeClosedEvent = {
   payload: {
     entryId: string;
     outcome: TradeOutcome;
+    journeyMeta?: JournalJourneyMeta;
   };
 };
 

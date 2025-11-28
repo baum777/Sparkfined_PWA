@@ -5,7 +5,9 @@ import JournalList from '@/components/journal/JournalList';
 import JournalDetailPanel from '@/components/journal/JournalDetailPanel';
 import JournalNewEntryDialog from '@/components/journal/JournalNewEntryDialog';
 import DashboardShell from '@/components/dashboard/DashboardShell';
+import { JournalJourneyBanner } from '@/components/journal/JournalJourneyBanner';
 import { JournalHeaderActions } from '@/components/journal/JournalHeaderActions';
+import { computeUserJourneySnapshotFromEntries } from '@/lib/journal/journey-snapshot';
 import { createQuickJournalEntry, loadJournalEntries, useJournalStore } from '@/store/journalStore';
 
 type DirectionFilter = 'all' | 'long' | 'short';
@@ -24,7 +26,7 @@ export default function JournalPageV2() {
       addEntry: state.addEntry,
     }));
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -105,6 +107,24 @@ export default function JournalPageV2() {
     };
   }, [entries]);
 
+  const journeySources = useMemo(
+    () =>
+      entries.map((entry) => ({
+        journeyMeta: entry.journeyMeta,
+      })),
+    [entries],
+  );
+
+  const hasJourneyMeta = useMemo(
+    () => journeySources.some((source) => Boolean(source.journeyMeta)),
+    [journeySources],
+  );
+
+  const journeySnapshot = useMemo(
+    () => computeUserJourneySnapshotFromEntries(journeySources),
+    [journeySources],
+  );
+
   const handleSelectEntry = useCallback(
     (id: string) => {
       setActiveId(id);
@@ -173,6 +193,8 @@ export default function JournalPageV2() {
           {isLoading && <p className="text-xs text-text-tertiary">Loading entries…</p>}
           {!isLoading && error && <p className="text-xs text-warn">{error}</p>}
         </div>
+
+        {hasJourneyMeta && journeySnapshot && <JournalJourneyBanner snapshot={journeySnapshot} />}
 
         <JournalLayout
           list={

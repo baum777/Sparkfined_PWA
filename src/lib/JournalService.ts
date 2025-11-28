@@ -72,6 +72,7 @@ function maybeEmitReflexionCompleted(
     payload: {
       entryId: updated.id,
       qualityScore: estimateReflexionQuality(updated),
+      journeyMeta: updated.journeyMeta,
     },
   })
 }
@@ -503,6 +504,7 @@ export async function markAsActive(
       payload: {
         entryId: updated.id,
         markedAt: updated.markedActiveAt ?? Date.now(),
+        journeyMeta: updated.journeyMeta,
       },
     })
   }
@@ -536,6 +538,7 @@ export async function closeEntry(
       payload: {
         entryId: updated.id,
         outcome: updated.outcome,
+        journeyMeta: updated.journeyMeta,
       },
     })
   }

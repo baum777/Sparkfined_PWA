@@ -49,8 +49,14 @@ sources:
 
 ## Telemetry
 - `src/lib/journal/journalEventSubscriptions.ts` lauscht auf den neuesten EventBus-Eintrag, filtert auf `domain === 'journal'` und POSTet Fire-and-Forget an `/api/telemetry`.
-- Payload enthält nur Metadaten (`entryId`, `updatedFields`, `outcome`-Summary etc.), kein Thesis-Text oder PII.
+- Payload enthält versionierte Metadaten (`entryId`, `updatedFields`, Journey-/XP-Felder), aber weiterhin keinen Thesis-Text oder PII.
 - Fehler beim POST werden bewusst geschluckt, damit Offline-Mode/Telemetry-Ausfälle den Journal-Flow nicht blockieren.
+
+### Journey & XP Telemetry (Loop J2-B)
+- `src/types/telemetry.ts` definiert ein versioniertes Envelope (`schemaVersion: 1`) für Journal-Telemetry inkl. Journey-Feldern (`phase`, `xpTotal`, `streak`, `qualityScore`).
+- `mapJournalEventToTelemetryEvent` (`src/lib/journal/journalTelemetry.ts`) verwandelt `JournalEvent` + optionales `journeyMeta` in ein stabiles Telemetry-Event, das von `initializeJournalEventSubscriptions` an `/api/telemetry` gesendet wird (`{ source: "sparkfined", events: [...] }`).
+- Journey-Metadaten stammen direkt aus den Event-Payloads (Snapshots oder `journeyMeta`-Beigaben) und bleiben optional, um ältere Konsumenten nicht zu brechen.
+- Aggregationen für spätere Dashboards/AI-Features existieren bereits als reine Helfer (`computePhaseDistribution`, `computeAverageQualityScore` in `src/lib/journal/journey-analytics.ts`) und sind per Vitest abgedeckt.
 
 ## Ausblick: Loops J2-J4 (Kurz)
 - **Loop J2 - Journey/XP:** Bewertet Events (Active/Closed/Reflexion) für Gamification, ersetzt die heuristische `qualityScore`-Funktion.
