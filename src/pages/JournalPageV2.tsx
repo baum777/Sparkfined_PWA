@@ -5,7 +5,9 @@ import JournalList from '@/components/journal/JournalList';
 import JournalDetailPanel from '@/components/journal/JournalDetailPanel';
 import JournalNewEntryDialog from '@/components/journal/JournalNewEntryDialog';
 import DashboardShell from '@/components/dashboard/DashboardShell';
+import { JournalJourneyBanner } from '@/components/journal/JournalJourneyBanner';
 import { JournalHeaderActions } from '@/components/journal/JournalHeaderActions';
+import { computeUserJourneySnapshotFromEntries } from '@/lib/journal/journey-snapshot';
 import { createQuickJournalEntry, loadJournalEntries, useJournalStore } from '@/store/journalStore';
 
 type DirectionFilter = 'all' | 'long' | 'short';
@@ -105,6 +107,11 @@ export default function JournalPageV2() {
     };
   }, [entries]);
 
+  const journeySnapshot = useMemo(
+    () => computeUserJourneySnapshotFromEntries(entries),
+    [entries],
+  );
+
   const handleSelectEntry = useCallback(
     (id: string) => {
       setActiveId(id);
@@ -173,6 +180,8 @@ export default function JournalPageV2() {
           {isLoading && <p className="text-xs text-text-tertiary">Loading entries…</p>}
           {!isLoading && error && <p className="text-xs text-warn">{error}</p>}
         </div>
+
+        {journeySnapshot && <JournalJourneyBanner snapshot={journeySnapshot} />}
 
         <JournalLayout
           list={
