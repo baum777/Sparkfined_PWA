@@ -40,3 +40,28 @@ export interface JournalInsightResult {
   costUsd?: number;                // Optional: AI API cost
   rawResponse?: unknown;           // Optional: raw AI response for debugging
 }
+
+// ============================================================================
+// PERSISTENCE (Loop J3-C)
+// ============================================================================
+
+/**
+ * Persisted record for journal insights (Dexie/IndexedDB storage)
+ */
+export interface JournalInsightRecord {
+  id: string;                      // insight.id as Primary Key
+  analysisKey: string;             // Describes which entry set these insights apply to
+  category: JournalInsightCategory;
+  severity: JournalInsightSeverity;
+  title: string;
+  summary: string;
+  recommendation: string;
+  evidenceEntries: string[];       // Array of JournalEntry IDs
+  confidence: number | null;
+  
+  // Metadata
+  generatedAt: string;             // ISO-8601 timestamp
+  modelUsed?: string;
+  journeyPhaseAtGeneration?: import('@/types/journal').JourneyPhase;
+  version: 1;                      // Schema version for future migrations
+}

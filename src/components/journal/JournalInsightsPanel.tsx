@@ -1,8 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Button from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { JournalInsightCard } from '@/components/journal/JournalInsightCard'
 import { getJournalInsightsForEntries } from '@/lib/journal/ai'
+import { 
+  buildAnalysisKey, 
+  saveInsightsForAnalysisKey, 
+  loadLatestInsightsForAnalysisKey,
+  recordToInsight 
+} from '@/lib/journal/journal-insights-store'
+import { sendJournalInsightsGeneratedEvent } from '@/lib/journal/journal-insights-telemetry'
 import type { JournalEntry as StoreJournalEntry } from '@/store/journalStore'
 import type { JournalEntry as DomainJournalEntry } from '@/types/journal'
 import type { JournalInsight } from '@/types/journalInsights'
@@ -70,6 +77,52 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
   const [insights, setInsights] = useState<JournalInsight[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [hasCachedInsights, setHasCachedInsights] = useState(false)
+
+  // Convert store entries to domain entries
+  const domainEntries = useMemo(
+    () => entries.map(mapStoreEntryToDomain),
+    [entries]
+  )
+
+  // Calculate analysis key for caching
+  const analysisKey = useMemo(
+    () => buildAnalysisKey(domainEntries.slice(-maxEntries), maxEntries),
+    [domainEntries, maxEntries]
+  )
+
+  // Load cached insights on mount or when analysisKey changes
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadCached() {
+      if (!domainEntries.length) return
+
+      try {
+        const cached = await loadLatestInsightsForAnalysisKey(analysisKey)
+        if (cancelled) return
+
+        if (cached && cached.length > 0) {
+          const restored = cached.map(recordToInsight)
+          setInsights(restored)
+          setHasCachedInsights(true)
+          setError(null)
+        } else {
+          setHasCachedInsights(false)
+        }
+      } catch (err) {
+        console.warn('[JournalInsightsPanel] Failed to load cached insights', err)
+        // Don't show error to user - just skip cache
+        setHasCachedInsights(false)
+      }
+    }
+
+    void loadCached()
+
+    return () => {
+      cancelled = true
+    }
+  }, [analysisKey, domainEntries.length])
 
   const handleGenerateInsights = async () => {
     if (!entries.length) {
@@ -82,15 +135,22 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
     setError(null)
 
     try {
-      const recentEntries = entries.slice(-maxEntries)
-      const domainEntries = recentEntries.map(mapStoreEntryToDomain)
+      const recentDomainEntries = domainEntries.slice(-maxEntries)
       const result = await getJournalInsightsForEntries({
-        entries: domainEntries,
+        entries: recentDomainEntries,
         maxEntries,
       })
+      
       setInsights(result.insights)
+      setHasCachedInsights(true)
 
-      if (!result.insights.length) {
+      if (result.insights.length > 0) {
+        // Save to cache
+        await saveInsightsForAnalysisKey(analysisKey, result)
+        
+        // Send telemetry (fire-and-forget)
+        void sendJournalInsightsGeneratedEvent(analysisKey, result)
+      } else {
         setError('No meaningful patterns detected yet—log a few more trades.')
       }
     } catch (err) {
@@ -126,7 +186,7 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
           isLoading={loading}
           data-testid="journal-insights-generate-button"
         >
-          Generate Insights
+          {hasCachedInsights ? 'Regenerate Insights' : 'Generate Insights'}
         </Button>
       </div>
 
