@@ -4,10 +4,38 @@ import type { Mock } from 'vitest'
 
 import { JournalInsightsPanel } from '@/components/journal/JournalInsightsPanel'
 import { getJournalInsightsForEntries } from '@/lib/journal/ai'
+import {
+  buildAnalysisKey,
+  loadLatestInsightsForAnalysisKey,
+  mapRecordToJournalInsight,
+  saveInsightsForAnalysisKey,
+} from '@/lib/journal/journal-insights-store'
+import { sendJournalInsightsGeneratedEvent } from '@/lib/journal/journal-insights-telemetry'
 import type { JournalEntry as StoreJournalEntry } from '@/store/journalStore'
 
 vi.mock('@/lib/journal/ai', () => ({
   getJournalInsightsForEntries: vi.fn(),
+}))
+
+vi.mock('@/lib/journal/journal-insights-store', () => {
+  return {
+    buildAnalysisKey: vi.fn(() => 'analysis-key'),
+    loadLatestInsightsForAnalysisKey: vi.fn(),
+    saveInsightsForAnalysisKey: vi.fn(),
+    mapRecordToJournalInsight: vi.fn((record) => ({
+      id: record.id ?? 'cached',
+      category: 'OTHER',
+      severity: 'INFO',
+      title: (record as { title?: string }).title ?? 'Cached Insight',
+      summary: 'Cached summary',
+      recommendation: 'Cached recommendation',
+      evidenceEntries: record.evidenceEntries ?? [],
+    })),
+  }
+})
+
+vi.mock('@/lib/journal/journal-insights-telemetry', () => ({
+  sendJournalInsightsGeneratedEvent: vi.fn(),
 }))
 
 function getFirstCallArgs<TArgs extends unknown[], TReturn>(
@@ -54,13 +82,27 @@ const mockEntries: StoreJournalEntry[] = [
 
 describe('JournalInsightsPanel', () => {
   const mockedService = vi.mocked(getJournalInsightsForEntries)
+  const mockedLoadCached = vi.mocked(loadLatestInsightsForAnalysisKey)
+  const mockedSaveInsights = vi.mocked(saveInsightsForAnalysisKey)
+  const mockedBuildKey = vi.mocked(buildAnalysisKey)
+  const mockedTelemetry = vi.mocked(sendJournalInsightsGeneratedEvent)
 
   beforeEach(() => {
     mockedService.mockReset()
+    mockedLoadCached.mockReset()
+    mockedSaveInsights.mockReset()
+    mockedBuildKey.mockReturnValue('analysis-key')
+    mockedTelemetry.mockReset()
+    vi.mocked(mapRecordToJournalInsight).mockClear()
+    mockedLoadCached.mockResolvedValue(null)
   })
 
-  it('renders generate button', () => {
+  it('renders generate button', async () => {
     render(<JournalInsightsPanel entries={mockEntries} />)
+
+    await waitFor(() => {
+      expect(mockedLoadCached).toHaveBeenCalledWith('analysis-key')
+    })
 
     const button = screen.getByTestId('journal-insights-generate-button')
     expect(button).toBeTruthy()
@@ -68,7 +110,8 @@ describe('JournalInsightsPanel', () => {
   })
 
   it('calls service and renders insights on success', async () => {
-    mockedService.mockResolvedValue({
+    const generatedAt = Date.now()
+    const mockResult = {
       insights: [
         {
           id: 'insight-1',
@@ -78,12 +121,13 @@ describe('JournalInsightsPanel', () => {
           summary: 'Entries show repeated FOMO during evening sessions.',
           recommendation: 'Set alerts and wait for confirmation before entering trades.',
           evidenceEntries: ['entry-1', 'entry-2'],
-          detectedAt: Date.now(),
+          detectedAt: generatedAt,
         },
       ],
-      generatedAt: Date.now(),
+      generatedAt,
       modelUsed: 'gpt-4o-mini',
-    })
+    }
+    mockedService.mockResolvedValue(mockResult)
 
     render(<JournalInsightsPanel entries={mockEntries} />)
 
@@ -105,6 +149,11 @@ describe('JournalInsightsPanel', () => {
 
     const card = await screen.findByTestId('journal-insight-card')
     expect(card.textContent).to.contain('FOMO entries spike')
+
+    expect(mockedSaveInsights).toHaveBeenCalledWith('analysis-key', mockResult, {
+      journeyPhase: 'SEEKER',
+    })
+    expect(mockedTelemetry).toHaveBeenCalledWith('analysis-key', mockResult)
   })
 
   it('surfaces an error when service throws', async () => {
@@ -118,5 +167,31 @@ describe('JournalInsightsPanel', () => {
       const errorText = screen.getByText('Could not generate insights. Please try again.')
       expect(errorText).toBeTruthy()
     })
+  })
+
+  it('hydrates cached insights on mount', async () => {
+    mockedLoadCached.mockResolvedValue([
+      {
+        id: 'cached-1',
+        analysisKey: 'analysis-key',
+        category: 'OTHER',
+        severity: 'INFO',
+        title: 'Cached',
+        summary: 'Summary',
+        recommendation: 'Recommendation',
+        evidenceEntries: ['entry-1'],
+        generatedAt: new Date().toISOString(),
+        version: 1,
+      },
+    ])
+
+    render(<JournalInsightsPanel entries={mockEntries} />)
+
+    const card = await screen.findByTestId('journal-insight-card')
+    expect(card.textContent).to.contain('Cached Insight')
+    expect(mockedService).not.toHaveBeenCalled()
+    expect(screen.getByTestId('journal-insights-generate-button').textContent).toContain(
+      'Regenerate Insights'
+    )
   })
 })

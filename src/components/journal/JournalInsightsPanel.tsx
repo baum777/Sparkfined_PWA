@@ -1,8 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Button from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { JournalInsightCard } from '@/components/journal/JournalInsightCard'
 import { getJournalInsightsForEntries } from '@/lib/journal/ai'
+import {
+  buildAnalysisKey,
+  loadLatestInsightsForAnalysisKey,
+  mapRecordToJournalInsight,
+  saveInsightsForAnalysisKey,
+} from '@/lib/journal/journal-insights-store'
+import { sendJournalInsightsGeneratedEvent } from '@/lib/journal/journal-insights-telemetry'
 import type { JournalEntry as StoreJournalEntry } from '@/store/journalStore'
 import type { JournalEntry as DomainJournalEntry } from '@/types/journal'
 import type { JournalInsight } from '@/types/journalInsights'
@@ -71,10 +78,58 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const domainEntries = useMemo(
+    () => entries.map(mapStoreEntryToDomain),
+    [entries]
+  )
+  const recentEntries = useMemo(
+    () => domainEntries.slice(-maxEntries),
+    [domainEntries, maxEntries]
+  )
+  const analysisKey = useMemo(() => {
+    if (!recentEntries.length) {
+      return null
+    }
+    return buildAnalysisKey(recentEntries, maxEntries)
+  }, [recentEntries, maxEntries])
+
+  useEffect(() => {
+    if (!analysisKey) {
+      setInsights(null)
+      setError(null)
+      return
+    }
+
+    setInsights(null)
+    setError(null)
+    let cancelled = false
+
+    async function hydrateFromCache() {
+      const cached = await loadLatestInsightsForAnalysisKey(analysisKey)
+      if (cancelled) return
+
+      if (cached && cached.length) {
+        setInsights(cached.map(mapRecordToJournalInsight))
+        setError(null)
+      } else {
+        setInsights(null)
+      }
+    }
+
+    void hydrateFromCache()
+
+    return () => {
+      cancelled = true
+    }
+  }, [analysisKey])
+
   const handleGenerateInsights = async () => {
-    if (!entries.length) {
+    if (!recentEntries.length) {
       setInsights([])
       setError('No journal entries available for analysis.')
+      return
+    }
+    if (!analysisKey) {
       return
     }
 
@@ -82,17 +137,22 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
     setError(null)
 
     try {
-      const recentEntries = entries.slice(-maxEntries)
-      const domainEntries = recentEntries.map(mapStoreEntryToDomain)
       const result = await getJournalInsightsForEntries({
-        entries: domainEntries,
+        entries: recentEntries,
         maxEntries,
       })
       setInsights(result.insights)
 
       if (!result.insights.length) {
         setError('No meaningful patterns detected yet—log a few more trades.')
+        return
       }
+
+      const journeyPhase = recentEntries[recentEntries.length - 1]?.journeyMeta?.phase
+      void saveInsightsForAnalysisKey(analysisKey, result, {
+        journeyPhase,
+      })
+      void sendJournalInsightsGeneratedEvent(analysisKey, result)
     } catch (err) {
       console.warn('[JournalInsightsPanel] Failed to generate insights', err)
       setError('Could not generate insights. Please try again.')
@@ -101,6 +161,9 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
       setLoading(false)
     }
   }
+
+  const buttonLabel =
+    insights && insights.length > 0 ? 'Regenerate Insights' : 'Generate Insights'
 
   return (
     <section
@@ -126,7 +189,7 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
           isLoading={loading}
           data-testid="journal-insights-generate-button"
         >
-          Generate Insights
+          {buttonLabel}
         </Button>
       </div>
 
