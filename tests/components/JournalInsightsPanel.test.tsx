@@ -1,36 +1,54 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Mock } from 'vitest'
 
 import { JournalInsightsPanel } from '@/components/journal/JournalInsightsPanel'
 import { getJournalInsightsForEntries } from '@/lib/journal/ai'
-import type { JournalEntry } from '@/types/journal'
+import type { JournalEntry as StoreJournalEntry } from '@/store/journalStore'
 
 vi.mock('@/lib/journal/ai', () => ({
   getJournalInsightsForEntries: vi.fn(),
 }))
 
-const mockEntries: JournalEntry[] = [
+function getFirstCallArgs<TArgs extends unknown[], TReturn>(
+  mockFn: Mock<TArgs, TReturn>
+): TArgs[0] {
+  expect(mockFn.mock.calls.length).to.be.greaterThan(0)
+  const [firstCall] = mockFn.mock.calls
+  if (!firstCall) {
+    throw new Error('Expected mocked service to be called at least once')
+  }
+  const [firstArg] = firstCall
+  if (typeof firstArg === 'undefined') {
+    throw new Error('Expected mocked service to be called with arguments')
+  }
+  return firstArg
+}
+
+const mockEntries: StoreJournalEntry[] = [
   {
     id: 'entry-1',
-    timestamp: Date.now(),
-    ticker: 'SOL',
-    address: 'sol-address',
-    setup: 'support',
-    emotion: 'confident',
-    status: 'active',
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
+    title: 'SOL breakout retest',
+    date: 'Mar 14 · 09:45 UTC',
+    direction: 'long',
+    pnl: '+3.4%',
+    notes: 'Scaled into reclaim after sweeping liquidity.',
+    tags: ['SOL'],
+    journeyMeta: {
+      phase: 'SEEKER',
+      xpTotal: 120,
+      streak: 3,
+      lastEventAt: Date.now() - 1000,
+    },
   },
   {
     id: 'entry-2',
-    timestamp: Date.now() - 1000,
-    ticker: 'BONK',
-    address: 'bonk-address',
-    setup: 'breakout',
-    emotion: 'fomo',
-    status: 'closed',
-    createdAt: Date.now() - 2000,
-    updatedAt: Date.now() - 1500,
+    title: 'BONK fade attempt',
+    date: 'Mar 13 · 22:10 UTC',
+    direction: 'short',
+    pnl: '-1.2%',
+    notes: 'Chased weakness into a tested level.',
+    tags: ['BONK'],
   },
 ]
 
@@ -72,10 +90,14 @@ describe('JournalInsightsPanel', () => {
     fireEvent.click(screen.getByTestId('journal-insights-generate-button'))
 
     await screen.findByTestId('journal-insight-card')
-    expect(mockedService).toHaveBeenCalledOnce()
+    expect(mockedService.mock.calls.length).to.equal(1)
 
-    const callArgs = mockedService.mock.calls[0][0]
-    expect(callArgs.entries).to.deep.equal(mockEntries)
+    const callArgs = getFirstCallArgs(mockedService)
+    expect(callArgs.entries).to.have.lengthOf(mockEntries.length)
+    const [firstMapped] = callArgs.entries
+    expect(firstMapped).to.exist
+    expect(firstMapped.ticker).to.equal('SOL')
+    expect(firstMapped.status).to.equal('active')
     expect(callArgs.maxEntries).to.equal(20)
 
     const card = await screen.findByTestId('journal-insight-card')
