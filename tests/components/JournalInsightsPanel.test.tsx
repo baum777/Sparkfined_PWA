@@ -63,7 +63,7 @@ describe('JournalInsightsPanel', () => {
     render(<JournalInsightsPanel entries={mockEntries} />)
 
     const button = screen.getByTestId('journal-insights-generate-button')
-    expect(button).to.exist
+    expect(button).toBeTruthy()
     expect(button.textContent).to.contain('Generate Insights')
   })
 
@@ -98,7 +98,7 @@ describe('JournalInsightsPanel', () => {
     if (!firstMapped) {
       throw new Error('Expected at least one mapped entry')
     }
-    expect(firstMapped).to.exist
+    expect(firstMapped).toBeTruthy()
     expect(firstMapped.ticker).to.equal('SOL')
     expect(firstMapped.status).to.equal('active')
     expect(callArgs.maxEntries).to.equal(20)
@@ -116,7 +116,7 @@ describe('JournalInsightsPanel', () => {
 
     await waitFor(() => {
       const errorText = screen.getByText('Could not generate insights. Please try again.')
-      expect(errorText).to.exist
+      expect(errorText).toBeTruthy()
     })
   })
 })
