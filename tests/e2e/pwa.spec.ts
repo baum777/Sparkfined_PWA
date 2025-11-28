@@ -7,7 +7,7 @@
  * 3. Window Controls Overlay (WCO): Titlebar fallback works
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect } from './fixtures/baseTest'
 
 test.describe('PWA Smoke Tests', () => {
   test('offline shell and service worker', async ({ page, context }) => {

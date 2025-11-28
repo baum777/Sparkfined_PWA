@@ -3,7 +3,7 @@
  * Upload to result flow test
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/baseTest';
 
 test.describe('Upload Flow', () => {
   test.skip('uploads chart and displays result card', async ({ page }) => {

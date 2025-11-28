@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../fixtures/baseTest';
 import { visitAlerts } from '../fixtures/navigation';
 import { ALERT_IDS } from '../fixtures/testData';
 import { awaitStableUI } from '../utils/wait';

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures/baseTest'
 
 // Smoke coverage for the chart workspace flows. These tests assume the seeded watchlist rows
 // and do not require live market data to validate UI anchors.

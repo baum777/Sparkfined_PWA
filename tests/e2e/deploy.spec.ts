@@ -1,5 +1,5 @@
 // tests/e2e/deploy.spec.ts
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/baseTest";
 
 test.describe("Sparkfined Deploy Smoke", () => {
   test("PWA installability & app shell", async ({ page, request }) => {

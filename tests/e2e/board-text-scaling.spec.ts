@@ -14,7 +14,7 @@
  * Run: npm run test:e2e
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/baseTest';
 import { awaitStableUI } from './utils/wait';
 
 test.describe('Board Page - Text Scaling (200% Zoom)', () => {

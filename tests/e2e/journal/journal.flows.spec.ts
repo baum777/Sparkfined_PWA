@@ -1,8 +1,7 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../fixtures/baseTest';
 import { visitJournal } from '../fixtures/navigation';
 import { makeJournalTestEntry } from '../fixtures/testData';
 import { awaitStableUI } from '../utils/wait';
-import { stubNoisyAPIs } from '../fixtures/api-stubs';
 
 test.describe('journal flows', () => {
   test.beforeEach(async ({ page }) => {
@@ -18,7 +17,6 @@ test.describe('journal flows', () => {
       console.log(`[Page Error] ${error.message}`);
     });
     
-    await stubNoisyAPIs(page);
     await visitJournal(page);
   });
 
