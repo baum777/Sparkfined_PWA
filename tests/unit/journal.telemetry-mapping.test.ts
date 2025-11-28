@@ -6,8 +6,16 @@ import type {
   JournalEntryCreatedEvent,
   JournalReflexionCompletedEvent,
 } from '@/types/journalEvents'
+import type { TelemetryEvent, TelemetryJournalPayloadV1 } from '@/types/telemetry'
 
 const baseTimestamp = '2024-11-01T00:00:00.000Z'
+
+function getJournalPayload(event: TelemetryEvent): TelemetryJournalPayloadV1 {
+  if (event.kind !== 'journal') {
+    throw new Error(`Expected journal telemetry event, got kind="${event.kind}"`)
+  }
+  return event.payload
+}
 
 describe('mapJournalEventToTelemetryEvent', () => {
   it('enriches reflexion events with journey context and quality score', () => {
@@ -36,17 +44,18 @@ describe('mapJournalEventToTelemetryEvent', () => {
       appVersion: '0.9.0',
       ts: baseTimestamp,
     })
+    const payload = getJournalPayload(result)
 
     expect(result.kind).toBe('journal')
     expect(result.ts).toBe(baseTimestamp)
     expect(result.sessionId).toBe('session-123')
-    expect(result.payload.schemaVersion).toBe(1)
-    expect(result.payload.eventType).toBe('JournalReflexionCompleted')
-    expect(result.payload.entryId).toBe('entry-1')
-    expect(result.payload.phase).toBe('WARRIOR')
-    expect(result.payload.xpTotal).toBe(420)
-    expect(result.payload.streak).toBe(5)
-    expect(result.payload.qualityScore).toBe(88)
+    expect(payload.schemaVersion).toBe(1)
+    expect(payload.eventType).toBe('JournalReflexionCompleted')
+    expect(payload.entryId).toBe('entry-1')
+    expect(payload.phase).toBe('WARRIOR')
+    expect(payload.xpTotal).toBe(420)
+    expect(payload.streak).toBe(5)
+    expect(payload.qualityScore).toBe(88)
   })
 
   it('falls back to null qualityScore when event does not provide one', () => {
@@ -72,8 +81,9 @@ describe('mapJournalEventToTelemetryEvent', () => {
     }
 
     const result = mapJournalEventToTelemetryEvent(event)
+    const payload = getJournalPayload(result)
 
-    expect(result.payload.phase).toBeUndefined()
-    expect(result.payload.qualityScore).toBeNull()
+    expect(payload.phase).toBeUndefined()
+    expect(payload.qualityScore).toBeNull()
   })
 })
