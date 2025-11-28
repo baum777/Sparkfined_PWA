@@ -2,10 +2,11 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { JournalJourneyBanner } from '@/components/journal/JournalJourneyBanner'
+import type { UserJourneySnapshot } from '@/lib/journal/journey-snapshot'
 
 describe('JournalJourneyBanner', () => {
   it('renders phase, XP, and streak values', () => {
-    const snapshot = {
+    const snapshot: UserJourneySnapshot = {
       phase: 'WARRIOR',
       xpTotal: 840,
       streak: 5,

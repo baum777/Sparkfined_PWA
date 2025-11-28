@@ -1,56 +1,51 @@
 import { describe, expect, it } from 'vitest'
 
-import { computeUserJourneySnapshotFromEntries } from '@/lib/journal/journey-snapshot'
-import type { JournalEntry } from '@/types/journal'
+import {
+  DEFAULT_JOURNEY_SNAPSHOT,
+  computeUserJourneySnapshotFromEntries,
+  type JourneySnapshotSource,
+} from '@/lib/journal/journey-snapshot'
+import type { JournalJourneyMeta } from '@/types/journal'
 
-function createEntry(overrides: Partial<JournalEntry>): JournalEntry {
+function buildMeta(overrides: Partial<JournalJourneyMeta> = {}): JournalJourneyMeta {
   return {
-    id: overrides.id ?? Math.random().toString(36).slice(2),
-    timestamp: overrides.timestamp ?? Date.now(),
-    ticker: overrides.ticker ?? 'SOL',
-    address: overrides.address ?? 'manual',
-    setup: overrides.setup ?? 'custom',
-    emotion: overrides.emotion ?? 'custom',
-    status: overrides.status ?? 'active',
-    createdAt: overrides.createdAt ?? Date.now(),
-    updatedAt: overrides.updatedAt ?? Date.now(),
-    journeyMeta: overrides.journeyMeta,
+    phase: overrides.phase ?? 'DEGEN',
+    xpTotal: overrides.xpTotal ?? 0,
+    streak: overrides.streak ?? 0,
+    lastEventAt: overrides.lastEventAt ?? Date.now(),
+    lastPhaseChangeAt: overrides.lastPhaseChangeAt,
+  }
+}
+
+function buildSource(meta?: JournalJourneyMeta, overrides: Partial<JourneySnapshotSource> = {}): JourneySnapshotSource {
+  return {
+    journeyMeta: meta,
+    updatedAt: overrides.updatedAt,
+    createdAt: overrides.createdAt,
   }
 }
 
 describe('computeUserJourneySnapshotFromEntries', () => {
-  it('returns null when no journey metadata is available', () => {
-    const entries = [createEntry({ journeyMeta: undefined })]
+  it('returns default snapshot when no journey metadata is available', () => {
+    const entries: JourneySnapshotSource[] = [buildSource(undefined)]
 
-    expect(computeUserJourneySnapshotFromEntries(entries)).toBeNull()
+    expect(computeUserJourneySnapshotFromEntries(entries)).toEqual(DEFAULT_JOURNEY_SNAPSHOT)
   })
 
   it('selects the meta with the highest XP total as snapshot', () => {
-    const entries: JournalEntry[] = [
-      createEntry({
-        journeyMeta: {
-          phase: 'DEGEN',
-          xpTotal: 120,
-          streak: 1,
-          lastEventAt: 1000,
-        },
-      }),
-      createEntry({
-        journeyMeta: {
-          phase: 'WARRIOR',
-          xpTotal: 420,
-          streak: 4,
-          lastEventAt: 2000,
-        },
-      }),
-      createEntry({
-        journeyMeta: {
-          phase: 'MASTER',
-          xpTotal: 320,
-          streak: 3,
-          lastEventAt: 3000,
-        },
-      }),
+    const entries: JourneySnapshotSource[] = [
+      buildSource(
+        buildMeta({ phase: 'DEGEN', xpTotal: 120, streak: 1, lastEventAt: 1_000 }),
+        { updatedAt: 1_000 },
+      ),
+      buildSource(
+        buildMeta({ phase: 'WARRIOR', xpTotal: 420, streak: 4, lastEventAt: 2_000 }),
+        { updatedAt: 2_000 },
+      ),
+      buildSource(
+        buildMeta({ phase: 'MASTER', xpTotal: 320, streak: 3, lastEventAt: 3_000 }),
+        { updatedAt: 3_000 },
+      ),
     ]
 
     const snapshot = computeUserJourneySnapshotFromEntries(entries)
@@ -59,30 +54,15 @@ describe('computeUserJourneySnapshotFromEntries', () => {
   })
 
   it('breaks XP ties by phase order and recency', () => {
-    const entries: JournalEntry[] = [
-      createEntry({
-        journeyMeta: {
-          phase: 'SEEKER',
-          xpTotal: 500,
-          streak: 5,
-          lastEventAt: 1000,
-        },
+    const entries: JourneySnapshotSource[] = [
+      buildSource(buildMeta({ phase: 'SEEKER', xpTotal: 500, streak: 5, lastEventAt: 1_000 }), {
+        updatedAt: 1_000,
       }),
-      createEntry({
-        journeyMeta: {
-          phase: 'MASTER',
-          xpTotal: 500,
-          streak: 6,
-          lastEventAt: 900,
-        },
+      buildSource(buildMeta({ phase: 'MASTER', xpTotal: 500, streak: 6, lastEventAt: 900 }), {
+        updatedAt: 900,
       }),
-      createEntry({
-        journeyMeta: {
-          phase: 'MASTER',
-          xpTotal: 500,
-          streak: 7,
-          lastEventAt: 1100,
-        },
+      buildSource(buildMeta({ phase: 'MASTER', xpTotal: 500, streak: 7, lastEventAt: 1_100 }), {
+        updatedAt: 1_100,
       }),
     ]
 

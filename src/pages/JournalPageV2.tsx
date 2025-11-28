@@ -107,9 +107,22 @@ export default function JournalPageV2() {
     };
   }, [entries]);
 
-  const journeySnapshot = useMemo(
-    () => computeUserJourneySnapshotFromEntries(entries),
+  const journeySources = useMemo(
+    () =>
+      entries.map((entry) => ({
+        journeyMeta: entry.journeyMeta,
+      })),
     [entries],
+  );
+
+  const hasJourneyMeta = useMemo(
+    () => journeySources.some((source) => Boolean(source.journeyMeta)),
+    [journeySources],
+  );
+
+  const journeySnapshot = useMemo(
+    () => computeUserJourneySnapshotFromEntries(journeySources),
+    [journeySources],
   );
 
   const handleSelectEntry = useCallback(
@@ -181,7 +194,7 @@ export default function JournalPageV2() {
           {!isLoading && error && <p className="text-xs text-warn">{error}</p>}
         </div>
 
-        {journeySnapshot && <JournalJourneyBanner snapshot={journeySnapshot} />}
+        {hasJourneyMeta && journeySnapshot && <JournalJourneyBanner snapshot={journeySnapshot} />}
 
         <JournalLayout
           list={

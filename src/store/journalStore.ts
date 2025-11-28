@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createEntry, queryEntries, updateEntryNotes } from '@/lib/JournalService';
-import type { JournalEntry as PersistedJournalEntry } from '@/types/journal';
+import type { JournalEntry as PersistedJournalEntry, JournalJourneyMeta } from '@/types/journal';
 import type { SolanaMemeTrendEvent, TrendSentimentLabel } from '@/types/events';
 import type { ChartCreationContext } from '@/domain/chart';
 
@@ -17,6 +17,7 @@ export interface JournalEntry {
   sourceUrl?: string;
   tags?: string[];
   sentimentLabel?: TrendSentimentLabel;
+  journeyMeta?: JournalJourneyMeta;
 }
 
 interface JournalState {
@@ -177,6 +178,7 @@ function mapPersistedToJournalEntry(entry: PersistedJournalEntry): JournalEntry 
     pnl: formatPnl(entry.outcome?.pnlPercent, entry.outcome?.pnl),
     notes: entry.thesis || (entry.customTags?.length ? entry.customTags.join(', ') : undefined),
     isAuto: false,
+    journeyMeta: entry.journeyMeta,
   };
 }
 
