@@ -1,3 +1,5 @@
+import type { JourneyPhase } from '@/types/journal'
+
 /**
  * Journal AI Insights Types (Loop J3-A)
  * 
@@ -28,6 +30,19 @@ export interface JournalInsight {
   evidenceEntries: string[];       // JournalEntry IDs supporting this insight
   confidence?: number;             // Optional: 0–100, how confident the AI is
   detectedAt?: number;             // Optional: Unix timestamp when insight was generated
+}
+
+/**
+ * Persisted record stored in IndexedDB/Dexie.
+ * Keeps the core insight payload plus metadata describing the analysis run.
+ */
+export interface JournalInsightRecord extends Omit<JournalInsight, 'detectedAt'> {
+  id: string;
+  analysisKey: string;
+  generatedAt: string; // ISO timestamp for ordering
+  modelUsed?: string;
+  journeyPhaseAtGeneration?: JourneyPhase;
+  version: 1;
 }
 
 /**
