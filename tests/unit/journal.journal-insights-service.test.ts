@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { JournalEntry } from '@/types/journal'
-import type { JournalInsight } from '@/types/journalInsights'
+import type { JournalInsight, JournalInsightResult } from '@/types/journalInsights'
 
 // Mock global fetch before importing the service
 const mockFetch = vi.fn()
@@ -14,6 +14,17 @@ global.fetch = mockFetch as unknown as typeof fetch
 
 // Now import the service
 import { getJournalInsightsForEntries } from '@/lib/journal/ai/journal-insights-service'
+
+function getSingleInsight(result: JournalInsightResult): JournalInsight {
+  expect(result.insights, 'expected exactly one insight').to.have.lengthOf(1)
+  const [first] = result.insights
+
+  if (!first) {
+    throw new Error('Expected at least one insight')
+  }
+
+  return first
+}
 
 describe('getJournalInsightsForEntries', () => {
   const mockEntry: JournalEntry = {
@@ -86,8 +97,9 @@ describe('getJournalInsightsForEntries', () => {
       entries: [mockEntry],
     })
 
-    expect(result.insights).toHaveLength(1)
-    expect(result.insights[0]).toMatchObject({
+    const insight = getSingleInsight(result)
+
+    expect(insight).toMatchObject({
       category: 'BEHAVIOR_LOOP',
       severity: 'WARNING',
       title: 'FOMO-Breakout Pattern',
@@ -96,8 +108,8 @@ describe('getJournalInsightsForEntries', () => {
       evidenceEntries: ['entry-1'],
       confidence: 85,
     })
-    expect(result.insights[0].id).toBeDefined()
-    expect(result.insights[0].detectedAt).toBeDefined()
+    expect(insight.id).toBeDefined()
+    expect(insight.detectedAt).toBeDefined()
   })
 
   it('should return metadata with result', async () => {
@@ -267,8 +279,9 @@ describe('getJournalInsightsForEntries', () => {
       entries: [mockEntry],
     })
 
-    expect(result.insights).toHaveLength(1)
-    expect(result.insights[0].evidenceEntries).toEqual(['entry-1'])
+    const insight = getSingleInsight(result)
+
+    expect(insight.evidenceEntries).toEqual(['entry-1'])
   })
 
   it('should handle API errors gracefully', async () => {
@@ -320,7 +333,10 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     // IDs should be stable for same category + title
-    expect(result1.insights[0].id).toBe(result2.insights[0].id)
+    const firstInsightRun1 = getSingleInsight(result1)
+    const firstInsightRun2 = getSingleInsight(result2)
+
+    expect(firstInsightRun1.id).toBe(firstInsightRun2.id)
   })
 
   it('should handle multiple insights', async () => {
@@ -364,8 +380,14 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     expect(result.insights).toHaveLength(2)
-    expect(result.insights[0].category).toBe('BEHAVIOR_LOOP')
-    expect(result.insights[1].category).toBe('TIMING')
+    const [first, second] = result.insights
+
+    if (!first || !second) {
+      throw new Error('Expected at least two insights')
+    }
+
+    expect(first.category).toBe('BEHAVIOR_LOOP')
+    expect(second.category).toBe('TIMING')
   })
 
   it('should respect maxEntries parameter', async () => {
@@ -422,7 +444,8 @@ describe('getJournalInsightsForEntries', () => {
       entries: [mockEntry],
     })
 
-    expect(result.insights).toHaveLength(1)
-    expect(result.insights[0].confidence).toBeUndefined()
+    const insight = getSingleInsight(result)
+
+    expect(insight.confidence).toBeUndefined()
   })
 })
