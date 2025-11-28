@@ -15,9 +15,10 @@ describe('JournalJourneyBanner', () => {
     render(<JournalJourneyBanner snapshot={snapshot} />)
 
     const banner = screen.getByTestId('journal-journey-banner')
-    expect(banner).toBeInTheDocument()
-    expect(banner).toHaveTextContent('WARRIOR')
-    expect(banner).toHaveTextContent('840')
-    expect(banner).toHaveTextContent('5')
+    expect(banner).to.exist
+    const text = banner.textContent ?? ''
+    expect(text).to.contain('WARRIOR')
+    expect(text).to.contain('840')
+    expect(text).to.contain('5')
   })
 })
