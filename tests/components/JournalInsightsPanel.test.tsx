@@ -95,6 +95,9 @@ describe('JournalInsightsPanel', () => {
     const callArgs = getFirstCallArgs(mockedService)
     expect(callArgs.entries).to.have.lengthOf(mockEntries.length)
     const [firstMapped] = callArgs.entries
+    if (!firstMapped) {
+      throw new Error('Expected at least one mapped entry')
+    }
     expect(firstMapped).to.exist
     expect(firstMapped.ticker).to.equal('SOL')
     expect(firstMapped.status).to.equal('active')
