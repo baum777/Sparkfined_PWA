@@ -42,7 +42,20 @@ export type JournalEntry = {
   // Links
   replaySessionId?: string;      // Link to Replay Session
   walletAddress?: string;        // Which wallet (for multi-wallet later)
+
+  // Journey / XP progression (Loop J2)
+  journeyMeta?: JournalJourneyMeta;
 };
+
+export type JourneyPhase = 'DEGEN' | 'SEEKER' | 'WARRIOR' | 'MASTER' | 'SAGE';
+
+export interface JournalJourneyMeta {
+  phase: JourneyPhase;
+  xpTotal: number;
+  streak: number;
+  lastEventAt: number;
+  lastPhaseChangeAt?: number;
+}
 
 // ============================================================================
 // CHART STATE (Reconstructable)
