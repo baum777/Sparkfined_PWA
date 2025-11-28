@@ -10,6 +10,21 @@ import {
   sendJournalInsightsGeneratedEvent,
 } from '@/lib/journal/journal-insights-telemetry'
 import type { JournalInsightResult } from '@/types/journalInsights'
+import type { TelemetryJournalInsightPayloadV1 } from '@/types/telemetry'
+
+function isJournalInsightPayload(
+  payload: unknown
+): payload is TelemetryJournalInsightPayloadV1 {
+  return (
+    !!payload &&
+    typeof payload === 'object' &&
+    'analysisKey' in payload &&
+    'insightCount' in payload &&
+    'categories' in payload &&
+    'severities' in payload &&
+    'generatedAt' in payload
+  )
+}
 
 describe('buildJournalInsightsTelemetryEvent', () => {
   it('builds telemetry event with correct structure', () => {
@@ -47,13 +62,19 @@ describe('buildJournalInsightsTelemetryEvent', () => {
 
     expect(event.kind).toBe('journal_insight')
     expect(event.ts).toBeTruthy()
-    expect(event.payload.schemaVersion).toBe(1)
-    expect(event.payload.analysisKey).toBe(analysisKey)
-    expect(event.payload.insightCount).toBe(2)
-    expect(event.payload.categories).toEqual(['BEHAVIOR_LOOP', 'TIMING'])
-    expect(event.payload.severities).toEqual(['WARNING', 'INFO'])
-    expect(event.payload.modelUsed).toBe('gpt-4o-mini')
-    expect(event.payload.generatedAt).toBeTruthy()
+
+    const payload = event.payload
+    if (!isJournalInsightPayload(payload)) {
+      throw new Error('Expected TelemetryJournalInsightPayloadV1 payload')
+    }
+
+    expect(payload.schemaVersion).toBe(1)
+    expect(payload.analysisKey).toBe(analysisKey)
+    expect(payload.insightCount).toBe(2)
+    expect(payload.categories).toEqual(['BEHAVIOR_LOOP', 'TIMING'])
+    expect(payload.severities).toEqual(['WARNING', 'INFO'])
+    expect(payload.modelUsed).toBe('gpt-4o-mini')
+    expect(payload.generatedAt).toBeTruthy()
   })
 
   it('deduplicates categories and severities', () => {
@@ -97,12 +118,17 @@ describe('buildJournalInsightsTelemetryEvent', () => {
 
     const event = buildJournalInsightsTelemetryEvent(analysisKey, result)
 
-    expect(event.payload.categories).toHaveLength(2)
-    expect(event.payload.categories).toContain('BEHAVIOR_LOOP')
-    expect(event.payload.categories).toContain('TIMING')
-    expect(event.payload.severities).toHaveLength(2)
-    expect(event.payload.severities).toContain('WARNING')
-    expect(event.payload.severities).toContain('INFO')
+    const payload = event.payload
+    if (!isJournalInsightPayload(payload)) {
+      throw new Error('Expected TelemetryJournalInsightPayloadV1 payload')
+    }
+
+    expect(payload.categories).toHaveLength(2)
+    expect(payload.categories).toContain('BEHAVIOR_LOOP')
+    expect(payload.categories).toContain('TIMING')
+    expect(payload.severities).toHaveLength(2)
+    expect(payload.severities).toContain('WARNING')
+    expect(payload.severities).toContain('INFO')
   })
 
   it('handles empty insights result', () => {
@@ -115,9 +141,14 @@ describe('buildJournalInsightsTelemetryEvent', () => {
 
     const event = buildJournalInsightsTelemetryEvent(analysisKey, result)
 
-    expect(event.payload.insightCount).toBe(0)
-    expect(event.payload.categories).toEqual([])
-    expect(event.payload.severities).toEqual([])
+    const payload = event.payload
+    if (!isJournalInsightPayload(payload)) {
+      throw new Error('Expected TelemetryJournalInsightPayloadV1 payload')
+    }
+
+    expect(payload.insightCount).toBe(0)
+    expect(payload.categories).toEqual([])
+    expect(payload.severities).toEqual([])
   })
 })
 
