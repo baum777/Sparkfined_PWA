@@ -26,7 +26,7 @@ export default function JournalPageV2() {
       addEntry: state.addEntry,
     }));
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);

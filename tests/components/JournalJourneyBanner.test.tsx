@@ -15,7 +15,6 @@ describe('JournalJourneyBanner', () => {
     render(<JournalJourneyBanner snapshot={snapshot} />)
 
     const banner = screen.getByTestId('journal-journey-banner')
-    expect(banner).to.exist
     const text = banner.textContent ?? ''
     expect(text).to.contain('WARRIOR')
     expect(text).to.contain('840')
