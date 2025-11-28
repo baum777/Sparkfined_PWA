@@ -1,4 +1,6 @@
-import { readFile } from "fs/promises";
+// NOTE: Namespace import keeps Vite's browser stub for "fs/promises" from failing.
+// Named imports trigger Rollup to validate exports against "__vite-browser-external".
+import * as fs from "fs/promises";
 import path from "path";
 
 const cache = new Map<string, string>();
@@ -8,7 +10,7 @@ async function readPrompt(relativePath: string): Promise<string> {
     return cache.get(relativePath)!;
   }
   const abs = path.resolve(process.cwd(), "ai", "prompts", relativePath);
-  const content = await readFile(abs, "utf8");
+  const content = await fs.readFile(abs, "utf8");
   cache.set(relativePath, content);
   return content;
 }
