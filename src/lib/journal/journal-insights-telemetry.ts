@@ -25,6 +25,7 @@ export function buildJournalInsightsTelemetryEvent(
     severities,
     modelUsed: result.modelUsed,
     generatedAt: new Date(result.generatedAt).toISOString(),
+    promptVersion: result.promptVersion,
   }
 
   return {

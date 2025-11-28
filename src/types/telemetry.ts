@@ -30,6 +30,7 @@ export interface TelemetryJournalInsightPayloadV1 {
   severities: JournalInsightSeverity[]
   modelUsed?: string
   generatedAt: string
+  promptVersion?: string
 }
 
 export type TelemetryEvent =
