@@ -14,7 +14,11 @@ describe('indicator calculations', () => {
     const points = computeSma(candles, 2)
     expect(points.map((p) => p.value)).toEqual([1.5, 2.5, 3.5])
     // time is now UTCTimestamp (seconds since epoch)
-    expect(points[0]!.time).toBe(2)
+    const [firstPoint] = points
+    if (!firstPoint) {
+      throw new Error('Expected SMA calculation to yield at least one point')
+    }
+    expect(firstPoint.time).toBe(2)
   })
 
   it('computes EMA smoothing correctly', () => {
@@ -28,8 +32,14 @@ describe('indicator calculations', () => {
     expect(basis.length).toBe(2)
     expect(upper.length).toBe(2)
     expect(lower.length).toBe(2)
-    expect(Number(upper[0]!.value.toFixed(4))).toBeGreaterThan(Number(basis[0]!.value.toFixed(4)))
-    expect(Number(lower[0]!.value.toFixed(4))).toBeLessThan(Number(basis[0]!.value.toFixed(4)))
+    const firstUpper = upper[0]
+    const firstBasis = basis[0]
+    const firstLower = lower[0]
+    if (!firstUpper || !firstBasis || !firstLower) {
+      throw new Error('Expected Bollinger band calculations to return paired values')
+    }
+    expect(Number(firstUpper.value.toFixed(4))).toBeGreaterThan(Number(firstBasis.value.toFixed(4)))
+    expect(Number(firstLower.value.toFixed(4))).toBeLessThan(Number(firstBasis.value.toFixed(4)))
   })
 
   it('buildIndicators maps overlays into computed indicator payloads', () => {

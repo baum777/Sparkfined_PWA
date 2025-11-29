@@ -39,7 +39,13 @@ describe('annotations mapping', () => {
       [],
       []
     )
-    expect(merged[0]!.id).toBe('2')
+    expect(merged).toHaveLength(2)
+
+    const [first] = merged
+    if (!first) {
+      throw new Error('Expected merged annotations to include at least one entry')
+    }
+    expect(first.id).toBe('2')
   })
 
   it('maps pulse delta events to signal annotations', () => {
