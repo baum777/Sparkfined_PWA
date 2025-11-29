@@ -1,20 +1,26 @@
-# Sparkfined
+# Sparkfined PWA
 
-> **From Chaos to Mastery** — Your Trading Command Center for Self-Improvement in Crypto Markets
+> **From Chaos to Mastery** — An Offline-First Trading Command Center for Crypto Markets
+
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](package.json)
+[![PWA](https://img.shields.io/badge/PWA-enabled-brightgreen.svg)](https://web.dev/progressive-web-apps/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://react.dev/)
 
 ---
 
 ## What is Sparkfined?
 
-Sparkfined is an **offline-first trading journal and coaching platform** built for crypto traders who want to turn losses into lessons and emotions into discipline.
+**Sparkfined** is an **offline-first Progressive Web App (PWA)** designed for crypto traders who want to transform losses into lessons and emotions into discipline. Built with a focus on self-improvement, it combines powerful journaling, AI-powered insights, and technical analysis tools to help you discover your trading edge.
 
-Unlike generic charting tools, Sparkfined helps you **understand yourself** — your patterns, your blind spots, your evolution as a trader. It combines a powerful journaling system with AI-powered behavioral analysis to show you exactly where your edge is hiding.
+Unlike generic charting platforms, Sparkfined helps you **understand yourself** — your behavioral patterns, blind spots, and evolution as a trader through systematic reflection and AI-driven analysis.
 
-**Built for:**
-- Day traders looking to break FOMO loops and revenge-trade cycles
-- Meme coin enthusiasts who need structure in the chaos
-- Self-improvement-focused traders who journal every trade
-- Anyone tired of repeating the same mistakes
+### Built For
+
+- **Day Traders** breaking FOMO loops and revenge-trade cycles
+- **Meme Coin Traders** who need structure in market chaos  
+- **Self-Improvement Traders** who journal consistently
+- **Disciplined Learners** tired of repeating the same mistakes
 
 ---
 
@@ -43,18 +49,19 @@ Sparkfined gives you **three things that matter more than any indicator:**
 
 ---
 
-## Core Features
+## ✨ Core Features
 
 ### 📝 Trading Journal — Your Second Brain
 
-**Why it matters:** The trader who journals consistently beats the one who doesn't. Every loss is a lesson, not a failure.
+**Why it matters:** Consistent journaling separates profitable traders from those who repeat mistakes. Every loss becomes a lesson.
 
-- **Rich note-taking** for every trade — thesis, emotions, outcome
-- **Tag-based filtering** (find all "Long SOL" or "Revenge Trade" entries instantly)
-- **Works offline** — write on planes, trains, anywhere
-- **Private by default** — your data stays local until you choose to share
+- **Rich note-taking** — Document thesis, emotions, and outcomes for every trade
+- **Tag-based filtering** — Instantly find patterns like "FOMO", "Revenge Trade", or specific setups
+- **Offline-capable** — Write anywhere, sync when online
+- **Privacy-first** — Data stored locally in IndexedDB (Dexie), under your control
+- **AI-Condense** — Let AI summarize long journal entries for quick review
 
-**The discipline:** Log every trade. Even the embarrassing ones. Especially the embarrassing ones.
+**The discipline:** Log every trade. Especially the painful ones.
 
 ---
 
@@ -153,48 +160,118 @@ Most crypto dashboards are built for casual investors checking prices once a day
 
 ---
 
-## How It Works (Simple Flow)
+## 🛠️ Tech Stack
 
-1. **Log a Trade**  
-   After you close a position, open Sparkfined and write down: ticker, thesis, emotion, outcome.
+**Frontend:**
+- **React 18.3** with **TypeScript 5.6** (strict mode enabled)
+- **Vite 5.4** for blazing-fast builds and HMR
+- **TailwindCSS 4.1** (dark-mode-first design)
+- **Zustand** for state management (lightweight, <1KB)
+- **Dexie** (IndexedDB wrapper) for offline-first data persistence
+- **React Router 6** for client-side routing
 
-2. **Tag & Filter**  
-   Tag entries with setups, emotions, or outcomes. Later, filter to see all "Revenge Trade" or "FOMO" entries.
+**Backend (Serverless):**
+- **Vercel Edge Functions** (Node 18+)
+- **OpenAI API** (gpt-4o-mini) for AI features
+- **xAI Grok** for crypto-native reasoning (optional)
 
-3. **Generate Insights**  
-   Once you have 10-20 trades logged, click "Generate Insights" to let AI analyze your patterns.
+**PWA & Offline:**
+- **vite-plugin-pwa** + **Workbox** for Service Worker
+- **~428KB precache** (static assets)
+- Cache strategies: Precache, Cache-First, Network-First, Stale-While-Revalidate
 
-4. **Read Your Patterns**  
-   AI shows you: behavior loops, timing leaks, risk management gaps, emotional triggers.
+**Testing:**
+- **Vitest** for unit/integration tests
+- **Playwright** for E2E tests
+- **Testing Library** (React) for component tests
+- Target: **80% coverage** overall, **90% for critical modules**
 
-5. **Fix One Thing**  
-   Pick the highest-severity insight. Fix that pattern. Repeat.
-
-6. **Track Your Journey**  
-   Watch your XP grow, your phase evolve, and your win rate stabilize as you fix patterns.
+**Deployment:**
+- **Vercel** (Edge Functions + Static Hosting)
+- **GitHub Actions** for CI/CD
+- **Lighthouse CI** for performance monitoring
 
 ---
 
-## Roadmap — What's Next
+## 🚀 How It Works (Simple Flow)
 
-**Current status:** ✅ Production-ready for personal use (Journal, Journey, AI Insights, Social Preview)
+1. **Log a Trade**  
+   After closing a position, document: ticker, thesis, emotions, and outcome
 
-**Coming in 2025:**
+2. **Tag & Filter**  
+   Apply tags (setups, emotions, outcomes) and filter to find patterns like "FOMO" or "Revenge Trade"
 
-**Q1 2025 — Community & Scale**
-- **Community Heatmaps:** See what behavioral patterns are most common across all traders (anonymized)
-- **Real-Time Alerts:** Get notified when confluence rules trigger (e.g., "RSI < 30 + Volume spike")
-- **Background Sync:** Queue journal entries offline, sync seamlessly when reconnected
+3. **Generate AI Insights**  
+   After 10-20 trades, click "Generate Insights" for AI-powered pattern analysis
 
-**Q2 2025 — Advanced Coaching**
-- **Multi-AI Providers:** Choose between OpenAI (fast/cheap) and Grok (crypto-native reasoning)
-- **Trade Replays:** Study past price action like a film reel, annotate what you missed
-- **Setup Templates:** Save your best setups as templates, track win rate per setup
+4. **Identify Patterns**  
+   AI reveals: behavior loops, timing issues, risk management gaps, emotional triggers
 
-**Q3 2025 — Social & Mentorship**
-- **Share Lessons:** Turn your best journal entries into shareable insights
-- **Leaderboards:** See top traders by consistency (not P&L — discipline matters more)
-- **Mentorship Pairing:** Get matched with traders one phase ahead of you
+5. **Fix One Thing**  
+   Choose your highest-severity insight and address it systematically
+
+6. **Track Progress**  
+   Monitor your evolution through XP, phases, and improving win rates
+
+---
+
+## 🗺️ Roadmap
+
+**Current Status:** `v0.1.0 Beta` — Core features stable, PWA functional, AI integrations live
+
+### Active Sprint: S0 — Foundation Cleanup (Nov 12 → Nov 26, 2025)
+
+**In Progress:**
+- ✅ Multi-Tool Prompt System (AI agent optimization)
+- ✅ PWA Offline-Mode Audit (Service Worker stable, 428KB precache)
+- ⏳ Bundle-Size Optimization (Target: <400KB)
+- ⏳ E2E Test Coverage expansion (Target: 15-20 critical flows)
+
+### Q1 2025 — High-Priority Features
+
+**🔐 On-Chain Access Gating** `P0`
+- Replace mock wallet with real Solana NFT-based access control
+- Integrate `@solana/wallet-adapter-react` (Phantom, Solflare)
+- `/api/access/verify` endpoint for on-chain NFT verification
+- **Effort:** 2 sprints (4 weeks)
+
+**🔔 Real-Time Alerts (Push Notifications)** `P0`
+- Browser push notifications for price alerts and signal triggers
+- Service Worker push event handlers
+- Alert subscription/triggering via Vercel Cron
+- **Effort:** 2 sprints (4 weeks)
+
+**🔄 Background Sync (Offline-First Writes)** `P0`
+- Queue offline actions (journal entries, alerts) for sync when online
+- Service Worker `sync` event handlers
+- Retry logic + conflict resolution
+- **Effort:** 1 sprint (2 weeks)
+
+**📊 Chart Library Evaluation** `P1`
+- Evaluate: Lightweight-Charts (current) vs. TradingView Widget vs. Recharts
+- Decision deadline: End Q1 2025
+- **Effort:** 1 sprint spike
+
+**💰 AI Cost Optimization** `P1`
+- Response caching (1h TTL) ✅ Partially done
+- Migrate high-volume tasks to gpt-4o-mini ✅ Done
+- Per-user rate limiting (20 requests/hour)
+- Prompt compression for long contexts
+- **Effort:** 1 sprint (2 weeks)
+
+### Q2 2025 — Platform Growth
+
+- **Supabase Migration** (Optional): Backend DB for cross-device sync
+- **Mobile App Wrapper** (Capacitor): Native iOS/Android app via App Store
+- **Advanced TA Indicators**: Ichimoku, Keltner, additional studies
+- **Trade Replay**: Study past price action with annotations
+
+### Q3 2025 — Community Features
+
+- **Community Heatmaps**: Anonymized behavioral patterns across traders
+- **Setup Templates**: Save & track win rates for custom setups
+- **Social Sharing**: Share journal insights/lessons
+- **Mentorship Pairing**: Connect with traders one phase ahead
 
 ---
 
@@ -247,36 +324,125 @@ Sparkfined is your training ground. The market is your test.
 
 ---
 
-## Start Your Journey
+## 🚀 Getting Started
 
-**Ready to level up?**
+### For Users
 
-1. **Visit:** [www.catgpt.com](https://www.catgpt.com) to learn more
-2. **Install the app** from your browser (works on desktop, mobile, tablet)
-3. **Log your first trade** — even if it's a loss. Especially if it's a loss.
-4. **Generate insights** after 10-20 entries — let AI show you what you're missing
-5. **Fix one pattern** — pick your highest-severity insight and address it
+**Ready to level up your trading?**
 
-**The Hero's Journey starts with one step. Start journaling today.**
+1. **Clone or deploy** the app (see Development Setup below)
+2. **Install as PWA** from your browser (works on desktop, mobile, tablet)
+3. **Log your first trade** — document thesis, emotions, and outcome
+4. **Generate AI insights** after 10-20 trades to reveal patterns
+5. **Fix one pattern** at a time — systematic improvement over quick fixes
+
+### For Developers
+
+**Prerequisites:**
+- Node.js ≥ 20.10.0
+- pnpm ≥ 9.0.0
+
+**Setup:**
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd sparkfined-pwa
+
+# Install dependencies
+pnpm install
+
+# Copy environment template
+cp .env.example .env.local
+# Edit .env.local and add your API keys:
+# - OPENAI_API_KEY (required for AI features)
+# - XAI_API_KEY (optional, for Grok integration)
+# - MORALIS_API_KEY (optional, for market data)
+
+# Start development server
+pnpm dev
+```
+
+**Available Scripts:**
+
+```bash
+pnpm dev              # Start dev server (http://localhost:5173)
+pnpm build            # Build for production
+pnpm preview          # Preview production build
+pnpm typecheck        # Run TypeScript type checking
+pnpm lint             # Run ESLint
+pnpm test             # Run Vitest unit tests
+pnpm test:e2e         # Run Playwright E2E tests
+pnpm check:size       # Check bundle size
+```
+
+**Project Structure:**
+
+```
+sparkfined-pwa/
+├── src/
+│   ├── pages/           # Full-page components
+│   ├── components/      # Reusable UI components
+│   ├── features/        # Feature-specific modules
+│   ├── hooks/           # Custom React hooks
+│   ├── lib/             # Pure utilities & helpers
+│   ├── store/           # Zustand state stores
+│   ├── types/           # TypeScript type definitions
+│   └── styles/          # Global CSS & Tailwind
+├── api/                 # Vercel serverless functions
+├── docs/                # Documentation & ADRs
+├── tests/               # Test files (E2E, integration)
+└── public/              # Static assets
+```
 
 ---
 
-## About
+## 📚 Documentation
 
-**Sparkfined** is built by traders, for traders. We've lost money on FOMO. We've revenge-traded into the dirt. We've blown accounts chasing green candles.
+- **[Architecture Overview](/.rulesync/02-frontend-arch.md)** — 5-layer architecture model
+- **[TypeScript Conventions](/.rulesync/01-typescript.md)** — Patterns & best practices
+- **[PWA Guidelines](/.rulesync/03-pwa-conventions.md)** — Offline-first strategies
+- **[Testing Strategy](/.rulesync/06-testing-strategy.md)** — Test pyramid & coverage targets
+- **[Design Decisions](/.rulesync/_intentions.md)** — ADRs (Architecture Decision Records)
+- **[AI Integration](/.rulesync/11-ai-integration.md)** — Dual-provider setup & cost management
 
-We built Sparkfined because **we needed it ourselves.**
+---
 
-Every feature exists because we made a mistake that could have been avoided if we'd just written it down, reflected, and learned.
+## 🤝 Contributing
 
-Your losses don't define you. What you learn from them does.
+We welcome contributions! Please follow these guidelines:
+
+1. **Read** `.rulesync/` documentation for architecture & conventions
+2. **Create** feature branches from `main`
+3. **Write** tests for new features (target: 80% coverage)
+4. **Run** `pnpm typecheck && pnpm lint && pnpm test` before committing
+5. **Document** significant decisions in `_intentions.md` (ADRs)
 
 ---
 
-**More Information:** [www.catgpt.com](https://www.catgpt.com)  
-**Version:** 1.0 Beta  
-**Status:** ✅ Production-Ready | 🚀 Launch-Ready
+## 📝 License
+
+This project is currently in private beta. License information will be provided upon public release.
 
 ---
+
+## 🎯 Philosophy
+
+**Sparkfined** is built by traders, for traders. We've experienced FOMO, revenge trading, and account blow-ups. We built this tool because **we needed it ourselves**.
+
+Every feature exists because we made a mistake that could have been avoided through systematic reflection and learning.
+
+### The Path to Mastery
+
+```
+DEGEN → SEEKER → WARRIOR → MASTER → SAGE
+```
+
+Your losses don't define you. **What you learn from them does.**
+
+---
+
+**Version:** `0.1.0-beta`  
+**Status:** ⚡ Active Development | 🚀 Beta Testing
 
 *Trading is a craft. Losses are lessons. Mastery comes from self-improvement, not luck.*
