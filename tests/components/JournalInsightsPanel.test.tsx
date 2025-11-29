@@ -10,6 +10,27 @@ vi.mock('@/lib/journal/ai', () => ({
   getJournalInsightsForEntries: vi.fn(),
 }))
 
+vi.mock('@/lib/journal/journal-insights-store', () => ({
+  buildAnalysisKey: vi.fn((entries, maxEntries) => `latest-${maxEntries}:${entries.map((e: { id: string }) => e.id).join(',')}`),
+  saveInsightsForAnalysisKey: vi.fn(() => Promise.resolve()),
+  loadLatestInsightsForAnalysisKey: vi.fn(() => Promise.resolve(null)),
+  recordToInsight: vi.fn((record) => ({
+    id: record.id,
+    category: record.category,
+    severity: record.severity,
+    title: record.title,
+    summary: record.summary,
+    recommendation: record.recommendation,
+    evidenceEntries: record.evidenceEntries,
+    confidence: record.confidence ?? undefined,
+    detectedAt: new Date(record.generatedAt).getTime(),
+  })),
+}))
+
+vi.mock('@/lib/journal/journal-insights-telemetry', () => ({
+  sendJournalInsightsGeneratedEvent: vi.fn(() => Promise.resolve()),
+}))
+
 function getFirstCallArgs<TArgs extends unknown[], TReturn>(
   mockFn: Mock<TArgs, TReturn>
 ): TArgs[0] {
@@ -55,8 +76,17 @@ const mockEntries: StoreJournalEntry[] = [
 describe('JournalInsightsPanel', () => {
   const mockedService = vi.mocked(getJournalInsightsForEntries)
 
-  beforeEach(() => {
+  beforeEach(async () => {
     mockedService.mockReset()
+    
+    // Reset all mocked modules
+    const { loadLatestInsightsForAnalysisKey, saveInsightsForAnalysisKey } = await import('@/lib/journal/journal-insights-store')
+    const { sendJournalInsightsGeneratedEvent } = await import('@/lib/journal/journal-insights-telemetry')
+    
+    vi.mocked(loadLatestInsightsForAnalysisKey).mockReset()
+    vi.mocked(loadLatestInsightsForAnalysisKey).mockResolvedValue(null)
+    vi.mocked(saveInsightsForAnalysisKey).mockReset()
+    vi.mocked(sendJournalInsightsGeneratedEvent).mockReset()
   })
 
   it('renders generate button', () => {
@@ -105,6 +135,9 @@ describe('JournalInsightsPanel', () => {
 
     const card = await screen.findByTestId('journal-insight-card')
     expect(card.textContent).to.contain('FOMO entries spike')
+
+    const preview = await screen.findByTestId('journal-social-preview')
+    expect(preview).toBeTruthy()
   })
 
   it('surfaces an error when service throws', async () => {
@@ -115,8 +148,153 @@ describe('JournalInsightsPanel', () => {
     fireEvent.click(screen.getByTestId('journal-insights-generate-button'))
 
     await waitFor(() => {
-      const errorText = screen.getByText('Could not generate insights. Please try again.')
+      const errorText = screen.getByText('Unable to generate insights right now. Check your network and try again shortly.')
       expect(errorText).toBeTruthy()
     })
+  })
+
+  it('loads cached insights on mount', async () => {
+    const { loadLatestInsightsForAnalysisKey } = await import('@/lib/journal/journal-insights-store')
+    
+    const cachedRecords = [
+      {
+        id: 'insight-cached',
+        analysisKey: 'latest-20:entry-1,entry-2',
+        category: 'BEHAVIOR_LOOP' as const,
+        severity: 'WARNING' as const,
+        title: 'Cached FOMO Pattern',
+        summary: 'This is from cache.',
+        recommendation: 'Use cached insights.',
+        evidenceEntries: ['entry-1'],
+        confidence: 90,
+        generatedAt: new Date().toISOString(),
+        version: 1 as const,
+      },
+    ]
+
+    vi.mocked(loadLatestInsightsForAnalysisKey).mockResolvedValue(cachedRecords)
+
+    render(<JournalInsightsPanel entries={mockEntries} />)
+
+    await waitFor(() => {
+      const card = screen.queryByTestId('journal-insight-card')
+      expect(card).toBeTruthy()
+      expect(card?.textContent).toContain('Cached FOMO Pattern')
+    })
+
+    // Button should say "Regenerate"
+    const button = screen.getByTestId('journal-insights-generate-button')
+    expect(button.textContent).toContain('Regenerate Insights')
+  })
+
+  it('saves insights after successful generation', async () => {
+    const { saveInsightsForAnalysisKey } = await import('@/lib/journal/journal-insights-store')
+    const { sendJournalInsightsGeneratedEvent } = await import('@/lib/journal/journal-insights-telemetry')
+
+    const result = {
+      insights: [
+        {
+          id: 'insight-new',
+          category: 'TIMING' as const,
+          severity: 'INFO' as const,
+          title: 'Evening Pattern',
+          summary: 'Most trades happen in evening.',
+          recommendation: 'Try morning sessions.',
+          evidenceEntries: ['entry-1'],
+          detectedAt: Date.now(),
+        },
+      ],
+      generatedAt: Date.now(),
+      modelUsed: 'gpt-4o-mini',
+    }
+
+    mockedService.mockResolvedValue(result)
+
+    render(<JournalInsightsPanel entries={mockEntries} />)
+
+    fireEvent.click(screen.getByTestId('journal-insights-generate-button'))
+
+    await waitFor(() => {
+      const card = screen.queryByTestId('journal-insight-card')
+      expect(card).toBeTruthy()
+    })
+
+    // Should save to cache
+    expect(vi.mocked(saveInsightsForAnalysisKey)).toHaveBeenCalledWith(
+      expect.stringContaining('latest-20:'),
+      result
+    )
+
+    // Should send telemetry
+    expect(vi.mocked(sendJournalInsightsGeneratedEvent)).toHaveBeenCalledWith(
+      expect.stringContaining('latest-20:'),
+      result
+    )
+  })
+
+  it('does not save or send telemetry for empty insights', async () => {
+    const { saveInsightsForAnalysisKey } = await import('@/lib/journal/journal-insights-store')
+    const { sendJournalInsightsGeneratedEvent } = await import('@/lib/journal/journal-insights-telemetry')
+
+    const result = {
+      insights: [],
+      generatedAt: Date.now(),
+      modelUsed: 'gpt-4o-mini',
+    }
+
+    mockedService.mockResolvedValue(result)
+
+    render(<JournalInsightsPanel entries={mockEntries} />)
+
+    fireEvent.click(screen.getByTestId('journal-insights-generate-button'))
+
+    await waitFor(() => {
+      const errorText = screen.queryByText('No meaningful patterns detected yet—log a few more trades.')
+      expect(errorText).toBeTruthy()
+    })
+
+    // Should NOT save or send telemetry
+    expect(vi.mocked(saveInsightsForAnalysisKey)).not.toHaveBeenCalled()
+    expect(vi.mocked(sendJournalInsightsGeneratedEvent)).not.toHaveBeenCalled()
+  })
+
+  it('shows a cache notice when IndexedDB lookup fails', async () => {
+    const { loadLatestInsightsForAnalysisKey } = await import('@/lib/journal/journal-insights-store')
+    vi.mocked(loadLatestInsightsForAnalysisKey).mockRejectedValue(new Error('indexedDB blocked'))
+
+    render(<JournalInsightsPanel entries={mockEntries} />)
+
+    const notice = await screen.findByTestId('journal-insights-cache-notice')
+    expect(notice.textContent).toContain('Local insight cache is currently unavailable')
+  })
+
+  it('caps the requested maxEntries before invoking the AI service', async () => {
+    mockedService.mockResolvedValue({
+      insights: [
+        {
+          id: 'insight-cap',
+          category: 'BEHAVIOR_LOOP',
+          severity: 'WARNING',
+          title: 'Cap Test',
+          summary: 'Testing hard cap.',
+          recommendation: 'Keep entries limited.',
+          evidenceEntries: ['entry-1', 'entry-2'],
+          detectedAt: Date.now(),
+        },
+      ],
+      generatedAt: Date.now(),
+      modelUsed: 'gpt-4o-mini',
+    })
+
+    render(<JournalInsightsPanel entries={mockEntries} maxEntries={999} />)
+
+    fireEvent.click(screen.getByTestId('journal-insights-generate-button'))
+
+    await waitFor(() => {
+      expect(mockedService).toHaveBeenCalled()
+    })
+
+    const callArgs = getFirstCallArgs(mockedService)
+    expect(callArgs.maxEntries).to.equal(50)
   })
 })

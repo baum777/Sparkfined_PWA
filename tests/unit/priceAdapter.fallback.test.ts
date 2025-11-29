@@ -43,7 +43,10 @@ describe('fetchTokenCandles', () => {
     expect(candles.length).toBeGreaterThan(0)
     expect(candles).toHaveLength(1)
 
-    const primaryCandle = candles[0]!
+    const [primaryCandle] = candles
+    if (!primaryCandle) {
+      throw new Error('Expected at least one primary candle from DexPaprika')
+    }
     expect(primaryCandle.open).toBeCloseTo(1)
     expect(primaryCandle.high).toBeCloseTo(2)
   })
@@ -78,7 +81,10 @@ describe('fetchTokenCandles', () => {
     expect(candles.length).toBeGreaterThan(0)
     expect(candles).toHaveLength(1)
 
-    const fallbackCandle = candles[0]!
+    const [fallbackCandle] = candles
+    if (!fallbackCandle) {
+      throw new Error('Expected at least one fallback candle from Moralis')
+    }
     expect(fallbackCandle.close).toBeCloseTo(1.2)
   })
 })

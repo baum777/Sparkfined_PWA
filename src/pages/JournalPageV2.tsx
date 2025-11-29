@@ -14,24 +14,22 @@ import { JournalInsightsPanel } from '@/components/journal/JournalInsightsPanel'
 type DirectionFilter = 'all' | 'long' | 'short';
 
 export default function JournalPageV2() {
-  const { entries, isLoading, error, activeId, setEntries, setActiveId, setLoading, setError, addEntry } =
-    useJournalStore((state) => ({
-      entries: state.entries,
-      isLoading: state.isLoading,
-      error: state.error,
-      activeId: state.activeId,
-      setEntries: state.setEntries,
-      setActiveId: state.setActiveId,
-      setLoading: state.setLoading,
-      setError: state.setError,
-      addEntry: state.addEntry,
-    }));
+  const entries = useJournalStore((state) => state.entries);
+  const isLoading = useJournalStore((state) => state.isLoading);
+  const error = useJournalStore((state) => state.error);
+  const activeId = useJournalStore((state) => state.activeId);
+  const setEntries = useJournalStore((state) => state.setEntries);
+  const setActiveId = useJournalStore((state) => state.setActiveId);
+  const setLoading = useJournalStore((state) => state.setLoading);
+  const setError = useJournalStore((state) => state.setError);
+  const addEntry = useJournalStore((state) => state.addEntry);
   const location = useLocation();
   const [, setSearchParams] = useSearchParams();
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createErrorMessage, setCreateErrorMessage] = useState<string | null>(null);
+  const [cacheWarning, setCacheWarning] = useState<string | null>(null);
   const entryFromUrl = useMemo(() => {
     if (!location.search) {
       return null;
@@ -52,10 +50,12 @@ export default function JournalPageV2() {
           return;
         }
         setEntries(loaded);
+        setCacheWarning(null);
       } catch (err) {
         console.warn('[Journal V2] Failed to load entries from persistence', err);
         if (isCurrent) {
           setError('Unable to load journal entries; showing empty state.');
+          setCacheWarning('Local journal cache is currently unavailable. Live data may be limited.');
         }
       } finally {
         if (isCurrent) {
@@ -193,6 +193,11 @@ export default function JournalPageV2() {
           <p>Select any entry to review and edit notes inline.</p>
           {isLoading && <p className="text-xs text-text-tertiary">Loading entries…</p>}
           {!isLoading && error && <p className="text-xs text-warn">{error}</p>}
+          {!isLoading && cacheWarning && (
+            <p className="text-xs text-text-tertiary" data-testid="journal-cache-warning">
+              {cacheWarning}
+            </p>
+          )}
         </div>
 
         {hasJourneyMeta && journeySnapshot && <JournalJourneyBanner snapshot={journeySnapshot} />}

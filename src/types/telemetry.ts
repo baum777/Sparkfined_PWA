@@ -1,7 +1,8 @@
 import type { JourneyPhase } from '@/types/journal'
 import type { JournalEvent } from '@/types/journalEvents'
+import type { JournalInsightCategory, JournalInsightSeverity } from '@/types/journalInsights'
 
-export type TelemetryEventKind = 'solana_meme_trend' | 'journal' | 'system'
+export type TelemetryEventKind = 'solana_meme_trend' | 'journal' | 'journal_insight' | 'system'
 
 export interface TelemetryBase {
   kind: TelemetryEventKind
@@ -21,8 +22,20 @@ export interface TelemetryJournalPayloadV1 {
   qualityScore?: number | null
 }
 
+export interface TelemetryJournalInsightPayloadV1 {
+  schemaVersion: 1
+  analysisKey: string
+  insightCount: number
+  categories: JournalInsightCategory[]
+  severities: JournalInsightSeverity[]
+  modelUsed?: string
+  generatedAt: string
+  promptVersion?: string
+}
+
 export type TelemetryEvent =
   | (TelemetryBase & { kind: 'journal'; payload: TelemetryJournalPayloadV1 })
+  | (TelemetryBase & { kind: 'journal_insight'; payload: TelemetryJournalInsightPayloadV1 })
   | (TelemetryBase & { kind: 'solana_meme_trend'; payload?: Record<string, unknown> })
   | (TelemetryBase & { kind: 'system'; payload?: Record<string, unknown> })
 

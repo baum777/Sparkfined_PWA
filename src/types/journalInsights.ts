@@ -33,10 +33,46 @@ export interface JournalInsight {
 /**
  * Envelope for insight results (optional, for future metadata)
  */
+export interface JournalInsightLimitMetadata {
+  entryCap: number;                // Hard cap enforced by the service
+  requestedMaxEntries: number;     // What the caller asked for
+  effectiveEntries: number;        // How many entries were actually analyzed
+  maxTokens: number;               // Max tokens passed to the AI provider
+  entryCapApplied: boolean;        // Whether entries were trimmed to respect the cap
+  tokenCapApplied: boolean;        // Whether the requested max tokens were clamped
+}
+
 export interface JournalInsightResult {
   insights: JournalInsight[];
   generatedAt: number;             // Unix timestamp
   modelUsed?: string;              // e.g., "gpt-4o-mini"
+  promptVersion?: string;          // Prompt schema identifier
   costUsd?: number;                // Optional: AI API cost
   rawResponse?: unknown;           // Optional: raw AI response for debugging
+  limits?: JournalInsightLimitMetadata; // Optional: constraint metadata for cost tracking
+}
+
+// ============================================================================
+// PERSISTENCE (Loop J3-C)
+// ============================================================================
+
+/**
+ * Persisted record for journal insights (Dexie/IndexedDB storage)
+ */
+export interface JournalInsightRecord {
+  id: string;                      // insight.id as Primary Key
+  analysisKey: string;             // Describes which entry set these insights apply to
+  category: JournalInsightCategory;
+  severity: JournalInsightSeverity;
+  title: string;
+  summary: string;
+  recommendation: string;
+  evidenceEntries: string[];       // Array of JournalEntry IDs
+  confidence: number | null;
+  
+  // Metadata
+  generatedAt: string;             // ISO-8601 timestamp
+  modelUsed?: string;
+  journeyPhaseAtGeneration?: import('@/types/journal').JourneyPhase;
+  version: 1;                      // Schema version for future migrations
 }

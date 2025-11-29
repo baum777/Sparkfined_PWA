@@ -1,75 +1,87 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import Button from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { JournalInsightCard } from '@/components/journal/JournalInsightCard'
+import { JournalSocialPreview } from '@/components/journal/JournalSocialPreview'
 import { getJournalInsightsForEntries } from '@/lib/journal/ai'
+import { mapStoreEntriesToDomain } from '@/lib/journal/journal-mapping'
+import { 
+  buildAnalysisKey, 
+  saveInsightsForAnalysisKey, 
+  loadLatestInsightsForAnalysisKey,
+  recordToInsight 
+} from '@/lib/journal/journal-insights-store'
+import { sendJournalInsightsGeneratedEvent } from '@/lib/journal/journal-insights-telemetry'
+import { computeSocialStatsFromInsights } from '@/lib/journal/journal-social-analytics'
 import type { JournalEntry as StoreJournalEntry } from '@/store/journalStore'
-import type { JournalEntry as DomainJournalEntry } from '@/types/journal'
 import type { JournalInsight } from '@/types/journalInsights'
-
-const FALLBACK_TICKER = 'MANUAL'
-const FALLBACK_ADDRESS = 'manual-entry'
-const FALLBACK_SETUP: DomainJournalEntry['setup'] = 'custom'
-const FALLBACK_EMOTION: DomainJournalEntry['emotion'] = 'custom'
-const FALLBACK_STATUS: DomainJournalEntry['status'] = 'active'
-
-function parseStoreDateToTimestamp(date?: string): number {
-  if (!date) {
-    return Date.now()
-  }
-  const sanitized = date.replace(/·/g, ' ')
-  const parsed = Date.parse(sanitized)
-  return Number.isNaN(parsed) ? Date.now() : parsed
-}
-
-function deriveTicker(entry: StoreJournalEntry): string {
-  if (entry.tags?.length) {
-    return entry.tags[0]?.toUpperCase() ?? FALLBACK_TICKER
-  }
-  const firstToken = entry.title?.trim().split(/\s+/)[0]
-  if (firstToken) {
-    const sanitized = firstToken.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
-    if (sanitized) {
-      return sanitized.slice(0, 12)
-    }
-  }
-  return FALLBACK_TICKER
-}
-
-function mapStoreEntryToDomain(entry: StoreJournalEntry): DomainJournalEntry {
-  const timestamp = parseStoreDateToTimestamp(entry.date)
-  // Best-effort mapping: fallback defaults preserve type safety when store data is sparse.
-  return {
-    id: entry.id,
-    timestamp,
-    ticker: deriveTicker(entry),
-    address: FALLBACK_ADDRESS,
-    setup: FALLBACK_SETUP,
-    emotion: FALLBACK_EMOTION,
-    customTags: entry.tags,
-    thesis: entry.notes,
-    grokContext: undefined,
-    chartSnapshot: undefined,
-    outcome: undefined,
-    status: FALLBACK_STATUS,
-    createdAt: timestamp,
-    updatedAt: timestamp,
-    markedActiveAt: undefined,
-    replaySessionId: undefined,
-    walletAddress: undefined,
-    journeyMeta: entry.journeyMeta,
-  }
-}
 
 interface JournalInsightsPanelProps {
   entries: StoreJournalEntry[]
   maxEntries?: number
 }
 
+const NO_INSIGHTS_MESSAGE = 'No meaningful patterns detected yet—log a few more trades.'
+const INSIGHT_ENTRY_CAP = 50
+
 export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsightsPanelProps) {
+  const cappedMaxEntries = Math.min(maxEntries, INSIGHT_ENTRY_CAP)
   const [insights, setInsights] = useState<JournalInsight[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [hasCachedInsights, setHasCachedInsights] = useState(false)
+  const [cacheNotice, setCacheNotice] = useState<string | null>(null)
+  const socialSnapshot = useMemo(
+    () => (insights && insights.length > 0 ? computeSocialStatsFromInsights(insights) : null),
+    [insights]
+  )
+
+  // Convert store entries to domain entries
+  const domainEntries = useMemo(
+    () => mapStoreEntriesToDomain(entries),
+    [entries]
+  )
+
+  // Calculate analysis key for caching
+  const analysisKey = useMemo(
+    () => buildAnalysisKey(domainEntries.slice(-cappedMaxEntries), cappedMaxEntries),
+    [domainEntries, cappedMaxEntries]
+  )
+
+  // Load cached insights on mount or when analysisKey changes
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadCached() {
+      if (!domainEntries.length) return
+
+      try {
+        const cached = await loadLatestInsightsForAnalysisKey(analysisKey)
+        if (cancelled) return
+
+        if (cached && cached.length > 0) {
+          const restored = cached.map(recordToInsight)
+          setInsights(restored)
+          setHasCachedInsights(true)
+          setError(null)
+          setCacheNotice(null)
+        } else {
+          setHasCachedInsights(false)
+          setCacheNotice(null)
+        }
+      } catch (err) {
+        console.warn('[JournalInsightsPanel] Failed to load cached insights', err)
+        setHasCachedInsights(false)
+        setCacheNotice('Local insight cache is currently unavailable. Regenerate to fetch fresh insights.')
+      }
+    }
+
+    void loadCached()
+
+    return () => {
+      cancelled = true
+    }
+  }, [analysisKey, domainEntries.length])
 
   const handleGenerateInsights = async () => {
     if (!entries.length) {
@@ -80,22 +92,34 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
 
     setLoading(true)
     setError(null)
+    setCacheNotice(null)
 
     try {
-      const recentEntries = entries.slice(-maxEntries)
-      const domainEntries = recentEntries.map(mapStoreEntryToDomain)
+      const recentDomainEntries = domainEntries.slice(-cappedMaxEntries)
       const result = await getJournalInsightsForEntries({
-        entries: domainEntries,
-        maxEntries,
+        entries: recentDomainEntries,
+        maxEntries: cappedMaxEntries,
       })
-      setInsights(result.insights)
+      
+      const nextInsights = result.insights ?? []
+      const hasInsights = nextInsights.length > 0
+      setInsights(nextInsights)
+      setHasCachedInsights(hasInsights)
+      setCacheNotice(null)
 
-      if (!result.insights.length) {
-        setError('No meaningful patterns detected yet—log a few more trades.')
+      if (hasInsights) {
+        // Save to cache
+        await saveInsightsForAnalysisKey(analysisKey, result)
+        
+        // Send telemetry (fire-and-forget)
+        void sendJournalInsightsGeneratedEvent(analysisKey, result)
+      } else {
+        // Surface empty state guidance without treating it as an error
+        setError(null)
       }
     } catch (err) {
       console.warn('[JournalInsightsPanel] Failed to generate insights', err)
-      setError('Could not generate insights. Please try again.')
+      setError('Unable to generate insights right now. Check your network and try again shortly.')
       setInsights(null)
     } finally {
       setLoading(false)
@@ -116,7 +140,7 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
             <span className="text-text-tertiary">Loop J3 · Behavioral Patterns</span>
           </div>
           <p className="text-sm text-text-secondary">
-            Analyze your last {Math.min(entries.length, maxEntries)} trades for loops, timing leaks, and mindset drifts.
+            Analyze your last {Math.min(entries.length, cappedMaxEntries)} trades for loops, timing leaks, and mindset drifts.
           </p>
         </div>
         <Button
@@ -126,24 +150,33 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
           isLoading={loading}
           data-testid="journal-insights-generate-button"
         >
-          Generate Insights
+          {hasCachedInsights ? 'Regenerate Insights' : 'Generate Insights'}
         </Button>
       </div>
 
+      {cacheNotice && !loading && (
+        <p className="text-xs text-text-tertiary" data-testid="journal-insights-cache-notice">
+          {cacheNotice}
+        </p>
+      )}
       {error && !loading && <p className="text-sm text-warn">{error}</p>}
       {loading && <p className="text-sm text-text-tertiary">Generating insights…</p>}
 
       {insights && insights.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2">
-          {insights.map((insight) => (
-            <JournalInsightCard key={insight.id} insight={insight} />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 md:grid-cols-2">
+            {insights.map((insight) => (
+              <JournalInsightCard key={insight.id} insight={insight} />
+            ))}
+          </div>
+
+          {socialSnapshot && <JournalSocialPreview snapshot={socialSnapshot} />}
+        </>
       )}
 
       {insights && insights.length === 0 && !loading && !error && (
         <p className="text-sm text-text-secondary">
-          No insights yet. Add more entries or adjust your notes for richer analysis.
+          {NO_INSIGHTS_MESSAGE}
         </p>
       )}
     </section>

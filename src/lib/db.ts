@@ -2,7 +2,7 @@
 // Handles trades, events, metrics, feedback, journal, and replay storage with offline-first approach
 
 const DB_NAME = 'sparkfined-ta-pwa'
-const DB_VERSION = 3 // Bumped for journal_entries + replay_sessions stores
+const DB_VERSION = 4 // Bumped for journal_insights store (Loop J3-C)
 
 export interface TradeEntry {
   id?: number
@@ -42,9 +42,10 @@ export interface FeedbackEntry {
 
 // Import unified journal types
 import type { JournalEntry, ReplaySession } from '@/types/journal'
+import type { JournalInsightRecord } from '@/types/journalInsights'
 
 // Re-export for convenience
-export type { JournalEntry, ReplaySession }
+export type { JournalEntry, ReplaySession, JournalInsightRecord }
 
 let dbInstance: IDBDatabase | null = null
 
@@ -129,6 +130,17 @@ export async function initDB(): Promise<IDBDatabase> {
         replayStore.createIndex('ticker', 'ticker', { unique: false })
         replayStore.createIndex('address', 'address', { unique: false })
         replayStore.createIndex('createdAt', 'createdAt', { unique: false })
+      }
+
+      // Create journal_insights store (Loop J3-C: AI Insights Persistence)
+      if (!db.objectStoreNames.contains('journal_insights')) {
+        const insightsStore = db.createObjectStore('journal_insights', {
+          keyPath: 'id',
+        })
+        insightsStore.createIndex('analysisKey', 'analysisKey', { unique: false })
+        insightsStore.createIndex('generatedAt', 'generatedAt', { unique: false })
+        insightsStore.createIndex('category', 'category', { unique: false })
+        insightsStore.createIndex('severity', 'severity', { unique: false })
       }
     }
   })

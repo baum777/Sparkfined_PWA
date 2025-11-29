@@ -1,623 +1,245 @@
-# Sparkfined PWA
+# Sparkfined
 
-> **From Chaos to Mastery** — Your Offline-First Trading Command Center for the Hero's Journey in Crypto Markets
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/baum777/sparkfined-pwa)
+> **From Chaos to Mastery** — Your Trading Command Center for Self-Improvement in Crypto Markets
 
 ---
 
-## The Hero's Journey
+## What is Sparkfined?
 
-Every trader starts as a **Degen** — chasing pumps, trading on emotions, lacking structure. You face **Trials**: painful losses, missed opportunities, inconsistent results. What separates those who quit from those who achieve **Mastery**?
+Sparkfined is an **offline-first trading journal and coaching platform** built for crypto traders who want to turn losses into lessons and emotions into discipline.
 
-**A system. A edge. A journal. Discipline.**
+Unlike generic charting tools, Sparkfined helps you **understand yourself** — your patterns, your blind spots, your evolution as a trader. It combines a powerful journaling system with AI-powered behavioral analysis to show you exactly where your edge is hiding.
 
-Sparkfined is your **companion on the Hero's Journey** — from chaotic trading to systematic consistency. It's not just another charting tool. It's a **Trading Command Center** designed to help you:
-
-1. **Capture the Chaos** — Journal every trade, screenshot, thought (even offline)
-2. **Find Your Edge** — Analyze patterns, KPIs, confluence signals with AI-powered insights
-3. **Build Discipline** — Track your evolution, learn from mistakes, develop mastery
-4. **Share Wisdom** — Become a **Sensei**, contribute lessons to the community
-
-This is the **Sparkfined Philosophy**: *Trading is a craft. Losses are lessons. Mastery comes from self-improvement, not luck.*
+**Built for:**
+- Day traders looking to break FOMO loops and revenge-trade cycles
+- Meme coin enthusiasts who need structure in the chaos
+- Self-improvement-focused traders who journal every trade
+- Anyone tired of repeating the same mistakes
 
 ---
 
-## What Makes Sparkfined Different?
+## Why Sparkfined?
 
-### 🎯 **Designed for Traders, Not Tourists**
+### The Problem
 
-Unlike generic crypto dashboards, Sparkfined is built with **trading-optimized UX principles**:
+Most traders lose money not because they lack charts or indicators, but because they:
+- **Repeat the same mistakes** (FOMO into pumps, revenge-trade after losses)
+- **Trade on emotion** instead of rules
+- **Have no system** to track what works and what doesn't
+- **Never reflect** on their trades — they just move to the next one
 
-- **Dark-Mode-First:** Reduce eye strain during late-night trading sessions (the only mode that matters)
-- **Information-Density:** See 20+ KPIs, 4 charts, and 10 signals at a glance — like a Bloomberg Terminal for crypto
-- **Action-Proximity:** Every critical action (Save, Alert, Analyze) is one click away — no modals, no friction
-- **Offline-First:** Journal, charts, and KPI dashboard work **without internet** — your data, always accessible
+### The Solution
 
-### 🧠 **AI That Understands Crypto**
+Sparkfined gives you **three things that matter more than any indicator:**
 
-Dual-AI strategy for cost-efficiency + crypto-native reasoning:
+1. **A Journal That Makes You Honest**  
+   Write down every trade. The good, the bad, the ugly. Face your patterns before they break you.
 
-- **OpenAI (gpt-4o-mini):** Fast, cheap ($0.15/1M tokens) for high-volume tasks (journal condensation, bullet summaries)
-- **Grok (xAI):** Expensive (~$5/1M tokens) but **crypto-native** for meme-coin analysis, social sentiment, on-chain heuristics
+2. **AI That Spots Your Blind Spots**  
+   Let AI analyze your last 20-50 trades and tell you what you can't see: timing patterns, emotional triggers, setup discipline gaps.
 
-**Why both?** Route simple tasks to OpenAI, complex crypto-reasoning to Grok. Save 60% on AI costs while getting better insights.
-
-### 📊 **Canvas-Rendered Charts, 60fps Smooth**
-
-Powered by **Lightweight Charts** (by TradingView):
-
-- OHLC candlesticks with 25+ indicators (RSI, MACD, Bollinger, Fibonacci, Volume)
-- Multi-timeframe analysis (1m, 5m, 15m, 1h, 4h, 1d)
-- Replay mode to study past moves
-- Offline-capable (no internet required after initial load)
-
-### 📝 **Journal as Your Second Brain**
-
-Trading without a journal is like exercising without tracking progress:
-
-- **Rich Text Editor** with Markdown support
-- **OCR for Screenshots** — Paste trade screenshots, extract text automatically
-- **AI Condensation** — Turn rambling thoughts into structured insights
-- **Tag-Based Filtering** — Find all "Long SOL" or "Stop Loss Hit" entries instantly
-- **100% Offline** — Write even on a plane, syncs when online
-
-### 🔔 **Serverless Alerts, Zero Maintenance**
-
-Visual rule builder → Serverless evaluation → Web Push notifications:
-
-- No backend server to maintain (runs on Vercel Edge Functions)
-- Confluence-based rules (e.g., "RSI < 30 AND Volume > 2x Avg")
-- Push notifications to your device (even when app is closed)
-- Alert history with performance tracking
-
-### 🌐 **PWA: Install Like Native, Deploy Like Web**
-
-- **No App Store** — Install directly from browser (Chrome, Safari, Edge)
-- **66 Precached Assets** (~428 KB gzipped) for instant offline access
-- **Background Sync** — Queue trades/journal entries offline, sync when reconnected
-- **Update Banner** — Get new features without reinstalling
+3. **A Journey That Rewards Growth**  
+   Track your evolution from Degen (chaos) to Master (discipline) with an XP system that rewards consistency, not just profits.
 
 ---
 
-## For Whom?
+## Core Features
 
-Sparkfined is built for **crypto traders who demand more**:
+### 📝 Trading Journal — Your Second Brain
 
-1. **Day Traders** — Need fast TA, pattern recognition, multi-timeframe confluence
-2. **Meme Coin Degens** — Track wallet flows, social sentiment, launch filtering
-3. **Journaling Enthusiasts** — Systematically document trades, reflect, improve edge
-4. **DeFi Power Users** — Solana-focused, on-chain data, DEX analytics (Raydium, Orca, Jupiter)
+**Why it matters:** The trader who journals consistently beats the one who doesn't. Every loss is a lesson, not a failure.
 
-**Not for you if:**
-- You want one-click trade execution (Sparkfined is research/analysis-focused, not a broker)
-- You need multi-chain support (we're Solana-first, no EVM planned)
-- You prefer light mode (we only have dark mode — the only mode traders need)
+- **Rich note-taking** for every trade — thesis, emotions, outcome
+- **Tag-based filtering** (find all "Long SOL" or "Revenge Trade" entries instantly)
+- **Works offline** — write on planes, trains, anywhere
+- **Private by default** — your data stays local until you choose to share
 
----
-
-## Features: Your Tools for the Journey
-
-### 🗺️ **Command Center (Board Dashboard)**
-
-Your mission control for daily trading:
-
-- **KPI Tiles** — Win rate, max drawdown, expectancy, Sharpe ratio at a glance
-- **Now Stream** — Activity feed with market events, your trades, AI insights
-- **Quick Actions** — One-click access to Analyze, Journal, Chart, Alerts
-- **Guided Tours** — Onboarding flow for new traders (skip if you're a veteran)
-
-**Philosophy:** *Information density meets clarity. See everything that matters, nothing that doesn't.*
-
-### 📊 **Advanced Charts (Analyze & Chart Pages)**
-
-Technical analysis without the bloat:
-
-- **25+ Indicators** — RSI, MACD, Bollinger Bands, Fibonacci, Volume, SMA/EMA, ATR, Stochastic
-- **Multi-Timeframe** — 1m to 1d, switch instantly
-- **Replay Mode** — Study past price action like a film reel
-- **Confluence Heatmap** — See where 3+ indicators agree (reduces false signals by 40%)
-- **Export Charts** — Save screenshots for your journal or social media
-
-**Philosophy:** *Confluence over single signals. Three confirmations beat one indicator.*
-
-### 📝 **Trading Journal (Your Second Brain)**
-
-The most underrated tool in trading:
-
-- **Rich Text Editor** — Write detailed post-mortems, tag entries (e.g., "Long SOL", "Revenge Trade")
-- **OCR for Screenshots** — Paste trade screenshots, auto-extract text
-- **AI Condensation** — Turn 500-word rants into 3 actionable bullets
-- **Statistics Module** — Track win rate, average R-multiple, best/worst setups
-- **100% Offline** — Write on flights, trains, anywhere
-
-**Philosophy:** *The trader who journals consistently beats the one who doesn't. Every loss is a lesson, not a failure.*
-
-### 🔔 **Alerts & Signals**
-
-Set it and forget it (until the signal fires):
-
-- **Visual Rule Builder** — No code required: "RSI < 30 AND Volume > 2x"
-- **Confluence Rules** — Combine 2-3 indicators for higher conviction
-- **Serverless Evaluation** — Runs on Vercel Edge Functions (zero maintenance)
-- **Web Push Notifications** — Get alerts even when app is closed
-- **Alert History** — Track which rules actually make money
-
-**Philosophy:** *Alerts free your attention. Monitor 50 tokens without staring at charts 24/7.*
-
-### 🤖 **AI-Powered Insights**
-
-Two AI providers, one orchestrator:
-
-- **Market Bullets** (OpenAI) — Summarize 10 market events in 30 seconds
-- **Social Sentiment** (Grok) — Analyze Twitter/CT vibes for meme coins
-- **Trade Post-Mortems** (OpenAI) — "What went wrong?" → 3-bullet summary
-- **Cost Management** — Hard cap at $0.25 per request, $100/day total
-
-**Philosophy:** *AI is a co-pilot, not the pilot. Use it to save time, not make decisions.*
-
-### 🔐 **Solana Wallet Gating**
-
-Access tiers based on on-chain holdings:
-
-- **OG Pass NFT Holders** (333 slots) — Full access to all features
-- **$SPARK Token Holders** (≥100k) — Premium features unlocked
-- **Public Tier** — Free charting + journal, limited AI calls
-
-**Status:** ⚠️ Mock validation active (on-chain integration planned Q1 2025)
-
-### 🌐 **PWA Superpowers**
-
-Progressive Web App = Best of native + web:
-
-- **Install from Browser** — No App Store approval, no 30% fees
-- **Offline-First** — Journal, Board, Charts work without internet
-- **66 Precached Assets** (~428 KB) — Instant load after first visit
-- **Background Sync** — Queue actions offline, sync when reconnected
-- **Update Banner** — New features auto-deploy, no reinstall
-
-**Philosophy:** *The web is the platform. No gatekeepers, no delays.*
+**The discipline:** Log every trade. Even the embarrassing ones. Especially the embarrassing ones.
 
 ---
 
-## Coming Soon 🚧
+### 🎯 Journey & XP — From Degen to Master
 
-- **Signal Orchestrator** — Event-sourcing engine for multi-indicator strategies
-- **Moralis Cortex AI** — Advanced on-chain risk scoring + sentiment analysis
-- **Social Features** — Share lessons, community leaderboards, trade ideas
-- **Real-Time WebSocket** — Live price updates (currently polling every 5s)
+**Why it matters:** Trading is a craft. Mastery comes from self-improvement, not luck.
 
-**See [`docs/features/next-up.md`](docs/features/next-up.md) for detailed roadmap.**
+Sparkfined tracks your **trading evolution** through five phases:
 
----
+| Phase | What It Means |
+|-------|---------------|
+| **DEGEN** | Chasing pumps, trading on emotions, no system |
+| **SEEKER** | Building awareness, testing setups, journaling starts |
+| **WARRIOR** | Following rules, managing risk, discipline emerging |
+| **MASTER** | Consistent edge, pattern recognition, emotional control |
+| **SAGE** | Wisdom, mentorship, helping others avoid your mistakes |
 
-## Design Philosophy: UI/UX for Traders
+**How it works:**
+- Earn **XP** for disciplined actions (journaling trades, following your setup, respecting stop-losses)
+- Build **streaks** by staying consistent
+- See your **phase** evolve as you level up
 
-### Why Sparkfined Looks & Feels Different
-
-Most crypto dashboards are built for "tourists" — casual investors checking prices once a day. **Sparkfined is built for traders** — people who spend 4-8 hours analyzing charts, writing journal entries, and monitoring 20+ signals.
-
-#### 1. **Dark-Mode-First (The Only Mode That Matters)**
-
-**Rationale:** Trading happens at 2 AM. Light mode burns your retinas. Every serious trading platform (TradingView, Binance, Bloomberg Terminal) is dark-first.
-
-**Implementation:**
-- **No light mode toggle** (saves development time, reduces complexity)
-- Semantic colors: Green = Bullish/Success, Red = Bearish/Error, Yellow = Warning, Purple = Brand
-- High-contrast text (WCAG AA compliant) for readability
-
-**Trade-off:** Some users prefer light mode. But 93% of beta testers chose dark mode when given the option. We optimized for the majority.
-
-#### 2. **Information Density (More Data, Less Scrolling)**
-
-**Rationale:** Traders need to see 20+ KPIs, 4 charts, and 10 signals **at a glance**. Minimalist UI wastes screen space.
-
-**Implementation:**
-- **Multi-column layouts** on desktop (3-4 columns)
-- **Compact tables** with small font sizes (14px body, 12px labels)
-- **Inline actions** instead of modals (e.g., "Delete" button on hover, not a confirmation dialog)
-
-**Trade-off:** Can feel "cramped" for non-traders. But our target users have 24"+ monitors and demand density.
-
-#### 3. **Action Proximity (One Click to Anything)**
-
-**Rationale:** When a signal fires, you have 30 seconds to act. Every extra click = lost opportunity.
-
-**Implementation:**
-- **Sticky action bars** (Save, Analyze, Alert) always visible
-- **Keyboard shortcuts** for power users (Cmd+S to save journal, Cmd+N for new entry)
-- **No unnecessary confirmation dialogs** (unless destructive action like "Delete All")
-
-**Trade-off:** Risk of accidental clicks. Mitigated with undo functionality and local backups.
-
-#### 4. **Offline-First (Trade on a Plane)**
-
-**Rationale:** Internet fails. APIs go down. Your journal shouldn't depend on Vercel being up.
-
-**Implementation:**
-- **IndexedDB (Dexie)** for local storage (50MB+ capacity)
-- **Service Worker** precaches 66 assets (~428 KB)
-- **Background Sync** queues actions when offline, syncs when reconnected
-
-**Trade-off:** More complex state management (sync conflicts, cache invalidation). But the reliability is worth it.
-
-#### 5. **Confluence Over Single Signals**
-
-**Rationale:** RSI < 30 alone is a weak signal. RSI < 30 + Volume spike + Bullish divergence = high conviction.
-
-**Implementation:**
-- **Visual rule builder** supports AND/OR logic
-- **Confluence heatmap** shows where 3+ indicators agree
-- **Alert history** tracks which confluence rules actually work
-
-**Trade-off:** Steeper learning curve for beginners. Mitigated with guided tours and default templates.
+**The truth:** You don't need more indicators. You need more discipline. The XP system keeps you accountable.
 
 ---
 
-## Tech Stack
+### 🧠 AI-Powered Behavioral Insights
 
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | React 18.3, TypeScript 5.6, Vite 5.4, TailwindCSS 4.1 |
-| **State** | Zustand, React Context, Custom Hooks |
-| **Persistence** | Dexie (IndexedDB), Offline-First Architecture |
-| **Backend** | Vercel Edge Functions (Serverless) |
-| **AI** | OpenAI (gpt-4o-mini), Grok (xAI) — Dual-provider strategy |
-| **Data** | Moralis, DexPaprika |
-| **PWA** | Workbox, vite-plugin-pwa, Service Worker |
-| **Testing** | Vitest (unit), Playwright (E2E), ESLint, TypeScript strict mode |
+**Why it matters:** You can't fix patterns you don't see. AI spots them for you.
 
-**Architecture:** 5-layer model (UI → State → Persistence → Backend → External Services)
+Sparkfined analyzes your recent trades and identifies **recurring patterns** across five categories:
 
-**For detailed architecture, see [`docs/pwa-audit/01_repo_index.md`](docs/pwa-audit/01_repo_index.md) and [`docs/process/product-overview.md`](docs/process/product-overview.md).**
+1. **Behavior Loops**  
+   Example: *"You FOMO into breakouts that are already +30% from lows. This leads to late entries and high drawdown risk."*
 
----
+2. **Timing Patterns**  
+   Example: *"Your worst trades happen after 8 PM. Fatigue leads to revenge trading."*
 
-## Getting Started
+3. **Risk Management**  
+   Example: *"You size 3x larger on revenge trades vs. planned setups. This blows your account faster."*
 
-### Prerequisites
+4. **Setup Discipline**  
+   Example: *"You take twice as many trades on weekends vs. weekdays, but your weekend win rate is 15% lower."*
 
-- **Node.js** >= 20.10.0 (enforced via `engines` in `package.json`)
-- **pnpm** (recommended) or npm
-- **API Keys** (see Configuration section below)
+5. **Emotional Patterns**  
+   Example: *"After 2 losses in a row, you double position size. This turns small losses into wipeouts."*
 
-### Installation
+**How it works:**
+- Select your last 20-50 journal entries
+- Click "Generate Insights" (runs in ~30 seconds)
+- Get 2-5 concrete insights with **actionable recommendations**
+- Each insight shows which trades support it (evidence-based, not guesses)
 
-```bash
-# Clone repository
-git clone https://github.com/baum777/sparkfined-pwa.git
-cd sparkfined-pwa
-
-# Install dependencies
-pnpm install
-
-# Copy environment template
-cp .env.example .env.local
-
-# Add required API keys to .env.local (see Configuration section)
-# Edit .env.local with your favorite editor
-```
-
-### Development
-
-```bash
-# Start development server (http://localhost:5173)
-pnpm dev
-```
-
-The app will hot-reload as you make changes. Open DevTools to inspect service worker status, IndexedDB, and telemetry.
-
-### Building for Production
-
-```bash
-# Type check, build, and verify bundle size
-pnpm build:local
-
-# Preview production build (http://localhost:4173)
-pnpm preview
-
-# Run all checks (lint, typecheck, test, E2E)
-pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e
-```
-
-**For detailed build and deployment instructions, see [`docs/setup/build-and-deploy.md`](docs/setup/build-and-deploy.md).**
+**The value:** AI doesn't tell you *what* to trade. It tells you *how* you're sabotaging yourself — so you can fix it.
 
 ---
 
-## Configuration
+### 📊 Social Preview — See Your Dominant Patterns
 
-### Essential Environment Variables
+**Why it matters:** Patterns become clearer when you see them aggregated.
 
-Create `.env.local` and configure these variables:
+After generating AI insights, Sparkfined shows you a **heatmap of your behavioral patterns:**
 
-```bash
-# === App Info ===
-VITE_APP_VERSION=1.0.0-beta
+- Which categories appear most often (e.g., "Behavior Loop: 5 insights")
+- Severity breakdown (INFO / WARNING / CRITICAL)
+- Your top 3 areas to improve
 
-# === Data Providers (at least one required) ===
-# Moralis (recommended for multi-chain support)
-MORALIS_API_KEY=your_moralis_key_here
-MORALIS_BASE_URL=https://deep-index.moralis.io/api/v2.2
-
-# DexPaprika (recommended for OHLC data)
-DEXPAPRIKA_API_KEY=your_dexpaprika_key_here
-DEXPAPRIKA_BASE=https://api.dexpaprika.com
-
-# === AI Providers (optional but recommended) ===
-OPENAI_API_KEY=sk-your_openai_key_here
-XAI_API_KEY=your_grok_key_here
-ANALYSIS_AI_PROVIDER=openai  # or 'xai'
-
-# === Security (production only) ===
-DATA_PROXY_SECRET=change_me_for_production
-AI_PROXY_SECRET=change_me_for_ai_proxy
-ALERTS_ADMIN_SECRET=change_me_for_alerts
-
-# === Web Push (optional) ===
-VITE_VAPID_PUBLIC_KEY=your_vapid_public_key
-VAPID_PRIVATE_KEY=your_vapid_private_key
-
-# === Feature Flags ===
-VITE_ENABLE_AI_TEASER=false
-VITE_ENABLE_DEBUG=false
-```
-
-**Important:**
-- ⚠️ **NEVER expose server-side keys with `VITE_` prefix** (they'll be bundled into the client!)
-- ✅ Server-only keys: `MORALIS_API_KEY`, `OPENAI_API_KEY`, `DATA_PROXY_SECRET`
-- ✅ Client-safe keys: `VITE_APP_VERSION`, `VITE_SOLANA_RPC_URL`
-
-**For complete environment variable reference, see [`docs/setup/environment-and-providers.md`](docs/setup/environment-and-providers.md).**
+**Coming soon:** Community-wide pattern heatmaps — see what mistakes *everyone* is making, not just you.
 
 ---
 
-## Available Scripts
+### 🔒 Offline-First — Your Data, Your Control
 
-```bash
-# Development
-pnpm dev              # Start dev server with HMR (port 5173)
-pnpm preview          # Preview production build (port 4173)
+**Why it matters:** Internet fails. APIs go down. Your journal shouldn't depend on anyone's server.
 
-# Building
-pnpm build            # TypeScript check + Vite production build
-pnpm build:local      # Build + bundle size check
-pnpm build:ci         # Build + E2E tests (CI equivalent)
+Sparkfined is a **Progressive Web App (PWA)** built to work offline:
 
-# Quality Assurance
-pnpm lint             # ESLint (flat config)
-pnpm format           # Prettier format
-pnpm typecheck        # TypeScript compiler (no emit)
-pnpm test             # Vitest unit tests with coverage
-pnpm test:watch       # Vitest watch mode
-pnpm test:e2e         # Playwright E2E tests
+- **Install from browser** — no App Store, no gatekeepers
+- **Write journal entries offline** — they sync when you're back online
+- **Cache your trades locally** — always accessible, even on a plane
+- **Own your data** — everything lives on your device first
 
-# Analysis
-pnpm analyze          # Bundle size visualizer
-pnpm lighthouse       # Lighthouse audit (requires preview)
-pnpm check:size       # Verify bundle size budget
-```
-
-**For script details and when to use each, see [`docs/setup/build-and-deploy.md`](docs/setup/build-and-deploy.md).**
+**The promise:** Your trading journey belongs to you. Not to a cloud service.
 
 ---
 
-## Testing PWA Features
+### 🎨 Built for Traders, Not Tourists
 
-```bash
-# Build and preview with service worker enabled
-pnpm build
-pnpm preview
-```
+Most crypto dashboards are built for casual investors checking prices once a day. Sparkfined is built for **traders** — people who spend hours analyzing, journaling, and refining their edge.
 
-**Verification Checklist:**
-1. **Manifest:** DevTools → Application → Manifest (verify 14 icons listed)
-2. **Service Worker:** Check "activated" status in DevTools → Application → Service Workers
-3. **Installation:** Look for browser "Install" button in address bar, click to install
-4. **Offline Mode:** Disconnect network → reload → verify custom offline page appears
-5. **Push Notifications:** Grant notification permission → test via `/api/push/test-send`
-
-**For detailed PWA testing, see [`docs/pwa-audit/03_core_flows.md`](docs/pwa-audit/03_core_flows.md).**
+**Design principles:**
+- **Dark-mode-first** — reduce eye strain during late-night sessions
+- **Information-dense** — see more data, scroll less
+- **One-click actions** — save journal, generate insights, filter entries instantly
+- **Offline-capable** — no internet required for core features
 
 ---
 
-## Access & Authentication
+## How It Works (Simple Flow)
 
-Sparkfined uses **Solana wallet-based access gating** with two tiers:
+1. **Log a Trade**  
+   After you close a position, open Sparkfined and write down: ticker, thesis, emotion, outcome.
 
-1. **OG Pass** — NFT holders from the Sparkfiend OG Pass collection (333 slots)
-2. **Token Holders** — Users holding ≥100k SPARK tokens
+2. **Tag & Filter**  
+   Tag entries with setups, emotions, or outcomes. Later, filter to see all "Revenge Trade" or "FOMO" entries.
 
-**Current Status:** ⚠️ Access gating infrastructure is functional (wallet connection, API status checks) but on-chain validation is in testing phase. Production deployment uses mock validation.
+3. **Generate Insights**  
+   Once you have 10-20 trades logged, click "Generate Insights" to let AI analyze your patterns.
 
-**To test access locally:**
-- Connect a Solana wallet (Phantom, Solflare, etc.)
-- Call `/api/access/status` with your wallet address
-- See [`docs/guides/access-tabs.md`](docs/guides/access-tabs.md) for UI/UX details
+4. **Read Your Patterns**  
+   AI shows you: behavior loops, timing leaks, risk management gaps, emotional triggers.
 
-**Note:** No NFT minting features are currently active. Legacy `ENABLE_OG_MINT` flag is deprecated.
+5. **Fix One Thing**  
+   Pick the highest-severity insight. Fix that pattern. Repeat.
 
----
-
-## Deployment
-
-### Vercel (Recommended)
-
-**Quick Deploy:**
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/baum777/sparkfined-pwa)
-
-**Manual Setup:**
-1. Connect your Git repository in [Vercel Dashboard](https://vercel.com/dashboard)
-2. Add environment variables (Project Settings → Environment Variables)
-   - Copy all non-`VITE_` vars from `.env.local`
-   - Add production secrets (see Configuration section)
-3. Deploy: Push to `main` branch → auto-deploy
-4. Verify: Run Lighthouse audit (target ≥90 in all categories)
-
-**Post-Deploy Checklist:**
-- [ ] Service Worker registered and active
-- [ ] Push notifications enabled (if configured)
-- [ ] `/api/access/status` responds correctly
-- [ ] Offline mode works (disconnect network, reload)
-- [ ] Lighthouse scores ≥90 (Performance, PWA, Accessibility, Best Practices)
-
-**For detailed deployment guide, see [`docs/setup/build-and-deploy.md`](docs/setup/build-and-deploy.md).**
-
-### Self-Hosted
-
-```bash
-pnpm build
-# Upload dist/ to your CDN/S3
-# Ensure service worker scope is set to '/*'
-# Configure environment variables on your server
-```
+6. **Track Your Journey**  
+   Watch your XP grow, your phase evolve, and your win rate stabilize as you fix patterns.
 
 ---
 
-## Documentation
+## Roadmap — What's Next
 
-All project documentation lives in the [`docs/`](docs/) directory, organized by category:
+**Current status:** ✅ Production-ready for personal use (Journal, Journey, AI Insights, Social Preview)
 
-### 📖 Start Here
+**Coming in 2025:**
 
-| Document | Purpose |
-|----------|---------|
-| [`docs/README.md`](docs/README.md) | **Documentation hub** — navigation guide to all docs |
-| [`docs/process/product-overview.md`](docs/process/product-overview.md) | Product vision, feature roadmap, architecture layers |
-| [`docs/setup/environment-and-providers.md`](docs/setup/environment-and-providers.md) | Complete environment setup, API keys, providers |
-| [`docs/pwa-audit/01_repo_index.md`](docs/pwa-audit/01_repo_index.md) | Repository structure and organization |
+**Q1 2025 — Community & Scale**
+- **Community Heatmaps:** See what behavioral patterns are most common across all traders (anonymized)
+- **Real-Time Alerts:** Get notified when confluence rules trigger (e.g., "RSI < 30 + Volume spike")
+- **Background Sync:** Queue journal entries offline, sync seamlessly when reconnected
 
-### 🔧 Setup & Deployment
+**Q2 2025 — Advanced Coaching**
+- **Multi-AI Providers:** Choose between OpenAI (fast/cheap) and Grok (crypto-native reasoning)
+- **Trade Replays:** Study past price action like a film reel, annotate what you missed
+- **Setup Templates:** Save your best setups as templates, track win rate per setup
 
-- [`docs/setup/build-and-deploy.md`](docs/setup/build-and-deploy.md) — Build scripts, CI/CD, deployment
-- [`docs/setup/push-notifications.md`](docs/setup/push-notifications.md) — Web Push setup (VAPID keys, testing)
-- [`docs/setup/environment-and-providers.md`](docs/setup/environment-and-providers.md) — Environment variables inventory
-
-### 🏗️ Architecture
-
-- [`docs/pwa-audit/01_repo_index.md`](docs/pwa-audit/01_repo_index.md) — Codebase structure
-- [`docs/pwa-audit/02_feature_catalog.md`](docs/pwa-audit/02_feature_catalog.md) — Complete feature list
-- [`docs/pwa-audit/04_offline_sync_model.md`](docs/pwa-audit/04_offline_sync_model.md) — Offline-first architecture
-
-### 🤖 AI Integration
-
-- [`docs/ai/integration-recommendations.md`](docs/ai/integration-recommendations.md) — AI provider strategy
-- [`docs/ai/advanced-insight-ui-spec-beta-v0.9.md`](docs/ai/advanced-insight-ui-spec-beta-v0.9.md) — Advanced Insight UI spec
-- [`docs/concepts/ai-roadmap.md`](docs/concepts/ai-roadmap.md) — AI feature roadmap
-
-### 📦 Historical Documentation
-
-- [`docs/archive/`](docs/archive/) — Archived documentation (cleanup reports, phase histories, old guides)
+**Q3 2025 — Social & Mentorship**
+- **Share Lessons:** Turn your best journal entries into shareable insights
+- **Leaderboards:** See top traders by consistency (not P&L — discipline matters more)
+- **Mentorship Pairing:** Get matched with traders one phase ahead of you
 
 ---
 
-## Contributing
+## Philosophy — The Path to Mastery
 
-This repository is currently private. To contribute:
-
-1. **Code Quality:** Run `pnpm lint && pnpm typecheck && pnpm test` before committing
-2. **Conventional Commits:** Use `feat:`, `fix:`, `docs:`, etc.
-3. **Testing:** Add tests for new features (Vitest for units, Playwright for E2E)
-4. **Documentation:** Update relevant docs in `docs/` when making changes
-
-**Pull Request Checklist:**
-- [ ] Code passes `pnpm build:local` (includes bundle size check)
-- [ ] All tests pass (`pnpm test && pnpm test:e2e`)
-- [ ] Documentation updated (if applicable)
-- [ ] Conventional commit message format
-
----
-
-## Performance & Quality
-
-**Current Metrics:**
-- ✅ Lighthouse Score: **≥90** (Performance, PWA, Accessibility, Best Practices)
-- ✅ Bundle Size: **428 KB** precached (66 assets)
-- ✅ Build Time: **~1.6s** (TypeScript + Vite)
-- ✅ Test Coverage: **>80%** overall, **>90%** critical modules
-- ✅ Offline Support: **100%** core features work offline
-
-**Quality Gates:**
-- TypeScript strict mode enabled
-- ESLint with React, JSX a11y plugins
-- Vitest with V8 coverage reporting
-- Playwright E2E for critical flows
-- Bundle size budget enforcement
-
-**See [`docs/pwa-audit/06_tests_observability_gaps.md`](docs/pwa-audit/06_tests_observability_gaps.md) for testing details.**
-
----
-
-## Security
-
-**Best Practices:**
-- ✅ All API keys are server-side only (no `VITE_` prefix)
-- ✅ Serverless proxies for external APIs (Moralis, DexPaprika)
-- ✅ Input validation on all API routes
-- ✅ CORS configured for Vercel deployment
-- ✅ Secrets rotation recommended quarterly
-
-**Important:**
-- Never commit `.env.local` (already in `.gitignore`)
-- Rotate `DATA_PROXY_SECRET` and `AI_PROXY_SECRET` in production
-- Use HTTPS only (Vercel enforces this by default)
-
-**For security details, see [`docs/pwa-audit/05_security_privacy.md`](docs/pwa-audit/05_security_privacy.md).**
-
----
-
-## Roadmap
-
-**Current Phase:** Foundation (R0) — Production-ready PWA ✅
-
-**Next Up:**
-- **R1 (Q1 2025):** On-chain access gating, real-time alerts, background sync
-- **R2 (Q2 2025):** Signal orchestrator, Moralis Cortex integration
-- **R3 (Q3 2025):** Social features, trade sharing, community insights
-
-**See [`IMPROVEMENT_ROADMAP.md`](IMPROVEMENT_ROADMAP.md) for detailed roadmap and [`docs/features/next-up.md`](docs/features/next-up.md) for upcoming features.**
-
----
-
-## The Path to Mastery
-
-### From Degen to Sensei
+### From Degen to Sage
 
 Sparkfined is not just software. It's a **system for self-improvement** disguised as a trading tool.
 
 **Stage 1: The Degen (Chaos)**
 - Trading on emotions, FOMO, revenge trades
 - No journal, no system, no edge
-- "Why did I lose again?" ← You don't even know
+- *"Why did I lose again?"* ← You don't even know
 
-**Stage 2: The Student (Awareness)**
+**Stage 2: The Seeker (Awareness)**
 - You start journaling. Every trade. Every mistake.
-- You add indicators. Test confluence rules.
+- You add tags. You filter for patterns.
 - Losses hurt less because you're **learning**.
 
-**Stage 3: The Practitioner (Discipline)**
+**Stage 3: The Warrior (Discipline)**
 - You have a system. You follow it.
-- You track win rate, expectancy, drawdown.
 - You know your edge. You trust the process.
+- You trade less, but win more.
 
 **Stage 4: The Master (Consistency)**
 - Your journal shows patterns. You fix them.
-- Your alerts fire 80% accurate signals.
-- You trade less, but win more.
+- Your AI insights reveal blind spots. You address them.
+- You track metrics: win rate, expectancy, drawdown.
 
-**Stage 5: The Sensei (Wisdom)**
+**Stage 5: The Sage (Wisdom)**
 - You share lessons. You help others avoid your mistakes.
 - Your trading becomes a craft, not a gamble.
 - You remember: **The best trade is the one you didn't take.**
 
-### The Sparkfined Promise
+---
+
+## The Sparkfined Promise
 
 We don't promise profits. We don't sell signals. We don't guarantee moon shots.
 
 **We promise:**
 - A **tool that respects your intelligence** (no scammy "100x guaranteed" BS)
-- A **system that works offline** (your data, your control)
 - A **journal that makes you honest** (face your mistakes, own your wins)
-- A **community of traders who get it** (losses are lessons, not failures)
+- **AI that spots your blind spots** (patterns you can't see on your own)
+- A **system that works offline** (your data, your control)
 
 **Your edge is not an indicator. It's discipline. It's journaling. It's self-awareness.**
 
@@ -625,58 +247,36 @@ Sparkfined is your training ground. The market is your test.
 
 ---
 
-## Join the Journey
+## Start Your Journey
 
-Ready to level up?
+**Ready to level up?**
 
-1. **Deploy Sparkfined** — One-click Vercel deploy (or self-host)
-2. **Journal your first trade** — Even if it's a loss. Especially if it's a loss.
-3. **Set your first alert** — Pick one confluence rule, test it for 30 days
-4. **Share your lesson** — When you learn something, help others avoid the same mistake
+1. **Visit:** [www.catgpt.com](https://www.catgpt.com) to learn more
+2. **Install the app** from your browser (works on desktop, mobile, tablet)
+3. **Log your first trade** — even if it's a loss. Especially if it's a loss.
+4. **Generate insights** after 10-20 entries — let AI show you what you're missing
+5. **Fix one pattern** — pick your highest-severity insight and address it
 
 **The Hero's Journey starts with one step. Start journaling today.**
 
 ---
 
-## License
+## About
 
-All rights reserved. This is a private repository owned by the Sparkfined team.
+**Sparkfined** is built by traders, for traders. We've lost money on FOMO. We've revenge-traded into the dirt. We've blown accounts chasing green candles.
 
----
+We built Sparkfined because **we needed it ourselves.**
 
-## Support
+Every feature exists because we made a mistake that could have been avoided if we'd just written it down, reflected, and learned.
 
-**Questions?**
-- 📖 Check [`docs/README.md`](docs/README.md) for navigation
-- 🔍 Search `docs/` for keywords
-- 📦 Check [`docs/archive/`](docs/archive/) for historical context
-
-**Issues?**
-- Build problems: See [`docs/setup/build-and-deploy.md`](docs/setup/build-and-deploy.md)
-- Environment issues: See [`docs/setup/environment-and-providers.md`](docs/setup/environment-and-providers.md)
-- PWA issues: See [`docs/pwa-audit/03_core_flows.md`](docs/pwa-audit/03_core_flows.md)
+Your losses don't define you. What you learn from them does.
 
 ---
 
-**Maintained by:** Sparkfined Team
-**Version:** 0.1.0 (Beta)
+**More Information:** [www.catgpt.com](https://www.catgpt.com)  
+**Version:** 1.0 Beta  
 **Status:** ✅ Production-Ready | 🚀 Launch-Ready
 
-
 ---
 
-## 📚 Documentation
-
-**Complete Documentation Hub:** [docs/README.md](./docs/README.md)
-
-### Quick Links
-
-- **[Active Sprint & Roadmap](./docs/active/Working_Plan.md)** — Current development status
-- **[Setup Guide](./docs/core/setup/environment-and-providers.md)** — Get started with development
-- **[Architecture](./docs/core/architecture/01_repo_index.md)** — System design & structure
-- **[AI Integration](./docs/core/ai/README_AI.md)** — AI features & configuration
-- **[Agent Configs](./AGENT_FILES/README.md)** — AI tool configurations (Cursor, Claude, Codex)
-
-**For detailed navigation, see [docs/README.md](./docs/README.md)**
-
-
+*Trading is a craft. Losses are lessons. Mastery comes from self-improvement, not luck.*

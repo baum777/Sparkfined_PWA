@@ -50,6 +50,8 @@ describe('getJournalInsightsForEntries', () => {
     },
   }
 
+  const PROMPT_VERSION = 'journal-insights-v1.0'
+
   const validAIResponse = {
     choices: [
       {
@@ -125,17 +127,23 @@ describe('getJournalInsightsForEntries', () => {
 
     expect(result.generatedAt).toBeDefined()
     expect(result.modelUsed).toBe('gpt-4o-mini')
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
     expect(result.costUsd).toBeDefined()
     expect(result.rawResponse).toBeDefined()
   })
 
   it('should handle empty entries array', async () => {
-    // Mock should not be called for empty entries
     const result = await getJournalInsightsForEntries({
       entries: [],
     })
 
     expect(result.insights).toHaveLength(0)
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
+    expect(result.limits).toMatchObject({
+      effectiveEntries: 0,
+      entryCapApplied: false,
+    })
+    expect(mockFetch).not.toHaveBeenCalled()
   })
 
   it('should handle invalid JSON from AI', async () => {
@@ -158,6 +166,7 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     expect(result.insights).toHaveLength(0)
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
     expect(result.rawResponse).toBeDefined()
   })
 
@@ -181,6 +190,7 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     expect(result.insights).toHaveLength(0)
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
   })
 
   it('should filter out insights with invalid categories', async () => {
@@ -296,6 +306,7 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     expect(result.insights).toHaveLength(0)
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
     expect(result.rawResponse).toBeDefined()
   })
 
@@ -307,6 +318,7 @@ describe('getJournalInsightsForEntries', () => {
     })
 
     expect(result.insights).toHaveLength(0)
+    expect(result.promptVersion).toBe(PROMPT_VERSION)
   })
 
   it('should generate stable IDs for insights', async () => {
@@ -409,6 +421,62 @@ describe('getJournalInsightsForEntries', () => {
 
     // Verify that fetch was called (prompt was built)
     expect(mockFetch).toHaveBeenCalled()
+  })
+
+  it('caps maxEntries to the hard limit and exposes metadata', async () => {
+    const manyEntries = Array.from({ length: 120 }, (_, i) => ({
+      ...mockEntry,
+      id: `entry-${i}`,
+    }))
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => validAIResponse,
+    })
+
+    const result = await getJournalInsightsForEntries({
+      entries: manyEntries,
+      maxEntries: 999,
+    })
+
+    expect(result.limits).toMatchObject({
+      requestedMaxEntries: 999,
+      effectiveEntries: 50,
+      entryCapApplied: true,
+    })
+    expect(mockFetch).toHaveBeenCalled()
+  })
+
+  it('caps maxTokens and forwards the clamped value to the API', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => validAIResponse,
+    })
+
+    const result = await getJournalInsightsForEntries({
+      entries: [mockEntry],
+      maxTokens: 5000,
+    })
+
+    const firstCall = mockFetch.mock.calls[0]
+    expect(firstCall).toBeTruthy()
+    if (!firstCall) {
+      throw new Error('expected fetch to be called once')
+    }
+
+    const [, requestInit] = firstCall
+    if (!requestInit || typeof requestInit.body !== 'string') {
+      throw new Error('expected request payload to be serialized JSON')
+    }
+
+    const payload = JSON.parse(requestInit.body) as { max_tokens?: number }
+    expect(payload.max_tokens).toBe(1500)
+    expect(result.limits).toMatchObject({
+      maxTokens: 1500,
+      tokenCapApplied: true,
+    })
   })
 
   it('should handle missing confidence field', async () => {
