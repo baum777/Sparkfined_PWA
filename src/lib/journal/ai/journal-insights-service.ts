@@ -6,13 +6,20 @@
  */
 
 import type { JournalEntry } from '@/types/journal'
-import type { JournalInsight, JournalInsightResult } from '@/types/journalInsights'
+import type {
+  JournalInsight,
+  JournalInsightResult,
+  JournalInsightLimitMetadata,
+} from '@/types/journalInsights'
 import { buildJournalInsightsPrompt, type JournalInsightPromptInput } from './journal-insights-prompt'
 
 // Re-use existing AI client infrastructure
 import { OpenAIClient } from '../../../../ai/model_clients/openai_client'
 
 const JOURNAL_INSIGHTS_PROMPT_VERSION = 'journal-insights-v1.0'
+const DEFAULT_MAX_ENTRIES = 20
+const MAX_ENTRIES_HARD_CAP = 50
+const MAX_TOKENS_LIMIT = 1500
 
 export interface JournalInsightRequest {
   entries: JournalEntry[]
@@ -36,30 +43,61 @@ export interface JournalInsightError {
 export async function getJournalInsightsForEntries(
   request: JournalInsightRequest
 ): Promise<JournalInsightResult> {
+  const requestedMaxEntries = request.maxEntries ?? DEFAULT_MAX_ENTRIES
+  const requestedMaxTokens = request.maxTokens ?? MAX_TOKENS_LIMIT
+  const cappedMaxEntries = Math.min(requestedMaxEntries, MAX_ENTRIES_HARD_CAP)
+  const effectiveMaxTokens = Math.min(requestedMaxTokens, MAX_TOKENS_LIMIT)
+  const entriesForAnalysis = request.entries.slice(-cappedMaxEntries)
+  const requestedEntryWindow = Math.min(request.entries.length, requestedMaxEntries)
+  const entryCapApplied = requestedEntryWindow > cappedMaxEntries
+  const tokenCapApplied = requestedMaxTokens > MAX_TOKENS_LIMIT
+  const model = request.model ?? 'gpt-4o-mini'
+  const limits: JournalInsightLimitMetadata = {
+    entryCap: MAX_ENTRIES_HARD_CAP,
+    requestedMaxEntries,
+    effectiveEntries: entriesForAnalysis.length,
+    maxTokens: effectiveMaxTokens,
+    entryCapApplied,
+    tokenCapApplied,
+  }
+
+  if (entriesForAnalysis.length === 0) {
+    return {
+      insights: [],
+      generatedAt: Date.now(),
+      modelUsed: model,
+      promptVersion: JOURNAL_INSIGHTS_PROMPT_VERSION,
+      limits,
+    }
+  }
+
   // 1. Build prompt
   const promptInput: JournalInsightPromptInput = {
-    entries: request.entries,
-    maxEntries: request.maxEntries ?? 20,
+    entries: entriesForAnalysis,
+    maxEntries: cappedMaxEntries,
     focusCategories: request.focusCategories,
   }
   const { system, user } = buildJournalInsightsPrompt(promptInput)
 
   // 2. Call AI (using existing OpenAI client)
   let aiResponse: string
-  let modelUsed = 'gpt-4o-mini'
+  let modelUsed = model
   let costUsd: number | undefined
 
   try {
     const client = new OpenAIClient({
-      model: request.model ?? 'gpt-4o-mini',
-      maxTokens: request.maxTokens ?? 1500, // Insights need more tokens than bullets
+      model,
+      maxTokens: effectiveMaxTokens, // Insights need more tokens than bullets, but stay capped
       temperature: 0.3, // Slightly higher for creative pattern recognition
     })
 
     // Note: OpenAIClient.analyzeMarket expects MarketPayload, which we don't have.
     // We need to call the OpenAI API directly using the client's internal fetch.
     // For now, let's create a minimal wrapper that uses the fetch pattern.
-    const response = await callOpenAIDirectly(client, system, user)
+    const response = await callOpenAIDirectly(client, system, user, {
+      model,
+      maxTokens: effectiveMaxTokens,
+    })
     aiResponse = response.text
     modelUsed = response.model
     costUsd = response.costUsd
@@ -71,11 +109,12 @@ export async function getJournalInsightsForEntries(
       modelUsed,
       promptVersion: JOURNAL_INSIGHTS_PROMPT_VERSION,
       rawResponse: { error: error instanceof Error ? error.message : 'Unknown error' },
+      limits,
     }
   }
 
   // 3. Parse AI response
-  const insights = parseInsightsFromAI(aiResponse, request.entries)
+  const insights = parseInsightsFromAI(aiResponse, entriesForAnalysis)
 
   // 4. Return result
   return {
@@ -85,6 +124,7 @@ export async function getJournalInsightsForEntries(
     promptVersion: JOURNAL_INSIGHTS_PROMPT_VERSION,
     costUsd,
     rawResponse: aiResponse,
+    limits,
   }
 }
 
@@ -92,9 +132,10 @@ export async function getJournalInsightsForEntries(
  * Direct OpenAI API call (reusing client infrastructure but with custom messages)
  */
 async function callOpenAIDirectly(
-  client: OpenAIClient,
+  _client: OpenAIClient,
   system: string,
-  user: string
+  user: string,
+  options: { model: string; maxTokens: number }
 ): Promise<{ text: string; model: string; costUsd?: number }> {
   // Access private fields via type casting (not ideal, but avoids duplicate fetch logic)
   const apiKey = process.env.OPENAI_API_KEY
@@ -102,13 +143,13 @@ async function callOpenAIDirectly(
     throw new Error('OPENAI_API_KEY not configured')
   }
 
-  const model = 'gpt-4o-mini'
+  const { model, maxTokens } = options
   const endpoint = 'https://api.openai.com/v1/chat/completions'
 
   const body = {
     model,
     temperature: 0.3,
-    max_tokens: 1500,
+    max_tokens: maxTokens,
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },

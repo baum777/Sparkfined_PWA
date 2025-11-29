@@ -47,6 +47,12 @@ sources:
 - `initializeEventSubscriptions` (AI-Ingest) ruft zusätzlich `initializeJournalEventSubscriptions`, damit Trend- und Journal-Pipelines parallel laufen.
 - Subscriptions nutzen ausschließlich `useEventBusStore.subscribe` - kein globales `window`-Event mehr.
 
+## Journal Insights UX Hardening (Loop J3-A mini)
+- **UX-Signale:** `JournalInsightsPanel` zeigt klare Fehlermeldungen ("Unable to generate…") sowie sanfte Notices, falls der lokale Insight-Cache (Dexie) nicht gelesen werden kann.
+- **Dexie-Warnung:** `JournalPageV2` setzt einen separaten `cacheWarning`-State, sobald `loadJournalEntries()` aus IndexedDB scheitert – Nutzer:innen sehen einen Hinweis ("Local journal cache…") ohne dass die Seite crasht.
+- **Cost-Limits:** `journal-insights-service` erzwingt jetzt `MAX_ENTRIES_HARD_CAP = 50` sowie `MAX_TOKENS_LIMIT = 1500`. Metadaten (`result.limits`) halten fest, ob Caps gegriffen haben (für Telemetrie/Cost-Debugging).
+- **Empty-State:** "No meaningful patterns detected yet—log a few more trades." wird nur noch als neutraler Hinweis gerendert (kein Error-State), damit Nutzer:innen den Unterschied zwischen "kein Pattern" und "Fehler" sehen.
+
 ## Telemetry
 - `src/lib/journal/journalEventSubscriptions.ts` lauscht auf den neuesten EventBus-Eintrag, filtert auf `domain === 'journal'` und POSTet Fire-and-Forget an `/api/telemetry`.
 - Payload enthält versionierte Metadaten (`entryId`, `updatedFields`, Journey-/XP-Felder), aber weiterhin keinen Thesis-Text oder PII.

@@ -148,7 +148,7 @@ describe('JournalInsightsPanel', () => {
     fireEvent.click(screen.getByTestId('journal-insights-generate-button'))
 
     await waitFor(() => {
-      const errorText = screen.getByText('Could not generate insights. Please try again.')
+      const errorText = screen.getByText('Unable to generate insights right now. Check your network and try again shortly.')
       expect(errorText).toBeTruthy()
     })
   })
@@ -256,5 +256,45 @@ describe('JournalInsightsPanel', () => {
     // Should NOT save or send telemetry
     expect(vi.mocked(saveInsightsForAnalysisKey)).not.toHaveBeenCalled()
     expect(vi.mocked(sendJournalInsightsGeneratedEvent)).not.toHaveBeenCalled()
+  })
+
+  it('shows a cache notice when IndexedDB lookup fails', async () => {
+    const { loadLatestInsightsForAnalysisKey } = await import('@/lib/journal/journal-insights-store')
+    vi.mocked(loadLatestInsightsForAnalysisKey).mockRejectedValue(new Error('indexedDB blocked'))
+
+    render(<JournalInsightsPanel entries={mockEntries} />)
+
+    const notice = await screen.findByTestId('journal-insights-cache-notice')
+    expect(notice.textContent).toContain('Local insight cache is currently unavailable')
+  })
+
+  it('caps the requested maxEntries before invoking the AI service', async () => {
+    mockedService.mockResolvedValue({
+      insights: [
+        {
+          id: 'insight-cap',
+          category: 'BEHAVIOR_LOOP',
+          severity: 'WARNING',
+          title: 'Cap Test',
+          summary: 'Testing hard cap.',
+          recommendation: 'Keep entries limited.',
+          evidenceEntries: ['entry-1', 'entry-2'],
+          detectedAt: Date.now(),
+        },
+      ],
+      generatedAt: Date.now(),
+      modelUsed: 'gpt-4o-mini',
+    })
+
+    render(<JournalInsightsPanel entries={mockEntries} maxEntries={999} />)
+
+    fireEvent.click(screen.getByTestId('journal-insights-generate-button'))
+
+    await waitFor(() => {
+      expect(mockedService).toHaveBeenCalled()
+    })
+
+    const callArgs = getFirstCallArgs(mockedService)
+    expect(callArgs.maxEntries).to.equal(50)
   })
 })
