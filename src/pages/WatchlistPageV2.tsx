@@ -110,69 +110,80 @@ export default function WatchlistPageV2() {
       description={headerDescription}
       actions={<WatchlistHeaderActions assetCount={assetCount} isLoading={isLoading} error={error} />}
     >
-      <WatchlistLayout>
-        <div
-          className="flex flex-col gap-4 text-text-primary lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6"
-          data-testid="watchlist-page"
-        >
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
-              <div className="flex flex-wrap items-center gap-2">
-                {SESSION_FILTERS.map((filter) => {
-                  const isActive = sessionFilter === filter;
-                  return (
-                    <button
-                      key={filter}
-                      type="button"
-                      onClick={() => setSessionFilter(filter)}
-                      className={`rounded-full border px-3 py-1 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
-                        isActive
-                          ? "border-brand bg-surface-hover text-text-primary"
-                          : "border-border text-text-secondary hover:bg-surface-hover"
-                      }`}
-                      data-testid={`watchlist-session-filter-${filter}`}
-                    >
-                      {filter === "all" ? "All" : filter}
-                    </button>
-                  );
-                })}
-              </div>
+      <div
+        className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8"
+        data-testid="watchlist-page"
+      >
+        <section className="space-y-3">
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Watchlist</p>
+            <p className="text-base text-text-primary">Your curated tokens, ready for focused tracking.</p>
+            <p className="text-sm text-text-secondary">
+              Filter, sort, and drill into price action without leaving your command center.
+            </p>
+          </div>
+          <div className="space-y-1 text-xs">
+            {isLoading && <p className="text-text-tertiary">Refreshing your watchlist…</p>}
+            {!isLoading && error && (
+              <p className="font-medium text-warn">Price data unavailable, showing last known values.</p>
+            )}
+            {!isLoading && !error && (
+              <p className="text-text-secondary">Live prices refresh automatically while Grok monitors flows.</p>
+            )}
+          </div>
+        </section>
 
-              <div className="flex items-center gap-3">
-                <LiveStatusBadge showLabel={true} />
-                <button
-                  type="button"
-                  onClick={() =>
-                    setSortMode((prev) => (prev === "default" ? "top-movers" : "default"))
-                  }
-                  className="rounded-full border border-border px-3 py-1 font-semibold text-text-secondary transition hover:border-brand hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                  data-testid="watchlist-sort-toggle"
-                >
-                  Order: {sortMode === "default" ? "Default" : "Top movers"}
-                </button>
-                {isLoading && (
-                  <span className="text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary animate-pulse">
-                    Refreshing prices…
-                  </span>
-                )}
-                {!isLoading && error && (
-                  <span className="text-xs text-warn">
-                    Price data unavailable, showing last known values.
-                  </span>
-                )}
+        <section>
+          <WatchlistLayout>
+            <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
+              <div className="space-y-4">
+                <div className="rounded-2xl border border-border bg-surface/80 backdrop-blur">
+                  <div className="space-y-3 border-b border-border px-4 py-3 text-xs sm:text-sm">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {SESSION_FILTERS.map((filter) => {
+                        const isActive = sessionFilter === filter;
+                        return (
+                          <button
+                            key={filter}
+                            type="button"
+                            onClick={() => setSessionFilter(filter)}
+                            className={`rounded-full border px-3 py-1 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+                              isActive
+                                ? "border-brand bg-surface-hover text-text-primary"
+                                : "border-border text-text-secondary hover:bg-surface-hover"
+                            }`}
+                            data-testid={`watchlist-session-filter-${filter}`}
+                          >
+                            {filter === "all" ? "All" : filter}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <LiveStatusBadge showLabel />
+                      <button
+                        type="button"
+                        onClick={() => setSortMode((prev) => (prev === "default" ? "top-movers" : "default"))}
+                        className="rounded-full border border-border px-3 py-1 font-semibold text-text-secondary transition hover:border-brand hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                        data-testid="watchlist-sort-toggle"
+                      >
+                        Order: {sortMode === "default" ? "Default" : "Top movers"}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="p-2">
+                    <WatchlistTable rows={visibleRows} activeSymbol={activeSymbol} trends={trends} onSelect={setActiveSymbol} />
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <WatchlistDetailPanel row={activeRow} trend={activeTrend} onOpenChart={openChart} onOpenReplay={openReplay} />
               </div>
             </div>
-          <WatchlistTable
-            rows={visibleRows}
-            activeSymbol={activeSymbol}
-            trends={trends}
-            onSelect={setActiveSymbol}
-          />
-        </div>
-        <WatchlistDetailPanel row={activeRow} trend={activeTrend} onOpenChart={openChart} onOpenReplay={openReplay} />
+          </WatchlistLayout>
+        </section>
       </div>
-    </WatchlistLayout>
-  </DashboardShell>
+    </DashboardShell>
   );
 }
 
