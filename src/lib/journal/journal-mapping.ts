@@ -18,15 +18,19 @@ function parseStoreDateToTimestamp(date?: string): number {
 }
 
 function deriveTicker(entry: StoreJournalEntry): string {
-  if (entry.tags?.length) {
-    return entry.tags[0]?.toUpperCase() ?? FALLBACK_TICKER
+  const [firstTag] = entry.tags ?? []
+  if (firstTag) {
+    return firstTag.toUpperCase()
   }
 
-  const firstToken = entry.title?.trim().split(/\s+/)[0]
-  if (firstToken) {
-    const sanitized = firstToken.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
-    if (sanitized) {
-      return sanitized.slice(0, 12)
+  const title = entry.title?.trim()
+  if (title) {
+    const [firstToken] = title.split(/\s+/)
+    if (firstToken) {
+      const sanitized = firstToken.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
+      if (sanitized) {
+        return sanitized.slice(0, 12)
+      }
     }
   }
 

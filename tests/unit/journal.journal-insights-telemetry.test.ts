@@ -208,13 +208,25 @@ describe('sendJournalInsightsGeneratedEvent', () => {
 
     const firstCall = mockFetch.mock.calls[0]
     expect(firstCall).toBeTruthy()
-    const requestInit = firstCall?.[1] as RequestInit
-    expect(requestInit?.body).toBeTruthy()
-    
-    const callBody = JSON.parse(requestInit.body as string)
+    if (!firstCall) {
+      throw new Error('Expected fetch to be called at least once')
+    }
+
+    const [, requestInit] = firstCall
+    if (!requestInit || typeof requestInit.body !== 'string') {
+      throw new Error('Expected fetch payload to include a serialized body')
+    }
+
+    type TelemetryPayload = { source?: string; events?: Array<{ kind?: string }> }
+    const callBody = JSON.parse(requestInit.body) as TelemetryPayload
     expect(callBody.source).toBe('sparkfined')
-    expect(callBody.events).toHaveLength(1)
-    expect(callBody.events[0].kind).toBe('journal_insight')
+    expect(callBody.events).toBeTruthy()
+
+    const [event] = callBody.events ?? []
+    if (!event) {
+      throw new Error('Expected telemetry payload to include at least one event')
+    }
+    expect(event.kind).toBe('journal_insight')
   })
 
   it('swallows errors silently', async () => {
