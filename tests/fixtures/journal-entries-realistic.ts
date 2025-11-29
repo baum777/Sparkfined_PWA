@@ -1,9 +1,26 @@
-import type { JournalEntry } from '@/types/journal'
+import type { JournalEntry, JournalJourneyMeta, JourneyPhase } from '@/types/journal'
 
 const toMs = (iso: string): number => Date.parse(iso)
 
+/**
+ * Helper to build JourneyMeta with type-safe JourneyPhase.
+ */
+function makeJourneyMeta(
+  phase: JourneyPhase,
+  xpTotal: number,
+  streak: number,
+  lastEventAt: number
+): JournalJourneyMeta {
+  return {
+    phase,
+    xpTotal,
+    streak,
+    lastEventAt,
+  }
+}
+
 const baseJourney = {
-  phase: 'SEEKER',
+  phase: 'SEEKER' as JourneyPhase,
   xpTotal: 1280,
   streak: 3,
 }
@@ -241,12 +258,7 @@ export const REALISTIC_JOURNAL_ENTRIES: JournalEntry[] = [
       ],
       closedAt: toMs('2025-01-11T00:05:00Z'),
     },
-    journeyMeta: {
-      phase: 'SEEKER',
-      xpTotal: 1295,
-      streak: 1,
-      lastEventAt: toMs('2025-01-11T00:20:00Z'),
-    },
+    journeyMeta: makeJourneyMeta('SEEKER', 1295, 1, toMs('2025-01-11T00:20:00Z')),
   },
   {
     id: 'trade-night-2',
@@ -282,12 +294,7 @@ export const REALISTIC_JOURNAL_ENTRIES: JournalEntry[] = [
       ],
       closedAt: toMs('2025-01-11T03:30:00Z'),
     },
-    journeyMeta: {
-      phase: 'SEEKER',
-      xpTotal: 1305,
-      streak: 1,
-      lastEventAt: toMs('2025-01-11T03:45:00Z'),
-    },
+    journeyMeta: makeJourneyMeta('SEEKER', 1305, 1, toMs('2025-01-11T03:45:00Z')),
   },
   {
     id: 'trade-night-3',
@@ -323,12 +330,7 @@ export const REALISTIC_JOURNAL_ENTRIES: JournalEntry[] = [
       ],
       closedAt: toMs('2025-01-11T22:25:00Z'),
     },
-    journeyMeta: {
-      phase: 'SEEKER',
-      xpTotal: 1310,
-      streak: 1,
-      lastEventAt: toMs('2025-01-11T22:30:00Z'),
-    },
+    journeyMeta: makeJourneyMeta('SEEKER', 1310, 1, toMs('2025-01-11T22:30:00Z')),
   },
   {
     id: 'trade-night-4',
@@ -364,12 +366,7 @@ export const REALISTIC_JOURNAL_ENTRIES: JournalEntry[] = [
       ],
       closedAt: toMs('2025-01-12T01:05:00Z'),
     },
-    journeyMeta: {
-      phase: 'SEEKER',
-      xpTotal: 1320,
-      streak: 1,
-      lastEventAt: toMs('2025-01-12T01:15:00Z'),
-    },
+    journeyMeta: makeJourneyMeta('SEEKER', 1320, 1, toMs('2025-01-12T01:15:00Z')),
   },
   {
     id: 'trade-risk-1',
@@ -414,12 +411,7 @@ export const REALISTIC_JOURNAL_ENTRIES: JournalEntry[] = [
       ],
       closedAt: toMs('2025-01-12T15:00:00Z'),
     },
-    journeyMeta: {
-      phase: 'DEGEN',
-      xpTotal: 900,
-      streak: 0,
-      lastEventAt: toMs('2025-01-12T15:10:00Z'),
-    },
+    journeyMeta: makeJourneyMeta('DEGEN', 900, 0, toMs('2025-01-12T15:10:00Z')),
   },
   {
     id: 'trade-risk-2',
@@ -456,12 +448,7 @@ export const REALISTIC_JOURNAL_ENTRIES: JournalEntry[] = [
       ],
       closedAt: toMs('2025-01-13T17:10:00Z'),
     },
-    journeyMeta: {
-      phase: 'DEGEN',
-      xpTotal: 880,
-      streak: 0,
-      lastEventAt: toMs('2025-01-13T17:20:00Z'),
-    },
+    journeyMeta: makeJourneyMeta('DEGEN', 880, 0, toMs('2025-01-13T17:20:00Z')),
   },
   {
     id: 'trade-risk-3',
@@ -497,11 +484,6 @@ export const REALISTIC_JOURNAL_ENTRIES: JournalEntry[] = [
         },
       ],
     },
-    journeyMeta: {
-      phase: 'DEGEN',
-      xpTotal: 870,
-      streak: 0,
-      lastEventAt: toMs('2025-01-14T13:30:00Z'),
-    },
+    journeyMeta: makeJourneyMeta('DEGEN', 870, 0, toMs('2025-01-14T13:30:00Z')),
   },
 ]

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, afterEach } from 'vitest'
 import { mapStoreEntryToDomain, mapStoreEntriesToDomain } from '@/lib/journal/journal-mapping'
 import type { JournalEntry as StoreJournalEntry } from '@/store/journalStore'
+import type { JourneyPhase } from '@/types/journal'
 
 const baseEntry: StoreJournalEntry = {
   id: 'entry-1',
@@ -11,7 +12,7 @@ const baseEntry: StoreJournalEntry = {
   notes: 'Scaled into reclaim after sweeping liquidity.',
   tags: ['sol'],
   journeyMeta: {
-    phase: 'SEEKER',
+    phase: 'SEEKER' as JourneyPhase,
     xpTotal: 120,
     streak: 3,
     lastEventAt: Date.now() - 1_000,
@@ -67,7 +68,16 @@ describe('journal-mapping', () => {
 
     const result = mapStoreEntriesToDomain(entries)
     expect(result).toHaveLength(2)
-    expect(result[0].id).toBe('entry-1')
-    expect(result[1].ticker).toBe('BONK')
+    
+    const [first, second] = result
+    expect(first).toBeTruthy()
+    expect(second).toBeTruthy()
+    
+    if (!first || !second) {
+      throw new Error('Expected both entries to be mapped')
+    }
+    
+    expect(first.id).toBe('entry-1')
+    expect(second.ticker).toBe('BONK')
   })
 })
