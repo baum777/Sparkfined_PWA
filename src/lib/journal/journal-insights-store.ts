@@ -63,28 +63,13 @@ export async function saveInsightsForAnalysisKey(
       }
     }
 
-    transaction.oncomplete = () => {
-      // Now insert new records
-      const insertTransaction = db.transaction(['journal_insights'], 'readwrite')
-      const insertStore = insertTransaction.objectStore('journal_insights')
+    // Insert new records in the same transaction
+    records.forEach((record) => {
+      store.add(record)
+    })
 
-      let inserted = 0
-      records.forEach((record) => {
-        const request = insertStore.add(record)
-        request.onsuccess = () => {
-          inserted++
-          if (inserted === records.length) {
-            resolve()
-          }
-        }
-        request.onerror = () => reject(request.error)
-      })
-
-      if (records.length === 0) {
-        resolve()
-      }
-    }
-
+    // Resolve when the single transaction completes
+    transaction.oncomplete = () => resolve()
     transaction.onerror = () => reject(transaction.error)
   })
 }

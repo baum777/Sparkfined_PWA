@@ -118,25 +118,33 @@ describe('saveInsightsForAnalysisKey', () => {
       promptVersion: 'journal-insights-v1.0',
     }
 
-    // Mock cursor for delete operation
-    mockIndex.openCursor.mockImplementation((_range) => ({
-      onsuccess: (event: { target: { result: null } }) => {
-        event.target.result = null
-      },
-    }))
+    // Mock cursor for delete operation (returns null cursor immediately)
+    const mockCursorRequest = {
+      onsuccess: null as ((event: { target: { result: null } }) => void) | null,
+    }
+    mockIndex.openCursor.mockReturnValue(mockCursorRequest)
 
-    // Mock add success
-    mockStore.add.mockImplementation(() => ({
-      onsuccess: vi.fn(),
-      onerror: vi.fn(),
-    }))
+    // Trigger cursor onsuccess with null (no existing records to delete)
+    setTimeout(() => {
+      if (mockCursorRequest.onsuccess) {
+        mockCursorRequest.onsuccess({ target: { result: null } })
+      }
+    }, 0)
 
-    // Trigger transaction.oncomplete immediately
+    // Mock add (returns request object, we don't need to trigger its callbacks)
+    mockStore.add.mockReturnValue({
+      onsuccess: null,
+      onerror: null,
+    })
+
+    // Create transaction mock that triggers oncomplete
     mockDB.transaction.mockImplementation(() => {
       const txn = {
-        ...mockTransaction,
         objectStore: vi.fn(() => mockStore),
+        oncomplete: null as (() => void) | null,
+        onerror: null as ((event: unknown) => void) | null,
       }
+      // Trigger oncomplete after a tick to simulate async IndexedDB behavior
       setTimeout(() => {
         if (txn.oncomplete) txn.oncomplete()
       }, 0)
@@ -145,7 +153,14 @@ describe('saveInsightsForAnalysisKey', () => {
 
     await saveInsightsForAnalysisKey(analysisKey, result)
 
-    expect(mockDB.transaction).toHaveBeenCalled()
+    expect(mockDB.transaction).toHaveBeenCalledWith(['journal_insights'], 'readwrite')
+    expect(mockStore.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'insight-1',
+        analysisKey,
+        category: 'BEHAVIOR_LOOP',
+      })
+    )
   })
 })
 
