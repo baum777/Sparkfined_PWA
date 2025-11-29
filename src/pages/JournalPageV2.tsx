@@ -14,18 +14,15 @@ import { JournalInsightsPanel } from '@/components/journal/JournalInsightsPanel'
 type DirectionFilter = 'all' | 'long' | 'short';
 
 export default function JournalPageV2() {
-  const { entries, isLoading, error, activeId, setEntries, setActiveId, setLoading, setError, addEntry } =
-    useJournalStore((state) => ({
-      entries: state.entries,
-      isLoading: state.isLoading,
-      error: state.error,
-      activeId: state.activeId,
-      setEntries: state.setEntries,
-      setActiveId: state.setActiveId,
-      setLoading: state.setLoading,
-      setError: state.setError,
-      addEntry: state.addEntry,
-    }));
+  const entries = useJournalStore((state) => state.entries);
+  const isLoading = useJournalStore((state) => state.isLoading);
+  const error = useJournalStore((state) => state.error);
+  const activeId = useJournalStore((state) => state.activeId);
+  const setEntries = useJournalStore((state) => state.setEntries);
+  const setActiveId = useJournalStore((state) => state.setActiveId);
+  const setLoading = useJournalStore((state) => state.setLoading);
+  const setError = useJournalStore((state) => state.setError);
+  const addEntry = useJournalStore((state) => state.addEntry);
   const location = useLocation();
   const [, setSearchParams] = useSearchParams();
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
