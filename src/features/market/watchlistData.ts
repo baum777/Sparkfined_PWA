@@ -92,7 +92,8 @@ async function fetchQuoteForSymbol(symbol: string): Promise<WatchlistQuote | nul
       return null
     }
 
-    const change24hPct = computeChangePct(latest, candles[0])
+    const firstCandle = candles[0] ?? latest
+    const change24hPct = computeChangePct(latest, firstCandle)
 
     return {
       symbol: normalizedSymbol,

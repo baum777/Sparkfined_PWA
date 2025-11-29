@@ -33,7 +33,8 @@ export async function fetchAnalysisSnapshot(): Promise<AnalysisSnapshot> {
     throw new Error("Invalid candle payload for analysis snapshot");
   }
 
-  const change24hPct = computeChangePct(latest, candles[0]);
+  const firstCandle = candles[0] ?? latest;
+  const change24hPct = computeChangePct(latest, firstCandle);
 
   return {
     symbol: ANALYSIS_SYMBOL_CONFIG.symbol,
