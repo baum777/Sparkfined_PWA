@@ -187,63 +187,80 @@ export default function JournalPageV2() {
         />
       }
     >
-      <div className="space-y-6 text-text-primary" data-testid="journal-page">
-        <div className="space-y-2 text-sm text-text-tertiary">
-          <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Daily practice</p>
-          <p>Select any entry to review and edit notes inline.</p>
-          {isLoading && <p className="text-xs text-text-tertiary">Loading entries…</p>}
-          {!isLoading && error && <p className="text-xs text-warn">{error}</p>}
-          {!isLoading && cacheWarning && (
-            <p className="text-xs text-text-tertiary" data-testid="journal-cache-warning">
-              {cacheWarning}
-            </p>
-          )}
-        </div>
+      <div
+        className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8"
+        data-testid="journal-page"
+      >
+        <section className="space-y-3">
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-text-tertiary">Daily practice</p>
+            <p className="text-base text-text-primary">Your trading log as a guided daily ritual.</p>
+            <p className="text-sm text-text-secondary">Select any entry to review and edit notes inline.</p>
+          </div>
+          <div className="space-y-1 text-xs">
+            {isLoading && <p className="text-text-tertiary">Loading entries…</p>}
+            {!isLoading && error && <p className="text-warn">{error}</p>}
+            {!isLoading && cacheWarning && (
+              <p className="text-text-secondary" data-testid="journal-cache-warning">
+                {cacheWarning}
+              </p>
+            )}
+          </div>
+        </section>
 
-        {hasJourneyMeta && journeySnapshot && <JournalJourneyBanner snapshot={journeySnapshot} />}
-        <JournalInsightsPanel entries={entries} />
+        {hasJourneyMeta && journeySnapshot && (
+          <section>
+            <JournalJourneyBanner snapshot={journeySnapshot} />
+          </section>
+        )}
 
-        <JournalLayout
-          list={
-            <div className="flex h-full flex-col space-y-3">
-              <p className="text-xs uppercase tracking-wider text-text-tertiary">Entries</p>
-              <div className="flex h-full flex-col rounded-2xl border border-border bg-surface/80 backdrop-blur">
-                <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-                  {directionFilters.map((filter) => {
-                    const isActive = directionFilter === filter.value;
-                    return (
-                      <button
-                        key={filter.value}
-                        type="button"
-                        onClick={() => setDirectionFilter(filter.value)}
-                        className={`rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
-                          isActive
-                            ? 'border-brand bg-surface-hover text-text-primary'
-                            : 'border-border text-text-secondary hover:bg-surface-hover'
-                        }`}
-                        data-testid={`journal-filter-${filter.value}`}
-                      >
-                        {filter.label}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="flex-1 overflow-y-auto p-2">
-                  {isLoading ? (
-                    <div className="space-y-2">
-                      {Array.from({ length: 3 }).map((_, idx) => (
-                        <div key={idx} className="h-16 animate-pulse rounded-2xl bg-surface" />
-                      ))}
-                    </div>
-                  ) : (
-                    <JournalList entries={filteredEntries} activeId={activeId} onSelect={handleSelectEntry} />
-                  )}
+        <section>
+          <JournalInsightsPanel entries={entries} />
+        </section>
+
+        <section>
+          <JournalLayout
+            list={
+              <div className="flex h-full flex-col space-y-3">
+                <p className="text-xs uppercase tracking-wider text-text-tertiary">Entries</p>
+                <div className="flex h-full flex-col rounded-2xl border border-border bg-surface/80 backdrop-blur">
+                  <div className="flex items-center gap-2 border-b border-border px-3 py-2">
+                    {directionFilters.map((filter) => {
+                      const isActive = directionFilter === filter.value;
+                      return (
+                        <button
+                          key={filter.value}
+                          type="button"
+                          onClick={() => setDirectionFilter(filter.value)}
+                          className={`rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+                            isActive
+                              ? 'border-brand bg-surface-hover text-text-primary'
+                              : 'border-border text-text-secondary hover:bg-surface-hover'
+                          }`}
+                          data-testid={`journal-filter-${filter.value}`}
+                        >
+                          {filter.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-2">
+                    {isLoading ? (
+                      <div className="space-y-2">
+                        {Array.from({ length: 3 }).map((_, idx) => (
+                          <div key={idx} className="h-16 animate-pulse rounded-2xl bg-surface" />
+                        ))}
+                      </div>
+                    ) : (
+                      <JournalList entries={filteredEntries} activeId={activeId} onSelect={handleSelectEntry} />
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          }
-          detail={<JournalDetailPanel entry={activeEntry} />}
-        />
+            }
+            detail={<JournalDetailPanel entry={activeEntry} />}
+          />
+        </section>
       </div>
       <JournalNewEntryDialog
         isOpen={isNewDialogOpen}

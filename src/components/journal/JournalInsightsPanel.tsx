@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Button from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
 import { JournalInsightCard } from '@/components/journal/JournalInsightCard'
 import { JournalSocialPreview } from '@/components/journal/JournalSocialPreview'
 import { getJournalInsightsForEntries } from '@/lib/journal/ai'
@@ -128,30 +127,28 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
 
   return (
     <section
-      className="space-y-4 rounded-2xl border border-border bg-surface/70 p-4 backdrop-blur"
+      className="space-y-4 rounded-2xl border border-border bg-surface/70 p-4 backdrop-blur md:p-5"
       data-testid="journal-insights-panel"
     >
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-text-tertiary">
-            <Badge variant="outline" className="text-[11px]">
-              AI Insights
-            </Badge>
-            <span className="text-text-tertiary">Loop J3 · Behavioral Patterns</span>
-          </div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">AI Insights</p>
           <p className="text-sm text-text-secondary">
-            Analyze your last {Math.min(entries.length, cappedMaxEntries)} trades for loops, timing leaks, and mindset drifts.
+            Let the coach scan your last {Math.min(entries.length, cappedMaxEntries)} trades for recurring patterns.
           </p>
         </div>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={handleGenerateInsights}
-          isLoading={loading}
-          data-testid="journal-insights-generate-button"
-        >
-          {hasCachedInsights ? 'Regenerate Insights' : 'Generate Insights'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleGenerateInsights}
+            isLoading={loading}
+            data-testid="journal-insights-generate-button"
+            className="whitespace-nowrap"
+          >
+            {hasCachedInsights ? 'Regenerate Insights' : 'Generate Insights'}
+          </Button>
+        </div>
       </div>
 
       {cacheNotice && !loading && (
@@ -170,7 +167,11 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
             ))}
           </div>
 
-          {socialSnapshot && <JournalSocialPreview snapshot={socialSnapshot} />}
+          {socialSnapshot && (
+            <div className="pt-2">
+              <JournalSocialPreview snapshot={socialSnapshot} />
+            </div>
+          )}
         </>
       )}
 
