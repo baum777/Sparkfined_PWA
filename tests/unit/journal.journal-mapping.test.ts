@@ -52,7 +52,7 @@ describe('journal-mapping', () => {
       id: 'entry-2',
       title: '',
       tags: undefined,
-      date: undefined,
+      date: '',
     })
 
     expect(domain.ticker).toBe('MANUAL')
@@ -67,7 +67,13 @@ describe('journal-mapping', () => {
 
     const result = mapStoreEntriesToDomain(entries)
     expect(result).toHaveLength(2)
-    expect(result[0].id).toBe('entry-1')
-    expect(result[1].ticker).toBe('BONK')
+
+    const [first, second] = result
+    if (!first || !second) {
+      throw new Error('Expected mapStoreEntriesToDomain to return two entries')
+    }
+
+    expect(first.id).toBe('entry-1')
+    expect(second.ticker).toBe('BONK')
   })
 })
