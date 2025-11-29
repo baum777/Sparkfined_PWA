@@ -33,14 +33,17 @@ export function JournalSocialPreview({
       className="border-border-subtle bg-surface-secondary/60 text-text-primary"
     >
       <CardHeader className="space-y-2">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-text-tertiary">
           Social Preview
         </p>
         <CardTitle className="text-base text-text-primary">
           Dominant Patterns in Your Insights
         </CardTitle>
         <p className="text-xs text-text-tertiary">
-          Based on {snapshot.totalInsights} insight{snapshot.totalInsights === 1 ? '' : 's'} from recent trades.
+          Based on {snapshot.totalInsights} insight{snapshot.totalInsights === 1 ? '' : 's'} from your recent trades.
+        </p>
+        <p className="text-sm text-text-secondary">
+          A local preview of which patterns surface most often inside your insights.
         </p>
       </CardHeader>
       <CardContent className="space-y-3 text-sm text-text-secondary">

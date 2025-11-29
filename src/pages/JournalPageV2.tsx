@@ -193,13 +193,19 @@ export default function JournalPageV2() {
       >
         <section className="space-y-3">
           <div className="space-y-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-text-tertiary">Daily practice</p>
-            <p className="text-base text-text-primary">Your trading log as a guided daily ritual.</p>
-            <p className="text-sm text-text-secondary">Select any entry to review and edit notes inline.</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Daily practice</p>
+            <p className="text-base text-text-primary">Your trading log as a guided ritual to build discipline, not FOMO.</p>
+            <p className="text-sm text-text-secondary">
+              Select any entry to review, refine your notes, and track your growth over time.
+            </p>
           </div>
           <div className="space-y-1 text-xs">
-            {isLoading && <p className="text-text-tertiary">Loading entries…</p>}
-            {!isLoading && error && <p className="text-warn">{error}</p>}
+            {isLoading && <p className="text-text-tertiary">Loading your journal…</p>}
+            {!isLoading && error && (
+              <p className="font-medium text-warn">
+                Could not load entries right now. Please reload or try again later.
+              </p>
+            )}
             {!isLoading && cacheWarning && (
               <p className="text-text-secondary" data-testid="journal-cache-warning">
                 {cacheWarning}

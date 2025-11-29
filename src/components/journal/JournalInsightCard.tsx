@@ -35,13 +35,13 @@ export function JournalInsightCard({ insight }: JournalInsightCardProps) {
       className="border-border-subtle bg-surface-secondary/60 text-text-primary"
     >
       <CardHeader className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wide">
+        <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.2em]">
           <Badge variant={severity.badgeVariant}>{severity.label}</Badge>
           <Badge variant="outline" className="text-text-secondary">
             {categoryLabels[insight.category] ?? insight.category.replace(/_/g, ' ')}
           </Badge>
           {typeof insight.confidence === 'number' && (
-            <span className="text-[11px] font-medium text-text-tertiary">
+            <span className="ml-auto text-[11px] font-medium text-text-tertiary">
               Confidence {Math.round(insight.confidence)}%
             </span>
           )}
@@ -53,7 +53,7 @@ export function JournalInsightCard({ insight }: JournalInsightCardProps) {
         <p className="text-sm text-text-secondary">{insight.summary}</p>
 
         <div className="rounded-2xl border border-border bg-surface px-4 py-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">Recommendation</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-text-tertiary">Recommendation</p>
           <p className="mt-1 text-sm text-text-primary">{insight.recommendation}</p>
         </div>
 

@@ -132,9 +132,9 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
     >
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">AI Insights</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-text-tertiary">AI Insights</p>
           <p className="text-sm text-text-secondary">
-            Let the coach scan your last {Math.min(entries.length, cappedMaxEntries)} trades for recurring patterns.
+            Let the trading coach scan your last {Math.min(entries.length, cappedMaxEntries)} trades for recurring patterns.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -168,7 +168,7 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
           </div>
 
           {socialSnapshot && (
-            <div className="pt-2">
+            <div className="pt-3">
               <JournalSocialPreview snapshot={socialSnapshot} />
             </div>
           )}
