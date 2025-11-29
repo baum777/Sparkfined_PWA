@@ -15,6 +15,96 @@ export type Candle = {
   volume?: number
 }
 
+type UnknownCandleRow = Record<string, unknown> | unknown[] | null | undefined
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const toUnixSeconds = (input: unknown): number | null => {
+  if (input == null) {
+    return null
+  }
+
+  const candidate =
+    input instanceof Date || typeof input === 'number' || typeof input === 'string' ? input : String(input)
+  const timestamp = new Date(candidate).getTime()
+
+  if (!Number.isFinite(timestamp)) {
+    return null
+  }
+
+  return Math.floor(timestamp / 1000)
+}
+
+const toFiniteNumber = (input: unknown): number | null => {
+  if (input == null) {
+    return null
+  }
+  const value = Number(input)
+  return Number.isFinite(value) ? value : null
+}
+
+const mapRowToCandle = (
+  row: UnknownCandleRow,
+  fieldMap: {
+    time: Array<string | number>
+    open: Array<string | number>
+    high: Array<string | number>
+    low: Array<string | number>
+    close: Array<string | number>
+    volume?: Array<string | number>
+  }
+): Candle | null => {
+  if (row == null) {
+    return null
+  }
+
+  const record = isPlainObject(row) ? row : undefined
+  const tuple = Array.isArray(row) ? row : undefined
+
+  const resolveValue = (candidates: Array<string | number>): unknown => {
+    for (const candidate of candidates) {
+      if (typeof candidate === 'number') {
+        if (!tuple) {
+          continue
+        }
+        const value = tuple[candidate]
+        if (value != null) {
+          return value
+        }
+      } else if (record && candidate in record) {
+        const value = record[candidate]
+        if (value != null) {
+          return value
+        }
+      }
+    }
+    return undefined
+  }
+
+  const time = toUnixSeconds(resolveValue(fieldMap.time))
+  const open = toFiniteNumber(resolveValue(fieldMap.open))
+  const high = toFiniteNumber(resolveValue(fieldMap.high))
+  const low = toFiniteNumber(resolveValue(fieldMap.low))
+  const close = toFiniteNumber(resolveValue(fieldMap.close))
+  const volumeValue = fieldMap.volume ? toFiniteNumber(resolveValue(fieldMap.volume)) : null
+
+  if (time == null || open == null || high == null || low == null || close == null) {
+    return null
+  }
+
+  return {
+    time,
+    open,
+    high,
+    low,
+    close,
+    volume: volumeValue ?? undefined,
+  }
+}
+
+const isCandle = (value: Candle | null): value is Candle => value !== null
+
 const COOLDOWN_MS = 30_000
 const cooldowns: Record<string, number> = {}
 
@@ -61,29 +151,33 @@ const fetchWithRetry = async (
   throw lastError ?? new Error('request failed')
 }
 
-const mapDexPaprikaCandles = (rows: any[]): Candle[] =>
+const mapDexPaprikaCandles = (rows: unknown[]): Candle[] =>
   rows
-    .map((row) => ({
-      time: Math.floor(new Date(row.timestamp ?? row.time ?? row[0]).getTime() / 1000),
-      open: Number(row.open ?? row[1]),
-      high: Number(row.high ?? row[2]),
-      low: Number(row.low ?? row[3]),
-      close: Number(row.close ?? row[4]),
-      volume: row.volume != null ? Number(row.volume) : undefined,
-    }))
-    .filter((candle) => Number.isFinite(candle.time) && Number.isFinite(candle.close))
+    .map((row) =>
+      mapRowToCandle(row, {
+        time: ['timestamp', 'time', 0],
+        open: ['open', 1],
+        high: ['high', 2],
+        low: ['low', 3],
+        close: ['close', 4],
+        volume: ['volume', 5],
+      })
+    )
+    .filter(isCandle)
 
-const mapMoralisCandles = (rows: any[]): Candle[] =>
+const mapMoralisCandles = (rows: unknown[]): Candle[] =>
   rows
-    .map((row) => ({
-      time: Math.floor(new Date(row.time ?? row.timestamp ?? row[0]).getTime() / 1000),
-      open: Number(row.open ?? row.o ?? row[1]),
-      high: Number(row.high ?? row.h ?? row[2]),
-      low: Number(row.low ?? row.l ?? row[3]),
-      close: Number(row.close ?? row.c ?? row[4]),
-      volume: row.volume != null ? Number(row.volume ?? row.v) : undefined,
-    }))
-    .filter((candle) => Number.isFinite(candle.time) && Number.isFinite(candle.close))
+    .map((row) =>
+      mapRowToCandle(row, {
+        time: ['time', 'timestamp', 0],
+        open: ['open', 'o', 1],
+        high: ['high', 'h', 2],
+        low: ['low', 'l', 3],
+        close: ['close', 'c', 4],
+        volume: ['volume', 'v', 5],
+      })
+    )
+    .filter(isCandle)
 
 export const fetchTokenCandles = async (
   network: string,
