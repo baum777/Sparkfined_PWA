@@ -238,21 +238,44 @@ export default function AnalysisPageV2() {
         />
       }
     >
-      <AnalysisLayout
-        title="Analysis"
-        subtitle="AI-backed market views, flows and playbooks."
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={(id) => {
-          setActiveTab(id as AnalysisTabId);
-          const nextParams = new URLSearchParams(searchParams);
-          nextParams.set("tab", id);
-          setSearchParams(nextParams, { replace: true });
-        }}
-        showHeader={false}
-      >
-        {renderTabContent()}
-      </AnalysisLayout>
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8">
+        <section className="space-y-3">
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Pattern analysis</p>
+            <p className="text-base text-text-primary">Deep dives into setups, timing, and sentiment.</p>
+            <p className="text-sm text-text-secondary">
+              Use filters and tabs to isolate the conditions that matter for your playbook.
+            </p>
+          </div>
+          <div className="space-y-1 text-xs">
+            {isMarketLoading && <p className="text-text-tertiary">Syncing the latest market snapshot…</p>}
+            {!isMarketLoading && marketError && (
+              <p className="font-medium text-warn">{marketError}</p>
+            )}
+            {!isMarketLoading && !marketError && (
+              <p className="text-text-secondary">Insights refresh automatically as new context comes in.</p>
+            )}
+          </div>
+        </section>
+
+        <section>
+          <AnalysisLayout
+            title="Analysis"
+            subtitle="AI-backed market views, flows and playbooks."
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={(id) => {
+              setActiveTab(id as AnalysisTabId);
+              const nextParams = new URLSearchParams(searchParams);
+              nextParams.set("tab", id);
+              setSearchParams(nextParams, { replace: true });
+            }}
+            showHeader={false}
+          >
+            {renderTabContent()}
+          </AnalysisLayout>
+        </section>
+      </div>
     </DashboardShell>
   );
 }
