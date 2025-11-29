@@ -94,7 +94,7 @@ describe('Journal Insights – Realistic Smoke Test', () => {
       (insight) => insight.category === 'BEHAVIOR_LOOP'
     )
 
-    expect(fomoInsight, 'expected BEHAVIOR_LOOP insight for FOMO loop').to.exist
+    expect(fomoInsight, 'expected BEHAVIOR_LOOP insight for FOMO loop').toBeTruthy()
     if (!fomoInsight) {
       return
     }

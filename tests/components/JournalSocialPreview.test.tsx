@@ -13,7 +13,7 @@ describe('JournalSocialPreview', () => {
     }
 
     const { container } = render(<JournalSocialPreview snapshot={snapshot} />)
-    expect(container.querySelector('[data-testid="journal-social-preview"]')).to.be.null
+    expect(container.querySelector('[data-testid="journal-social-preview"]')).toBeNull()
   })
 
   it('renders top patterns with severity counts when snapshot has data', () => {
@@ -37,7 +37,7 @@ describe('JournalSocialPreview', () => {
     render(<JournalSocialPreview snapshot={snapshot} />)
 
     const root = screen.getByTestId('journal-social-preview')
-    expect(root).to.exist
+    expect(root).toBeTruthy()
     expect(root.textContent).to.contain('Dominant Patterns')
     expect(root.textContent).to.contain('Behavior Loop')
     expect(root.textContent).to.contain('5 insight')
