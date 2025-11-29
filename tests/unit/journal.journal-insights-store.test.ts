@@ -4,7 +4,7 @@
  * Tests for persistence layer for AI-generated journal insights.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   buildAnalysisKey,
   saveInsightsForAnalysisKey,
@@ -119,11 +119,7 @@ describe('saveInsightsForAnalysisKey', () => {
     }
 
     // Mock cursor for delete operation
-    const mockCursor = {
-      delete: vi.fn(),
-      continue: vi.fn(),
-    }
-    mockIndex.openCursor.mockImplementation((range) => ({
+    mockIndex.openCursor.mockImplementation((_range) => ({
       onsuccess: (event: { target: { result: null } }) => {
         event.target.result = null
       },

@@ -36,8 +36,6 @@ export interface JournalInsightError {
 export async function getJournalInsightsForEntries(
   request: JournalInsightRequest
 ): Promise<JournalInsightResult> {
-  const startTime = Date.now()
-
   // 1. Build prompt
   const promptInput: JournalInsightPromptInput = {
     entries: request.entries,
