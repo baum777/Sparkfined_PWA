@@ -21,11 +21,16 @@ interface JournalInsightsPanelProps {
   maxEntries?: number
 }
 
+const NO_INSIGHTS_MESSAGE = 'No meaningful patterns detected yet—log a few more trades.'
+const INSIGHT_ENTRY_CAP = 50
+
 export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsightsPanelProps) {
+  const cappedMaxEntries = Math.min(maxEntries, INSIGHT_ENTRY_CAP)
   const [insights, setInsights] = useState<JournalInsight[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [hasCachedInsights, setHasCachedInsights] = useState(false)
+  const [cacheNotice, setCacheNotice] = useState<string | null>(null)
   const socialSnapshot = useMemo(
     () => (insights && insights.length > 0 ? computeSocialStatsFromInsights(insights) : null),
     [insights]
@@ -39,8 +44,8 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
 
   // Calculate analysis key for caching
   const analysisKey = useMemo(
-    () => buildAnalysisKey(domainEntries.slice(-maxEntries), maxEntries),
-    [domainEntries, maxEntries]
+    () => buildAnalysisKey(domainEntries.slice(-cappedMaxEntries), cappedMaxEntries),
+    [domainEntries, cappedMaxEntries]
   )
 
   // Load cached insights on mount or when analysisKey changes
@@ -59,13 +64,15 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
           setInsights(restored)
           setHasCachedInsights(true)
           setError(null)
+          setCacheNotice(null)
         } else {
           setHasCachedInsights(false)
+          setCacheNotice(null)
         }
       } catch (err) {
         console.warn('[JournalInsightsPanel] Failed to load cached insights', err)
-        // Don't show error to user - just skip cache
         setHasCachedInsights(false)
+        setCacheNotice('Local insight cache is currently unavailable. Regenerate to fetch fresh insights.')
       }
     }
 
@@ -85,29 +92,34 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
 
     setLoading(true)
     setError(null)
+    setCacheNotice(null)
 
     try {
-      const recentDomainEntries = domainEntries.slice(-maxEntries)
+      const recentDomainEntries = domainEntries.slice(-cappedMaxEntries)
       const result = await getJournalInsightsForEntries({
         entries: recentDomainEntries,
-        maxEntries,
+        maxEntries: cappedMaxEntries,
       })
       
-      setInsights(result.insights)
-      setHasCachedInsights(true)
+      const nextInsights = result.insights ?? []
+      const hasInsights = nextInsights.length > 0
+      setInsights(nextInsights)
+      setHasCachedInsights(hasInsights)
+      setCacheNotice(null)
 
-      if (result.insights.length > 0) {
+      if (hasInsights) {
         // Save to cache
         await saveInsightsForAnalysisKey(analysisKey, result)
         
         // Send telemetry (fire-and-forget)
         void sendJournalInsightsGeneratedEvent(analysisKey, result)
       } else {
-        setError('No meaningful patterns detected yet—log a few more trades.')
+        // Surface empty state guidance without treating it as an error
+        setError(null)
       }
     } catch (err) {
       console.warn('[JournalInsightsPanel] Failed to generate insights', err)
-      setError('Could not generate insights. Please try again.')
+      setError('Unable to generate insights right now. Check your network and try again shortly.')
       setInsights(null)
     } finally {
       setLoading(false)
@@ -128,7 +140,7 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
             <span className="text-text-tertiary">Loop J3 · Behavioral Patterns</span>
           </div>
           <p className="text-sm text-text-secondary">
-            Analyze your last {Math.min(entries.length, maxEntries)} trades for loops, timing leaks, and mindset drifts.
+            Analyze your last {Math.min(entries.length, cappedMaxEntries)} trades for loops, timing leaks, and mindset drifts.
           </p>
         </div>
         <Button
@@ -142,6 +154,11 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
         </Button>
       </div>
 
+      {cacheNotice && !loading && (
+        <p className="text-xs text-text-tertiary" data-testid="journal-insights-cache-notice">
+          {cacheNotice}
+        </p>
+      )}
       {error && !loading && <p className="text-sm text-warn">{error}</p>}
       {loading && <p className="text-sm text-text-tertiary">Generating insights…</p>}
 
@@ -159,7 +176,7 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
 
       {insights && insights.length === 0 && !loading && !error && (
         <p className="text-sm text-text-secondary">
-          No insights yet. Add more entries or adjust your notes for richer analysis.
+          {NO_INSIGHTS_MESSAGE}
         </p>
       )}
     </section>

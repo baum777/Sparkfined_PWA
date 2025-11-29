@@ -32,6 +32,7 @@ export default function JournalPageV2() {
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createErrorMessage, setCreateErrorMessage] = useState<string | null>(null);
+  const [cacheWarning, setCacheWarning] = useState<string | null>(null);
   const entryFromUrl = useMemo(() => {
     if (!location.search) {
       return null;
@@ -52,10 +53,12 @@ export default function JournalPageV2() {
           return;
         }
         setEntries(loaded);
+        setCacheWarning(null);
       } catch (err) {
         console.warn('[Journal V2] Failed to load entries from persistence', err);
         if (isCurrent) {
           setError('Unable to load journal entries; showing empty state.');
+          setCacheWarning('Local journal cache is currently unavailable. Live data may be limited.');
         }
       } finally {
         if (isCurrent) {
@@ -193,6 +196,11 @@ export default function JournalPageV2() {
           <p>Select any entry to review and edit notes inline.</p>
           {isLoading && <p className="text-xs text-text-tertiary">Loading entries…</p>}
           {!isLoading && error && <p className="text-xs text-warn">{error}</p>}
+          {!isLoading && cacheWarning && (
+            <p className="text-xs text-text-tertiary" data-testid="journal-cache-warning">
+              {cacheWarning}
+            </p>
+          )}
         </div>
 
         {hasJourneyMeta && journeySnapshot && <JournalJourneyBanner snapshot={journeySnapshot} />}
