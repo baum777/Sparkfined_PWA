@@ -12,19 +12,9 @@ export default [
       "*.config.js",
       "*.config.ts",
       "scripts/**",
-      "wireframes/**",
-      "docs/archive/**",
-      "ai/**",
+      "docs/**",
       "middleware.ts"
     ]
-  },
-  {
-    files: ["docs/archive/**"],
-    languageOptions: {
-      parserOptions: {
-        project: null
-      }
-    }
   },
   // Service Worker files (public/push/sw.js)
   {
