@@ -19,7 +19,7 @@ beforeEach(() => {
   sanityCheckMock.mockImplementation((bullets: string[]) => bullets);
 });
 
-const fixturePath = path.resolve(process.cwd(), "ai", "tests", "fixtures", "btc_payload.json");
+const fixturePath = path.resolve(process.cwd(), "tests", "unit", "ai", "backend", "fixtures", "btc_payload.json");
 
 async function loadPayload(): Promise<MarketPayload> {
   const json = await readFile(fixturePath, "utf8");
