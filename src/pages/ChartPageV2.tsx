@@ -6,9 +6,11 @@ import DashboardShell from '@/components/dashboard/DashboardShell'
 import Button from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardFooter, CardHeader } from '@/components/ui/Card'
+import StateView from '@/components/ui/StateView'
 import { DEFAULT_TIMEFRAME, TIMEFRAME_ORDER, type ChartTimeframe, type IndicatorPresetId } from '@/domain/chart'
 import useOhlcData from '@/hooks/useOhlcData'
 import { useIndicators } from '@/hooks/useIndicators'
+import { useOnlineStatus } from '@/hooks/useOnlineStatus'
 import { useAlertsStore } from '@/store/alertsStore'
 import { useJournalStore } from '@/store/journalStore'
 import { useChartUiStore } from '@/store/chartUiStore'
@@ -67,6 +69,7 @@ export default function ChartPageV2() {
     () => resolveAsset(searchParams.get('symbol'), searchParams.get('address'), searchParams.get('network')),
     [searchParams]
   )
+  const isDefaultAsset = !searchParams.get('symbol') && !searchParams.get('address')
 
   useEffect(() => {
     const nextTimeframe = resolveTimeframe(searchParams.get('timeframe'))
@@ -79,6 +82,7 @@ export default function ChartPageV2() {
     timeframe,
     network: asset.network,
   })
+  const isOnline = useOnlineStatus()
 
   const indicatorConfig = useChartUiStore((state) => state.getConfigFor(asset.address))
   const hasSeenIntro = useChartUiStore((state) => state.hasSeenIntro)
@@ -191,6 +195,27 @@ export default function ChartPageV2() {
     >
       <Card className="space-y-6 rounded-3xl" data-testid="chart-page">
         {!hasSeenIntro && <ChartIntroBanner onDismiss={dismissIntro} />}
+        {!isOnline && (
+          <StateView
+            type="offline"
+            description="You're offline. Showing last cached chart data."
+            compact
+          />
+        )}
+        {isDefaultAsset && (
+          <div className="rounded-lg border border-blue-500/20 bg-blue-950/20 p-3 text-sm">
+            <p className="text-blue-200">
+              <strong>No symbol provided.</strong> Showing default chart (SOL/USDT). Select a token from the{' '}
+              <button
+                onClick={() => navigate('/watchlist-v2')}
+                className="underline hover:text-blue-100"
+              >
+                Watchlist
+              </button>{' '}
+              to view other charts.
+            </p>
+          </div>
+        )}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-text-primary">Advanced chart</h2>

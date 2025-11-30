@@ -11,6 +11,8 @@ import { useWatchlistStore } from "@/store/watchlistStore";
 import type { WatchlistRow } from "@/store/watchlistStore";
 import { DEFAULT_TIMEFRAME } from "@/domain/chart";
 import { buildChartUrl, buildReplayUrl } from "@/lib/chartLinks";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import StateView from "@/components/ui/StateView";
 
 type SessionFilter = "all" | "London" | "NY" | "Asia";
 type SortMode = "default" | "top-movers";
@@ -30,6 +32,7 @@ export default function WatchlistPageV2() {
   const [activeSymbol, setActiveSymbol] = React.useState<string | undefined>(undefined);
   const hasHydratedRef = React.useRef(false);
   const navigate = useNavigate();
+  const isOnline = useOnlineStatus();
   const loadQuotes = React.useCallback(
     async (symbols: string[]) => {
       if (!symbols.length) {
@@ -135,6 +138,15 @@ export default function WatchlistPageV2() {
 
         <section>
           <WatchlistLayout>
+            {!isOnline && (
+              <div className="mb-4">
+                <StateView
+                  type="offline"
+                  description="You're offline. Showing last cached prices."
+                  compact
+                />
+              </div>
+            )}
             <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
               <div className="space-y-4">
                 <div className="rounded-2xl border border-border bg-surface/80 backdrop-blur">
