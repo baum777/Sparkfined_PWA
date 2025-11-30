@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createEntry, queryEntries, updateEntryNotes } from '@/lib/JournalService';
+import { createEntry, queryEntries, updateEntryNotes, deleteEntry } from '@/lib/JournalService';
 import type { JournalEntry as PersistedJournalEntry, JournalJourneyMeta } from '@/types/journal';
 import type { SolanaMemeTrendEvent, TrendSentimentLabel } from '@/types/events';
 import type { ChartCreationContext } from '@/domain/chart';
@@ -32,6 +32,7 @@ interface JournalState {
   setError: (message: string | null) => void;
   addEntry: (entry: JournalEntry) => void;
   updateEntry: (entry: JournalEntry) => void;
+  removeEntry: (id: string) => Promise<void>;
   createDraftFromChart: (context: ChartCreationContext) => Promise<JournalEntry>;
   autoTagFromTrendEvent: (event: SolanaMemeTrendEvent) => Promise<void>;
 }
@@ -89,6 +90,18 @@ export const useJournalStore = create<JournalState>((set) => ({
     set((state) => ({
       entries: state.entries.map((entry) => (entry.id === nextEntry.id ? nextEntry : entry)),
       })),
+  removeEntry: async (id) => {
+    try {
+      await deleteEntry(id);
+      set((state) => ({
+        entries: state.entries.filter((entry) => entry.id !== id),
+        activeId: state.activeId === id ? undefined : state.activeId,
+      }));
+    } catch (error) {
+      console.warn('[journalStore] failed to delete entry', error);
+      throw error;
+    }
+  },
   createDraftFromChart: async (context) => {
     const title = `${context.symbol} · ${context.timeframe} journal`
     const notes = `Created from chart at ${new Date(context.time).toUTCString()} @ ${context.price}`

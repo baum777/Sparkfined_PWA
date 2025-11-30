@@ -258,7 +258,12 @@ export default function JournalPageV2() {
                         ))}
                       </div>
                     ) : (
-                      <JournalList entries={filteredEntries} activeId={activeId} onSelect={handleSelectEntry} />
+                      <JournalList
+                        entries={filteredEntries}
+                        activeId={activeId}
+                        onSelect={handleSelectEntry}
+                        onNewEntry={() => setIsNewDialogOpen(true)}
+                      />
                     )}
                   </div>
                 </div>

@@ -11,9 +11,11 @@ import { useWatchlistStore } from "@/store/watchlistStore";
 import type { WatchlistRow } from "@/store/watchlistStore";
 import { DEFAULT_TIMEFRAME } from "@/domain/chart";
 import { buildChartUrl, buildReplayUrl } from "@/lib/chartLinks";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import StateView from "@/components/ui/StateView";
 
 type SessionFilter = "all" | "London" | "NY" | "Asia";
-type SortMode = "default" | "top-movers";
+type SortMode = "default" | "top-movers" | "alphabetical";
 
 export default function WatchlistPageV2() {
   const { rows, isLoading, error, hydrateFromQuotes, setLoading, setError } = useWatchlistStore((state) => ({
@@ -30,6 +32,7 @@ export default function WatchlistPageV2() {
   const [activeSymbol, setActiveSymbol] = React.useState<string | undefined>(undefined);
   const hasHydratedRef = React.useRef(false);
   const navigate = useNavigate();
+  const isOnline = useOnlineStatus();
   const loadQuotes = React.useCallback(
     async (symbols: string[]) => {
       if (!symbols.length) {
@@ -71,7 +74,12 @@ export default function WatchlistPageV2() {
       return filteredRows;
     }
 
-    return [...filteredRows].sort((a, b) => getAbsChange(b) - getAbsChange(a));
+    if (sortMode === "top-movers") {
+      return [...filteredRows].sort((a, b) => getAbsChange(b) - getAbsChange(a));
+    }
+
+    // alphabetical
+    return [...filteredRows].sort((a, b) => a.symbol.localeCompare(b.symbol));
   }, [rows, sessionFilter, sortMode]);
   const activeRow = React.useMemo(
     () => rows.find((row) => row.symbol === activeSymbol),
@@ -135,6 +143,15 @@ export default function WatchlistPageV2() {
 
         <section>
           <WatchlistLayout>
+            {!isOnline && (
+              <div className="mb-4">
+                <StateView
+                  type="offline"
+                  description="You're offline. Showing last cached prices."
+                  compact
+                />
+              </div>
+            )}
             <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
               <div className="space-y-4">
                 <div className="rounded-2xl border border-border bg-surface/80 backdrop-blur">
@@ -163,11 +180,22 @@ export default function WatchlistPageV2() {
                       <LiveStatusBadge showLabel />
                       <button
                         type="button"
-                        onClick={() => setSortMode((prev) => (prev === "default" ? "top-movers" : "default"))}
+                        onClick={() =>
+                          setSortMode((prev) => {
+                            if (prev === "default") return "top-movers";
+                            if (prev === "top-movers") return "alphabetical";
+                            return "default";
+                          })
+                        }
                         className="rounded-full border border-border px-3 py-1 font-semibold text-text-secondary transition hover:border-brand hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                         data-testid="watchlist-sort-toggle"
                       >
-                        Order: {sortMode === "default" ? "Default" : "Top movers"}
+                        Sort:{" "}
+                        {sortMode === "default"
+                          ? "Default"
+                          : sortMode === "top-movers"
+                            ? "Top Movers"
+                            : "A-Z"}
                       </button>
                     </div>
                   </div>

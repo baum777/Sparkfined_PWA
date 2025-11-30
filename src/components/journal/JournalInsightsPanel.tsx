@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import Button from '@/components/ui/Button'
+import StateView from '@/components/ui/StateView'
 import { JournalInsightCard } from '@/components/journal/JournalInsightCard'
 import { JournalSocialPreview } from '@/components/journal/JournalSocialPreview'
 import { getJournalInsightsForEntries } from '@/lib/journal/ai'
 import { mapStoreEntriesToDomain } from '@/lib/journal/journal-mapping'
-import { 
-  buildAnalysisKey, 
-  saveInsightsForAnalysisKey, 
+import {
+  buildAnalysisKey,
+  saveInsightsForAnalysisKey,
   loadLatestInsightsForAnalysisKey,
-  recordToInsight 
+  recordToInsight
 } from '@/lib/journal/journal-insights-store'
 import { sendJournalInsightsGeneratedEvent } from '@/lib/journal/journal-insights-telemetry'
 import { computeSocialStatsFromInsights } from '@/lib/journal/journal-social-analytics'
@@ -152,12 +153,30 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
       </div>
 
       {cacheNotice && !loading && (
-        <p className="text-xs text-text-tertiary" data-testid="journal-insights-cache-notice">
-          {cacheNotice}
-        </p>
+        <StateView
+          type="offline"
+          description={cacheNotice}
+          compact
+          data-testid="journal-insights-cache-notice"
+        />
       )}
-      {error && !loading && <p className="text-sm text-warn">{error}</p>}
-      {loading && <p className="text-sm text-text-tertiary">Generating insights…</p>}
+      {error && !loading && (
+        <StateView
+          type="error"
+          title="Failed to generate insights"
+          description={error}
+          actionLabel="Try again"
+          onAction={handleGenerateInsights}
+          compact
+        />
+      )}
+      {loading && (
+        <StateView
+          type="loading"
+          description="Analyzing your trading patterns with AI…"
+          compact
+        />
+      )}
 
       {insights && insights.length > 0 && (
         <>
@@ -176,9 +195,12 @@ export function JournalInsightsPanel({ entries, maxEntries = 20 }: JournalInsigh
       )}
 
       {insights && insights.length === 0 && !loading && !error && (
-        <p className="text-sm text-text-secondary">
-          {NO_INSIGHTS_MESSAGE}
-        </p>
+        <StateView
+          type="empty"
+          title="No patterns detected yet"
+          description={NO_INSIGHTS_MESSAGE}
+          compact
+        />
       )}
     </section>
   )

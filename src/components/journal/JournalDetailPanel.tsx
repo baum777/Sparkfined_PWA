@@ -8,9 +8,11 @@ type JournalDetailPanelProps = {
 
 export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
   const updateEntry = useJournalStore((state) => state.updateEntry);
+  const removeEntry = useJournalStore((state) => state.removeEntry);
   const [isEditing, setIsEditing] = useState(false);
   const [draftNotes, setDraftNotes] = useState(entry?.notes ?? '');
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -72,6 +74,27 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
     }
   }, [draftNotes, entry, updateEntry]);
 
+  const handleDelete = useCallback(async () => {
+    if (!entry) {
+      return;
+    }
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${entry.title}"? This action cannot be undone.`,
+    );
+    if (!confirmed) {
+      return;
+    }
+    setIsDeleting(true);
+    setErrorMessage(null);
+    try {
+      await removeEntry(entry.id);
+    } catch (err) {
+      console.warn('[Journal V2] Failed to delete entry', err);
+      setErrorMessage('Could not delete entry. Please try again.');
+      setIsDeleting(false);
+    }
+  }, [entry, removeEntry]);
+
   if (!entry) {
     return (
       <div
@@ -115,15 +138,26 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
             >
               {directionLabel}
             </span>
-            <button
-              type="button"
-              onClick={handleStartEdit}
-              disabled={!entry || isSaving}
-              className="rounded-full border border-border-subtle bg-interactive-hover px-3 py-1 text-xs font-medium text-text-primary transition hover:border-border-hover hover:bg-interactive-active disabled:opacity-40"
-              data-testid="journal-edit-notes-button"
-            >
-              Edit notes
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={!entry || isSaving || isDeleting}
+                className="rounded-full border border-status-armed-border bg-status-armed-bg px-3 py-1 text-xs font-medium text-status-armed-text transition hover:border-status-armed-text hover:bg-status-armed-text/10 disabled:opacity-40"
+                data-testid="journal-delete-button"
+              >
+                {isDeleting ? 'Deleting…' : 'Delete'}
+              </button>
+              <button
+                type="button"
+                onClick={handleStartEdit}
+                disabled={!entry || isSaving || isDeleting}
+                className="rounded-full border border-border-subtle bg-interactive-hover px-3 py-1 text-xs font-medium text-text-primary transition hover:border-border-hover hover:bg-interactive-active disabled:opacity-40"
+                data-testid="journal-edit-notes-button"
+              >
+                Edit notes
+              </button>
+            </div>
           </div>
         </div>
       </div>
