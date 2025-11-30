@@ -15,7 +15,7 @@ import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import StateView from "@/components/ui/StateView";
 
 type SessionFilter = "all" | "London" | "NY" | "Asia";
-type SortMode = "default" | "top-movers";
+type SortMode = "default" | "top-movers" | "alphabetical";
 
 export default function WatchlistPageV2() {
   const { rows, isLoading, error, hydrateFromQuotes, setLoading, setError } = useWatchlistStore((state) => ({
@@ -74,7 +74,12 @@ export default function WatchlistPageV2() {
       return filteredRows;
     }
 
-    return [...filteredRows].sort((a, b) => getAbsChange(b) - getAbsChange(a));
+    if (sortMode === "top-movers") {
+      return [...filteredRows].sort((a, b) => getAbsChange(b) - getAbsChange(a));
+    }
+
+    // alphabetical
+    return [...filteredRows].sort((a, b) => a.symbol.localeCompare(b.symbol));
   }, [rows, sessionFilter, sortMode]);
   const activeRow = React.useMemo(
     () => rows.find((row) => row.symbol === activeSymbol),
@@ -175,11 +180,22 @@ export default function WatchlistPageV2() {
                       <LiveStatusBadge showLabel />
                       <button
                         type="button"
-                        onClick={() => setSortMode((prev) => (prev === "default" ? "top-movers" : "default"))}
+                        onClick={() =>
+                          setSortMode((prev) => {
+                            if (prev === "default") return "top-movers";
+                            if (prev === "top-movers") return "alphabetical";
+                            return "default";
+                          })
+                        }
                         className="rounded-full border border-border px-3 py-1 font-semibold text-text-secondary transition hover:border-brand hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                         data-testid="watchlist-sort-toggle"
                       >
-                        Order: {sortMode === "default" ? "Default" : "Top movers"}
+                        Sort:{" "}
+                        {sortMode === "default"
+                          ? "Default"
+                          : sortMode === "top-movers"
+                            ? "Top Movers"
+                            : "A-Z"}
                       </button>
                     </div>
                   </div>
