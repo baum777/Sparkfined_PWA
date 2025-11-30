@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import DashboardKpiStrip from '@/components/dashboard/DashboardKpiStrip';
 import DashboardQuickActions from '@/components/dashboard/DashboardQuickActions';
@@ -6,13 +6,9 @@ import DashboardMainGrid from '@/components/dashboard/DashboardMainGrid';
 import InsightTeaser from '@/components/dashboard/InsightTeaser';
 import JournalSnapshot from '@/components/dashboard/JournalSnapshot';
 import ErrorBanner from '@/components/ui/ErrorBanner';
-
-const kpiItems = [
-  { label: 'Net P&L', value: '+12.4%', trend: 'up' as const },
-  { label: 'Win Rate', value: '63%', trend: 'flat' as const },
-  { label: 'Alerts Armed', value: '5', trend: 'up' as const },
-  { label: 'Journal Streak', value: '9 days', trend: 'up' as const },
-];
+import { useJournalStore } from '@/store/journalStore';
+import { useAlertsStore } from '@/store/alertsStore';
+import { calculateNetPnL, calculateWinRate, calculateJournalStreak } from '@/lib/dashboard/calculateKPIs';
 
 const dummyInsight = {
   title: 'SOL Daily Bias',
@@ -21,22 +17,38 @@ const dummyInsight = {
   summary: 'Market structure shows higher lows with strong momentum on intraday timeframes. Watching for pullbacks to re-enter long positions with tight risk management.',
 };
 
-const dummyJournalEntries = [
-  { id: '1', title: 'Scalped SOL breakout', date: '2025-02-16', direction: 'long' as const },
-  { id: '2', title: 'Fade on BTC range high', date: '2025-02-15', direction: 'short' as const },
-  { id: '3', title: 'ETH trend follow setup', date: '2025-02-14', direction: 'long' as const },
-];
-
 export default function DashboardPageV2() {
-  // TODO[P1]: Replace placeholder UI state with dashboard data store once available
+  // Get real data from stores
+  const journalEntries = useJournalStore((state) => state.entries);
+  const alerts = useAlertsStore((state) => state.alerts);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasData, setHasData] = useState(true);
+
+  // Calculate real KPIs from journal data
+  const kpiItems = useMemo(() => {
+    const armedAlertsCount = alerts.filter((a) => a.status === 'armed').length;
+
+    return [
+      { label: 'Net P&L', value: calculateNetPnL(journalEntries), trend: 'up' as const },
+      { label: 'Win Rate', value: calculateWinRate(journalEntries, 30), trend: 'flat' as const },
+      { label: 'Alerts Armed', value: String(armedAlertsCount), trend: 'up' as const },
+      { label: 'Journal Streak', value: calculateJournalStreak(journalEntries), trend: 'up' as const },
+    ];
+  }, [journalEntries, alerts]);
+
+  // Get recent journal entries for snapshot (last 3)
+  const recentJournalEntries = useMemo(() => {
+    return journalEntries
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 3);
+  }, [journalEntries]);
+
+  const hasData = journalEntries.length > 0;
 
   const handleRetry = () => {
     setError(null);
     setIsLoading(false);
-    setHasData(true);
   };
 
   const kpiStripContent = isLoading ? (
@@ -94,7 +106,7 @@ export default function DashboardPageV2() {
     return (
       <DashboardMainGrid
         primary={<InsightTeaser {...dummyInsight} />}
-        secondary={<JournalSnapshot entries={dummyJournalEntries} />}
+        secondary={<JournalSnapshot entries={recentJournalEntries} />}
       />
     );
   };
