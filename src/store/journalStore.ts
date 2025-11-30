@@ -78,7 +78,13 @@ export const useJournalStore = create<JournalState>((set) => ({
   error: null,
   lastDraftFromChart: undefined,
   setEntries: (entries) => set(() => ({ entries })),
-  setActiveId: (id) => set({ activeId: id }),
+  setActiveId: (id) =>
+    set((state) => {
+      if (state.activeId === id) {
+        return state;
+      }
+      return { activeId: id };
+    }),
   setLoading: (value) => set({ isLoading: value }),
   setError: (message) => set({ error: message }),
   addEntry: (entry) =>
