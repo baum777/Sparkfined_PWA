@@ -38,16 +38,19 @@ describe('JournalPageV2 cache warnings', () => {
   })
 
   it('hydrates entry selection from the URL without triggering nested updates', async () => {
+    const now = Date.now()
     vi.mocked(queryEntries).mockResolvedValue([
       {
         id: 'entry-1',
-        thesis: 'Discipline over hype',
+        ticker: 'SOL',
+        address: 'So11111111111111111111111111111111111111112',
         status: 'active',
         setup: 'custom',
         emotion: 'custom',
-        timestamp: Date.now(),
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
+        thesis: 'Discipline over hype',
+        timestamp: now,
+        createdAt: now,
+        updatedAt: now,
       },
     ])
 
