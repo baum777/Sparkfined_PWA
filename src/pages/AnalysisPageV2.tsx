@@ -137,7 +137,7 @@ export default function AnalysisPageV2() {
       return (
         <div className="space-y-6">
           <div className="space-y-3">
-            <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Current AI Insight</p>
+            <p className="text-xs uppercase tracking-[0.25em] text-text-tertiary">Current AI Insight</p>
             <h2 className="text-2xl font-semibold text-text-primary">
               Bias remains {overviewInsight.bias.toLowerCase()} while liquidity builds.
             </h2>
@@ -165,7 +165,7 @@ export default function AnalysisPageV2() {
             <div className="space-y-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/5 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Social trend</p>
+                  <p className="text-xs uppercase tracking-[0.25em] text-emerald-200/80">Social trend</p>
                   <p className="text-sm text-text-secondary">{trendInsight.tweet.snippet ?? trendInsight.tweet.fullText}</p>
                 </div>
                 {trendInsight.sentiment?.label ? (
@@ -260,8 +260,6 @@ export default function AnalysisPageV2() {
 
         <section>
           <AnalysisLayout
-            title="Analysis"
-            subtitle="AI-backed market views, flows and playbooks."
             tabs={tabs}
             activeTab={activeTab}
             onTabChange={(id) => {
