@@ -16,7 +16,7 @@
 import { Loader2, AlertTriangle, FileText, Wifi } from '@/lib/icons';
 import Button from './Button';
 
-interface StateViewProps {
+interface StateViewProps extends React.HTMLAttributes<HTMLDivElement> {
   type: 'loading' | 'empty' | 'error' | 'offline';
   title?: string;
   description?: string;
@@ -34,6 +34,7 @@ export default function StateView({
   onAction,
   compact = false,
   icon,
+  ...htmlProps
 }: StateViewProps) {
   const config = {
     loading: {
@@ -67,12 +68,13 @@ export default function StateView({
   };
   
   const { Icon, defaultTitle, defaultDescription, iconColor, animate } = config[type];
-  
+
   return (
     <div
+      {...htmlProps}
       className={`flex flex-col items-center justify-center text-center ${
         compact ? 'py-6 px-4' : 'py-12 px-6'
-      }`}
+      } ${htmlProps.className || ''}`}
       role="status"
       aria-live="polite"
       aria-atomic="true"
