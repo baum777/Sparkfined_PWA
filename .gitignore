@@ -18,3 +18,14 @@ telemetry/ai/*.jsonl
 .DS_Store
 Thumbs.db
 *.tsbuildinfo
+
+# Lighthouse CI Reports
+.lhci-report/
+.lighthouseci/
+
+# Test Reports (keep local)
+playwright-report/
+test-results/
+
+# Archive Bundles
+docs/archive/**/*.zip
