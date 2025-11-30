@@ -2,7 +2,7 @@ import React from 'react';
 import AnalysisSidebarTabs, { AnalysisTab } from './AnalysisSidebarTabs';
 
 interface AnalysisLayoutProps {
-  title: string;
+  title?: string;
   subtitle?: string;
   tabs: ReadonlyArray<AnalysisTab>;
   activeTab: string;
@@ -21,7 +21,7 @@ export default function AnalysisLayout({
   showHeader = true,
 }: AnalysisLayoutProps) {
   return (
-    <div className="space-y-6 rounded-3xl border border-border bg-surface/70 p-4 sm:p-6">
+    <div className="space-y-6 rounded-2xl border border-border bg-surface/70 p-4 sm:p-6">
       <div className="md:hidden">
         <AnalysisSidebarTabs tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} orientation="horizontal" />
       </div>

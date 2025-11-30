@@ -138,7 +138,7 @@ export default function WatchlistPageV2() {
             <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
               <div className="space-y-4">
                 <div className="rounded-2xl border border-border bg-surface/80 backdrop-blur">
-                  <div className="space-y-3 border-b border-border px-4 py-3 text-xs sm:text-sm">
+                  <div className="space-y-3 border-b border-border px-3 py-2 text-xs sm:text-sm">
                     <div className="flex flex-wrap items-center gap-2">
                       {SESSION_FILTERS.map((filter) => {
                         const isActive = sessionFilter === filter;
