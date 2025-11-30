@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { JournalEntry } from '@/store/journalStore';
+import { BookOpen } from '@/lib/icons';
 
 export type JournalListEntry = JournalEntry;
 
@@ -8,9 +9,10 @@ interface JournalListProps {
   entries: ReadonlyArray<JournalListEntry>;
   activeId?: string;
   onSelect: (id: string) => void;
+  onNewEntry?: () => void;
 }
 
-export default function JournalList({ entries, activeId, onSelect }: JournalListProps) {
+export default function JournalList({ entries, activeId, onSelect, onNewEntry }: JournalListProps) {
   const [, setSearchParams] = useSearchParams();
 
   const handleSelect = (id: string) => {
@@ -25,16 +27,57 @@ export default function JournalList({ entries, activeId, onSelect }: JournalList
   if (!entries.length) {
     return (
       <div
-        className="flex min-h-[240px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center"
+        className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-12 text-center"
         data-testid="journal-empty-state"
       >
-        <p className="text-base font-medium text-text-primary">No journal entries yet.</p>
-        <p className="mt-2 max-w-sm text-sm text-text-secondary">
-          Your trades and notes will appear here once you create them.
+        {/* Icon */}
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sentiment-bull-bg/20">
+          <BookOpen size={32} className="text-sentiment-bull" />
+        </div>
+
+        {/* Heading */}
+        <h3 className="text-lg font-semibold text-text-primary">Start Your Trading Journal</h3>
+
+        {/* Description */}
+        <p className="mt-2 max-w-sm text-sm leading-relaxed text-text-secondary">
+          Document your trades, track your reasoning, and build consistent habits.
+          Every entry helps you spot patterns and improve over time.
         </p>
-        <p className="mt-4 text-xs uppercase tracking-wide text-text-tertiary">
-          Create your first entry from the trade flow.
-        </p>
+
+        {/* Tips */}
+        <div className="mt-6 space-y-2 text-left">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-tertiary">What to journal:</p>
+          <ul className="space-y-1.5 text-sm text-text-secondary">
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 text-sentiment-bull">•</span>
+              <span>Entry setup and thesis</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 text-sentiment-bull">•</span>
+              <span>Risk management decisions</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 text-sentiment-bull">•</span>
+              <span>Emotions and mental state</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="mt-0.5 text-sentiment-bull">•</span>
+              <span>Post-trade lessons learned</span>
+            </li>
+          </ul>
+        </div>
+
+        {/* CTA */}
+        {onNewEntry && (
+          <button
+            type="button"
+            onClick={onNewEntry}
+            className="mt-6 rounded-full border border-sentiment-bull-border bg-sentiment-bull-bg px-5 py-2.5 text-sm font-medium text-sentiment-bull transition hover:bg-sentiment-bull-bg/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sentiment-bull"
+            data-testid="journal-empty-cta"
+          >
+            Create Your First Entry
+          </button>
+        )}
       </div>
     );
   }
