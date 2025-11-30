@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mergeBotScores } from "../model_clients/grok_client.js";
+import { mergeBotScores } from "@/ai/backend/clients/grok_client.js";
 
 describe("mergeBotScores", () => {
   it("returns heuristic score when model is missing", () => {

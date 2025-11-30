@@ -1,8 +1,8 @@
 import { readFile } from "fs/promises";
 import path from "path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AIOrchestrator, SANITY_WARNING, mergeJournalFields, validateBulletResponse } from "../orchestrator.js";
-import { withExponentialBackoff } from "../retry.js";
+import { AIOrchestrator, SANITY_WARNING, mergeJournalFields, validateBulletResponse } from "@/ai/backend/orchestrator.js";
+import { withExponentialBackoff } from "@/ai/backend/retry.js";
 import type { MarketPayload, SocialAnalysis } from "@/types/ai";
 
 vi.mock("@/lib/ai/heuristics", () => ({

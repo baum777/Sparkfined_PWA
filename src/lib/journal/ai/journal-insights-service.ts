@@ -14,7 +14,7 @@ import type {
 import { buildJournalInsightsPrompt, type JournalInsightPromptInput } from './journal-insights-prompt'
 
 // Re-use existing AI client infrastructure
-import { OpenAIClient } from '../../../../ai/model_clients/openai_client'
+import { OpenAIClient } from '@/ai/backend/clients/openai_client'
 
 const JOURNAL_INSIGHTS_PROMPT_VERSION = 'journal-insights-v1.0'
 const DEFAULT_MAX_ENTRIES = 20

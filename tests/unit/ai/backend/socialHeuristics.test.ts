@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import * as heuristics from "@/lib/ai/heuristics";
-import { scoreBotLikelihood } from "../socialHeuristics.js";
+import { scoreBotLikelihood } from "@/ai/backend/socialHeuristics.js";
 
 describe("scoreBotLikelihood", () => {
   it("builds payload with safe defaults for missing author data", () => {

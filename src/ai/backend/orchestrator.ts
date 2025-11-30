@@ -1,7 +1,7 @@
 import { appendFile, mkdir } from "fs/promises";
 import path from "path";
-import { OpenAIClient } from "./model_clients/openai_client.js";
-import { GrokClient } from "./model_clients/grok_client.js";
+import { OpenAIClient } from "./clients/openai_client.js";
+import { GrokClient } from "./clients/grok_client.js";
 import type {
   MarketPayload,
   OrchestratorResult,
