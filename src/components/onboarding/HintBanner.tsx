@@ -11,7 +11,6 @@
  */
 
 import { Lightbulb, X } from '@/lib/icons';
-import { useOnboardingStore } from '@/store/onboardingStore';
 import { useEffect, useState } from 'react';
 
 interface HintBannerProps {
@@ -31,12 +30,15 @@ export function HintBanner({
   onAction,
   delayMs = 5000,
 }: HintBannerProps) {
-  const { isHintDismissed, dismissHint } = useOnboardingStore();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     // Check if hint was already dismissed
-    if (isHintDismissed(hintId)) {
+    if (window.localStorage.getItem(`hint:${hintId}`)) {
       return;
     }
 
@@ -46,11 +48,13 @@ export function HintBanner({
     }, delayMs);
 
     return () => clearTimeout(timer);
-  }, [hintId, isHintDismissed, delayMs]);
+  }, [hintId, delayMs]);
 
   const handleDismiss = () => {
     setIsVisible(false);
-    dismissHint(hintId);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(`hint:${hintId}`, 'dismissed');
+    }
   };
 
   if (!isVisible) return null;

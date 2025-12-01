@@ -1,166 +1,146 @@
-/**
- * Onboarding Store - Manages onboarding state and progress
- * 
- * Tracks:
- * - User persona (beginner, intermediate, advanced)
- * - Tour completion status
- * - Feature discovery progress
- * - Dismissed hints
- * - Overall onboarding completion
- */
-
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-export type UserLevel = 'beginner' | 'intermediate' | 'advanced' | null;
+const ONBOARDING_STORAGE_KEY = 'onboarding_completed';
+const ONBOARDING_PROGRESS_KEY = 'onboarding_progress_steps';
+const ONBOARDING_STEP_INDEX_KEY = 'onboarding_current_step';
+export const ONBOARDING_STEP_IDS = ['journal', 'watchlist', 'alerts'] as const;
+const TOTAL_WIZARD_STEPS = ONBOARDING_STEP_IDS.length;
 
-interface OnboardingState {
-  // User Persona
-  userLevel: UserLevel;
-  setUserLevel: (level: UserLevel) => void;
+const isWindowAvailable = (): boolean => typeof window !== 'undefined';
 
-  // Tour Progress
-  tourCompleted: boolean;
-  currentTourStep: number;
-  completeTour: () => void;
-  setTourStep: (step: number) => void;
-  resetTour: () => void;
+const readCompletionFlag = (): boolean => {
+  if (!isWindowAvailable()) {
+    return false;
+  }
 
-  // Feature Discovery (checklist items)
-  discoveredFeatures: string[];
-  discoverFeature: (feature: string) => void;
-  
-  // Hints & Tips (dismissed state)
-  dismissedHints: string[];
-  dismissHint: (hintId: string) => void;
-  isHintDismissed: (hintId: string) => boolean;
+  return window.localStorage.getItem(ONBOARDING_STORAGE_KEY) === 'true';
+};
 
-  // Progress Tracking
-  progress: number;
-  calculateProgress: () => void;
-  
-  // First visit tracking
-  firstVisit: boolean;
-  markVisited: () => void;
-  
-  // Reset all onboarding
+const persistCompletionFlag = (isComplete: boolean) => {
+  if (!isWindowAvailable()) {
+    return;
+  }
+
+  if (isComplete) {
+    window.localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
+  } else {
+    window.localStorage.removeItem(ONBOARDING_STORAGE_KEY);
+  }
+};
+
+export interface OnboardingState {
+  hasCompletedOnboarding: boolean;
+  currentStep: number;
+  completedSteps: Set<string>;
+  skipOnboarding: () => void;
+  completeStep: (stepId: string) => void;
   resetOnboarding: () => void;
 }
 
-const CHECKLIST_ITEMS = [
-  // Getting Started (3 items)
-  'tour-completed',
-  'theme-customized',
-  'watchlist-created',
-  
-  // First Steps (4 items)
-  'token-analyzed',
-  'chart-created',
-  'alert-added',
-  'journal-entry-written',
-  
-  // Advanced Features (3 items)
-  'replay-mode-used',
-  'ai-analysis-used',
-  'alert-backtested',
-];
+const readCompletedSteps = (): Set<string> => {
+  if (!isWindowAvailable()) {
+    return new Set<string>();
+  }
 
-export const useOnboardingStore = create<OnboardingState>()(
-  persist(
-    (set, get) => ({
-      // Initial State
-      userLevel: null as UserLevel,
-      tourCompleted: false,
-      currentTourStep: 0,
-      discoveredFeatures: [] as string[],
-      dismissedHints: [] as string[],
-      progress: 0,
-      firstVisit: true,
-
-      // Actions
-      setUserLevel: (level) => {
-        set({ userLevel: level });
-        get().calculateProgress();
-      },
-
-      completeTour: () => {
-        set({ tourCompleted: true });
-        get().discoverFeature('tour-completed');
-      },
-
-      setTourStep: (step) => set({ currentTourStep: step }),
-
-      resetTour: () => set({ tourCompleted: false, currentTourStep: 0 }),
-
-      discoverFeature: (feature) => {
-        const { discoveredFeatures } = get();
-        if (!discoveredFeatures.includes(feature)) {
-          set({ 
-            discoveredFeatures: [...discoveredFeatures, feature],
-          });
-          get().calculateProgress();
-        }
-      },
-
-      dismissHint: (hintId) => {
-        const { dismissedHints } = get();
-        if (!dismissedHints.includes(hintId)) {
-          set({ dismissedHints: [...dismissedHints, hintId] });
-        }
-      },
-
-      isHintDismissed: (hintId) => {
-        return get().dismissedHints.includes(hintId);
-      },
-
-      calculateProgress: () => {
-        const { discoveredFeatures } = get();
-        const totalItems = CHECKLIST_ITEMS.length;
-        const completedItems = discoveredFeatures.filter(f => 
-          CHECKLIST_ITEMS.includes(f)
-        ).length;
-        
-        const progress = Math.round((completedItems / totalItems) * 100);
-        set({ progress });
-      },
-
-      markVisited: () => set({ firstVisit: false }),
-
-      resetOnboarding: () => {
-        set({
-          userLevel: null,
-          tourCompleted: false,
-          currentTourStep: 0,
-          discoveredFeatures: [],
-          dismissedHints: [],
-          progress: 0,
-          firstVisit: true,
-        });
-      },
-    }),
-    {
-      name: 'sparkfined-onboarding',
-      version: 1,
+  try {
+    const raw = window.localStorage.getItem(ONBOARDING_PROGRESS_KEY);
+    if (!raw) {
+      return new Set<string>();
     }
-  )
-);
 
-// Checklist structure for UI
-export const ONBOARDING_CHECKLIST = {
-  'Getting Started': [
-    { id: 'tour-completed', label: 'Complete product tour' },
-    { id: 'theme-customized', label: 'Set display theme' },
-    { id: 'watchlist-created', label: 'Create watchlist' },
-  ],
-  'First Steps': [
-    { id: 'token-analyzed', label: 'Analyze your first token' },
-    { id: 'chart-created', label: 'Create your first chart' },
-    { id: 'alert-added', label: 'Add your first alert' },
-    { id: 'journal-entry-written', label: 'Write a journal entry' },
-  ],
-  'Advanced Features': [
-    { id: 'replay-mode-used', label: 'Try Chart Replay mode' },
-    { id: 'ai-analysis-used', label: 'Use AI-powered analysis' },
-    { id: 'alert-backtested', label: 'Backtest an alert rule' },
-  ],
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return new Set<string>();
+    }
+
+    const validSteps = parsed.filter((value): value is string =>
+      typeof value === 'string' && ONBOARDING_STEP_IDS.includes(value as (typeof ONBOARDING_STEP_IDS)[number])
+    );
+
+    return new Set(validSteps);
+  } catch {
+    return new Set<string>();
+  }
 };
+
+const readCurrentStepIndex = (): number => {
+  if (!isWindowAvailable()) {
+    return 0;
+  }
+
+  const raw = window.localStorage.getItem(ONBOARDING_STEP_INDEX_KEY);
+  const parsed = Number(raw);
+
+  if (!Number.isFinite(parsed)) {
+    return 0;
+  }
+
+  return Math.min(Math.max(0, parsed), TOTAL_WIZARD_STEPS - 1);
+};
+
+const persistProgress = (steps: Set<string>, currentStep: number) => {
+  if (!isWindowAvailable()) {
+    return;
+  }
+
+  window.localStorage.setItem(ONBOARDING_PROGRESS_KEY, JSON.stringify(Array.from(steps)));
+  window.localStorage.setItem(ONBOARDING_STEP_INDEX_KEY, currentStep.toString());
+};
+
+const clearProgress = () => {
+  if (!isWindowAvailable()) {
+    return;
+  }
+
+  window.localStorage.removeItem(ONBOARDING_PROGRESS_KEY);
+  window.localStorage.removeItem(ONBOARDING_STEP_INDEX_KEY);
+};
+
+const getDefaultState = (): Pick<
+  OnboardingState,
+  'hasCompletedOnboarding' | 'currentStep' | 'completedSteps'
+> => ({
+  hasCompletedOnboarding: readCompletionFlag(),
+  currentStep: readCurrentStepIndex(),
+  completedSteps: readCompletedSteps(),
+});
+
+export const useOnboardingStore = create<OnboardingState>((set, get) => ({
+  ...getDefaultState(),
+
+  skipOnboarding: () => {
+    persistCompletionFlag(true);
+    set({ hasCompletedOnboarding: true });
+  },
+
+  completeStep: (stepId) => {
+    const { completedSteps, currentStep, hasCompletedOnboarding } = get();
+    const alreadyCompleted = completedSteps.has(stepId);
+    const nextCompletedSteps = new Set(completedSteps);
+    nextCompletedSteps.add(stepId);
+
+    const hasCompleted = nextCompletedSteps.size >= TOTAL_WIZARD_STEPS;
+    if (hasCompleted) {
+      persistCompletionFlag(true);
+    }
+
+    const nextStepIndex =
+      hasCompleted || alreadyCompleted
+        ? Math.min(TOTAL_WIZARD_STEPS - 1, currentStep)
+        : Math.min(TOTAL_WIZARD_STEPS - 1, currentStep + 1);
+
+    set({
+      completedSteps: nextCompletedSteps,
+      hasCompletedOnboarding: hasCompleted || hasCompletedOnboarding,
+      currentStep: nextStepIndex,
+    });
+
+    persistProgress(nextCompletedSteps, nextStepIndex);
+  },
+
+  resetOnboarding: () => {
+    persistCompletionFlag(false);
+    clearProgress();
+    set(getDefaultState());
+  },
+}));

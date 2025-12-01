@@ -10,12 +10,24 @@
 
 import { useState } from 'react';
 import { CheckCircle2, Circle, ChevronUp, ChevronDown, X } from '@/lib/icons';
-import { useOnboardingStore, ONBOARDING_CHECKLIST } from '@/store/onboardingStore';
+import { useOnboardingStore } from '@/store/onboardingStore';
+
+const ONBOARDING_CHECKLIST = {
+  'Quick Wins': [
+    { id: 'journal', label: 'Create your first journal entry' },
+    { id: 'watchlist', label: 'Add symbols to your watchlist' },
+    { id: 'alerts', label: 'Arm an automated alert' },
+  ],
+} as const;
+
+const TOTAL_ITEMS = Object.values(ONBOARDING_CHECKLIST).reduce((count, items) => count + items.length, 0);
 
 export function OnboardingChecklist() {
-  const { progress, discoveredFeatures, resetOnboarding } = useOnboardingStore();
+  const completedSteps = useOnboardingStore((state) => state.completedSteps);
+  const resetOnboarding = useOnboardingStore((state) => state.resetOnboarding);
   const [isOpen, setIsOpen] = useState(true);
   const [isDismissed, setIsDismissed] = useState(false);
+  const progress = TOTAL_ITEMS ? Math.round((completedSteps.size / TOTAL_ITEMS) * 100) : 0;
 
   // Don't show if dismissed or completed
   if (isDismissed || progress === 100) {
@@ -90,9 +102,7 @@ export function OnboardingChecklist() {
       {isOpen && (
         <div id="checklist-content" className="px-4 pb-4 max-h-96 overflow-y-auto">
           {Object.entries(ONBOARDING_CHECKLIST).map(([category, items]) => {
-            const completedCount = items.filter(item => 
-              discoveredFeatures.includes(item.id)
-            ).length;
+            const completedCount = items.filter((item) => completedSteps.has(item.id)).length;
             const isComplete = completedCount === items.length;
 
             return (
@@ -115,7 +125,7 @@ export function OnboardingChecklist() {
                 {/* Items */}
                 <ul className="space-y-1.5 ml-6">
                   {items.map((item) => {
-                    const isCompleted = discoveredFeatures.includes(item.id);
+                    const isCompleted = completedSteps.has(item.id);
                     
                     return (
                       <li 

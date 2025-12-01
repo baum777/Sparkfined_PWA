@@ -8,7 +8,8 @@
  */
 
 import type { DriveStep, Config } from 'driver.js';
-import { UserLevel } from '@/store/onboardingStore';
+
+type UserLevel = 'beginner' | 'intermediate' | 'advanced' | null;
 
 type DriverInstance = ReturnType<typeof import('driver.js').driver>;
 

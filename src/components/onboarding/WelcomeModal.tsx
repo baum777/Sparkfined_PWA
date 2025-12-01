@@ -10,8 +10,9 @@
 import { useRef, useId, useState } from 'react';
 import type { MouseEvent } from 'react';
 import { Zap, GraduationCap, TrendingUp, Rocket, X } from '@/lib/icons';
-import { useOnboardingStore, UserLevel } from '@/store/onboardingStore';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+
+type UserLevel = 'beginner' | 'intermediate' | 'advanced' | null;
 
 interface WelcomeModalProps {
   onClose: () => void;
@@ -20,7 +21,6 @@ interface WelcomeModalProps {
 
 export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) {
   const [selectedLevel, setSelectedLevel] = useState<UserLevel>(null);
-  const { setUserLevel, markVisited } = useOnboardingStore();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const headingId = useId();
   const modalRef = useFocusTrap<HTMLDivElement>({
@@ -37,14 +37,11 @@ export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) 
 
   const handleContinue = () => {
     if (selectedLevel) {
-      setUserLevel(selectedLevel);
-      markVisited();
       onPersonaSelected(selectedLevel);
     }
   };
 
   const handleSkip = () => {
-    markVisited();
     onClose();
   };
 
