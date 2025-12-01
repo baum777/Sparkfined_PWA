@@ -23,6 +23,7 @@
     "test:ci": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:full": "pnpm typecheck && pnpm test && pnpm playwright test && pnpm run build",
     "check:size": "node scripts/check-bundle-size.mjs",
     "check-env": "node scripts/check-env.js"
   },

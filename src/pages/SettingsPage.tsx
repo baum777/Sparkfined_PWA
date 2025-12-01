@@ -5,6 +5,8 @@ import { useTelemetry } from "../state/telemetry";
 import { useAISettings } from "../state/ai";
 import { useAIContext } from "../state/aiContext";
 import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from "../lib/walletMonitor";
+import Button from "@/components/ui/Button";
+import { useOnboardingStore } from "@/store/onboardingStore";
 import { useTheme, type ThemeMode } from "@/lib/theme/useTheme";
 
 interface SettingsPageProps {
@@ -20,6 +22,7 @@ export default function SettingsPage({
   const { theme, setTheme } = useTheme();
   const { flags, setFlags, buffer, drain } = useTelemetry();
   const { ai, setAI } = useAISettings();
+  const resetOnboarding = useOnboardingStore((state) => state.resetOnboarding);
   const [busy, setBusy] = React.useState<string | null>(null);
   const [msg, setMsg] = React.useState<string | null>(null);
   const [pick, setPick] = React.useState<Record<NamespaceKey, boolean>>(() => {
@@ -120,6 +123,15 @@ export default function SettingsPage({
       </div>
       <div className="mt-4 text-xs text-zinc-500">
         Gespeichert unter <code>sparkfined.settings.v1</code>. Änderungen wirken sofort.
+      </div>
+      <div className="mt-4 flex justify-end">
+        <Button
+          variant="outline"
+          onClick={resetOnboarding}
+          data-testid="reset-onboarding"
+        >
+          Reset Onboarding
+        </Button>
       </div>
 
       {/* BLOCK 2: Wallet Monitoring */}
