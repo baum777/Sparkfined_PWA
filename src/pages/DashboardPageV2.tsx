@@ -5,6 +5,7 @@ import DashboardQuickActions from '@/components/dashboard/DashboardQuickActions'
 import DashboardMainGrid from '@/components/dashboard/DashboardMainGrid';
 import InsightTeaser from '@/components/dashboard/InsightTeaser';
 import JournalSnapshot from '@/components/dashboard/JournalSnapshot';
+import AlertsSnapshot from '@/components/dashboard/AlertsSnapshot';
 import ErrorBanner from '@/components/ui/ErrorBanner';
 import { useJournalStore } from '@/store/journalStore';
 import { useAlertsStore } from '@/store/alertsStore';
@@ -76,6 +77,7 @@ export default function DashboardPageV2() {
           <DashboardMainGrid
             primary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
             secondary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
+            tertiary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
           />
         </div>
       );
@@ -107,6 +109,7 @@ export default function DashboardPageV2() {
               <p>Add a new journal entry to see recent trades and notes.</p>
             </div>
           }
+          tertiary={<AlertsSnapshot />}
         />
       );
     }
@@ -115,6 +118,7 @@ export default function DashboardPageV2() {
       <DashboardMainGrid
         primary={<InsightTeaser {...dummyInsight} />}
         secondary={<JournalSnapshot entries={recentJournalEntries} />}
+        tertiary={<AlertsSnapshot />}
       />
     );
   };
