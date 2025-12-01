@@ -247,6 +247,21 @@
     transition-delay: 0.8s;
   }
 
+  .motion-delay-900 {
+    animation-delay: 0.9s;
+    transition-delay: 0.9s;
+  }
+
+  .motion-delay-1000 {
+    animation-delay: 1s;
+    transition-delay: 1s;
+  }
+
+  .motion-delay-1200 {
+    animation-delay: 1.2s;
+    transition-delay: 1.2s;
+  }
+
   .motion-duration-fast {
     animation-duration: var(--duration-short) !important;
     transition-duration: var(--duration-short) !important;

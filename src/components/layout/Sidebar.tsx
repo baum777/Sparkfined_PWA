@@ -21,6 +21,7 @@ import {
   ChevronRight,
   type LucideIcon,
 } from '@/lib/icons';
+import { getItem, setItem } from '@/lib/safeStorage';
 
 interface NavItem {
   path: string;
@@ -40,8 +41,15 @@ const secondaryNavItems: NavItem[] = [
   { path: '/settings-v2', label: 'Settings', Icon: Settings },
 ];
 
+const STORAGE_KEY = 'sparkfined.sidebar.collapsed';
+
 export default function Sidebar() {
-  const [isCollapsed, setIsCollapsed] = React.useState(true);
+  const [isCollapsed, setIsCollapsed] = React.useState<boolean>(() => {
+    const stored = getItem(STORAGE_KEY);
+    if (stored === 'false') return false;
+    if (stored === 'true') return true;
+    return true;
+  });
 
   React.useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -49,6 +57,10 @@ export default function Sidebar() {
     const width = isCollapsed ? '5rem' : '16rem';
     root.style.setProperty('--sidebar-width', width);
     root.dataset.sidebar = isCollapsed ? 'collapsed' : 'expanded';
+  }, [isCollapsed]);
+
+  React.useEffect(() => {
+    setItem(STORAGE_KEY, isCollapsed ? 'true' : 'false');
   }, [isCollapsed]);
 
   React.useEffect(() => {
