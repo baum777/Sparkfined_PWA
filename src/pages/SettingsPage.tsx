@@ -6,6 +6,8 @@ import { useAISettings } from "../state/ai";
 import { useAIContext } from "../state/aiContext";
 import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from "../lib/walletMonitor";
 import { useTheme, type ThemeMode } from "@/lib/theme/useTheme";
+import Button from "@/components/ui/Button";
+import { useOnboardingStore } from "@/store/onboardingStore";
 
 interface SettingsPageProps {
   showHeading?: boolean;
@@ -30,6 +32,7 @@ export default function SettingsPage({
     return base;
   });
   const fileRef = React.useRef<HTMLInputElement | null>(null);
+  const resetOnboarding = useOnboardingStore((state) => state.resetOnboarding);
 
   // BLOCK 2: Wallet monitoring state
   const [walletAddress, setWalletAddress] = React.useState(() => {
@@ -92,6 +95,11 @@ export default function SettingsPage({
       {showHeading ? (
         <h1 className="mb-4 text-lg font-semibold text-zinc-100 md:text-xl">Einstellungen</h1>
       ) : null}
+      <div className="mb-4">
+        <Button variant="outline" onClick={resetOnboarding} data-testid="reset-onboarding">
+          Reset Onboarding
+        </Button>
+      </div>
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
         <Row label="Theme">
           <Select value={theme} onChange={(e)=>setTheme(e.target.value as ThemeMode)}>
