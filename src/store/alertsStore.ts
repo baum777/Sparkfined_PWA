@@ -1,20 +1,22 @@
 import { create } from 'zustand';
 import type { SolanaMemeTrendEvent, TrendCallToAction, TrendHypeLevel, TrendSentimentLabel } from '@/types/events';
 
-export type AlertType = 'price' | 'volume' | 'volatility' | 'trend';
-export type AlertStatus = 'armed' | 'triggered' | 'snoozed';
+export type AlertType = 'price-above' | 'price-below';
+export type AlertStatus = 'armed' | 'triggered' | 'paused';
 export type AlertOrigin = 'manual' | 'grok-trend';
 
 export type Alert = {
   id: string;
   symbol: string;
-  condition: string;
   type: AlertType;
-  status: AlertStatus;
+  condition: string;
+  threshold: number;
   timeframe: string;
-  createdAt?: string;
-  meta?: Record<string, unknown>;
+  status: AlertStatus;
+  createdAt: string;
+  updatedAt: string;
   origin?: AlertOrigin;
+  meta?: Record<string, unknown>;
   summary?: string;
   sourceUrl?: string;
   sentimentLabel?: TrendSentimentLabel;
@@ -23,85 +25,105 @@ export type Alert = {
   callToAction?: TrendCallToAction;
 };
 
+export type CreateAlertInput = {
+  symbol: string;
+  type: AlertType;
+  condition: string;
+  threshold: number;
+  timeframe: string;
+};
+
 interface AlertsState {
   alerts: Alert[];
   setAlerts: (alerts: Alert[]) => void;
   pushAlert: (alert: Alert) => void;
+  createAlert: (input: CreateAlertInput) => Alert;
+  updateAlert: (id: string, updates: Partial<Omit<Alert, 'id'>>) => void;
+  deleteAlert: (id: string) => void;
   processTrendEvent?: (evt: SolanaMemeTrendEvent) => void;
   createDraftFromChart: (input: { address: string; symbol: string; price: number; time: number; timeframe: string }) => Alert;
 }
 
-const INITIAL_ALERTS: Alert[] = [
-  {
-    id: 'btc-breakout',
-    symbol: 'BTCUSDT',
-    condition: 'Price closes above 42,500 with RSI > 60',
-    type: 'price',
-    status: 'armed',
-    timeframe: '4H',
-  },
-  {
-    id: 'eth-volume-surge',
-    symbol: 'ETHUSDT',
-    condition: 'Volume spikes > 160% of 20-session average',
-    type: 'volume',
-    status: 'triggered',
-    timeframe: '1H',
-  },
-  {
-    id: 'sol-volatility-squeeze',
-    symbol: 'SOLUSDT',
-    condition: 'Volatility compression breaks with > 4% range expansion',
-    type: 'volatility',
-    status: 'snoozed',
-    timeframe: '1D',
-  },
-  {
-    id: 'op-reclaim',
-    symbol: 'OPUSDT',
-    condition: 'Price reclaims 200 EMA and holds for 2 closes',
-    type: 'price',
-    status: 'armed',
-    timeframe: '4H',
-  },
-  {
-    id: 'arb-volume-imabalance',
-    symbol: 'ARBUSDT',
-    condition: 'Buy volume > sell volume by 30% on session open',
-    type: 'volume',
-    status: 'snoozed',
-    timeframe: '30M',
-  },
-  {
-    id: 'avax-volatility-break',
-    symbol: 'AVAXUSDT',
-    condition: 'ATR(14) expands above 2.8 with +3% move in hour',
-    type: 'volatility',
-    status: 'triggered',
-    timeframe: '1H',
-  },
-];
+const ALERT_LIMIT = 50;
+
+const INITIAL_ALERTS: Alert[] = buildInitialAlerts();
 
 export const useAlertsStore = create<AlertsState>((set) => ({
   alerts: INITIAL_ALERTS,
   setAlerts: (alerts) => set({ alerts }),
   pushAlert: (alert) =>
     set((state) => ({
-      alerts: dedupeAlerts([alert, ...state.alerts]).slice(0, 50),
+      alerts: dedupeAlerts([alert, ...state.alerts]).slice(0, ALERT_LIMIT),
+    })),
+  createAlert: (input) => {
+    const now = new Date().toISOString();
+    const normalizedSymbol = input.symbol.trim().toUpperCase();
+    const normalizedCondition = input.condition.trim();
+    const alert: Alert = {
+      id: generateAlertId(),
+      symbol: normalizedSymbol,
+      type: input.type,
+      condition: normalizedCondition,
+      threshold: input.threshold,
+      timeframe: input.timeframe,
+      status: 'armed',
+      createdAt: now,
+      updatedAt: now,
+      origin: 'manual',
+    };
+
+    set((state) => ({
+      alerts: dedupeAlerts([alert, ...state.alerts]).slice(0, ALERT_LIMIT),
+    }));
+
+    return alert;
+  },
+  updateAlert: (id, updates) =>
+    set((state) => {
+      const index = state.alerts.findIndex((alert) => alert.id === id);
+      if (index === -1) {
+        return { alerts: state.alerts };
+      }
+
+      const now = new Date().toISOString();
+      const sanitizedUpdates: Partial<Omit<Alert, 'id'>> = { ...updates };
+
+      if (typeof sanitizedUpdates.symbol === 'string') {
+        sanitizedUpdates.symbol = sanitizedUpdates.symbol.trim().toUpperCase();
+      }
+      if (typeof sanitizedUpdates.condition === 'string') {
+        sanitizedUpdates.condition = sanitizedUpdates.condition.trim();
+      }
+      if (typeof sanitizedUpdates.timeframe === 'string') {
+        sanitizedUpdates.timeframe = sanitizedUpdates.timeframe.trim();
+      }
+
+      const nextAlerts = state.alerts.map((alert) =>
+        alert.id === id ? { ...alert, ...sanitizedUpdates, updatedAt: now } : alert,
+      );
+
+      return { alerts: nextAlerts };
+    }),
+  deleteAlert: (id) =>
+    set((state) => ({
+      alerts: state.alerts.filter((alert) => alert.id !== id),
     })),
   createDraftFromChart: (input) => {
+    const timestamp = new Date(input.time).toISOString();
     const alert: Alert = {
       id: `chart-${input.symbol}-${input.time}`,
-      symbol: input.symbol.toUpperCase(),
+      symbol: input.symbol.trim().toUpperCase(),
       condition: `Create alert @ ${input.price} on ${new Date(input.time).toUTCString()}`,
-      type: 'price',
+      type: 'price-above',
       status: 'armed',
       timeframe: input.timeframe,
-      createdAt: new Date(input.time).toISOString(),
+      threshold: input.price,
+      createdAt: timestamp,
+      updatedAt: timestamp,
       origin: 'manual',
-    }
-    set((state) => ({ alerts: dedupeAlerts([alert, ...state.alerts]).slice(0, 50) }))
-    return alert
+    };
+    set((state) => ({ alerts: dedupeAlerts([alert, ...state.alerts]).slice(0, ALERT_LIMIT) }));
+    return alert;
   },
   processTrendEvent: (evt) =>
     set((state) => {
@@ -109,18 +131,99 @@ export const useAlertsStore = create<AlertsState>((set) => ({
         return dedupeAlerts([alert, ...acc]);
       }, state.alerts);
 
-      return { alerts: nextAlerts.slice(0, 50) };
+      return { alerts: nextAlerts.slice(0, ALERT_LIMIT) };
     }),
 }));
 
+function buildInitialAlerts(): Alert[] {
+  const now = Date.now();
+  const createTimestamp = (offsetHours: number) => new Date(now - offsetHours * 60 * 60 * 1000).toISOString();
+
+  return [
+    {
+      id: 'btc-breakout',
+      symbol: 'BTCUSDT',
+      condition: 'Price closes above 42,500 with RSI > 60',
+      type: 'price-above',
+      status: 'armed',
+      timeframe: '4h',
+      threshold: 42500,
+      createdAt: createTimestamp(12),
+      updatedAt: createTimestamp(6),
+    },
+    {
+      id: 'eth-liquidity-run',
+      symbol: 'ETHUSDT',
+      condition: 'Watch for failure to reclaim $2,350 after sweep',
+      type: 'price-below',
+      status: 'triggered',
+      timeframe: '1h',
+      threshold: 2350,
+      createdAt: createTimestamp(24),
+      updatedAt: createTimestamp(2),
+    },
+    {
+      id: 'sol-squeeze',
+      symbol: 'SOLUSDT',
+      condition: 'Breaks above prior value area and holds for 2 closes',
+      type: 'price-above',
+      status: 'paused',
+      timeframe: '1d',
+      threshold: 190,
+      createdAt: createTimestamp(30),
+      updatedAt: createTimestamp(18),
+    },
+    {
+      id: 'op-200ema-reclaim',
+      symbol: 'OPUSDT',
+      condition: '200 EMA reclaim with 4h close confirmation',
+      type: 'price-above',
+      status: 'armed',
+      timeframe: '4h',
+      threshold: 3.15,
+      createdAt: createTimestamp(40),
+      updatedAt: createTimestamp(12),
+    },
+    {
+      id: 'arb-bid-imbalance',
+      symbol: 'ARBUSDT',
+      condition: 'Alert when price loses VWAP after early session imbalance',
+      type: 'price-below',
+      status: 'paused',
+      timeframe: '30m',
+      threshold: 1.63,
+      createdAt: createTimestamp(55),
+      updatedAt: createTimestamp(20),
+    },
+    {
+      id: 'avax-volatility-break',
+      symbol: 'AVAXUSDT',
+      condition: 'Momentum continuation above 42.80 with expanding ATR',
+      type: 'price-above',
+      status: 'triggered',
+      timeframe: '1h',
+      threshold: 42.8,
+      createdAt: createTimestamp(65),
+      updatedAt: createTimestamp(4),
+    },
+  ];
+}
+
 function buildTrendAlerts(evt: SolanaMemeTrendEvent): Alert[] {
   const alerts: Alert[] = [];
+  const timestamp = evt.receivedAt ?? new Date().toISOString();
+  const threshold = typeof evt.market?.priceUsd === 'number' ? evt.market.priceUsd : 0;
+  const direction: AlertType =
+    typeof evt.market?.priceChange24hPct === 'number' && evt.market.priceChange24hPct < 0 ? 'price-below' : 'price-above';
+
   const base: Partial<Alert> = {
     symbol: evt.token.symbol.toUpperCase(),
-    type: 'trend',
+    type: direction,
     status: 'triggered',
-    timeframe: evt.trading?.timeframe ?? '1H',
-    createdAt: evt.receivedAt,
+    timeframe: evt.trading?.timeframe ?? '1h',
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    threshold,
     origin: 'grok-trend',
     sourceUrl: evt.source.tweetUrl,
     sentimentLabel: evt.sentiment?.label,
@@ -176,5 +279,13 @@ function dedupeAlerts(alerts: Alert[]): Alert[] {
   });
 
   return result;
+}
+
+function generateAlertId() {
+  if (typeof globalThis.crypto?.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID();
+  }
+
+  return `alert-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 

@@ -1,17 +1,24 @@
 import React from 'react';
+import Button from '@/components/ui/Button';
+import AlertEditDialog from '@/components/alerts/AlertEditDialog';
+import { useAlertsStore } from '@/store/alertsStore';
 import type { Alert, AlertStatus } from '@/store/alertsStore';
 
 interface AlertsDetailPanelProps {
   alert?: Alert;
+  onAlertDeleted?: (id: string) => void;
 }
 
 const STATUS_STYLES: Record<AlertStatus, string> = {
   armed: 'bg-status-armed-bg text-status-armed-text',
   triggered: 'bg-status-triggered-bg text-status-triggered-text',
-  snoozed: 'bg-status-snoozed-bg text-status-snoozed-text',
+  paused: 'bg-status-snoozed-bg text-status-snoozed-text',
 };
 
-export default function AlertsDetailPanel({ alert }: AlertsDetailPanelProps) {
+export default function AlertsDetailPanel({ alert, onAlertDeleted }: AlertsDetailPanelProps) {
+  const deleteAlert = useAlertsStore((state) => state.deleteAlert);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
   if (!alert) {
     return (
       <div
@@ -25,19 +32,50 @@ export default function AlertsDetailPanel({ alert }: AlertsDetailPanelProps) {
 
   const statusClass = STATUS_STYLES[alert.status];
 
+  const handleDelete = () => {
+    if (!alert) {
+      return;
+    }
+    const confirmed = window.confirm('Are you sure you want to delete this alert? This action cannot be undone.');
+    if (!confirmed) {
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      deleteAlert(alert.id);
+      onAlertDeleted?.(alert.id);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <section
       className="space-y-6 rounded-2xl border border-border-moderate bg-surface p-5 text-sm text-text-secondary"
       data-testid="alerts-detail-panel"
     >
-      <header className="space-y-1">
-        <p className="text-xs uppercase tracking-wide text-text-tertiary">
-          {alert.symbol} &middot; {alert.timeframe}
-        </p>
-        <h2 className="text-2xl font-semibold text-text-primary" data-testid="alerts-detail-condition">
-          {alert.condition}
-        </h2>
-        {alert.summary ? <p className="text-sm text-text-secondary">{alert.summary}</p> : null}
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-1">
+          <p className="text-xs uppercase tracking-wide text-text-tertiary">
+            {alert.symbol} &middot; {alert.timeframe}
+          </p>
+          <h2 className="text-2xl font-semibold text-text-primary" data-testid="alerts-detail-condition">
+            {alert.condition}
+          </h2>
+          {alert.summary ? <p className="text-sm text-text-secondary">{alert.summary}</p> : null}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <AlertEditDialog alert={alert} />
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            data-testid="alert-delete-button"
+          >
+            {isDeleting ? 'Deleting…' : 'Delete'}
+          </Button>
+        </div>
       </header>
 
       <div className="space-y-3">
@@ -93,6 +131,9 @@ export default function AlertsDetailPanel({ alert }: AlertsDetailPanelProps) {
 }
 
 function formatLabel(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
+  return value
+    .split('-')
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(' ');
 }
 
