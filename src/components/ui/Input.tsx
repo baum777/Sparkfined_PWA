@@ -10,6 +10,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   rightIcon?: React.ReactNode
   mono?: boolean
   errorId?: string
+  errorTestId?: string
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
@@ -22,6 +23,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
     rightIcon,
     mono = false,
     errorId,
+  errorTestId,
     className,
     id,
     ...props
@@ -69,7 +71,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
       </div>
 
       {error ? (
-        <p id={computedErrorId} className="mt-1 flex items-center gap-1 text-xs text-danger" role="alert">
+        <p
+          id={computedErrorId}
+          className="mt-1 flex items-center gap-1 text-xs text-danger"
+          role="alert"
+          data-testid={errorTestId}
+        >
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-danger" aria-hidden />
           {error}
         </p>

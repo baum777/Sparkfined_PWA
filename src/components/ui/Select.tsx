@@ -12,6 +12,7 @@ interface SelectProps {
   placeholder?: string;
   disabled?: boolean;
   error?: string;
+  triggerProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
 }
 
 import { ChevronDown, ChevronUp, Check } from '@/lib/icons';
@@ -23,11 +24,13 @@ export default function Select({
   placeholder = 'Select…',
   disabled = false,
   error,
+  triggerProps,
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const selectedOption = options.find(opt => opt.value === value);
+  const { className: triggerClassName, ...restTriggerProps } = triggerProps ?? {};
   
   // Close on outside click
   useEffect(() => {
@@ -61,12 +64,13 @@ export default function Select({
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full flex items-center justify-between px-3 py-2.5 text-sm h-11 bg-zinc-900 border transition-all ${
           isOpen ? 'border-emerald-500 ring-1 ring-emerald-500/50' : error ? 'border-rose-500' : 'border-zinc-700'
-        } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}
+        } ${disabled ? 'opacity-60 cursor-not-allowed' : ''} ${triggerClassName ?? ''}`}
         style={{
           borderRadius: 'var(--radius-lg)',
         }}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
+        {...restTriggerProps}
       >
         <span className={selectedOption ? 'text-zinc-100' : 'text-zinc-500'}>
           {selectedOption?.label || placeholder}

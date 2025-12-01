@@ -7,8 +7,8 @@ import { AlertsHeaderActions } from '@/components/alerts/AlertsHeaderActions';
 import { useAlertsStore } from '@/store/alertsStore';
 import { useSearchParams } from 'react-router-dom';
 
-type StatusFilter = 'all' | 'armed' | 'triggered' | 'snoozed';
-type TypeFilter = 'all' | 'price' | 'volume' | 'volatility' | 'trend';
+type StatusFilter = 'all' | 'armed' | 'triggered' | 'paused';
+type TypeFilter = 'all' | 'price-above' | 'price-below';
 
 export default function AlertsPageV2() {
   const alerts = useAlertsStore((state) => state.alerts);
@@ -113,13 +113,16 @@ export default function AlertsPageV2() {
   );
 }
 
-const STATUS_FILTERS: StatusFilter[] = ['all', 'armed', 'triggered', 'snoozed'];
-const TYPE_FILTERS: TypeFilter[] = ['all', 'price', 'volume', 'volatility', 'trend'];
+const STATUS_FILTERS: StatusFilter[] = ['all', 'armed', 'triggered', 'paused'];
+const TYPE_FILTERS: TypeFilter[] = ['all', 'price-above', 'price-below'];
 
 function formatFilterLabel(value: string) {
   if (value === 'all') {
     return 'All';
   }
 
-  return value.charAt(0).toUpperCase() + value.slice(1);
+  return value
+    .split('-')
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(' ');
 }

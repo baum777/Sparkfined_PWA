@@ -8,7 +8,7 @@ interface AlertsDetailPanelProps {
 const STATUS_STYLES: Record<AlertStatus, string> = {
   armed: 'bg-status-armed-bg text-status-armed-text',
   triggered: 'bg-status-triggered-bg text-status-triggered-text',
-  snoozed: 'bg-status-snoozed-bg text-status-snoozed-text',
+  paused: 'bg-status-snoozed-bg text-status-snoozed-text',
 };
 
 export default function AlertsDetailPanel({ alert }: AlertsDetailPanelProps) {
@@ -93,6 +93,9 @@ export default function AlertsDetailPanel({ alert }: AlertsDetailPanelProps) {
 }
 
 function formatLabel(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
+  return value
+    .split('-')
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(' ');
 }
 
