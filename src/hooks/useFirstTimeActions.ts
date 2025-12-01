@@ -6,12 +6,8 @@
  * trackAction('chart-created', '🎉 Nice! Your first chart is ready.');
  */
 
-import { useOnboardingStore } from '@/store/onboardingStore';
-
 export function useFirstTimeActions() {
-  const { discoverFeature } = useOnboardingStore();
-
-  const trackAction = (key: string, message: string, featureId?: string) => {
+  const trackAction = (key: string, message: string, _featureId?: string) => {
     // Check if action was already tracked
     const storageKey = `first:${key}`;
     const alreadyTracked = localStorage.getItem(storageKey);
@@ -23,11 +19,6 @@ export function useFirstTimeActions() {
       // Show toast notification (you can integrate with your toast library)
       console.log('[First Time Action]:', message);
       
-      // Optional: Update checklist if featureId provided
-      if (featureId) {
-        discoverFeature(featureId);
-      }
-
       // Return true to indicate this was the first time
       return true;
     }
