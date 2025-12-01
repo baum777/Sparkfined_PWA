@@ -10,6 +10,10 @@ import {
 import { fetchAnalysisSnapshot, type AnalysisSnapshot } from "@/features/market/analysisData";
 import { useSearchParams } from "react-router-dom";
 import { AnalysisHeaderActions } from "@/components/analysis/AnalysisHeaderActions";
+import AnalysisOverviewStats, { type AnalysisOverviewStat } from "@/components/analysis/AnalysisOverviewStats";
+import StateView from "@/components/ui/StateView";
+import { Activity, ArrowDownRight, ArrowUpRight, Target, TrendingUp, Zap } from "@/lib/icons";
+import type { BiasLabel } from "@/types/ai";
 
 const tabs = [
   { id: "overview", label: "Overview" },
@@ -19,17 +23,14 @@ const tabs = [
 
 type AnalysisTabId = (typeof tabs)[number]["id"];
 
-const overviewInsight = {
-  bias: "Bullish",
-  confidence: 0.78,
-  timeFrame: "4H",
-  summary:
-    "Momentum stays constructive above the 42.50 liquidity shelf. AI expects continuation toward the weekly supply band as long as higher lows remain intact.",
-};
-
 const USD_FORMATTER = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
+});
+
+const COMPACT_USD_FORMATTER = new Intl.NumberFormat("en-US", {
+  notation: "compact",
+  maximumFractionDigits: 1,
 });
 
 export default function AnalysisPageV2() {
@@ -43,8 +44,10 @@ export default function AnalysisPageV2() {
   const [isMarketLoading, setIsMarketLoading] = React.useState(false);
   const [marketError, setMarketError] = React.useState<string | null>(null);
   const ingestAdvancedInsight = useAdvancedInsightStore((state) => state.ingest);
-  const hasInsight = Boolean(useAdvancedInsightStore((state) => state.sections));
+  const analysisSections = useAdvancedInsightStore((state) => state.sections);
+  const hasInsight = Boolean(analysisSections);
   const trendSnapshots = useAdvancedInsightStore((state) => state.trendSnapshots);
+  const sourcePayloadMeta = useAdvancedInsightStore((state) => state.sourcePayload?.meta);
   const hasLoadedMarketRef = React.useRef(false);
   const trendInsight = React.useMemo(() => {
     const keys = Object.keys(trendSnapshots);
@@ -52,6 +55,25 @@ export default function AnalysisPageV2() {
     if (!firstKey) return undefined;
     return trendSnapshots[firstKey];
   }, [trendSnapshots]);
+  const insightSourceLabel = sourcePayloadMeta?.source ?? null;
+  const isInsightMock = Boolean(
+    insightSourceLabel && insightSourceLabel.toLowerCase().includes("mock")
+  );
+
+  const loadMarketSnapshot = React.useCallback(async () => {
+    setIsMarketLoading(true);
+    setMarketError(null);
+
+    try {
+      const snapshot = await fetchAnalysisSnapshot();
+      setMarketSnapshot(snapshot);
+    } catch (error) {
+      console.warn("[analysis] Failed to fetch market snapshot", error);
+      setMarketError("Failed to load analysis data. Please try again.");
+    } finally {
+      setIsMarketLoading(false);
+    }
+  }, []);
 
   React.useEffect(() => {
     if (!tabFromUrl || tabFromUrl !== activeTab) {
@@ -69,21 +91,8 @@ export default function AnalysisPageV2() {
     }
 
     hasLoadedMarketRef.current = true;
-    setIsMarketLoading(true);
-    setMarketError(null);
-
-    void fetchAnalysisSnapshot()
-      .then((snapshot) => {
-        setMarketSnapshot(snapshot);
-      })
-      .catch((error) => {
-        console.warn("[analysis] Failed to fetch market snapshot", error);
-        setMarketError("Market snapshot unavailable, showing AI bias only.");
-      })
-      .finally(() => {
-        setIsMarketLoading(false);
-      });
-  }, [activeTab]);
+    void loadMarketSnapshot();
+  }, [activeTab, loadMarketSnapshot]);
 
   React.useEffect(() => {
     if (hasInsight) {
@@ -95,70 +104,129 @@ export default function AnalysisPageV2() {
     ingestAdvancedInsight(mockInsight, generateMockUnlockedAccess());
   }, [hasInsight, ingestAdvancedInsight, marketSnapshot?.price]);
 
+  const analysisStats = React.useMemo<AnalysisOverviewStat[]>(() => {
+    if (!analysisSections) {
+      return [];
+    }
+
+    const stats: AnalysisOverviewStat[] = [];
+    const bias = analysisSections.market_structure.bias.auto_value;
+    const range = analysisSections.market_structure.range.auto_value;
+    const flow = analysisSections.flow_volume.flow.auto_value;
+
+    if (bias) {
+      stats.push({
+        id: "bias",
+        label: "Bias",
+        value: formatBiasLabel(bias.bias),
+        helper: truncate(bias.reason, 120),
+        icon: Activity,
+        tone: getToneFromBias(bias.bias),
+      });
+    }
+
+    if (range) {
+      stats.push({
+        id: "range",
+        label: "Range window",
+        value: `${formatUsd(range.low)} to ${formatUsd(range.high)}`,
+        helper: `${range.window_hours}h window`,
+        icon: Target,
+        tone: "neutral",
+      });
+    }
+
+    if (flow?.vol_24h_usd) {
+      const delta = typeof flow.vol_24h_delta_pct === "number" ? flow.vol_24h_delta_pct : undefined;
+      stats.push({
+        id: "volume",
+        label: "24h Volume",
+        value: formatCompactUsd(flow.vol_24h_usd),
+        helper:
+          delta !== undefined
+            ? `${formatChangePct(delta)} vs prev 24h`
+            : flow.source
+              ? `Source: ${flow.source}`
+              : undefined,
+        icon: Zap,
+        tone: getToneFromNumber(delta),
+      });
+    }
+
+    if (marketSnapshot) {
+      stats.push({
+        id: "price",
+        label: `${marketSnapshot.symbol} price`,
+        value: formatUsd(marketSnapshot.price),
+        helper: `${marketSnapshot.timeframeLabel} close`,
+        icon: TrendingUp,
+        tone: "neutral",
+      });
+
+      stats.push({
+        id: "change",
+        label: "24h change",
+        value: formatChangePct(marketSnapshot.change24hPct),
+        helper: "vs previous 24h",
+        icon: marketSnapshot.change24hPct >= 0 ? ArrowUpRight : ArrowDownRight,
+        tone: getToneFromNumber(marketSnapshot.change24hPct),
+      });
+    }
+
+    return stats;
+  }, [analysisSections, marketSnapshot]);
+
   const renderTabContent = () => {
     if (activeTab === "overview") {
-      if (!hasInsight) {
-        return <OverviewInsightSkeleton />;
-      }
-
-      const stats: Array<{ label: string; value: React.ReactNode; accent?: string }> = [
-        { label: "Bias", value: overviewInsight.bias, accent: "text-emerald-300" },
-        {
-          label: "Confidence",
-          value: `${Math.round(overviewInsight.confidence * 100)}%`,
-          accent: "text-amber-300",
-        },
-        { label: "Timeframe", value: overviewInsight.timeFrame, accent: "text-text-primary" },
-      ];
-
-      if (marketSnapshot) {
-        stats.push(
-          {
-            label: "Last price",
-            value: formatUsd(marketSnapshot.price),
-            accent: "text-amber-200",
-          },
-          {
-            label: "24h change",
-            value: formatChangePct(marketSnapshot.change24hPct),
-            accent: getChangeAccentFromNumber(marketSnapshot.change24hPct),
-          }
-        );
-      } else if (isMarketLoading) {
-        const placeholder = (
-          <span className="inline-flex h-5 w-20 rounded-full bg-surface-hover animate-pulse" />
-        );
-        stats.push(
-          { label: "Last price", value: placeholder, accent: "text-text-secondary" },
-          { label: "24h change", value: placeholder, accent: "text-text-secondary" }
+      if (!analysisSections) {
+        return (
+          <div className="rounded-2xl border border-border bg-surface p-10">
+            <StateView
+              type={isMarketLoading ? "loading" : "empty"}
+              title={isMarketLoading ? "Loading analysis..." : "No analysis data yet"}
+              description={
+                isMarketLoading
+                  ? "Preparing the latest AI overview."
+                  : "Run your first analysis or import trading history to see insights here."
+              }
+              compact
+            />
+          </div>
         );
       }
+
+      const bias = analysisSections.market_structure.bias.auto_value;
+      const summaryHeadline = bias
+        ? `Bias: ${formatBiasLabel(bias.bias)}`
+        : "Bias pending";
+      const summaryDescription =
+        bias?.reason ?? "AI insight summary will appear once data is ready.";
+      const summaryTimeframe =
+        sourcePayloadMeta?.timeframe ?? marketSnapshot?.timeframeLabel ?? "4H";
+      const statsDescription = marketSnapshot
+        ? `${marketSnapshot.symbol} ${marketSnapshot.timeframeLabel} window`
+        : "AI snapshot uses heuristics until live data arrives.";
+      const statsLoading = !analysisStats.length && isMarketLoading;
+      const statsError = marketError && !analysisStats.length ? marketError : null;
 
       return (
         <div className="space-y-6">
-          <div className="space-y-3">
+          <div className="space-y-4">
             <p className="text-xs uppercase tracking-[0.25em] text-text-tertiary">Current AI Insight</p>
-            <h2 className="text-2xl font-semibold text-text-primary">
-              Bias remains {overviewInsight.bias.toLowerCase()} while liquidity builds.
-            </h2>
-            <p className="text-sm text-text-secondary max-w-3xl">{overviewInsight.summary}</p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-              {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-text-secondary"
-                >
-                  <p className="text-xs uppercase tracking-wide text-text-tertiary">{stat.label}</p>
-                  <p className={`mt-1 text-lg font-semibold ${stat.accent ?? "text-text-primary"}`}>
-                    {stat.value}
-                  </p>
-                </div>
-              ))}
-            </div>
-            {isMarketLoading && !marketSnapshot && (
-              <p className="text-xs text-text-tertiary">Fetching market snapshot…</p>
-            )}
-            {marketError && <p className="text-xs text-amber-300">{marketError}</p>}
+            <h2 className="text-2xl font-semibold text-text-primary">{summaryHeadline}</h2>
+            <p className="text-sm text-text-secondary max-w-3xl">{summaryDescription}</p>
+            <p className="text-xs uppercase tracking-wide text-text-tertiary">
+              Focus timeframe: {summaryTimeframe}
+            </p>
+            <AnalysisOverviewStats
+              stats={analysisStats}
+              isLoading={statsLoading}
+              error={statsError}
+              onRetry={loadMarketSnapshot}
+              showMockBadge={isInsightMock}
+              title="Analysis snapshot"
+              description={statsDescription}
+            />
           </div>
 
           {trendInsight ? (
@@ -300,37 +368,15 @@ function TrendBadge({ label }: { label: string }) {
   );
 }
 
-function OverviewInsightSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <div className="h-3 w-40 rounded-full bg-surface-hover animate-pulse" />
-          <div className="h-6 w-3/4 rounded-full bg-surface-hover animate-pulse" />
-          <div className="h-4 w-full rounded-full bg-surface animate-pulse" />
-          <div className="h-4 w-2/3 rounded-full bg-surface animate-pulse" />
-        </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {[0, 1, 2].map((key) => (
-            <div
-              key={key}
-              className="h-20 rounded-2xl border border-border bg-surface animate-pulse"
-            />
-          ))}
-        </div>
-      </div>
-      <div className="rounded-3xl border border-border bg-surface p-6">
-        <div className="h-64 w-full animate-pulse rounded-2xl bg-surface-hover" />
-        <p className="mt-4 text-center text-sm text-text-tertiary">
-          No AI insight available yet. Fetching the latest market view…
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function formatUsd(value: number): string {
   return USD_FORMATTER.format(value);
+}
+
+function formatCompactUsd(value: number): string {
+  if (value < 1000) {
+    return USD_FORMATTER.format(value);
+  }
+  return COMPACT_USD_FORMATTER.format(value);
 }
 
 function formatChangePct(value: number): string {
@@ -338,12 +384,42 @@ function formatChangePct(value: number): string {
   return `${prefix}${value.toFixed(1)}%`;
 }
 
-function getChangeAccentFromNumber(value: number): string {
+function formatBiasLabel(bias?: BiasLabel): string {
+  if (!bias) {
+    return "Neutral";
+  }
+  return bias.charAt(0).toUpperCase() + bias.slice(1);
+}
+
+function truncate(text: string | undefined, maxLength: number): string {
+  if (!text) {
+    return "";
+  }
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.slice(0, maxLength).trim()}...`;
+}
+
+function getToneFromBias(bias?: BiasLabel): AnalysisOverviewStat["tone"] {
+  if (bias === "bullish") {
+    return "positive";
+  }
+  if (bias === "bearish") {
+    return "negative";
+  }
+  return "neutral";
+}
+
+function getToneFromNumber(value?: number): AnalysisOverviewStat["tone"] {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return "neutral";
+  }
   if (value > 0) {
-    return "text-emerald-300";
+    return "positive";
   }
   if (value < 0) {
-    return "text-rose-300";
+    return "negative";
   }
-  return "text-text-primary";
+  return "neutral";
 }
