@@ -51,11 +51,16 @@ export default function OnboardingWizard() {
     return null
   }
 
-  const activeStep = STEPS[currentStepIndex]
+  const safeIndex = Math.max(0, Math.min(currentStepIndex, STEPS.length - 1))
+  const activeStep = STEPS[safeIndex]
+
+  if (!activeStep) {
+    return null
+  }
 
   const handleNext = () => {
     completeStep(activeStep.id)
-    if (currentStepIndex === STEPS.length - 1) {
+    if (safeIndex === STEPS.length - 1) {
       navigate(activeStep.targetRoute)
       return
     }
@@ -122,7 +127,7 @@ export default function OnboardingWizard() {
 
             <div className="rounded-2xl border border-border-subtle bg-surface-subtle p-6">
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary">
-                Step {currentStepIndex + 1} of {STEPS.length}
+                Step {safeIndex + 1} of {STEPS.length}
               </p>
               <div className="mt-4 flex items-center gap-4">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface">
