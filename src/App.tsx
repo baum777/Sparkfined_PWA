@@ -1,3 +1,4 @@
+import React from 'react'
 import { SettingsProvider } from './state/settings'
 import { TelemetryProvider } from './state/telemetry'
 import { AIProviderState } from './state/ai'
@@ -9,8 +10,56 @@ import MissingConfigBanner from './components/MissingConfigBanner'
 import OfflineIndicator from './components/pwa/OfflineIndicator'
 import './styles/App.css'
 import { ThemeProvider } from '@/lib/theme/theme-provider'
+import { checkAlerts, notifyAlertTriggered } from '@/lib/alerts/triggerEngine'
+import { useAlertsStore } from '@/store/alertsStore'
 
 function App() {
+  React.useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    let isRunning = false
+
+    const runCheck = async () => {
+      if (isRunning) {
+        return
+      }
+
+      isRunning = true
+
+      try {
+        const { alerts } = useAlertsStore.getState()
+        const armedAlerts = alerts.filter((alert) => alert.status === 'armed')
+
+        if (!armedAlerts.length) {
+          return
+        }
+
+        const triggeredAlerts = await checkAlerts(armedAlerts)
+
+        if (triggeredAlerts.length) {
+          const { updateAlert } = useAlertsStore.getState()
+          triggeredAlerts.forEach(({ alert, price }) => {
+            updateAlert(alert.id, { status: 'triggered' })
+            notifyAlertTriggered(alert, price)
+          })
+        }
+      } catch (error) {
+        console.error('Error while checking alerts', error)
+      } finally {
+        isRunning = false
+      }
+    }
+
+    const intervalId = window.setInterval(runCheck, 60_000)
+    runCheck()
+
+    return () => {
+      window.clearInterval(intervalId)
+    }
+  }, [])
+
   return (
     <TelemetryProvider>
       <ThemeProvider>

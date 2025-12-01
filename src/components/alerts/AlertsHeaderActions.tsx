@@ -1,6 +1,7 @@
 import React from 'react';
 import type { Alert } from '@/store/alertsStore';
 import AlertCreateDialog from '@/components/alerts/AlertCreateDialog';
+import NotificationsPermissionButton from '@/components/alerts/NotificationsPermissionButton';
 
 interface AlertsHeaderActionsProps {
   alerts: Alert[];
@@ -15,7 +16,10 @@ export function AlertsHeaderActions({ alerts }: AlertsHeaderActionsProps) {
         <span className="rounded-full border border-border px-3 py-1 text-text-primary">{alerts.length} alerts</span>
         <span className="rounded-full border border-border px-3 py-1">{triggeredCount} triggered</span>
       </div>
-      <AlertCreateDialog />
+      <div className="flex flex-wrap items-center gap-2">
+        <NotificationsPermissionButton />
+        <AlertCreateDialog />
+      </div>
     </div>
   );
 }
