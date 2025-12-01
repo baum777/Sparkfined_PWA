@@ -79,3 +79,9 @@ When collapsing tables:
 - **Tablet:** Journal/Watchlist show two columns, filter chips are readable, tables remain legible.
 - **Desktop:** KPI strips align to the grid, detail panels retain their width ratios.
 - **Keyboard/Screen reader:** Focus order follows reading order; stacked card labels remain visible.
+
+## Skip Link & Main Content Landmark
+
+- The global skip link (`<a href="#main-content">`) lives near the top of `src/App.tsx`. It becomes visible on focus and jumps straight to the main region.
+- Every routed page renders inside the single `<main id="main-content" tabIndex={-1}>` declared in `App.tsx`. Nested layouts (DashboardShell, JournalLayout, etc.) should use `<section>` or `<div>` instead of defining their own `<main>`.
+- When creating new layout shells, ensure they sit inside the existing main element; if you need focus management, rely on the `tabIndex={-1}` already set on the canonical main.
