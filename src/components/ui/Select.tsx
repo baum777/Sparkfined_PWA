@@ -5,6 +5,10 @@ interface SelectOption {
   label: string;
 }
 
+type SelectTriggerProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  'data-testid'?: string;
+};
+
 interface SelectProps {
   options: SelectOption[];
   value: string;
@@ -12,7 +16,7 @@ interface SelectProps {
   placeholder?: string;
   disabled?: boolean;
   error?: string;
-  triggerProps?: React.ButtonHTMLAttributes<HTMLButtonElement>;
+  triggerProps?: SelectTriggerProps;
 }
 
 import { ChevronDown, ChevronUp, Check } from '@/lib/icons';
