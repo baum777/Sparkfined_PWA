@@ -20,6 +20,12 @@ export default function AlertsPageV2() {
   const [activeAlertId, setActiveAlertId] = React.useState<string | undefined>(
     isValidAlertId ? (alertFromUrl as string) : undefined,
   );
+  const handleAlertDeleted = React.useCallback(
+    (deletedId: string) => {
+      setActiveAlertId((current) => (current === deletedId ? undefined : current));
+    },
+    [setActiveAlertId],
+  );
   const headerDescription = `${alerts.length} alerts tracked · Stay ahead of key levels, momentum shifts and volatility spikes`;
   const filteredAlerts = React.useMemo(() => {
     return alerts.filter((alert) => {
@@ -106,7 +112,7 @@ export default function AlertsPageV2() {
               onSelectAlert={setActiveAlertId}
             />
           </div>
-          <AlertsDetailPanel alert={activeAlert} />
+          <AlertsDetailPanel alert={activeAlert} onAlertDeleted={handleAlertDeleted} />
         </div>
       </AlertsLayout>
     </DashboardShell>

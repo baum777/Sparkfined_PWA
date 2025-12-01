@@ -38,6 +38,8 @@ interface AlertsState {
   setAlerts: (alerts: Alert[]) => void;
   pushAlert: (alert: Alert) => void;
   createAlert: (input: CreateAlertInput) => Alert;
+  updateAlert: (id: string, updates: Partial<Omit<Alert, 'id'>>) => void;
+  deleteAlert: (id: string) => void;
   processTrendEvent?: (evt: SolanaMemeTrendEvent) => void;
   createDraftFromChart: (input: { address: string; symbol: string; price: number; time: number; timeframe: string }) => Alert;
 }
@@ -76,6 +78,36 @@ export const useAlertsStore = create<AlertsState>((set) => ({
 
     return alert;
   },
+  updateAlert: (id, updates) =>
+    set((state) => {
+      const index = state.alerts.findIndex((alert) => alert.id === id);
+      if (index === -1) {
+        return { alerts: state.alerts };
+      }
+
+      const now = new Date().toISOString();
+      const sanitizedUpdates: Partial<Omit<Alert, 'id'>> = { ...updates };
+
+      if (typeof sanitizedUpdates.symbol === 'string') {
+        sanitizedUpdates.symbol = sanitizedUpdates.symbol.trim().toUpperCase();
+      }
+      if (typeof sanitizedUpdates.condition === 'string') {
+        sanitizedUpdates.condition = sanitizedUpdates.condition.trim();
+      }
+      if (typeof sanitizedUpdates.timeframe === 'string') {
+        sanitizedUpdates.timeframe = sanitizedUpdates.timeframe.trim();
+      }
+
+      const nextAlerts = state.alerts.map((alert) =>
+        alert.id === id ? { ...alert, ...sanitizedUpdates, updatedAt: now } : alert,
+      );
+
+      return { alerts: nextAlerts };
+    }),
+  deleteAlert: (id) =>
+    set((state) => ({
+      alerts: state.alerts.filter((alert) => alert.id !== id),
+    })),
   createDraftFromChart: (input) => {
     const timestamp = new Date(input.time).toISOString();
     const alert: Alert = {
