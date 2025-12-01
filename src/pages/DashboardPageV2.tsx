@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import DashboardKpiStrip from '@/components/dashboard/DashboardKpiStrip';
 import DashboardQuickActions from '@/components/dashboard/DashboardQuickActions';
@@ -6,13 +6,9 @@ import DashboardMainGrid from '@/components/dashboard/DashboardMainGrid';
 import InsightTeaser from '@/components/dashboard/InsightTeaser';
 import JournalSnapshot from '@/components/dashboard/JournalSnapshot';
 import ErrorBanner from '@/components/ui/ErrorBanner';
-
-const kpiItems = [
-  { label: 'Net P&L', value: '+12.4%', trend: 'up' as const },
-  { label: 'Win Rate', value: '63%', trend: 'flat' as const },
-  { label: 'Alerts Armed', value: '5', trend: 'up' as const },
-  { label: 'Journal Streak', value: '9 days', trend: 'up' as const },
-];
+import { useJournalStore } from '@/store/journalStore';
+import { useAlertsStore } from '@/store/alertsStore';
+import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from '@/lib/dashboard/calculateKPIs';
 
 const dummyInsight = {
   title: 'SOL Daily Bias',
@@ -21,23 +17,47 @@ const dummyInsight = {
   summary: 'Market structure shows higher lows with strong momentum on intraday timeframes. Watching for pullbacks to re-enter long positions with tight risk management.',
 };
 
-const dummyJournalEntries = [
-  { id: '1', title: 'Scalped SOL breakout', date: '2025-02-16', direction: 'long' as const },
-  { id: '2', title: 'Fade on BTC range high', date: '2025-02-15', direction: 'short' as const },
-  { id: '3', title: 'ETH trend follow setup', date: '2025-02-14', direction: 'long' as const },
-];
-
 export default function DashboardPageV2() {
-  // TODO[P1]: Replace placeholder UI state with dashboard data store once available
+  const journalEntries = useJournalStore((state) => state.entries);
+  const alerts = useAlertsStore((state) => state.alerts);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasData, setHasData] = useState(true);
+
+  const hasData = journalEntries.length > 0;
 
   const handleRetry = () => {
     setError(null);
     setIsLoading(false);
-    setHasData(true);
   };
+
+  const kpiItems = useMemo(() => {
+    const armedAlertsCount = alerts.filter((alert) => alert.status === 'armed').length;
+    const netPnLValue = calculateNetPnL(journalEntries);
+    const winRateValue = calculateWinRate(journalEntries, 30);
+    const streakValue = calculateJournalStreak(journalEntries);
+
+    const netTrend: 'up' | 'down' | 'flat' =
+      netPnLValue === 'N/A' || netPnLValue === '0%' ? 'flat' : netPnLValue.startsWith('-') ? 'down' : 'up';
+
+    return [
+      { label: 'Net P&L', value: netPnLValue, trend: netTrend },
+      { label: 'Win Rate', value: winRateValue, trend: 'flat' as const },
+      { label: 'Alerts Armed', value: String(armedAlertsCount), trend: 'up' as const },
+      { label: 'Journal Streak', value: streakValue, trend: 'up' as const },
+    ];
+  }, [alerts, journalEntries]);
+
+  const recentJournalEntries = useMemo(() => {
+    if (!journalEntries.length) {
+      return [];
+    }
+    return [...journalEntries]
+      .map((entry) => ({ entry, timestamp: getEntryDate(entry)?.getTime() ?? 0 }))
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 3)
+      .map(({ entry }) => entry);
+  }, [journalEntries]);
 
   const kpiStripContent = isLoading ? (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -94,7 +114,7 @@ export default function DashboardPageV2() {
     return (
       <DashboardMainGrid
         primary={<InsightTeaser {...dummyInsight} />}
-        secondary={<JournalSnapshot entries={dummyJournalEntries} />}
+        secondary={<JournalSnapshot entries={recentJournalEntries} />}
       />
     );
   };
