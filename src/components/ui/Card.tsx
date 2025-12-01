@@ -9,11 +9,30 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantClasses: Record<CardVariant, string> = {
-  default: 'bg-surface border-border-subtle',
-  muted: 'bg-surface-subtle border-border-moderate',
-  interactive: 'bg-surface border-border-subtle hover:border-border-accent hover:shadow-emerald-glow transition-shadow',
+  default: 'bg-surface border-border-subtle shadow-card-subtle',
+  muted: 'bg-surface-subtle border-border-moderate shadow-card-subtle',
+  interactive:
+    'bg-surface border-border-subtle shadow-card-subtle hover:border-border-accent hover:shadow-emerald-glow',
 }
 
+/**
+ * Card
+ *
+ * Usage:
+ * ```tsx
+ * <Card>
+ *   <CardHeader>
+ *     <CardTitle>Session stats</CardTitle>
+ *     <CardDescription>Last 24h performance</CardDescription>
+ *   </CardHeader>
+ *   <CardContent>…</CardContent>
+ * </Card>
+ *
+ * <Card interactive onClick={handleClick}>
+ *   <CardContent>Interactive surface</CardContent>
+ * </Card>
+ * ```
+ */
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
   { variant = 'default', className, interactive, onClick, onKeyDown, tabIndex, ...props },
   ref
@@ -33,9 +52,9 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
     <div
       ref={ref}
       className={cn(
-        'rounded-2xl border p-6 shadow-card-subtle',
+        'rounded-2xl border p-6 transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
         variantClasses[variant],
-        isInteractive && 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+        isInteractive && 'cursor-pointer hover:-translate-y-0.5 active:translate-y-0 focus-visible:-translate-y-0.5',
         className
       )}
       tabIndex={isInteractive ? tabIndex ?? 0 : tabIndex}

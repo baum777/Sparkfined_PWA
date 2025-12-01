@@ -12,6 +12,7 @@
 
 import { useState } from 'react'
 import { ChevronDown, ChevronUp } from '@/lib/icons'
+import Button from '@/components/ui/Button'
 import type { AnalysisResult, AITeaserAnalysis } from '@/types/analysis'
 
 interface ResultCardProps {
@@ -149,12 +150,12 @@ export default function ResultCard({
 
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={onSave} className="btn-primary">
+          <Button onClick={onSave} className="w-full">
             Mark Entry
-          </button>
-          <button onClick={onNewAnalysis} className="btn-ghost">
+          </Button>
+          <Button onClick={onNewAnalysis} variant="ghost" className="w-full">
             New Analysis
-          </button>
+          </Button>
         </div>
       </div>
 

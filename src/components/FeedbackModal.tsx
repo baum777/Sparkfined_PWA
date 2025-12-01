@@ -2,6 +2,7 @@ import { useState, useRef, useId } from 'react'
 import type { MouseEvent } from 'react'
 import { saveFeedback, getSessionId } from '@/lib/db'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
+import Button from '@/components/ui/Button'
 
 interface FeedbackModalProps {
   isOpen: boolean
@@ -192,13 +193,14 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 </div>
               </div>
 
-              <button
+              <Button
                 onClick={handleSubmit}
                 disabled={!feedbackText.trim() || isSaving}
-                className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full"
+                isLoading={isSaving}
               >
-                {isSaving ? 'Saving...' : 'Submit Feedback'}
-              </button>
+                Submit Feedback
+              </Button>
             </div>
           )}
 

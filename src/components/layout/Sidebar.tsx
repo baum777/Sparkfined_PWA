@@ -100,7 +100,6 @@ export default function Sidebar() {
       className={`fixed left-0 top-0 hidden h-screen flex-col border-r border-border bg-surface/80 py-6 backdrop-blur-sm transition-[width,transform] duration-300 ease-out motion-reduce:transition-none lg:flex ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
-      style={{ width: isCollapsed ? '5rem' : '16rem' }}
       role="navigation"
       aria-label="Primary navigation"
       data-collapsed={isCollapsed}

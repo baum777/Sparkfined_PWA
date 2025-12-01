@@ -7,6 +7,17 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   errorId?: string;
 }
 
+/**
+ * Textarea with optional auto-resize and consistent focus styling.
+ *
+ * ```tsx
+ * <Textarea
+ *   placeholder="Leave a note"
+ *   hint="Markdown supported"
+ *   error={errorMessage}
+ * />
+ * ```
+ */
 export default function Textarea({
   error,
   hint,
@@ -18,10 +29,11 @@ export default function Textarea({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const generatedErrorId = errorId || `error-${Math.random().toString(36).substr(2, 9)}`;
   
-  const baseStyles = 'w-full bg-zinc-900 border text-zinc-100 placeholder-zinc-500 transition-all focus:outline-none focus:ring-1 resize-none';
+  const baseStyles =
+    'w-full rounded-token-lg border bg-zinc-900 text-zinc-100 placeholder-zinc-500 transition-all duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface resize-none max-h-[400px] overflow-y-auto';
   const stateStyles = error 
-    ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/50' 
-    : 'border-zinc-700 focus:border-emerald-500 focus:ring-emerald-500/50';
+    ? 'border-rose-500 focus-visible:border-rose-500 focus-visible:ring-rose-500/50'
+    : 'border-zinc-700 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/50';
   const sizeStyles = 'px-3 py-2.5 text-sm min-h-[88px]'; // 2 Zeilen minimum
   
   // Auto-resize logic
@@ -50,12 +62,6 @@ export default function Textarea({
         aria-invalid={!!error}
         aria-describedby={error ? generatedErrorId : undefined}
         className={`${baseStyles} ${stateStyles} ${sizeStyles} ${className}`}
-        style={{
-          borderRadius: 'var(--radius-lg)',
-          transition: `all var(--duration-short) var(--ease-in-out)`,
-          maxHeight: '400px', // mobile
-          overflowY: 'auto',
-        }}
         {...props}
       />
       {error && (
