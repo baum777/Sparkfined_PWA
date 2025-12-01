@@ -1,5 +1,8 @@
 import type { Config } from 'tailwindcss'
 
+const withAlpha = (variable: string) => `rgb(var(${variable}) / <alpha-value>)`
+const withFixedAlpha = (variable: string, alpha: number | string) => `rgb(var(${variable}) / ${alpha})`
+
 export default {
   content: [
     './index.html',
@@ -9,96 +12,96 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Brand Colors (from tokens.css)
+        // Brand Colors (powered by tokens.css)
         brand: {
-          DEFAULT: '#0fb34c',
-          hover: '#059669',
+          DEFAULT: withAlpha('--color-brand'),
+          hover: withAlpha('--color-brand-hover'),
         },
-        accent: '#00ff66',
+        accent: withAlpha('--color-accent'),
 
         // Background & Surface
         bg: {
-          DEFAULT: '#0a0a0a',
-          elevated: '#0b0b13',
-          surface: '#18181b',
-          'surface-subtle': '#0f0f12',
-          overlay: '#050505',
+          DEFAULT: withAlpha('--color-bg'),
+          elevated: withAlpha('--color-bg-elevated'),
+          surface: withAlpha('--color-surface'),
+          'surface-subtle': withAlpha('--color-surface-subtle'),
+          overlay: withAlpha('--color-bg-overlay'),
         },
         surface: {
-          DEFAULT: '#18181b',
-          hover: '#27272a',
-          elevated: '#1c1c1e',
-          subtle: '#131316',
-          skeleton: 'rgba(255,255,255,0.05)',
-          850: '#1c1c1e', // for hover states (legacy compatibility)
+          DEFAULT: withAlpha('--color-surface'),
+          hover: withAlpha('--color-surface-hover'),
+          elevated: withAlpha('--color-surface-elevated'),
+          subtle: withAlpha('--color-surface-subtle'),
+          skeleton: withFixedAlpha('--color-surface-skeleton', '0.05'),
+          850: withAlpha('--color-surface-850'), // legacy compatibility
         },
 
         // Borders
         border: {
-          DEFAULT: '#27272a',
-          subtle: 'rgba(255,255,255,0.05)',
-          moderate: 'rgba(255,255,255,0.1)',
-          hover: 'rgba(255,255,255,0.15)',
-          accent: '#0fb34c',
-          focus: '#10b981',
+          DEFAULT: withAlpha('--color-border'),
+          subtle: withFixedAlpha('--color-border-contrast', '0.06'),
+          moderate: withFixedAlpha('--color-border-contrast', '0.1'),
+          hover: withFixedAlpha('--color-border-contrast', '0.15'),
+          accent: withAlpha('--color-border-accent'),
+          focus: withAlpha('--color-border-focus'),
         },
 
         // Text
         text: {
-          primary: '#f4f4f5',
-          secondary: '#a1a1aa',
-          tertiary: '#71717a',
+          primary: withAlpha('--color-text-primary'),
+          secondary: withAlpha('--color-text-secondary'),
+          tertiary: withAlpha('--color-text-tertiary'),
         },
 
         // Interactive states
         interactive: {
-          hover: 'rgba(255,255,255,0.05)',
-          active: 'rgba(255,255,255,0.08)',
-          disabled: 'rgba(255,255,255,0.02)',
+          hover: withFixedAlpha('--color-interactive-base', '0.05'),
+          active: withFixedAlpha('--color-interactive-base', '0.08'),
+          disabled: withFixedAlpha('--color-interactive-base', '0.02'),
         },
 
         // Sentiment
         sentiment: {
           bull: {
-            DEFAULT: '#10b981',
-            bg: 'rgba(16,185,129,0.1)',
-            border: 'rgba(16,185,129,0.6)',
+            DEFAULT: withAlpha('--color-sentiment-bull'),
+            bg: withFixedAlpha('--color-sentiment-bull', '0.12'),
+            border: withFixedAlpha('--color-sentiment-bull', '0.6'),
           },
           bear: {
-            DEFAULT: '#f43f5e',
-            bg: 'rgba(244,63,94,0.1)',
-            border: 'rgba(251,113,133,0.6)',
+            DEFAULT: withAlpha('--color-sentiment-bear'),
+            bg: withFixedAlpha('--color-sentiment-bear', '0.12'),
+            border: withFixedAlpha('--color-sentiment-bear', '0.6'),
           },
           neutral: {
-            DEFAULT: '#f59e0b',
-            bg: 'rgba(245,158,11,0.1)',
-            border: 'rgba(251,191,36,0.6)',
+            DEFAULT: withAlpha('--color-sentiment-neutral'),
+            bg: withFixedAlpha('--color-sentiment-neutral', '0.12'),
+            border: withFixedAlpha('--color-sentiment-neutral', '0.6'),
           },
         },
 
         // Status backgrounds (alerts)
         status: {
           armed: {
-            bg: 'rgba(245,158,11,0.1)',
-            text: '#fcd34d',
+            bg: withFixedAlpha('--color-status-armed', '0.15'),
+            text: withAlpha('--color-status-armed'),
           },
           triggered: {
-            bg: 'rgba(16,185,129,0.1)',
-            text: '#6ee7b7',
+            bg: withFixedAlpha('--color-status-triggered', '0.15'),
+            text: withAlpha('--color-status-triggered'),
           },
           snoozed: {
-            bg: 'rgba(14,165,233,0.1)',
-            text: '#7dd3fc',
+            bg: withFixedAlpha('--color-status-snoozed', '0.15'),
+            text: withAlpha('--color-status-snoozed'),
           },
         },
 
         // Semantic
-        success: '#10b981',
-        danger: '#f43f5e',
-        bull: '#10b981',
-        bear: '#f43f5e',
-        info: '#06b6d4',
-        warn: '#f59e0b',
+        success: withAlpha('--color-success'),
+        danger: withAlpha('--color-danger'),
+        bull: withAlpha('--color-sentiment-bull'),
+        bear: withAlpha('--color-sentiment-bear'),
+        info: withAlpha('--color-info'),
+        warn: withAlpha('--color-warn'),
         
         // Zinc palette (complete spectrum for UI)
         zinc: {
@@ -271,11 +274,11 @@ export default {
       },
       
       backgroundImage: {
-        'brand-gradient': 'linear-gradient(135deg, #0fb34c 0%, #059669 100%)',
-        'emerald-gradient': 'linear-gradient(to right, #34d399, #22d3ee)',
-        'grid-pattern': 'linear-gradient(to right, #27272a 1px, transparent 1px), linear-gradient(to bottom, #27272a 1px, transparent 1px)',
-        'app-gradient': 'linear-gradient(to bottom, #050505 0%, #0b0b13 50%, #050505 100%)',
-        'surface-gradient': 'linear-gradient(135deg, #18181b 0%, #1c1c1e 100%)',
+        'brand-gradient': 'linear-gradient(135deg, rgb(var(--color-brand)) 0%, rgb(var(--color-brand-hover)) 100%)',
+        'emerald-gradient': 'linear-gradient(to right, rgb(var(--color-success)) 0%, rgb(var(--color-info)) 100%)',
+        'grid-pattern': 'linear-gradient(to right, rgb(var(--color-border) / 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgb(var(--color-border) / 0.2) 1px, transparent 1px)',
+        'app-gradient': 'linear-gradient(to bottom, rgb(var(--color-bg-overlay) / 0.9) 0%, rgb(var(--color-bg)) 50%, rgb(var(--color-bg-overlay) / 0.95) 100%)',
+        'surface-gradient': 'linear-gradient(135deg, rgb(var(--color-surface-subtle)) 0%, rgb(var(--color-surface-elevated)) 100%)',
       },
       
       backgroundSize: {

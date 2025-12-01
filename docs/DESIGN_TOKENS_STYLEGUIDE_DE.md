@@ -178,6 +178,35 @@ Level 4: Pages (src/pages/)
 
 ## 2. Design-Tokens & UI-Styleguide (Vorschlag)
 
+### 2.0 Token-Format & Themes (Canonical Regeln)
+
+- **Farbtokens = RGB-Kanäle**  
+  Alle `--color-*` Variablen speichern nur die drei Kanäle (`--color-bg: 10 10 10`). Konsum erfolgt immer über `rgb(var(--color-bg) / alpha)`.  
+  Beispiel: `border-color: rgb(var(--color-border) / 0.15);`
+- **Dark-Mode-First**  
+  `:root` liefert Dark-Defaults und der `ThemeProvider` setzt `data-theme="dark"` initial.  
+  `:root[data-theme="light"]` überschreibt dieselben Tokens mit hellen Werten, sobald der User aktiv auf Light umschaltet.
+- **OLED-Support**  
+  Pure-Black wird nur für Dark Themes erzwungen: `:root:not([data-theme="light"]) body[data-oled="true"] { … }`. Dadurch bleibt Light Mode unverändert, auch wenn OLED aktiviert ist.
+- **Tailwind Bindung**  
+  `tailwind.config.ts` referenziert identische Tokens via `rgb(var(--token) / <alpha-value>)`. Utilities wie `bg-surface/80` oder `border-border-accent/30` funktionieren damit automatisch für Dark, Light und OLED.
+- **Deprecated Tokens**  
+  `--space-*` bleiben dokumentiert, sind aber als *@deprecated* markiert (Tailwind Spacing ersetzt sie). Entfernen erst nach vollständiger Migration.
+
+```css
+:root {
+  --color-brand: 15 179 76;
+}
+
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    rgb(var(--color-brand)) 0%,
+    rgb(var(--color-brand-hover)) 100%
+  );
+}
+```
+
 ### 2.1 Farb-System (Colors)
 
 #### **2.1.1 Primärfarben (Brand)**

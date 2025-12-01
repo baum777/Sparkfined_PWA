@@ -235,7 +235,7 @@
 }
 
 .focus-ring:focus-visible {
-  outline-color: var(--color-emerald);
+  outline-color: rgb(var(--color-emerald));
 }
 
 /* === Loading Spinner === */

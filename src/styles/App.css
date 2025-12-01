@@ -9,8 +9,8 @@
 
 body {
   margin: 0;
-  background-color: var(--color-bg);
-  color: var(--color-text-primary);
+  background-color: rgb(var(--color-bg));
+  color: rgb(var(--color-text-primary));
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   line-height: var(--leading-sm);

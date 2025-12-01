@@ -48,7 +48,7 @@ export default function BottomNav() {
                 }`
               }
               style={({ isActive }) => ({
-                borderTop: isActive ? '2px solid var(--color-brand)' : undefined,
+                borderTop: isActive ? '2px solid rgb(var(--color-brand))' : undefined,
                 transition: 'all var(--duration-short) var(--ease-in-out)',
               })}
             >
