@@ -1,172 +1,158 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '@/components/ui/Button'
-import { Bell, BookOpen, Star, type LucideIcon } from '@/lib/icons'
-import { cn } from '@/lib/ui/cn'
+import { Bell, BookOpen, Star, X, type LucideIcon } from '@/lib/icons'
 import { useOnboardingStore } from '@/store/onboardingStore'
 
-interface StepDefinition {
+interface OnboardingStep {
   id: string
   title: string
-  description: string
+  icon: LucideIcon
   actionLabel: string
-  Illustration: LucideIcon
-  targetPath: string
+  targetRoute: string
 }
 
-const STEP_DEFINITIONS: StepDefinition[] = [
+const STEPS: OnboardingStep[] = [
   {
     id: 'journal',
     title: 'Track Your Trades',
-    description: 'Log executions with context, screenshots, and AI summaries to build a repeatable process.',
+    icon: BookOpen,
     actionLabel: 'Create First Entry',
-    Illustration: BookOpen,
-    targetPath: '/journal-v2',
+    targetRoute: '/journal-v2',
   },
   {
     id: 'watchlist',
     title: 'Monitor Your Plays',
-    description: 'Centralize symbols, catalysts, and conviction so you never lose sight of the next setup.',
+    icon: Star,
     actionLabel: 'Build Watchlist',
-    Illustration: Star,
-    targetPath: '/watchlist-v2',
+    targetRoute: '/watchlist-v2',
   },
   {
     id: 'alerts',
     title: 'Never Miss a Move',
-    description: 'Automate entries and exits with precise alerts for price, volume, or technical signals.',
+    icon: Bell,
     actionLabel: 'Create First Alert',
-    Illustration: Bell,
-    targetPath: '/alerts-v2',
+    targetRoute: '/alerts-v2',
   },
 ]
 
-const TOTAL_STEPS = STEP_DEFINITIONS.length
+const STEP_DESCRIPTIONS: Record<string, string> = {
+  journal: 'Log executions with context, screenshots, and AI summaries to build a repeatable process.',
+  watchlist: 'Centralize symbols, catalysts, and conviction so you never lose sight of the next setup.',
+  alerts: 'Automate entries and exits with precise alerts for price, volume, or technical signals.',
+}
+
+const TOTAL_STEPS = STEPS.length
 
 export default function OnboardingWizard() {
   const navigate = useNavigate()
   const hasCompletedOnboarding = useOnboardingStore((state) => state.hasCompletedOnboarding)
-  const currentStep = useOnboardingStore((state) => state.currentStep)
-  const completedSteps = useOnboardingStore((state) => state.completedSteps)
   const skipOnboarding = useOnboardingStore((state) => state.skipOnboarding)
   const completeStep = useOnboardingStore((state) => state.completeStep)
+  const [currentStepIndex, setCurrentStepIndex] = React.useState(0)
 
-  const stepsWithHandlers = React.useMemo(
-    () =>
-      STEP_DEFINITIONS.map((step) => ({
-        ...step,
-        onAction: () => navigate(step.targetPath),
-      })),
-    [navigate]
-  )
+  React.useEffect(() => {
+    if (!hasCompletedOnboarding) {
+      setCurrentStepIndex(0)
+    }
+  }, [hasCompletedOnboarding])
 
   if (hasCompletedOnboarding) {
     return null
   }
 
-  if (!stepsWithHandlers.length) {
-    return null
-  }
+  const activeStep = STEPS[currentStepIndex]!
+  const Icon = activeStep.icon
 
-  const safeStepIndex = Math.max(0, Math.min(currentStep, stepsWithHandlers.length - 1))
-  const activeStep = stepsWithHandlers[safeStepIndex]!
-  const progressPercent = Math.round((completedSteps.size / TOTAL_STEPS) * 100)
-
-  const handlePrimaryAction = () => {
+  const handleNext = () => {
     completeStep(activeStep.id)
-    activeStep.onAction()
+
+    if (currentStepIndex === TOTAL_STEPS - 1) {
+      navigate(activeStep.targetRoute)
+      return
+    }
+
+    setCurrentStepIndex((index) => Math.min(index + 1, TOTAL_STEPS - 1))
   }
 
-  return (
-    <Dialog isOpen={!hasCompletedOnboarding}>
-      <section className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-border-moderate bg-surface text-text-primary shadow-[0_30px_120px_rgba(0,0,0,0.45)]">
-        <div className="flex flex-col gap-8 px-6 pb-10 pt-8 md:flex-row md:gap-12 md:px-10 md:pb-12">
-          <div className="flex-1 space-y-6">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary">First-run setup</p>
-              <h2 className="mt-2 text-3xl font-semibold leading-tight text-text-primary">
-                Welcome to Sparkfined
-                <span className="block text-base font-normal text-text-secondary">Complete three quick steps to personalize your command center.</span>
-              </h2>
-            </div>
+  const handleSkip = () => {
+    skipOnboarding()
+  }
 
-            <div className="flex items-center gap-2" aria-label="Onboarding progress">
-              {stepsWithHandlers.map((step, index) => {
-                const isComplete = completedSteps.has(step.id)
-                const isActive = index === safeStepIndex
+  const handleClose = () => {
+    skipOnboarding()
+  }
 
-                return (
-                  <span
-                    key={step.id}
-                    className={cn(
-                      'h-2 flex-1 rounded-full transition-all',
-                      isComplete && 'bg-brand shadow-[0_0_12px_rgba(16,185,129,0.45)]',
-                      !isComplete && isActive && 'bg-brand/70',
-                      !isComplete && !isActive && 'bg-border-moderate'
-                    )}
-                  />
-                )
-              })}
-            </div>
+  const renderBarState = (index: number) => {
+    if (index < currentStepIndex) {
+      return 'bg-emerald-500'
+    }
 
-            <div className="rounded-2xl border border-border-subtle bg-surface-subtle p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.4em] text-text-tertiary">
-                Step {safeStepIndex + 1} of {TOTAL_STEPS}
-              </p>
-              <h3 className="mt-3 text-2xl font-semibold text-text-primary">{activeStep.title}</h3>
-              <p className="mt-3 text-base text-text-secondary">{activeStep.description}</p>
-            </div>
+    if (index === currentStepIndex) {
+      return 'bg-emerald-400'
+    }
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button
-                variant="ghost"
-                className="w-full border border-transparent text-text-secondary hover:border-border-moderate hover:bg-surface-subtle"
-                onClick={skipOnboarding}
-              >
-                Skip for now
-              </Button>
-              <Button className="w-full" size="lg" onClick={handlePrimaryAction}>
-                {activeStep.actionLabel}
-              </Button>
-            </div>
-          </div>
-
-          <aside className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-border-subtle bg-gradient-to-br from-brand/5 via-transparent to-sentiment-bull-bg/30 p-8 text-center">
-            <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-sentiment-bull-bg/40">
-              <activeStep.Illustration className="h-12 w-12 text-sentiment-bull" />
-            </div>
-            <p className="mt-6 max-w-sm text-sm text-text-secondary">
-              Each action opens the exact workspace you need. You can always revisit this walkthrough from Settings → Onboarding.
-            </p>
-            <div className="mt-6 w-full rounded-2xl border border-border-subtle bg-surface px-5 py-4 text-left">
-              <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Progress</p>
-              <div className="mt-2 text-3xl font-semibold text-text-primary">{progressPercent}%</div>
-              <p className="text-sm text-text-secondary">{completedSteps.size} of {TOTAL_STEPS} steps completed</p>
-            </div>
-          </aside>
-        </div>
-      </section>
-    </Dialog>
-  )
-}
-
-interface DialogProps {
-  isOpen: boolean
-  children: React.ReactNode
-}
-
-function Dialog({ isOpen, children }: DialogProps) {
-  if (!isOpen) {
-    return null
+    return 'bg-white/15'
   }
 
   return (
     <div
-      className="fixed inset-0 z-[120] flex min-h-screen w-full items-center justify-center bg-bg-overlay/75 px-4 py-6 backdrop-blur"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 py-8"
       role="dialog"
       aria-modal="true"
+      data-testid="onboarding-wizard"
     >
-      {children}
+      <section className="relative w-full max-w-2xl rounded-3xl bg-zinc-900 px-8 py-10 text-white shadow-2xl">
+        <button
+          type="button"
+          className="absolute right-4 top-4 rounded-full p-2 text-zinc-400 transition hover:bg-white/10 hover:text-white"
+          onClick={handleClose}
+          aria-label="Close onboarding"
+          data-testid="onboarding-close"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2">
+              {STEPS.map((step, index) => (
+                <span
+                  key={step.id}
+                  className={`h-2 flex-1 rounded-full transition ${renderBarState(index)}`}
+                />
+              ))}
+            </div>
+            <p className="text-sm text-zinc-400">
+              Step {currentStepIndex + 1} of {TOTAL_STEPS}
+            </p>
+          </div>
+
+          <div className="flex items-start gap-6">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10">
+              <Icon className="h-8 w-8 text-emerald-400" />
+            </div>
+            <div>
+              <h2 className="text-3xl font-semibold">{activeStep.title}</h2>
+              <p className="mt-3 text-base text-zinc-300">{STEP_DESCRIPTIONS[activeStep.id]}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button
+              variant="ghost"
+              className="w-full border border-white/10 bg-transparent text-white hover:bg-white/10"
+              onClick={handleSkip}
+              data-testid="onboarding-skip"
+            >
+              Skip
+            </Button>
+            <Button className="w-full" size="lg" onClick={handleNext} data-testid="onboarding-action">
+              {activeStep.actionLabel}
+            </Button>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
