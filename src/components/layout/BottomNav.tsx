@@ -29,33 +29,40 @@ export default function BottomNav() {
   return (
     <nav
       id="main-navigation"
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-800 bg-zinc-900/95 backdrop-blur-sm lg:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/70 bg-surface/95 backdrop-blur-md supports-[backdrop-filter]:bg-surface/75 lg:hidden"
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="mx-auto max-w-7xl px-2">
-        <div className="grid grid-cols-4 gap-1">
+      <div className="mx-auto max-w-7xl px-3 py-1.5">
+        <div className="grid grid-cols-4 gap-1.5">
           {navItems.map(({ path, label, Icon }) => (
             <NavLink
               key={path}
               to={path}
               id={getTourId(label)}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-1 py-3 px-2 transition-colors relative ${
+                [
+                  'relative flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium tracking-tight transition-all duration-150 ease-out motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
                   isActive
-                    ? 'text-emerald-500'
-                    : 'text-zinc-500 hover:text-zinc-300 active:text-zinc-400'
-                }`
+                    ? 'text-brand'
+                    : 'text-text-secondary hover:text-text-primary active:text-text-primary/80',
+                ].join(' ')
               }
-              style={({ isActive }) => ({
-                borderTop: isActive ? '2px solid rgb(var(--color-brand))' : undefined,
-                transition: 'all var(--duration-short) var(--ease-in-out)',
-              })}
             >
               {({ isActive }) => (
                 <>
-                  <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                  <span className="text-xs font-medium">{label}</span>
+                  <span
+                    className={`pointer-events-none absolute inset-x-6 top-1 h-1 rounded-full bg-brand/70 transition-opacity duration-150 motion-reduce:transition-none ${
+                      isActive ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    aria-hidden="true"
+                  />
+                  <Icon
+                    size={22}
+                    strokeWidth={isActive ? 2.4 : 2}
+                    className="transition-transform duration-150 motion-reduce:transition-none"
+                  />
+                  <span className="leading-none">{label}</span>
                 </>
               )}
             </NavLink>

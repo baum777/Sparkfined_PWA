@@ -89,7 +89,10 @@ function App() {
               <Sidebar />
 
               {/* Main content with sidebar offset on desktop */}
-              <div id="main-content" className="lg:pl-20">
+              <div
+                id="main-content"
+                className="transition-[padding] duration-300 ease-out motion-reduce:transition-none lg:pl-[var(--sidebar-width,5rem)]"
+              >
                 <RoutesRoot />
                 <GlobalInstruments />
               </div>

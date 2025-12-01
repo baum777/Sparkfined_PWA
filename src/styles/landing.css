@@ -1,163 +1,7 @@
-/* Landing Page Animations & Styles */
+/* Landing Page Structural Styles
+ * All motion tokens (fade, slide, ticker, glow, stagger) live in motion.css.
+ */
 
-/* Fade In Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
-  opacity: 0;
-}
-
-/* Slide In From Left */
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-slide-in-left {
-  animation: slideInLeft 0.8s ease-out forwards;
-  opacity: 0;
-}
-
-/* Slide In From Right */
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-slide-in-right {
-  animation: slideInRight 0.8s ease-out forwards;
-  opacity: 0;
-}
-
-/* Ticker Scroll (Infinite) */
-@keyframes ticker {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-ticker {
-  animation: ticker 30s linear infinite;
-}
-
-/* Glow Pulse (CTA) */
-@keyframes glowPulse {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
-  }
-}
-
-.animate-glow-pulse {
-  animation: glowPulse 2s ease-in-out infinite;
-}
-
-/* Float Animation (Floating Stats) */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* Scale In (Pop) */
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.5s ease-out forwards;
-  opacity: 0;
-}
-
-/* Shimmer Effect (Stats on Hover) */
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-.shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  background-size: 1000px 100%;
-  animation: shimmer 3s linear infinite;
-}
-
-/* Responsive Animation Adjustments */
-@media (prefers-reduced-motion: reduce) {
-  .animate-fade-in,
-  .animate-slide-in-left,
-  .animate-slide-in-right,
-  .animate-glow-pulse,
-  .animate-float,
-  .animate-scale-in {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-  
-  .animate-ticker {
-    animation: ticker 60s linear infinite; /* Slow down ticker */
-  }
-}
-
-/* Mobile Optimizations */
-@media (max-width: 768px) {
-  .animate-fade-in,
-  .animate-slide-in-left,
-  .animate-slide-in-right,
-  .animate-scale-in {
-    animation-duration: 0.4s !important; /* Faster on mobile */
-  }
-}
-
-/* Scroll Reveal (Intersection Observer Helper Classes) */
 .reveal {
   opacity: 0;
   transform: translateY(30px);
@@ -170,33 +14,13 @@
 }
 
 /* Stagger Effect Helper */
-.stagger-1 { animation-delay: 0.1s !important; }
-.stagger-2 { animation-delay: 0.2s !important; }
-.stagger-3 { animation-delay: 0.3s !important; }
-.stagger-4 { animation-delay: 0.4s !important; }
-.stagger-5 { animation-delay: 0.5s !important; }
-.stagger-6 { animation-delay: 0.6s !important; }
-
-/* Gradient Text Animation */
-@keyframes gradientShift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-.gradient-animate {
-  background-size: 200% auto;
-  animation: gradientShift 3s ease-in-out infinite;
-}
+/* Use motion-delay-* utilities from motion.css instead of discrete stagger classes. */
 
 /* Backdrop Blur for Nav */
 .backdrop-blur-nav {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background-color: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(10, 10, 10, 0.85);
 }
 
 /* Custom Scrollbar */
@@ -218,13 +42,4 @@
   background: #52525b; /* zinc-600 */
 }
 
-/* Smooth Scroll */
-html {
-  scroll-behavior: smooth;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-}
+/* Smooth scroll is managed globally in index.css to honor reduced-motion */

@@ -1,16 +1,26 @@
 /**
  * Desktop Sidebar Navigation
- * 
+ *
  * Features:
  * - Visible on desktop (>= lg)
  * - Icon + Label (vertical)
  * - Active state indicator (emerald bg, rounded)
- * - Collapsible (optional, for later)
+ * - Collapsible with smooth transitions (stores width in CSS var)
  * - Settings at bottom
  */
 
+import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, BarChart3, FileText, Bell, TrendingUp, Settings, type LucideIcon } from '@/lib/icons';
+import {
+  Home,
+  BarChart3,
+  FileText,
+  Bell,
+  TrendingUp,
+  Settings,
+  ChevronRight,
+  type LucideIcon,
+} from '@/lib/icons';
 
 interface NavItem {
   path: string;
@@ -31,6 +41,34 @@ const secondaryNavItems: NavItem[] = [
 ];
 
 export default function Sidebar() {
+  const [isCollapsed, setIsCollapsed] = React.useState(true);
+
+  React.useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    const width = isCollapsed ? '5rem' : '16rem';
+    root.style.setProperty('--sidebar-width', width);
+    root.dataset.sidebar = isCollapsed ? 'collapsed' : 'expanded';
+  }, [isCollapsed]);
+
+  React.useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    return () => {
+      root.style.setProperty('--sidebar-width', '5rem');
+      delete root.dataset.sidebar;
+    };
+  }, []);
+
+  const getNavClasses = (isActive: boolean) =>
+    [
+      'group flex w-full rounded-2xl px-3 py-2 font-medium transition-all duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+      isCollapsed ? 'flex-col items-center justify-center gap-1 text-[11px]' : 'flex-row items-center gap-3 text-sm',
+      isActive
+        ? 'bg-brand/10 text-brand shadow-[0_5px_20px_rgba(16,185,129,0.15)]'
+        : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover',
+    ].join(' ');
+
   // Map labels to tour step IDs
   const getTourId = (label: string) => {
     const idMap: Record<string, string> = {
@@ -47,34 +85,38 @@ export default function Sidebar() {
   return (
     <aside
       id="main-navigation"
-      className="fixed left-0 top-0 hidden h-screen w-20 flex-col border-r border-zinc-800 bg-zinc-900 py-6 lg:flex"
+      className={`fixed left-0 top-0 hidden h-screen flex-col border-r border-border bg-surface/80 py-6 backdrop-blur-sm transition-[width,transform] duration-300 ease-out motion-reduce:transition-none lg:flex ${
+        isCollapsed ? 'w-20' : 'w-64'
+      }`}
+      style={{ width: isCollapsed ? '5rem' : '16rem' }}
       role="navigation"
       aria-label="Primary navigation"
+      data-collapsed={isCollapsed}
     >
       {/* Primary Nav */}
-      <nav className="flex-1 space-y-2 px-3">
+      <nav className="flex-1 space-y-2 px-2">
         {primaryNavItems.map(({ path, label, Icon }) => (
           <NavLink
             key={path}
             to={path}
             id={getTourId(label)}
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-1 rounded-lg py-3 px-2 transition-all ${
-                isActive
-                  ? 'bg-emerald-500/10 text-emerald-500'
-                  : 'text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300'
-              }`
-            }
-            style={{
-              borderRadius: 'var(--radius-lg)',
-              transition: 'all var(--duration-short) var(--ease-in-out)',
-            }}
+            className={({ isActive }) => getNavClasses(isActive)}
             aria-label={label}
           >
             {({ isActive }) => (
               <>
-                <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                <span className="text-xs font-medium">{label}</span>
+                <Icon
+                  size={isCollapsed ? 22 : 20}
+                  strokeWidth={isActive ? 2.4 : 2}
+                  className="transition-transform duration-200 motion-reduce:transition-none"
+                />
+                <span
+                  className={`text-current transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
+                    isCollapsed ? 'text-[11px]' : 'text-sm'
+                  }`}
+                >
+                  {label}
+                </span>
               </>
             )}
           </NavLink>
@@ -82,34 +124,55 @@ export default function Sidebar() {
       </nav>
       
       {/* Secondary Nav (Bottom) */}
-      <nav className="space-y-2 px-3">
+      <nav className="space-y-2 px-2">
         {secondaryNavItems.map(({ path, label, Icon }) => (
           <NavLink
             key={path}
             to={path}
             id={getTourId(label)}
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-1 rounded-lg py-3 px-2 transition-all ${
-                isActive
-                  ? 'bg-emerald-500/10 text-emerald-500'
-                  : 'text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300'
-              }`
-            }
-            style={{
-              borderRadius: 'var(--radius-lg)',
-              transition: 'all var(--duration-short) var(--ease-in-out)',
-            }}
+            className={({ isActive }) => getNavClasses(isActive)}
             aria-label={label}
           >
             {({ isActive }) => (
               <>
-                <Icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                <span className="text-xs font-medium">{label}</span>
+                <Icon
+                  size={isCollapsed ? 22 : 20}
+                  strokeWidth={isActive ? 2.4 : 2}
+                  className="transition-transform duration-200 motion-reduce:transition-none"
+                />
+                <span
+                  className={`text-current transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
+                    isCollapsed ? 'text-[11px]' : 'text-sm'
+                  }`}
+                >
+                  {label}
+                </span>
               </>
             )}
           </NavLink>
         ))}
       </nav>
+
+      <button
+        type="button"
+        onClick={() => setIsCollapsed((prev) => !prev)}
+        className="mx-3 mt-4 flex items-center justify-center gap-2 rounded-2xl border border-border/60 bg-surface-subtle px-3 py-2 text-xs font-medium text-text-secondary transition-all duration-200 hover:border-brand hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus motion-reduce:transition-none"
+        aria-pressed={!isCollapsed}
+        aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+      >
+        <ChevronRight
+          className={`h-4 w-4 transition-transform duration-200 motion-reduce:transition-none ${
+            isCollapsed ? '' : 'rotate-180'
+          }`}
+        />
+        <span
+          className={`overflow-hidden transition-[max-width,opacity] duration-200 motion-reduce:transition-none ${
+            isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[6rem] opacity-100'
+          }`}
+        >
+          {isCollapsed ? 'Expand' : 'Collapse'}
+        </span>
+      </button>
     </aside>
   );
 }
