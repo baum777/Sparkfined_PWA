@@ -26,7 +26,14 @@ test.describe('journal flows', () => {
     await page.getByTestId('journal-new-entry-button').click();
     await page.getByTestId('journal-new-entry-title').fill(entry.title);
     await page.getByTestId('journal-new-entry-notes').fill(entry.notes);
-    await page.getByTestId('journal-save-entry-button').click();
+
+    // Ensure button is in viewport before clicking
+    const saveButton = page.getByTestId('journal-save-entry-button');
+    await saveButton.scrollIntoViewIfNeeded();
+    await saveButton.click();
+
+    // Wait for dialog to close before checking detail panel
+    await expect(page.getByTestId('journal-new-entry-dialog')).not.toBeVisible();
 
     const newestEntry = page.getByTestId('journal-list-item').first();
     await expect(newestEntry).toContainText(entry.title);
@@ -36,7 +43,11 @@ test.describe('journal flows', () => {
 
   test('@journal prevents saving when the title is empty', async ({ page }) => {
     await page.getByTestId('journal-new-entry-button').click();
-    await page.getByTestId('journal-save-entry-button').click();
+
+    const saveButton = page.getByTestId('journal-save-entry-button');
+    await saveButton.scrollIntoViewIfNeeded();
+    await saveButton.click();
+
     await expect(page.getByTestId('journal-new-entry-error')).toContainText('title');
   });
 

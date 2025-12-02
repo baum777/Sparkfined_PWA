@@ -13,8 +13,8 @@ export function makeJournalTestEntry(label: string = 'Quick log'): JournalTestEn
 
 export const ALERT_IDS = {
   armed: 'btc-breakout',
-  triggered: 'eth-volume-surge',
-  snoozed: 'sol-volatility-squeeze',
+  triggered: 'eth-liquidity-run',
+  paused: 'sol-squeeze',
   volatility: 'avax-volatility-break',
 } as const;
 
