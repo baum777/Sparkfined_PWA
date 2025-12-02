@@ -9,10 +9,10 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantClasses: Record<CardVariant, string> = {
-  default: 'bg-surface border-border-subtle shadow-card-subtle',
-  muted: 'bg-surface-subtle border-border-moderate shadow-card-subtle',
+  default: 'bg-gradient-to-br from-surface to-surface-elevated border-border-subtle shadow-card-subtle',
+  muted: 'bg-gradient-to-br from-surface-subtle to-surface border-border-moderate shadow-card-subtle',
   interactive:
-    'bg-surface border-border-subtle shadow-card-subtle hover:border-border-accent hover:shadow-emerald-glow',
+    'bg-gradient-to-br from-surface to-surface-elevated border-border-subtle shadow-card-subtle hover:border-accent/40 hover:shadow-glow-cyan',
 }
 
 /**
@@ -54,7 +54,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
       className={cn(
         'rounded-2xl border p-6 transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
         variantClasses[variant],
-        isInteractive && 'cursor-pointer hover:-translate-y-0.5 active:translate-y-0 focus-visible:-translate-y-0.5',
+        isInteractive && 'group cursor-pointer hover:scale-[1.01] hover:-translate-y-0.5 active:scale-[0.99] active:translate-y-0 focus-visible:-translate-y-0.5',
         className
       )}
       tabIndex={isInteractive ? tabIndex ?? 0 : tabIndex}
