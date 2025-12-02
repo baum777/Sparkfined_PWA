@@ -1,121 +1,219 @@
-# Sparkfined PWA
+# ⚡ Sparkfined
 
-> **From Chaos to Mastery** — An Offline-First Trading Command Center for Crypto Markets
+> **From Chaos to Mastery** — Your Offline-First Trading Command Center for Crypto Markets
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](package.json)
 [![PWA](https://img.shields.io/badge/PWA-enabled-brightgreen.svg)](https://web.dev/progressive-web-apps/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18.3-blue.svg)](https://react.dev/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+**[🚀 Launch App](https://sparkfined.vercel.app)** • **[📖 Documentation](./docs)** • **[💬 Discord](https://discord.gg/sparkfined)** • **[🐦 Twitter](https://twitter.com/sparkfined)**
 
 ---
 
-## What is Sparkfined?
+## ⚡ Quick Start
 
-**Sparkfined** is an **offline-first Progressive Web App (PWA)** designed for crypto traders who want to transform losses into lessons and emotions into discipline. Built with a focus on self-improvement, it combines powerful journaling, AI-powered insights, and technical analysis tools to help you discover your trading edge.
+```bash
+# 1. Open the app (no signup required)
+https://sparkfined.vercel.app
 
-Unlike generic charting platforms, Sparkfined helps you **understand yourself** — your behavioral patterns, blind spots, and evolution as a trader through systematic reflection and AI-driven analysis.
+# 2. Install as PWA (optional)
+Click "Install" in browser menu → Add to Home Screen
 
-### Built For
+# 3. Start using immediately
+✅ View charts (BTC, ETH, SOL...)
+✅ Set your first alert
+✅ Log your first trade
+✅ Generate AI insights after 10+ entries
+```
 
-- **Day Traders** breaking FOMO loops and revenge-trade cycles
-- **Meme Coin Traders** who need structure in market chaos  
-- **Self-Improvement Traders** who journal consistently
-- **Disciplined Learners** tired of repeating the same mistakes
+**3 seconds to start. 0 barriers. 100% free core features.**
 
 ---
 
-## Why Sparkfined?
+## 🎯 What is Sparkfined?
 
-### The Problem
+**Stop trading blind. Start trading smart.**
 
-Most traders lose money not because they lack charts or indicators, but because they:
-- **Repeat the same mistakes** (FOMO into pumps, revenge-trade after losses)
-- **Trade on emotion** instead of rules
-- **Have no system** to track what works and what doesn't
-- **Never reflect** on their trades — they just move to the next one
+**Sparkfined** is an **offline-first Progressive Web App (PWA)** that transforms how crypto traders learn, reflect, and improve. Built by traders for traders, it combines:
 
-### The Solution
+- 📊 **Professional charting** with 30+ technical indicators
+- 🔔 **Smart alerts** that work while you sleep  
+- 📝 **AI-powered journaling** to track your evolution
+- 🎮 **Trade replay** to learn from past mistakes
+- 🧠 **Behavioral insights** to spot your blind spots
 
-Sparkfined gives you **three things that matter more than any indicator:**
+Unlike generic charting platforms, Sparkfined doesn't just show you data — it helps you **understand yourself** through systematic reflection and AI-driven analysis. Your edge isn't the chart. It's what you DO with it.
 
-1. **A Journal That Makes You Honest**  
-   Write down every trade. The good, the bad, the ugly. Face your patterns before they break you.
+### 🎯 Built For
 
-2. **AI That Spots Your Blind Spots**  
-   Let AI analyze your last 20-50 trades and tell you what you can't see: timing patterns, emotional triggers, setup discipline gaps.
+- 🚀 **Day Traders** breaking FOMO loops and revenge-trade cycles
+- 🔥 **Meme Coin Traders** who need structure in market chaos  
+- 📈 **Swing Traders** tracking multi-day positions
+- 🧠 **Self-Improvement Traders** who journal consistently
+- 🎯 **Disciplined Learners** tired of repeating the same mistakes
 
-3. **A Journey That Rewards Growth**  
-   Track your evolution from Degen (chaos) to Master (discipline) with an XP system that rewards consistency, not just profits.
+---
+
+## 💡 Why Sparkfined?
+
+### The Problem We Solve
+
+You're losing money. Not because you lack charts or indicators, but because:
+
+| Pain Point | The Reality |
+|-----------|-------------|
+| 📉 **Missed Breakouts** | *"Set alert at $50k, woke up to $52k. FML."* |
+| 🧠 **Trade Amnesia** | *"Why did I enter this? Was it FOMO or setup?"* |
+| 📱 **Desktop-Only Tools** | *"Can't draw trendlines on my phone at 3am."* |
+| 💸 **Subscription Hell** | *"$50/month for basic alerts? Really?"* |
+| 🔄 **Scattered Tools** | *"TradingView + Telegram + Twitter + 12 tabs..."* |
+
+**The truth:** You don't need more indicators. You need more **discipline**. More **self-awareness**. More **systematic reflection**.
+
+### The Solution: Three Pillars
+
+Sparkfined gives you what matters most:
+
+#### 💎 **1. Clarity Over Chaos**
+Professional charting that works **offline**. Canvas-based 60fps rendering, 30+ technical indicators, drawing tools, multi-timeframe analysis. Your command center in your pocket.
+
+#### 📜 **2. Memory Over Instinct**  
+Trading journal with AI compression, OCR screenshot analysis, emotion tracking, pattern recognition. Your instinct lies. Your data doesn't.
+
+#### 🔑 **3. Sovereignty Over Dependency**
+Local-first storage, no vendor lock-in, works offline, your data stays yours. You own your strategy. You own your journey.
 
 ---
 
 ## ✨ Core Features
 
-### 📝 Trading Journal — Your Second Brain
+### 📊 **Charts That Don't Suck**
 
-**Why it matters:** Consistent journaling separates profitable traders from those who repeat mistakes. Every loss becomes a lesson.
+**Why it matters:** You can't trade what you can't see clearly.
 
-- **Rich note-taking** — Document thesis, emotions, and outcomes for every trade
-- **Tag-based filtering** — Instantly find patterns like "FOMO", "Revenge Trade", or specific setups
-- **Offline-capable** — Write anywhere, sync when online
-- **Privacy-first** — Data stored locally in IndexedDB (Dexie), under your control
-- **AI-Condense** — Let AI summarize long journal entries for quick review
+```
+✅ Canvas-based 60fps rendering (smooth as butter)
+✅ 30+ Technical Indicators (RSI, MACD, Bollinger, Volume Profile...)
+✅ Professional Drawing Tools (trendlines, fibonacci, rectangles)
+✅ Multi-Timeframe Analysis (1m to 1W)
+✅ Works Offline (PWA architecture)
+✅ Mobile-Optimized (trade from anywhere)
+```
 
-**The discipline:** Log every trade. Especially the painful ones.
-
----
-
-### 🎯 Journey & XP — From Degen to Master
-
-**Why it matters:** Trading is a craft. Mastery comes from self-improvement, not luck.
-
-Sparkfined tracks your **trading evolution** through five phases:
-
-| Phase | What It Means |
-|-------|---------------|
-| **DEGEN** | Chasing pumps, trading on emotions, no system |
-| **SEEKER** | Building awareness, testing setups, journaling starts |
-| **WARRIOR** | Following rules, managing risk, discipline emerging |
-| **MASTER** | Consistent edge, pattern recognition, emotional control |
-| **SAGE** | Wisdom, mentorship, helping others avoid your mistakes |
-
-**How it works:**
-- Earn **XP** for disciplined actions (journaling trades, following your setup, respecting stop-losses)
-- Build **streaks** by staying consistent
-- See your **phase** evolve as you level up
-
-**The truth:** You don't need more indicators. You need more discipline. The XP system keeps you accountable.
+**No lag. No subscription. Just charts.**
 
 ---
 
-### 🧠 AI-Powered Behavioral Insights
+### 🔔 **Alerts That Actually Work**
+
+**Why it matters:** The market never sleeps. But you have to.
+
+```
+✅ Server-Side Evaluation (runs 24/7, not just when app is open)
+✅ Multi-Condition Rules (price + volume + indicator combinations)
+✅ Push Notifications (desktop + mobile)
+✅ Backtest Before Activate (see historical triggers)
+✅ Smart Grouping (avoid notification spam)
+```
+
+**Set it. Forget it. Get notified when it matters.**
+
+---
+
+### 📝 **Journal You'll Actually Use**
+
+**Why it matters:** Consistent journaling separates profitable traders from those who repeat mistakes.
+
+```
+✅ One-Click Entry Creation (save trades in 10 seconds)
+✅ AI-Powered Summaries (condense long notes instantly)
+✅ Screenshot OCR (extract text from trading screenshots)
+✅ Emotion Tracking (tag FOMO, Fear, Greed, Revenge)
+✅ Pattern Recognition (AI finds recurring mistakes)
+✅ Export to Markdown (own your data forever)
+```
+
+**Log every trade. Especially the painful ones.**
+
+---
+
+### 🎮 **Trade Replay — Learn From History**
+
+**Why it matters:** You can't fix mistakes you don't understand.
+
+```
+✅ Time-Travel Through Charts (replay any past period)
+✅ Hide Future Data (practice entries without hindsight bias)
+✅ Save Studies (bookmark key moments)
+✅ Compare Setups (what would've happened if...)
+✅ Pattern Practice (train on 1000s of historical candles)
+```
+
+**The replay mode that backtested traders swear by.**
+
+---
+
+### 🎯 **Journey System — From Degen to Master**
+
+**Why it matters:** Trading is a craft. Mastery comes from discipline, not luck.
+
+Track your **evolution** through five phases:
+
+```
+💀 DEGEN    → Chasing pumps, pure emotions, no system
+🔍 SEEKER   → Building awareness, testing setups
+⚔️  WARRIOR  → Following rules, managing risk
+👑 MASTER   → Consistent edge, pattern recognition
+🧙 SAGE     → Wisdom, mentorship, teaching others
+```
+
+**Earn XP for:**
+- ✅ Journaling every trade (consistency > profits)
+- ✅ Following your setup (discipline > FOMO)
+- ✅ Respecting stop-losses (survival > revenge)
+- ✅ Daily streaks (showing up > short bursts)
+
+**The truth:** You don't need more indicators. You need more discipline.
+
+---
+
+### 🧠 **AI-Powered Behavioral Insights**
 
 **Why it matters:** You can't fix patterns you don't see. AI spots them for you.
 
-Sparkfined analyzes your recent trades and identifies **recurring patterns** across five categories:
+Analyze your last 20-50 trades and get **evidence-based insights** in 5 categories:
 
-1. **Behavior Loops**  
-   Example: *"You FOMO into breakouts that are already +30% from lows. This leads to late entries and high drawdown risk."*
+```
+🔄 BEHAVIOR LOOPS
+   "You FOMO into breakouts already +30% from lows.
+    This leads to late entries and high drawdown risk."
 
-2. **Timing Patterns**  
-   Example: *"Your worst trades happen after 8 PM. Fatigue leads to revenge trading."*
+⏰ TIMING PATTERNS
+   "Your worst trades happen after 8 PM.
+    Fatigue leads to revenge trading."
 
-3. **Risk Management**  
-   Example: *"You size 3x larger on revenge trades vs. planned setups. This blows your account faster."*
+💰 RISK MANAGEMENT
+   "You size 3x larger on revenge trades vs. planned setups.
+    This blows your account faster."
 
-4. **Setup Discipline**  
-   Example: *"You take twice as many trades on weekends vs. weekdays, but your weekend win rate is 15% lower."*
+📋 SETUP DISCIPLINE
+   "You take 2x more trades on weekends (but 15% lower win rate).
+    Overtrading when bored."
 
-5. **Emotional Patterns**  
-   Example: *"After 2 losses in a row, you double position size. This turns small losses into wipeouts."*
+😡 EMOTIONAL PATTERNS
+   "After 2 losses in a row, you double position size.
+    This turns small losses into wipeouts."
+```
 
 **How it works:**
-- Select your last 20-50 journal entries
-- Click "Generate Insights" (runs in ~30 seconds)
-- Get 2-5 concrete insights with **actionable recommendations**
-- Each insight shows which trades support it (evidence-based, not guesses)
+1. Select your last 20-50 journal entries
+2. Click "Generate Insights" (~30 seconds)
+3. Get 2-5 concrete insights with **actionable recommendations**
+4. See which trades support each insight (evidence, not guesses)
 
-**The value:** AI doesn't tell you *what* to trade. It tells you *how* you're sabotaging yourself — so you can fix it.
+**AI doesn't tell you *what* to trade. It tells you *how* you're sabotaging yourself.**
 
 ---
 
@@ -162,56 +260,71 @@ Most crypto dashboards are built for casual investors checking prices once a day
 
 ## 🛠️ Tech Stack
 
-**Frontend:**
-- **React 18.3** with **TypeScript 5.6** (strict mode enabled)
-- **Vite 5.4** for blazing-fast builds and HMR
-- **TailwindCSS 4.1** (dark-mode-first design)
-- **Zustand** for state management (lightweight, <1KB)
-- **Dexie** (IndexedDB wrapper) for offline-first data persistence
-- **React Router 6** for client-side routing
+### Frontend (The Fast Stuff)
+```typescript
+⚡ React 18.3          // UI framework
+📘 TypeScript 5.6      // Type safety (strict mode)
+🎨 TailwindCSS 4.1     // Dark-mode-first design
+🏪 Zustand             // State management (<1KB)
+💾 Dexie               // IndexedDB wrapper (offline storage)
+🧭 React Router 6      // Client-side routing
+⚙️  Vite 5.4           // Build tool (blazing fast HMR)
+```
 
-**Backend (Serverless):**
-- **Vercel Edge Functions** (Node 18+)
-- **OpenAI API** (gpt-4o-mini) for AI features
-- **xAI Grok** for crypto-native reasoning (optional)
+### Backend (The Serverless Magic)
+```typescript
+🌐 Vercel Edge Functions  // Serverless API (Node 18+)
+🤖 OpenAI API (gpt-4o-mini) // AI insights & analysis
+🦾 xAI Grok              // Crypto-native reasoning (optional)
+```
 
-**PWA & Offline:**
-- **vite-plugin-pwa** + **Workbox** for Service Worker
-- **~428KB precache** (static assets)
-- Cache strategies: Precache, Cache-First, Network-First, Stale-While-Revalidate
+### PWA & Offline (The Resilience)
+```typescript
+📦 vite-plugin-pwa + Workbox  // Service Worker
+💿 ~428KB precache           // Static assets cached
+🔄 Cache strategies          // Precache, Cache-First, Network-First
+```
 
-**Testing:**
-- **Vitest** for unit/integration tests
-- **Playwright** for E2E tests
-- **Testing Library** (React) for component tests
-- Target: **80% coverage** overall, **90% for critical modules**
+### Testing (The Confidence)
+```typescript
+✅ Vitest           // Unit + Integration tests
+🎭 Playwright       // E2E tests (critical flows)
+🧪 Testing Library  // Component tests
+🎯 Coverage: 80% overall, 90% critical paths
+```
 
-**Deployment:**
-- **Vercel** (Edge Functions + Static Hosting)
-- **GitHub Actions** for CI/CD
-- **Lighthouse CI** for performance monitoring
+### Deployment (The Pipeline)
+```typescript
+🚀 Vercel              // Edge Functions + Static Hosting
+⚙️  GitHub Actions     // CI/CD automation
+📊 Lighthouse CI       // Performance monitoring
+```
 
 ---
 
-## 🚀 How It Works (Simple Flow)
+## 🚀 How It Works (5-Minute Flow)
 
-1. **Log a Trade**  
-   After closing a position, document: ticker, thesis, emotions, and outcome
+```
+1️⃣  LOG A TRADE
+    Close a position → Document: ticker, thesis, emotions, outcome
+    
+2️⃣  TAG & FILTER  
+    Apply tags: "FOMO", "Revenge Trade", "Setup: Breakout"
+    
+3️⃣  GENERATE AI INSIGHTS
+    After 10-20 trades → Click "Generate Insights" (~30s)
+    
+4️⃣  IDENTIFY PATTERNS
+    AI reveals: behavior loops, timing issues, emotional triggers
+    
+5️⃣  FIX ONE THING
+    Pick your highest-severity insight → Address it systematically
+    
+6️⃣  TRACK PROGRESS
+    Monitor evolution: XP, phases, win rates, streaks
+```
 
-2. **Tag & Filter**  
-   Apply tags (setups, emotions, outcomes) and filter to find patterns like "FOMO" or "Revenge Trade"
-
-3. **Generate AI Insights**  
-   After 10-20 trades, click "Generate Insights" for AI-powered pattern analysis
-
-4. **Identify Patterns**  
-   AI reveals: behavior loops, timing issues, risk management gaps, emotional triggers
-
-5. **Fix One Thing**  
-   Choose your highest-severity insight and address it systematically
-
-6. **Track Progress**  
-   Monitor your evolution through XP, phases, and improving win rates
+**Simple. Systematic. Transformative.**
 
 ---
 
@@ -219,63 +332,72 @@ Most crypto dashboards are built for casual investors checking prices once a day
 
 **Current Status:** `v0.1.0 Beta` — Core features stable, PWA functional, AI integrations live
 
-### Active Sprint: S0 — Foundation Cleanup (Nov 12 → Nov 26, 2025)
+### 🎯 Q1 2025 — Stability & Growth
 
-**In Progress:**
-- ✅ Multi-Tool Prompt System (AI agent optimization)
-- ✅ PWA Offline-Mode Audit (Service Worker stable, 428KB precache)
-- ⏳ Bundle-Size Optimization (Target: <400KB)
-- ⏳ E2E Test Coverage expansion (Target: 15-20 critical flows)
+```
+✅ COMPLETED
+   ✓ Multi-Tool Prompt System (AI optimization)
+   ✓ PWA Offline-Mode Audit (428KB precache)
+   ✓ AI Cost Optimization (gpt-4o-mini migration)
 
-### Q1 2025 — High-Priority Features
+⏳ IN PROGRESS
+   ⚙️  Bundle-Size Optimization (<400KB target)
+   🧪 E2E Test Coverage (15-20 critical flows)
 
-**🔐 On-Chain Access Gating** `P0`
-- Replace mock wallet with real Solana NFT-based access control
-- Integrate `@solana/wallet-adapter-react` (Phantom, Solflare)
-- `/api/access/verify` endpoint for on-chain NFT verification
-- **Effort:** 2 sprints (4 weeks)
+🚀 PLANNED
+   🔐 On-Chain Access Gating (Solana NFT verification)
+   🔔 Real-Time Push Notifications (browser + mobile)
+   🔄 Background Sync (offline write queue)
+   📊 Chart Library Evaluation (TradingView vs Lightweight)
+```
 
-**🔔 Real-Time Alerts (Push Notifications)** `P0`
-- Browser push notifications for price alerts and signal triggers
-- Service Worker push event handlers
-- Alert subscription/triggering via Vercel Cron
-- **Effort:** 2 sprints (4 weeks)
+### 🌟 Q2 2025 — Platform Expansion
 
-**🔄 Background Sync (Offline-First Writes)** `P0`
-- Queue offline actions (journal entries, alerts) for sync when online
-- Service Worker `sync` event handlers
-- Retry logic + conflict resolution
-- **Effort:** 1 sprint (2 weeks)
+```
+☁️  Supabase Migration (cross-device sync)
+📱 Mobile App Wrapper (iOS/Android via Capacitor)
+📈 Advanced TA Indicators (Ichimoku, Keltner, Volume Profile+)
+🎮 Enhanced Replay Mode (annotations, save studies)
+💬 In-App Chat (trader community)
+```
 
-**📊 Chart Library Evaluation** `P1`
-- Evaluate: Lightweight-Charts (current) vs. TradingView Widget vs. Recharts
-- Decision deadline: End Q1 2025
-- **Effort:** 1 sprint spike
+### 🚀 Q3 2025 — Community & Scale
 
-**💰 AI Cost Optimization** `P1`
-- Response caching (1h TTL) ✅ Partially done
-- Migrate high-volume tasks to gpt-4o-mini ✅ Done
-- Per-user rate limiting (20 requests/hour)
-- Prompt compression for long contexts
-- **Effort:** 1 sprint (2 weeks)
+```
+🌐 Community Heatmaps (anonymized behavioral patterns)
+📋 Setup Templates (save & track custom strategies)
+📤 Social Sharing (export insights to Twitter/Discord)
+🎓 Mentorship Pairing (connect with traders 1 phase ahead)
+🏆 Leaderboards (XP, streaks, win rates)
+🔓 Open Source Release (MIT license)
+```
 
-### Q2 2025 — Platform Growth
-
-- **Supabase Migration** (Optional): Backend DB for cross-device sync
-- **Mobile App Wrapper** (Capacitor): Native iOS/Android app via App Store
-- **Advanced TA Indicators**: Ichimoku, Keltner, additional studies
-- **Trade Replay**: Study past price action with annotations
-
-### Q3 2025 — Community Features
-
-- **Community Heatmaps**: Anonymized behavioral patterns across traders
-- **Setup Templates**: Save & track win rates for custom setups
-- **Social Sharing**: Share journal insights/lessons
-- **Mentorship Pairing**: Connect with traders one phase ahead
+**Our Promise:** Build features that matter. No fluff. No token pump. Just tools that make you better.
 
 ---
 
-## Philosophy — The Path to Mastery
+## 🎯 The Sparkfined Promise
+
+We don't promise:
+- ❌ Guaranteed profits
+- ❌ "100x moon shots"
+- ❌ Signal groups
+- ❌ Token pumps
+
+We **do** promise:
+- ✅ **Honest tools** that respect your intelligence
+- ✅ **A journal** that makes you face your mistakes
+- ✅ **AI insights** that spot your blind spots
+- ✅ **Offline-first** architecture (your data, your control)
+- ✅ **No BS** — transparent development, no gimmicks
+
+**Your edge is not an indicator. It's discipline. It's self-awareness. It's systematic reflection.**
+
+Sparkfined is your training ground. The market is your test.
+
+---
+
+## 💭 Philosophy — The Path to Mastery
 
 ### From Degen to Sage
 
