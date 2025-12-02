@@ -14,6 +14,7 @@ import { checkAlerts, notifyAlertTriggered } from '@/lib/alerts/triggerEngine'
 import { useAlertsStore } from '@/store/alertsStore'
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 import { useOnboardingStore } from '@/store/onboardingStore'
+import { ToastProvider } from '@/components/ui/Toast'
 
 function App() {
   const hasCompletedOnboarding = useOnboardingStore((state) => state.hasCompletedOnboarding)
@@ -71,6 +72,7 @@ function App() {
         <ThemeProvider>
           <SettingsProvider>
             <AIProviderState>
+              <ToastProvider>
               {/* Missing Config Banner */}
               <MissingConfigBanner />
 
@@ -100,6 +102,7 @@ function App() {
 
               {/* Mobile Bottom Nav (< lg) */}
               <BottomNav />
+              </ToastProvider>
             </AIProviderState>
           </SettingsProvider>
         </ThemeProvider>

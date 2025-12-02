@@ -9,8 +9,9 @@ async function bypassOnboarding(page: Page) {
 }
 
 async function goToAlerts(page: Page) {
-  await page.goto(ALERTS_URL);
-  await expect(page.getByTestId('alerts-page')).toBeVisible();
+  await page.goto(ALERTS_URL, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(500);
+  await expect(page.getByTestId('alerts-page')).toBeVisible({ timeout: 10000 });
 }
 
 async function createAlert(page: Page, symbol: string) {

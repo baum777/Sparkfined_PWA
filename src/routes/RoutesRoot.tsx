@@ -20,6 +20,15 @@ const AlertsPageV2 = lazy(() => import("../pages/AlertsPageV2"));
 const ChartPageV2 = lazy(() => import("../pages/ChartPageV2"));
 const SettingsPageV2 = lazy(() => import("../pages/SettingsPageV2"));
 
+// Dev-only showcase pages (excluded from production bundle)
+const StyleShowcasePage = import.meta.env.DEV
+  ? lazy(() => import("../pages/StyleShowcasePage"))
+  : lazy(() => Promise.resolve({ default: () => null }));
+
+const UXShowcasePage = import.meta.env.DEV
+  ? lazy(() => import("../pages/UXShowcasePage"))
+  : lazy(() => Promise.resolve({ default: () => null }));
+
 function Fallback() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -69,6 +78,15 @@ export default function RoutesRoot() {
           <Route path="/chart-v2" element={<ChartPageV2 />} />
           <Route path="/settings-v2" element={<SettingsPageV2 />} />
           <Route path="/icons" element={<IconShowcase />} />
+          
+          {/* Dev-only showcase routes */}
+          {import.meta.env.DEV && (
+            <>
+              <Route path="/styles" element={<StyleShowcasePage />} />
+              <Route path="/ux" element={<UXShowcasePage />} />
+            </>
+          )}
+          
           <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
         </Routes>
       </Suspense>

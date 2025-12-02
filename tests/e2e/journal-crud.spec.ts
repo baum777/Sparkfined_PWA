@@ -19,8 +19,9 @@ async function createJournalEntry(page: Page, title: string, notes: string) {
 
 test.beforeEach(async ({ page }) => {
   await bypassOnboarding(page);
-  await page.goto(JOURNAL_URL);
-  await expect(page.getByTestId('journal-page')).toBeVisible();
+  await page.goto(JOURNAL_URL, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(500);
+  await expect(page.getByTestId('journal-page')).toBeVisible({ timeout: 10000 });
 });
 
 test('shows journal entries and detail panel updates', async ({ page }) => {

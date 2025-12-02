@@ -453,6 +453,59 @@ export default {
         wider: '0.05em',
         widest: '0.1em',
       },
+      
+      // Filter utilities
+      blur: {
+        xs: '2px',
+        sm: '4px',
+        md: '8px',
+        lg: '12px',
+        xl: '16px',
+        '2xl': '24px',
+        '3xl': '40px',
+      },
+      
+      // Brightness
+      brightness: {
+        0: '0',
+        50: '0.5',
+        75: '0.75',
+        90: '0.9',
+        95: '0.95',
+        100: '1',
+        105: '1.05',
+        110: '1.1',
+        125: '1.25',
+        150: '1.5',
+        200: '2',
+      },
+      
+      // Saturate
+      saturate: {
+        0: '0',
+        50: '0.5',
+        100: '1',
+        150: '1.5',
+        200: '2',
+      },
+      
+      // Container queries
+      container: {
+        center: true,
+        padding: {
+          DEFAULT: '1rem',
+          sm: '1.5rem',
+          lg: '2rem',
+          xl: '3rem',
+        },
+        screens: {
+          sm: '640px',
+          md: '768px',
+          lg: '1024px',
+          xl: '1280px',
+          '2xl': '1536px',
+        },
+      },
     },
   },
   plugins: [],
