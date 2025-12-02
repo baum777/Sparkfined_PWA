@@ -1,111 +1,192 @@
-/**
- * Accessible Form Field Component
- * 
- * Features:
- * - Automatic ARIA attributes (aria-invalid, aria-describedby)
- * - Error message announcements (aria-live)
- * - Required field indicators
- * - Helper text support
- * - Label association (htmlFor)
- * - Focus management
- * 
- * WCAG 2.1 Compliance:
- * - 3.3.1 Error Identification (A)
- * - 3.3.2 Labels or Instructions (A)
- * - 3.3.3 Error Suggestion (AA)
- * - 4.1.3 Status Messages (AA)
- */
-
-import { ReactNode, useId } from 'react';
-import { AlertTriangle, Info } from '@/lib/icons';
+import React from 'react';
 
 interface FormFieldProps {
   label: string;
-  children: ReactNode;
   error?: string;
   hint?: string;
   required?: boolean;
-  htmlFor?: string;
+  children: React.ReactElement;
   className?: string;
 }
 
-export default function FormField({
-  label,
-  children,
-  error,
-  hint,
-  required = false,
-  htmlFor,
-  className = '',
+export function FormField({ 
+  label, 
+  error, 
+  hint, 
+  required, 
+  children, 
+  className = '' 
 }: FormFieldProps) {
-  const generatedId = useId();
-  const fieldId = htmlFor || generatedId;
-  const errorId = `${fieldId}-error`;
-  const hintId = `${fieldId}-hint`;
+  const childId = children.props.id || `field-${label.toLowerCase().replace(/\s+/g, '-')}`;
   
   return (
     <div className={`space-y-2 ${className}`}>
       {/* Label */}
-      <label
-        htmlFor={fieldId}
-        className="block text-sm font-medium text-zinc-200"
+      <label 
+        htmlFor={childId}
+        className="block text-sm font-medium text-text-primary"
       >
         {label}
-        {required && (
-          <span className="ml-1 text-rose-500" aria-label="required">
-            *
-          </span>
-        )}
+        {required && <span className="text-sentiment-bear ml-1">*</span>}
       </label>
-      
-      {/* Helper Text */}
-      {hint && !error && (
-        <div
-          id={hintId}
-          className="flex items-start gap-2 text-xs text-zinc-500"
-        >
-          <Info size={14} className="mt-0.5 flex-shrink-0" />
-          <span>{hint}</span>
-        </div>
-      )}
-      
-      {/* Input Field */}
-      <div>
-        {children}
+
+      {/* Input */}
+      <div className="relative">
+        {React.cloneElement(children, {
+          id: childId,
+          'aria-invalid': error ? 'true' : 'false',
+          'aria-describedby': error ? `${childId}-error` : hint ? `${childId}-hint` : undefined,
+          className: `${children.props.className || ''} ${
+            error ? 'border-sentiment-bear focus:border-sentiment-bear focus:ring-sentiment-bear' : ''
+          }`,
+        })}
+        
+        {/* Error Icon */}
+        {error && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <svg className="w-5 h-5 text-sentiment-bear" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        )}
       </div>
-      
-      {/* Error Message */}
-      {error && (
-        <div
-          id={errorId}
-          role="alert"
-          aria-live="assertive"
-          className="flex items-start gap-2 text-xs text-rose-500"
-        >
-          <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
-          <span>{error}</span>
-        </div>
+
+      {/* Hint or Error Message */}
+      {error ? (
+        <p id={`${childId}-error`} className="text-sm text-sentiment-bear flex items-start gap-1.5">
+          <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {error}
+        </p>
+      ) : hint ? (
+        <p id={`${childId}-hint`} className="text-xs text-text-tertiary">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+// Input with built-in validation
+export function ValidatedInput({
+  value,
+  onChange,
+  onBlur,
+  validation,
+  ...props
+}: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'onBlur'> & {
+  value: string;
+  onChange: (value: string) => void;
+  onBlur?: () => void;
+  validation?: {
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    pattern?: RegExp;
+    custom?: (value: string) => string | undefined;
+  };
+}) {
+  const [error, setError] = React.useState<string>();
+  const [touched, setTouched] = React.useState(false);
+
+  const validate = React.useCallback((val: string) => {
+    if (!validation) return;
+
+    if (validation.required && !val.trim()) {
+      return 'This field is required';
+    }
+
+    if (validation.minLength && val.length < validation.minLength) {
+      return `Minimum ${validation.minLength} characters required`;
+    }
+
+    if (validation.maxLength && val.length > validation.maxLength) {
+      return `Maximum ${validation.maxLength} characters allowed`;
+    }
+
+    if (validation.pattern && !validation.pattern.test(val)) {
+      return 'Invalid format';
+    }
+
+    if (validation.custom) {
+      return validation.custom(val);
+    }
+  }, [validation]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    onChange(newValue);
+    
+    if (touched) {
+      setError(validate(newValue));
+    }
+  };
+
+  const handleBlur = () => {
+    setTouched(true);
+    setError(validate(value));
+    onBlur?.();
+  };
+
+  return (
+    <div className="relative">
+      <input
+        {...props}
+        value={value}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        className={`
+          input
+          ${error && touched ? 'border-sentiment-bear focus:border-sentiment-bear focus:ring-sentiment-bear' : ''}
+          ${props.className || ''}
+        `}
+        aria-invalid={error && touched ? 'true' : 'false'}
+      />
+      {error && touched && (
+        <p className="mt-2 text-sm text-sentiment-bear flex items-start gap-1.5">
+          <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          {error}
+        </p>
       )}
     </div>
   );
 }
 
-/**
- * Usage Example:
- * 
- * <FormField
- *   label="Token Address"
- *   htmlFor="token-address"
- *   error={errors.address}
- *   hint="Enter a valid Solana token address"
- *   required
- * >
- *   <Input
- *     id="token-address"
- *     value={address}
- *     onChange={(e) => setAddress(e.target.value)}
- *     aria-invalid={!!errors.address}
- *     aria-describedby={errors.address ? 'token-address-error' : 'token-address-hint'}
- *   />
- * </FormField>
- */
+// Character counter for inputs
+export function CharacterCounter({ 
+  current, 
+  max 
+}: { 
+  current: number; 
+  max: number; 
+}) {
+  const percentage = (current / max) * 100;
+  const isWarning = percentage >= 80;
+  const isError = percentage >= 100;
+
+  return (
+    <div className="flex items-center justify-between text-xs">
+      <span className={`font-medium ${
+        isError ? 'text-sentiment-bear' : 
+        isWarning ? 'text-sentiment-neutral' : 
+        'text-text-tertiary'
+      }`}>
+        {current} / {max}
+      </span>
+      {/* Progress bar */}
+      <div className="flex-1 ml-3 h-1 bg-surface-elevated rounded-full overflow-hidden">
+        <div
+          className={`h-full transition-all duration-200 ${
+            isError ? 'bg-sentiment-bear' :
+            isWarning ? 'bg-sentiment-neutral' :
+            'bg-brand'
+          }`}
+          style={{ width: `${Math.min(percentage, 100)}%` }}
+        />
+      </div>
+    </div>
+  );
+}
