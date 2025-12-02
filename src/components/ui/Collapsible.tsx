@@ -149,14 +149,15 @@ export function Accordion({
         const isOpen = openItems.includes(item.id);
         
         return (
-          <Collapsible
-            key={item.id}
-            title={item.title}
-            defaultOpen={isOpen}
-            variant={variant}
-          >
-            {item.content}
-          </Collapsible>
+          <div key={item.id} onClick={() => toggleItem(item.id)}>
+            <Collapsible
+              title={item.title}
+              defaultOpen={isOpen}
+              variant={variant}
+            >
+              {item.content}
+            </Collapsible>
+          </div>
         );
       })}
     </div>

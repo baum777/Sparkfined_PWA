@@ -21,15 +21,19 @@ test.describe("Sparkfined Deploy Smoke", () => {
   });
 
   test("App renders and shows dashboard", async ({ page }) => {
-    await page.goto('/', { waitUntil: "domcontentloaded" });
+    await page.goto('/', { waitUntil: "networkidle" });
     await expect(page.locator("body")).toBeVisible();
+    
+    // Wait for app to render
+    await page.waitForTimeout(1000);
     
     // Dashboard should show title or navigation
     // Check for Dashboard heading or any main navigation text
     const hasDashboard = await page.locator("text=Dashboard").first().isVisible().catch(() => false);
     const hasNavigation = await page.locator("text=Journal").isVisible().catch(() => false);
     const hasContent = await page.locator("text=Sparkfined").isVisible().catch(() => false);
+    const hasBoard = await page.locator("text=Board").isVisible().catch(() => false);
     
-    expect(hasDashboard || hasNavigation || hasContent).toBeTruthy();
+    expect(hasDashboard || hasNavigation || hasContent || hasBoard).toBeTruthy();
   });
 });

@@ -1,6 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-
-const WATCHLIST_URL = '/watchlist-v2';
+import { visitWatchlist } from './fixtures/navigation';
 const candlePayload = JSON.stringify(
   Array.from({ length: 25 }, (_, index) => ({
     timestamp: Date.now() - (25 - index) * 60000,
@@ -29,8 +28,7 @@ async function mockCandles(page: Page) {
 test.beforeEach(async ({ page }) => {
   await bypassOnboarding(page);
   await mockCandles(page);
-  await page.goto(WATCHLIST_URL);
-  await expect(page.getByTestId('watchlist-page')).toBeVisible();
+  await visitWatchlist(page);
 });
 
 test('filters watchlist rows by session', async ({ page }) => {

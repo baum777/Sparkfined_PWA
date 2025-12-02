@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Skeleton, SkeletonCard, SkeletonList } from '@/components/ui/Skeleton';
-import { EmptyState, EmptyJournalState } from '@/components/ui/EmptyState';
+import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState, InlineError, ErrorBanner } from '@/components/ui/ErrorState';
 import { useToast } from '@/components/ui/Toast';
 import { Tooltip, InfoTooltip, HelpTooltip } from '@/components/ui/Tooltip';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
 import { KeyboardShortcutsDialog, defaultShortcuts } from '@/components/ui/KeyboardShortcutsDialog';
 import { FormField, ValidatedInput, CharacterCounter } from '@/components/ui/FormField';
-import { Collapsible, ShowMore, Accordion, ExpandableText } from '@/components/ui/Collapsible';
+import { Collapsible, ShowMore, ExpandableText } from '@/components/ui/Collapsible';
 import { useFocusTrap } from '@/hooks/useFocusManagement';
 import { ScaleTransition } from '@/components/ui/PageTransition';
 
