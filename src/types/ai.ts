@@ -317,7 +317,7 @@ export interface DeepSignalResult {
 export type DeepSignalCard = DeepSignalResult;
 
 //
-// === Advanced Insight & Token Gating ===
+// === Advanced Insight ===
 //
 
 export type AnalysisLayerId = 'L1_STRUCTURE' | 'L2_FLOW' | 'L3_TACTICAL' | 'L4_MACRO' | 'L5_INDICATORS';
@@ -352,23 +352,12 @@ export interface AdvancedInsightCard {
   active_layers?: AnalysisLayerId[];
 }
 
-export type AccessTier = 'free' | 'basic' | 'advanced_locked';
-
-export interface FeatureAccessMeta {
-  feature: 'advanced_deep_dive' | 'basic_snapshot' | 'journal_condense' | 'social_analysis';
-  tier: AccessTier;
-  token_lock_id?: string | null;     // on-chain lock account id
-  is_unlocked: boolean;
-  reason?: string;                   // for locked state messages
-}
-
 export interface AnalyzeMarketResult {
   snapshot: MarketSnapshotCard | null;
   deep_signal: DeepSignalCard | null;
   sanity_flags?: string[];
 
   advanced?: AdvancedInsightCard | null;
-  access?: FeatureAccessMeta;        // token-lock & gating meta
 }
 
 //

@@ -2,7 +2,7 @@
  * Analyze Market Endpoint
  * Returns AnalyzeMarketResult with Advanced Insight data
  * 
- * Beta v0.9: Backend endpoint for Advanced Insight feature
+ * Backend endpoint for Advanced Insight feature
  */
 
 export const config = { runtime: "edge" };
@@ -47,8 +47,6 @@ interface AnalyzeMarketRequest {
   /** OHLC candles (if pre-fetched) */
   candles?: OhlcCandle[];
 
-  /** Whether to check access gating */
-  checkAccess?: boolean;
 }
 
 const SUPPORTED_TIMEFRAMES = new Set([
@@ -91,7 +89,6 @@ export default async function handler(req: Request) {
     const volume24hUsd = coerceNumber(body.volume24hUsd);
     const marketCapUsd = coerceNumber(body.marketCapUsd);
     const liquidityUsd = coerceNumber(body.liquidityUsd);
-    const checkAccess = Boolean(body.checkAccess);
 
     const providedCandles = normalizeCandles(body.candles);
     if (providedCandles === null) {
@@ -186,16 +183,10 @@ export default async function handler(req: Request) {
       playbookEntries,
     });
 
-    let accessMeta = undefined;
-    if (checkAccess) {
-      accessMeta = await checkAccessGating(req);
-    }
-
     const result: AnalyzeMarketResult = {
       snapshot: null,
       deep_signal: null,
       advanced: advancedInsight,
-      access: accessMeta,
       sanity_flags: [],
     };
 
@@ -211,25 +202,6 @@ export default async function handler(req: Request) {
       500
     );
   }
-}
-
-/**
- * Check access gating for Advanced Insight
- */
-async function checkAccessGating(_req: Request): Promise<any> {
-  // Beta v0.9: Mock access check
-  // TODO: Implement real NFT-based access gating
-  
-  // For now, return unlocked access in development
-  const isDev = process.env.NODE_ENV !== "production";
-  
-  return {
-    feature: "advanced_deep_dive",
-    tier: isDev ? "basic" : "advanced_locked",
-    is_unlocked: isDev,
-    token_lock_id: isDev ? undefined : "pending-nft-check",
-    reason: isDev ? undefined : "Beta: Advanced Insight requires NFT-based access",
-  };
 }
 
 function coerceNumber(value: unknown): number {

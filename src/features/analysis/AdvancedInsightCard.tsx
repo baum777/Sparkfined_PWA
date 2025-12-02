@@ -1,15 +1,12 @@
 /**
  * Advanced Insight Card
  * Tab-based UI for market structure, flow/volume, playbook analysis
- * 
- * Beta v0.9: Core UI with token-lock overlay and user overrides
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   useAdvancedInsightStore,
   useAdvancedInsightData,
-  useAdvancedInsightAccess,
   useAdvancedInsightTab,
   useAdvancedInsightOverrides,
 } from './advancedInsightStore';
@@ -42,7 +39,6 @@ interface Tab {
 
 export default function AdvancedInsightCard() {
   const sections = useAdvancedInsightData();
-  const { access, isLocked } = useAdvancedInsightAccess();
   const { activeTab, setActiveTab } = useAdvancedInsightTab();
   const { overridesCount, resetAllOverrides } = useAdvancedInsightOverrides();
   const telemetry = useAdvancedInsightTelemetry();
@@ -53,9 +49,9 @@ export default function AdvancedInsightCard() {
     if (sections) {
       const ticker = sourcePayload?.meta?.ticker;
       const timeframe = sourcePayload?.meta?.timeframe;
-      telemetry.trackOpened(ticker, timeframe, true, isLocked);
+      telemetry.trackOpened(ticker, timeframe, true);
     }
-  }, [sections, isLocked, sourcePayload]);
+  }, [sections, sourcePayload]);
 
   // Track tab switches
   const handleTabChange = (newTab: TabId) => {
@@ -92,16 +88,6 @@ export default function AdvancedInsightCard() {
 
   return (
     <div className="relative rounded-xl border border-zinc-800 bg-zinc-900/40 overflow-hidden">
-      {/* Token Lock Overlay */}
-      {isLocked && (
-        <TokenLockOverlay
-          access={access}
-          onUnlockClick={() => {
-            telemetry.trackUnlockClicked(access?.tier || 'unknown');
-          }}
-        />
-      )}
-
       {/* Header */}
       <div className="border-b border-zinc-800 px-4 py-3">
         <div className="flex items-center justify-between">
@@ -183,57 +169,6 @@ export default function AdvancedInsightCard() {
             <MacroTab data={sections.macro} />
           )}
         </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// Token Lock Overlay
-// ============================================================================
-
-interface TokenLockOverlayProps {
-  access: any;
-  onUnlockClick: () => void;
-}
-
-function TokenLockOverlay({ access, onUnlockClick }: TokenLockOverlayProps) {
-  const overlayRef = useRef<HTMLDivElement | null>(null);
-  const titleId = 'advanced-insight-lock-title';
-  const descriptionId = 'advanced-insight-lock-description';
-
-  useEffect(() => {
-    overlayRef.current?.focus();
-  }, []);
-
-  const reasonText = access?.reason || 'This feature requires NFT-based access.';
-
-  return (
-    <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div
-        ref={overlayRef}
-        className="max-w-sm rounded-lg border border-zinc-700 bg-zinc-900 p-6 text-center focus:outline-none focus:ring-2 focus:ring-emerald-500"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        aria-describedby={descriptionId}
-        tabIndex={-1}
-      >
-        <div className="mb-3 text-3xl">🔒</div>
-        <h4 id={titleId} className="mb-2 text-sm font-medium text-zinc-200">
-          Advanced Insight Locked
-        </h4>
-        <p id={descriptionId} className="mb-4 text-xs text-zinc-400">
-          {reasonText}
-        </p>
-        <a
-          href="/access"
-          onClick={onUnlockClick}
-          aria-label="Unlock advanced insight access"
-          className="inline-block rounded bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700 transition-colors"
-        >
-          Unlock Access
-        </a>
-      </div>
     </div>
   );
 }

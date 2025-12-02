@@ -1,8 +1,6 @@
 /**
  * Mock Advanced Insight Data Generator
  * For testing and development of Advanced Insight UI
- * 
- * Beta v0.9: Provides realistic mock data without requiring AI backend
  */
 
 import type {
@@ -155,28 +153,3 @@ export function generateMockAdvancedInsight(
   };
 }
 
-/**
- * Generate mock locked access state
- */
-export function generateMockLockedAccess() {
-  return {
-    feature: 'advanced_deep_dive' as const,
-    tier: 'advanced_locked' as const,
-    token_lock_id: 'mock-lock-001',
-    is_unlocked: false,
-    reason: 'Beta: Advanced Insight requires NFT-based access. Manual approval available.',
-  };
-}
-
-/**
- * Generate mock unlocked access state
- */
-export function generateMockUnlockedAccess() {
-  return {
-    feature: 'advanced_deep_dive' as const,
-    tier: 'advanced_locked' as const,
-    token_lock_id: null,
-    is_unlocked: true,
-    reason: undefined,
-  };
-}

@@ -1,8 +1,6 @@
 /**
  * Advanced Insight Store
  * Single source of truth for Advanced Insight state, overrides, and telemetry
- * 
- * Beta v0.9: Core state management for market structure, flow/volume, playbook
  */
 
 import { create } from 'zustand';
@@ -10,7 +8,6 @@ import { persist } from 'zustand/middleware';
 import type {
   AdvancedInsightCard,
   AdvancedInsightSections,
-  FeatureAccessMeta,
   EditableField,
 } from '@/types/ai';
 import type { SolanaMemeTrendEvent } from '@/types/events';
@@ -24,9 +21,6 @@ export interface AdvancedInsightState {
   sections: AdvancedInsightSections | null;
   sourcePayload: any | null; // MarketSnapshotPayload
   
-  // Access control
-  access: FeatureAccessMeta | null;
-  
   // UI state
   activeTab: 'market_structure' | 'flow_volume' | 'playbook' | 'macro';
   isEditing: boolean;
@@ -37,7 +31,7 @@ export interface AdvancedInsightState {
   trendSnapshots: Record<string, SolanaMemeTrendEvent>;
   
   // Actions
-  ingest: (data: AdvancedInsightCard, access?: FeatureAccessMeta) => void;
+  ingest: (data: AdvancedInsightCard) => void;
   setActiveTab: (tab: AdvancedInsightState['activeTab']) => void;
   applyTrendEvent?: (event: SolanaMemeTrendEvent) => void;
   
@@ -56,7 +50,6 @@ export interface AdvancedInsightState {
   
   // Getters
   getOverridesCount: () => number;
-  isLocked: () => boolean;
 }
 
 // ============================================================================
@@ -115,7 +108,6 @@ export const useAdvancedInsightStore = create<AdvancedInsightState>()(
         // Initial state
         sections: null,
         sourcePayload: null,
-        access: null,
         activeTab: 'market_structure',
         isEditing: false,
         overridesCount: 0,
@@ -123,11 +115,10 @@ export const useAdvancedInsightStore = create<AdvancedInsightState>()(
         trendSnapshots: {},
 
       // Ingest AI data
-      ingest: (data, access) => {
+      ingest: (data) => {
         set({
           sections: data.sections,
           sourcePayload: data.source_payload,
-          access: access || null,
           overridesCount: countOverrides(data.sections),
         });
       },
@@ -218,7 +209,6 @@ export const useAdvancedInsightStore = create<AdvancedInsightState>()(
           set({
             sections: null,
             sourcePayload: null,
-            access: null,
             activeTab: 'market_structure',
             isEditing: false,
             overridesCount: 0,
@@ -231,11 +221,6 @@ export const useAdvancedInsightStore = create<AdvancedInsightState>()(
         getOverridesCount: () => {
           return get().overridesCount;
         },
-
-      isLocked: () => {
-        const { access } = get();
-        return access ? !access.is_unlocked : false;
-      },
       applyTrendEvent: (event) => {
         set((state) => ({
           trendSnapshots: {
@@ -265,12 +250,6 @@ export function useAdvancedInsightData() {
   return useAdvancedInsightStore((state) => state.sections);
 }
 
-export function useAdvancedInsightAccess() {
-  return useAdvancedInsightStore((state) => ({
-    access: state.access,
-    isLocked: state.isLocked(),
-  }));
-}
 
 export function useAdvancedInsightTab() {
   return useAdvancedInsightStore((state) => ({

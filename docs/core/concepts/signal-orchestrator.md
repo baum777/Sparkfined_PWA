@@ -58,6 +58,5 @@ sources:
 
 ## Use-Case Highlights
 - **AI Feedback Loop:** Lessons füttern Playbooks und Journal-Prompts für kontinuierliches Lernen.
-- **Token Gating:** Hochwertige Signale können über Access Rank freigeschaltet werden.
 - **Automation Hooks:** Action Graph erlaubt Webhooks oder Execution Bots über definierte Edges.
 

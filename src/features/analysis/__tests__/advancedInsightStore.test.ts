@@ -3,8 +3,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { useAdvancedInsightStore } from '../advancedInsightStore';
 import {
   generateMockAdvancedInsight,
-  generateMockLockedAccess,
-  generateMockUnlockedAccess,
 } from '../mockAdvancedInsightData';
 
 const storeWithPersist = useAdvancedInsightStore as typeof useAdvancedInsightStore & {
@@ -24,31 +22,19 @@ describe('advancedInsightStore', () => {
     resetStore();
   });
 
-  it('ingests mock data and sets access/lock state', () => {
+  it('ingests mock data correctly', () => {
     const mockData = generateMockAdvancedInsight('SOL', 50);
-    const unlockedAccess = generateMockUnlockedAccess();
 
-    useAdvancedInsightStore.getState().ingest(mockData, unlockedAccess);
+    useAdvancedInsightStore.getState().ingest(mockData);
 
     const state = useAdvancedInsightStore.getState();
     expect(state.sections?.market_structure.range.auto_value.low).toBeDefined();
-    expect(state.access).toMatchObject(unlockedAccess);
     expect(state.overridesCount).toBe(0);
-    expect(state.isLocked()).toBe(false);
-  });
-
-  it('reflects locked access when ingesting locked data', () => {
-    const mockData = generateMockAdvancedInsight();
-    const lockedAccess = generateMockLockedAccess();
-
-    useAdvancedInsightStore.getState().ingest(mockData, lockedAccess);
-
-    expect(useAdvancedInsightStore.getState().isLocked()).toBe(true);
   });
 
   it('overrideField stores user value and increments overridesCount', () => {
     const mockData = generateMockAdvancedInsight();
-    useAdvancedInsightStore.getState().ingest(mockData, generateMockUnlockedAccess());
+    useAdvancedInsightStore.getState().ingest(mockData);
 
     const currentRange = mockData.sections.market_structure.range.auto_value;
     const nextRange = { ...currentRange, low: currentRange.low - 1 };
@@ -63,7 +49,7 @@ describe('advancedInsightStore', () => {
 
   it('resetField clears the override and decrements count', () => {
     const mockData = generateMockAdvancedInsight();
-    useAdvancedInsightStore.getState().ingest(mockData, generateMockUnlockedAccess());
+    useAdvancedInsightStore.getState().ingest(mockData);
 
     const currentRange = mockData.sections.market_structure.range.auto_value;
     const nextRange = { ...currentRange, high: currentRange.high + 5 };
@@ -80,7 +66,7 @@ describe('advancedInsightStore', () => {
 
   it('resetAllOverrides clears every override and resets count to zero', () => {
     const mockData = generateMockAdvancedInsight();
-    useAdvancedInsightStore.getState().ingest(mockData, generateMockUnlockedAccess());
+    useAdvancedInsightStore.getState().ingest(mockData);
 
     const store = useAdvancedInsightStore.getState();
     store.overrideField('market_structure', 'range', {

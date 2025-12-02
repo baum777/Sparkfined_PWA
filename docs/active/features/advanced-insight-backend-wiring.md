@@ -34,7 +34,6 @@ Successfully wired the Advanced Insight backend to populate real data instead of
 │ 2. enrichSnapshot()      │
 │ 3. generatePlaybook()    │
 │ 4. buildAdvancedInsight()│
-│ 5. checkAccessGating()   │
 └────────┬─────────────────┘
          │
          ▼
@@ -42,7 +41,6 @@ Successfully wired the Advanced Insight backend to populate real data instead of
 │  AnalyzeMarketResult       │
 ├────────────────────────────┤
 │ - advanced: Card           │
-│ - access: FeatureAccessMeta│
 │ - snapshot: null (future)  │
 │ - deep_signal: null        │
 └────────┬───────────────────┘
@@ -50,7 +48,7 @@ Successfully wired the Advanced Insight backend to populate real data instead of
          ▼
 ┌──────────────────────────┐
 │ advancedInsightStore     │
-│ .ingest(card, access)    │
+│ .ingest(card)            │
 └──────────────────────────┘
          │
          ▼
@@ -213,7 +211,6 @@ POST /api/ai/analyze-market
   marketCapUsd?: number;    // Market cap (optional)
   liquidityUsd?: number;    // Liquidity (optional)
   candles?: OhlcCandle[];   // Pre-fetched candles (optional)
-  checkAccess?: boolean;    // Check NFT gating (default: false)
 }
 ```
 
@@ -224,7 +221,6 @@ POST /api/ai/analyze-market
   snapshot: null,                    // Future: Basic snapshot
   deep_signal: null,                 // Future: OpenAI deep signal
   advanced: AdvancedInsightCard,     // Main payload
-  access: FeatureAccessMeta,         // Token lock status
   sanity_flags: string[]             // Warnings
 }
 ```
@@ -312,12 +308,6 @@ function MyComponent() {
    - Market Structure tab (range, levels, zones, bias)
    - Flow/Volume tab (24h volume, delta)
    - Playbook tab (tactical entries)
-   - No token lock overlay (unlocked in dev)
-
-### Mock Data Testing
-
-- **🧪 Mock (Unlocked)**: Load mock data with unlocked access
-- **🔒 Mock (Locked)**: Load mock data with locked access (shows overlay)
 
 ### Expected Behavior
 
@@ -344,7 +334,6 @@ All types are defined in `src/types/ai.ts`:
 - ✅ `AdvancedInsightSections` - Section breakdown
 - ✅ `EditableField<T>` - Auto/user value pattern
 - ✅ `AnalyzeMarketResult` - API response wrapper
-- ✅ `FeatureAccessMeta` - Token gating metadata
 
 ---
 
@@ -409,12 +398,6 @@ All types are defined in `src/types/ai.ts`:
 - ❌ No batching (one address at a time)
 - ❌ Edge runtime limits complex heuristics
 
-### Access Gating
-
-- ⚠️ Mock access check (NFT verification not implemented)
-- ⚠️ Unlocked by default in development
-- ⚠️ No user session tracking
-
 ---
 
 ## Performance
@@ -446,7 +429,6 @@ All types are defined in `src/types/ai.ts`:
 - [ ] E2E test with real contract address
 - [ ] Vercel edge function deployment test
 - [ ] Production environment variables check
-- [ ] Access gating implementation (post-Beta)
 
 ---
 
