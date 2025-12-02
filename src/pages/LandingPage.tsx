@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   TrendingUp, 
@@ -11,19 +11,12 @@ import {
   Star,
   Lock,
   Wifi,
-  Clock,
-  PlayCircle,
-  Target,
-  Award,
-  TrendingDown
+  Clock
 } from '@/lib/icons';
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-  const [visibleStats, setVisibleStats] = useState<{ [key: string]: boolean }>({});
-  const statsRef = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     // Auto-rotate testimonials
@@ -31,26 +24,6 @@ export default function LandingPage() {
       setActiveTestimonial(prev => (prev + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
-
-  // Intersection Observer for stats animation
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleStats(prev => ({ ...prev, [entry.target.id]: true }));
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    Object.values(statsRef.current).forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => observer.disconnect();
   }, []);
 
   return (
@@ -86,7 +59,7 @@ export default function LandingPage() {
         
         <div className="relative mx-auto max-w-5xl text-center">
           {/* Floating Stats */}
-          <div className="absolute -top-8 left-0 right-0 flex flex-wrap justify-center gap-4 text-xs text-zinc-500 md:text-sm">
+          <div className="absolute -top-8 left-0 right-0 flex justify-center gap-4 text-xs text-zinc-500 md:text-sm">
             <span className="animate-fade-in flex items-center gap-1">
               <Zap size={14} className="text-emerald-500" />
               1,247 alerts today
@@ -102,17 +75,16 @@ export default function LandingPage() {
           </div>
 
           <h1 className="animate-slide-in-left mb-6 text-4xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl">
-            <span className="block">⚡ Stop Trading Blind.</span>
+            <span className="block">Stop Trading Blind.</span>
             <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
               Start Trading Smart.
             </span>
           </h1>
           
-          <p className="animate-fade-in motion-delay-200 mb-4 text-lg text-zinc-400 md:text-xl">
-            Your edge isn't the chart. It's what you <strong className="text-zinc-200">DO</strong> with it.
-          </p>
-          <p className="animate-fade-in motion-delay-300 mb-8 text-base text-zinc-500 md:text-lg">
-            The command center that actual traders use. No BS, just alpha.
+          <p className="animate-fade-in motion-delay-200 mb-8 text-lg text-zinc-400 md:text-xl">
+            Your edge isn't the chart. It's what you DO with it.
+            <br />
+            <span className="text-zinc-500">The command center that actual traders use. No BS, just alpha.</span>
           </p>
 
           <div className="animate-fade-in motion-delay-400 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -120,14 +92,10 @@ export default function LandingPage() {
               onClick={() => navigate('/dashboard-v2')}
               className="group flex items-center gap-2 rounded-lg bg-emerald-500 px-8 py-4 text-lg font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-600 hover:scale-105 hover:shadow-[0_0_50px_rgba(16,185,129,0.5)] active:scale-95"
             >
-              Try It Now - No Signup
+              Get Started - It's Free
               <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
             </button>
-            <button 
-              onClick={() => setIsVideoModalOpen(true)}
-              className="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-900 px-8 py-4 text-lg font-medium text-zinc-100 transition-all hover:border-zinc-600 hover:bg-zinc-800"
-            >
-              <PlayCircle size={20} />
+            <button className="rounded-lg border border-zinc-700 bg-zinc-900 px-8 py-4 text-lg font-medium text-zinc-100 transition-all hover:border-zinc-600 hover:bg-zinc-800">
               Watch 30s Demo
             </button>
           </div>
@@ -144,10 +112,6 @@ export default function LandingPage() {
             <span className="flex items-center gap-2">
               <CheckCircle2 size={16} className="text-emerald-500" />
               Works offline
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-500" />
-              Privacy-first
             </span>
           </div>
         </div>
@@ -208,12 +172,9 @@ export default function LandingPage() {
       {/* The Solution - 3 Feature Grid */}
       <section id="features" className="px-4 py-20 md:px-6 md:py-32 bg-zinc-900/30">
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-4 text-center text-3xl font-bold md:text-5xl">
-            HERE'S HOW SPARKFINED FIXES THAT
+          <h2 className="mb-16 text-center text-3xl font-bold md:text-5xl">
+            HERE'S HOW SPARKFINED FIXES THAT:
           </h2>
-          <p className="mb-16 text-center text-lg text-zinc-500">
-            Three pillars. One mission: Make you a better trader.
-          </p>
 
           <div className="grid gap-8 md:grid-cols-3">
             {features.map((feature, i) => (
@@ -221,11 +182,11 @@ export default function LandingPage() {
                 key={i}
                 className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-6 transition-all hover:border-emerald-500/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:-translate-y-2"
               >
-                <div className="mb-6 flex h-48 items-center justify-center rounded-lg bg-gradient-to-br from-zinc-950 to-zinc-900 border border-zinc-800">
-                  <feature.icon className="text-emerald-500/50 group-hover:text-emerald-500 transition-colors" size={64} />
+                <div className="mb-6 flex h-48 items-center justify-center rounded-lg bg-zinc-950">
+                  <feature.icon className="text-zinc-700" size={64} />
                 </div>
                 
-                <h3 className="mb-4 text-2xl font-bold group-hover:text-emerald-400 transition-colors">{feature.title}</h3>
+                <h3 className="mb-4 text-2xl font-bold">{feature.title}</h3>
                 
                 <ul className="mb-6 space-y-2">
                   {feature.bullets.map((bullet, j) => (
@@ -236,44 +197,11 @@ export default function LandingPage() {
                   ))}
                 </ul>
 
-                <button 
-                  onClick={() => navigate('/dashboard-v2')}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium transition-all hover:border-emerald-500 hover:bg-emerald-500 hover:text-black group-hover:border-emerald-500/50"
-                >
+                <button className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium transition-all hover:border-emerald-500 hover:bg-zinc-700 group-hover:text-emerald-400">
                   Try Demo →
                 </button>
               </div>
             ))}
-          </div>
-
-          {/* Journey System Teaser */}
-          <div className="mt-20 rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-950 p-8 md:p-12">
-            <div className="text-center mb-8">
-              <h3 className="text-3xl font-bold mb-4">🎮 Your Trading Journey</h3>
-              <p className="text-zinc-400">
-                Track your evolution from Degen to Master. Earn XP for discipline, not just profits.
-              </p>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-5">
-              {journeyPhases.map((phase, i) => (
-                <div key={i} className="text-center">
-                  <div className="mb-2 text-4xl">{phase.icon}</div>
-                  <div className="text-sm font-semibold text-zinc-300">{phase.name}</div>
-                  <div className="text-xs text-zinc-500 mt-1">{phase.xp}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 text-center">
-              <button 
-                onClick={() => navigate('/dashboard-v2')}
-                className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-6 py-3 font-medium text-black transition-all hover:bg-emerald-400"
-              >
-                <Award size={20} />
-                Start Your Journey
-              </button>
-            </div>
           </div>
         </div>
       </section>
@@ -281,31 +209,18 @@ export default function LandingPage() {
       {/* Stats Banner */}
       <section className="px-4 py-20 md:px-6 md:py-32">
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-16 text-center text-3xl font-bold md:text-4xl">⚡ BY THE NUMBERS</h2>
+          <h2 className="mb-16 text-center text-3xl font-bold md:text-4xl">BY THE NUMBERS</h2>
           
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat, i) => (
               <div
                 key={i}
-                id={`stat-${i}`}
-                ref={(el) => (statsRef.current[`stat-${i}`] = el)}
-                className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-center transition-all hover:border-emerald-500/50 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-center"
               >
-                <div className={`mb-2 text-4xl font-bold text-emerald-500 transition-all ${
-                  visibleStats[`stat-${i}`] ? 'animate-fade-in' : 'opacity-0'
-                }`}>
-                  {stat.value}
-                </div>
+                <div className="mb-2 text-4xl font-bold text-emerald-500">{stat.value}</div>
                 <div className="text-sm text-zinc-400">{stat.label}</div>
               </div>
             ))}
-          </div>
-          
-          {/* Additional Context */}
-          <div className="mt-12 text-center">
-            <p className="text-zinc-500">
-              Built for traders. By traders. <strong className="text-emerald-500">No bullshit.</strong>
-            </p>
           </div>
         </div>
       </section>
@@ -400,63 +315,41 @@ export default function LandingPage() {
       <section className="relative overflow-hidden px-4 py-32 md:px-6">
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/30 to-zinc-950"></div>
         
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.3),transparent_50%)]"></div>
-        </div>
-        
         <div className="relative mx-auto max-w-4xl text-center">
           <h2 className="mb-6 text-4xl font-bold md:text-6xl">
             ⚡ READY TO TRADE SMARTER?
           </h2>
-          <p className="mb-4 text-xl text-zinc-300">
+          <p className="mb-8 text-xl text-zinc-300">
             Open the app. No signup. No credit card.
-          </p>
-          <p className="mb-8 text-lg text-zinc-400">
-            Start charting in <strong className="text-emerald-400">3 seconds</strong>.
+            <br />
+            Start charting in 3 seconds.
           </p>
 
           <button
             onClick={() => navigate('/dashboard-v2')}
-            className="group mb-8 inline-flex items-center gap-3 rounded-lg bg-emerald-500 px-12 py-5 text-xl font-bold text-black shadow-[0_0_50px_rgba(16,185,129,0.4)] transition-all hover:bg-emerald-400 hover:scale-105 hover:shadow-[0_0_70px_rgba(16,185,129,0.6)] active:scale-95"
+            className="mb-8 rounded-lg bg-emerald-500 px-12 py-5 text-xl font-bold text-white shadow-[0_0_50px_rgba(16,185,129,0.4)] transition-all hover:bg-emerald-400 hover:scale-105 hover:shadow-[0_0_70px_rgba(16,185,129,0.6)]"
           >
-            Launch Sparkfined
-            <ArrowRight size={24} className="transition-transform group-hover:translate-x-2" />
+            Launch Sparkfined →
           </button>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-zinc-500">
             <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-500" />
+              <CheckCircle2 size={16} />
               Works offline
             </span>
             <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-500" />
-              ~400KB bundle
+              <CheckCircle2 size={16} />
+              80KB download
             </span>
             <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-500" />
+              <CheckCircle2 size={16} />
               Privacy-first
             </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-500" />
-              100% free core
-            </span>
           </div>
 
-          <p className="mt-12 text-base text-zinc-600">
+          <p className="mt-8 text-zinc-600">
             Or continue being exit liquidity. Your call. 🤷
           </p>
-
-          {/* The Degen's Creed */}
-          <div className="mt-16 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 backdrop-blur-sm">
-            <h3 className="mb-6 text-2xl font-bold text-emerald-400">The Degen's Creed</h3>
-            <div className="space-y-3 text-left text-zinc-400 md:text-center">
-              <p>I trade not blind, but with <strong className="text-zinc-200">clarity</strong>.</p>
-              <p>I rely not on hope, but on <strong className="text-zinc-200">data</strong>.</p>
-              <p>When FOMO calls, I check my <strong className="text-zinc-200">journal</strong>.</p>
-              <p className="pt-2 text-emerald-400">I am not a gambler. I am <strong>sovereign</strong>.</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -468,76 +361,43 @@ export default function LandingPage() {
             <span className="text-xl font-bold">Sparkfined</span>
           </div>
 
-          <div className="mb-6 flex justify-center gap-6 text-sm text-zinc-400">
-            <a
-              href="https://twitter.com/sparkfined"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-zinc-100 transition-colors"
-            >
-              Twitter
-            </a>
-            <a
-              href="https://github.com/sparkfined"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-zinc-100 transition-colors"
-            >
-              GitHub
-            </a>
-            <a
-              href="https://discord.gg/sparkfined"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-zinc-100 transition-colors"
-            >
-              Discord
-            </a>
-            <a href="/docs" className="hover:text-zinc-100 transition-colors">
-              Docs
-            </a>
+            <div className="mb-6 flex justify-center gap-6 text-sm text-zinc-400">
+              <a
+                href="https://twitter.com/sparkfined"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-zinc-100"
+              >
+                Twitter
+              </a>
+              <a
+                href="https://github.com/sparkfined"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-zinc-100"
+              >
+                GitHub
+              </a>
+              <a
+                href="https://discord.gg/sparkfined"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-zinc-100"
+              >
+                Discord
+              </a>
+              <a href="/docs" className="hover:text-zinc-100">
+                Docs
+              </a>
           </div>
 
           <p className="text-sm text-zinc-600">
             Built by degens, for degens.
             <br />
-            © 2025 Sparkfined. No bullshit guarantee.
+            © 2024 Sparkfined. No bullshit guarantee.
           </p>
         </div>
       </footer>
-
-      {/* Video Demo Modal */}
-      {isVideoModalOpen && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={() => setIsVideoModalOpen(false)}
-        >
-          <div 
-            className="relative mx-4 w-full max-w-4xl rounded-2xl bg-zinc-900 p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setIsVideoModalOpen(false)}
-              className="absolute -top-12 right-0 text-zinc-400 hover:text-zinc-100"
-              aria-label="Close"
-            >
-              <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            
-            <div className="aspect-video rounded-lg bg-zinc-950 flex items-center justify-center">
-              <div className="text-center">
-                <PlayCircle size={64} className="mx-auto mb-4 text-zinc-700" />
-                <p className="text-zinc-500">Demo video coming soon...</p>
-                <p className="mt-2 text-sm text-zinc-600">
-                  For now, <button onClick={() => { setIsVideoModalOpen(false); navigate('/dashboard-v2'); }} className="text-emerald-500 hover:underline">launch the app</button> to explore!
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -625,14 +485,6 @@ const ogTierFeatures = [
   'Advanced backtest',
   'Soulbound NFT',
   'Leaderboard access',
-];
-
-const journeyPhases = [
-  { icon: '💀', name: 'DEGEN', xp: '0-100' },
-  { icon: '🔍', name: 'SEEKER', xp: '100-500' },
-  { icon: '⚔️', name: 'WARRIOR', xp: '500-2K' },
-  { icon: '👑', name: 'MASTER', xp: '2K-5K' },
-  { icon: '🧙', name: 'SAGE', xp: '5K+' },
 ];
 
 const testimonials = [
