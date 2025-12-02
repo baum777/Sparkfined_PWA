@@ -31,7 +31,7 @@ export interface ThemeProviderProps {
   defaultTheme?: ThemeMode
 }
 
-export function ThemeProvider({ children, defaultTheme = 'system' }: ThemeProviderProps) {
+export function ThemeProvider({ children, defaultTheme = 'dark' }: ThemeProviderProps) {
   const [theme, setThemeState] = React.useState<ThemeMode>(() => getInitialTheme(defaultTheme))
   const [prefersDark, setPrefersDark] = React.useState<boolean>(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return true

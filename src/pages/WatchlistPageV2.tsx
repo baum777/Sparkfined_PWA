@@ -152,7 +152,7 @@ export default function WatchlistPageV2() {
                 />
               </div>
             )}
-            <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <div className="space-y-4">
                 <div className="rounded-2xl border border-border bg-surface/80 backdrop-blur">
                   <div className="space-y-3 border-b border-border px-3 py-2 text-xs sm:text-sm">

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { WatchlistRow, WatchlistTrendSnapshot } from '@/store/watchlistStore';
+import { ResponsiveTable } from '@/components/layout/ResponsiveTable';
 
 interface WatchlistTableProps {
   rows: ReadonlyArray<WatchlistRow>;
@@ -11,22 +12,23 @@ interface WatchlistTableProps {
 export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }: WatchlistTableProps) {
   return (
     <div className="rounded-2xl border border-border-moderate bg-surface" data-testid="watchlist-table">
-      <div className="hidden grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary sm:grid">
-        <span>Symbol</span>
-        <span>Name</span>
-        <span>Price</span>
-        <span>24h change</span>
-        <span>Session</span>
-      </div>
-      <div className="divide-y divide-border-subtle">
-        {rows.map((row) => {
+      <ResponsiveTable className="sm:px-4" innerClassName="sm:min-w-[720px]">
+        <div className="hidden grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary sm:grid">
+          <span>Symbol</span>
+          <span>Name</span>
+          <span>Price</span>
+          <span>24h change</span>
+          <span>Session</span>
+        </div>
+        <div className="divide-y divide-border-subtle">
+          {rows.map((row) => {
           const isActive = activeSymbol === row.symbol;
           const hasTrend = Boolean(trends?.[row.symbol]);
           return (
             <div
               key={`${row.symbol}-${row.session}`}
               onClick={() => onSelect?.(row.symbol)}
-              className={`flex flex-col gap-4 px-4 py-4 text-sm text-text-secondary transition sm:grid sm:grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] sm:items-center sm:gap-6 sm:px-6 ${
+              className={`flex flex-col gap-4 px-4 py-4 text-sm text-text-secondary transition sm:grid sm:grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] sm:items-center sm:gap-6 ${
                 isActive
                   ? 'cursor-pointer border-l-4 border-sentiment-bull-border bg-interactive-active'
                   : 'cursor-pointer hover:bg-interactive-hover'
@@ -61,10 +63,11 @@ export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }:
                   {row.session}
                 </span>
               </div>
-            </div>
-          );
+              </div>
+            );
         })}
-      </div>
+        </div>
+      </ResponsiveTable>
     </div>
   );
 }

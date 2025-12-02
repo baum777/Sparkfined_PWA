@@ -15,6 +15,21 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
 }
 
+/**
+ * Button
+ *
+ * Usage:
+ * ```tsx
+ * <Button variant="primary" size="md" onClick={handleSave}>
+ *   Save changes
+ * </Button>
+ *
+ * <Button variant="ghost" size="sm" aria-label="Open settings">
+ *   <SettingsIcon />
+ * </Button>
+ * ```
+ */
+
 const variantClasses: Record<ButtonVariant, string> = {
   primary: 'bg-brand text-white shadow-glow-accent hover:bg-brand-hover focus-visible:ring-brand/60',
   secondary:

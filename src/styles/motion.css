@@ -60,12 +60,70 @@
   }
 }
 
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(15, 179, 76, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(15, 179, 76, 0.55);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
   }
 }
 
@@ -87,6 +145,14 @@
   animation: scale-in var(--duration-short) var(--ease-out) forwards;
 }
 
+.animate-slide-in-left {
+  animation: slide-in-left var(--duration-medium) var(--ease-out) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right var(--duration-medium) var(--ease-out) forwards;
+}
+
 .animate-shimmer {
   background: linear-gradient(
     90deg,
@@ -96,6 +162,25 @@
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-ticker {
+  animation: ticker 30s linear infinite;
+  will-change: transform;
+}
+
+.animate-gradient-shift {
+  background-size: 200% auto;
+  animation: gradient-shift 3s ease-in-out infinite;
 }
 
 /* === Stagger Effects (for lists) === */
@@ -115,6 +200,83 @@
 .stagger > *:nth-child(8) { animation-delay: 350ms; }
 .stagger > *:nth-child(9) { animation-delay: 400ms; }
 .stagger > *:nth-child(10) { animation-delay: 450ms; }
+
+@layer utilities {
+  .motion-delay-0 {
+    animation-delay: 0s !important;
+    transition-delay: 0s !important;
+  }
+
+  .motion-delay-100 {
+    animation-delay: 0.1s;
+    transition-delay: 0.1s;
+  }
+
+  .motion-delay-200 {
+    animation-delay: 0.2s;
+    transition-delay: 0.2s;
+  }
+
+  .motion-delay-300 {
+    animation-delay: 0.3s;
+    transition-delay: 0.3s;
+  }
+
+  .motion-delay-400 {
+    animation-delay: 0.4s;
+    transition-delay: 0.4s;
+  }
+
+  .motion-delay-500 {
+    animation-delay: 0.5s;
+    transition-delay: 0.5s;
+  }
+
+  .motion-delay-600 {
+    animation-delay: 0.6s;
+    transition-delay: 0.6s;
+  }
+
+  .motion-delay-700 {
+    animation-delay: 0.7s;
+    transition-delay: 0.7s;
+  }
+
+  .motion-delay-800 {
+    animation-delay: 0.8s;
+    transition-delay: 0.8s;
+  }
+
+  .motion-delay-900 {
+    animation-delay: 0.9s;
+    transition-delay: 0.9s;
+  }
+
+  .motion-delay-1000 {
+    animation-delay: 1s;
+    transition-delay: 1s;
+  }
+
+  .motion-delay-1200 {
+    animation-delay: 1.2s;
+    transition-delay: 1.2s;
+  }
+
+  .motion-duration-fast {
+    animation-duration: var(--duration-short) !important;
+    transition-duration: var(--duration-short) !important;
+  }
+
+  .motion-duration-base {
+    animation-duration: var(--duration-medium) !important;
+    transition-duration: var(--duration-medium) !important;
+  }
+
+  .motion-duration-slow {
+    animation-duration: var(--duration-long) !important;
+    transition-duration: var(--duration-long) !important;
+  }
+}
 
 /* === Page Transitions === */
 
@@ -203,10 +365,26 @@
   .animate-slide-up,
   .animate-slide-down,
   .animate-scale-in,
+  .animate-slide-in-left,
+  .animate-slide-in-right,
+  .animate-glow-pulse,
+  .animate-float,
+  .animate-gradient-shift,
   .stagger > * {
     opacity: 1;
     transform: none;
     animation: none;
+  }
+
+  .animate-ticker {
+    animation-duration: 45s;
+    animation-iteration-count: 1;
+    transform: none;
+  }
+
+  [class*="motion-delay-"] {
+    animation-delay: 0s !important;
+    transition-delay: 0s !important;
   }
 }
 
@@ -235,7 +413,7 @@
 }
 
 .focus-ring:focus-visible {
-  outline-color: var(--color-emerald);
+  outline-color: rgb(var(--color-emerald));
 }
 
 /* === Loading Spinner === */

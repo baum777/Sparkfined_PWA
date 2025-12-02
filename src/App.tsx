@@ -89,10 +89,14 @@ function App() {
               <Sidebar />
 
               {/* Main content with sidebar offset on desktop */}
-              <div id="main-content" className="lg:pl-20">
+              <main
+                id="main-content"
+                tabIndex={-1}
+                className="transition-[padding] duration-300 ease-out motion-reduce:transition-none lg:pl-[var(--sidebar-width,5rem)]"
+              >
                 <RoutesRoot />
                 <GlobalInstruments />
-              </div>
+              </main>
 
               {/* Mobile Bottom Nav (< lg) */}
               <BottomNav />

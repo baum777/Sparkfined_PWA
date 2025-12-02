@@ -26,10 +26,7 @@ export default function Skeleton({
   const skeletons = Array.from({ length: count }, (_, i) => (
     <div
       key={i}
-      className={`bg-zinc-800/50 ${animate ? 'animate-pulse' : ''} ${className}`}
-      style={{
-        borderRadius: 'var(--radius-lg)',
-      }}
+      className={`rounded-token-lg bg-zinc-800/50 ${animate ? 'animate-pulse' : ''} ${className}`}
       aria-hidden="true"
     />
   ));

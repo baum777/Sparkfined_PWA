@@ -21,6 +21,20 @@ interface SelectProps {
 
 import { ChevronDown, ChevronUp, Check } from '@/lib/icons';
 
+/**
+ * Select component for simple option lists.
+ *
+ * ```tsx
+ * <Select
+ *   value={range}
+ *   onChange={setRange}
+ *   options={[
+ *     { value: '24h', label: 'Last 24h' },
+ *     { value: '7d', label: 'Last 7 days' },
+ *   ]}
+ * />
+ * ```
+ */
 export default function Select({
   options,
   value,
@@ -66,12 +80,9 @@ export default function Select({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-3 py-2.5 text-sm h-11 bg-zinc-900 border transition-all ${
+        className={`flex h-11 w-full items-center justify-between rounded-token-lg border bg-zinc-900 px-3 py-2.5 text-sm transition-all duration-150 ease-out ${
           isOpen ? 'border-emerald-500 ring-1 ring-emerald-500/50' : error ? 'border-rose-500' : 'border-zinc-700'
-        } ${disabled ? 'opacity-60 cursor-not-allowed' : ''} ${triggerClassName ?? ''}`}
-        style={{
-          borderRadius: 'var(--radius-lg)',
-        }}
+        } ${disabled ? 'cursor-not-allowed opacity-60' : ''} ${triggerClassName ?? ''}`}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         {...restTriggerProps}
@@ -84,11 +95,7 @@ export default function Select({
       
       {isOpen && (
         <div
-          className="absolute z-50 w-full mt-1 bg-zinc-900 border border-zinc-700 max-h-60 overflow-y-auto"
-          style={{
-            borderRadius: 'var(--radius-md)',
-            boxShadow: 'var(--shadow-md)',
-          }}
+          className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-token-md border border-zinc-700 bg-zinc-900 shadow-token-md"
           role="listbox"
         >
           {options.map((option) => (

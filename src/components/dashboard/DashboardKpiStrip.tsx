@@ -39,21 +39,24 @@ export default function DashboardKpiStrip({ items }: DashboardKpiStripProps) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <div className="flex min-w-full gap-3">
+    <section
+      className="relative -mx-4 overflow-x-auto px-4 py-2 md:mx-0 md:overflow-visible lg:py-0"
+      aria-label="Key performance indicators"
+    >
+      <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible lg:grid-cols-4">
         {items.map((item) => {
           const trend = item.trend ? trendConfig[item.trend] : null;
           return (
-            <div
+            <article
               key={item.label}
-              className="flex min-w-[160px] flex-1 flex-col rounded-2xl border border-border-subtle bg-surface-skeleton px-4 py-3 backdrop-blur"
+              className="flex min-w-[min(240px,80vw)] flex-1 snap-start flex-col rounded-2xl border border-border-subtle bg-surface-skeleton/90 px-4 py-3 text-text-primary shadow-card-subtle backdrop-blur-sm md:min-w-0 md:snap-none"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs uppercase tracking-widest text-text-tertiary">{item.label}</span>
+                <span className="text-[11px] uppercase tracking-[0.4em] text-text-tertiary">{item.label}</span>
                 {item.lastUpdated && <DataFreshness lastUpdated={item.lastUpdated} />}
               </div>
               <div className="mt-2 flex items-baseline justify-between gap-3">
-                <span className="text-2xl font-mono font-semibold text-text-primary">{item.value}</span>
+                <span className="text-2xl font-mono font-semibold">{item.value}</span>
                 {trend ? (
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold ${trend.className}`}
@@ -64,10 +67,10 @@ export default function DashboardKpiStrip({ items }: DashboardKpiStripProps) {
                   </span>
                 ) : null}
               </div>
-            </div>
+            </article>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

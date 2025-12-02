@@ -3,6 +3,7 @@ import type { MouseEvent } from 'react'
 import { saveTrade } from '@/lib/db'
 import type { TradeEntry } from '@/lib/db'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
+import Button from '@/components/ui/Button'
 
 interface SaveTradeModalProps {
   isOpen: boolean
@@ -206,21 +207,18 @@ export default function SaveTradeModal({
             </div>
           </div>
 
-          <div className="flex gap-3 mt-6">
-            <button
+          <div className="mt-6 flex gap-3">
+            <Button
+              variant="ghost"
               onClick={onClose}
-              className="btn-ghost flex-1"
               disabled={isSaving}
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="btn-primary flex-1"
-            >
-              {isSaving ? 'Saving...' : 'Save Entry'}
-            </button>
+            </Button>
+            <Button onClick={handleSave} disabled={isSaving} isLoading={isSaving} className="flex-1">
+              Save Entry
+            </Button>
           </div>
         </div>
       </div>

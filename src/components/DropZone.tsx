@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import Button from '@/components/ui/Button'
 
 interface DropZoneProps {
   onReady: (payload: { file?: File; ca?: string }) => void
@@ -145,12 +146,9 @@ export default function DropZone({ onReady }: DropZoneProps) {
           </div>
 
           {/* Upload Button */}
-          <button
-            onClick={() => fileRef.current?.click()}
-            className="btn-primary"
-          >
+          <Button onClick={() => fileRef.current?.click()} type="button">
             📸 Select Image
-          </button>
+          </Button>
           
           <input
             ref={fileRef}
@@ -203,13 +201,9 @@ export default function DropZone({ onReady }: DropZoneProps) {
           </p>
         </div>
 
-        <button
-          onClick={trySubmitCA}
-          disabled={!ca.trim()}
-          className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <Button onClick={trySubmitCA} disabled={!ca.trim()} className="w-full">
           🔍 Analyze by CA
-        </button>
+        </Button>
       </div>
 
       {/* Error Display */}

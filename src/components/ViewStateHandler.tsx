@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { ViewState } from '@/types/viewState'
+import Button from '@/components/ui/Button'
 
 interface ViewStateHandlerProps {
   state: ViewState
@@ -45,9 +46,9 @@ export default function ViewStateHandler({
                   {error || 'An unexpected error occurred'}
                 </p>
               </div>
-              <button onClick={() => window.location.reload()} className="btn-primary mt-4">
+              <Button onClick={() => window.location.reload()} className="mt-4">
                 Try Again
-              </button>
+              </Button>
             </>
           )}
         </div>

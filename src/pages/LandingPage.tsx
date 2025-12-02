@@ -29,7 +29,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-lg">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md supports-[backdrop-filter]:bg-zinc-950/60">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
           <div className="flex items-center gap-2">
             <Zap className="text-emerald-500" size={28} />
@@ -64,11 +64,11 @@ export default function LandingPage() {
               <Zap size={14} className="text-emerald-500" />
               1,247 alerts today
             </span>
-            <span className="animate-fade-in flex items-center gap-1" style={{ animationDelay: '0.2s' }}>
+            <span className="animate-fade-in motion-delay-200 flex items-center gap-1">
               <Wifi size={14} className="text-emerald-500" />
               98.5% uptime
             </span>
-            <span className="animate-fade-in flex items-center gap-1" style={{ animationDelay: '0.4s' }}>
+            <span className="animate-fade-in motion-delay-400 flex items-center gap-1">
               <Clock size={14} className="text-emerald-500" />
               42ms response
             </span>
@@ -81,13 +81,13 @@ export default function LandingPage() {
             </span>
           </h1>
           
-          <p className="animate-fade-in mb-8 text-lg text-zinc-400 md:text-xl" style={{ animationDelay: '0.2s' }}>
+          <p className="animate-fade-in motion-delay-200 mb-8 text-lg text-zinc-400 md:text-xl">
             Your edge isn't the chart. It's what you DO with it.
             <br />
             <span className="text-zinc-500">The command center that actual traders use. No BS, just alpha.</span>
           </p>
 
-          <div className="animate-fade-in flex flex-col items-center justify-center gap-4 sm:flex-row" style={{ animationDelay: '0.4s' }}>
+          <div className="animate-fade-in motion-delay-400 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <button
               onClick={() => navigate('/dashboard-v2')}
               className="group flex items-center gap-2 rounded-lg bg-emerald-500 px-8 py-4 text-lg font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-600 hover:scale-105 hover:shadow-[0_0_50px_rgba(16,185,129,0.5)] active:scale-95"
@@ -118,7 +118,7 @@ export default function LandingPage() {
 
         {/* Animated Chart Preview */}
         <div className="relative mx-auto mt-16 max-w-5xl">
-          <div className="animate-fade-in rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900 to-zinc-950 p-4 shadow-2xl" style={{ animationDelay: '0.6s' }}>
+          <div className="animate-fade-in motion-delay-600 rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900 to-zinc-950 p-4 shadow-2xl">
             <div className="aspect-video rounded-lg bg-zinc-950 flex items-center justify-center">
               <BarChart3 size={48} className="text-zinc-700" />
               <span className="ml-3 text-zinc-600">Chart Preview - Coming Soon</span>
