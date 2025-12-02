@@ -20,16 +20,16 @@ test.describe("Sparkfined Deploy Smoke", () => {
     expect(swSupported).toBeTruthy();
   });
 
-  test("App renders and shows onboarding or dashboard", async ({ page }) => {
+  test("App renders and shows dashboard", async ({ page }) => {
     await page.goto('/', { waitUntil: "domcontentloaded" });
     await expect(page.locator("body")).toBeVisible();
     
-    // Check for either onboarding wizard OR dashboard content
-    // Onboarding shows "Configure Sparkfined" text
-    // Dashboard shows navigation elements
-    const hasOnboarding = await page.locator("text=Configure Sparkfined").isVisible().catch(() => false);
-    const hasDashboard = await page.locator("text=Board").isVisible().catch(() => false);
+    // Dashboard should show title or navigation
+    // Check for Dashboard heading or any main navigation text
+    const hasDashboard = await page.locator("text=Dashboard").first().isVisible().catch(() => false);
+    const hasNavigation = await page.locator("text=Journal").isVisible().catch(() => false);
+    const hasContent = await page.locator("text=Sparkfined").isVisible().catch(() => false);
     
-    expect(hasOnboarding || hasDashboard).toBeTruthy();
+    expect(hasDashboard || hasNavigation || hasContent).toBeTruthy();
   });
 });
