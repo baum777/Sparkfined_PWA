@@ -27,3 +27,21 @@ sources:
 
 Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unveränderte Dateien (z. B. `docs/README.md`, `docs/lore/`) behalten ihren bestehenden Platz und sind für zukünftige Konsolidierung markiert (`Kategorie E`).
 
+
+| `BUNDLE-OPTIMIZATION-PLAN.md`, `BUNDLE-OPTIMIZATION-RESULT.md`, `BUNDLE-SIZE-FINAL-SUMMARY.md` | CI/CD | Bundle-Optimierung Dokumentation | Von Root verschoben | `docs/ci/` |
+| `STYLING-UPDATES.md`, `UX-IMPROVEMENTS-SUMMARY.md`, `UX-TEST-STATUS.md` | Archive | UX/Styling Updates und Tests | Von Root verschoben | `docs/archive/` |
+
+---
+
+## 📝 Dokumentations-Richtlinien
+
+**Alle neuen Dokumente MÜSSEN in `/docs` erstellt werden!** Das Root-Verzeichnis bleibt frei von Markdown-Dateien (außer README.md).
+
+Siehe [AGENT_FILES/CLAUDE.md](/AGENT_FILES/CLAUDE.md) für vollständige Dokumentations-Richtlinien.
+
+### Schnellreferenz:
+- ✅ Dokumente nur erstellen wenn wirklich nötig
+- ✅ Alle Dokumente in `/docs` speichern
+- ✅ In Index-Dateien eintragen
+- ✅ Metadaten hinzufügen (Status, Datum, Kategorie)
+- ❌ Keine Dokumente im Root-Verzeichnis
