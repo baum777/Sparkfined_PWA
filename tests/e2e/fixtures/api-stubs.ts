@@ -105,4 +105,32 @@ export async function stubNoisyAPIs(page: Page): Promise<void> {
       }),
     ),
   );
+
+  // Stub /api/prices endpoint with deterministic data
+  await page.route('**/api/prices**', (route) => {
+    const url = route.request().url();
+    const parsed = new URL(url);
+    const symbol = parsed.searchParams.get('symbol') || 'BTCUSDT';
+    
+    // Return mock price data based on symbol
+    const mockPrices: Record<string, number> = {
+      'BTCUSDT': 43280.50,
+      'ETHUSDT': 2320.75,
+      'SOLUSDT': 98.42,
+      'OPUSDT': 3.12,
+    };
+    
+    const price = mockPrices[symbol] || 100.00;
+    
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        symbol,
+        price,
+        timestamp: Date.now(),
+        source: 'mock',
+      }),
+    });
+  });
 }
