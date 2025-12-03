@@ -57,84 +57,85 @@ export default function JournalNewEntryDialog({
       data-testid="journal-new-entry-dialog"
     >
       {/* E2E contract: tests depend on this dialog + save button IDs for stability */}
-      <div className="flex min-h-full items-start justify-center px-4 py-6 md:items-center md:py-10">
+      <div className="flex min-h-screen items-start justify-center px-4 py-4 md:items-center md:py-10">
         <form
           onSubmit={handleSubmit}
-          className="flex w-full max-w-md flex-col rounded-2xl border border-border-moderate bg-surface-elevated p-6 text-text-primary shadow-2xl max-h-[90vh] overflow-y-auto"
+          className="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-border-moderate bg-surface-elevated p-6 text-text-primary shadow-2xl"
           data-testid="journal-new-entry-form"
           onClick={(e) => e.stopPropagation()}
         >
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-text-primary">New journal entry</h2>
-            <p className="text-sm text-text-secondary">Capture the idea quickly – you can refine it later.</p>
+          {/* UX/E2E contract: keep content scrollable while actions stay visible within 1 scroll */}
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold text-text-primary">New journal entry</h2>
+              <p className="text-sm text-text-secondary">Capture the idea quickly – you can refine it later.</p>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="rounded-full border border-border-moderate px-3 py-1 text-xs text-text-secondary transition hover:border-border-hover hover:bg-interactive-hover disabled:opacity-40"
+              data-testid="journal-close-entry-button"
+            >
+              Close
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="rounded-full border border-border-moderate px-3 py-1 text-xs text-text-secondary transition hover:border-border-hover hover:bg-interactive-hover disabled:opacity-40"
-            data-testid="journal-close-entry-button"
-          >
-            Close
-          </button>
-        </div>
 
-        <div className="mt-5 space-y-4">
-          <label className="space-y-1 text-sm text-text-primary">
-            <span className="text-xs uppercase tracking-wide text-text-tertiary">Title</span>
-            <input
-              type="text"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="Setup / reason"
-              className="w-full rounded-xl border border-border-moderate bg-surface-subtle px-3 py-2 text-sm text-text-primary outline-none transition focus:border-border-hover focus:ring-2 focus:ring-border-focus disabled:opacity-60"
+          <div className="mt-5 flex-1 space-y-4 overflow-y-auto pr-1 min-h-0">
+            <label className="space-y-1 text-sm text-text-primary">
+              <span className="text-xs uppercase tracking-wide text-text-tertiary">Title</span>
+              <input
+                type="text"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder="Setup / reason"
+                className="w-full rounded-xl border border-border-moderate bg-surface-subtle px-3 py-2 text-sm text-text-primary outline-none transition focus:border-border-hover focus:ring-2 focus:ring-border-focus disabled:opacity-60"
+                disabled={isSubmitting}
+                autoFocus
+                data-testid="journal-new-entry-title"
+              />
+            </label>
+
+            <label className="space-y-1 text-sm text-text-primary">
+              <span className="text-xs uppercase tracking-wide text-text-tertiary">Notes</span>
+              <textarea
+                value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+                placeholder="Context, plan, risk..."
+                rows={5}
+                className="w-full rounded-xl border border-border-moderate bg-surface-subtle px-3 py-2 text-sm text-text-primary outline-none transition focus:border-border-hover focus:ring-2 focus:ring-border-focus disabled:opacity-60"
+                disabled={isSubmitting}
+                data-testid="journal-new-entry-notes"
+              />
+            </label>
+
+            {(localError || errorMessage) && (
+              <p className="text-sm text-status-armed-text" data-testid="journal-new-entry-error">
+                {localError ?? errorMessage}
+              </p>
+            )}
+          </div>
+
+          <div className="mt-6 flex flex-shrink-0 items-center justify-end gap-3">
+            <button
+              type="button"
+              onClick={onClose}
               disabled={isSubmitting}
-              autoFocus
-              data-testid="journal-new-entry-title"
-            />
-          </label>
-
-          <label className="space-y-1 text-sm text-text-primary">
-            <span className="text-xs uppercase tracking-wide text-text-tertiary">Notes</span>
-            <textarea
-              value={notes}
-              onChange={(event) => setNotes(event.target.value)}
-              placeholder="Context, plan, risk..."
-              rows={5}
-              className="w-full rounded-xl border border-border-moderate bg-surface-subtle px-3 py-2 text-sm text-text-primary outline-none transition focus:border-border-hover focus:ring-2 focus:ring-border-focus disabled:opacity-60"
+              className="rounded-full border border-border-subtle px-4 py-2 text-sm text-text-secondary transition hover:border-border-hover hover:bg-interactive-hover disabled:opacity-40"
+              data-testid="journal-cancel-entry-button"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
               disabled={isSubmitting}
-              data-testid="journal-new-entry-notes"
-            />
-          </label>
-
-          {(localError || errorMessage) && (
-            <p className="text-sm text-status-armed-text" data-testid="journal-new-entry-error">
-              {localError ?? errorMessage}
-            </p>
-          )}
-        </div>
-
-        <div className="mt-6 flex items-center justify-end gap-3">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSubmitting}
-            className="rounded-full border border-border-subtle px-4 py-2 text-sm text-text-secondary transition hover:border-border-hover hover:bg-interactive-hover disabled:opacity-40"
-            data-testid="journal-cancel-entry-button"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="rounded-full border border-brand bg-interactive-active px-4 py-2 text-sm font-medium text-text-primary transition hover:bg-sentiment-bull-bg disabled:opacity-40"
-            data-testid="journal-save-entry-button"
-          >
-            {isSubmitting ? 'Saving…' : 'Save entry'}
-          </button>
-        </div>
-      </form>
+              className="rounded-full border border-brand bg-interactive-active px-4 py-2 text-sm font-medium text-text-primary transition hover:bg-sentiment-bull-bg disabled:opacity-40"
+              data-testid="journal-save-entry-button"
+            >
+              {isSubmitting ? 'Saving…' : 'Save entry'}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -804,3 +804,25 @@ Commands & Results (to be run by CI/Human):
 
 New open points:
 - None; rerun the targeted Playwright suite to confirm stabilization.
+
+### 2025-12-03 – Canvas Sprint – Fix `@journal` & `@watchlist` Playwright E2E Suite
+
+Date: 2025-12-03  
+Agent: Codex (GPT-5.1)  
+Section: Canvas – Fix `@journal` & `@watchlist` Playwright E2E suite  
+Branch: cursor/stabilize-journal-and-watchlist-e2e-tests-gpt-5.1-codex-high-fbc4  
+Source: "Fix `@journal` & `@watchlist` Playwright E2E suite" Canvas
+
+Actions:
+- Refactored `src/components/journal/JournalNewEntryDialog.tsx` to keep the header static, move the form body into a dedicated `flex-1 overflow-y-auto` region, and leave the action bar outside the scroll area so `journal-save-entry-button` always stays within a single viewport scroll on CI.
+- Added an optional `testId` prop to `src/components/dashboard/DashboardShell.tsx` and used it in `src/pages/WatchlistPageV2.tsx`, ensuring the actual routed page container exposes `data-testid="watchlist-page"` with an inline E2E contract comment.
+- Recorded this canvas run in `docs/active/Execution_Log.md` and outlined the pending Playwright commands for verification.
+
+Commands & Results (to be run by CI/Human):
+- `pnpm exec playwright test tests/e2e/journal/journal.flows.spec.ts` → Pending
+- `pnpm exec playwright test tests/e2e/watchlist/watchlist.flows.spec.ts` → Pending
+- `pnpm exec playwright test tests/e2e/watchlist-sorting.spec.ts` → Pending
+- `pnpm exec playwright test --grep "@journal|@alerts|@watchlist"` → Pending
+
+New open points:
+- None; rerun the targeted Playwright suite above to confirm the fixes.

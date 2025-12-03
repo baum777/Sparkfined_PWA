@@ -119,14 +119,14 @@ export default function WatchlistPageV2() {
   );
 
   return (
-    <div data-testid="watchlist-page">
-      {/* E2E contract: visitWatchlist waits for this root container */}
-      <DashboardShell
-        title="Watchlist"
-        description={headerDescription}
-        actions={<WatchlistHeaderActions assetCount={assetCount} isLoading={isLoading} error={error} />}
-      >
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8">
+    <DashboardShell
+      title="Watchlist"
+      description={headerDescription}
+      actions={<WatchlistHeaderActions assetCount={assetCount} isLoading={isLoading} error={error} />}
+      testId="watchlist-page"
+    >
+      {/* E2E contract: visitWatchlist waits for this container */}
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8">
           <section className="space-y-3">
             <div className="space-y-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Watchlist</p>
@@ -215,9 +215,8 @@ export default function WatchlistPageV2() {
               </div>
             </WatchlistLayout>
           </section>
-        </div>
-      </DashboardShell>
-    </div>
+      </div>
+    </DashboardShell>
   );
 }
 
