@@ -1,15 +1,12 @@
 /**
  * useAdvancedInsight Hook
  * Fetch real Advanced Insight data from backend
- * 
- * Beta v0.9: Replaces mock data with real API calls
  */
 
 import { useState, useCallback } from 'react';
 import type {
   AnalyzeMarketResult,
   AdvancedInsightCard,
-  FeatureAccessMeta,
   OhlcCandle,
 } from '@/types/ai';
 import { useAdvancedInsightStore } from '@/features/analysis/advancedInsightStore';
@@ -17,9 +14,6 @@ import { useAdvancedInsightStore } from '@/features/analysis/advancedInsightStor
 export interface UseAdvancedInsightOptions {
   /** Auto-ingest into store on success */
   autoIngest?: boolean;
-  
-  /** Check access gating */
-  checkAccess?: boolean;
 }
 
 export interface AdvancedInsightRequest {
@@ -68,7 +62,7 @@ export interface UseAdvancedInsightResult {
 export function useAdvancedInsight(
   options: UseAdvancedInsightOptions = {}
 ): UseAdvancedInsightResult {
-  const { autoIngest = true, checkAccess = true } = options;
+  const { autoIngest = true } = options;
   const advancedInsightStore = useAdvancedInsightStore();
   
   const [loading, setLoading] = useState(false);
@@ -86,10 +80,7 @@ export function useAdvancedInsight(
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            ...request,
-            checkAccess,
-          }),
+          body: JSON.stringify(request),
         });
 
         if (!response.ok) {
@@ -103,7 +94,7 @@ export function useAdvancedInsight(
 
         // Auto-ingest into store if enabled
         if (autoIngest && data.advanced) {
-          advancedInsightStore.ingest(data.advanced, data.access);
+          advancedInsightStore.ingest(data.advanced);
         }
 
         return data;
@@ -116,7 +107,7 @@ export function useAdvancedInsight(
         setLoading(false);
       }
     },
-    [autoIngest, checkAccess, advancedInsightStore]
+    [autoIngest, advancedInsightStore]
   );
 
   const clear = useCallback(() => {
@@ -141,8 +132,8 @@ export function useAdvancedInsightIngest() {
   const advancedInsightStore = useAdvancedInsightStore();
 
   const ingest = useCallback(
-    (data: AdvancedInsightCard, access?: FeatureAccessMeta) => {
-      advancedInsightStore.ingest(data, access);
+    (data: AdvancedInsightCard) => {
+      advancedInsightStore.ingest(data);
     },
     [advancedInsightStore]
   );

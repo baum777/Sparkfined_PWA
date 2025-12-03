@@ -1,8 +1,6 @@
 /**
  * Advanced Insight Telemetry
  * Structured event tracking for Advanced Insight feature
- * 
- * Beta v0.9: Integrates with existing TelemetryService and useEventLogger
  */
 
 import { Telemetry } from '@/lib/TelemetryService';
@@ -19,7 +17,6 @@ export const AdvancedInsightEvents = {
   SAVED: 'ui.advanced_insight.saved',
   RESET: 'ui.advanced_insight.reset',
   RESET_ALL: 'ui.advanced_insight.reset_all',
-  UNLOCK_CLICKED: 'ui.advanced_insight.unlock_clicked',
 } as const;
 
 export type AdvancedInsightEventName = typeof AdvancedInsightEvents[keyof typeof AdvancedInsightEvents];
@@ -34,7 +31,6 @@ export interface AdvancedInsightOpenedPayload extends TelemetryPayload {
   ticker?: string;
   timeframe?: string;
   has_data: boolean;
-  is_locked: boolean;
 }
 
 export interface AdvancedInsightTabSwitchedPayload extends TelemetryPayload {
@@ -58,10 +54,6 @@ export interface AdvancedInsightResetPayload extends TelemetryPayload {
   field_name: string;
 }
 
-export interface AdvancedInsightUnlockClickedPayload extends TelemetryPayload {
-  current_tier: string;
-}
-
 // ============================================================================
 // Telemetry Functions
 // ============================================================================
@@ -72,14 +64,12 @@ export interface AdvancedInsightUnlockClickedPayload extends TelemetryPayload {
 export function trackAdvancedInsightOpened(
   ticker?: string,
   timeframe?: string,
-  hasData: boolean = false,
-  isLocked: boolean = false
+  hasData: boolean = false
 ): void {
   const payload: AdvancedInsightOpenedPayload = {
     ticker,
     timeframe,
     has_data: hasData,
-    is_locked: isLocked,
   };
 
   // Log to TelemetryService (performance metrics)
@@ -222,28 +212,6 @@ export function trackAdvancedInsightResetAll(): void {
   }
 }
 
-/**
- * Track unlock CTA clicked
- */
-export function trackAdvancedInsightUnlockClicked(currentTier: string): void {
-  const payload: AdvancedInsightUnlockClickedPayload = {
-    current_tier: currentTier,
-  };
-
-  Telemetry.log(AdvancedInsightEvents.UNLOCK_CLICKED, 1, payload);
-
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(
-      new CustomEvent('telemetry:event', {
-        detail: {
-          type: AdvancedInsightEvents.UNLOCK_CLICKED,
-          data: payload,
-        },
-      })
-    );
-  }
-}
-
 // ============================================================================
 // React Hook for Telemetry
 // ============================================================================
@@ -255,15 +223,15 @@ export function useAdvancedInsightTelemetry() {
   const telemetry = useTelemetry();
 
   return {
-    trackOpened: (ticker?: string, timeframe?: string, hasData?: boolean, isLocked?: boolean) => {
-      trackAdvancedInsightOpened(ticker, timeframe, hasData, isLocked);
+    trackOpened: (ticker?: string, timeframe?: string, hasData?: boolean) => {
+      trackAdvancedInsightOpened(ticker, timeframe, hasData);
       
       // Also enqueue via TelemetryProvider
       telemetry.enqueue({
         id: crypto.randomUUID(),
         ts: Date.now(),
         type: AdvancedInsightEvents.OPENED,
-        attrs: { ticker, timeframe, has_data: hasData, is_locked: isLocked },
+        attrs: { ticker, timeframe, has_data: hasData },
       });
     },
 
@@ -318,17 +286,6 @@ export function useAdvancedInsightTelemetry() {
         id: crypto.randomUUID(),
         ts: Date.now(),
         type: AdvancedInsightEvents.RESET_ALL,
-      });
-    },
-
-    trackUnlockClicked: (currentTier: string) => {
-      trackAdvancedInsightUnlockClicked(currentTier);
-      
-      telemetry.enqueue({
-        id: crypto.randomUUID(),
-        ts: Date.now(),
-        type: AdvancedInsightEvents.UNLOCK_CLICKED,
-        attrs: { current_tier: currentTier },
       });
     },
   };

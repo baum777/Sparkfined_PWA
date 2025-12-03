@@ -10,9 +10,6 @@ sources:
   - src/sections/ai/useAssist.ts
 ---
 
-1. **Token-Gated AI Actions**
-   - Restrict high-cost AI templates unless `AccessProvider` confirms eligible rank or token balance.
-   - Provide per-model cost estimates in settings; warn before exceeding budgets.
 
 2. **Offline Journal Merge**
    - Introduce conflict markers when server version diverges from cached draft.

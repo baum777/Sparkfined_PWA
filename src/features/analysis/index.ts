@@ -1,8 +1,6 @@
 /**
  * Advanced Insight Feature
  * Export barrel for cleaner imports
- * 
- * Beta v0.9: Core UI & Flow for Advanced Market Analysis
  */
 
 // Main Component
@@ -12,7 +10,6 @@ export { default as AdvancedInsightCard } from './AdvancedInsightCard';
 export {
   useAdvancedInsightStore,
   useAdvancedInsightData,
-  useAdvancedInsightAccess,
   useAdvancedInsightTab,
   useAdvancedInsightOverrides,
 } from './advancedInsightStore';
@@ -28,7 +25,6 @@ export {
   trackAdvancedInsightSaved,
   trackAdvancedInsightReset,
   trackAdvancedInsightResetAll,
-  trackAdvancedInsightUnlockClicked,
   AdvancedInsightEvents,
 } from './advancedInsightTelemetry';
 
@@ -39,12 +35,9 @@ export type {
   AdvancedInsightFieldOverriddenPayload,
   AdvancedInsightSavedPayload,
   AdvancedInsightResetPayload,
-  AdvancedInsightUnlockClickedPayload,
 } from './advancedInsightTelemetry';
 
 // Mock Data (for testing)
 export {
   generateMockAdvancedInsight,
-  generateMockLockedAccess,
-  generateMockUnlockedAccess,
 } from './mockAdvancedInsightData';

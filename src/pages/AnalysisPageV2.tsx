@@ -4,7 +4,6 @@ import AnalysisLayout from "@/components/analysis/AnalysisLayout";
 import {
   AdvancedInsightCard,
   generateMockAdvancedInsight,
-  generateMockUnlockedAccess,
   useAdvancedInsightStore,
 } from "@/features/analysis";
 import { fetchAnalysisSnapshot, type AnalysisSnapshot } from "@/features/market/analysisData";
@@ -101,7 +100,7 @@ export default function AnalysisPageV2() {
 
     const livePrice = marketSnapshot?.price ?? 42.8;
     const mockInsight = generateMockAdvancedInsight("SOL", livePrice);
-    ingestAdvancedInsight(mockInsight, generateMockUnlockedAccess());
+    ingestAdvancedInsight(mockInsight);
   }, [hasInsight, ingestAdvancedInsight, marketSnapshot?.price]);
 
   const analysisStats = React.useMemo<AnalysisOverviewStat[]>(() => {
