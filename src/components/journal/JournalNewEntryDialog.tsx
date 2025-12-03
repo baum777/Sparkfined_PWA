@@ -56,7 +56,7 @@ export default function JournalNewEntryDialog({
       onClick={handleOverlayClick}
       data-testid="journal-new-entry-dialog"
     >
-      <div className="flex min-h-full items-start justify-center p-4 py-8 md:items-center">
+      <div className="flex min-h-full items-center justify-center p-4 py-8">
         <form
           onSubmit={handleSubmit}
           className="w-full max-w-md rounded-2xl border border-border-moderate bg-surface-elevated p-6 text-text-primary shadow-2xl"
