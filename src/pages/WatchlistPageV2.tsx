@@ -62,8 +62,14 @@ export default function WatchlistPageV2() {
 
     hasHydratedRef.current = true;
     const symbols = rows.map((row) => row.symbol);
-    void loadQuotes(symbols);
-  }, [rows, loadQuotes]);
+
+    // Defensive: catch any unhandled errors in loadQuotes to prevent page crash
+    loadQuotes(symbols).catch((error) => {
+      console.warn('[watchlist] Failed to load quotes on mount', error);
+      setError('Unable to refresh prices. Showing cached data.');
+      setLoading(false);
+    });
+  }, [rows, loadQuotes, setError, setLoading]);
   const assetCount = rows.length;
   const headerDescription = `${assetCount} assets watched \u00b7 Quickly scan risk, momentum and context`;
   const visibleRows = React.useMemo(() => {
@@ -113,15 +119,13 @@ export default function WatchlistPageV2() {
   );
 
   return (
-    <DashboardShell
-      title="Watchlist"
-      description={headerDescription}
-      actions={<WatchlistHeaderActions assetCount={assetCount} isLoading={isLoading} error={error} />}
-    >
-      <div
-        className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8"
-        data-testid="watchlist-page"
+    <div data-testid="watchlist-page">
+      <DashboardShell
+        title="Watchlist"
+        description={headerDescription}
+        actions={<WatchlistHeaderActions assetCount={assetCount} isLoading={isLoading} error={error} />}
       >
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8">
         <section className="space-y-3">
           <div className="space-y-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Watchlist</p>
@@ -211,7 +215,8 @@ export default function WatchlistPageV2() {
           </WatchlistLayout>
         </section>
       </div>
-    </DashboardShell>
+      </DashboardShell>
+    </div>
   );
 }
 

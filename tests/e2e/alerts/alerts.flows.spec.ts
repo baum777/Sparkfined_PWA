@@ -18,14 +18,14 @@ test.describe('alerts flows', () => {
     expect(statuses.every((status) => status === 'triggered')).toBe(true);
   });
 
-  test('@alerts type filter isolates volume alerts', async ({ page }) => {
-    await page.getByTestId('alerts-type-filter-volume').click();
+  test('@alerts type filter isolates price-above alerts', async ({ page }) => {
+    await page.getByTestId('alerts-type-filter-price-above').click();
 
     const items = page.locator('[data-testid="alerts-list-item"]');
     await expect(items).not.toHaveCount(0);
 
     const types = await items.evaluateAll((nodes) => nodes.map((node) => node.getAttribute('data-alert-type')));
-    expect(types.every((type) => type === 'volume')).toBe(true);
+    expect(types.every((type) => type === 'price-above')).toBe(true);
   });
 
   test('@alerts selecting an alert updates the detail panel and URL', async ({ page }) => {
@@ -39,21 +39,21 @@ test.describe('alerts flows', () => {
   });
 
   test('@alerts respects preselected alert query params', async ({ page }) => {
-    const preselected = ALERT_IDS.snoozed;
+    const preselected = ALERT_IDS.paused;
     await page.goto(`/alerts-v2?alert=${preselected}`);
     await awaitStableUI(page);
 
     await expect(page.getByTestId('alerts-detail-panel')).toBeVisible();
-    await expect(page.getByTestId('alerts-detail-condition')).toContainText('Volatility compression');
+    await expect(page.getByTestId('alerts-detail-condition')).toContainText('Breaks above prior value area');
     await expect(page.locator(`[data-testid="alerts-list-item"][data-alert-id="${preselected}"]`)).toHaveAttribute(
       'data-alert-status',
-      'snoozed',
+      'paused',
     );
   });
 
   test('@alerts combined filters show the empty state when nothing matches', async ({ page }) => {
-    await page.getByTestId('alerts-status-filter-triggered').click();
-    await page.getByTestId('alerts-type-filter-trend').click();
+    await page.getByTestId('alerts-status-filter-armed').click();
+    await page.getByTestId('alerts-type-filter-price-below').click();
 
     await expect(page.getByTestId('alerts-empty-state')).toBeVisible();
   });

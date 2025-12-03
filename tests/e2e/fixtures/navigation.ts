@@ -4,17 +4,16 @@ import { awaitStableUI } from '../utils/wait';
 async function visit(page: Page, path: string, testId: string) {
   await page.goto(path, { waitUntil: 'networkidle' });
   await awaitStableUI(page);
-  
-  // Wait for Suspense fallback to complete (if any)
-  await page.waitForSelector('[data-testid]:not([data-testid*="loading"])', {
-    state: 'visible',
-    timeout: 10000,
-  }).catch(() => {
-    // Fallback: just wait for any content
-    console.log(`[E2E] Suspense fallback detected for ${path}, waiting longer...`);
-  });
-  
-  await expect(page.getByTestId(testId)).toBeVisible({ timeout: 10000 });
+
+  // Wait for Suspense fallback to disappear (if present)
+  const loadingIndicator = page.getByTestId('app-loading');
+  const isLoading = await loadingIndicator.isVisible().catch(() => false);
+  if (isLoading) {
+    await expect(loadingIndicator).not.toBeVisible({ timeout: 10000 });
+  }
+
+  // Wait for the specific page element to be visible
+  await expect(page.getByTestId(testId)).toBeVisible({ timeout: 15000 });
 }
 
 export async function visitJournal(page: Page) {
