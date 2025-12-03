@@ -1,0 +1,117 @@
+# ==============================================
+# Sparkfined PWA - AI Context Ignore Patterns
+# ==============================================
+# Purpose: Exclude heavy/generated files from AI assistant context
+# to improve performance and relevance of code assistance.
+
+# -------------------------
+# Dependencies & Packages
+# -------------------------
+node_modules/
+pnpm-store/
+.pnpm/
+.yarn/
+.npm/
+
+# -------------------------
+# Build Artifacts
+# -------------------------
+dist/
+build/
+out/
+*.tsbuildinfo
+tsconfig.build.tsbuildinfo
+
+# -------------------------
+# Test Outputs & Coverage
+# -------------------------
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+.playwright/
+playwright/.cache/
+
+# -------------------------
+# Caches & Temp Files
+# -------------------------
+.vite/
+.cache/
+.turbo/
+.next/
+.vercel/
+*.log
+*.log.*
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# -------------------------
+# IDE & Editor Files
+# -------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# -------------------------
+# Environment & Secrets
+# -------------------------
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+credentials.json
+
+# -------------------------
+# Git & Version Control
+# -------------------------
+.git/
+.gitignore
+
+# -------------------------
+# Lock Files (heavy, not needed for context)
+# -------------------------
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# -------------------------
+# Generated Documentation (exclude to avoid duplication)
+# -------------------------
+# Note: Keep source docs in docs/ but exclude generated outputs
+storybook-static/
+.docusaurus/
+
+# -------------------------
+# PWA & Service Worker Artifacts
+# -------------------------
+sw.js
+sw.js.map
+workbox-*.js
+workbox-*.js.map
+
+# -------------------------
+# Large Media & Assets (if not needed for code context)
+# -------------------------
+# Uncomment if you have large asset directories
+# public/videos/
+# public/images/large/
+
+# -------------------------
+# Archived Docs (rarely needed for current work)
+# -------------------------
+docs/archive/
+
+# -------------------------
+# Generated Rule Files (don't feed them back to AI)
+# -------------------------
+# These are outputs of rulesync, not inputs
+CLAUDE.md
+.cursorrules
+.github/copilot-instructions.md
+.clinerules/
