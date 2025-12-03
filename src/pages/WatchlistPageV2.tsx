@@ -119,102 +119,103 @@ export default function WatchlistPageV2() {
   );
 
   return (
-    <div>
+    <div data-testid="watchlist-page">
+      {/* E2E contract: visitWatchlist waits for this root container */}
       <DashboardShell
         title="Watchlist"
         description={headerDescription}
         actions={<WatchlistHeaderActions assetCount={assetCount} isLoading={isLoading} error={error} />}
       >
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8" data-testid="watchlist-page">
-        <section className="space-y-3">
-          <div className="space-y-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Watchlist</p>
-            <p className="text-base text-text-primary">Your curated tokens, ready for focused tracking.</p>
-            <p className="text-sm text-text-secondary">
-              Filter, sort, and drill into price action without leaving your command center.
-            </p>
-          </div>
-          <div className="space-y-1 text-xs">
-            {isLoading && <p className="text-text-tertiary">Refreshing your watchlist…</p>}
-            {!isLoading && error && (
-              <p className="font-medium text-warn">Price data unavailable, showing last known values.</p>
-            )}
-            {!isLoading && !error && (
-              <p className="text-text-secondary">Live prices refresh automatically while Grok monitors flows.</p>
-            )}
-          </div>
-        </section>
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8">
+          <section className="space-y-3">
+            <div className="space-y-1">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Watchlist</p>
+              <p className="text-base text-text-primary">Your curated tokens, ready for focused tracking.</p>
+              <p className="text-sm text-text-secondary">
+                Filter, sort, and drill into price action without leaving your command center.
+              </p>
+            </div>
+            <div className="space-y-1 text-xs">
+              {isLoading && <p className="text-text-tertiary">Refreshing your watchlist…</p>}
+              {!isLoading && error && (
+                <p className="font-medium text-warn">Price data unavailable, showing last known values.</p>
+              )}
+              {!isLoading && !error && (
+                <p className="text-text-secondary">Live prices refresh automatically while Grok monitors flows.</p>
+              )}
+            </div>
+          </section>
 
-        <section>
-          <WatchlistLayout>
-            {!isOnline && (
-              <div className="mb-4">
-                <StateView
-                  type="offline"
-                  description="You're offline. Showing last cached prices."
-                  compact
-                />
-              </div>
-            )}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-              <div className="space-y-4">
-                <div className="rounded-2xl border border-border bg-surface/80 backdrop-blur">
-                  <div className="space-y-3 border-b border-border px-3 py-2 text-xs sm:text-sm">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {SESSION_FILTERS.map((filter) => {
-                        const isActive = sessionFilter === filter;
-                        return (
-                          <button
-                            key={filter}
-                            type="button"
-                            onClick={() => setSessionFilter(filter)}
-                            className={`rounded-full border px-3 py-1 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
-                              isActive
-                                ? "border-brand bg-surface-hover text-text-primary"
-                                : "border-border text-text-secondary hover:bg-surface-hover"
-                            }`}
-                            data-testid={`watchlist-session-filter-${filter}`}
-                          >
-                            {filter === "all" ? "All" : filter}
-                          </button>
-                        );
-                      })}
+          <section>
+            <WatchlistLayout>
+              {!isOnline && (
+                <div className="mb-4">
+                  <StateView
+                    type="offline"
+                    description="You're offline. Showing last cached prices."
+                    compact
+                  />
+                </div>
+              )}
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+                <div className="space-y-4">
+                  <div className="rounded-2xl border border-border bg-surface/80 backdrop-blur">
+                    <div className="space-y-3 border-b border-border px-3 py-2 text-xs sm:text-sm">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {SESSION_FILTERS.map((filter) => {
+                          const isActive = sessionFilter === filter;
+                          return (
+                            <button
+                              key={filter}
+                              type="button"
+                              onClick={() => setSessionFilter(filter)}
+                              className={`rounded-full border px-3 py-1 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+                                isActive
+                                  ? "border-brand bg-surface-hover text-text-primary"
+                                  : "border-border text-text-secondary hover:bg-surface-hover"
+                              }`}
+                              data-testid={`watchlist-session-filter-${filter}`}
+                            >
+                              {filter === "all" ? "All" : filter}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <LiveStatusBadge showLabel />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSortMode((prev) => {
+                              if (prev === "default") return "top-movers";
+                              if (prev === "top-movers") return "alphabetical";
+                              return "default";
+                            })
+                          }
+                          className="rounded-full border border-border px-3 py-1 font-semibold text-text-secondary transition hover:border-brand hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                          data-testid="watchlist-sort-toggle"
+                        >
+                          Sort:{" "}
+                          {sortMode === "default"
+                            ? "Default"
+                            : sortMode === "top-movers"
+                              ? "Top Movers"
+                              : "A-Z"}
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <LiveStatusBadge showLabel />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setSortMode((prev) => {
-                            if (prev === "default") return "top-movers";
-                            if (prev === "top-movers") return "alphabetical";
-                            return "default";
-                          })
-                        }
-                        className="rounded-full border border-border px-3 py-1 font-semibold text-text-secondary transition hover:border-brand hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                        data-testid="watchlist-sort-toggle"
-                      >
-                        Sort:{" "}
-                        {sortMode === "default"
-                          ? "Default"
-                          : sortMode === "top-movers"
-                            ? "Top Movers"
-                            : "A-Z"}
-                      </button>
+                    <div className="p-2">
+                      <WatchlistTable rows={visibleRows} activeSymbol={activeSymbol} trends={trends} onSelect={setActiveSymbol} />
                     </div>
-                  </div>
-                  <div className="p-2">
-                    <WatchlistTable rows={visibleRows} activeSymbol={activeSymbol} trends={trends} onSelect={setActiveSymbol} />
                   </div>
                 </div>
+                <div className="space-y-4">
+                  <WatchlistDetailPanel row={activeRow} trend={activeTrend} onOpenChart={openChart} onOpenReplay={openReplay} />
+                </div>
               </div>
-              <div className="space-y-4">
-                <WatchlistDetailPanel row={activeRow} trend={activeTrend} onOpenChart={openChart} onOpenReplay={openReplay} />
-              </div>
-            </div>
-          </WatchlistLayout>
-        </section>
-      </div>
+            </WatchlistLayout>
+          </section>
+        </div>
       </DashboardShell>
     </div>
   );

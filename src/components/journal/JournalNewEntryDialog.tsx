@@ -56,10 +56,11 @@ export default function JournalNewEntryDialog({
       onClick={handleOverlayClick}
       data-testid="journal-new-entry-dialog"
     >
-      <div className="flex min-h-full items-start justify-center p-4 py-8 md:items-center">
+      {/* E2E contract: tests depend on this dialog + save button IDs for stability */}
+      <div className="flex min-h-full items-start justify-center px-4 py-6 md:items-center md:py-10">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md rounded-2xl border border-border-moderate bg-surface-elevated p-6 text-text-primary shadow-2xl"
+          className="flex w-full max-w-md flex-col rounded-2xl border border-border-moderate bg-surface-elevated p-6 text-text-primary shadow-2xl max-h-[90vh] overflow-y-auto"
           data-testid="journal-new-entry-form"
           onClick={(e) => e.stopPropagation()}
         >

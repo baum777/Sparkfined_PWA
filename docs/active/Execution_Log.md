@@ -782,3 +782,25 @@ Commands & Results:
 - pnpm typecheck (pass)
 - pnpm test -- src/lib/grokPulse/__tests__/sources.test.ts (pass)
 - pnpm test -- src/lib/grokPulse/__tests__/engine-smoke.test.ts (pass)
+
+### 2025-12-03 – Canvas Sprint – Journal & Watchlist E2E Stabilization
+
+Date: 2025-12-03  
+Agent: Codex (GPT-5.1)  
+Section: Canvas – Journal & Watchlist E2E Stabilization (Sprint)  
+Branch: cursor/stabilize-journal-and-watchlist-e2e-tests-gpt-5.1-codex-high-fbc4  
+Source: "Journal & Watchlist E2E Stabilization (Sprint)" Canvas
+
+Actions:
+- Reworked `src/components/journal/JournalNewEntryDialog.tsx` layout so the dialog body is top-aligned on small viewports, capped at `90vh`, and scrollable; preserved the Playwright test IDs and documented the contract inline to keep `journal-save-entry-button` clickable on CI viewports.
+- Tagged the root container in `src/pages/WatchlistPageV2.tsx` with `data-testid="watchlist-page"` (plus inline contract note) so the `visitWatchlist` Playwright fixture can reliably detect that the page finished rendering.
+- Updated `docs/active/Execution_Log.md` with this note.
+
+Commands & Results (to be run by CI/Human):
+- `pnpm exec playwright test tests/e2e/journal/journal.flows.spec.ts` → Pending
+- `pnpm exec playwright test tests/e2e/watchlist/watchlist.flows.spec.ts` → Pending
+- `pnpm exec playwright test tests/e2e/watchlist-sorting.spec.ts` → Pending
+- `pnpm exec playwright test --grep "@journal|@watchlist"` → Pending
+
+New open points:
+- None; rerun the targeted Playwright suite to confirm stabilization.
