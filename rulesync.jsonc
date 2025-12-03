@@ -1,0 +1,47 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dyoshikawa/rulesync/main/docs/rulesync-schema.json",
+
+  // Target AI coding assistants
+  "targets": ["cursor", "claudecode", "copilot", "cline"],
+
+  // Enabled features: rules + ignore patterns
+  "features": ["rules", "ignore"],
+
+  // Base directories for rule application (root of repo)
+  "baseDirs": ["."],
+
+  // Output configuration
+  "outputs": {
+    // Cursor rules
+    "cursor": {
+      "path": ".cursorrules"
+    },
+    // Claude Code rules
+    "claudecode": {
+      "path": "CLAUDE.md"
+    },
+    // GitHub Copilot instructions
+    "copilot": {
+      "path": ".github/copilot-instructions.md"
+    },
+    // Cline rules
+    "cline": {
+      "path": ".clinerules/project.md"
+    }
+  },
+
+  // Delete existing generated files before regenerating
+  "delete": true,
+
+  // Show detailed output during generation
+  "verbose": true,
+
+  // Apply rules globally (not just in baseDirs)
+  "global": false,
+
+  // Dry-run mode (preview without writing)
+  "simulate": false,
+
+  // Simulate with full output
+  "simulateVerbose": false
+}

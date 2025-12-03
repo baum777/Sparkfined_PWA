@@ -27,3 +27,25 @@ sources:
 
 Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unveränderte Dateien (z. B. `docs/README.md`, `docs/lore/`) behalten ihren bestehenden Platz und sind für zukünftige Konsolidierung markiert (`Kategorie E`).
 
+
+---
+
+## 📦 Neue Ergänzungen (2025-12-03)
+
+### Rulesync & AI Agent Setup
+- **`.rulesync/rules/overview.md`** - Globale AI-Guardrails und Projektübersicht
+- **`.rulesync/rules/journal-system.md`** - Journal-Domain spezifische Regeln
+- **`.rulesync/.aiignore`** - AI-Kontext Ausschluss-Muster
+- **`.rulesync/HANDOVER.md`** - Setup-Anleitung für Rulesync
+- **`rulesync.jsonc`** - Rulesync Hauptkonfiguration
+
+### Aus Root verschobene Dokumente
+| Original (Root) | Neue Location | Kategorie |
+|-----------------|---------------|-----------|
+| `BUNDLE-OPTIMIZATION-PLAN.md` | `docs/process/` | Process |
+| `BUNDLE-OPTIMIZATION-RESULT.md` | `docs/process/` | Process |
+| `BUNDLE-SIZE-FINAL-SUMMARY.md` | `docs/process/` | Process |
+| `STYLING-UPDATES.md` | `docs/design/` | Design |
+| `UX-IMPROVEMENTS-SUMMARY.md` | `docs/design/` | Design |
+| `UX-TEST-STATUS.md` | `docs/qa/` | QA |
+| `sparkfined-style-guide.html` | `docs/design/` | Design |
