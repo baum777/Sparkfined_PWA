@@ -73,7 +73,7 @@ const INITIAL_ENTRIES: JournalEntry[] = [
 ];
 
 export const useJournalStore = create<JournalState>((set) => ({
-  entries: [],
+  entries: INITIAL_ENTRIES,
   activeId: undefined,
   isLoading: false,
   error: null,

@@ -52,7 +52,7 @@ test.describe('alerts flows', () => {
   });
 
   test('@alerts combined filters show the empty state when nothing matches', async ({ page }) => {
-    await page.getByTestId('alerts-status-filter-paused').click();
+    await page.getByTestId('alerts-status-filter-armed').click();
     await page.getByTestId('alerts-type-filter-price-below').click();
 
     await expect(page.getByTestId('alerts-empty-state')).toBeVisible();

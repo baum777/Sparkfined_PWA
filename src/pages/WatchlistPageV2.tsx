@@ -62,8 +62,14 @@ export default function WatchlistPageV2() {
 
     hasHydratedRef.current = true;
     const symbols = rows.map((row) => row.symbol);
-    void loadQuotes(symbols);
-  }, [rows, loadQuotes]);
+
+    // Defensive: catch any unhandled errors in loadQuotes to prevent page crash
+    loadQuotes(symbols).catch((error) => {
+      console.warn('[watchlist] Failed to load quotes on mount', error);
+      setError('Unable to refresh prices. Showing cached data.');
+      setLoading(false);
+    });
+  }, [rows, loadQuotes, setError, setLoading]);
   const assetCount = rows.length;
   const headerDescription = `${assetCount} assets watched \u00b7 Quickly scan risk, momentum and context`;
   const visibleRows = React.useMemo(() => {

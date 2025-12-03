@@ -58,6 +58,9 @@ test.describe('journal flows', () => {
     await page.getByTestId('journal-edit-notes-button').click();
     await page.getByTestId('journal-detail-notes-input').fill(newNotes);
     await page.getByTestId('journal-detail-save-notes').click();
+
+    // Wait for edit mode to close and notes to be saved
+    await expect(page.getByTestId('journal-detail-notes-input')).not.toBeVisible();
     await expect(page.getByTestId('journal-notes-content')).toContainText(newNotes);
   });
 
