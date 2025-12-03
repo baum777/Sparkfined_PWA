@@ -264,22 +264,13 @@ export default {
       
       boxShadow: {
         'card-subtle': '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
-        // Alchemical Glow Effects
-        'glow-accent': '0 0 16px rgba(0, 240, 255, 0.4)',
-        'glow-brand': '0 0 20px rgba(57, 255, 20, 0.5)',
-        'glow-cyan': '0 0 16px rgba(0, 240, 255, 0.4)',
-        'glow-gold': '0 0 18px rgba(255, 184, 0, 0.45)',
-        'glow-magenta': '0 0 18px rgba(255, 0, 110, 0.45)',
-        'glow-phosphor': '0 0 20px rgba(57, 255, 20, 0.5)',
-        // Hover states with stronger glow
-        'glow-cyan-hover': '0 0 24px rgba(0, 240, 255, 0.6), 0 0 12px rgba(0, 240, 255, 0.3)',
-        'glow-gold-hover': '0 0 24px rgba(255, 184, 0, 0.6), 0 0 12px rgba(255, 184, 0, 0.3)',
-        'glow-phosphor-hover': '0 0 28px rgba(57, 255, 20, 0.7), 0 0 14px rgba(57, 255, 20, 0.4)',
-        // Legacy compatibility
-        'emerald-glow': '0 0 20px rgba(57, 255, 20, 0.5)',
-        'emerald-glow-lg': '0 0 28px rgba(57, 255, 20, 0.7)',
-        'emerald-glow-xl': '0 0 36px rgba(57, 255, 20, 0.8)',
-        'rose-glow': '0 0 18px rgba(255, 0, 110, 0.45)',
+        'glow-accent': '0 0 10px rgba(0, 255, 102, 0.22)',
+        'glow-brand': '0 0 12px rgba(255, 98, 0, 0.18)',
+        'glow-cyan': '0 0 8px rgba(0, 229, 255, 0.2)',
+        'emerald-glow': '0 0 30px rgba(16, 185, 129, 0.3)',
+        'emerald-glow-lg': '0 0 50px rgba(16, 185, 129, 0.5)',
+        'emerald-glow-xl': '0 0 70px rgba(16, 185, 129, 0.6)',
+        'rose-glow': '0 0 20px rgba(244, 63, 94, 0.3)',
       },
       
       backgroundImage: {
@@ -330,11 +321,6 @@ export default {
         'scale-in': 'scale-in 150ms cubic-bezier(0, 0, 0.2, 1) forwards',
         'shimmer': 'shimmer 1.5s infinite',
         'ticker': 'ticker 20s linear infinite',
-        // Alchemical animations
-        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
-        'float': 'float 3s ease-in-out infinite',
-        'bounce-subtle': 'bounce-subtle 0.6s cubic-bezier(0.22, 0.61, 0.36, 1)',
-        'press': 'press 140ms cubic-bezier(0.4, 0, 0.2, 1)',
       },
       
       keyframes: {
@@ -372,30 +358,6 @@ export default {
         'ticker': {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
-        },
-        // Alchemical keyframes
-        'glow-pulse': {
-          '0%, 100%': { 
-            opacity: '1',
-            filter: 'brightness(1) drop-shadow(0 0 8px currentColor)'
-          },
-          '50%': { 
-            opacity: '0.8',
-            filter: 'brightness(1.2) drop-shadow(0 0 16px currentColor)'
-          },
-        },
-        'float': {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-8px)' },
-        },
-        'bounce-subtle': {
-          '0%, 100%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(1.05)' },
-        },
-        'press': {
-          '0%': { transform: 'scale(1)' },
-          '50%': { transform: 'scale(0.95)' },
-          '100%': { transform: 'scale(1)' },
         },
       },
       

@@ -49,29 +49,23 @@ export default function DashboardKpiStrip({ items }: DashboardKpiStripProps) {
           return (
             <article
               key={item.label}
-              className="group relative flex min-w-[min(240px,80vw)] flex-1 snap-start flex-col overflow-hidden rounded-2xl border border-border-subtle bg-gradient-to-br from-surface to-surface-elevated px-5 py-4 text-text-primary shadow-card-subtle backdrop-blur-sm transition-all hover:border-border-moderate hover:shadow-glow-cyan md:min-w-0 md:snap-none"
+              className="flex min-w-[min(240px,80vw)] flex-1 snap-start flex-col rounded-2xl border border-border-subtle bg-surface-skeleton/90 px-4 py-3 text-text-primary shadow-card-subtle backdrop-blur-sm md:min-w-0 md:snap-none"
             >
-              {/* Subtle gradient overlay on hover */}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-              
-              <div className="relative flex items-start justify-between gap-3">
-                {/* Icon + Label */}
-                <div className="flex items-center gap-3">
-                  {trend && (
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all ${trend.className} group-hover:scale-110`}>
-                      {trend.icon}
-                    </div>
-                  )}
-                  <div className="flex flex-col">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.35em] text-text-tertiary">{item.label}</span>
-                    <span className="mt-1 text-2xl font-mono font-bold">{item.value}</span>
-                  </div>
-                </div>
-                
-                {/* Status indicator */}
-                {item.lastUpdated && (
-                  <DataFreshness lastUpdated={item.lastUpdated} />
-                )}
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] uppercase tracking-[0.4em] text-text-tertiary">{item.label}</span>
+                {item.lastUpdated && <DataFreshness lastUpdated={item.lastUpdated} />}
+              </div>
+              <div className="mt-2 flex items-baseline justify-between gap-3">
+                <span className="text-2xl font-mono font-semibold">{item.value}</span>
+                {trend ? (
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold ${trend.className}`}
+                    aria-label={trend.label}
+                  >
+                    {trend.icon}
+                    {item.trend === 'flat' ? '—' : 'Live'}
+                  </span>
+                ) : null}
               </div>
             </article>
           );
