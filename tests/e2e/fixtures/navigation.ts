@@ -5,8 +5,14 @@ async function visit(page: Page, path: string, testId: string) {
   await page.goto(path, { waitUntil: 'networkidle' });
   await awaitStableUI(page);
 
-  // Wait for the specific page element to be visible (handles Suspense automatically)
-  // Increased timeout for lazy-loaded pages
+  // Wait for Suspense fallback to disappear (if present)
+  const loadingIndicator = page.getByTestId('app-loading');
+  const isLoading = await loadingIndicator.isVisible().catch(() => false);
+  if (isLoading) {
+    await expect(loadingIndicator).not.toBeVisible({ timeout: 10000 });
+  }
+
+  // Wait for the specific page element to be visible
   await expect(page.getByTestId(testId)).toBeVisible({ timeout: 15000 });
 }
 

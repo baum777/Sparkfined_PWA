@@ -50,7 +50,7 @@ export default function JournalNewEntryDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-bg-overlay/70 px-4 py-8 backdrop-blur"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-bg-overlay/70 px-4 py-8 backdrop-blur"
       role="dialog"
       aria-modal="true"
       onClick={handleOverlayClick}
@@ -58,7 +58,7 @@ export default function JournalNewEntryDialog({
     >
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-2xl border border-border-moderate bg-surface-elevated p-6 text-text-primary shadow-2xl"
+        className="my-auto w-full max-w-md rounded-2xl border border-border-moderate bg-surface-elevated p-6 text-text-primary shadow-2xl"
         data-testid="journal-new-entry-form"
       >
         <div className="flex items-start justify-between">

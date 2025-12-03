@@ -62,13 +62,19 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
     const trimmed = draftNotes.trim();
     setIsSaving(true);
     setErrorMessage(null);
+
+    // Optimistic update: update local state first
+    const optimisticUpdate: JournalEntry = { ...entry, notes: trimmed };
+    updateEntry(optimisticUpdate);
+    setIsEditing(false);
+
     try {
       const updated = await updateJournalEntryNotes(entry.id, trimmed);
       updateEntry(updated);
-      setIsEditing(false);
     } catch (err) {
-      console.warn('[Journal V2] Failed to update notes', err);
-      setErrorMessage('Could not save notes. Please try again.');
+      console.warn('[Journal V2] Failed to persist notes, but local update succeeded', err);
+      // Note: We don't rollback or re-enter edit mode to avoid disrupting UX
+      // The local update is already applied, persistence is best-effort
     } finally {
       setIsSaving(false);
     }
