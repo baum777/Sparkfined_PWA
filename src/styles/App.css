@@ -1,79 +1,83 @@
-/* Import Design Tokens */
-@import './tokens.css';
-@import './fonts.css';
-@import './motion.css';
-@import './high-contrast.css';
-@import './landing.css';
-@import './alchemical.css';
+/* 
+ * App-Level Component Styles
+ * NOTE: Base styles and design tokens are loaded via index.css
+ * This file contains only App.tsx-specific overrides and enhancements
+ */
 
-/* Sparkfined TA-PWA: Blade Runner × TradingView × Notion */
+/* === App-Specific Overrides === */
 
-body {
-  margin: 0;
-  background-color: rgb(var(--color-bg));
-  color: rgb(var(--color-text-primary));
-  font-family: var(--font-sans);
-  font-size: var(--text-sm);
-  line-height: var(--leading-sm);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
+/* Root container should always fill viewport */
 #root {
   width: 100%;
   min-height: 100vh;
-  background-color: rgb(var(--color-bg));
 }
 
-/* Utility classes */
-.font-mono {
-  font-family: var(--font-mono);
-}
+/* === App-Level Feature Flags === */
 
-/* Offline mode indicator (subtle neon warning) */
+/* Offline mode indicator styling hook */
 body.offline-mode {
-  /* Optional: Add accent glow to indicate offline state */
+  /* Can be extended by components to show offline state */
 }
 
-/* Custom scrollbar (cyberpunk aesthetic) */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+/* === Component-Specific Utilities === */
+
+/* App layout helpers (can be extended as needed) */
+.app-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-::-webkit-scrollbar-track {
-  background: #0A0A0A;
+.app-main {
+  flex: 1;
+  overflow: auto;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #2A2A2A;
-  border-radius: 5px;
+/* === Performance Hints === */
+
+/* Promote layout-heavy elements to own layer */
+.will-animate {
+  will-change: transform, opacity;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #00FF66;
-  box-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
+.will-scroll {
+  will-change: scroll-position;
 }
 
-/* Loading skeleton shimmer */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    #121212 0%,
-    #1A1A1A 50%,
-    #121212 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
+/* === Browser-Specific Fixes === */
+
+/* Safari iOS fixes for 100vh issues */
+@supports (-webkit-touch-callout: none) {
+  #root {
+    min-height: -webkit-fill-available;
+  }
 }
 
-/* Respect reduced motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+/* === PWA-Specific Styles === */
+
+/* Standalone PWA mode (installed app) */
+@media (display-mode: standalone) {
+  body {
+    /* Add safe-area padding for iOS notch */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* === Print Styles === */
+
+@media print {
+  body::before,
+  body::after {
+    display: none; /* Remove noise/scanlines when printing */
+  }
+  
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
   }
 }
