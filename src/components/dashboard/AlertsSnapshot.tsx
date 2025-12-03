@@ -42,8 +42,8 @@ export default function AlertsSnapshot() {
       className="bg-surface-subtle"
     >
       <CardHeader className="mb-2">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-text-tertiary">⚡ Signals</p>
-        <CardTitle className="text-lg font-bold">Alert Status</CardTitle>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-text-tertiary">Signals</p>
+        <CardTitle className="text-base">Alerts snapshot</CardTitle>
       </CardHeader>
 
       {hasAlerts ? (
@@ -76,23 +76,22 @@ export default function AlertsSnapshot() {
         />
       )}
 
-      <CardFooter className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border-subtle pt-4">
+      <CardFooter className="mt-6 flex flex-wrap items-center justify-between gap-3">
         {hasAlerts ? (
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary">
-            Total: <span className="text-text-primary font-bold">{totalAlerts}</span>
+          <p className="text-xs uppercase tracking-wide text-text-tertiary">
+            Total alerts: <span className="text-text-primary">{totalAlerts}</span>
           </p>
         ) : (
-          <p className="text-xs text-text-tertiary">Never miss a level 🎯</p>
+          <p className="text-xs text-text-tertiary">Stay ahead of volatility.</p>
         )}
 
         <Button
           variant="ghost"
           size="sm"
-          className="text-accent hover:text-accent/80 hover:bg-accent/5"
           onClick={handleViewAll}
           data-testid="dashboard-alerts-view-all"
         >
-          Manage Alerts →
+          View all
         </Button>
       </CardFooter>
     </Card>
@@ -107,46 +106,16 @@ interface StatBlockProps {
 }
 
 function StatBlock({ label, value, testId, badgeClass }: StatBlockProps) {
-  const isArmed = label === 'Armed';
-  const isTriggered = label === 'Triggered';
-  const isActive = value > 0;
-  
   return (
-    <div className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br from-surface to-surface-elevated p-4 shadow-sm transition-all ${
-      isActive 
-        ? isArmed 
-          ? 'border-accent/30 shadow-glow-cyan hover:shadow-glow-cyan-hover' 
-          : 'border-warn/30 shadow-glow-gold hover:shadow-glow-gold-hover'
-        : 'border-border-subtle hover:border-border-moderate'
-    }`}>
-      {/* Animated overlay for active alerts */}
-      {isActive && (
-        <div className={`pointer-events-none absolute inset-0 opacity-10 ${
-          isArmed ? 'bg-gradient-to-br from-accent to-transparent' : 'bg-gradient-to-br from-warn to-transparent'
-        } ${isTriggered ? 'animate-pulse' : ''}`} />
-      )}
-      
-      <div className="relative">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary">{label}</span>
-          {isActive && (
-            <div className={`status-indicator ${isArmed ? 'armed' : 'triggered'}`} />
-          )}
-        </div>
-        <div className="mt-3 flex items-baseline gap-2">
-          <span className="font-mono text-3xl font-bold text-text-primary" data-testid={testId}>
-            {value}
-          </span>
-          <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
-            isActive
-              ? isArmed
-                ? 'border-accent/40 bg-accent/10 text-accent shadow-glow-cyan'
-                : 'border-warn/40 bg-warn/10 text-warn shadow-glow-gold'
-              : 'border-border-subtle bg-surface-skeleton text-text-tertiary'
-          }`}>
-            {isActive ? '⚡ Live' : 'Idle'}
-          </span>
-        </div>
+    <div className="rounded-2xl border border-border-moderate bg-surface p-4 shadow-inner">
+      <p className="text-xs uppercase tracking-wide text-text-tertiary">{label}</p>
+      <div className="mt-3 flex items-baseline gap-2">
+        <span className="text-3xl font-semibold text-text-primary" data-testid={testId}>
+          {value}
+        </span>
+        <span className={`rounded-full px-2 py-1 text-[11px] font-medium ${badgeClass}`}>
+          {value > 0 ? 'Active' : 'Idle'}
+        </span>
       </div>
     </div>
   );

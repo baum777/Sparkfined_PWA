@@ -16,25 +16,25 @@ type StepDefinition = {
 const STEPS: StepDefinition[] = [
   {
     id: 'journal',
-    title: 'SUMMON: Journal Your Ritual',
-    description: 'Capture thesis & emotions.',
-    actionLabel: 'Open Journal',
+    title: 'Journal your ritual',
+    description: 'Capture thesis, risk and emotions in /journal-v2 so every session starts with clarity.',
+    actionLabel: 'Open journal workspace',
     icon: BookOpen,
     targetRoute: '/journal-v2',
   },
   {
     id: 'watchlist',
-    title: 'WATCH: Track Your Targets',
-    description: 'Pin high-conviction setups.',
-    actionLabel: 'Open Watchlist',
+    title: 'Curate your watchlist',
+    description: 'Pin catalysts and conviction scores inside /watchlist-v2 to stay focused on high-quality setups.',
+    actionLabel: 'Review watchlist',
     icon: Star,
     targetRoute: '/watchlist-v2',
   },
   {
     id: 'alerts',
-    title: 'MASTER: Automate Alerts',
-    description: 'Never miss key levels.',
-    actionLabel: 'Setup Alerts',
+    title: 'Stay ahead with alerts',
+    description: 'Route price, volume and flow triggers into /alerts-v2 before the next volatility spike.',
+    actionLabel: 'Enable alerts',
     icon: Bell,
     targetRoute: '/alerts-v2',
   },
@@ -94,12 +94,15 @@ export default function OnboardingWizard() {
         </button>
 
         <div className="grid gap-8 px-6 py-10 lg:grid-cols-[1.1fr_0.9fr] lg:px-10">
-          <div className="space-y-8">
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-text-tertiary">⚡ First-Run Setup</p>
-              <h2 className="text-4xl font-bold leading-tight text-text-primary">
-                Three Steps to Mastery
+          <div className="space-y-6">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-text-tertiary">First-run setup</p>
+              <h2 className="mt-2 text-3xl font-semibold leading-tight text-text-primary">
+                Configure Sparkfined in three moves
               </h2>
+              <p className="mt-2 text-sm text-text-secondary">
+                Each step drops you into the exact workspace so you can finish onboarding without losing momentum.
+              </p>
             </div>
 
             <div className="flex items-center gap-2" aria-label="Onboarding progress">
@@ -122,81 +125,64 @@ export default function OnboardingWizard() {
               })}
             </div>
 
-            <div className="group relative overflow-hidden rounded-3xl border border-border-moderate bg-gradient-to-br from-surface-subtle to-surface p-8 shadow-lg transition-all hover:shadow-glow-cyan-hover">
-              {/* Icon - Large and Prominent */}
-              <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-surface-elevated shadow-glow-cyan transition-transform group-hover:scale-105">
-                <activeStep.icon className="h-12 w-12 text-accent" aria-hidden="true" />
-              </div>
-              
-              {/* Content */}
-              <div className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary">
-                  Step {safeIndex + 1} of {STEPS.length}
-                </p>
-                <h3 className="text-2xl font-bold text-text-primary">{activeStep.title}</h3>
-                <p className="text-base text-text-secondary">{activeStep.description}</p>
+            <div className="rounded-2xl border border-border-subtle bg-surface-subtle p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary">
+                Step {safeIndex + 1} of {STEPS.length}
+              </p>
+              <div className="mt-4 flex items-center gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface">
+                  <activeStep.icon className="h-8 w-8 text-brand" aria-hidden="true" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-text-primary">{activeStep.title}</h3>
+                  <p className="mt-1 text-sm text-text-secondary">{activeStep.description}</p>
+                </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <Button
                 variant='ghost'
-                className="w-full text-text-tertiary hover:text-text-secondary"
+                className="w-full"
                 onClick={handleSkip}
                 data-testid="onboarding-skip"
               >
-                Skip
+                Skip onboarding
               </Button>
               <Button
-                className="w-full shadow-glow-cyan transition-all hover:scale-[1.02] hover:shadow-glow-cyan-hover active:scale-95"
+                className="w-full"
                 size="lg"
                 onClick={handleNext}
                 data-testid="onboarding-action"
               >
-                {activeStep.actionLabel} →
+                {activeStep.actionLabel}
               </Button>
             </div>
           </div>
 
-          <aside className="space-y-6 rounded-3xl border border-border-subtle bg-surface-subtle/50 p-6 backdrop-blur-sm">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary">🎯 Your Path</p>
-            </div>
+          <aside className="space-y-4 rounded-2xl border border-border-subtle bg-surface-subtle p-6">
+            <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Playbook</p>
+            <p className="text-sm text-text-secondary">
+              Finish onboarding once and the wizard stays hidden via local storage (<code>sparkfined_onboarding_completed</code>).
+              You can relaunch it anytime under Settings.
+            </p>
             <ul className="space-y-3">
               {STEPS.map((step, index) => {
                 const isComplete = index < currentStepIndex
-                const isActive = index === currentStepIndex
                 return (
                   <li
                     key={step.id}
                     className={[
-                      'relative flex items-center gap-4 rounded-2xl border px-4 py-4 transition-all',
-                      isComplete && 'border-brand/60 bg-surface shadow-glow-phosphor',
-                      isActive && !isComplete && 'border-accent/60 bg-surface shadow-glow-cyan',
-                      !isComplete && !isActive && 'border-border-subtle bg-surface/50',
+                      'flex items-center gap-3 rounded-2xl border px-3 py-3 text-sm',
+                      isComplete ? 'border-brand/60 bg-surface' : 'border-border-moderate bg-surface',
                     ]
                       .filter(Boolean)
                       .join(' ')}
                   >
-                    <div className={[
-                      'flex h-10 w-10 items-center justify-center rounded-xl transition-colors',
-                      isComplete && 'bg-brand/20',
-                      isActive && !isComplete && 'bg-accent/20',
-                      !isComplete && !isActive && 'bg-surface-elevated',
-                    ].filter(Boolean).join(' ')}>
-                      <step.icon 
-                        className={[
-                          'h-5 w-5',
-                          isComplete && 'text-brand',
-                          isActive && !isComplete && 'text-accent',
-                          !isComplete && !isActive && 'text-text-tertiary',
-                        ].filter(Boolean).join(' ')} 
-                        aria-hidden="true" 
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-text-primary">{step.title}</p>
-                      <p className="text-xs text-text-tertiary">{step.description}</p>
+                    <step.icon className="h-5 w-5 text-text-secondary" aria-hidden="true" />
+                    <div>
+                      <p className="font-semibold text-text-primary">{step.title}</p>
+                      <p className="text-xs text-text-tertiary">{step.targetRoute}</p>
                     </div>
                   </li>
                 )

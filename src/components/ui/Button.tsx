@@ -31,14 +31,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  */
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-brand text-zinc-950 font-semibold shadow-glow-brand hover:bg-brand-hover hover:shadow-glow-phosphor-hover hover:scale-[1.02] active:scale-95 focus-visible:ring-brand/60',
+  primary: 'bg-brand text-white shadow-glow-accent hover:bg-brand-hover focus-visible:ring-brand/60',
   secondary:
-    'bg-surface-subtle text-text-primary border border-border-moderate hover:bg-surface-hover hover:border-border-hover hover:scale-[1.01] active:scale-98 focus-visible:ring-border-focus',
-  ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface-subtle hover:scale-[1.01] active:scale-98 focus-visible:ring-border-focus/50',
+    'bg-surface-subtle text-text-primary border border-border-moderate hover:bg-surface-hover focus-visible:ring-border-focus',
+  ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface-subtle focus-visible:ring-border-focus/50',
   outline:
-    'bg-transparent text-text-primary border border-border-moderate hover:border-border-hover hover:bg-surface-subtle hover:scale-[1.01] active:scale-98 focus-visible:ring-border-focus',
+    'bg-transparent text-text-primary border border-border-moderate hover:border-border-hover hover:bg-surface-subtle focus-visible:ring-border-focus',
   destructive:
-    'bg-danger text-white border border-danger shadow-rose-glow hover:bg-danger/90 hover:shadow-glow-magenta hover:scale-[1.02] active:scale-95 focus-visible:ring-danger/60',
+    'bg-danger text-white border border-danger hover:bg-danger/90 focus-visible:ring-danger/60',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -67,7 +67,7 @@ export default function Button({
       type={type}
       disabled={disabled || isLoadingState}
       className={cn(
-        'inline-flex select-none items-center justify-center gap-2 rounded-xl font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100',
+        'inline-flex select-none items-center justify-center gap-2 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60',
         variantClasses[variant],
         sizeClasses[size],
         className
