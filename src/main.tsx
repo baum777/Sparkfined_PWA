@@ -1,10 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
-import './styles/index.css'
-import './styles/driver-override.css'
-import 'driver.js/dist/driver.css'
 import { BrowserRouter } from 'react-router-dom'
+
+// === CRITICAL: CSS imports MUST be before any component imports ===
+// Order matters: Base styles → Third-party styles → Overrides
+import './styles/index.css'          // Base: Tokens + Tailwind + Global styles
+import 'driver.js/dist/driver.css'  // Third-party: Driver.js tour library
+import './styles/driver-override.css' // Override: Custom driver.js theme
+
+// === Component imports (after CSS) ===
+import App from './App'
 import { initializeLayoutToggles } from './lib/layout-toggle'
 import { AppErrorBoundary } from '@/app/AppErrorBoundary'
 import { logError } from '@/lib/log-error'
