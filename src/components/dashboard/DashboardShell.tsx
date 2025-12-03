@@ -14,6 +14,7 @@ interface DashboardShellProps {
   onTabSelect?: (tabId: string) => void;
   kpiStrip?: React.ReactNode;
   children: React.ReactNode;
+  testId?: string;
 }
 
 export default function DashboardShell({
@@ -25,11 +26,12 @@ export default function DashboardShell({
   onTabSelect,
   kpiStrip,
   children,
+  testId,
 }: DashboardShellProps) {
   const hasTabs = Array.isArray(tabs) && tabs.length > 0;
 
   return (
-    <div className="min-h-screen bg-app-gradient text-text-primary">
+    <div className="min-h-screen bg-app-gradient text-text-primary" data-testid={testId}>
       <header className="border-b border-border-subtle bg-surface-elevated/60 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
