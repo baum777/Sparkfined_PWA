@@ -111,6 +111,11 @@ export const useOracleStore = create<OracleState>((set, get) => ({
         isLoading: false,
         lastFetchTimestamp: Date.now(),
       });
+
+      // Check for high-score notification
+      if (savedReport) {
+        await maybeNotifyHighScore(savedReport);
+      }
     } catch (error) {
       console.error('[OracleStore] Failed to fetch report:', error);
 
@@ -153,16 +158,25 @@ export const useOracleStore = create<OracleState>((set, get) => ({
 
   /**
    * Mark today's Oracle report as read
-   * Triggers XP grant and streak increment via grantOracleReadRewards
+   * Triggers XP grant, streak increment, badges, and auto-journal entry
    */
   markTodayAsRead: async () => {
     const { todayReport } = get();
     
-    if (!todayReport || todayReport.read) {
-      return; // Already read or no report
+    if (!todayReport) {
+      console.warn('[OracleStore] No report to mark as read');
+      return;
+    }
+
+    if (todayReport.read) {
+      console.log('[OracleStore] Report already marked as read');
+      return;
     }
 
     try {
+      // Grant rewards FIRST (before marking as read, so the guard check passes)
+      await grantOracleReadRewards(todayReport);
+
       // Mark as read in Dexie
       await markOracleReportAsRead(todayReport.date);
 
@@ -173,8 +187,7 @@ export const useOracleStore = create<OracleState>((set, get) => ({
           : null,
       }));
 
-      // Grant rewards (XP, streak, badge)
-      await grantOracleReadRewards(todayReport);
+      console.log('[OracleStore] Report marked as read successfully');
     } catch (error) {
       console.error('[OracleStore] Failed to mark as read:', error);
       set({ error: 'Failed to mark report as read.' });
@@ -221,41 +234,122 @@ export const useOracleStore = create<OracleState>((set, get) => ({
   },
 }));
 
-// ===== Integration Helper =====
+// ===== Integration Helpers =====
 
 /**
  * Grant rewards for reading an Oracle report
  * - XP: 50 points
  * - Streak: Increment Oracle streak
  * - Badge: Unlock after 7/21 day streaks
+ * - Auto-journal entry: Create insight entry
  */
 async function grantOracleReadRewards(report: OracleReport): Promise<void> {
-  try {
-    // Dynamic import to avoid circular dependency
-    const { useGamificationStore } = await import('./gamificationStore');
+  // Guard: Don't grant rewards twice
+  if (report.read) {
+    console.log('[OracleStore] Report already read, skipping rewards');
+    return;
+  }
 
-    // Grant XP (50 points for reading Oracle)
+  try {
+    // Dynamic imports to avoid circular dependencies
+    const { useGamificationStore } = await import('./gamificationStore');
+    const { useJournalStore } = await import('./journalStore');
+
+    // 1. Grant XP (50 points for reading Oracle)
     useGamificationStore.getState().addXP(50);
 
-    // Increment Oracle streak
+    // 2. Increment Oracle streak
     useGamificationStore.getState().incrementStreak('oracle');
 
-    // Check for streak badges
+    // 3. Check for streak badges
     const { streaks, badges } = useGamificationStore.getState();
     
     // 7-day streak badge
     if (streaks.oracle === 7 && !badges.includes('oracle-week')) {
       useGamificationStore.getState().addBadge('oracle-week');
+      console.log('[OracleStore] Badge unlocked: Oracle Devotee (7 days)');
     }
     
     // 21-day streak badge
     if (streaks.oracle === 21 && !badges.includes('oracle-master')) {
       useGamificationStore.getState().addBadge('oracle-master');
+      console.log('[OracleStore] Badge unlocked: Oracle Master (21 days)');
+    }
+
+    // 4. Create auto-journal entry
+    try {
+      const normalizedTheme = report.topTheme.toLowerCase().replace(/\s+/g, '-');
+      const journalEntry = {
+        id: `oracle-${report.date}`,
+        title: `Oracle ${report.score}/7 → ${report.topTheme}`,
+        date: new Date().toISOString(),
+        direction: 'long' as const,
+        notes: `Read Oracle report. Next meta-shift likely: ${report.topTheme}`,
+        tags: ['meta-shift', normalizedTheme, 'oracle'],
+        isAuto: true,
+      };
+
+      useJournalStore.getState().addEntry(journalEntry);
+      console.log('[OracleStore] Auto-journal entry created');
+    } catch (journalError) {
+      console.error('[OracleStore] Failed to create journal entry:', journalError);
+      // Don't fail the whole operation if journal fails
     }
 
     console.log(`[OracleStore] Granted rewards: +50 XP, streak: ${streaks.oracle}`);
   } catch (error) {
     console.error('[OracleStore] Failed to grant rewards:', error);
+  }
+}
+
+/**
+ * Show notification for high-score reports (score >= 6)
+ * Only triggers once per report (checked via notified flag)
+ */
+async function maybeNotifyHighScore(report: OracleReport): Promise<void> {
+  // Guard: Score too low
+  if (report.score < 6) {
+    return;
+  }
+
+  // Guard: Already notified
+  if (report.notified) {
+    return;
+  }
+
+  // Guard: Not in browser context
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    console.warn('[OracleStore] Notifications not supported in this environment');
+    return;
+  }
+
+  try {
+    // Request permission if not granted
+    let permission = Notification.permission;
+
+    if (permission === 'default') {
+      permission = await Notification.requestPermission();
+    }
+
+    // Show notification if granted
+    if (permission === 'granted') {
+      new Notification('Meta-Shift incoming!', {
+        body: `Oracle score: ${report.score}/7 → ${report.topTheme}`,
+        icon: '/icon-192.png',
+        badge: '/icon-96.png',
+        tag: `oracle-${report.date}`,
+        requireInteraction: false,
+      });
+
+      console.log(`[OracleStore] Notification sent for high-score report (${report.score}/7)`);
+
+      // Mark as notified
+      await markOracleReportAsNotified(report.date);
+    } else {
+      console.log('[OracleStore] Notification permission denied');
+    }
+  } catch (error) {
+    console.error('[OracleStore] Failed to send notification:', error);
   }
 }
 

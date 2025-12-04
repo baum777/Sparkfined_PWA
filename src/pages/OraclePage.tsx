@@ -3,12 +3,17 @@
  * 
  * Displays daily meta-market intelligence reports.
  * Loads today's report on mount and provides refresh/mark-as-read actions.
+ * 
+ * Features:
+ * - Auto-loads today's report
+ * - High-score notifications (score >= 6)
+ * - Rewards on first read: XP, streak, badges, auto-journal entry
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { useOracleStore } from '@/store/oracleStore';
-import { RefreshCw, CheckCircle2, Loader2 } from '@/lib/icons';
+import { RefreshCw, CheckCircle2, Loader2, Sparkles } from '@/lib/icons';
 
 export default function OraclePage() {
   const todayReport = useOracleStore((state) => state.todayReport);
@@ -16,6 +21,9 @@ export default function OraclePage() {
   const error = useOracleStore((state) => state.error);
   const loadTodayReport = useOracleStore((state) => state.loadTodayReport);
   const markTodayAsRead = useOracleStore((state) => state.markTodayAsRead);
+
+  const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
+  const [rewardMessage, setRewardMessage] = useState<string | null>(null);
 
   // Load today's report on mount
   useEffect(() => {
@@ -34,12 +42,36 @@ export default function OraclePage() {
     };
   }, [loadTodayReport]);
 
+  // Clear reward message after 5 seconds
+  useEffect(() => {
+    if (rewardMessage) {
+      const timeout = setTimeout(() => {
+        setRewardMessage(null);
+      }, 5000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [rewardMessage]);
+
   const handleRefresh = async () => {
     await loadTodayReport({ forceRefresh: true });
   };
 
   const handleMarkAsRead = async () => {
-    await markTodayAsRead();
+    if (!todayReport || todayReport.read) {
+      return;
+    }
+
+    setIsMarkingAsRead(true);
+    
+    try {
+      await markTodayAsRead();
+      setRewardMessage('🎉 +50 XP earned! Oracle streak increased.');
+    } catch (err) {
+      console.error('[OraclePage] Failed to mark as read:', err);
+    } finally {
+      setIsMarkingAsRead(false);
+    }
   };
 
   const isReportRead = todayReport?.read ?? false;
@@ -69,18 +101,37 @@ export default function OraclePage() {
               <button
                 type="button"
                 onClick={handleMarkAsRead}
-                className="flex items-center gap-2 rounded-full border border-brand bg-brand/10 px-4 py-2 text-sm font-medium text-brand transition hover:bg-brand/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                disabled={isMarkingAsRead}
+                className="flex items-center gap-2 rounded-full border border-brand bg-brand/10 px-4 py-2 text-sm font-medium text-brand transition hover:bg-brand/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:cursor-not-allowed disabled:opacity-50"
                 data-testid="oracle-mark-read-button"
-                aria-label="Mark Oracle report as read"
+                aria-label="Mark Oracle report as read and earn rewards"
               >
-                <CheckCircle2 size={16} />
-                <span>Mark as Read</span>
+                {isMarkingAsRead ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <CheckCircle2 size={16} />
+                )}
+                <span>{isMarkingAsRead ? 'Saving...' : 'Mark as Read'}</span>
               </button>
             )}
           </div>
         }
       >
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+          {/* Reward Message */}
+          {rewardMessage && (
+            <div
+              className="animate-fade-in rounded-3xl border border-brand/30 bg-brand/10 p-4"
+              role="alert"
+              aria-live="polite"
+            >
+              <div className="flex items-center gap-3">
+                <Sparkles size={20} className="text-brand" />
+                <p className="text-sm font-medium text-brand">{rewardMessage}</p>
+              </div>
+            </div>
+          )}
+
           {/* Loading State */}
           {isLoading && !todayReport && (
             <div className="flex flex-col items-center justify-center gap-4 rounded-3xl border border-border bg-surface p-12">
