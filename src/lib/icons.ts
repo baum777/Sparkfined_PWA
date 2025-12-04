@@ -17,6 +17,7 @@ export { default as Clock } from 'lucide-react/dist/esm/icons/clock';
 export { default as Bell } from 'lucide-react/dist/esm/icons/bell';
 export { default as Settings } from 'lucide-react/dist/esm/icons/settings';
 export { default as Lock } from 'lucide-react/dist/esm/icons/lock';
+export { default as Sparkles } from 'lucide-react/dist/esm/icons/sparkles';
 
 // Actions
 export { default as Plus } from 'lucide-react/dist/esm/icons/plus';
