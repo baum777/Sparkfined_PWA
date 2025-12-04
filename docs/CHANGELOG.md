@@ -16,12 +16,36 @@
   - `docs/process/DOCS-GOVERNANCE-QUICK-REF.md` – One-page quick reference for contributors (250+ lines)
   - `docs/CHANGELOG.md` – This file (documentation change tracking)
 
+- **Created design system documentation:**
+  - `docs/design/DESIGN_SYSTEM.md` (36K) – Complete design specification moved from root
+    - Full color palette (Spark/Void/mystical theme)
+    - Typography scale (Space Grotesk, Inter, JetBrains Mono)
+    - Spacing system (8px grid)
+    - Animation specifications (Framer Motion)
+    - Mobile gesture library (swipe, pull-to-refresh, drag-to-reorder)
+    - Component specifications (12+ components)
+    - Accessibility guidelines (WCAG AA compliance)
+  - `docs/design/DESIGN_MODULE_SPEC.md` (44K) – Implementation roadmap and module architecture
+    - Gap analysis (current state vs. design spec)
+    - Module directory structure (`src/design-system/`)
+    - Design token migration plan (colors, typography, spacing, shadows, animation)
+    - Component API specifications (Button, Card, Badge, Alert, Modal, Input, Tooltip)
+    - Mobile gesture hooks (useSwipeable, usePullToRefresh, useBottomSheet, useDragReorder)
+    - Implementation brief for Codex (60+ tasks organized in 6 phases)
+    - Testing strategy (unit tests, E2E tests, visual regression)
+    - Acceptance criteria and success metrics
+
 ### Changed
 - **Updated documentation index:**
   - `docs/index.md` – Added new "Documentation Governance (2025-12-04)" section
   - Added links to all new governance documents
   - Added proposed 7-folder structure overview
   - Added key findings summary
+  - Added "Design System Documentation (2025-12-04)" section with overview and implementation status
+
+### Removed
+- **Cleaned up root directory:**
+  - `design_system.md` – Moved to `docs/design/DESIGN_SYSTEM.md` (governance compliance)
 
 ### Context
 - User requested review of proposed documentation governance rules (in German)

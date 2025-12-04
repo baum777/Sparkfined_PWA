@@ -72,3 +72,24 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 5. `05_guides/` - Setup, deployment, onboarding
 6. `06_decisions/` - Lore, ADRs, metrics, pitch deck
 7. `07_archive/` - Historical docs, obsolete files
+
+---
+
+## 🎨 Design System Documentation (2025-12-04)
+
+### Design System Files
+- **`docs/design/DESIGN_SYSTEM.md`** (36K) - Complete design specification with colors, typography, spacing, animations, gestures, and component specs
+- **`docs/design/DESIGN_MODULE_SPEC.md`** (44K) - Module architecture, implementation roadmap, and detailed brief for Codex (Implementation Agent)
+
+### Overview
+The Design System establishes the "Alchemical Trading Interface" aesthetic:
+- **Color Palette**: Spark (cyan), Void (deep black), mystical accents (violet, ember, gold)
+- **Typography**: Space Grotesk (display), Inter (body), JetBrains Mono (code/data)
+- **Components**: Button, Card, Badge, Alert, Modal, Input, Tooltip, BottomSheet
+- **Mobile Gestures**: Swipe-to-action, pull-to-refresh, drag-to-reorder
+- **Animation**: Framer Motion with mystical glow effects
+
+### Implementation Status
+- ⚠️ **Gap Identified**: Current implementation uses emerald/zinc palette, design spec requires Spark/Void
+- 📋 **Module Spec Ready**: Complete architecture and token structure defined
+- 🎯 **For Codex**: DESIGN_MODULE_SPEC.md contains full implementation checklist with 60+ tasks
