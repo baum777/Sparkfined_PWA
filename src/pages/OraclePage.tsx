@@ -1,16 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { RefreshCw, Sparkles } from '@/lib/icons';
 import { useOracleStore } from '@/store/oracleStore';
+import { OracleThemeFilter } from '@/components/oracle/OracleThemeFilter';
+import { OracleHistoryChart } from '@/components/oracle/OracleHistoryChart';
+import { OracleHistoryList } from '@/components/oracle/OracleHistoryList';
 
 export default function OraclePage() {
   const todayReport = useOracleStore((state) => state.todayReport);
   const loading = useOracleStore((state) => state.loading);
   const error = useOracleStore((state) => state.error);
   const lastFetchTimestamp = useOracleStore((state) => state.lastFetchTimestamp);
+  const reports = useOracleStore((state) => state.reports);
   const loadTodayReport = useOracleStore((state) => state.loadTodayReport);
   const loadHistory = useOracleStore((state) => state.loadHistory);
   const markTodayAsRead = useOracleStore((state) => state.markTodayAsRead);
+  const [themeFilter, setThemeFilter] = useState('All');
 
   useEffect(() => {
     void loadTodayReport();
@@ -32,6 +37,13 @@ export default function OraclePage() {
   const lastUpdatedLabel = lastUpdatedTimestamp
     ? new Date(lastUpdatedTimestamp).toUTCString()
     : 'Awaiting first report';
+
+  const filteredReports = useMemo(() => {
+    if (themeFilter === 'All') {
+      return reports;
+    }
+    return reports.filter((report) => report.topTheme === themeFilter);
+  }, [reports, themeFilter]);
 
   return (
     <DashboardShell
@@ -108,6 +120,12 @@ export default function OraclePage() {
             </pre>
           </div>
         </section>
+
+        <OracleThemeFilter value={themeFilter} onChange={setThemeFilter} />
+
+        <OracleHistoryChart reports={filteredReports} />
+
+        <OracleHistoryList reports={filteredReports} />
       </div>
     </DashboardShell>
   );
