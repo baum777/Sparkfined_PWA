@@ -43,8 +43,8 @@ export default function AnalysisLayout({
                   aria-selected={isActive}
                   className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
                     isActive
-                      ? 'border-emerald-400/60 bg-emerald-400/10 text-white'
-                      : 'border-transparent text-zinc-400 hover:border-zinc-600 hover:text-white'
+                      ? 'border-spark/60 bg-spark/10 text-white'
+                      : 'border-transparent text-fog hover:border-ash hover:text-white'
                   }`}
                 >
                   {tab.label}

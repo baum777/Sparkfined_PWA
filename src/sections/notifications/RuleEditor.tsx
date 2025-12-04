@@ -8,10 +8,10 @@ export default function RuleEditor({
   onChange: (p: Partial<UiAlertRule>) => void;
   onSave: () => void;
 }) {
-  const ctrl = "rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm text-zinc-200";
-  const btn  = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
+  const ctrl = "rounded border border-smoke-lighter bg-smoke px-2 py-1 text-sm text-mist";
+  const btn  = "rounded-lg border border-smoke-lighter px-2 py-1 text-xs text-mist hover:bg-smoke-light";
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
+    <div className="rounded-xl border border-smoke-light bg-smoke/40 p-3">
       <div className="grid grid-cols-2 gap-2 md:grid-cols-6">
         <select className={ctrl} value={draft.kind ?? "price-cross"} onChange={e=>onChange({ ...draft, kind: e.target.value as any })}>
           <option value="price-cross">price-cross</option>
@@ -28,7 +28,7 @@ export default function RuleEditor({
         </select>
         <button className={btn} onClick={onSave}>Regel speichern</button>
       </div>
-      <div className="mt-2 text-[11px] text-zinc-500">Hinweis: Address/TF überschreiben ggf. die globalen Feed-Einstellungen beim Evaluieren (Client).</div>
+      <div className="mt-2 text-[11px] text-ash">Hinweis: Address/TF überschreiben ggf. die globalen Feed-Einstellungen beim Evaluieren (Client).</div>
     </div>
   );
 }

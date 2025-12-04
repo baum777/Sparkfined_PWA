@@ -29,9 +29,9 @@ export default function Overview() {
     return (
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         {Array.from({ length: 7 }).map((_, i) => (
-          <div key={i} className="border-b border-zinc-800 bg-zinc-900 p-3 md:rounded-lg md:border">
-            <div className="h-4 w-16 animate-pulse rounded bg-zinc-800" />
-            <div className="mt-2 h-8 w-24 animate-pulse rounded bg-zinc-800" />
+          <div key={i} className="border-b border-smoke-light bg-smoke p-3 md:rounded-lg md:border">
+            <div className="h-4 w-16 animate-pulse rounded bg-smoke-light" />
+            <div className="mt-2 h-8 w-24 animate-pulse rounded bg-smoke-light" />
           </div>
         ))}
       </div>
@@ -41,7 +41,7 @@ export default function Overview() {
   // Error state
   if (error || !kpiData) {
     return (
-      <div className="rounded-lg border border-rose-800/50 bg-rose-950/20 p-6">
+      <div className="rounded-lg border border-blood/50 bg-blood/20 p-6">
         <StateView
           type="error"
           title="Failed to load KPIs"
@@ -156,7 +156,7 @@ export default function Overview() {
       {/* Show More Button (Mobile only) */}
       <button
         onClick={() => setShowAll(!showAll)}
-        className="mt-3 flex w-full items-center justify-center gap-2 py-2 text-sm text-zinc-400 transition-colors hover:text-zinc-300 md:hidden"
+        className="mt-3 flex w-full items-center justify-center gap-2 py-2 text-sm text-fog transition-colors hover:text-fog md:hidden"
       >
         {showAll ? (
           <>

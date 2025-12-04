@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/design-system';
 import { BookmarkPlus, Share2, RefreshCw } from '@/lib/icons';
 
 export function ChartHeaderActions() {

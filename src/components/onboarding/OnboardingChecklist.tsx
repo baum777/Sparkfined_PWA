@@ -35,11 +35,11 @@ export function OnboardingChecklist() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 w-80 max-w-[calc(100vw-2rem)] bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl z-40 animate-slide-in-right">
+    <div className="fixed bottom-4 right-4 w-80 max-w-[calc(100vw-2rem)] bg-smoke border border-smoke-light rounded-xl shadow-2xl z-40 animate-slide-in-right">
       {/* Header */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 hover:bg-zinc-800/50 transition-colors rounded-t-xl"
+        className="w-full flex items-center justify-between p-4 hover:bg-smoke-light/50 transition-colors rounded-t-xl"
         aria-expanded={isOpen}
         aria-controls="checklist-content"
       >
@@ -54,7 +54,7 @@ export function OnboardingChecklist() {
                 stroke="currentColor"
                 strokeWidth="3"
                 fill="none"
-                className="text-zinc-700"
+                className="text-smoke-lighter"
               />
               <circle
                 cx="20"
@@ -65,7 +65,7 @@ export function OnboardingChecklist() {
                 fill="none"
                 strokeDasharray={`${2 * Math.PI * 16}`}
                 strokeDashoffset={`${2 * Math.PI * 16 * (1 - progress / 100)}`}
-                className="text-emerald-500 transition-all duration-500"
+                className="text-spark transition-all duration-500"
                 strokeLinecap="round"
               />
             </svg>
@@ -75,7 +75,7 @@ export function OnboardingChecklist() {
           </div>
           <div className="text-left">
             <div className="font-semibold text-sm">Onboarding Progress</div>
-            <div className="text-xs text-zinc-400">
+            <div className="text-xs text-fog">
               {progress < 50 && "Just getting started"}
               {progress >= 50 && progress < 80 && "You're making progress!"}
               {progress >= 80 && progress < 100 && "Almost there!"}
@@ -89,7 +89,7 @@ export function OnboardingChecklist() {
               e.stopPropagation();
               setIsDismissed(true);
             }}
-            className="p-1 hover:bg-zinc-700 rounded transition-colors text-zinc-400 hover:text-zinc-100"
+            className="p-1 hover:bg-smoke-lighter rounded transition-colors text-fog hover:text-mist"
             aria-label="Dismiss checklist"
           >
             <X size={16} />
@@ -110,13 +110,13 @@ export function OnboardingChecklist() {
                 {/* Category header */}
                 <div className="flex items-center gap-2 mb-2">
                   {isComplete ? (
-                    <CheckCircle2 size={16} className="text-emerald-500" />
+                    <CheckCircle2 size={16} className="text-spark" />
                   ) : (
-                    <Circle size={16} className="text-zinc-600" />
+                    <Circle size={16} className="text-ash" />
                   )}
                   <h3 className="font-semibold text-sm">
                     {category}
-                    <span className="ml-2 text-zinc-500">
+                    <span className="ml-2 text-ash">
                       ({completedCount}/{items.length})
                     </span>
                   </h3>
@@ -133,11 +133,11 @@ export function OnboardingChecklist() {
                         className="flex items-center gap-2 text-sm"
                       >
                         {isCompleted ? (
-                          <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
+                          <CheckCircle2 size={14} className="text-spark flex-shrink-0" />
                         ) : (
-                          <Circle size={14} className="text-zinc-600 flex-shrink-0" />
+                          <Circle size={14} className="text-ash flex-shrink-0" />
                         )}
-                        <span className={isCompleted ? 'text-zinc-400 line-through' : 'text-zinc-300'}>
+                        <span className={isCompleted ? 'text-fog line-through' : 'text-fog'}>
                           {item.label}
                         </span>
                       </li>
@@ -149,7 +149,7 @@ export function OnboardingChecklist() {
           })}
 
           {/* Footer actions */}
-          <div className="mt-4 pt-4 border-t border-zinc-800">
+          <div className="mt-4 pt-4 border-t border-smoke-light">
             <button
               onClick={() => {
                 if (confirm('This will reset all onboarding progress. Continue?')) {
@@ -157,7 +157,7 @@ export function OnboardingChecklist() {
                   setIsDismissed(false);
                 }
               }}
-              className="w-full text-xs text-zinc-500 hover:text-zinc-300 transition-colors py-2"
+              className="w-full text-xs text-ash hover:text-fog transition-colors py-2"
             >
               Reset Progress
             </button>

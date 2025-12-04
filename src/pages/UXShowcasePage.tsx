@@ -3,7 +3,7 @@ import { Skeleton, SkeletonCard } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState, InlineError, ErrorBanner } from '@/components/ui/ErrorState';
 import { useToast } from '@/components/ui/Toast';
-import { Tooltip, InfoTooltip, HelpTooltip } from '@/components/ui/Tooltip';
+import { Tooltip } from '@/design-system';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
 import { KeyboardShortcutsDialog, defaultShortcuts } from '@/components/ui/KeyboardShortcutsDialog';
 import { FormField, ValidatedInput, CharacterCounter } from '@/components/ui/FormField';
@@ -146,8 +146,8 @@ export default function UXShowcasePage() {
                   Hover me
                 </button>
               </Tooltip>
-              <InfoTooltip content="Additional information about this feature" />
-              <HelpTooltip
+              <InfoTooltipIcon content="Additional information about this feature" />
+              <HelpTooltipCard
                 title="Win Rate"
                 description="Percentage of profitable trades out of total trades"
               />
@@ -158,7 +158,7 @@ export default function UXShowcasePage() {
                 <span className="text-sm font-medium text-text-primary">Net P&L</span>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-sentiment-bull">+$2,450</span>
-                  <InfoTooltip content="Your total profit/loss over the last 30 days" />
+                  <InfoTooltipIcon content="Your total profit/loss over the last 30 days" />
                 </div>
               </div>
             </div>
@@ -353,7 +353,7 @@ function Section({
             {description}
           </p>
         </div>
-        {help && <InfoTooltip content={help} />}
+        {help && <InfoTooltipIcon content={help} />}
       </div>
       <div>{children}</div>
     </div>
@@ -387,4 +387,38 @@ function Modal({
       </ScaleTransition>
     </div>
   );
+}
+
+function InfoTooltipIcon({ content }: { content: React.ReactNode }) {
+  return (
+    <Tooltip content={content} placement="top">
+      <button
+        className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-text-tertiary hover:text-text-primary hover:border-border-focus transition-colors"
+        aria-label="More information"
+      >
+        i
+      </button>
+    </Tooltip>
+  )
+}
+
+function HelpTooltipCard({ title, description }: { title: string; description: string }) {
+  return (
+    <Tooltip
+      placement="top"
+      content={
+        <div className="max-w-xs space-y-1">
+          <p className="font-semibold text-text-primary">{title}</p>
+          <p className="text-xs text-text-secondary leading-relaxed">{description}</p>
+        </div>
+      }
+    >
+      <button
+        className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-surface-elevated border border-border text-text-tertiary hover:text-text-primary hover:border-brand transition-colors"
+        aria-label={`${title} help`}
+      >
+        ?
+      </button>
+    </Tooltip>
+  )
 }

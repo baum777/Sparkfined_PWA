@@ -52,23 +52,23 @@ export default function AdvancedInsightCardTestDouble() {
   };
 
   return (
-    <div className="relative rounded-xl border border-zinc-800 bg-zinc-900/40 overflow-hidden">
+    <div className="relative rounded-xl border border-smoke-light bg-smoke/40 overflow-hidden">
       {current.locked && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/80 backdrop-blur-sm">
           <div
-            className="max-w-sm rounded-lg border border-zinc-700 bg-zinc-900 p-6 text-center focus:outline-none"
+            className="max-w-sm rounded-lg border border-smoke-lighter bg-smoke p-6 text-center focus:outline-none"
             role="dialog"
             aria-modal="true"
           >
             <div className="mb-3 text-3xl">🔒</div>
-            <h4 className="mb-2 text-sm font-medium text-zinc-200">Advanced Insight Locked</h4>
-            <p className="mb-4 text-xs text-zinc-400">
+            <h4 className="mb-2 text-sm font-medium text-mist">Advanced Insight Locked</h4>
+            <p className="mb-4 text-xs text-fog">
               This feature requires NFT-based access. Manual approval available.
             </p>
             <a
               href="/access"
               aria-label="Unlock advanced insight access"
-              className="inline-block rounded bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700 transition-colors"
+              className="inline-block rounded bg-spark px-4 py-2 text-xs font-medium text-white hover:bg-spark transition-colors"
             >
               Unlock Access
             </a>
@@ -76,12 +76,12 @@ export default function AdvancedInsightCardTestDouble() {
         </div>
       )}
 
-      <div className="border-b border-zinc-800 px-4 py-3">
+      <div className="border-b border-smoke-light px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-medium text-zinc-200">Advanced Insight</h3>
+            <h3 className="text-sm font-medium text-mist">Advanced Insight</h3>
             {overridesCount > 0 && (
-              <span className="rounded bg-emerald-900/30 px-2 py-0.5 text-xs text-emerald-300">
+              <span className="rounded bg-spark/30 px-2 py-0.5 text-xs text-spark">
                 {overridesCount} override{overridesCount === 1 ? '' : 's'}
               </span>
             )}
@@ -90,7 +90,7 @@ export default function AdvancedInsightCardTestDouble() {
             <button
               type="button"
               aria-label="Edit playbook entries"
-              className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+              className="text-xs text-fog hover:text-mist transition-colors"
               onClick={() => {
                 setActiveTab('playbook');
                 setIsEditing(true);
@@ -101,7 +101,7 @@ export default function AdvancedInsightCardTestDouble() {
             {overridesCount > 0 && (
               <button
                 type="button"
-                className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+                className="text-xs text-fog hover:text-mist transition-colors"
                 onClick={() => {
                   setEntries(initialEntries);
                   setOverridesCount(0);
@@ -114,7 +114,7 @@ export default function AdvancedInsightCardTestDouble() {
         </div>
       </div>
 
-      <div className="border-b border-zinc-800 px-4">
+      <div className="border-b border-smoke-light px-4">
         <div className="flex gap-1" role="tablist" aria-label="Advanced Insight sections">
           {tabs.map((tab) => (
             <button
@@ -130,8 +130,8 @@ export default function AdvancedInsightCardTestDouble() {
                 px-3 py-2 text-xs font-medium transition-colors border-b-2 -mb-px
                 ${
                   activeTab === tab.id
-                    ? 'border-emerald-500 text-emerald-300'
-                    : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                    ? 'border-spark text-spark'
+                    : 'border-transparent text-fog hover:text-mist'
                 }
               `}
             >
@@ -148,31 +148,31 @@ export default function AdvancedInsightCardTestDouble() {
         aria-labelledby={`advanced-insight-tab-${activeTab}`}
       >
         {activeTab === 'market_structure' && (
-          <div className="space-y-3 text-xs text-zinc-200">
+          <div className="space-y-3 text-xs text-mist">
             <h4 className="text-sm font-medium">Range Structure</h4>
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <span className="text-zinc-500">Low:</span> ${range.low.toFixed(4)}
+                <span className="text-ash">Low:</span> ${range.low.toFixed(4)}
               </div>
               <div>
-                <span className="text-zinc-500">Mid:</span> ${range.mid.toFixed(4)}
+                <span className="text-ash">Mid:</span> ${range.mid.toFixed(4)}
               </div>
               <div>
-                <span className="text-zinc-500">High:</span> ${range.high.toFixed(4)}
+                <span className="text-ash">High:</span> ${range.high.toFixed(4)}
               </div>
             </div>
           </div>
         )}
 
         {activeTab === 'flow_volume' && (
-          <div className="space-y-2 text-xs text-zinc-200">
+          <div className="space-y-2 text-xs text-mist">
             <div className="flex items-center justify-between">
-              <span className="text-zinc-400">Volume (USD):</span>
+              <span className="text-fog">Volume (USD):</span>
               <span>${flow.vol_24h_usd?.toLocaleString()}</span>
             </div>
             {typeof flow.vol_24h_delta_pct === 'number' && (
               <div className="flex items-center justify-between">
-                <span className="text-zinc-400">24h Change:</span>
+                <span className="text-fog">24h Change:</span>
                 <span>{flow.vol_24h_delta_pct.toFixed(2)}%</span>
               </div>
             )}
@@ -182,22 +182,22 @@ export default function AdvancedInsightCardTestDouble() {
         {activeTab === 'playbook' && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium text-zinc-200">Tactical Entries</h4>
+              <h4 className="text-sm font-medium text-mist">Tactical Entries</h4>
             </div>
             {overridesCount > 0 && (
-              <span className="rounded bg-amber-900/30 px-1.5 py-0.5 text-[10px] text-amber-300">
+              <span className="rounded bg-gold/30 px-1.5 py-0.5 text-[10px] text-gold">
                 Edited
               </span>
             )}
             {isEditing ? (
               <div className="space-y-2">
-                <label htmlFor="playbook-editor" className="block text-xs text-zinc-400">
+                <label htmlFor="playbook-editor" className="block text-xs text-fog">
                   Edit tactical playbook entries
                 </label>
                 <textarea
                   id="playbook-editor"
                   aria-label="Edit tactical playbook entries"
-                  className="h-32 w-full rounded border border-zinc-700 bg-black/40 px-3 py-2 text-xs text-zinc-100 focus:border-emerald-600 focus:outline-none"
+                  className="h-32 w-full rounded border border-smoke-lighter bg-black/40 px-3 py-2 text-xs text-mist focus:border-spark focus:outline-none"
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
                 />
@@ -206,7 +206,7 @@ export default function AdvancedInsightCardTestDouble() {
                     type="button"
                     onClick={handleSaveEntry}
                     disabled={!draft.trim()}
-                    className="rounded bg-emerald-600 px-3 py-1 text-xs font-medium text-white disabled:bg-emerald-900/40"
+                    className="rounded bg-spark px-3 py-1 text-xs font-medium text-white disabled:bg-spark/40"
                   >
                     Save
                   </button>
@@ -216,7 +216,7 @@ export default function AdvancedInsightCardTestDouble() {
                       setDraft('');
                       setIsEditing(false);
                     }}
-                    className="rounded border border-zinc-700 px-3 py-1 text-xs text-zinc-200"
+                    className="rounded border border-smoke-lighter px-3 py-1 text-xs text-mist"
                   >
                     Cancel
                   </button>
@@ -227,9 +227,9 @@ export default function AdvancedInsightCardTestDouble() {
                 {entries.map((entry, index) => (
                   <div
                     key={`${entry}-${index}`}
-                    className="flex items-start gap-2 rounded border border-zinc-800 bg-zinc-900/60 p-2 text-xs text-zinc-300"
+                    className="flex items-start gap-2 rounded border border-smoke-light bg-smoke/60 p-2 text-xs text-fog"
                   >
-                    <span className="text-zinc-500">{index + 1}.</span>
+                    <span className="text-ash">{index + 1}.</span>
                     <span>{entry}</span>
                   </div>
                 ))}

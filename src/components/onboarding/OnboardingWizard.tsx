@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import Button from '@/components/ui/Button'
+import { Button } from '@/design-system'
 import { Bell, BookOpen, Star, X, type LucideIcon } from '@/lib/icons'
 import { useOnboardingStore } from '@/store/onboardingStore'
 

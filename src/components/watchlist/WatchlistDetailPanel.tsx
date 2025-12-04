@@ -35,7 +35,7 @@ export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenRe
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Price</p>
-          <p className="mt-1 text-lg font-semibold text-amber-200">{row.price}</p>
+          <p className="mt-1 text-lg font-semibold text-gold">{row.price}</p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">24h change</p>
@@ -84,14 +84,14 @@ function getChangeAccent(change: string) {
   const trimmed = change.trim();
 
   if (trimmed.startsWith('-')) {
-    return 'text-rose-300';
+    return 'text-blood';
   }
 
   if (trimmed.startsWith('+')) {
-    return 'text-emerald-300';
+    return 'text-spark';
   }
 
-  return 'text-zinc-200';
+  return 'text-mist';
 }
 
 function SocialTrendCard({ trend }: { trend?: WatchlistTrendSnapshot }) {

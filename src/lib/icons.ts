@@ -95,6 +95,6 @@ export type { LucideIcon } from 'lucide-react';
  * - xl: 48px (hero illustrations, onboarding)
  * 
  * Example:
- * <Search size={20} className="text-zinc-400" />
- * <Bell size={24} className="text-emerald-500" />
+ * <Search size={20} className="text-fog" />
+ * <Bell size={24} className="text-spark" />
  */

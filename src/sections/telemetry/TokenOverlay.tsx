@@ -22,9 +22,9 @@ export default function TokenOverlay() {
   if (!flags.tokenOverlay) return null;
   const { iterationsLeft } = summarizeBudget(now, avg, 196000);
   return (
-    <div className="pointer-events-none fixed bottom-3 right-3 z-50 rounded-lg border border-emerald-800/60 bg-zinc-900/80 px-3 py-2 text-[11px] text-zinc-200 shadow">
+    <div className="pointer-events-none fixed bottom-3 right-3 z-50 rounded-lg border border-spark/60 bg-smoke/80 px-3 py-2 text-[11px] text-mist shadow">
       <div className="flex items-center gap-2">
-        <span className="rounded bg-emerald-900/40 px-1.5 py-0.5 text-emerald-200">Token-Budget</span>
+        <span className="rounded bg-spark/40 px-1.5 py-0.5 text-spark">Token-Budget</span>
         <span>now ≈ <b>{now}</b></span>
         <span>avg ≈ <b>{avg}</b></span>
         <span>max = <b>196k</b></span>

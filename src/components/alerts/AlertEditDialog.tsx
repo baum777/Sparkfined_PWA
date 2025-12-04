@@ -1,6 +1,5 @@
 import React from 'react';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
+import { Button, Input } from '@/design-system';
 import Select from '@/components/ui/Select';
 import type { Alert, AlertType } from '@/store/alertsStore';
 import { useAlertsStore } from '@/store/alertsStore';
@@ -174,8 +173,7 @@ export default function AlertEditDialog({ alert }: AlertEditDialogProps) {
                   placeholder="BTCUSDT"
                   autoFocus
                   data-testid="alert-edit-symbol-input"
-                  error={errors.symbol}
-                  errorTestId="alert-edit-symbol-error"
+                  errorText={errors.symbol || undefined}
                 />
               </div>
 
@@ -204,8 +202,7 @@ export default function AlertEditDialog({ alert }: AlertEditDialogProps) {
                   onChange={(event) => setFormState((prev) => ({ ...prev, condition: event.target.value }))}
                   placeholder="Alert when price closes above threshold"
                   data-testid="alert-edit-condition-input"
-                  error={errors.condition}
-                  errorTestId="alert-edit-condition-error"
+                  errorText={errors.condition || undefined}
                 />
               </div>
 
@@ -221,8 +218,7 @@ export default function AlertEditDialog({ alert }: AlertEditDialogProps) {
                   onChange={(event) => setFormState((prev) => ({ ...prev, threshold: event.target.value }))}
                   placeholder="42500"
                   data-testid="alert-edit-threshold-input"
-                  error={errors.threshold}
-                  errorTestId="alert-edit-threshold-error"
+                  errorText={errors.threshold || undefined}
                 />
               </div>
 

@@ -230,14 +230,14 @@ export default function AnalysisPageV2() {
           </div>
 
           {trendInsight ? (
-            <div className="space-y-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/5 p-4">
+            <div className="space-y-2 rounded-2xl border border-spark/30 bg-spark/5 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.25em] text-emerald-200/80">Social trend</p>
+                  <p className="text-xs uppercase tracking-[0.25em] text-spark/80">Social trend</p>
                   <p className="text-sm text-text-secondary">{trendInsight.tweet.snippet ?? trendInsight.tweet.fullText}</p>
                 </div>
                 {trendInsight.sentiment?.label ? (
-                  <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-200">
+                  <span className="inline-flex items-center rounded-full bg-spark/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-spark">
                     {trendInsight.sentiment.label}
                   </span>
                 ) : null}
@@ -261,7 +261,7 @@ export default function AnalysisPageV2() {
                   href={trendInsight.source.tweetUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-200 underline decoration-emerald-500/70 decoration-dotted underline-offset-4"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-spark underline decoration-spark/70 decoration-dotted underline-offset-4"
                 >
                   View tweet
                   <span aria-hidden="true">↗</span>

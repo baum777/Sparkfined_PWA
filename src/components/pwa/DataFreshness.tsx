@@ -56,7 +56,7 @@ export default function DataFreshness({ lastUpdated, className = '' }: DataFresh
   }, [lastUpdated]);
 
   return (
-    <span className={`text-xs text-zinc-500 ${className}`} title={new Date(lastUpdated).toLocaleString()}>
+    <span className={`text-xs text-ash ${className}`} title={new Date(lastUpdated).toLocaleString()}>
       Updated {timeAgo}
     </span>
   );

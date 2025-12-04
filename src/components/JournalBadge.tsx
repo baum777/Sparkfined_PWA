@@ -73,8 +73,8 @@ export default function JournalBadge() {
         transition-all duration-200
         ${
           isNew
-            ? 'animate-pulse border-emerald-500 bg-emerald-500/20 text-emerald-100'
-            : 'border-cyan-700 bg-cyan-900/20 text-cyan-100 hover:bg-cyan-900/40'
+            ? 'animate-pulse border-spark bg-spark/20 text-spark'
+            : 'border-spark/40 bg-spark/10 text-spark hover:bg-spark/20'
         }
       `}
       aria-label={`${tempCount} new trade${tempCount !== 1 ? 's' : ''} detected`}
@@ -105,8 +105,8 @@ export default function JournalBadge() {
       {/* Dot indicator (mobile only) */}
       {isNew && (
         <span className="absolute -right-1 -top-1 flex h-3 w-3">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-          <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500"></span>
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-spark opacity-50"></span>
+          <span className="relative inline-flex h-3 w-3 rounded-full bg-spark"></span>
         </span>
       )}
     </button>

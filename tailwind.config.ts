@@ -179,98 +179,6 @@ export default {
         info: withAlpha('--color-info'),
         warn: withAlpha('--color-warn'),
         
-        // TODO: design-system: drop legacy Tailwind palettes after spark tokens cover all usage
-        // TODO: design-system: remove legacy palettes once dashboard + journal surfaces finish Spark migration
-        // Zinc palette (complete spectrum for UI)
-        zinc: {
-          50: '#fafafa',
-          100: '#f4f4f5',
-          200: '#e4e4e7',
-          300: '#d4d4d8',
-          400: '#a1a1aa',
-          500: '#71717a',
-          600: '#52525b',
-          700: '#3f3f46',
-          800: '#27272a',
-          850: '#1c1c1e',
-          900: '#18181b',
-          950: '#0a0a0a',
-        },
-        
-        // Emerald palette (brand/success)
-        emerald: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
-          950: '#022c22',
-        },
-        
-        // Rose palette (danger/bear)
-        rose: {
-          50: '#fff1f2',
-          100: '#ffe4e6',
-          200: '#fecdd3',
-          300: '#fda4af',
-          400: '#fb7185',
-          500: '#f43f5e',
-          600: '#e11d48',
-          700: '#be123c',
-          800: '#9f1239',
-          900: '#881337',
-          950: '#4c0519',
-        },
-        
-        // Cyan palette (info/accents)
-        cyan: {
-          50: '#ecfeff',
-          100: '#cffafe',
-          200: '#a5f3fc',
-          300: '#67e8f9',
-          400: '#22d3ee',
-          500: '#06b6d4',
-          600: '#0891b2',
-          700: '#0e7490',
-          800: '#155e75',
-          900: '#164e63',
-          950: '#083344',
-        },
-        
-        // Amber palette (warnings)
-        amber: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
-          950: '#451a03',
-        },
-        
-        // Slate palette (alternative grays)
-        slate: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
-        },
       },
       
       fontFamily: {
@@ -303,10 +211,6 @@ export default {
         'glow-accent': '0 0 10px rgba(0, 255, 102, 0.22)',
         'glow-brand': '0 0 12px rgba(255, 98, 0, 0.18)',
         'glow-cyan': '0 0 8px rgba(0, 229, 255, 0.2)',
-        'emerald-glow': '0 0 30px rgba(16, 185, 129, 0.3)',
-        'emerald-glow-lg': '0 0 50px rgba(16, 185, 129, 0.5)',
-        'emerald-glow-xl': '0 0 70px rgba(16, 185, 129, 0.6)',
-        'rose-glow': '0 0 20px rgba(244, 63, 94, 0.3)',
       },
       
       backgroundImage: {
@@ -314,7 +218,6 @@ export default {
         'gradient-gold': gradientTokens.gold,
         'gradient-void': gradientTokens.void,
         'brand-gradient': 'linear-gradient(135deg, rgb(var(--color-brand)) 0%, rgb(var(--color-brand-hover)) 100%)',
-        'emerald-gradient': 'linear-gradient(to right, rgb(var(--color-success)) 0%, rgb(var(--color-info)) 100%)',
         'grid-pattern': 'linear-gradient(to right, rgb(var(--color-border) / 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgb(var(--color-border) / 0.2) 1px, transparent 1px)',
         'app-gradient': 'linear-gradient(to bottom, rgb(var(--color-bg-overlay) / 0.9) 0%, rgb(var(--color-bg)) 50%, rgb(var(--color-bg-overlay) / 0.95) 100%)',
         'surface-gradient': 'linear-gradient(135deg, rgb(var(--color-surface-subtle)) 0%, rgb(var(--color-surface-elevated)) 100%)',

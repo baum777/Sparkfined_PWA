@@ -12,7 +12,7 @@
 
 import { useState } from 'react'
 import { ChevronDown, ChevronUp } from '@/lib/icons'
-import Button from '@/components/ui/Button'
+import { Button } from '@/design-system'
 import type { AnalysisResult, AITeaserAnalysis } from '@/types/analysis'
 
 interface ResultCardProps {

@@ -29,11 +29,11 @@ export default function FeedItem({
 }: FeedItemProps) {
   // Icon mapping
   const iconMap = {
-    alert: { Icon: Bell, color: 'text-emerald-500' },
-    analysis: { Icon: Search, color: 'text-cyan-500' },
-    journal: { Icon: FileText, color: 'text-cyan-500' },
-    export: { Icon: Download, color: 'text-zinc-400' },
-    error: { Icon: AlertTriangle, color: 'text-rose-500' },
+    alert: { Icon: Bell, color: 'text-spark' },
+    analysis: { Icon: Search, color: 'text-spark' },
+    journal: { Icon: FileText, color: 'text-spark' },
+    export: { Icon: Download, color: 'text-fog' },
+    error: { Icon: AlertTriangle, color: 'text-blood' },
   };
   
   const { Icon, color } = iconMap[type];
@@ -51,9 +51,9 @@ export default function FeedItem({
   
   return (
     <div
-      className={`flex items-start gap-3 border-b border-zinc-800/50 px-3 py-2 transition-colors ${
-        unread ? 'border-l-2 border-l-emerald-500 pl-2' : ''
-      } ${onClick ? 'cursor-pointer hover:bg-zinc-900/50 active:bg-zinc-800' : ''}`}
+      className={`flex items-start gap-3 border-b border-smoke-light/50 px-3 py-2 transition-colors ${
+        unread ? 'border-l-2 border-l-spark pl-2' : ''
+      } ${onClick ? 'cursor-pointer hover:bg-smoke/50 active:bg-smoke-light' : ''}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
@@ -61,17 +61,17 @@ export default function FeedItem({
       aria-label={`${type}: ${text}, ${getRelativeTime(timestamp)} ago`}
     >
       {/* Icon */}
-      <Icon size={20} className={unread ? color : 'text-zinc-600'} />
+      <Icon size={20} className={unread ? color : 'text-ash'} />
       
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <p className={`text-sm line-clamp-2 ${unread ? 'text-zinc-200' : 'text-zinc-400'}`}>
+        <p className={`text-sm line-clamp-2 ${unread ? 'text-mist' : 'text-fog'}`}>
           {text}
         </p>
       </div>
       
       {/* Timestamp */}
-      <span className="font-mono text-xs text-zinc-600 flex-shrink-0">
+      <span className="font-mono text-xs text-ash flex-shrink-0">
         {getRelativeTime(timestamp)}
       </span>
     </div>

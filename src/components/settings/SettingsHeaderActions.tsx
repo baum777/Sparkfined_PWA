@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/design-system';
 import { Download, RotateCw } from '@/lib/icons';
 
 export function SettingsHeaderActions() {

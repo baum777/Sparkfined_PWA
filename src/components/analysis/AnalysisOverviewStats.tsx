@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/design-system';
 import StateView from '@/components/ui/StateView';
 import type { LucideIcon } from '@/lib/icons';
 
@@ -112,9 +111,9 @@ export default function AnalysisOverviewStats({
 function toneValueClass(tone: AnalysisOverviewStatTone = 'neutral'): string {
   switch (tone) {
     case 'positive':
-      return 'text-emerald-300';
+      return 'text-spark';
     case 'negative':
-      return 'text-rose-300';
+      return 'text-blood';
     default:
       return 'text-text-primary';
   }
@@ -123,9 +122,9 @@ function toneValueClass(tone: AnalysisOverviewStatTone = 'neutral'): string {
 function toneIconClass(tone: AnalysisOverviewStatTone = 'neutral'): string {
   switch (tone) {
     case 'positive':
-      return 'bg-emerald-500/10 text-emerald-300';
+      return 'bg-spark/10 text-spark';
     case 'negative':
-      return 'bg-rose-500/10 text-rose-300';
+      return 'bg-blood/10 text-blood';
     default:
       return 'bg-surface text-text-secondary';
   }

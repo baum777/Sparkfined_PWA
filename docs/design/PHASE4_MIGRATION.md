@@ -1097,6 +1097,13 @@ See `/docs/design/DESIGN_SYSTEM.md` for full token documentation.
 - Defined success criteria
 - Created testing strategy
 
+### 2025-12-04 - Phase 4 Execution (Codex)
+- Migrated remaining legacy surfaces (RoutesRoot, AppErrorBoundary, ReplayPlayer, JournalBadge, App skip link) to Spark tokens
+- Repointed all Button/Card/Badge/Input/Tooltip imports to `@/design-system` and deleted shim files
+- Replaced legacy emerald/zinc/slate/rose/cyan/amber Tailwind classes repo-wide with Spark semantic tokens
+- Removed legacy Tailwind palettes, gradients, and glow utilities; added Spark equivalents where needed
+- Ensured alerts CRUD dialogs use Spark `Input` + `Button` APIs and updated tests/code accordingly
+
 ---
 
 **End of Phase 4 Migration Plan**

@@ -122,7 +122,7 @@ export default function PatternDashboard({
   return (
     <div className="space-y-4">
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-zinc-800 pb-2">
+      <div className="flex gap-2 border-b border-smoke-light pb-2">
         {[
           { id: "overview", label: "📊 Overview" },
           { id: "setup", label: "🎯 By Setup" },
@@ -134,8 +134,8 @@ export default function PatternDashboard({
             onClick={() => setActiveTab(tab.id as any)}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === tab.id
-                ? "bg-cyan-500/20 text-cyan-400"
-                : "text-zinc-500 hover:text-zinc-300"
+                ? "bg-spark/20 text-spark"
+                : "text-ash hover:text-fog"
             }`}
           >
             {tab.label}
@@ -173,12 +173,12 @@ export default function PatternDashboard({
           </div>
 
           {/* Best Patterns */}
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-            <h3 className="mb-3 text-sm font-semibold text-green-400">
+          <div className="rounded-xl border border-smoke-light bg-smoke/60 p-4">
+            <h3 className="mb-3 text-sm font-semibold text-phosphor">
               ✅ Best Performing Patterns
             </h3>
             {bestPatterns.length === 0 ? (
-              <p className="text-xs text-zinc-600">
+              <p className="text-xs text-ash">
                 No closed trades yet. Close some trades to see patterns.
               </p>
             ) : (
@@ -187,26 +187,26 @@ export default function PatternDashboard({
                   <button
                     key={`best-${idx}`}
                     onClick={() => onFilterByPattern(pattern.setup, pattern.emotion)}
-                    className="flex w-full items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-left transition-colors hover:border-green-500/50 hover:bg-green-500/5"
+                    className="flex w-full items-center justify-between rounded-lg border border-smoke-light bg-void-lighter p-3 text-left transition-colors hover:border-phosphor/50 hover:bg-phosphor/5"
                   >
                     <div>
                       <div className="mb-1 flex items-center gap-2">
-                        <span className="rounded bg-green-500/20 px-2 py-0.5 text-xs font-medium text-green-400">
+                        <span className="rounded bg-phosphor/20 px-2 py-0.5 text-xs font-medium text-phosphor">
                           {pattern.setup}
                         </span>
                         <span className="rounded bg-purple-500/20 px-2 py-0.5 text-xs font-medium text-purple-400">
                           {pattern.emotion}
                         </span>
                       </div>
-                      <p className="text-xs text-zinc-600">
+                      <p className="text-xs text-ash">
                         {pattern.count} trades • {pattern.winRate.toFixed(0)}% win rate
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-green-400">
+                      <p className="text-sm font-bold text-phosphor">
                         {formatPnl(pattern.avgPnl)}
                       </p>
-                      <p className="text-xs text-zinc-600">avg</p>
+                      <p className="text-xs text-ash">avg</p>
                     </div>
                   </button>
                 ))}
@@ -215,12 +215,12 @@ export default function PatternDashboard({
           </div>
 
           {/* Worst Patterns */}
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-            <h3 className="mb-3 text-sm font-semibold text-red-400">
+          <div className="rounded-xl border border-smoke-light bg-smoke/60 p-4">
+            <h3 className="mb-3 text-sm font-semibold text-blood">
               ❌ Worst Performing Patterns
             </h3>
             {worstPatterns.length === 0 ? (
-              <p className="text-xs text-zinc-600">
+              <p className="text-xs text-ash">
                 No closed trades yet.
               </p>
             ) : (
@@ -229,26 +229,26 @@ export default function PatternDashboard({
                   <button
                     key={`worst-${idx}`}
                     onClick={() => onFilterByPattern(pattern.setup, pattern.emotion)}
-                    className="flex w-full items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-left transition-colors hover:border-red-500/50 hover:bg-red-500/5"
+                    className="flex w-full items-center justify-between rounded-lg border border-smoke-light bg-void-lighter p-3 text-left transition-colors hover:border-blood/50 hover:bg-blood/5"
                   >
                     <div>
                       <div className="mb-1 flex items-center gap-2">
-                        <span className="rounded bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-400">
+                        <span className="rounded bg-blood/20 px-2 py-0.5 text-xs font-medium text-blood">
                           {pattern.setup}
                         </span>
                         <span className="rounded bg-purple-500/20 px-2 py-0.5 text-xs font-medium text-purple-400">
                           {pattern.emotion}
                         </span>
                       </div>
-                      <p className="text-xs text-zinc-600">
+                      <p className="text-xs text-ash">
                         {pattern.count} trades • {pattern.winRate.toFixed(0)}% win rate
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-red-400">
+                      <p className="text-sm font-bold text-blood">
                         {formatPnl(pattern.avgPnl)}
                       </p>
-                      <p className="text-xs text-zinc-600">avg</p>
+                      <p className="text-xs text-ash">avg</p>
                     </div>
                   </button>
                 ))}
@@ -260,36 +260,36 @@ export default function PatternDashboard({
 
       {/* By Setup Tab */}
       {activeTab === "setup" && (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-          <h3 className="mb-3 text-sm font-semibold text-zinc-200">
+        <div className="rounded-xl border border-smoke-light bg-smoke/60 p-4">
+          <h3 className="mb-3 text-sm font-semibold text-mist">
             Performance by Setup
           </h3>
           <div className="space-y-3">
             {stats.bySetup.map((setup) => (
               <div
                 key={setup.setup}
-                className="rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+                className="rounded-lg border border-smoke-light bg-void-lighter p-3"
               >
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="rounded bg-green-500/20 px-2 py-1 text-xs font-medium text-green-400">
+                  <span className="rounded bg-phosphor/20 px-2 py-1 text-xs font-medium text-phosphor">
                     {setup.setup}
                   </span>
-                  <span className="text-xs text-zinc-600">
+                  <span className="text-xs text-ash">
                     {setup.totalTrades} trades
                   </span>
                 </div>
                 
                 {/* Win Rate Bar */}
                 <div className="mb-2">
-                  <div className="flex items-center justify-between text-xs text-zinc-400">
+                  <div className="flex items-center justify-between text-xs text-fog">
                     <span>Win Rate</span>
                     <span className="font-medium">
                       {((setup.winCount / setup.totalTrades) * 100).toFixed(1)}%
                     </span>
                   </div>
-                  <div className="mt-1 h-2 rounded-full bg-zinc-800">
+                  <div className="mt-1 h-2 rounded-full bg-smoke-light">
                     <div
-                      className="h-full rounded-full bg-green-500"
+                      className="h-full rounded-full bg-phosphor"
                       style={{
                         width: `${(setup.winCount / setup.totalTrades) * 100}%`,
                       }}
@@ -300,28 +300,28 @@ export default function PatternDashboard({
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <div>
-                    <p className="text-zinc-600">Avg PnL</p>
+                    <p className="text-ash">Avg PnL</p>
                     <p
                       className={`font-medium ${
-                        setup.avgPnl >= 0 ? "text-green-400" : "text-red-400"
+                        setup.avgPnl >= 0 ? "text-phosphor" : "text-blood"
                       }`}
                     >
                       {formatPnl(setup.avgPnl)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-zinc-600">Total PnL</p>
+                    <p className="text-ash">Total PnL</p>
                     <p
                       className={`font-medium ${
-                        setup.totalPnl >= 0 ? "text-green-400" : "text-red-400"
+                        setup.totalPnl >= 0 ? "text-phosphor" : "text-blood"
                       }`}
                     >
                       {formatPnl(setup.totalPnl)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-zinc-600">W/L</p>
-                    <p className="font-medium text-zinc-300">
+                    <p className="text-ash">W/L</p>
+                    <p className="font-medium text-fog">
                       {setup.winCount}/{setup.lossCount}
                     </p>
                   </div>
@@ -329,7 +329,7 @@ export default function PatternDashboard({
 
                 <button
                   onClick={() => onFilterByPattern(setup.setup, undefined)}
-                  className="mt-2 w-full rounded-lg bg-zinc-800 py-1 text-xs text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
+                  className="mt-2 w-full rounded-lg bg-smoke-light py-1 text-xs text-fog transition-colors hover:bg-smoke-lighter hover:text-mist"
                 >
                   View All {setup.setup} Trades →
                 </button>
@@ -341,33 +341,33 @@ export default function PatternDashboard({
 
       {/* By Emotion Tab */}
       {activeTab === "emotion" && (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-          <h3 className="mb-3 text-sm font-semibold text-zinc-200">
+        <div className="rounded-xl border border-smoke-light bg-smoke/60 p-4">
+          <h3 className="mb-3 text-sm font-semibold text-mist">
             Performance by Emotion
           </h3>
           <div className="space-y-3">
             {stats.byEmotion.map((emotion) => (
               <div
                 key={emotion.emotion}
-                className="rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+                className="rounded-lg border border-smoke-light bg-void-lighter p-3"
               >
                 <div className="mb-2 flex items-center justify-between">
                   <span className="rounded bg-purple-500/20 px-2 py-1 text-xs font-medium text-purple-400">
                     {emotion.emotion}
                   </span>
-                  <span className="text-xs text-zinc-600">
+                  <span className="text-xs text-ash">
                     {emotion.totalTrades} trades
                   </span>
                 </div>
                 
                 <div className="mb-2">
-                  <div className="flex items-center justify-between text-xs text-zinc-400">
+                  <div className="flex items-center justify-between text-xs text-fog">
                     <span>Win Rate</span>
                     <span className="font-medium">
                       {((emotion.winCount / emotion.totalTrades) * 100).toFixed(1)}%
                     </span>
                   </div>
-                  <div className="mt-1 h-2 rounded-full bg-zinc-800">
+                  <div className="mt-1 h-2 rounded-full bg-smoke-light">
                     <div
                       className="h-full rounded-full bg-purple-500"
                       style={{
@@ -379,28 +379,28 @@ export default function PatternDashboard({
 
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <div>
-                    <p className="text-zinc-600">Avg PnL</p>
+                    <p className="text-ash">Avg PnL</p>
                     <p
                       className={`font-medium ${
-                        emotion.avgPnl >= 0 ? "text-green-400" : "text-red-400"
+                        emotion.avgPnl >= 0 ? "text-phosphor" : "text-blood"
                       }`}
                     >
                       {formatPnl(emotion.avgPnl)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-zinc-600">Total PnL</p>
+                    <p className="text-ash">Total PnL</p>
                     <p
                       className={`font-medium ${
-                        emotion.totalPnl >= 0 ? "text-green-400" : "text-red-400"
+                        emotion.totalPnl >= 0 ? "text-phosphor" : "text-blood"
                       }`}
                     >
                       {formatPnl(emotion.totalPnl)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-zinc-600">W/L</p>
-                    <p className="font-medium text-zinc-300">
+                    <p className="text-ash">W/L</p>
+                    <p className="font-medium text-fog">
                       {emotion.winCount}/{emotion.lossCount}
                     </p>
                   </div>
@@ -408,7 +408,7 @@ export default function PatternDashboard({
 
                 <button
                   onClick={() => onFilterByPattern(undefined, emotion.emotion)}
-                  className="mt-2 w-full rounded-lg bg-zinc-800 py-1 text-xs text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
+                  className="mt-2 w-full rounded-lg bg-smoke-light py-1 text-xs text-fog transition-colors hover:bg-smoke-lighter hover:text-mist"
                 >
                   View All {emotion.emotion} Trades →
                 </button>
@@ -420,16 +420,16 @@ export default function PatternDashboard({
 
       {/* Pattern Library Tab */}
       {activeTab === "library" && (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-          <h3 className="mb-3 text-sm font-semibold text-zinc-200">
+        <div className="rounded-xl border border-smoke-light bg-smoke/60 p-4">
+          <h3 className="mb-3 text-sm font-semibold text-mist">
             📚 Successful Pattern Library
           </h3>
-          <p className="mb-4 text-xs text-zinc-500">
+          <p className="mb-4 text-xs text-ash">
             Browse trades with PnL &gt; 10% to build your pattern library
           </p>
           
           {entries.filter((e) => e.status === "closed" && e.outcome && e.outcome.pnlPercent > 10).length === 0 ? (
-            <p className="text-xs text-zinc-600">
+            <p className="text-xs text-ash">
               No successful patterns yet. Close trades with &gt;10% PnL to build your library.
             </p>
           ) : (
@@ -441,7 +441,7 @@ export default function PatternDashboard({
                   <button
                     key={entry.id}
                     onClick={() => onViewEntry(entry.id)}
-                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-left transition-colors hover:border-green-500/50 hover:bg-green-500/5"
+                    className="rounded-lg border border-smoke-light bg-void-lighter p-3 text-left transition-colors hover:border-phosphor/50 hover:bg-phosphor/5"
                   >
                     {/* Screenshot Preview */}
                     {entry.chartSnapshot?.screenshot && (
@@ -453,23 +453,23 @@ export default function PatternDashboard({
                     )}
                     
                     <div className="mb-2 flex items-center gap-2">
-                      <span className="text-sm font-semibold text-zinc-200">
+                      <span className="text-sm font-semibold text-mist">
                         {entry.ticker}
                       </span>
-                      <span className="rounded bg-green-500/20 px-1.5 py-0.5 text-xs font-medium text-green-400">
+                      <span className="rounded bg-phosphor/20 px-1.5 py-0.5 text-xs font-medium text-phosphor">
                         {entry.setup}
                       </span>
                     </div>
                     
-                    <p className="mb-2 line-clamp-2 text-xs text-zinc-500">
+                    <p className="mb-2 line-clamp-2 text-xs text-ash">
                       {entry.thesis || "No thesis"}
                     </p>
                     
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-600">
+                      <span className="text-ash">
                         {new Date(entry.timestamp).toLocaleDateString()}
                       </span>
-                      <span className="font-bold text-green-400">
+                      <span className="font-bold text-phosphor">
                         +{entry.outcome!.pnlPercent.toFixed(1)}%
                       </span>
                     </div>
@@ -496,9 +496,9 @@ function StatCard({
   color?: "green" | "red" | "cyan";
 }) {
   const colorClasses = {
-    green: "border-green-500/50 bg-green-500/10 text-green-400",
-    red: "border-red-500/50 bg-red-500/10 text-red-400",
-    cyan: "border-cyan-500/50 bg-cyan-500/10 text-cyan-400",
+    green: "border-phosphor/50 bg-phosphor/10 text-phosphor",
+    red: "border-blood/50 bg-blood/10 text-blood",
+    cyan: "border-spark/50 bg-spark/10 text-spark",
   };
 
   return (
@@ -506,11 +506,11 @@ function StatCard({
       className={`rounded-xl border p-4 ${
         color
           ? colorClasses[color]
-          : "border-zinc-800 bg-zinc-900/60 text-zinc-200"
+          : "border-smoke-light bg-smoke/60 text-mist"
       }`}
     >
       <div className="mb-1 text-2xl">{icon}</div>
-      <p className="mb-1 text-xs text-zinc-500">{label}</p>
+      <p className="mb-1 text-xs text-ash">{label}</p>
       <p className="text-xl font-bold">{value}</p>
     </div>
   );

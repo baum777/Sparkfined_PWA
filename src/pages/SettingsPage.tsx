@@ -5,7 +5,7 @@ import { useTelemetry } from "../state/telemetry";
 import { useAISettings } from "../state/ai";
 import { useAIContext } from "../state/aiContext";
 import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from "../lib/walletMonitor";
-import Button from "@/components/ui/Button";
+import { Button } from "@/design-system";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useTheme, type ThemeMode } from "@/lib/theme/useTheme";
 
@@ -80,22 +80,22 @@ export default function SettingsPage({
   };
 
   const Row = ({ label, children }:{label:string;children:React.ReactNode}) => (
-    <div className="flex items-center justify-between gap-3 border-b border-zinc-800 py-3">
-      <div className="text-sm text-zinc-300">{label}</div>
+    <div className="flex items-center justify-between gap-3 border-b border-smoke-light py-3">
+      <div className="text-sm text-fog">{label}</div>
       <div>{children}</div>
     </div>
   );
   const Select = (p:React.SelectHTMLAttributes<HTMLSelectElement>) =>
-    <select {...p} className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm text-zinc-200" />;
+    <select {...p} className="rounded border border-smoke-lighter bg-smoke px-2 py-1 text-sm text-mist" />;
   const Toggle = ({checked,onChange}:{checked:boolean;onChange:(v:boolean)=>void}) =>
-    <button onClick={()=>onChange(!checked)} className={`rounded px-2 py-1 text-sm border ${checked?"border-emerald-700 bg-emerald-900/30 text-emerald-100":"border-zinc-700 text-zinc-200 hover:bg-zinc-800"}`}>{checked?"ON":"OFF"}</button>;
+    <button onClick={()=>onChange(!checked)} className={`rounded px-2 py-1 text-sm border ${checked?"border-spark bg-spark/30 text-spark":"border-smoke-lighter text-mist hover:bg-smoke-light"}`}>{checked?"ON":"OFF"}</button>;
 
   return (
     <div className={wrapperClassName}>
       {showHeading ? (
-        <h1 className="mb-4 text-lg font-semibold text-zinc-100 md:text-xl">Einstellungen</h1>
+        <h1 className="mb-4 text-lg font-semibold text-mist md:text-xl">Einstellungen</h1>
       ) : null}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <div className="rounded-xl border border-smoke-light bg-smoke/40 p-4">
         <Row label="Theme">
           <Select value={theme} onChange={(e)=>setTheme(e.target.value as ThemeMode)}>
             <option value="system">System</option>
@@ -121,12 +121,12 @@ export default function SettingsPage({
           <Toggle checked={settings.showMinimap} onChange={(v)=>setSettings({showMinimap:v})}/>
         </Row>
       </div>
-      <div className="mt-4 text-xs text-zinc-500">
+      <div className="mt-4 text-xs text-ash">
         Gespeichert unter <code>sparkfined.settings.v1</code>. Änderungen wirken sofort.
       </div>
       <div className="mt-4 flex justify-end">
         <Button
-          variant="outline"
+          variant="secondary"
           onClick={resetOnboarding}
           data-testid="reset-onboarding"
         >
@@ -135,15 +135,15 @@ export default function SettingsPage({
       </div>
 
       {/* BLOCK 2: Wallet Monitoring */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Wallet-Monitoring (Auto-Journal)</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-mist">Wallet-Monitoring (Auto-Journal)</h2>
+      <div className="rounded-xl border border-smoke-light bg-smoke/40 p-4">
         <Row label="Wallet-Adresse">
           <input
             type="text"
             value={walletAddress}
             onChange={(e) => handleWalletChange(e.target.value)}
             placeholder="DezXAZ8z7Pnr..."
-            className="w-64 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm text-zinc-200"
+            className="w-64 rounded border border-smoke-lighter bg-smoke px-2 py-1 text-sm text-mist"
           />
         </Row>
         <Row label="Wallet-Monitoring aktiv">
@@ -161,9 +161,9 @@ export default function SettingsPage({
 
         {/* Status display */}
         {monitorStatus && monitorStatus.isRunning && (
-          <div className="mt-3 rounded border border-emerald-800/40 bg-emerald-950/20 p-3 text-xs text-emerald-200">
+          <div className="mt-3 rounded border border-spark/40 bg-spark/20 p-3 text-xs text-spark">
             <div className="mb-1 font-semibold">✅ Monitoring aktiv</div>
-            <div className="text-emerald-300/80">
+            <div className="text-spark/80">
               <div>Wallet: {monitorStatus.walletAddress.slice(0, 8)}...{monitorStatus.walletAddress.slice(-6)}</div>
               <div>Letzter Check: {new Date(monitorStatus.lastChecked).toLocaleTimeString()}</div>
               <div>Transaktionen gesehen: {monitorStatus.seenTransactions}</div>
@@ -172,21 +172,21 @@ export default function SettingsPage({
         )}
 
         {walletAddress && !monitoringEnabled && (
-          <div className="mt-3 rounded border border-zinc-700 bg-zinc-900/60 p-3 text-xs text-zinc-400">
+          <div className="mt-3 rounded border border-smoke-lighter bg-smoke/60 p-3 text-xs text-fog">
             ⏸️ Monitoring pausiert. Aktiviere oben, um Auto-Journal zu starten.
           </div>
         )}
       </div>
-      <div className="mt-2 text-xs text-zinc-500">
+      <div className="mt-2 text-xs text-ash">
         <strong>Info:</strong> Wallet-Monitoring erkennt automatisch Buy-Transaktionen und erstellt
         temporäre Journal-Einträge. Du hast 7 Tage Zeit, um sie als "aktiv" zu markieren.
       </div>
 
       {/* Data Export / Import */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Daten — Export / Import</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
-        <div className="mb-2 text-xs text-zinc-400">Wähle Bereiche für Export:</div>
-        <div className="mb-3 grid grid-cols-2 gap-2 text-xs text-zinc-300 md:grid-cols-3">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-mist">Daten — Export / Import</h2>
+      <div className="rounded-xl border border-smoke-light bg-smoke/40 p-4">
+        <div className="mb-2 text-xs text-fog">Wähle Bereiche für Export:</div>
+        <div className="mb-3 grid grid-cols-2 gap-2 text-xs text-fog md:grid-cols-3">
           {Object.keys(KEYS).map(k => {
             const key = k as NamespaceKey;
             return (
@@ -199,7 +199,7 @@ export default function SettingsPage({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
-            className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800"
+            className="rounded-lg border border-smoke-lighter px-2 py-1 text-xs text-mist hover:bg-smoke-light"
             onClick={()=>{
               const selected = Object.entries(pick).filter(([,v])=>v).map(([k])=>k as NamespaceKey);
               const payload = exportAppData(selected);
@@ -216,28 +216,28 @@ export default function SettingsPage({
                    } catch(e:any){ setMsg(`Import-Fehler: ${e?.message||e}`); }
                    setBusy(null); e.currentTarget.value = "";
                  }} />
-          <button className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800"
+          <button className="rounded-lg border border-smoke-lighter px-2 py-1 text-xs text-mist hover:bg-smoke-light"
                   onClick={()=>fileRef.current?.click()}>Import JSON (Merge)</button>
         </div>
-        {busy && <div className="mt-2 text-[11px] text-zinc-400">{busy}</div>}
-        {msg &&  <div className="mt-2 text-[11px] text-emerald-300">{msg}</div>}
+        {busy && <div className="mt-2 text-[11px] text-fog">{busy}</div>}
+        {msg &&  <div className="mt-2 text-[11px] text-spark">{msg}</div>}
       </div>
 
       {/* Danger Zone */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Danger Zone</h2>
-      <div className="rounded-xl border border-rose-900 bg-rose-950/30 p-4">
-        <div className="text-xs text-rose-100">Gezieltes Löschen</div>
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-mist">Danger Zone</h2>
+      <div className="rounded-xl border border-blood bg-blood/30 p-4">
+        <div className="text-xs text-blood">Gezieltes Löschen</div>
         <div className="mt-2 grid grid-cols-2 gap-2 text-xs md:grid-cols-3">
           {Object.entries(KEYS).map(([ns, _key])=>(
             <button key={ns}
-              className="rounded border border-rose-900 px-2 py-1 text-rose-100 hover:bg-rose-900/20"
+              className="rounded border border-blood px-2 py-1 text-blood hover:bg-blood/20"
               onClick={()=>{ if(confirm(`Lösche ${ns}?`)) { clearNs(ns as NamespaceKey); alert(`${ns} gelöscht.`);} }}>
               Clear {ns}
             </button>
           ))}
         </div>
         <div className="mt-3">
-          <button className="rounded border border-rose-900 px-3 py-2 text-sm text-rose-100 hover:bg-rose-900/20"
+          <button className="rounded border border-blood px-3 py-2 text-sm text-blood hover:bg-blood/20"
             onClick={()=>{
               if (!confirm("Factory Reset? Alle sparkfined.* Daten werden gelöscht!")) return;
               Object.keys(KEYS).forEach(ns => clearNs(ns as NamespaceKey));
@@ -249,12 +249,12 @@ export default function SettingsPage({
       </div>
 
       {/* AI */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">AI</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-mist">AI</h2>
+      <div className="rounded-xl border border-smoke-light bg-smoke/40 p-4 text-xs text-fog">
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           <label className="inline-flex items-center gap-2">
             Provider
-            <select className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+            <select className="rounded border border-smoke-lighter bg-smoke px-2 py-1 text-xs text-mist"
                     value={ai.provider} onChange={(e)=>setAI({ provider: e.target.value as any })}>
               <option value="anthropic">Anthropic</option>
               <option value="openai">OpenAI</option>
@@ -263,7 +263,7 @@ export default function SettingsPage({
           </label>
           <label className="inline-flex items-center gap-2">
             Model
-            <input className="w-48 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+            <input className="w-48 rounded border border-smoke-lighter bg-smoke px-2 py-1 text-xs text-mist"
                    placeholder="(optional override)"
                    value={ai.model || ""} onChange={(e)=>setAI({ model: e.target.value || undefined })}/>
           </label>
@@ -272,45 +272,45 @@ export default function SettingsPage({
           <label className="inline-flex items-center gap-2">
             maxOutputTokens
             <input type="number" min={64} max={4000}
-                   className="w-28 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+                   className="w-28 rounded border border-smoke-lighter bg-smoke px-2 py-1 text-xs text-mist"
                    value={ai.maxOutputTokens ?? 800}
                    onChange={(e)=>setAI({ maxOutputTokens: Number(e.target.value) })}/>
           </label>
           <label className="inline-flex items-center gap-2">
             maxCostUsd / Call
             <input type="number" min={0.01} step={0.01}
-                   className="w-28 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+                   className="w-28 rounded border border-smoke-lighter bg-smoke px-2 py-1 text-xs text-mist"
                    value={ai.maxCostUsd ?? 0.15}
                    onChange={(e)=>setAI({ maxCostUsd: Number(e.target.value) })}/>
           </label>
         </div>
-        <div className="mt-1 text-[11px] text-zinc-500">
+        <div className="mt-1 text-[11px] text-ash">
           Server setzt zusätzlich eine globale Obergrenze via <code>AI_MAX_COST_USD</code>.
         </div>
-        <div className="mt-2 text-[11px] text-zinc-500">Keys bleiben serverseitig (.env). Der Client sendet nur Provider/Model + Prompt.</div>
+        <div className="mt-2 text-[11px] text-ash">Keys bleiben serverseitig (.env). Der Client sendet nur Provider/Model + Prompt.</div>
       </div>
 
       {/* Token Budget */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">AI Token Budget</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-mist">AI Token Budget</h2>
+      <div className="rounded-xl border border-smoke-light bg-smoke/40 p-4 text-xs text-fog">
         <AIStats/>
       </div>
 
       {/* Risk & Playbook Defaults */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Risk & Playbook Defaults</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
-        <div className="mb-2 text-[12px] text-zinc-400">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-mist">Risk & Playbook Defaults</h2>
+      <div className="rounded-xl border border-smoke-light bg-smoke/40 p-4 text-xs text-fog">
+        <div className="mb-2 text-[12px] text-fog">
           Setze Standard-Balance und Preset, die im Analyze/Ideas-Playbook vorgefüllt werden.
         </div>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
           <label className="flex items-center gap-2">Default-Balance
-            <input className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs"
+            <input className="rounded border border-smoke-lighter bg-smoke px-2 py-1 text-xs"
                    type="number" min={100} step={50}
                    value={settings.defaultBalance||1000}
                    onChange={e=>setSettings({ defaultBalance: Number(e.target.value||0) })}/>
           </label>
           <label className="flex items-center gap-2">Default-Preset
-            <select className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs"
+            <select className="rounded border border-smoke-lighter bg-smoke px-2 py-1 text-xs"
                     value={settings.defaultPlaybookId||"bal-15"}
                     onChange={e=>setSettings({ defaultPlaybookId: e.target.value })}>
               <option value="cons-1">Conservative · 1% · ATR×1.5</option>
@@ -322,8 +322,8 @@ export default function SettingsPage({
       </div>
 
       {/* Monitoring & Tokens */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Monitoring & Tokens</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-mist">Monitoring & Tokens</h2>
+      <div className="rounded-xl border border-smoke-light bg-smoke/40 p-4 text-xs text-fog">
         <div className="mb-2 grid grid-cols-2 gap-2 md:grid-cols-3">
           <label className="inline-flex items-center gap-2"><input type="checkbox" checked={flags.enabled} onChange={e=>setFlags({enabled: e.target.checked})}/> Enabled</label>
           <label className="inline-flex items-center gap-2"><input type="checkbox" checked={flags.includeNetwork} onChange={e=>setFlags({includeNetwork: e.target.checked})}/> API Timings</label>
@@ -333,20 +333,20 @@ export default function SettingsPage({
           <div className="inline-flex items-center gap-2">
             Sampling
             <input type="number" min={0} max={1} step={0.05} value={flags.sampling} onChange={e=>setFlags({sampling: Number(e.target.value)})}
-                   className="w-20 rounded border border-zinc-700 bg-zinc-900 px-1 py-0.5 text-xs text-zinc-200"/>
+                   className="w-20 rounded border border-smoke-lighter bg-smoke px-1 py-0.5 text-xs text-mist"/>
           </div>
         </div>
         <div className="mt-2 flex items-center gap-2">
-          <button className="rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800" onClick={drain}>Jetzt senden ({buffer.length})</button>
-          <span className="text-zinc-500">Batch alle 15s & beim Tab-Wechsel</span>
+          <button className="rounded border border-smoke-lighter px-2 py-1 hover:bg-smoke-light" onClick={drain}>Jetzt senden ({buffer.length})</button>
+          <span className="text-ash">Batch alle 15s & beim Tab-Wechsel</span>
         </div>
       </div>
 
       {/* PWA Controls */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">PWA</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-mist">PWA</h2>
+      <div className="rounded-xl border border-smoke-light bg-smoke/40 p-4 text-xs text-fog">
         <div className="flex flex-wrap items-center gap-2">
-          <button className="rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800"
+          <button className="rounded border border-smoke-lighter px-2 py-1 hover:bg-smoke-light"
             onClick={async ()=>{
               setBusy("Update-Check…");
               const res = await pokeServiceWorker();
@@ -357,7 +357,7 @@ export default function SettingsPage({
             }}>
             SW-Update anstoßen
           </button>
-          <button className="rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800"
+          <button className="rounded border border-smoke-lighter px-2 py-1 hover:bg-smoke-light"
             onClick={async ()=>{
               setBusy("Caches leeren…");
               const removed = await clearCaches();
@@ -367,11 +367,11 @@ export default function SettingsPage({
             Caches leeren
           </button>
         </div>
-        <div className="mt-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-[11px] text-zinc-500">
-          <div className="mb-1 text-xs font-medium text-zinc-400">App Info</div>
-          <div>Version: <span className="text-zinc-300">{import.meta.env.VITE_APP_VERSION ?? "dev"}</span></div>
-          <div>Build: <span className="text-zinc-300">{import.meta.env.MODE}</span></div>
-          <div>VAPID: <span className={import.meta.env.VITE_VAPID_PUBLIC_KEY ? "text-emerald-400" : "text-amber-400"}>{import.meta.env.VITE_VAPID_PUBLIC_KEY ? "configured" : "missing"}</span></div>
+        <div className="mt-3 rounded-lg border border-smoke-light bg-void-lighter p-3 text-[11px] text-ash">
+          <div className="mb-1 text-xs font-medium text-fog">App Info</div>
+          <div>Version: <span className="text-fog">{import.meta.env.VITE_APP_VERSION ?? "dev"}</span></div>
+          <div>Build: <span className="text-fog">{import.meta.env.MODE}</span></div>
+          <div>VAPID: <span className={import.meta.env.VITE_VAPID_PUBLIC_KEY ? "text-spark" : "text-gold"}>{import.meta.env.VITE_VAPID_PUBLIC_KEY ? "configured" : "missing"}</span></div>
         </div>
       </div>
     </div>
@@ -381,27 +381,27 @@ export default function SettingsPage({
 function AIStats() {
   const ctx = useAIContext();
   const pct = (ctx.tokenUsed / ctx.tokenBudget) * 100;
-  const progressColor = pct > 90 ? "bg-rose-500" : pct > 70 ? "bg-amber-500" : "bg-emerald-500";
+  const progressColor = pct > 90 ? "bg-blood" : pct > 70 ? "bg-gold" : "bg-spark";
   
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
         <div>Used Tokens: {ctx.tokenUsed.toLocaleString()} / {ctx.tokenBudget.toLocaleString()}</div>
-        <div className="text-zinc-500">{pct.toFixed(1)}%</div>
+        <div className="text-ash">{pct.toFixed(1)}%</div>
       </div>
-      <div className="relative h-2 w-full overflow-hidden rounded-full bg-zinc-800">
+      <div className="relative h-2 w-full overflow-hidden rounded-full bg-smoke-light">
         <div 
           className={`h-full transition-all duration-300 ${progressColor}`}
           style={{ width: `${Math.min(100, pct)}%` }}
         />
       </div>
       {ctx.activeIdeaId && (
-        <div className="mt-2 text-[11px] text-zinc-500">
+        <div className="mt-2 text-[11px] text-ash">
           Active Context: Idea {ctx.activeIdeaId.slice(0, 8)}...
         </div>
       )}
       <button 
-        className="mt-2 rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800" 
+        className="mt-2 rounded border border-smoke-lighter px-2 py-1 hover:bg-smoke-light" 
         onClick={() => ctx.reset()}
       >
         Reset Counter

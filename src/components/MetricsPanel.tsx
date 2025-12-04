@@ -12,7 +12,7 @@ import {
   type FeedbackEntry,
 } from '@/lib/db'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
-import Button from '@/components/ui/Button'
+import { Button } from '@/design-system'
 
 interface MetricsPanelProps {
   isOpen: boolean
@@ -109,18 +109,18 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
       <div
         ref={modalRef}
         tabIndex={-1}
-        className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-h-[90vh] flex flex-col focus:outline-none"
+        className="relative w-full max-w-2xl bg-white dark:bg-smoke-light rounded-xl shadow-2xl max-h-[90vh] flex flex-col focus:outline-none"
         data-testid="modal-content"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-          <h2 id={headingId} className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+        <div className="flex items-center justify-between p-4 border-b border-mist dark:border-smoke-lighter">
+          <h2 id={headingId} className="text-lg font-semibold text-smoke dark:text-mist">
             📊 Usage Metrics & Feedback
           </h2>
           <button
             ref={closeButtonRef}
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+            className="text-fog hover:text-fog dark:hover:text-fog transition-colors"
           >
             ✕
           </button>
@@ -129,7 +129,7 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {isLoading ? (
-            <div className="text-center py-8 text-slate-500 dark:text-slate-400">
+            <div className="text-center py-8 text-ash dark:text-fog">
               Loading data...
             </div>
           ) : (
@@ -137,18 +137,18 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
               {/* Summary */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="card text-center">
-                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <div className="text-2xl font-bold text-spark dark:text-spark">
                     {totalEvents}
                   </div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                  <div className="text-xs text-fog dark:text-fog mt-1">
                     Total Events
                   </div>
                 </div>
                 <div className="card text-center">
-                  <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  <div className="text-2xl font-bold text-phosphor dark:text-phosphor">
                     {metrics.length}
                   </div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                  <div className="text-xs text-fog dark:text-fog mt-1">
                     Metric Types
                   </div>
                 </div>
@@ -156,7 +156,7 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
                   <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                     {queuedFeedback.length}
                   </div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                  <div className="text-xs text-fog dark:text-fog mt-1">
                     Pending Feedback
                   </div>
                 </div>
@@ -165,20 +165,20 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
               {/* Metrics Table */}
               {metrics.length > 0 && (
                 <div className="card">
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                  <h3 className="font-semibold text-smoke dark:text-mist mb-3">
                     Event Counters
                   </h3>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-slate-200 dark:border-slate-700">
-                          <th className="text-left py-2 px-3 text-slate-600 dark:text-slate-400 font-medium">
+                        <tr className="border-b border-mist dark:border-smoke-lighter">
+                          <th className="text-left py-2 px-3 text-fog dark:text-fog font-medium">
                             Event Type
                           </th>
-                          <th className="text-right py-2 px-3 text-slate-600 dark:text-slate-400 font-medium">
+                          <th className="text-right py-2 px-3 text-fog dark:text-fog font-medium">
                             Count
                           </th>
-                          <th className="text-right py-2 px-3 text-slate-600 dark:text-slate-400 font-medium">
+                          <th className="text-right py-2 px-3 text-fog dark:text-fog font-medium">
                             Last Updated
                           </th>
                         </tr>
@@ -187,15 +187,15 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
                         {metrics.map((metric) => (
                           <tr
                             key={metric.eventType}
-                            className="border-b border-slate-100 dark:border-slate-800 last:border-0"
+                            className="border-b border-mist dark:border-smoke-light last:border-0"
                           >
-                            <td className="py-2 px-3 text-slate-700 dark:text-slate-300 font-mono text-xs">
+                            <td className="py-2 px-3 text-smoke-lighter dark:text-fog font-mono text-xs">
                               {metric.eventType}
                             </td>
-                            <td className="py-2 px-3 text-right font-semibold text-slate-900 dark:text-slate-100">
+                            <td className="py-2 px-3 text-right font-semibold text-smoke dark:text-mist">
                               {metric.count}
                             </td>
-                            <td className="py-2 px-3 text-right text-slate-600 dark:text-slate-400 text-xs">
+                            <td className="py-2 px-3 text-right text-fog dark:text-fog text-xs">
                               {new Date(metric.lastUpdated).toLocaleTimeString()}
                             </td>
                           </tr>
@@ -209,34 +209,34 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
               {/* Feedback List */}
               {feedback.length > 0 && (
                 <div className="card">
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                  <h3 className="font-semibold text-smoke dark:text-mist mb-3">
                     Feedback Items ({feedback.length})
                   </h3>
                   <div className="space-y-2 max-h-60 overflow-y-auto">
                     {feedback.map((item) => (
                       <div
                         key={item.id}
-                        className="p-3 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700"
+                        className="p-3 rounded-lg bg-void dark:bg-smoke border border-mist dark:border-smoke-lighter"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                              <span className="text-xs font-semibold px-2 py-0.5 rounded bg-spark dark:bg-void-lighter text-void-lighter dark:text-spark">
                                 {item.type}
                               </span>
-                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                              <span className="text-xs text-ash dark:text-fog">
                                 {new Date(item.timestamp).toLocaleDateString()}
                               </span>
                             </div>
-                            <p className="text-sm text-slate-700 dark:text-slate-300">
+                            <p className="text-sm text-smoke-lighter dark:text-fog">
                               {item.text}
                             </p>
                           </div>
                           <span
                             className={`text-xs px-2 py-0.5 rounded ${
                               item.status === 'exported'
-                                ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                                : 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200'
+                                ? 'bg-phosphor dark:bg-phosphor text-phosphor dark:text-phosphor'
+                                : 'bg-gold dark:bg-gold text-gold dark:text-gold'
                             }`}
                           >
                             {item.status}
@@ -249,7 +249,7 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
               )}
 
               {/* Privacy Notice */}
-              <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 p-3 rounded-lg">
+              <div className="text-xs text-ash dark:text-fog bg-mist dark:bg-smoke p-3 rounded-lg">
                 🔒 <strong>Privacy Guarantee:</strong> All data is stored locally on your device.
                 No personally identifiable information (PII) is collected. Exported files contain
                 only anonymous usage counts and feedback text you've provided.
@@ -259,16 +259,16 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
         </div>
 
         {/* Footer - Export Actions */}
-        <div className="border-t border-slate-200 dark:border-slate-700 p-4 space-y-2">
+        <div className="border-t border-mist dark:border-smoke-lighter p-4 space-y-2">
           <div className="flex gap-2">
             <Button onClick={handleExportJSON} className="flex-1">
               📥 Export JSON
             </Button>
-            <Button variant="outline" onClick={handleExportCSV} className="flex-1">
+            <Button variant="secondary" onClick={handleExportCSV} className="flex-1">
               📥 Export CSV
             </Button>
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={handleCopyJSON}
               title="Copy JSON to clipboard"
@@ -278,7 +278,7 @@ export default function MetricsPanel({ isOpen, onClose }: MetricsPanelProps) {
               {copied ? '✓' : '📋'}
             </Button>
           </div>
-          <p className="text-xs text-center text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-center text-ash dark:text-fog">
             Export your data to share with the community or keep as a backup
           </p>
         </div>

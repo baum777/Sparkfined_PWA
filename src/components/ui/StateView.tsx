@@ -14,7 +14,7 @@
  */
 
 import { Loader2, AlertTriangle, FileText, Wifi } from '@/lib/icons';
-import Button from './Button';
+import { Button } from '@/design-system';
 
 interface StateViewProps extends React.HTMLAttributes<HTMLDivElement> {
   type: 'loading' | 'empty' | 'error' | 'offline';
@@ -41,28 +41,28 @@ export default function StateView({
       Icon: Loader2,
       defaultTitle: 'Loading...',
       defaultDescription: 'Fetching latest data',
-      iconColor: 'text-emerald-500',
+      iconColor: 'text-spark',
       animate: true,
     },
     empty: {
       Icon: FileText,
       defaultTitle: 'No data yet',
       defaultDescription: 'Start by analyzing your first token',
-      iconColor: 'text-zinc-600',
+      iconColor: 'text-ash',
       animate: false,
     },
     error: {
       Icon: AlertTriangle,
       defaultTitle: 'Something went wrong',
       defaultDescription: 'Unable to load data. Please try again.',
-      iconColor: 'text-rose-500',
+      iconColor: 'text-blood',
       animate: false,
     },
     offline: {
       Icon: Wifi,
       defaultTitle: 'Offline',
       defaultDescription: 'Showing cached data. Connect to refresh.',
-      iconColor: 'text-amber-500',
+      iconColor: 'text-gold',
       animate: false,
     },
   };
@@ -90,13 +90,13 @@ export default function StateView({
       )}
       
       {/* Title */}
-      <h3 className={`font-semibold text-zinc-200 ${compact ? 'text-sm' : 'text-base'} mb-1`}>
+      <h3 className={`font-semibold text-mist ${compact ? 'text-sm' : 'text-base'} mb-1`}>
         {title || defaultTitle}
       </h3>
       
       {/* Description */}
       {(description || defaultDescription) && (
-        <p className={`text-zinc-500 ${compact ? 'text-xs' : 'text-sm'} mb-4 max-w-xs`}>
+        <p className={`text-fog ${compact ? 'text-xs' : 'text-sm'} mb-4 max-w-xs`}>
           {description || defaultDescription}
         </p>
       )}

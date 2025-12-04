@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { ViewState } from '@/types/viewState'
-import Button from '@/components/ui/Button'
+import { Button } from '@/design-system'
 
 interface ViewStateHandlerProps {
   state: ViewState
@@ -25,8 +25,8 @@ export default function ViewStateHandler({
         <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
           {loadingContent || (
             <>
-              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+              <div className="w-12 h-12 border-4 border-spark border-t-transparent rounded-full animate-spin" />
+              <p className="text-text-secondary">Loading...</p>
             </>
           )}
         </div>
@@ -39,10 +39,10 @@ export default function ViewStateHandler({
             <>
               <div className="text-6xl">⚠️</div>
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                <h3 className="text-lg font-semibold text-text-primary mb-2">
                   Something went wrong
                 </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
+                <p className="text-sm text-text-secondary">
                   {error || 'An unexpected error occurred'}
                 </p>
               </div>

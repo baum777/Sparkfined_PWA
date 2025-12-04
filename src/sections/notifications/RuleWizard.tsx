@@ -31,16 +31,16 @@ export default function RuleWizard({ onCreate }: { onCreate: (rule:any)=>void })
   const hint = preset.hint?.(values);
   const rule = build();
 
-  const ctrl = "rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200";
+  const ctrl = "rounded border border-smoke-lighter bg-smoke px-2 py-1 text-xs text-mist";
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3 text-xs text-zinc-200">
+    <div className="rounded-xl border border-smoke-light bg-smoke/40 p-3 text-xs text-mist">
       <div className="mb-2 flex items-center gap-2">
         <div className="text-sm font-medium">Rule-Wizard</div>
         <select className={ctrl} value={presetId} onChange={e=>setPresetId(e.target.value as any)}>
           {PRESETS.map(p=><option key={p.id} value={p.id}>{p.label}</option>)}
         </select>
       </div>
-      <div className="mb-2 text-[12px] text-zinc-400">{preset.description}</div>
+      <div className="mb-2 text-[12px] text-fog">{preset.description}</div>
       <div className="mb-2 grid grid-cols-2 gap-2 md:grid-cols-3">
         <label className="flex items-center gap-2">
           Contract (CA)
@@ -80,13 +80,13 @@ export default function RuleWizard({ onCreate }: { onCreate: (rule:any)=>void })
           }
         })}
       </div>
-      {hint && <div className="mt-2 text-[11px] text-emerald-300">{hint}</div>}
+      {hint && <div className="mt-2 text-[11px] text-spark">{hint}</div>}
       <div className="mt-2">
-        <button className="rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800"
+        <button className="rounded border border-smoke-lighter px-2 py-1 hover:bg-smoke-light"
                 onClick={()=> rule && onCreate(rule)}
                 disabled={!rule}>Regel erstellen</button>
         <button
-          className="ml-2 rounded border border-emerald-700 px-2 py-1 text-emerald-100 hover:bg-emerald-900/30 disabled:opacity-50"
+          className="ml-2 rounded border border-spark px-2 py-1 text-spark hover:bg-spark/30 disabled:opacity-50"
           disabled={!rule || !addr}
           onClick={()=>{
             if (!rule || !addr) return;

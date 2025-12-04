@@ -1,7 +1,6 @@
 import React from 'react'
 import type { SocialStatsSnapshot } from '@/types/journalSocial'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/design-system'
 
 interface JournalSocialPreviewProps {
   snapshot: SocialStatsSnapshot
@@ -67,10 +66,10 @@ export function JournalSocialPreview({
                 </p>
               </div>
               <div className="flex flex-col items-end gap-1 text-[11px] text-text-tertiary">
-                <Badge variant="outline" className="px-2 py-0.5 text-[10px]">
+                <Badge variant="default" className="px-2 py-0.5 text-[10px] bg-transparent border-border text-text-secondary">
                   Warn {warning}
                 </Badge>
-                <Badge variant="outline" className="px-2 py-0.5 text-[10px]">
+                <Badge variant="default" className="px-2 py-0.5 text-[10px] bg-transparent border-border text-text-secondary">
                   Crit {critical}
                 </Badge>
               </div>

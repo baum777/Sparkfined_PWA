@@ -24,7 +24,7 @@ export function TooltipIcon({
   return (
     <div className="relative inline-block">
       <button
-        className={`text-zinc-400 hover:text-zinc-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded ${className}`}
+        className={`text-fog hover:text-mist transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spark rounded ${className}`}
         aria-label="Help"
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
@@ -37,7 +37,7 @@ export function TooltipIcon({
 
       {isVisible && (
         <div 
-          className="absolute z-50 left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 px-3 py-2 text-sm bg-zinc-800 text-zinc-100 rounded-lg shadow-xl border border-zinc-700 pointer-events-none"
+          className="absolute z-50 left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 px-3 py-2 text-sm bg-smoke-light text-mist rounded-lg shadow-xl border border-smoke-lighter pointer-events-none"
           role="tooltip"
         >
           <div className="relative">
@@ -45,7 +45,7 @@ export function TooltipIcon({
             {learnMoreUrl && (
               <a 
                 href={learnMoreUrl}
-                className="block mt-2 text-emerald-400 hover:text-emerald-300 text-xs pointer-events-auto"
+                className="block mt-2 text-spark hover:text-spark text-xs pointer-events-auto"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -54,7 +54,7 @@ export function TooltipIcon({
             )}
           </div>
           {/* Arrow */}
-          <div className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 bg-zinc-800 border-r border-b border-zinc-700 rotate-45"></div>
+          <div className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-2 h-2 bg-smoke-light border-r border-b border-smoke-lighter rotate-45"></div>
         </div>
       )}
     </div>
