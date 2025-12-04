@@ -180,6 +180,7 @@ export default {
         warn: withAlpha('--color-warn'),
         
         // TODO: design-system: drop legacy Tailwind palettes after spark tokens cover all usage
+        // TODO: design-system: remove legacy palettes once dashboard + journal surfaces finish Spark migration
         // Zinc palette (complete spectrum for UI)
         zinc: {
           50: '#fafafa',

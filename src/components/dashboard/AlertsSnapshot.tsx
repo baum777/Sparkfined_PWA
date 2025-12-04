@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { Badge, Button, Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/design-system';
 import StateView from '@/components/ui/StateView';
 import { useAlertsStore } from '@/store/alertsStore';
 
@@ -38,8 +37,7 @@ export default function AlertsSnapshot() {
   return (
     <Card
       data-testid="dashboard-alerts-snapshot"
-      variant="muted"
-      className="bg-surface-subtle"
+      className="bg-smoke/60 border-smoke-light"
     >
       <CardHeader className="mb-2">
         <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-text-tertiary">Signals</p>
@@ -53,13 +51,13 @@ export default function AlertsSnapshot() {
               label="Armed"
               value={armedCount}
               testId="dashboard-alerts-armed-count"
-              badgeClass="border border-emerald-500/30 bg-emerald-500/5"
+              badgeVariant="armed"
             />
             <StatBlock
               label="Triggered"
               value={triggeredCount}
               testId="dashboard-alerts-triggered-count"
-              badgeClass="border border-rose-500/30 bg-rose-500/5"
+              badgeVariant="triggered"
             />
           </div>
         </CardContent>
@@ -102,20 +100,20 @@ interface StatBlockProps {
   label: string;
   value: number;
   testId: string;
-  badgeClass: string;
+  badgeVariant: 'armed' | 'triggered';
 }
 
-function StatBlock({ label, value, testId, badgeClass }: StatBlockProps) {
+function StatBlock({ label, value, testId, badgeVariant }: StatBlockProps) {
   return (
-    <div className="rounded-2xl border border-border-moderate bg-surface p-4 shadow-inner">
+    <div className="rounded-2xl border border-smoke-light bg-void-lightest/10 p-4">
       <p className="text-xs uppercase tracking-wide text-text-tertiary">{label}</p>
       <div className="mt-3 flex items-baseline gap-2">
         <span className="text-3xl font-semibold text-text-primary" data-testid={testId}>
           {value}
         </span>
-        <span className={`rounded-full px-2 py-1 text-[11px] font-medium ${badgeClass}`}>
+        <Badge variant={badgeVariant} size="sm" className="font-medium normal-case tracking-normal">
           {value > 0 ? 'Active' : 'Idle'}
-        </span>
+        </Badge>
       </div>
     </div>
   );

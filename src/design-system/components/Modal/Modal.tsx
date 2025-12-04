@@ -104,7 +104,7 @@ export function Modal({
                     </h2>
                   ) : null}
                   {description ? (
-                    <p id={descriptionId} className="mt-2 text-sm text-fog">
+                    <p id={descriptionId} className="mt-2 text-sm text-text-secondary">
                       {description}
                     </p>
                   ) : null}
