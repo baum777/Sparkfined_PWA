@@ -62,7 +62,7 @@ export { default as Users } from 'lucide-react/dist/esm/icons/users';
 export { default as FileCheck } from 'lucide-react/dist/esm/icons/file-check';
 export { default as MessageCircle } from 'lucide-react/dist/esm/icons/message-circle';
 export { default as Activity } from 'lucide-react/dist/esm/icons/activity';
-export { default as Sparkles } from 'lucide-react/dist/esm/icons/sparkles';
+export { default as Eye } from 'lucide-react/dist/esm/icons/eye';
 
 // Additional icons (used in various components)
 export { default as RotateCw } from 'lucide-react/dist/esm/icons/rotate-cw';

@@ -379,6 +379,15 @@ export const selectXPProgress = (state: GamificationState): {
   }
 
   const nextPhase = phases[currentIndex + 1];
+  if (!nextPhase) {
+    return {
+      current: 0,
+      needed: 0,
+      percentage: 100,
+      nextPhase: null,
+    };
+  }
+  
   const currentThreshold = PHASE_THRESHOLDS[state.phase];
   const nextThreshold = PHASE_THRESHOLDS[nextPhase];
   const progressInPhase = state.xp - currentThreshold;
@@ -389,7 +398,7 @@ export const selectXPProgress = (state: GamificationState): {
     current: progressInPhase,
     needed: xpNeededForNext,
     percentage,
-    nextPhase,
+    nextPhase: nextPhase ?? null,
   };
 };
 

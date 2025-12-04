@@ -85,6 +85,7 @@ export async function getOracleReportByDate(
  */
 export async function getTodayReport(): Promise<OracleReport | undefined> {
   const today = new Date().toISOString().split('T')[0];
+  if (!today) return undefined;
   return await getOracleReportByDate(today);
 }
 

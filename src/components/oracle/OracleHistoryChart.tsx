@@ -45,9 +45,15 @@ export default function OracleHistoryChart({ reports }: OracleHistoryChartProps)
   const linePath = useMemo(() => {
     if (points.length === 0) return '';
     
-    let path = `M ${points[0].x} ${points[0].y}`;
+    const firstPoint = points[0];
+    if (!firstPoint) return '';
+    
+    let path = `M ${firstPoint.x} ${firstPoint.y}`;
     for (let i = 1; i < points.length; i++) {
-      path += ` L ${points[i].x} ${points[i].y}`;
+      const point = points[i];
+      if (point) {
+        path += ` L ${point.x} ${point.y}`;
+      }
     }
     return path;
   }, [points]);
@@ -115,7 +121,7 @@ export default function OracleHistoryChart({ reports }: OracleHistoryChartProps)
           })}
 
           {/* X-axis labels (show first, middle, last) */}
-          {points.length > 0 && (
+          {points.length > 0 && points[0] && points[points.length - 1] && (
             <>
               {/* First date */}
               <text
@@ -179,7 +185,6 @@ export default function OracleHistoryChart({ reports }: OracleHistoryChartProps)
                     className="text-surface-elevated"
                     stroke="currentColor"
                     strokeWidth="1"
-                    className="text-border"
                   />
                   <text
                     x={point.x}

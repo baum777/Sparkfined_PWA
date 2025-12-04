@@ -219,7 +219,7 @@ function extractTopTheme(rawResponse: string): string {
 
     for (const line of lines) {
       const probMatch = line.match(/[-•]\s*([^:]+):\s*(\d+)%/);
-      if (probMatch) {
+      if (probMatch && probMatch[1] && probMatch[2]) {
         const theme = probMatch[1].trim();
         const prob = parseInt(probMatch[2], 10);
         probabilities.push({ theme, prob });
@@ -228,7 +228,10 @@ function extractTopTheme(rawResponse: string): string {
 
     if (probabilities.length > 0) {
       probabilities.sort((a, b) => b.prob - a.prob);
-      return probabilities[0].theme;
+      const topTheme = probabilities[0]?.theme;
+      if (topTheme) {
+        return topTheme;
+      }
     }
   } catch (error) {
     console.error('[Oracle] Failed to extract theme:', error);
@@ -320,7 +323,7 @@ export default async function handler(req: Request): Promise<Response> {
     const response: OracleAPIResponse = {
       report: fullReport,
       score,
-      theme,
+      theme: theme || 'Gaming', // Ensure theme is never undefined
       timestamp: Date.now(),
       date: today,
     };

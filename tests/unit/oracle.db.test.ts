@@ -128,6 +128,8 @@ describe('Oracle Database', () => {
   describe('getTodayReport', () => {
     it('returns today\'s report if it exists', async () => {
       const today = new Date().toISOString().split('T')[0];
+      if (!today) throw new Error('Invalid date');
+      
       const report: Omit<OracleReport, 'id'> = {
         date: today,
         score: 5,
@@ -215,7 +217,7 @@ describe('Oracle Database', () => {
 
       const reports = await getLast30DaysReports();
       expect(reports).toHaveLength(1);
-      expect(reports[0].date).toBe('2025-11-15');
+      expect(reports[0]?.date).toBe('2025-11-15');
     });
   });
 
@@ -308,8 +310,8 @@ describe('Oracle Database', () => {
 
       const all = await getAllOracleReports();
       expect(all).toHaveLength(2);
-      expect(all[0].date).toBe('2025-12-04'); // Most recent first
-      expect(all[1].date).toBe('2025-12-01');
+      expect(all[0]?.date).toBe('2025-12-04'); // Most recent first
+      expect(all[1]?.date).toBe('2025-12-01');
     });
   });
 });
