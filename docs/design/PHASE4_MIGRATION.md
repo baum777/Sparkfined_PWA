@@ -1001,6 +1001,28 @@ git branch -D design-system/phase4-legacy-cleanup
 - [ ] Performance metrics stable
 - [ ] Documentation updated
 
+## Phase 4 Completion Snapshot (2025‑12‑04)
+- ✅ All spark design-system components (Button, Card, Badge, Input, Tooltip, Alert, Modal) are the single source for UI primitives; legacy shims in `src/components/ui/*` have been removed.
+- ✅ Spark tokens replace every Tailwind standard palette (zinc, slate, emerald, rose, cyan, amber, green, blue, red). Searches for `(?<![A-Za-z0-9_-])(palette-name)-[0-9]` return zero matches in `src/**`.
+- ✅ `tailwind.config.ts` now only exposes Spark tokens, spark gradients, and glow utilities; legacy palettes, `emerald-gradient`, and `emerald-glow*` entries are removed.
+- ✅ Alerts CRUD dialogs, dashboard snapshots, watchlist tables, onboarding flows, and signals boards import from `@/design-system` directly and rely exclusively on tokens defined in `src/styles/tokens.css`.
+- ⚠️ Purpose-built composites that still live in `src/components/ui/` (e.g., `StateView`, `Select`, `Toast`, `EmptyState`) are intentionally retained. They wrap Spark primitives internally and are candidates for a future move into `src/design-system/components/composites`.
+
+### Critical QA Surfaces for Phase 5
+1. **Dashboard & Watchlist (dark + light themes)** – verify spark sentiment badges, metric tiles, and quick actions retain hover/active depth.
+2. **Alerts CRUD (create + edit + delete)** – inputs use `errorText`, modals animate via Design System. Run through validation states and confirm aria attributes.
+3. **Onboarding wizard** – focus rings, progress bars, and CTA buttons were auto‑mapped to spark tokens. Validate reduced-motion + keyboard usage.
+4. **Signals & Analysis boards** – color-coded cards now rely on spark/blood/gold; confirm contrast ratios ≥ 4.5:1, especially for “neutral” bias badges.
+5. **Landing / Marketing surfaces** – gradients transitioned away from cyan/emerald palettes. Compare hero cards vs. spec to ensure brand glow intensity is acceptable.
+6. **NotificationsPermissionButton / LiveStatusBadge / OfflineIndicator** – check micro-interactions (pulses, badges) for AA compliance and consistent glow strengths.
+
+### Known UX & Token Follow-ups
+- `SettingsPage.tsx` received an automated mapping from zinc/emerald to spark tokens. A TODO is left in-file to perform a dedicated light/dark QA sweep on toggles, select controls, and danger-zone panels.
+- `MetricsPanel` now renders spark/phosphor foregrounds in both themes. Visual QA should confirm that the dual theme classes (`dark:bg-…`) still express hierarchy and that exported rows remain readable.
+- `UXShowcasePage` continues to use bespoke `btn-*` utility classes for demo purposes. Keep this page out of production builds (DEV-only route) until buttons are migrated to Spark components.
+- `src/components/ui/*` houses composite patterns (FormField, EmptyState, Select, Toast, etc.) that still export from that path. These files are explicitly whitelisted; new primitives must live under `src/design-system/components/`.
+- Gradient tokens (`gradient-spark`, `gradient-gold`, `gradient-void`) cover current hero needs. If product wants exotic blends again, the request must go through Design review instead of ad-hoc CSS.
+
 ---
 
 ## Post-Migration Governance

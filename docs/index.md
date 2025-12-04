@@ -93,3 +93,12 @@ The Design System establishes the "Alchemical Trading Interface" aesthetic:
 - ⚠️ **Gap Identified**: Current implementation uses emerald/zinc palette, design spec requires Spark/Void
 - 📋 **Module Spec Ready**: Complete architecture and token structure defined
 - 🎯 **For Codex**: DESIGN_MODULE_SPEC.md contains full implementation checklist with 60+ tasks
+
+---
+
+## 🔄 Spark Migration Status (2025-12-04)
+
+- **docs/design/PHASE4_MIGRATION.md** now documents the completed Phase 4 rollout (shims removed, Spark-only Tailwind config) and lists the critical QA passes for Dashboard, Watchlist, Alerts CRUD, Onboarding, Landing, and Signals.
+- **docs/design/DESIGN_SYSTEM.md** captures the finalized Spark token mapping, gesture references, governance rules, and a Codex playbook for future automation tasks.
+- **docs/design/DESIGN_MODULE_SPEC.md** includes the authoritative APIs for Button, Card, Badge, Input, Tooltip, Alert, Modal, plus `useSwipeable`, `usePullToRefresh`, `useBottomSheet`, and `useDragReorder`.
+- Phase 5 (“Stabilize & Govern”) is active: Spark is the single styling source, and Claude owns QA/documentation while Codex handles future migrations under the new ruleset.

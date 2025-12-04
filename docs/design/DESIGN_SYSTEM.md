@@ -3,7 +3,7 @@
 > **Alchemical Trading Interface Design System**  
 > Complete specification for colors, typography, spacing, animations, gestures, and components.
 > 
-> Last Updated: December 2024  
+> Last Updated: December 2025  
 > Status: Production Ready
 
 ---
@@ -28,6 +28,12 @@
 ## Introduction
 
 Sparkfined is a Progressive Web App (PWA) for cryptocurrency trading analytics. The design system combines mystical/occult aesthetics with professional trading functionality, creating an "Alchemical Trading Interface" that guides users from DEGEN to SAGE trader status.
+
+### Spark Is the Single Source of Truth
+
+- Tokens live in `src/styles/tokens.css` and are compiled into Tailwind via `tailwind.config.ts`. No Tailwind default palettes or ad-hoc hex values are allowed in product code.
+- Components, gestures, and utilities are exported from `src/design-system/index.ts`. Applications import from `@/design-system`, never from bespoke folders.
+- CSS utilities map directly to Spark tokens (`bg-void`, `border-smoke-light`, `text-mist`, `text-fog`, sentiment tokens, etc.) so visual updates propagate globally.
 
 ### Design Philosophy
 
@@ -799,6 +805,17 @@ const usePullToRefresh = (onRefresh) => {
 }
 ```
 
+### Gestures Module Reference
+
+All production implementations live in `src/design-system/gestures`:
+
+- `useSwipeable(options)` — handles horizontal swipe detection with configurable threshold, velocity, and callbacks for left/right actions.
+- `usePullToRefresh({ onRefresh, threshold, resistance })` — orchestrates the state machine described above and emits haptic feedback when the threshold is crossed.
+- `useBottomSheet({ snapPoints, onClose })` — supplies motion props for sheet/backdrop, drag-to-close logic, and spring animations tuned to Spark easing tokens.
+- `useDragReorder<T>()` — thin wrapper on top of `framer-motion`’s `Reorder` component with sensible Spark defaults for scale, elevation, and shadows.
+
+Utilities such as `haptic.tap/success/error` live in `src/design-system/utils/haptic.ts` and must be used instead of custom `navigator.vibrate` calls.
+
 ---
 
 ### Bottom Sheet
@@ -1390,48 +1407,93 @@ export const haptic = {
 ### Component Example
 
 ```tsx
-// components/ui/Button.tsx
-import { forwardRef, ButtonHTMLAttributes } from 'react'
-import { motion } from 'framer-motion'
-import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from '@/lib/utils'
+// src/design-system/components/Button/Button.tsx
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { Loader2 } from 'lucide-react'
+import { cn } from '@/design-system/utils/cn'
 
-const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 font-medium tracking-wide transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spark disabled:opacity-50',
-  {
-    variants: {
-      variant: {
-        primary: 'bg-gradient-spark text-void hover:shadow-glow-spark',
-        secondary: 'bg-transparent text-spark border-2 border-spark hover:bg-spark hover:text-void',
-        ghost: 'bg-transparent hover:bg-smoke',
-      },
-      size: {
-        sm: 'h-9 px-3 text-sm rounded-md',
-        md: 'h-11 px-5 text-base rounded-lg',
-        lg: 'h-14 px-8 text-lg rounded-xl',
-      },
-    },
-    defaultVariants: {
-      variant: 'primary',
-      size: 'md',
-    },
-  }
-)
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success'
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl'
 
-export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant
+  size?: ButtonSize
+  isLoading?: boolean
+  leftIcon?: ReactNode
+  rightIcon?: ReactNode
+}
+
+const variantStyles: Record<ButtonVariant, string> = {
+  primary: 'bg-gradient-spark text-void border border-spark/20 hover:shadow-glow-spark',
+  secondary: 'bg-transparent text-spark border-2 border-spark hover:bg-spark hover:text-void',
+  ghost: 'bg-transparent text-mist hover:bg-smoke hover:text-spark',
+  danger: 'bg-blood text-mist hover:shadow-glow-blood',
+  success: 'bg-phosphor text-void hover:shadow-glow-phosphor',
+}
+
+const sizeStyles: Record<ButtonSize, string> = {
+  sm: 'h-9 px-3 text-sm rounded-md',
+  md: 'h-11 px-5 text-base rounded-lg',
+  lg: 'h-14 px-8 text-lg rounded-xl',
+  xl: 'h-16 px-10 text-xl rounded-2xl',
+}
+
+const MotionButton = motion.button
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = 'primary',
+      size = 'md',
+      isLoading = false,
+      leftIcon,
+      rightIcon,
+      disabled,
+      children,
+      type = 'button',
+      ...props
+    },
+    ref
+  ) => {
+    const prefersReducedMotion = useReducedMotion()
+    const isDisabled = disabled || isLoading
+
     return (
-      <motion.button
+      <MotionButton
         ref={ref}
-        className={cn(buttonVariants({ variant, size, className }))}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        type={type}
+        disabled={isDisabled}
+        className={cn(
+          'relative inline-flex items-center justify-center gap-2 font-medium tracking-wide',
+          'transition-all duration-250 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spark',
+          'disabled:cursor-not-allowed disabled:opacity-60',
+          variantStyles[variant],
+          sizeStyles[size],
+          className
+        )}
+        whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+        whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        aria-busy={isLoading}
+        data-variant={variant}
+        data-size={size}
         {...props}
-      />
+      >
+        {isLoading ? (
+          <span className="inline-flex items-center gap-2" role="status" aria-live="polite">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <span className="text-sm">Loading</span>
+          </span>
+        ) : (
+          <>
+            {leftIcon ? <span className="flex items-center">{leftIcon}</span> : null}
+            <span>{children}</span>
+            {rightIcon ? <span className="flex items-center">{rightIcon}</span> : null}
+          </>
+        )}
+      </MotionButton>
     )
   }
 )
@@ -1445,33 +1507,39 @@ Button.displayName = 'Button'
 
 ```
 src/
+├── design-system/
+│   ├── components/
+│   │   ├── Alert/
+│   │   ├── Badge/
+│   │   ├── Button/
+│   │   ├── Card/
+│   │   ├── Input/
+│   │   ├── Modal/
+│   │   └── Tooltip/
+│   ├── gestures/
+│   │   ├── useBottomSheet.ts
+│   │   ├── useDragReorder.ts
+│   │   ├── usePullToRefresh.ts
+│   │   └── useSwipeable.ts
+│   ├── tokens/
+│   ├── theme/
+│   └── utils/
 ├── components/
-│   ├── ui/
-│   │   ├── Button.tsx
-│   │   ├── Card.tsx
-│   │   ├── Badge.tsx
-│   │   ├── Input.tsx
-│   │   └── Alert.tsx
-│   ├── layout/
-│   │   ├── Header.tsx
-│   │   ├── Sidebar.tsx
-│   │   └── BottomNav.tsx
-│   └── features/
-│       ├── Dashboard/
-│       ├── Journal/
-│       ├── Alerts/
-│       └── Watchlist/
+│   ├── dashboard/
+│   ├── watchlist/
+│   ├── alerts/
+│   └── ui/            # Composite patterns (StateView, Select, Toast, etc.)
 ├── styles/
-│   ├── design-tokens.css
+│   ├── tokens.css
 │   ├── globals.css
 │   └── animations.css
 ├── lib/
-│   ├── utils.ts
-│   └── haptic.ts
-└── hooks/
-    ├── usePullToRefresh.ts
-    ├── useSwipeable.ts
-    └── useBottomSheet.ts
+│   ├── downloadJSON.ts
+│   └── theme/
+└── pages/
+    ├── DashboardPageV2.tsx
+    ├── WatchlistPageV2.tsx
+    └── ...
 ```
 
 ---
@@ -1514,6 +1582,56 @@ src/
 3. Test on low-end devices (60fps target)
 4. Respect `prefers-reduced-motion`
 5. Include haptic feedback where appropriate
+
+---
+
+## Governance & Usage Rules
+
+### ✅ Do
+- Import primitives, gestures, and utilities exclusively from `@/design-system`.
+- Use semantic Spark utilities (`bg-void`, `border-smoke-light`, `text-mist`, `text-fog`, `text-sentiment-bull`, etc.) instead of raw hex values.
+- Keep composite patterns (`StateView`, `Select`, `Toast`, etc.) inside `src/components/ui/` until they graduate into the design system.
+- Document every new token or component in `docs/design/DESIGN_SYSTEM.md` and `docs/design/DESIGN_MODULE_SPEC.md`.
+
+### ❌ Don't
+- Reintroduce Tailwind default palettes (`zinc-*`, `slate-*`, etc.) or arbitrary gradients.
+- Create ad-hoc utility classes like `.btn-primary` outside of the design system.
+- Add new `navigator.vibrate` calls—use the shared `haptic` helper.
+- Bypass accessibility requirements (ARIA labeling, focus traps, reduced-motion handling).
+
+### Extension Process
+1. **Discovery** – open a Design ticket with a Figma exploration + rationale.
+2. **Spec** – update DESIGN_SYSTEM.md + DESIGN_MODULE_SPEC.md with proposed API, props, tokens.
+3. **Implementation** – add code under `src/design-system` with tests (`tests/design-system/...`), update tokens/Tailwind if needed.
+4. **Review** – run `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:e2e`, plus manual smoke tests on Dashboard, Watchlist, Alerts CRUD, Onboarding, Landing, and Signals.
+5. **Docs** – update `docs/index.md` + `docs/CHANGELOG.md` and add screenshots or references where relevant.
+
+### QA Checklist Before Merge
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+- `pnpm test:e2e`
+- Manual click-through of: Dashboard, Watchlist, Alerts CRUD, Onboarding flow, Landing hero, Signals/Analysis boards.
+- Contrast spot checks for spark/blood/gold text against surfaces in both dark and any future light themes.
+
+---
+
+## Codex Playbook for Spark
+
+1. **Scope Guardrails**
+   - Codex may refactor or migrate components **only** by editing files inside `src/design-system/**` and call sites that import from there.
+   - For composite views, Codex must reuse Spark primitives; no bespoke Tailwind palettes or new utility classes.
+2. **Tokens & Variants**
+   - Requests for new tokens/variants must cite updated documentation; Codex cannot invent colors, spacing, or shadows.
+   - Input errors use `errorText`, button states use `variant="secondary" | "ghost" | "danger" | "success"`, etc.
+3. **Gestures & Utils**
+   - Interactions leverage `useSwipeable`, `useBottomSheet`, `usePullToRefresh`, `useDragReorder`, and `haptic` utilities. No custom gesture hooks without design approval.
+4. **Workflow Expectations**
+   - Follow the Phase 4/5 workflow: read specs, plan, implement, add tests, update docs, and list validation commands in handoff notes.
+5. **Forbidden Actions**
+   - Adding dependencies, toggling Tailwind config flags, or reintroducing legacy shims is prohibited without UX Architect sign-off.
+
+Use this playbook when prompting Codex so generated code aligns with Spark governance.
 
 ---
 

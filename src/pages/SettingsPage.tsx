@@ -9,6 +9,8 @@ import { Button } from "@/design-system";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useTheme, type ThemeMode } from "@/lib/theme/useTheme";
 
+// TODO: design-system: run a dedicated light/dark QA on these Spark token replacements to confirm focus/hover contrast.
+
 interface SettingsPageProps {
   showHeading?: boolean;
   wrapperClassName?: string;

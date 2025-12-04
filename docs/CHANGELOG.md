@@ -42,6 +42,11 @@
   - Added proposed 7-folder structure overview
   - Added key findings summary
   - Added "Design System Documentation (2025-12-04)" section with overview and implementation status
+  - Added "Spark Migration Status (2025-12-04)" section covering Phase 4 completion + Phase 5 stabilization ownership
+- **Refined design-system docs:**
+  - `docs/design/PHASE4_MIGRATION.md` – Added Phase 4 completion snapshot, QA surface checklist, and known risks/TODOs
+  - `docs/design/DESIGN_SYSTEM.md` – Updated Spark single-source guidance, added gestures reference, governance rules, QA checklist, and Codex playbook
+  - `docs/design/DESIGN_MODULE_SPEC.md` – Synced final APIs for Badge/Input/Tooltip, extended gesture hook specs
 
 ### Removed
 - **Cleaned up root directory:**
