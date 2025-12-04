@@ -9,7 +9,6 @@ import { create } from 'zustand';
 import type { OracleReport } from '@/types/oracle';
 import {
   upsertOracleReport,
-  getOracleReportByDate,
   getTodayReport,
   getLast30DaysReports,
   markOracleReportAsRead,
@@ -134,9 +133,9 @@ export const useOracleStore = create<OracleState>((set, get) => ({
 
   /**
    * Load Oracle report history
-   * @param days - Number of days to load (default: 30)
+   * @param _days - Number of days to load (default: 30, currently unused as we fetch last 30 days)
    */
-  loadHistory: async (days = 30) => {
+  loadHistory: async (_days = 30) => {
     set({ isLoading: true, error: null });
 
     try {
