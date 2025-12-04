@@ -1185,33 +1185,32 @@ test.describe('Oracle Flow', () => {
 ## 10. Implementation Roadmap
 
 ### Phase 1: Core Infrastructure (Week 1)
-- [ ] Create Dexie schema (`src/lib/db-oracle.ts`)
-- [ ] Implement Zustand store (`src/store/oracleStore.ts`)
-- [ ] Build `/api/oracle` endpoint with mock Grok calls
-- [ ] Add Oracle route to `RoutesRoot.tsx`
-- [ ] Add Oracle nav item to Sidebar
-- [ ] Create basic `OraclePage.tsx` with loading states
+- [x] Create Dexie schema (`src/lib/db-oracle.ts`) – verified via `tests/unit/oracle.db.test.ts`
+- [x] Implement Zustand store (`src/store/oracleStore.ts`) – covered by `tests/unit/oracle.store.test.ts`
+- [x] Build `/api/oracle` endpoint with mock Grok calls (`/api/oracle.ts`, `tests/api/oracle.test.ts`)
+- [x] Add Oracle route to `RoutesRoot.tsx`
+- [x] Add Oracle nav item to Sidebar
+- [x] Create basic `OraclePage.tsx` with loading states (`tests/e2e/oracle/oracle.flows.spec.ts`)
 
 ### Phase 2: Grok Integration (Week 1-2)
-- [ ] Integrate real Grok API (score, theme, alpha prompts)
-- [ ] Test prompt outputs and parsing
-- [ ] Add error handling for API failures
+- [x] Integrate real Grok API (score, theme, alpha prompts) via `callGrokPrompt` helper
+- [x] Test prompt outputs and parsing in `tests/api/oracle.test.ts`
+- [x] Add error handling for API failures (401/500 guardrails)
 - [ ] Implement caching strategy (KV optional)
 
 ### Phase 3: UI Components (Week 2)
-- [ ] Build `OracleHeader` component (score badge, theme badge, buttons)
-- [ ] Build `OracleReportPanel` (formatted report display)
-- [ ] Build `OracleHistoryChart` (Recharts line chart)
-- [ ] Build `OracleThemeFilter` (theme dropdown)
-- [ ] Build `OracleHistoryList` (past reports table)
-- [ ] Build `OracleReportModal` (full report viewer)
+- [x] Build `OracleHeader` component (score badge, theme badge, buttons) – part of `src/pages/OraclePage.tsx`
+- [x] Build `OracleReportPanel` (formatted report display)
+- [x] Build `OracleHistoryChart` (Recharts line chart) – `src/components/oracle/OracleHistoryChart.tsx`
+- [x] Build `OracleThemeFilter` (theme dropdown) – `src/components/oracle/OracleThemeFilter.tsx`
+- [x] Build `OracleHistoryList` (past reports table + modal) – `src/components/oracle/OracleHistoryList.tsx`
+- [x] Build `OracleReportModal` (full report viewer inside list modal)
 
 ### Phase 4: Gamification (Week 3)
-- [ ] Create `gamificationStore.ts` with XP/Streaks/Badges
-- [ ] Integrate Oracle read → XP grant
-- [ ] Integrate Oracle read → Streak increment
-- [ ] Integrate Oracle read → Auto-journal entry
-- [ ] Add badge unlocking logic (7-day, 21-day streaks)
+- [x] Create `gamificationStore.ts` with XP/Streaks/Badges (`tests/unit/oracle.gamificationStore.test.ts`)
+- [x] Integrate Oracle read → XP grant (`grantOracleReadRewards`)
+- [x] Integrate Oracle read → Streak increment + badge unlocks (7/21 days)
+- [x] Integrate Oracle read → Auto-journal entry (`createQuickJournalEntry`, `useJournalStore`)
 - [ ] Display XP/Phase in UI (e.g., header widget)
 
 ### Phase 5: Notifications (Week 3)
