@@ -1,7 +1,73 @@
 import type { Config } from 'tailwindcss'
+import { colors as designTokensColors } from './src/design-system/tokens/colors'
+import { typography } from './src/design-system/tokens/typography'
+import { spacing as spacingScale, borderRadius as radiusScale } from './src/design-system/tokens/spacing'
+import { shadows as shadowTokens, glows } from './src/design-system/tokens/shadows'
+import { animation } from './src/design-system/tokens/animation'
 
 const withAlpha = (variable: string) => `rgb(var(${variable}) / <alpha-value>)`
 const withFixedAlpha = (variable: string, alpha: number | string) => `rgb(var(${variable}) / ${alpha})`
+
+const fontStack = (value: string) =>
+  value
+    .split(',')
+    .map((item) => item.replace(/['"]/g, '').trim())
+    .filter(Boolean)
+
+const gradientTokens = designTokensColors.gradients
+
+const designSystemColors = {
+  void: designTokensColors.void,
+  spark: designTokensColors.spark,
+  smoke: designTokensColors.smoke,
+  mist: designTokensColors.mist,
+  gold: designTokensColors.gold,
+  blood: designTokensColors.blood,
+  phosphor: designTokensColors.phosphor,
+  violet: designTokensColors.violet,
+  ember: designTokensColors.ember,
+}
+
+const legacySpacing = {
+  '0.5': '0.125rem',
+  '1': '0.25rem',
+  '1.5': '0.375rem',
+  '2': '0.5rem',
+  '2.5': '0.625rem',
+  '3': '0.75rem',
+  '3.5': '0.875rem',
+  '4': '1rem',
+  '5': '1.25rem',
+  '6': '1.5rem',
+  '7': '1.75rem',
+  '8': '2rem',
+  '9': '2.25rem',
+  '10': '2.5rem',
+  '11': '2.75rem',
+  '12': '3rem',
+  '14': '3.5rem',
+  '16': '4rem',
+  '20': '5rem',
+  '24': '6rem',
+  '28': '7rem',
+  '32': '8rem',
+  '36': '9rem',
+  '40': '10rem',
+  '44': '11rem',
+  '48': '12rem',
+  '52': '13rem',
+  '56': '14rem',
+  '60': '15rem',
+  '64': '16rem',
+  '72': '18rem',
+  '80': '20rem',
+  '96': '24rem',
+}
+
+const spacingExtension = {
+  ...legacySpacing,
+  ...spacingScale,
+}
 
 export default {
   content: [
@@ -12,6 +78,16 @@ export default {
   theme: {
     extend: {
       colors: {
+        void: designSystemColors.void,
+        spark: designSystemColors.spark,
+        smoke: designSystemColors.smoke,
+        mist: designSystemColors.mist,
+        gold: designSystemColors.gold,
+        blood: designSystemColors.blood,
+        phosphor: designSystemColors.phosphor,
+        violet: designSystemColors.violet,
+        ember: designSystemColors.ember,
+
         // Brand Colors (powered by tokens.css)
         brand: {
           DEFAULT: withAlpha('--color-brand'),
@@ -196,73 +272,31 @@ export default {
       },
       
       fontFamily: {
-        sans: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        display: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: fontStack(typography.fontFamily.primary),
+        display: fontStack(typography.fontFamily.display),
+        mono: fontStack(typography.fontFamily.mono),
       },
       
       fontSize: {
-        xs: ['0.75rem', { lineHeight: '1.33' }],
-        sm: ['0.875rem', { lineHeight: '1.43' }],
-        base: ['1rem', { lineHeight: '1.5' }],
-        lg: ['1.125rem', { lineHeight: '1.56' }],
-        xl: ['1.25rem', { lineHeight: '1.4' }],
-        '2xl': ['1.5rem', { lineHeight: '1.33' }],
-        '3xl': ['1.875rem', { lineHeight: '1.25' }],
-        '4xl': ['2.25rem', { lineHeight: '1.2' }],
-        '5xl': ['3rem', { lineHeight: '1.15' }],
+        ...typography.fontSize,
         '6xl': ['3.75rem', { lineHeight: '1.1' }],
         '7xl': ['4.5rem', { lineHeight: '1.05' }],
       },
       
-      spacing: {
-        // 8px Grid + extended values
-        '0.5': '0.125rem',  // 2px
-        '1': '0.25rem',     // 4px
-        '1.5': '0.375rem',  // 6px
-        '2': '0.5rem',      // 8px
-        '2.5': '0.625rem',  // 10px
-        '3': '0.75rem',     // 12px
-        '3.5': '0.875rem',  // 14px
-        '4': '1rem',        // 16px
-        '5': '1.25rem',     // 20px
-        '6': '1.5rem',      // 24px
-        '7': '1.75rem',     // 28px
-        '8': '2rem',        // 32px
-        '9': '2.25rem',     // 36px
-        '10': '2.5rem',     // 40px
-        '11': '2.75rem',    // 44px
-        '12': '3rem',       // 48px
-        '14': '3.5rem',     // 56px
-        '16': '4rem',       // 64px
-        '20': '5rem',       // 80px
-        '24': '6rem',       // 96px
-        '28': '7rem',       // 112px
-        '32': '8rem',       // 128px
-        '36': '9rem',       // 144px
-        '40': '10rem',      // 160px
-        '44': '11rem',      // 176px
-        '48': '12rem',      // 192px
-        '52': '13rem',      // 208px
-        '56': '14rem',      // 224px
-        '60': '15rem',      // 240px
-        '64': '16rem',      // 256px
-        '72': '18rem',      // 288px
-        '80': '20rem',      // 320px
-        '96': '24rem',      // 384px
-      },
+      spacing: spacingExtension,
       
       borderRadius: {
-        sm: '6px',
-        md: '8px',
-        lg: '12px',
-        xl: '16px',
-        '2xl': '20px',
-        '3xl': '24px',
-        full: '9999px',
+        ...radiusScale,
+        '2xl': '1.25rem',
+        '3xl': '1.5rem',
       },
       
       boxShadow: {
+        ...shadowTokens,
+        'glow-spark': glows.spark,
+        'glow-gold': glows.gold,
+        'glow-blood': glows.blood,
+        'glow-phosphor': glows.phosphor,
         'card-subtle': '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
         'glow-accent': '0 0 10px rgba(0, 255, 102, 0.22)',
         'glow-brand': '0 0 12px rgba(255, 98, 0, 0.18)',
@@ -274,6 +308,9 @@ export default {
       },
       
       backgroundImage: {
+        'gradient-spark': gradientTokens.spark,
+        'gradient-gold': gradientTokens.gold,
+        'gradient-void': gradientTokens.void,
         'brand-gradient': 'linear-gradient(135deg, rgb(var(--color-brand)) 0%, rgb(var(--color-brand-hover)) 100%)',
         'emerald-gradient': 'linear-gradient(to right, rgb(var(--color-success)) 0%, rgb(var(--color-info)) 100%)',
         'grid-pattern': 'linear-gradient(to right, rgb(var(--color-border) / 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgb(var(--color-border) / 0.2) 1px, transparent 1px)',
@@ -286,6 +323,7 @@ export default {
       },
       
       transitionDuration: {
+        ...animation.duration,
         '0': '0ms',
         '75': '75ms',
         '100': '100ms',
@@ -304,6 +342,7 @@ export default {
       },
       
       transitionTimingFunction: {
+        ...animation.easing,
         'soft-out': 'cubic-bezier(0, 0, 0.2, 1)',
         'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
         'ease-in': 'cubic-bezier(0.4, 0, 1, 1)',
