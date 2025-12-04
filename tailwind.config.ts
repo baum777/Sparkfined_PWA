@@ -131,9 +131,9 @@ export default {
 
         // Interactive states
         interactive: {
-          hover: withFixedAlpha('--color-interactive-base', '0.05'),
-          active: withFixedAlpha('--color-interactive-base', '0.08'),
-          disabled: withFixedAlpha('--color-interactive-base', '0.02'),
+          hover: withFixedAlpha('--color-interactive-hover', '0.08'),
+          active: withFixedAlpha('--color-interactive-active', '0.16'),
+          disabled: withFixedAlpha('--color-interactive-base', '0.2'),
         },
 
         // Sentiment
@@ -179,6 +179,7 @@ export default {
         info: withAlpha('--color-info'),
         warn: withAlpha('--color-warn'),
         
+        // TODO: design-system: drop legacy Tailwind palettes after spark tokens cover all usage
         // Zinc palette (complete spectrum for UI)
         zinc: {
           50: '#fafafa',

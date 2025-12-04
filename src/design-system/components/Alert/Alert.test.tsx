@@ -22,6 +22,11 @@ describe('Alert', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument()
   })
 
+  it('uses status role for non-triggered variant', () => {
+    render(<Alert variant="armed" title="Status" />)
+    expect(screen.getByRole('status')).toBeInTheDocument()
+  })
+
   it('renders action buttons', () => {
     render(
       <Alert
@@ -31,5 +36,11 @@ describe('Alert', () => {
     )
 
     expect(screen.getByTestId('action')).toBeInTheDocument()
+  })
+
+  it('renders accent bar for visual emphasis', () => {
+    const { container } = render(<Alert title="Accent" />)
+    const accent = container.querySelector('[aria-hidden="true"]')
+    expect(accent).not.toBeNull()
   })
 })

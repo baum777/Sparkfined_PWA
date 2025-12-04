@@ -51,4 +51,15 @@ describe('Modal', () => {
 
     expect(queryByTestId('modal')).not.toBeInTheDocument()
   })
+
+  it('respects closeOnOverlayClick when disabled', () => {
+    render(
+      <Modal isOpen onClose={onClose} closeOnOverlayClick={false} title="Locked">
+        Locked modal
+      </Modal>
+    )
+
+    fireEvent.click(screen.getByTestId('modal-backdrop'))
+    expect(onClose).not.toHaveBeenCalled()
+  })
 })

@@ -1,6 +1,7 @@
 /**
  * @deprecated Use `import { Card } from '@/design-system'` instead.
  * Temporary bridge while migrating legacy imports.
+ * TODO: design-system: migrate remaining Card imports to '@/design-system' namespace and remove this shim.
  */
 export {
   Card as default,

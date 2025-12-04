@@ -13,6 +13,7 @@ export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
 
 const variantStyles: Record<AlertVariant, string> = {
   armed: 'bg-spark/5 border-spark text-spark',
+  // TODO: design-system: replace animate-pulse with spec-defined "animate-pulse-subtle" utility once added to styles.
   triggered: 'bg-gold/5 border-gold text-gold animate-pulse',
   paused: 'bg-smoke/50 border-smoke-light text-fog',
 }

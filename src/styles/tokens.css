@@ -50,6 +50,7 @@
   --color-surface-subtle: var(--color-smoke-light);
   --color-surface-elevated: var(--color-smoke-lighter);
   --color-surface-hover: var(--color-void-lightest);
+  --color-surface-850: 28 28 30;
   --color-surface-skeleton: 255 255 255;
 
   --color-text-primary: var(--color-mist);
@@ -61,9 +62,9 @@
   --color-border-accent: var(--color-spark);
   --color-border-focus: var(--color-spark);
 
-  --color-interactive-base: var(--color-mist);
-  --color-interactive-hover: var(--color-spark);
-  --color-interactive-active: var(--color-spark-dim);
+  --color-interactive-base: 255 255 255;
+  --color-interactive-hover: 0 240 255;
+  --color-interactive-active: 0 188 212;
 
   --color-success: var(--color-phosphor);
   --color-danger: var(--color-blood);
@@ -162,6 +163,7 @@
   --color-surface-subtle: 248 250 252;
   --color-surface-elevated: 237 242 247;
   --color-surface-hover: 229 231 235;
+  --color-surface-850: 232 234 239;
   --color-surface-skeleton: 15 23 42;
 
   --color-text-primary: 15 23 42;
@@ -171,8 +173,8 @@
   --color-border: 203 213 225;
   --color-border-contrast: 15 23 42;
   --color-interactive-base: 15 23 42;
-  --color-interactive-hover: 15 23 42;
-  --color-interactive-active: 71 85 105;
+  --color-interactive-hover: 56 189 248;
+  --color-interactive-active: 37 99 235;
 }
 
 /* Layout modifiers */

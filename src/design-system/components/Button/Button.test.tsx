@@ -29,4 +29,24 @@ describe('Button', () => {
     render(<Button isLoading>Processing</Button>)
     expect(screen.getByTestId('button-spinner')).toBeInTheDocument()
   })
+
+  it('renders optional icons when provided', () => {
+    render(
+      <Button
+        leftIcon={<span data-testid="left-icon">L</span>}
+        rightIcon={<span data-testid="right-icon">R</span>}
+      >
+        Iconic
+      </Button>
+    )
+
+    expect(screen.getByTestId('left-icon')).toBeInTheDocument()
+    expect(screen.getByTestId('right-icon')).toBeInTheDocument()
+  })
+
+  it('applies size classes', () => {
+    render(<Button size="xl">Gigantic</Button>)
+    const button = screen.getByRole('button', { name: 'Gigantic' })
+    expect(button.className).toContain('h-16')
+  })
 })
