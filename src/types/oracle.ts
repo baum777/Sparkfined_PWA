@@ -35,3 +35,18 @@ export interface OracleAPIResponse {
   timestamp: number;
   date: string;
 }
+
+export type JourneyPhase = 'DEGEN' | 'SEEKER' | 'WARRIOR' | 'MASTER' | 'SAGE';
+
+export interface GamificationStreaks {
+  journal: number;
+  oracle: number;
+  analysis: number;
+}
+
+export interface GamificationSnapshot {
+  xp: number;
+  phase: JourneyPhase;
+  streaks: GamificationStreaks;
+  badges: string[];
+}
