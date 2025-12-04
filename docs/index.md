@@ -49,3 +49,26 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 | `UX-IMPROVEMENTS-SUMMARY.md` | `docs/design/` | Design |
 | `UX-TEST-STATUS.md` | `docs/qa/` | QA |
 | `sparkfined-style-guide.html` | `docs/design/` | Design |
+
+---
+
+## 📦 Documentation Governance (2025-12-04)
+
+### Governance Audit & Rules
+- **`docs/CHANGELOG.md`** - Documentation change tracking (NEW - required for all doc changes)
+- **`docs/process/DOCS-GOVERNANCE-AUDIT.md`** - Full audit of repo structure vs. proposed 7×7 rules
+- **`docs/process/DOCS-GOVERNANCE-FAZIT.md`** - German summary with actionable recommendations
+
+### Key Findings
+- ✅ **Root is clean** - Only README.md, AGENTS.md, CLAUDE.md (compliant)
+- ❌ **`/docs` exceeds 7×7 rule** - 16 folders instead of 7, multiple folders with >7 files
+- ⚠️ **Action needed** - See FAZIT for consolidation plan (16 folders → 7 folders)
+
+### Proposed 7-Folder Structure
+1. `01_architecture/` - System design, API landscape, PWA audit
+2. `02_concepts/` - Journal, Oracle, AI roadmap, design tokens
+3. `03_specs/` - Tickets, bugs, feature specs
+4. `04_process/` - CI/CD, QA, workflows, lint rules
+5. `05_guides/` - Setup, deployment, onboarding
+6. `06_decisions/` - Lore, ADRs, metrics, pitch deck
+7. `07_archive/` - Historical docs, obsolete files
