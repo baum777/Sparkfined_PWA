@@ -22,6 +22,9 @@ export default function OraclePage() {
   };
 
   const handleMarkAsRead = () => {
+    if (!todayReport || todayReport.read) {
+      return;
+    }
     void markTodayAsRead();
   };
 

@@ -4,9 +4,11 @@ import {
   getOracleReportByDate,
   getOracleReportsSince,
   markOracleReportAsRead,
+  markOracleReportAsNotified,
   upsertOracleReport,
 } from '@/lib/db-oracle';
 import { useGamificationStore } from './gamificationStore';
+import { createQuickJournalEntry, useJournalStore } from './journalStore';
 
 const DEFAULT_HISTORY_DAYS = 30;
 
@@ -68,12 +70,14 @@ export const useOracleStore = create<OracleState>((set, get) => ({
         };
       }
 
+      const finalReport = resolvedReport ? await maybeNotifyHighScore(resolvedReport) : resolvedReport;
+
       set((state) => ({
-        reports: resolvedReport ? upsertReport(state.reports, resolvedReport) : state.reports,
-        todayReport: resolvedReport ?? state.todayReport,
+        reports: finalReport ? upsertReport(state.reports, finalReport) : state.reports,
+        todayReport: finalReport ?? state.todayReport,
         loading: false,
         error: undefined,
-        lastFetchTimestamp: resolvedReport?.timestamp ?? state.lastFetchTimestamp,
+        lastFetchTimestamp: finalReport?.timestamp ?? state.lastFetchTimestamp,
       }));
     } catch (error) {
       console.error('[oracleStore] Failed to load today report', error);
@@ -124,21 +128,23 @@ export const useOracleStore = create<OracleState>((set, get) => ({
 
   markTodayAsRead: async () => {
     const report = get().todayReport;
-    if (!report || report.read) {
+    if (!report) {
       return;
     }
 
     try {
-      await markOracleReportAsRead(report.date);
-      await grantOracleReadRewards(report);
+      const rewardedReport = await grantOracleReadRewards(report);
+      if (!rewardedReport) {
+        return;
+      }
 
-      const updatedReport: OracleReport = { ...report, read: true };
       set((state) => ({
-        reports: upsertReport(state.reports, updatedReport),
-        todayReport: updatedReport,
+        reports: upsertReport(state.reports, rewardedReport),
+        todayReport: rewardedReport,
+        error: state.error,
       }));
     } catch (error) {
-      console.error('[oracleStore] Failed to mark report as read', error);
+      console.error('[oracleStore] Failed to apply Oracle rewards', error);
       set((state) => ({
         ...state,
         error: error instanceof Error ? error.message : 'Unable to update read flag',
@@ -147,14 +153,62 @@ export const useOracleStore = create<OracleState>((set, get) => ({
   },
 }));
 
-export async function grantOracleReadRewards(report: OracleReport): Promise<void> {
+export async function grantOracleReadRewards(report: OracleReport): Promise<OracleReport | undefined> {
   if (report.read) {
-    return;
+    return report;
   }
+
+  await markOracleReportAsRead(report.date);
 
   const gamification = useGamificationStore.getState();
   gamification.addXP(50);
-  gamification.incrementOracleStreak();
+  useGamificationStore.getState().incrementOracleStreak();
+
+  const { streaks, badges, addBadge } = useGamificationStore.getState();
+  if (streaks.oracle >= 21 && !badges.includes('oracle-master')) {
+    addBadge('oracle-master');
+  }
+
+  await createOracleJournalEntry(report);
+
+  return { ...report, read: true };
+}
+
+export async function maybeNotifyHighScore(report: OracleReport): Promise<OracleReport> {
+  if (typeof window === 'undefined' || typeof Notification === 'undefined') {
+    return report;
+  }
+
+  if (report.score < 6 || report.notified) {
+    return report;
+  }
+
+  if (Notification.permission === 'default') {
+    try {
+      await Notification.requestPermission();
+    } catch (error) {
+      console.warn('[oracleStore] Notification permission request failed', error);
+    }
+  }
+
+  if (Notification.permission !== 'granted') {
+    return report;
+  }
+
+  try {
+    new Notification('Meta-Shift incoming!', {
+      body: `Oracle score ${report.score}/7 → ${report.topTheme}`,
+      icon: '/icon-192.png',
+      badge: '/icon-96.png',
+      tag: `oracle-${report.date}`,
+    });
+  } catch (error) {
+    console.warn('[oracleStore] Unable to show Oracle notification', error);
+    return report;
+  }
+
+  await markOracleReportAsNotified(report.date);
+  return { ...report, notified: true };
 }
 
 function getTodayIsoDate(): string {
@@ -187,4 +241,34 @@ function upsertReport(collection: OracleReport[], report: OracleReport): OracleR
   next.push(report);
   next.sort((a, b) => b.date.localeCompare(a.date));
   return next;
+}
+
+async function createOracleJournalEntry(report: OracleReport): Promise<void> {
+  const normalizedTheme = normalizeThemeSlug(report.topTheme);
+  try {
+    const entry = await createQuickJournalEntry({
+      title: `Oracle ${report.score}/7`,
+      notes: `Oracle ${report.score}/7 → nächster Shift wahrscheinlich ${report.topTheme}`,
+    });
+
+    const tags = new Set(entry.tags ?? []);
+    tags.add('meta-shift');
+    if (normalizedTheme) {
+      tags.add(normalizedTheme);
+    }
+
+    useJournalStore.getState().addEntry({
+      ...entry,
+      id: entry.id,
+      notes: entry.notes,
+      tags: Array.from(tags),
+      isAuto: true,
+    });
+  } catch (error) {
+    console.warn('[oracleStore] Failed to create Oracle journal entry', error);
+  }
+}
+
+function normalizeThemeSlug(theme: string): string {
+  return theme.toLowerCase().replace(/\s+/g, '-');
 }
