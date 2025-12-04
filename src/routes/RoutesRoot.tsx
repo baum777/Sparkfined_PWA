@@ -19,6 +19,7 @@ const WatchlistPageV2 = lazy(() => import("../pages/WatchlistPageV2"));
 const AlertsPageV2 = lazy(() => import("../pages/AlertsPageV2"));
 const ChartPageV2 = lazy(() => import("../pages/ChartPageV2"));
 const SettingsPageV2 = lazy(() => import("../pages/SettingsPageV2"));
+const OraclePage = lazy(() => import("../pages/OraclePage"));
 
 // Dev-only showcase pages (excluded from production bundle)
 const StyleShowcasePage = import.meta.env.DEV
@@ -74,6 +75,7 @@ export default function RoutesRoot() {
           <Route path="/watchlist-v2" element={<WatchlistPageV2 />} />
           <Route path="/analysis-v2" element={<AnalysisPageV2 />} />
           <Route path="/journal-v2" element={<JournalPageV2 />} />
+          <Route path="/oracle" element={<OraclePage />} />
           <Route path="/alerts-v2" element={<AlertsPageV2 />} />
           <Route path="/chart-v2" element={<ChartPageV2 />} />
           <Route path="/settings-v2" element={<SettingsPageV2 />} />
