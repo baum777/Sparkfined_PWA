@@ -8,30 +8,42 @@
  * - Auto-loads today's report
  * - High-score notifications (score >= 6)
  * - Rewards on first read: XP, streak, badges, auto-journal entry
+ * - 30-day history chart
+ * - Theme filtering
+ * - Past reports list
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import { useOracleStore } from '@/store/oracleStore';
 import { RefreshCw, CheckCircle2, Loader2, Sparkles } from '@/lib/icons';
+import OracleHistoryChart from '@/components/oracle/OracleHistoryChart';
+import OracleThemeFilter from '@/components/oracle/OracleThemeFilter';
+import OracleHistoryList from '@/components/oracle/OracleHistoryList';
 
 export default function OraclePage() {
   const todayReport = useOracleStore((state) => state.todayReport);
+  const reports = useOracleStore((state) => state.reports);
   const isLoading = useOracleStore((state) => state.isLoading);
   const error = useOracleStore((state) => state.error);
   const loadTodayReport = useOracleStore((state) => state.loadTodayReport);
+  const loadHistory = useOracleStore((state) => state.loadHistory);
   const markTodayAsRead = useOracleStore((state) => state.markTodayAsRead);
 
   const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
   const [rewardMessage, setRewardMessage] = useState<string | null>(null);
+  const [selectedTheme, setSelectedTheme] = useState<string>('All');
 
-  // Load today's report on mount
+  // Load today's report and history on mount
   useEffect(() => {
     let isMounted = true;
 
     const load = async () => {
       if (isMounted) {
-        await loadTodayReport();
+        await Promise.all([
+          loadTodayReport(),
+          loadHistory(30),
+        ]);
       }
     };
 
@@ -40,7 +52,15 @@ export default function OraclePage() {
     return () => {
       isMounted = false;
     };
-  }, [loadTodayReport]);
+  }, [loadTodayReport, loadHistory]);
+
+  // Filter reports by theme
+  const filteredReports = useMemo(() => {
+    if (selectedTheme === 'All') {
+      return reports;
+    }
+    return reports.filter((report) => report.topTheme === selectedTheme);
+  }, [reports, selectedTheme]);
 
   // Clear reward message after 5 seconds
   useEffect(() => {
@@ -225,6 +245,28 @@ export default function OraclePage() {
                 <span>Load Report</span>
               </button>
             </div>
+          )}
+
+          {/* Analytics Section */}
+          {reports.length > 0 && (
+            <>
+              {/* Divider */}
+              <div className="my-6 border-t border-border" />
+
+              {/* Theme Filter */}
+              <div className="max-w-xs">
+                <OracleThemeFilter
+                  value={selectedTheme}
+                  onChange={setSelectedTheme}
+                />
+              </div>
+
+              {/* History Chart */}
+              <OracleHistoryChart reports={filteredReports} />
+
+              {/* History List */}
+              <OracleHistoryList reports={filteredReports} />
+            </>
           )}
         </div>
       </DashboardShell>
