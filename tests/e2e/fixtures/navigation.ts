@@ -27,3 +27,7 @@ export async function visitAlerts(page: Page) {
 export async function visitWatchlist(page: Page) {
   await visit(page, '/watchlist-v2', 'watchlist-page');
 }
+
+export async function visitOracle(page: Page) {
+  await visit(page, '/oracle', 'oracle-page');
+}

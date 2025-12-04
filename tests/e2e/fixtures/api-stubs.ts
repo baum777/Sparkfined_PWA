@@ -133,4 +133,24 @@ export async function stubNoisyAPIs(page: Page): Promise<void> {
       }),
     });
   });
+
+  // Stub Oracle edge function so history tests have deterministic data
+  await page.route('**/api/oracle', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        report: [
+          'SCORE: 5/7',
+          'BREAKDOWN: Liquidity steady, whales rotating into AI.',
+          'META: Gaming rotation building momentum.',
+          'ALPHA: Early Solana infra tokens accumulating quietly.',
+        ].join('\n'),
+        score: 5,
+        theme: 'Gaming',
+        timestamp: Date.now(),
+        date: new Date().toISOString().split('T')[0],
+      }),
+    })
+  );
 }

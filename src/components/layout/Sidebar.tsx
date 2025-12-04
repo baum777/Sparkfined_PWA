@@ -18,22 +18,26 @@ import {
   Bell,
   TrendingUp,
   Settings,
+  Sparkles,
   ChevronRight,
   type LucideIcon,
 } from '@/lib/icons';
 import { getItem, setItem } from '@/lib/safeStorage';
+import { useOnboardingStore } from '@/store/onboardingStore';
 
 interface NavItem {
   path: string;
   label: string;
   Icon: LucideIcon;
+  requiresAuth?: boolean;
 }
 
 const primaryNavItems: NavItem[] = [
   { path: '/dashboard-v2', label: 'Board', Icon: Home },
   { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
   { path: '/chart-v2', label: 'Chart', Icon: TrendingUp },
-  { path: '/journal-v2', label: 'Journal', Icon: FileText },
+  { path: '/journal-v2', label: 'Journal', Icon: FileText, requiresAuth: true },
+  { path: '/oracle', label: 'Oracle', Icon: Sparkles, requiresAuth: true },
   { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
 ];
 
@@ -44,6 +48,7 @@ const secondaryNavItems: NavItem[] = [
 const STORAGE_KEY = 'sparkfined.sidebar.collapsed';
 
 export default function Sidebar() {
+  const isAuthenticated = useOnboardingStore((state) => state.hasCompletedOnboarding);
   const [isCollapsed, setIsCollapsed] = React.useState<boolean>(() => {
     const stored = getItem(STORAGE_KEY);
     if (stored === 'false') return false;
@@ -88,11 +93,17 @@ export default function Sidebar() {
       'Analyze': 'analyze-link',
       'Chart': 'chart-link',
       'Journal': 'journal-link',
+      'Oracle': 'oracle-link',
       'Alerts': 'notifications-link',
       'Settings': 'settings-link',
     };
     return idMap[label] || '';
   };
+
+  const visiblePrimaryItems = React.useMemo(
+    () => primaryNavItems.filter((item) => (item.requiresAuth ? isAuthenticated : true)),
+    [isAuthenticated]
+  );
 
   return (
     <aside
@@ -106,7 +117,7 @@ export default function Sidebar() {
     >
       {/* Primary Nav */}
       <nav className="flex-1 space-y-2 px-2">
-        {primaryNavItems.map(({ path, label, Icon }) => (
+        {visiblePrimaryItems.map(({ path, label, Icon }) => (
           <NavLink
             key={path}
             to={path}
