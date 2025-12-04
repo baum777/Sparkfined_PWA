@@ -1244,7 +1244,397 @@ test.describe('Oracle Flow', () => {
 
 ---
 
-## 11. Open Questions & Decisions
+## 11. Implementation Paths (Finalized)
+
+### Backend Files
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| Edge Function | `api/oracle.ts` | Main Oracle endpoint (Grok integration, report generation) |
+| Cron Config | `vercel.json` | Daily cron schedule (09:00 UTC) |
+| Grok Prompts | `src/lib/prompts/oracle.ts` | Prompt templates (score, theme, alpha) |
+
+### Database Layer
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| Dexie Schema | `src/lib/db-oracle.ts` | Oracle-specific IndexedDB (separate from `sparkfined-ta-pwa`) |
+| DB Operations | `src/lib/db-oracle.ts` | CRUD operations (save/load/mark reports) |
+
+### State Management
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| Oracle Store | `src/store/oracleStore.ts` | Zustand store for Oracle state |
+| Gamification Store | `src/store/gamificationStore.ts` | XP/Streaks/Badges system (NEW) |
+
+### Type Definitions
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| Oracle Types | `src/types/oracle.ts` | `OracleReport`, `OracleAPIResponse`, themes, etc. |
+
+### Frontend Components
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| Page | `src/pages/OraclePage.tsx` | Main Oracle page (lazy loaded) |
+| Sidebar Nav | `src/components/layout/Sidebar.tsx` | Add Oracle nav item (Eye icon) |
+| Routes | `src/routes/RoutesRoot.tsx` | Add `/oracle` route |
+| Header | `src/components/oracle/OracleHeader.tsx` | Score badge, theme badge, actions |
+| Report Panel | `src/components/oracle/OracleReportPanel.tsx` | Full report display (markdown) |
+| History Chart | `src/components/oracle/OracleHistoryChart.tsx` | 30-day line chart (Recharts) |
+| Theme Filter | `src/components/oracle/OracleThemeFilter.tsx` | Theme dropdown filter |
+| History List | `src/components/oracle/OracleHistoryList.tsx` | Past reports table |
+| Report Modal | `src/components/oracle/OracleReportModal.tsx` | Full report modal view |
+
+### Testing
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| E2E Tests | `tests/e2e/oracle/oracle.flows.spec.ts` | Oracle flow tests (Playwright) |
+| DB Tests | `tests/lib/db-oracle.test.ts` | Dexie operations tests |
+| Store Tests | `tests/store/oracleStore.test.ts` | Oracle store logic tests |
+| Gamification Tests | `tests/store/gamificationStore.test.ts` | XP/Streak/Badge tests |
+| API Tests | `tests/api/oracle.test.ts` | Edge Function tests |
+
+---
+
+## 12. Edge Function Auth & Environment Variables
+
+### Auth Pattern (from `grok-pulse/cron.ts`)
+
+**Authorization Header:**
+```typescript
+Authorization: Bearer <ORACLE_CRON_SECRET>
+```
+
+**Validation Logic:**
+```typescript
+export const config = { runtime: "edge" };
+
+export default async function handler(req: Request): Promise<Response> {
+  const secret = process.env.ORACLE_CRON_SECRET?.trim();
+  if (!secret) {
+    return json({ ok: false, error: "ORACLE_CRON_SECRET not configured" }, 500);
+  }
+
+  const authHeader = req.headers.get("authorization") || "";
+  const [scheme, token] = authHeader.split(" ", 2);
+
+  if (!scheme || !token || scheme.toLowerCase() !== "bearer") {
+    return json({ ok: false, error: "Unauthorized" }, 401);
+  }
+
+  if (token.trim() !== secret) {
+    return json({ ok: false, error: "Unauthorized" }, 401);
+  }
+
+  // Execute Oracle logic...
+}
+```
+
+### Environment Variables
+
+**Required:**
+```bash
+# .env.local (or Vercel Environment Variables)
+ORACLE_CRON_SECRET="<random-256-bit-secret>"
+XAI_API_KEY="<grok-api-key>"
+```
+
+**Usage Notes:**
+- `ORACLE_CRON_SECRET`: Bearer token for Vercel Cron authentication
+- `XAI_API_KEY`: x.ai API key for Grok calls (NEVER exposed to client)
+- Both should be stored in Vercel Project Settings → Environment Variables
+- Client **NEVER** accesses `XAI_API_KEY` directly (all Grok calls via Edge Function)
+
+### Request/Response Shape
+
+**Client → `/api/oracle` (GET):**
+```typescript
+// No auth header required for client requests
+fetch('/api/oracle', {
+  method: 'GET',
+  headers: { 'Content-Type': 'application/json' }
+})
+```
+
+**Cron → `/api/oracle` (GET):**
+```typescript
+// Auth header required for Cron requests
+fetch('/api/oracle', {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.ORACLE_CRON_SECRET}`
+  }
+})
+```
+
+**Response:**
+```typescript
+{
+  report: string;    // Full combined report
+  score: number;     // 0-7
+  theme: string;     // e.g., "Gaming"
+  timestamp: number; // Unix ms
+  date: string;      // YYYY-MM-DD
+}
+```
+
+---
+
+## 13. Type Definitions (TypeScript)
+
+**File:** `src/types/oracle.ts`
+
+```typescript
+// ============================================================================
+// ORACLE REPORT (Dexie + Store)
+// ============================================================================
+
+export interface OracleReport {
+  id?: number;           // Auto-increment (Dexie)
+  date: string;          // YYYY-MM-DD (logical primary key)
+  score: number;         // 0-7
+  topTheme: OracleTheme; // Top meta-shift theme
+  fullReport: string;    // Complete text report
+  read: boolean;         // XP guard flag (false until user reads)
+  notified: boolean;     // Notification guard flag (false until notified)
+  timestamp: number;     // Unix ms (when report was generated)
+  createdAt: number;     // Unix ms (when saved to Dexie)
+}
+
+// ============================================================================
+// API RESPONSE
+// ============================================================================
+
+export interface OracleAPIResponse {
+  report: string;        // Full combined report
+  score: number;         // 0-7
+  theme: string;         // e.g., "Gaming"
+  timestamp: number;     // Unix ms
+  date: string;          // YYYY-MM-DD
+}
+
+// ============================================================================
+// ORACLE THEMES
+// ============================================================================
+
+export const ORACLE_THEMES = [
+  'Gaming',
+  'RWA',
+  'AI Agents',
+  'DePIN',
+  'Privacy/ZK',
+  'Collectibles/TCG',
+  'Stablecoin Yield',
+] as const;
+
+export type OracleTheme = typeof ORACLE_THEMES[number];
+
+// ============================================================================
+// GAMIFICATION (XP / Streaks / Badges)
+// ============================================================================
+
+export type JourneyPhase = 'DEGEN' | 'SEEKER' | 'WARRIOR' | 'MASTER' | 'SAGE';
+
+export interface GamificationState {
+  xpTotal: number;
+  phase: JourneyPhase;
+  streaks: {
+    journal: number;      // Consecutive journal entries
+    oracle: number;       // Consecutive Oracle reads
+    analysis: number;     // Consecutive analysis sessions
+  };
+  badges: Badge[];
+  lastActivityAt: number;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  unlockedAt: number;
+}
+
+// Phase thresholds
+export const PHASE_THRESHOLDS: Record<JourneyPhase, number> = {
+  DEGEN: 0,
+  SEEKER: 500,
+  WARRIOR: 2000,
+  MASTER: 5000,
+  SAGE: 10000,
+};
+```
+
+---
+
+## 14. Codex Implementation Backlog
+
+### Module 1: Oracle Dexie DB & Types
+
+**Scope:**
+- Create `src/types/oracle.ts` with all type definitions
+- Create `src/lib/db-oracle.ts` with Dexie schema (`sparkfined-oracle` DB)
+- Implement CRUD operations: `putTodayReport`, `getTodayReport`, `getLast30DaysReports`, `markReportAsRead`, `markReportAsNotified`
+- Add unit tests for Dexie operations
+
+**Done Criteria:**
+- ✅ `OracleReport` type matches schema
+- ✅ Dexie DB initializes with `reports` table
+- ✅ Can save/load reports from IndexedDB
+- ✅ Indexes on `date`, `score`, `topTheme`, `read`, `timestamp`
+- ✅ Unit tests pass (100% coverage on DB operations)
+
+---
+
+### Module 2: Oracle Store & Gamification Store
+
+**Scope:**
+- Create `src/store/oracleStore.ts` with Zustand
+- Implement `fetchTodayReport`, `fetchHistory`, `markAsRead`, `markAsNotified`
+- Create `src/store/gamificationStore.ts` with XP/Streaks/Badges
+- Implement `addXP`, `incrementStreak`, `resetStreak`, `unlockBadge`, `computePhase`
+- Integrate Oracle read → XP grant → Streak increment
+
+**Done Criteria:**
+- ✅ Oracle store loads today's report from Dexie (cached)
+- ✅ Oracle store fetches from `/api/oracle` on refresh
+- ✅ Gamification store persists to localStorage (via Zustand persist)
+- ✅ Reading Oracle grants 50 XP and increments streak
+- ✅ Streak badges unlock at 7/21 days
+- ✅ Unit tests pass (store logic)
+
+---
+
+### Module 3: Edge Function `/api/oracle`
+
+**Scope:**
+- Create `api/oracle.ts` with Edge runtime
+- Implement Bearer token auth (pattern from `grok-pulse/cron.ts`)
+- Create `src/lib/prompts/oracle.ts` with 3 Grok prompts (score, theme, alpha)
+- Integrate Grok API calls (3 parallel requests)
+- Combine reports and return structured response
+- Add error handling (Grok API failures)
+
+**Done Criteria:**
+- ✅ Endpoint returns `OracleAPIResponse` shape
+- ✅ Auth validation works (401 for invalid token)
+- ✅ Grok prompts generate valid reports
+- ✅ Response includes `score`, `theme`, `report`, `timestamp`, `date`
+- ✅ Edge Function deploys successfully to Vercel
+- ✅ API tests pass (unauthorized, valid response, error handling)
+
+---
+
+### Module 4: Oracle Page & Navigation
+
+**Scope:**
+- Create `src/pages/OraclePage.tsx` (lazy loaded)
+- Add Oracle nav item to `src/components/layout/Sidebar.tsx` (Eye icon from Lucide)
+- Add `/oracle` route to `src/routes/RoutesRoot.tsx`
+- Implement page layout with `DashboardShell`
+- Load today's report and history on mount
+- Display loading/error states
+
+**Done Criteria:**
+- ✅ Oracle Page renders with DashboardShell
+- ✅ Sidebar shows "Oracle" nav item with Eye icon
+- ✅ Route `/oracle` navigates to OraclePage
+- ✅ Page loads today's report from store
+- ✅ Loading spinner shows during fetch
+- ✅ Error message shows on failure
+- ✅ E2E test: Navigate to Oracle page
+
+---
+
+### Module 5: Oracle UI Components
+
+**Scope:**
+- Create `src/components/oracle/OracleHeader.tsx` (score badge, theme badge, refresh button, mark-as-read button)
+- Create `src/components/oracle/OracleReportPanel.tsx` (formatted report display with expandable sections)
+- Create `src/components/oracle/OracleHistoryChart.tsx` (Recharts line chart, 30-day history)
+- Create `src/components/oracle/OracleThemeFilter.tsx` (theme dropdown)
+- Create `src/components/oracle/OracleHistoryList.tsx` (past reports table)
+- Create `src/components/oracle/OracleReportModal.tsx` (full report modal)
+
+**Done Criteria:**
+- ✅ Header displays score badge (0-7) and theme badge
+- ✅ Refresh button fetches latest report
+- ✅ Mark-as-read button grants XP and increments streak
+- ✅ Report panel displays full report with markdown formatting
+- ✅ History chart shows 30-day line chart (date → score)
+- ✅ Theme filter filters history by theme
+- ✅ History list shows past reports in table format
+- ✅ Modal shows full report for selected day
+- ✅ All components use Tailwind design tokens
+- ✅ Component tests pass (UI rendering)
+
+---
+
+### Module 6: Notifications & Auto-Journal
+
+**Scope:**
+- Implement high-score notification (score ≥ 6)
+- Request notification permission
+- Integrate with existing notification system
+- Create auto-journal entry when Oracle is read
+- Link auto-entry to journal store
+
+**Done Criteria:**
+- ✅ Notification fires when score ≥ 6 and `notified === false`
+- ✅ Notification permission requested on first Oracle visit
+- ✅ Notification shows: "Meta-Shift incoming! Oracle score: 6/7 → Gaming"
+- ✅ Auto-journal entry created on Oracle read
+- ✅ Entry title: "Oracle {score}/7 → {theme}"
+- ✅ Entry notes: "Read Oracle report. Next meta-shift likely: {theme}"
+- ✅ E2E test: High-score notification
+
+---
+
+### Module 7: Analytics & Cron Integration
+
+**Scope:**
+- Add cron schedule to `vercel.json` (daily 09:00 UTC)
+- Test cron execution locally (Vercel CLI)
+- Implement 30-day analytics chart
+- Add theme-based filtering
+- Test offline behavior (PWA)
+
+**Done Criteria:**
+- ✅ Cron schedule added to `vercel.json`
+- ✅ Cron executes daily at 09:00 UTC
+- ✅ Chart displays 30 days of score history
+- ✅ Chart tooltip shows date, score, theme
+- ✅ Theme filter works correctly
+- ✅ Offline behavior: loads cached reports from Dexie
+- ✅ E2E test: Analytics chart displays
+
+---
+
+### Module 8: Tests & Documentation
+
+**Scope:**
+- Write unit tests for Dexie operations (`tests/lib/db-oracle.test.ts`)
+- Write unit tests for stores (`tests/store/oracleStore.test.ts`, `tests/store/gamificationStore.test.ts`)
+- Write E2E tests for Oracle flow (`tests/e2e/oracle/oracle.flows.spec.ts`)
+- Write API tests (`tests/api/oracle.test.ts`)
+- Update `docs/core/concepts/oracle-subsystem.md` with implementation notes
+- Update `CHANGELOG.md`
+
+**Done Criteria:**
+- ✅ Unit tests: 80%+ coverage on Oracle/Gamification stores
+- ✅ E2E tests: Oracle page navigation, read report, XP grant, chart display
+- ✅ API tests: Auth validation, valid response, error handling
+- ✅ Documentation updated with implementation notes
+- ✅ CHANGELOG.md includes Oracle subsystem entry
+- ✅ All tests pass in CI/CD
+
+---
+
+## 15. Open Questions & Decisions
 
 ### Q1: Should Oracle reports be user-specific or global?
 
@@ -1567,11 +1957,104 @@ tests/
 
 ---
 
-## 17. Changelog
+## 17. Implementation Summary & Handover
+
+### Finalized Architecture Decisions
+
+**Database Strategy:**
+- **Separate Dexie DB**: `sparkfined-oracle` (distinct from `sparkfined-ta-pwa`)
+- **Rationale**: Avoids schema conflicts with existing journal/replay tables
+- **Schema**: Single `reports` table with indexes on `date`, `score`, `topTheme`, `read`, `timestamp`
+
+**State Management:**
+- **Oracle Store**: `src/store/oracleStore.ts` (Zustand)
+- **Gamification Store**: `src/store/gamificationStore.ts` (NEW, with Zustand persist)
+- **Integration**: Oracle read → XP grant (50 XP) → Streak increment → Auto-journal entry
+
+**Edge Function Pattern:**
+- **Runtime**: `edge` (global distribution, low latency)
+- **Auth**: Bearer token (pattern from `grok-pulse/cron.ts`)
+- **Grok Integration**: 3 parallel Grok calls (score, theme, alpha)
+- **Caching**: Dexie on client (optional: Vercel KV for global cache in Phase 2)
+
+**Frontend Architecture:**
+- **Page**: `OraclePage.tsx` (lazy loaded via React Router)
+- **Navigation**: Eye icon in Sidebar (between Journal and Alerts)
+- **Components**: 6 modular components (Header, ReportPanel, Chart, Filter, List, Modal)
+- **Design System**: TailwindCSS design tokens (no hardcoded colors)
+
+### Paths Validated Against Repo
+
+All paths finalized to match actual repo structure:
+- ✅ Edge Functions: `api/oracle.ts` (pattern matches `api/grok-pulse/cron.ts`)
+- ✅ Dexie DB: Separate DB instance (pattern matches `src/lib/db.ts`)
+- ✅ Stores: Zustand with persist (pattern matches `src/store/journalStore.ts`, `src/store/alertsStore.ts`)
+- ✅ Pages: Lazy loaded (pattern matches `src/pages/JournalPageV2.tsx`)
+- ✅ Components: Domain-organized (pattern matches `src/components/journal/`)
+- ✅ Types: Separate file per domain (pattern matches `src/types/journal.ts`)
+
+### Integration Points
+
+**Journal System:**
+- Auto-entry creation on Oracle read (via `createQuickJournalEntry` helper)
+- Entry format: "Oracle {score}/7 → {theme}" with context tags
+
+**XP/Gamification:**
+- Reuses `JourneyPhase` type from existing `journal.ts`
+- New Gamification Store tracks global XP (not just per-entry)
+- Oracle streak tracked separately from Journal streak
+
+**Notifications:**
+- High-score notifications (score ≥ 6) use existing Notification API
+- No Service Worker push in Phase 1 (future enhancement)
+
+**Analytics:**
+- 30-day chart uses existing Recharts library (already in bundle)
+- Theme filter uses existing UI patterns (button group)
+
+### Open Decisions (For Codex)
+
+**Decision 1: Dexie DB Name**
+- **Option A**: Separate DB `sparkfined-oracle` (recommended, cleaner isolation)
+- **Option B**: Add `oracle_reports` table to existing `sparkfined-ta-pwa` DB
+- **Recommendation**: **Option A** (avoids version conflicts, easier to debug)
+
+**Decision 2: Grok API Integration**
+- **Option A**: Direct x.ai API calls (requires x.ai account)
+- **Option B**: Mock Grok responses for Phase 1, real API in Phase 2
+- **Recommendation**: **Option B** for MVP (faster iteration, no API costs during dev)
+
+**Decision 3: Cron Reliability**
+- **Option A**: Cron-only (relies on Vercel Cron execution)
+- **Option B**: Cron + Vercel KV cache (pre-warm reports for all users)
+- **Recommendation**: **Option A** for Phase 1, **Option B** for Phase 2
+
+**Decision 4: Auto-Journal Integration**
+- **Option A**: Create auto-entry immediately on Oracle read (recommended)
+- **Option B**: Create auto-entry as "draft" that user can review/edit
+- **Recommendation**: **Option A** (simpler UX, matches existing auto-entry pattern)
+
+### Next Steps for Codex
+
+1. **Start with Module 1** (Dexie DB & Types) — foundational layer
+2. **Progress to Module 2** (Stores) — business logic
+3. **Implement Module 3** (Edge Function) — can use mock Grok responses initially
+4. **Build Module 4** (Page & Navigation) — UI skeleton
+5. **Complete Module 5** (UI Components) — user-facing features
+6. **Add Module 6** (Notifications & Auto-Journal) — integrations
+7. **Finalize Module 7** (Analytics & Cron) — polish
+8. **Test Module 8** (Tests & Docs) — validation
+
+**Estimated Implementation Time:** 2-3 weeks (8 modules, ~2-3 days per module)
+
+---
+
+## 18. Changelog
 
 | Date | Author | Change |
 |------|--------|--------|
 | 2025-12-04 | Sparkfined Team | Initial draft |
+| 2025-12-04 | Claude (Architect) | Finalized paths, types, auth patterns, Codex backlog |
 
 ---
 
