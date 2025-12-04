@@ -1575,4 +1575,620 @@ tests/
 
 ---
 
+---
+
+## 18. Implementation Paths (Finalized)
+
+**Status**: Validated against actual repository structure  
+**Last Updated**: 2025-12-04
+
+### Backend Layer
+
+| Component | Path | Pattern | Notes |
+|-----------|------|---------|-------|
+| Oracle API Endpoint | `/api/oracle.ts` | Edge Function | Runtime: `edge`, Auth: Bearer token |
+| Cron Secret Env Var | `ORACLE_CRON_SECRET` | Vercel Env | Validated in handler like `PULSE_CRON_SECRET` |
+| Grok API Key Env Var | `XAI_API_KEY` | Vercel Env | Used internally by Edge Function only |
+
+**Auth Pattern** (extracted from `api/grok-pulse/cron.ts`):
+```typescript
+const secret = process.env.ORACLE_CRON_SECRET?.trim();
+const authHeader = req.headers.get("authorization") || "";
+const [scheme, token] = authHeader.split(" ", 2);
+
+if (!scheme || !token || scheme.toLowerCase() !== "bearer") {
+  return json({ ok: false, error: "Unauthorized" }, 401);
+}
+
+if (token.trim() !== secret) {
+  return json({ ok: false, error: "Unauthorized" }, 401);
+}
+```
+
+### Persistence Layer (Dexie)
+
+| Component | Path | Pattern | Notes |
+|-----------|------|---------|-------|
+| Oracle Database | `src/lib/db-oracle.ts` | Separate Dexie DB | Database name: `sparkfined-oracle` |
+| Oracle Types | `src/types/oracle.ts` | Type definitions | Exports: `OracleReport`, `OracleAPIResponse`, `OracleTheme` |
+
+**Database Pattern** (follows `src/lib/db-board.ts`):
+```typescript
+import Dexie, { type Table } from 'dexie';
+
+export class OracleDatabase extends Dexie {
+  reports!: Table<OracleReport, number>;
+
+  constructor() {
+    super('sparkfined-oracle');
+
+    this.version(1).stores({
+      reports: '++id, date, score, topTheme, read, timestamp',
+    });
+  }
+}
+
+export const oracleDB = new OracleDatabase();
+```
+
+**Rationale for Separate Database**:
+- Follows existing pattern: `sparkfined-ta-pwa` (journal/trades) and `sparkfined-board` (charts/alerts) are already separate
+- Oracle is a distinct domain with its own lifecycle
+- Avoids schema conflicts and version migrations across unrelated features
+- Enables independent versioning and cleanup strategies
+
+### State Management (Zustand)
+
+| Component | Path | Pattern | Notes |
+|-----------|------|---------|-------|
+| Oracle Store | `src/store/oracleStore.ts` | Zustand store | No persistence (Dexie is source of truth) |
+| Gamification Store | `src/store/gamificationStore.ts` | Zustand + persist | For XP/Streaks/Badges across all features |
+
+**Store Pattern** (follows `src/store/journalStore.ts`):
+```typescript
+import { create } from 'zustand';
+
+interface OracleState {
+  currentReport: OracleReport | null;
+  history: OracleReport[];
+  isLoading: boolean;
+  error: string | null;
+  
+  fetchTodayReport: (forceRefresh?: boolean) => Promise<void>;
+  fetchHistory: () => Promise<void>;
+  markAsRead: (date: string) => Promise<void>;
+  markAsNotified: (date: string) => Promise<void>;
+}
+
+export const useOracleStore = create<OracleState>((set, get) => ({
+  // ... implementation
+}));
+```
+
+### Frontend Layer
+
+| Component | Path | Pattern | Notes |
+|-----------|------|---------|-------|
+| Oracle Page | `src/pages/OraclePage.tsx` | Lazy-loaded page | Uses `DashboardShell` wrapper |
+| Oracle Components | `src/components/oracle/` | Domain folder | All Oracle-specific UI components |
+| - Header | `src/components/oracle/OracleHeader.tsx` | Sub-component | Score badge, theme badge, actions |
+| - Report Panel | `src/components/oracle/OracleReportPanel.tsx` | Sub-component | Markdown/formatted report display |
+| - History Chart | `src/components/oracle/OracleHistoryChart.tsx` | Sub-component | Uses Recharts (already in project) |
+| - Theme Filter | `src/components/oracle/OracleThemeFilter.tsx` | Sub-component | Dropdown/button group |
+| - History List | `src/components/oracle/OracleHistoryList.tsx` | Sub-component | Past reports table |
+| - Report Modal | `src/components/oracle/OracleReportModal.tsx` | Sub-component | Full report viewer |
+
+**Routing Integration** (modify `src/routes/RoutesRoot.tsx`):
+```typescript
+const OraclePage = lazy(() => import("../pages/OraclePage"));
+
+// Inside <Routes>:
+<Route path="/oracle" element={<OraclePage />} />
+```
+
+**Navigation Integration** (modify `src/components/layout/Sidebar.tsx`):
+```typescript
+import { Eye } from '@/lib/icons'; // Or appropriate icon
+
+const primaryNavItems: NavItem[] = [
+  { path: '/dashboard-v2', label: 'Board', Icon: Home },
+  { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
+  { path: '/chart-v2', label: 'Chart', Icon: TrendingUp },
+  { path: '/journal-v2', label: 'Journal', Icon: FileText },
+  { path: '/oracle', label: 'Oracle', Icon: Eye }, // NEW
+  { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
+];
+```
+
+### Prompts & Templates
+
+| Component | Path | Pattern | Notes |
+|-----------|------|---------|-------|
+| Grok Prompts | `src/lib/prompts/oracle.ts` | Template constants | `SCORE_PROMPT`, `THEME_PROMPT`, `ALPHA_PROMPT` |
+
+### Testing
+
+| Component | Path | Pattern | Notes |
+|-----------|------|---------|-------|
+| Dexie Tests | `tests/lib/db-oracle.test.ts` | Vitest unit tests | CRUD operations |
+| Oracle Store Tests | `tests/store/oracleStore.test.ts` | Vitest unit tests | Store actions |
+| Gamification Tests | `tests/store/gamificationStore.test.ts` | Vitest unit tests | XP/Streak logic |
+| E2E Flow Tests | `tests/e2e/oracle/oracle.flows.spec.ts` | Playwright E2E | User flows |
+| API Tests | `tests/api/oracle.test.ts` | Vitest unit tests | Endpoint validation |
+
+---
+
+## 19. Type Definitions (Finalized)
+
+**File**: `src/types/oracle.ts`
+
+### Core Types
+
+```typescript
+/**
+ * Oracle Report - Persisted in Dexie
+ */
+export interface OracleReport {
+  id?: number;           // Auto-increment (Dexie)
+  date: string;          // YYYY-MM-DD (logical primary key)
+  score: number;         // 0-7
+  topTheme: string;      // e.g., "Gaming", "RWA"
+  fullReport: string;    // Complete markdown text
+  read: boolean;         // XP guard flag
+  notified: boolean;     // Notification guard flag
+  timestamp: number;     // Unix ms (when fetched from API)
+  createdAt: number;     // Unix ms (when created locally)
+}
+
+/**
+ * Oracle API Response - From /api/oracle
+ */
+export interface OracleAPIResponse {
+  report: string;    // Full combined report
+  score: number;     // 0-7
+  theme: string;     // Top theme (e.g., "Gaming")
+  timestamp: number; // Unix ms
+  date: string;      // YYYY-MM-DD
+}
+
+/**
+ * Oracle Themes - Supported meta-shift categories
+ */
+export const ORACLE_THEMES = [
+  'Gaming',
+  'RWA',
+  'AI Agents',
+  'DePIN',
+  'Privacy/ZK',
+  'Collectibles/TCG',
+  'Stablecoin Yield',
+] as const;
+
+export type OracleTheme = typeof ORACLE_THEMES[number];
+```
+
+### Gamification Types
+
+```typescript
+/**
+ * Journey Phase - Hero's Journey progression
+ */
+export type JourneyPhase = 'DEGEN' | 'SEEKER' | 'WARRIOR' | 'MASTER' | 'SAGE';
+
+/**
+ * Streaks - Consecutive activity tracking
+ */
+export interface Streaks {
+  journal: number;      // Consecutive journal entries
+  oracle: number;       // Consecutive Oracle reads
+  analysis: number;     // Consecutive analysis sessions
+}
+
+/**
+ * Badge - Unlockable achievement
+ */
+export interface Badge {
+  id: string;           // Unique badge ID (e.g., "oracle-week")
+  name: string;         // Display name (e.g., "Oracle Devotee")
+  description: string;  // Badge description
+  unlockedAt: number;   // Unix ms (when unlocked)
+}
+
+/**
+ * Gamification State - Global XP/Streak/Badge tracking
+ */
+export interface GamificationState {
+  xpTotal: number;
+  phase: JourneyPhase;
+  streaks: Streaks;
+  badges: Badge[];
+  lastActivityAt: number;
+}
+```
+
+### Integration Types
+
+```typescript
+/**
+ * Grok Prompt Result - Internal type for API processing
+ */
+export interface GrokPromptResult {
+  raw: string;          // Raw Grok response
+  parsed?: {            // Parsed structured data (if applicable)
+    score?: number;
+    theme?: string;
+    alphas?: Array<{
+      ca: string;
+      ticker: string;
+      thesis: string;
+      risk: 'High' | 'Medium' | 'Low';
+    }>;
+  };
+}
+
+/**
+ * Oracle Notification Payload - For Web Push / Service Worker
+ */
+export interface OracleNotification {
+  title: string;
+  body: string;
+  icon: string;
+  badge?: string;
+  tag: string;
+  data: {
+    date: string;
+    score: number;
+    theme: string;
+  };
+}
+```
+
+---
+
+## 20. Codex Implementation Backlog (Modules)
+
+**Priority Order**: Sequential (each module builds on previous)  
+**Total Estimated Effort**: ~4 weeks (1 senior engineer)
+
+### Module 1: Oracle Dexie DB & Types
+
+**Scope**:
+- Create `src/types/oracle.ts` with all core types (`OracleReport`, `OracleAPIResponse`, `ORACLE_THEMES`)
+- Create `src/lib/db-oracle.ts` with Dexie schema (separate database: `sparkfined-oracle`)
+- Implement CRUD operations:
+  - `putTodayReport(report)` → upsert by date
+  - `getTodayReport()` → load today's report
+  - `getLast30DaysReports()` → load history for chart
+  - `markReportAsRead(date)` → flag for XP
+  - `markReportAsNotified(date)` → flag for notification
+- Write unit tests in `tests/lib/db-oracle.test.ts`:
+  - Save/load reports
+  - Date-based queries
+  - Flag updates
+  - Edge cases (no data, duplicate dates)
+
+**Done Criteria**:
+- ✅ All types exported from `src/types/oracle.ts`
+- ✅ Dexie DB instantiated and versioned
+- ✅ All CRUD operations tested with Vitest
+- ✅ No TypeScript errors
+- ✅ Coverage ≥ 80% for `db-oracle.ts`
+
+---
+
+### Module 2: Oracle Store & Gamification Store
+
+**Scope**:
+- Create `src/store/oracleStore.ts` with Zustand store:
+  - State: `currentReport`, `history`, `isLoading`, `error`
+  - Actions: `fetchTodayReport`, `fetchHistory`, `markAsRead`, `markAsNotified`
+  - API integration (fetch from `/api/oracle`)
+  - Dexie persistence (save fetched reports)
+- Create `src/store/gamificationStore.ts` with Zustand + persist:
+  - State: `xpTotal`, `phase`, `streaks`, `badges`, `lastActivityAt`
+  - Actions: `addXP`, `incrementStreak`, `resetStreak`, `unlockBadge`, `computePhase`
+  - Phase thresholds (DEGEN → SAGE)
+  - Badge unlocking logic (7-day streak, 21-day streak)
+- Wire `markAsRead` in `oracleStore` to trigger:
+  - `gamificationStore.addXP(50)`
+  - `gamificationStore.incrementStreak('oracle')`
+  - Auto-journal entry (via `journalStore.createQuickJournalEntry`)
+- Write unit tests in `tests/store/`:
+  - Mock Dexie operations
+  - Test XP calculation and phase transitions
+  - Test streak increment/reset
+  - Test badge unlocking
+
+**Done Criteria**:
+- ✅ Both stores fully implemented
+- ✅ Oracle store fetches from API and persists to Dexie
+- ✅ Gamification store persists to localStorage (via Zustand persist)
+- ✅ `markAsRead` triggers XP/Streak/Journal integrations
+- ✅ All store tests passing with ≥ 80% coverage
+- ✅ No TypeScript errors
+
+---
+
+### Module 3: Edge Function /api/oracle
+
+**Scope**:
+- Create `/api/oracle.ts` with Edge Function runtime
+- Implement Bearer token auth (pattern from `api/grok-pulse/cron.ts`)
+  - Validate `ORACLE_CRON_SECRET` from env
+  - Return 401 if unauthorized
+- Implement Grok API integration:
+  - Create `src/lib/prompts/oracle.ts` with 3 prompts (score, theme, alpha)
+  - Call Grok API 3x in parallel (`Promise.all`)
+  - Parse responses (regex or structured prompts)
+  - Combine into full report
+- Return structured response:
+  - `{ report, score, theme, timestamp, date }`
+- Add Vercel Cron config to `vercel.json`:
+  - Path: `/api/oracle`
+  - Schedule: `0 9 * * *` (09:00 UTC daily)
+- Error handling:
+  - Grok API failures (retry once, fallback to cached)
+  - Rate limits (log and return 429)
+  - Malformed responses (log and return 500)
+- Write API tests in `tests/api/oracle.test.ts`:
+  - Unauthorized request (401)
+  - Valid Cron request (200)
+  - Response structure validation
+  - Grok API failure handling
+
+**Done Criteria**:
+- ✅ `/api/oracle.ts` endpoint deployed
+- ✅ Auth working (401 for invalid token)
+- ✅ Grok API calls successful (3 prompts)
+- ✅ Response structure matches `OracleAPIResponse` type
+- ✅ Cron config added to `vercel.json`
+- ✅ API tests passing
+- ✅ Manual test: `curl -H "Authorization: Bearer <token>" https://staging.sparkfined.com/api/oracle`
+
+---
+
+### Module 4: Oracle Page & Navigation
+
+**Scope**:
+- Create `src/pages/OraclePage.tsx`:
+  - Use `DashboardShell` wrapper (title: "Oracle")
+  - Load today's report on mount (`fetchTodayReport`)
+  - Load history on mount (`fetchHistory`)
+  - Handle loading/error states
+  - Render `OracleHeader` and `OracleReportPanel`
+- Create `src/components/oracle/OracleHeader.tsx`:
+  - Display score badge (e.g., "6/7")
+  - Display theme badge (e.g., "Gaming")
+  - Refresh button (force fetch)
+  - "Mark as Read" button (disabled if already read)
+- Create `src/components/oracle/OracleReportPanel.tsx`:
+  - Display full report (markdown or plain text)
+  - Expandable sections (score breakdown, themes, alphas)
+  - Copy-to-clipboard button
+- Add Oracle route to `src/routes/RoutesRoot.tsx`:
+  - Lazy-load `OraclePage`
+  - Route: `/oracle`
+- Add Oracle nav item to `src/components/layout/Sidebar.tsx`:
+  - Icon: `Eye` (or appropriate)
+  - Label: "Oracle"
+  - Path: `/oracle`
+  - Position: Between Journal and Alerts
+- Style components with Tailwind (follow existing design tokens)
+
+**Done Criteria**:
+- ✅ Oracle page accessible at `/oracle`
+- ✅ Sidebar shows Oracle nav item
+- ✅ Page loads today's report
+- ✅ Header displays score and theme badges
+- ✅ Report panel shows full text
+- ✅ "Mark as Read" button triggers XP/Streak/Journal
+- ✅ Responsive design (mobile + desktop)
+- ✅ No TypeScript errors
+
+---
+
+### Module 5: Notifications & Auto-Journal
+
+**Scope**:
+- Implement high-score notification in `OraclePage.tsx`:
+  - `useEffect` to watch `currentReport`
+  - If `score >= 6` and `!notified`:
+    - Request notification permission (if default)
+    - Send local notification (Web Notification API)
+    - Mark as notified in DB
+- Add notification click handler:
+  - Focus app (if backgrounded)
+  - Navigate to `/oracle` (if not already there)
+- Implement auto-journal entry on "Mark as Read":
+  - Call `journalStore.createQuickJournalEntry`
+  - Title: `Oracle ${score}/7 → ${theme}`
+  - Notes: `Read Oracle report. Next meta-shift likely: ${theme}`
+  - Tags: `['meta-shift', theme.toLowerCase()]`
+- Test notifications:
+  - Desktop: Chrome, Firefox, Safari
+  - Mobile PWA: iOS Safari, Android Chrome
+  - Permission denied fallback (silent)
+- Add notification icon/badge assets to `public/icons/`
+
+**Done Criteria**:
+- ✅ Notifications work on high score (≥ 6)
+- ✅ Notifications only sent once per report
+- ✅ Auto-journal entry created on "Mark as Read"
+- ✅ Notification permission prompt shown (if needed)
+- ✅ Notification click navigates to Oracle page
+- ✅ Works offline (notification queued until online)
+- ✅ No crashes if notifications blocked
+
+---
+
+### Module 6: Analytics (Chart, Filter, History)
+
+**Scope**:
+- Create `src/components/oracle/OracleHistoryChart.tsx`:
+  - Use Recharts `LineChart` (already in project)
+  - Data: Last 30 days of reports
+  - X-axis: Date (YYYY-MM-DD)
+  - Y-axis: Score (0-7)
+  - Line: Color-coded by theme (e.g., Gaming = green, RWA = blue)
+  - Tooltip: Show date, score, theme
+  - Click on point: Open full report for that day
+- Create `src/components/oracle/OracleThemeFilter.tsx`:
+  - Dropdown or button group (All | Gaming | RWA | AI Agents | ...)
+  - Filter state: `selectedTheme`
+  - Apply filter to history chart and list
+- Create `src/components/oracle/OracleHistoryList.tsx`:
+  - Table/list of past reports (filtered by theme)
+  - Columns: Date | Score | Theme | Actions
+  - Actions: "View Full Report" button
+  - Pagination (if > 30 items)
+- Create `src/components/oracle/OracleReportModal.tsx`:
+  - Modal overlay with full report
+  - Close button (X)
+  - Copy-to-clipboard button
+  - Keyboard shortcuts (Esc to close)
+- Wire components in `OraclePage.tsx`:
+  - State: `selectedTheme`, `selectedReportForModal`
+  - Filter history by theme
+  - Pass filtered data to chart and list
+  - Open modal when "View Full Report" clicked
+- Optimize chart performance:
+  - Virtualization (if needed for large datasets)
+  - Debounce filter changes
+  - Memoize filtered data
+
+**Done Criteria**:
+- ✅ Chart displays 30-day score history
+- ✅ Theme filter works (filters chart and list)
+- ✅ History list shows past reports
+- ✅ Click on chart point opens full report modal
+- ✅ Modal displays full report with markdown formatting
+- ✅ No performance issues with 30+ reports
+- ✅ Responsive design (chart resizes on mobile)
+- ✅ No TypeScript errors
+
+---
+
+### Module 7: Tests & E2E
+
+**Scope**:
+- Write E2E tests in `tests/e2e/oracle/oracle.flows.spec.ts`:
+  - **Test 1: Load Oracle page**
+    - Navigate to `/oracle`
+    - Verify page loads
+    - Verify today's report displays
+    - Verify score and theme badges visible
+  - **Test 2: Mark as read**
+    - Click "Mark as Read" button
+    - Verify XP increased (check header/UI)
+    - Verify streak incremented (check gamification state)
+    - Verify auto-journal entry created (check journal page)
+  - **Test 3: View history chart**
+    - Verify chart displays
+    - Click on a point
+    - Verify modal opens with full report
+  - **Test 4: Filter by theme**
+    - Click theme filter button (e.g., "Gaming")
+    - Verify history list filtered
+    - Verify chart filtered
+  - **Test 5: Notification (high score)**
+    - Mock high-score report (score = 6)
+    - Grant notification permission
+    - Verify notification sent
+    - Click notification
+    - Verify navigates to Oracle page
+- Add `data-testid` attributes to all components:
+  - `oracle-score`, `oracle-theme`, `mark-as-read-button`, `oracle-history-chart`, `theme-filter-{theme}`, `history-item`, etc.
+- Write integration tests in `tests/components/oracle/`:
+  - Test each component in isolation
+  - Mock store state and actions
+  - Verify rendering and interactions
+- Run Playwright E2E:
+  - `pnpm test:e2e`
+  - Fix flaky tests (use `waitFor` instead of `wait`)
+  - Ensure all tests pass consistently
+
+**Done Criteria**:
+- ✅ All E2E tests passing
+- ✅ All component tests passing
+- ✅ E2E tests use stable `data-testid` selectors
+- ✅ No flaky tests (run 10x consecutively)
+- ✅ Coverage ≥ 80% for Oracle components
+- ✅ CI pipeline green (GitHub Actions)
+
+---
+
+## 21. Open Decisions & Next Steps
+
+### Decision Matrix
+
+| Decision | Status | Rationale |
+|----------|--------|-----------|
+| Separate Dexie DB for Oracle? | ✅ **Approved** | Follows existing pattern (`sparkfined-board` is separate) |
+| Global or user-specific reports? | ✅ **Global** | Simplifies backend, reduces costs, creates community pulse |
+| Cache reports in Vercel KV? | ⏸️ **Phase 2** | Not needed for MVP; add later if Cron reliability is critical |
+| Allow streak "freezes"? | ❌ **No** | Strict streaks (like Duolingo) encourage daily engagement |
+| Oracle score influences Alerts? | ❌ **Phase 1: No** | Separate domains; can add "Meta-Shift Mode" in future |
+
+### Integration Checklist
+
+**Before starting implementation:**
+- [ ] Validate `XAI_API_KEY` is available in Vercel env
+- [ ] Create `ORACLE_CRON_SECRET` in Vercel env (256-bit random)
+- [ ] Confirm Grok API quota and rate limits
+- [ ] Verify Recharts is installed (`pnpm list recharts`)
+- [ ] Test Web Notification API in PWA context (iOS/Android)
+
+**During implementation:**
+- [ ] Run `pnpm typecheck` after each module
+- [ ] Run `pnpm lint` to catch style issues
+- [ ] Update `docs/core/concepts/oracle-subsystem.md` after each module
+- [ ] Test offline behavior (Service Worker caching)
+- [ ] Test on staging environment before production deploy
+
+**After implementation:**
+- [ ] Update `CHANGELOG.md` with Oracle feature
+- [ ] Write user-facing guide: `docs/core/guides/oracle-guide.md`
+- [ ] Create demo video/GIF for X announcement
+- [ ] Soft launch to beta testers (feature flag: 50% users)
+- [ ] Monitor metrics (engagement, XP, streaks) for 1 week
+- [ ] Full launch (100% users) after validation
+
+---
+
+## 22. Environment Variables (Complete List)
+
+### Required
+
+| Variable | Purpose | Example | Where to Set |
+|----------|---------|---------|--------------|
+| `ORACLE_CRON_SECRET` | Bearer token for Cron auth | `<256-bit-random>` | Vercel Dashboard → Environment Variables |
+| `XAI_API_KEY` | Grok API key for report generation | `xai-...` | Vercel Dashboard → Environment Variables |
+
+### Optional (Phase 2+)
+
+| Variable | Purpose | Example | Where to Set |
+|----------|---------|---------|--------------|
+| `KV_REST_API_URL` | Vercel KV URL (if caching reports) | `https://...` | Vercel Dashboard → Storage |
+| `KV_REST_API_TOKEN` | Vercel KV token | `...` | Vercel Dashboard → Storage |
+
+### Local Development (.env.local)
+
+```bash
+# Oracle Subsystem
+ORACLE_CRON_SECRET="your-secret-here"
+XAI_API_KEY="xai-your-key-here"
+
+# Optional (Phase 2)
+# KV_REST_API_URL="https://..."
+# KV_REST_API_TOKEN="..."
+```
+
+**Security Notes**:
+- **NEVER** commit `.env.local` to git (already in `.gitignore`)
+- **NEVER** expose `XAI_API_KEY` to client-side code
+- Rotate `ORACLE_CRON_SECRET` every 90 days
+- Use Vercel's "Preview" environment for staging tests
+
+---
+
 **End of Document**
