@@ -17,6 +17,7 @@ export { default as Clock } from 'lucide-react/dist/esm/icons/clock';
 export { default as Bell } from 'lucide-react/dist/esm/icons/bell';
 export { default as Settings } from 'lucide-react/dist/esm/icons/settings';
 export { default as Lock } from 'lucide-react/dist/esm/icons/lock';
+export { default as Sparkles } from 'lucide-react/dist/esm/icons/sparkles';
 
 // Actions
 export { default as Plus } from 'lucide-react/dist/esm/icons/plus';
@@ -61,7 +62,7 @@ export { default as Users } from 'lucide-react/dist/esm/icons/users';
 export { default as FileCheck } from 'lucide-react/dist/esm/icons/file-check';
 export { default as MessageCircle } from 'lucide-react/dist/esm/icons/message-circle';
 export { default as Activity } from 'lucide-react/dist/esm/icons/activity';
-export { default as Sparkles } from 'lucide-react/dist/esm/icons/sparkles';
+export { default as Eye } from 'lucide-react/dist/esm/icons/eye';
 
 // Additional icons (used in various components)
 export { default as RotateCw } from 'lucide-react/dist/esm/icons/rotate-cw';

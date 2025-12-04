@@ -19,6 +19,7 @@ import {
   TrendingUp,
   Settings,
   ChevronRight,
+  Sparkles,
   type LucideIcon,
 } from '@/lib/icons';
 import { getItem, setItem } from '@/lib/safeStorage';
@@ -34,6 +35,7 @@ const primaryNavItems: NavItem[] = [
   { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
   { path: '/chart-v2', label: 'Chart', Icon: TrendingUp },
   { path: '/journal-v2', label: 'Journal', Icon: FileText },
+  { path: '/oracle', label: 'Oracle', Icon: Sparkles },
   { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
 ];
 
@@ -88,6 +90,7 @@ export default function Sidebar() {
       'Analyze': 'analyze-link',
       'Chart': 'chart-link',
       'Journal': 'journal-link',
+      'Oracle': 'oracle-link',
       'Alerts': 'notifications-link',
       'Settings': 'settings-link',
     };
