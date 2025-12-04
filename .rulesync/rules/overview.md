@@ -241,8 +241,8 @@ npx rulesync generate --dry-run    # Preview without writing
 
 This is the **global overview**. For domain-specific guardrails, see:
 - `.rulesync/rules/journal-system.md` – Journal domain rules
+- `.rulesync/rules/playwright-e2e-health.md` – Playwright E2E test suite maintenance
 - (Future) `.rulesync/rules/market-orchestrator.md` – Market data rules
-- (Future) `.rulesync/rules/ci-and-tests.md` – CI/CD and testing patterns
 
 ---
 

@@ -87,6 +87,13 @@ docs/
 - **[guides/](./core/guides/)** — Practical how-to guides
   - Access tabs guide
 
+### QA & Testing
+
+- **[qa/](./qa/)** — Quality assurance & testing documentation
+  - E2E testing guide (Playwright)
+  - Manual QA checklist
+  - UX test status
+
 ### AI Integration
 
 - **[ai/](./core/ai/)** — AI system documentation
@@ -191,6 +198,7 @@ docs/
 - [Architecture Overview](./core/architecture/01_repo_index.md)
 - [Core Flows](./core/architecture/03_core_flows.md)
 - [AI Integration](./core/ai/README_AI.md)
+- [E2E Testing Guide](./qa/e2e-testing-guide.md)
 
 **Current Work:**
 - [Active Sprint Plan](./active/Working_Plan.md)
