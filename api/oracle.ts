@@ -319,7 +319,7 @@ export default async function handler(req: Request): Promise<Response> {
     const fullReport = combineReports(scoreRaw, themeRaw, alphaRaw);
 
     // Build response
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split('T')[0] ?? new Date().toISOString().substring(0, 10);
     const response: OracleAPIResponse = {
       report: fullReport,
       score,

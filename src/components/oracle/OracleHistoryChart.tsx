@@ -121,31 +121,38 @@ export default function OracleHistoryChart({ reports }: OracleHistoryChartProps)
           })}
 
           {/* X-axis labels (show first, middle, last) */}
-          {points.length > 0 && points[0] && points[points.length - 1] && (
-            <>
-              {/* First date */}
-              <text
-                x={points[0].x}
-                y={height - padding.bottom + 20}
-                textAnchor="start"
-                className="text-text-tertiary"
-                fontSize="12"
-              >
-                {formatDate(points[0].report.date)}
-              </text>
-              
-              {/* Last date */}
-              <text
-                x={points[points.length - 1].x}
-                y={height - padding.bottom + 20}
-                textAnchor="end"
-                className="text-text-tertiary"
-                fontSize="12"
-              >
-                {formatDate(points[points.length - 1].report.date)}
-              </text>
-            </>
-          )}
+          {(() => {
+            const firstPoint = points[0];
+            const lastPoint = points[points.length - 1];
+            
+            if (!firstPoint || !lastPoint) return null;
+            
+            return (
+              <>
+                {/* First date */}
+                <text
+                  x={firstPoint.x}
+                  y={height - padding.bottom + 20}
+                  textAnchor="start"
+                  className="text-text-tertiary"
+                  fontSize="12"
+                >
+                  {formatDate(firstPoint.report.date)}
+                </text>
+                
+                {/* Last date */}
+                <text
+                  x={lastPoint.x}
+                  y={height - padding.bottom + 20}
+                  textAnchor="end"
+                  className="text-text-tertiary"
+                  fontSize="12"
+                >
+                  {formatDate(lastPoint.report.date)}
+                </text>
+              </>
+            );
+          })()}
 
           {/* Line path */}
           <path
