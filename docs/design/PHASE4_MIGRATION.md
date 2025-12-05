@@ -534,6 +534,13 @@ export { haptic } from './utils/haptic'
 - [ ] `pnpm lint` passes
 - [ ] `pnpm test` passes
 
+#### Step 1 – Implementation Notes (2025-12-05)
+
+- Created `src/design-system/` module with tokens (colors, typography, spacing, shadows, animation), Spark theme object, utils and public barrel exports.
+- Added Button, Card, Alert and Modal components powered by Spark tokens plus focused unit tests for rendering, variants and interactions.
+- Updated Tailwind + `tokens.css` + `fonts.css` to expose Spark/Void palette, typography stack and glow utilities without removing legacy aliases.
+- Introduced shims in `src/components/ui/` so legacy imports re-export the new design system primitives, keeping Step 2 migration low risk.
+
 #### Nice to Have 🎁
 
 - [ ] Haptic feedback utilities

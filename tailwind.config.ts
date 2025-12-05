@@ -1,4 +1,9 @@
 import type { Config } from 'tailwindcss'
+import { colors as sparkColors } from './src/design-system/tokens/colors'
+import { typography } from './src/design-system/tokens/typography'
+import { borderRadius as radiusTokens } from './src/design-system/tokens/spacing'
+import { glows, shadows } from './src/design-system/tokens/shadows'
+import { animation } from './src/design-system/tokens/animation'
 
 const withAlpha = (variable: string) => `rgb(var(${variable}) / <alpha-value>)`
 const withFixedAlpha = (variable: string, alpha: number | string) => `rgb(var(${variable}) / ${alpha})`
@@ -18,6 +23,45 @@ export default {
           hover: withAlpha('--color-brand-hover'),
         },
         accent: withAlpha('--color-accent'),
+
+        // Spark design system palette
+        void: {
+          DEFAULT: sparkColors.void.DEFAULT,
+          lighter: sparkColors.void.lighter,
+          lightest: sparkColors.void.lightest,
+        },
+        spark: {
+          DEFAULT: sparkColors.spark.DEFAULT,
+          dim: sparkColors.spark.dim,
+        },
+        smoke: {
+          DEFAULT: sparkColors.smoke.DEFAULT,
+          light: sparkColors.smoke.light,
+          lighter: sparkColors.smoke.lighter,
+        },
+        mist: {
+          DEFAULT: sparkColors.mist.DEFAULT,
+          fog: sparkColors.mist.fog,
+          ash: sparkColors.mist.ash,
+        },
+        gold: {
+          DEFAULT: sparkColors.gold.DEFAULT,
+          dim: sparkColors.gold.dim,
+        },
+        blood: {
+          DEFAULT: sparkColors.blood.DEFAULT,
+          dim: sparkColors.blood.dim,
+        },
+        phosphor: {
+          DEFAULT: sparkColors.phosphor.DEFAULT,
+          dim: sparkColors.phosphor.dim,
+        },
+        violet: {
+          DEFAULT: sparkColors.violet.DEFAULT,
+        },
+        ember: {
+          DEFAULT: sparkColors.ember.DEFAULT,
+        },
 
         // Background & Surface
         bg: {
@@ -196,21 +240,13 @@ export default {
       },
       
       fontFamily: {
-        sans: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        display: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: typography.fontFamily.primary,
+        display: typography.fontFamily.display,
+        mono: typography.fontFamily.mono,
       },
       
       fontSize: {
-        xs: ['0.75rem', { lineHeight: '1.33' }],
-        sm: ['0.875rem', { lineHeight: '1.43' }],
-        base: ['1rem', { lineHeight: '1.5' }],
-        lg: ['1.125rem', { lineHeight: '1.56' }],
-        xl: ['1.25rem', { lineHeight: '1.4' }],
-        '2xl': ['1.5rem', { lineHeight: '1.33' }],
-        '3xl': ['1.875rem', { lineHeight: '1.25' }],
-        '4xl': ['2.25rem', { lineHeight: '1.2' }],
-        '5xl': ['3rem', { lineHeight: '1.15' }],
+        ...typography.fontSize,
         '6xl': ['3.75rem', { lineHeight: '1.1' }],
         '7xl': ['4.5rem', { lineHeight: '1.05' }],
       },
@@ -253,13 +289,9 @@ export default {
       },
       
       borderRadius: {
-        sm: '6px',
-        md: '8px',
-        lg: '12px',
-        xl: '16px',
-        '2xl': '20px',
-        '3xl': '24px',
-        full: '9999px',
+        ...radiusTokens,
+        '2xl': '1.25rem',
+        '3xl': '1.5rem',
       },
       
       boxShadow: {
@@ -271,6 +303,14 @@ export default {
         'emerald-glow-lg': '0 0 50px rgba(16, 185, 129, 0.5)',
         'emerald-glow-xl': '0 0 70px rgba(16, 185, 129, 0.6)',
         'rose-glow': '0 0 20px rgba(244, 63, 94, 0.3)',
+        'spark-sm': shadows.sm,
+        'spark-md': shadows.md,
+        'spark-lg': shadows.lg,
+        'spark-xl': shadows.xl,
+        'glow-spark': glows.spark,
+        'glow-gold': glows.gold,
+        'glow-blood': glows.blood,
+        'glow-phosphor': glows.phosphor,
       },
       
       backgroundImage: {
@@ -279,6 +319,9 @@ export default {
         'grid-pattern': 'linear-gradient(to right, rgb(var(--color-border) / 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgb(var(--color-border) / 0.2) 1px, transparent 1px)',
         'app-gradient': 'linear-gradient(to bottom, rgb(var(--color-bg-overlay) / 0.9) 0%, rgb(var(--color-bg)) 50%, rgb(var(--color-bg-overlay) / 0.95) 100%)',
         'surface-gradient': 'linear-gradient(135deg, rgb(var(--color-surface-subtle)) 0%, rgb(var(--color-surface-elevated)) 100%)',
+        'gradient-spark': sparkColors.gradients.spark,
+        'gradient-gold': sparkColors.gradients.gold,
+        'gradient-void': sparkColors.gradients.void,
       },
       
       backgroundSize: {
@@ -301,6 +344,10 @@ export default {
         '500': '500ms',
         '700': '700ms',
         '1000': '1000ms',
+        fast: animation.duration.fast,
+        normal: animation.duration.normal,
+        slow: animation.duration.slow,
+        slower: animation.duration.slower,
       },
       
       transitionTimingFunction: {
@@ -309,6 +356,10 @@ export default {
         'ease-in': 'cubic-bezier(0.4, 0, 1, 1)',
         'ease-out': 'cubic-bezier(0, 0, 0.2, 1)',
         'soft': 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+        'spark-out': animation.easing.out,
+        'spark-in': animation.easing.in,
+        'spark-in-out': animation.easing.inOut,
+        'spark-bounce': animation.easing.bounce,
       },
       
       animation: {

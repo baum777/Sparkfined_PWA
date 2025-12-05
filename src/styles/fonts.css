@@ -1,7 +1,13 @@
 /* Google Fonts Fallback (must be first) */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* JetBrains Mono — Latin Subset */
+/* Sparkfined core font stack
+ * - Inter: UI + body copy
+ * - Space Grotesk: Display + hero numerics
+ * - JetBrains Mono: Data + code surfaces
+ */
 
 /**
  * Option 1: Local (self-hosted) — Recommended for production
