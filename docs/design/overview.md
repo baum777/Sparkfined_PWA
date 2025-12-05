@@ -30,6 +30,7 @@ Border Glows, Background Patterns, Custom Scrollbars und weitere Utility-Klassen
 
 Das Design System ist in folgende Bereiche unterteilt:
 
+- **[Colors](./colors.md)** - Complete color palette, Tailwind utilities, usage patterns
 - **[Glassmorphism](./glassmorphism.md)** - Frosted-Glass-Effekte
 - **[Elevation](./elevation.md)** - Schatten-Ebenen für visuelle Hierarchie
 - **[Cards](./cards.md)** - Card-System mit Varianten
