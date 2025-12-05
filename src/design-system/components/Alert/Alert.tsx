@@ -5,7 +5,7 @@ export type AlertVariant = 'armed' | 'triggered' | 'paused'
 
 export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   variant?: AlertVariant
-  title: ReactNode
+  title?: ReactNode
   description?: ReactNode
   badge?: ReactNode
   actions?: ReactNode

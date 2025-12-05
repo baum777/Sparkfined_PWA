@@ -118,7 +118,7 @@ Umfangreiche Card-Varianten für verschiedene Use-Cases.
 </div>
 ```
 
-> **TypeScript-Hinweis:** Motion-spezifische Props (z. B. `whileHover` oder animierte `style`-Werte) werden nur an interaktive Cards weitergereicht. Statische Cards akzeptieren ausschließlich reguläre HTML/CSS-Properties, damit `style` sauber mit `CSSProperties` typisiert bleibt.
+> **TypeScript-Hinweis:** Motion-spezifische Props (z. B. `whileHover` oder animierte `style`-Werte) werden nur an interaktive Cards weitergereicht. Statische Cards akzeptieren ausschließlich reguläre HTML/CSS-Properties, damit `style` sauber mit `CSSProperties` typisiert bleibt. Drag-Handler (`onDrag*`) werden aus den Card-Props herausgefiltert, um Konflikte zwischen React- und Motion-Events zu vermeiden; nutze bei Bedarf einen expliziten `motion.div`-Wrapper.
 
 ### Beispiel: Dashboard KPI Card
 
@@ -144,7 +144,7 @@ Umfangreiche Card-Varianten für verschiedene Use-Cases.
 
 Komplett überarbeitete Buttons mit Hover-Animationen.
 
-**TypeScript-Hinweis:** Framer-Motion-Buttons nehmen ausschließlich `ReactNode` als `children` entgegen. `MotionValue`-Payloads werden in den Motion-Props herausgefiltert, damit Komponenten-APIs konsistent bleiben.
+**TypeScript-Hinweis:** Framer-Motion-Buttons nehmen ausschließlich `ReactNode` als `children` entgegen. `MotionValue`-Payloads werden in den Motion-Props herausgefiltert, damit Komponenten-APIs konsistent bleiben. Drag-Events (`onDrag*`) sind absichtlich nicht Teil der Button-API; falls du Dragging brauchst, kapsle den Button in einen separaten `motion`-Container.
 
 ### Button-Varianten:
 

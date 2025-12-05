@@ -4,7 +4,10 @@ import { cn } from '@/design-system/utils/cn'
 
 export type CardVariant = 'default' | 'interactive' | 'glow' | 'muted'
 
-type BaseCardProps = Omit<HTMLMotionProps<'div'>, 'ref' | 'onDrag' | 'children'>
+type BaseCardProps = Omit<
+  HTMLMotionProps<'div'>,
+  'ref' | 'children' | 'onDrag' | 'onDragStart' | 'onDragEnd'
+>
 
 export interface CardProps extends BaseCardProps {
   variant?: CardVariant
@@ -33,10 +36,13 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         }
       : {}
 
-    const { onDrag, style, ...safeRest } = rest as typeof rest & {
-      onDrag?: unknown
-      style?: CSSProperties
-    }
+    const { onDrag: _onDrag, onDragStart: _onDragStart, onDragEnd: _onDragEnd, style, ...safeRest } =
+      rest as typeof rest & {
+        onDrag?: unknown
+        onDragStart?: unknown
+        onDragEnd?: unknown
+        style?: CSSProperties
+      }
 
     const resolvedStyle = isInteractive ? style : (style as CSSProperties | undefined)
 
