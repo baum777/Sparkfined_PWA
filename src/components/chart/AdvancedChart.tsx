@@ -19,7 +19,7 @@ import type {
   OhlcCandle,
 } from '@/domain/chart'
 import type { ChartDataSource } from '@/hooks/useOhlcData'
-import { getChartColors, subscribeToThemeChanges } from '@/lib/chartColors'
+import { getChartColors } from '@/lib/chartColors'
 
 export type AdvancedChartProps = {
   candles: OhlcCandle[]

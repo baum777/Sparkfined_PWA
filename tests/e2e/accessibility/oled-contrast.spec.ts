@@ -19,18 +19,23 @@ import type { Page } from '@playwright/test'
  * Formula: https://www.w3.org/WAI/GL/wiki/Contrast_ratio
  */
 function getRelativeLuminance(r: number, g: number, b: number): number {
-  const [rs, gs, bs] = [r, g, b].map(c => {
+  const normalized = [r, g, b].map(c => {
     c = c / 255
     return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
   })
+  const [rs = 0, gs = 0, bs = 0] = normalized
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs
 }
 
 function getContrastRatio(rgb1: string, rgb2: string): number {
-  const parseRgb = (rgb: string) => {
+  const parseRgb = (rgb: string): [number, number, number] => {
     const match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)
     if (!match) return [0, 0, 0]
-    return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])]
+    return [
+      parseInt(match[1] || '0', 10),
+      parseInt(match[2] || '0', 10),
+      parseInt(match[3] || '0', 10)
+    ]
   }
 
   const [r1, g1, b1] = parseRgb(rgb1)
@@ -123,7 +128,10 @@ test.describe('OLED Mode - Color Contrast (WCAG)', () => {
       
       // Should be near-black (not pure black, for visual hierarchy)
       // Expected: rgb(8, 8, 8) or similar
-      const [r, g, b] = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)?.slice(1).map(Number) || [0, 0, 0]
+      const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)
+      const r = match ? parseInt(match[1] || '0', 10) : 0
+      const g = match ? parseInt(match[2] || '0', 10) : 0
+      const b = match ? parseInt(match[3] || '0', 10) : 0
       
       // Near-black means 0-20 for each channel
       expect(r).toBeLessThanOrEqual(20)
@@ -346,11 +354,10 @@ test.describe('OLED Mode - Color Contrast (WCAG)', () => {
   test('should distinguish interactive elements', async ({ page }) => {
     await page.goto('/dashboard-v2')
     
-    // Find buttons and links
+    // Find buttons
     const buttons = page.locator('button:visible')
-    const links = page.locator('a:visible')
     
-    // Buttons and links should be visually distinct
+    // Buttons should be visually distinct
     // (either by color, underline, or other styling)
     if (await buttons.count() > 0) {
       const buttonStyle = await buttons.first().evaluate((el) => {

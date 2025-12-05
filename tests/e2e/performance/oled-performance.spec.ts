@@ -44,7 +44,7 @@ async function getPerformanceMetrics(page: Page) {
       tcpConnect: perfData.connectEnd - perfData.connectStart,
       request: perfData.responseStart - perfData.requestStart,
       response: perfData.responseEnd - perfData.responseStart,
-      domProcessing: perfData.domComplete - perfData.domLoading,
+      domProcessing: perfData.domComplete - perfData.domInteractive,
       
       // Transfer sizes
       transferSize: perfData.transferSize,
@@ -59,12 +59,12 @@ async function getPerformanceMetrics(page: Page) {
  */
 async function getMemoryUsage(page: Page): Promise<{ usedJSHeapSize: number; totalJSHeapSize: number } | null> {
   return await page.evaluate(() => {
-    // @ts-ignore - performance.memory is Chrome-specific
+    // @ts-expect-error - performance.memory is Chrome-specific
     if (performance.memory) {
       return {
-        // @ts-ignore
+        // @ts-expect-error - Chrome-specific API
         usedJSHeapSize: performance.memory.usedJSHeapSize,
-        // @ts-ignore
+        // @ts-expect-error - Chrome-specific API
         totalJSHeapSize: performance.memory.totalJSHeapSize,
       }
     }
@@ -169,7 +169,7 @@ test.describe('OLED Mode - Performance Tests', () => {
       document.body.dataset.oled = 'true'
       
       // Force style recalc
-      window.getComputedStyle(document.body).backgroundColor
+      void window.getComputedStyle(document.body).backgroundColor
       
       return performance.now() - start
     })
@@ -243,7 +243,7 @@ test.describe('OLED Mode - Performance Tests', () => {
       // Toggle OLED mode multiple times
       for (let i = 0; i < 10; i++) {
         document.body.dataset.oled = i % 2 === 0 ? 'true' : 'false'
-        window.getComputedStyle(document.body).backgroundColor // Force recalc
+        void window.getComputedStyle(document.body).backgroundColor // Force recalc
       }
       
       observer.disconnect()
@@ -267,7 +267,7 @@ test.describe('OLED Mode - Performance Tests', () => {
     const fps = await page.evaluate(() => {
       return new Promise<number>((resolve) => {
         let frameCount = 0
-        let lastTime = performance.now()
+        const lastTime = performance.now()
         
         function countFrames() {
           frameCount++
@@ -371,8 +371,8 @@ test.describe('OLED Mode - Performance Tests', () => {
       for (let i = 0; i < 100; i++) {
         const element = document.body.children[i % document.body.children.length]
         if (element) {
-          window.getComputedStyle(element).backgroundColor
-          window.getComputedStyle(element).color
+          void window.getComputedStyle(element).backgroundColor
+          void window.getComputedStyle(element).color
         }
       }
       
@@ -428,7 +428,7 @@ test.describe('OLED Mode - Performance Tests', () => {
         localStorage.setItem('oled-mode', i % 2 === 0 ? 'true' : 'false')
         
         // Read
-        const value = localStorage.getItem('oled-mode')
+        void localStorage.getItem('oled-mode')
       }
       
       return performance.now() - start
@@ -477,8 +477,6 @@ test.describe('OLED Mode - Performance Tests', () => {
   test('should animate toggle smoothly', async ({ page }) => {
     await page.goto('/settings-v2')
     await page.waitForLoadState('networkidle')
-    
-    const toggle = page.getByRole('switch', { name: /OLED Mode/i })
     
     // Measure animation performance
     const animationTime = await page.evaluate(async () => {

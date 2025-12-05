@@ -36,9 +36,10 @@ function getTokenValue(token: string): string {
   }
 
   // Convert "15 179 76" to "rgb(15, 179, 76)"
-  const [r, g, b] = value.split(' ').map(Number);
+  const parts = value.split(' ').map(Number);
+  const [r = 0, g = 0, b = 0] = parts;
   
-  if (isNaN(r) || isNaN(g) || isNaN(b)) {
+  if (isNaN(r) || isNaN(g) || isNaN(b) || parts.length !== 3) {
     console.warn(`[chartColors] Invalid RGB value for token "${token}": "${value}"`);
     return 'rgb(0, 0, 0)';
   }

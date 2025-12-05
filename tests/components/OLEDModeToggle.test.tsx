@@ -221,9 +221,6 @@ describe('OLEDModeToggle', () => {
 
   it('works when localStorage is unavailable', () => {
     // Mock localStorage to throw
-    const originalGetItem = localStorage.getItem
-    const originalSetItem = localStorage.setItem
-    
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('localStorage unavailable')
     })
