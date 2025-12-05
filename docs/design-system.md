@@ -142,6 +142,8 @@ Umfangreiche Card-Varianten für verschiedene Use-Cases.
 
 Komplett überarbeitete Buttons mit Hover-Animationen.
 
+**TypeScript-Hinweis:** Framer-Motion-Buttons nehmen ausschließlich `ReactNode` als `children` entgegen. `MotionValue`-Payloads werden in den Motion-Props herausgefiltert, damit Komponenten-APIs konsistent bleiben.
+
 ### Button-Varianten:
 
 ```tsx

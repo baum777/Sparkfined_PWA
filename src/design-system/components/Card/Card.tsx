@@ -1,14 +1,15 @@
-import { forwardRef, type HTMLAttributes } from 'react'
+import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { motion, useReducedMotion, type HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/design-system/utils/cn'
 
 export type CardVariant = 'default' | 'interactive' | 'glow' | 'muted'
 
-type BaseCardProps = Omit<HTMLMotionProps<'div'>, 'ref' | 'onDrag'>
+type BaseCardProps = Omit<HTMLMotionProps<'div'>, 'ref' | 'onDrag' | 'children'>
 
 export interface CardProps extends BaseCardProps {
   variant?: CardVariant
   interactive?: boolean
+  children?: ReactNode
 }
 
 const variantStyles: Record<CardVariant, string> = {
