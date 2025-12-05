@@ -513,6 +513,16 @@ export { haptic } from './utils/haptic'
 
 ---
 
+#### Step 1 Status – 2025-12-05 (Codex)
+
+- `src/design-system/` scaffolded with tokens, theme bundle, utils, README, and a public barrel API.
+- Spark/Void tokens implemented in TypeScript plus mirrored updates to `tailwind.config.ts`, `src/styles/tokens.css`, and `src/styles/fonts.css`.
+- Core components (`Button`, `Card`, `Alert`, `Modal`) implemented under `src/design-system/components/*` with matching Vitest coverage.
+- Compatibility shims in `src/components/ui/*` re-export the new components without touching consuming screens.
+- No production screens migrated yet; Step 2+ will swap imports surface-by-surface.
+
+---
+
 ### Acceptance Criteria (Step 1)
 
 #### Must Have ✅

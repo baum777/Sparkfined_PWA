@@ -1,7 +1,16 @@
 import type { Config } from 'tailwindcss'
+import { colors as designSystemColors } from './src/design-system/tokens/colors'
+import { typography as designSystemTypography } from './src/design-system/tokens/typography'
+import { borderRadius as designSystemRadius } from './src/design-system/tokens/spacing'
+import { glows as designSystemGlows, shadows as designSystemShadows } from './src/design-system/tokens/shadows'
+import { animation as designSystemAnimation } from './src/design-system/tokens/animation'
 
 const withAlpha = (variable: string) => `rgb(var(${variable}) / <alpha-value>)`
 const withFixedAlpha = (variable: string, alpha: number | string) => `rgb(var(${variable}) / ${alpha})`
+const fontStack = (stack: string) =>
+  stack
+    .split(',')
+    .map((font) => font.trim().replace(/^'(.*)'$/, '$1'))
 
 export default {
   content: [
@@ -18,6 +27,17 @@ export default {
           hover: withAlpha('--color-brand-hover'),
         },
         accent: withAlpha('--color-accent'),
+
+        // Design system palette
+        spark: designSystemColors.spark,
+        void: designSystemColors.void,
+        smoke: designSystemColors.smoke,
+        mist: designSystemColors.mist,
+        gold: designSystemColors.gold,
+        blood: designSystemColors.blood,
+        phosphor: designSystemColors.phosphor,
+        violet: designSystemColors.violet,
+        ember: designSystemColors.ember,
 
         // Background & Surface
         bg: {
@@ -196,9 +216,9 @@ export default {
       },
       
       fontFamily: {
-        sans: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        display: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: fontStack(designSystemTypography.fontFamily.primary),
+        display: fontStack(designSystemTypography.fontFamily.display),
+        mono: fontStack(designSystemTypography.fontFamily.mono),
       },
       
       fontSize: {
@@ -253,16 +273,16 @@ export default {
       },
       
       borderRadius: {
-        sm: '6px',
-        md: '8px',
-        lg: '12px',
-        xl: '16px',
-        '2xl': '20px',
+        ...designSystemRadius,
         '3xl': '24px',
-        full: '9999px',
       },
       
       boxShadow: {
+        ...designSystemShadows,
+        'glow-spark': designSystemGlows.spark,
+        'glow-gold': designSystemGlows.gold,
+        'glow-blood': designSystemGlows.blood,
+        'glow-phosphor': designSystemGlows.phosphor,
         'card-subtle': '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
         'glow-accent': '0 0 10px rgba(0, 255, 102, 0.22)',
         'glow-brand': '0 0 12px rgba(255, 98, 0, 0.18)',
@@ -279,6 +299,9 @@ export default {
         'grid-pattern': 'linear-gradient(to right, rgb(var(--color-border) / 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgb(var(--color-border) / 0.2) 1px, transparent 1px)',
         'app-gradient': 'linear-gradient(to bottom, rgb(var(--color-bg-overlay) / 0.9) 0%, rgb(var(--color-bg)) 50%, rgb(var(--color-bg-overlay) / 0.95) 100%)',
         'surface-gradient': 'linear-gradient(135deg, rgb(var(--color-surface-subtle)) 0%, rgb(var(--color-surface-elevated)) 100%)',
+        'gradient-spark': designSystemColors.gradients.spark,
+        'gradient-gold': designSystemColors.gradients.gold,
+        'gradient-void': designSystemColors.gradients.void,
       },
       
       backgroundSize: {
@@ -301,6 +324,10 @@ export default {
         '500': '500ms',
         '700': '700ms',
         '1000': '1000ms',
+        'ds-fast': designSystemAnimation.duration.fast,
+        'ds-normal': designSystemAnimation.duration.normal,
+        'ds-slow': designSystemAnimation.duration.slow,
+        'ds-slower': designSystemAnimation.duration.slower,
       },
       
       transitionTimingFunction: {
@@ -309,6 +336,10 @@ export default {
         'ease-in': 'cubic-bezier(0.4, 0, 1, 1)',
         'ease-out': 'cubic-bezier(0, 0, 0.2, 1)',
         'soft': 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+        'spark-out': designSystemAnimation.easing.out,
+        'spark-in': designSystemAnimation.easing.in,
+        'spark-in-out': designSystemAnimation.easing.inOut,
+        'spark-bounce': designSystemAnimation.easing.bounce,
       },
       
       animation: {
