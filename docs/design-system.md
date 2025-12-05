@@ -118,6 +118,8 @@ Umfangreiche Card-Varianten für verschiedene Use-Cases.
 </div>
 ```
 
+> **TypeScript-Hinweis:** Motion-spezifische Props (z. B. `whileHover` oder animierte `style`-Werte) werden nur an interaktive Cards weitergereicht. Statische Cards akzeptieren ausschließlich reguläre HTML/CSS-Properties, damit `style` sauber mit `CSSProperties` typisiert bleibt.
+
 ### Beispiel: Dashboard KPI Card
 
 ```tsx

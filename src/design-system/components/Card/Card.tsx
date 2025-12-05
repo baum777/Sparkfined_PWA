@@ -1,4 +1,4 @@
-import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
 import { motion, useReducedMotion, type HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/design-system/utils/cn'
 
@@ -33,7 +33,12 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         }
       : {}
 
-    const { onDrag, ...safeRest } = rest as typeof rest & { onDrag?: unknown }
+    const { onDrag, style, ...safeRest } = rest as typeof rest & {
+      onDrag?: unknown
+      style?: CSSProperties
+    }
+
+    const resolvedStyle = isInteractive ? style : (style as CSSProperties | undefined)
 
     return (
       <Component
@@ -47,8 +52,9 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         tabIndex={isInteractive ? 0 : rest.tabIndex}
         role={isInteractive ? 'button' : rest.role}
         onClick={onClick}
-        {...motionProps}
+        {...(isInteractive ? motionProps : {})}
         {...safeRest}
+        style={resolvedStyle}
       >
         {children}
       </Component>
