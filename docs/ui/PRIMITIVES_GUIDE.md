@@ -32,6 +32,7 @@ import { Share2 } from '@/lib/icons'
 - Variants: `default`, `muted`, `interactive`
 - Adds `rounded-2xl`, `p-6`, `shadow-card-subtle` backed by `bg-surface` tokens
 - `interactive` (or any `onClick`) adds cursor + keyboard handling
+- Always renders as a `motion.div` so animation props remain type-safe even when we downgrade the behavior to a static surface
 - Subcomponents: `CardHeader`, `CardFooter` with sensible spacing defaults
 
 ```tsx

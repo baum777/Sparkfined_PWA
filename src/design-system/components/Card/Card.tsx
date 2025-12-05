@@ -1,4 +1,4 @@
-import { forwardRef, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { motion, useReducedMotion, type HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/design-system/utils/cn'
 
@@ -28,7 +28,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ variant = 'default', interactive = false, className, children, onClick, ...rest }, ref) => {
     const prefersReducedMotion = useReducedMotion()
     const isInteractive = interactive || typeof onClick === 'function' || variant === 'interactive'
-    const Component = isInteractive ? MotionDiv : 'div'
+    const { tabIndex: tabIndexProp, role: roleProp, ...restProps } = rest
     const motionProps = isInteractive
       ? {
           whileHover: prefersReducedMotion ? undefined : { y: -2, borderColor: '#00F0FF' },
@@ -36,18 +36,8 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         }
       : {}
 
-    const { onDrag: _onDrag, onDragStart: _onDragStart, onDragEnd: _onDragEnd, style, ...safeRest } =
-      rest as typeof rest & {
-        onDrag?: unknown
-        onDragStart?: unknown
-        onDragEnd?: unknown
-        style?: CSSProperties
-      }
-
-    const resolvedStyle = isInteractive ? style : (style as CSSProperties | undefined)
-
     return (
-      <Component
+      <MotionDiv
         ref={ref}
         className={cn(
           'rounded-lg p-4 text-text-primary transition-all duration-250 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spark',
@@ -55,15 +45,14 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           variantStyles[variant],
           className
         )}
-        tabIndex={isInteractive ? 0 : rest.tabIndex}
-        role={isInteractive ? 'button' : rest.role}
+        tabIndex={isInteractive ? 0 : tabIndexProp}
+        role={isInteractive ? 'button' : roleProp}
         onClick={onClick}
         {...(isInteractive ? motionProps : {})}
-        {...safeRest}
-        style={resolvedStyle}
+        {...restProps}
       >
         {children}
-      </Component>
+      </MotionDiv>
     )
   }
 )
