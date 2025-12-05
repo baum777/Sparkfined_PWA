@@ -332,7 +332,7 @@ Most crypto dashboards are built for casual investors checking prices once a day
 
 **Current Status:** `v0.1.0 Beta` — Core features stable, PWA functional, AI integrations live
 
-### 🎯 Q1 2025 — Stability & Growth
+### 🎯 Q1 2026 — Stability & Growth
 
 ```
 ✅ COMPLETED
@@ -351,7 +351,7 @@ Most crypto dashboards are built for casual investors checking prices once a day
    📊 Chart Library Evaluation (TradingView vs Lightweight)
 ```
 
-### 🌟 Q2 2025 — Platform Expansion
+### 🌟 Q2 2026 — Platform Expansion
 
 ```
 ☁️  Supabase Migration (cross-device sync)
@@ -361,7 +361,7 @@ Most crypto dashboards are built for casual investors checking prices once a day
 💬 In-App Chat (trader community)
 ```
 
-### 🚀 Q3 2025 — Community & Scale
+### 🚀 Q3 2026 — Community & Scale
 
 ```
 🌐 Community Heatmaps (anonymized behavioral patterns)
