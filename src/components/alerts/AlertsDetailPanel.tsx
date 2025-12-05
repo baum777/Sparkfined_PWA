@@ -22,7 +22,7 @@ export default function AlertsDetailPanel({ alert, onAlertDeleted }: AlertsDetai
   if (!alert) {
     return (
       <div
-        className="min-h-[280px] rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-8 text-sm text-text-secondary"
+        className="card-bordered min-h-[280px] rounded-2xl border-dashed px-6 py-8 text-sm text-text-secondary"
         data-testid="alerts-detail-empty"
       >
         Select an alert on the left to see more detail and context here.
@@ -51,7 +51,7 @@ export default function AlertsDetailPanel({ alert, onAlertDeleted }: AlertsDetai
 
   return (
     <section
-      className="space-y-6 rounded-2xl border border-border-moderate bg-surface p-5 text-sm text-text-secondary"
+      className="card-glass space-y-6 rounded-2xl p-5 text-sm text-text-secondary"
       data-testid="alerts-detail-panel"
     >
       <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

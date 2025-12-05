@@ -6,8 +6,8 @@ interface AlertsLayoutProps {
 
 export default function AlertsLayout({ children }: AlertsLayoutProps) {
   return (
-    <section className="space-y-6 rounded-3xl border border-border-subtle bg-surface-subtle p-4 sm:p-6">
-      <div className="rounded-2xl border border-border-subtle bg-surface-elevated p-4 sm:p-6 shadow-inner">
+    <section className="card space-y-6 rounded-3xl p-4 sm:p-6">
+      <div className="card-elevated rounded-2xl p-4 sm:p-6">
         {children}
       </div>
     </section>
