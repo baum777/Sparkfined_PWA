@@ -15,31 +15,40 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/design-system/utils/cn'
 
-export type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right'
+export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right'
 
 export interface TooltipProps {
   content: ReactNode
-  placement?: TooltipPlacement
+  position?: TooltipPosition
+  placement?: TooltipPosition
   openDelay?: number
   closeDelay?: number
   children: ReactElement
 }
 
-const placementOffsets: Record<TooltipPlacement, { x: number; y: number }> = {
+const placementOffsets: Record<TooltipPosition, { x: number; y: number }> = {
   top: { x: 0, y: -8 },
   bottom: { x: 0, y: 8 },
   left: { x: -8, y: 0 },
   right: { x: 8, y: 0 },
 }
 
-export function Tooltip({ children, content, placement = 'top', openDelay = 150, closeDelay = 80 }: TooltipProps) {
+export function Tooltip({
+  children,
+  content,
+  position: positionProp,
+  placement,
+  openDelay = 150,
+  closeDelay = 80,
+}: TooltipProps) {
   const triggerRef = useRef<HTMLElement | null>(null)
   const [isOpen, setIsOpen] = useState(false)
-  const [position, setPosition] = useState({ top: 0, left: 0 })
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 })
   const id = useId()
   const openTimer = useRef<number>()
   const closeTimer = useRef<number>()
   const [isPortalReady, setPortalReady] = useState(false)
+  const resolvedPosition = positionProp ?? placement ?? 'top'
 
   useEffect(() => {
     setPortalReady(typeof document !== 'undefined')
@@ -52,11 +61,11 @@ export function Tooltip({ children, content, placement = 'top', openDelay = 150,
   const updatePosition = useCallback(() => {
     if (!triggerRef.current) return
     const rect = triggerRef.current.getBoundingClientRect()
-    const offset = placementOffsets[placement]
+    const offset = placementOffsets[resolvedPosition]
     let top = rect.top + window.scrollY + offset.y
     let left = rect.left + window.scrollX + offset.x
 
-    switch (placement) {
+    switch (resolvedPosition) {
       case 'top':
         top = rect.top + window.scrollY - 8
         left = rect.left + window.scrollX + rect.width / 2
@@ -75,8 +84,8 @@ export function Tooltip({ children, content, placement = 'top', openDelay = 150,
         break
     }
 
-    setPosition({ top, left })
-  }, [placement])
+    setTooltipPosition({ top, left })
+  }, [resolvedPosition])
 
   useEffect(() => {
     if (!isOpen) return
@@ -149,9 +158,11 @@ export function Tooltip({ children, content, placement = 'top', openDelay = 150,
                 transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
                   'pointer-events-none absolute z-[1500] max-w-xs rounded-lg border border-spark/30 bg-void-lightest/95 px-3 py-2 text-xs text-mist shadow-glow-spark',
-                  placement === 'top' || placement === 'bottom' ? 'translate-x-[-50%]' : 'translate-y-[-50%]'
+                  resolvedPosition === 'top' || resolvedPosition === 'bottom'
+                    ? 'translate-x-[-50%]'
+                    : 'translate-y-[-50%]'
                 )}
-                style={{ top: position.top, left: position.left }}
+                style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
                 role="tooltip"
                 id={id}
               >

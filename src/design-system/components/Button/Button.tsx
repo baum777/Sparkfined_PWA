@@ -1,12 +1,14 @@
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { forwardRef, type ReactNode } from 'react'
+import { motion, useReducedMotion, type HTMLMotionProps } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/design-system/utils/cn'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success'
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl'
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+type BaseButtonProps = Omit<HTMLMotionProps<'button'>, 'ref' | 'onDrag'>
+
+export interface ButtonProps extends BaseButtonProps {
   variant?: ButtonVariant
   size?: ButtonSize
   isLoading?: boolean
@@ -43,12 +45,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       children,
       type = 'button',
-      ...props
+      ...rest
     },
     ref
   ) => {
     const prefersReducedMotion = useReducedMotion()
     const isDisabled = disabled || isLoading
+
+    const { onDrag, ...safeRest } = rest as typeof rest & { onDrag?: unknown }
 
     return (
       <MotionButton
@@ -69,7 +73,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         aria-busy={isLoading}
         data-variant={variant}
         data-size={size}
-        {...props}
+        {...safeRest}
       >
         {isLoading ? (
           <span

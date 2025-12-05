@@ -3,7 +3,7 @@ import { cn } from '@/design-system/utils/cn'
 
 export type AlertVariant = 'armed' | 'triggered' | 'paused'
 
-export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
+export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   variant?: AlertVariant
   title: ReactNode
   description?: ReactNode

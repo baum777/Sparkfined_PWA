@@ -2,9 +2,14 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-04
+**Last Updated:** 2025-12-05
 
 ---
+
+## 2025-12-05
+
+### Changed
+- Recorded design-system type safety updates (Badge, Card, Alert, Input, Button, Tooltip) to align variants and props with current usage and typecheck requirements.
 
 ## 2025-12-04
 
