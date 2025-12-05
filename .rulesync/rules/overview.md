@@ -36,10 +36,32 @@ cursor:
 
 ## 🚨 **Hard Guardrails for AI Assistants**
 
-### 1. **No Command Execution**
-- **NEVER** run CLI commands automatically (`npm`, `git`, `pnpm`, `npx`)
-- **SUGGEST** commands for the human to run
-- Explain what each command does and why it's needed
+### 1. **Keep All Checks Green**
+- **ALWAYS** run and ensure all validation commands pass before finishing work:
+  - `pnpm typecheck` (TypeScript compiler must pass)
+  - `pnpm lint` (ESLint must pass with no errors)
+  - `pnpm test` (All Vitest unit tests must pass)
+  - `pnpm test:e2e` (All Playwright E2E tests must pass)
+
+#### Loop-Safety & Guardrails (STRICT)
+
+- **Keine Dirty-Fixes / Kein Config-Gefummel**
+  - TS-/ESLint-/Vite-Konfiguration NICHT lockern, um Fehler verschwinden zu lassen.
+  - Kein `// eslint-disable` oder `// @ts-ignore`, außer es ist absolut unvermeidbar UND du erklärst es explizit.
+  - Keine neuen `any`-Casts nur zum „Beruhigen" von TypeScript.
+
+- **Keine neuen Runtime-Loops**
+  - Keine neuen `setInterval`/`setTimeout`-Polls ohne klaren Cleanup.
+  - Keine neuen `useEffect`-/EventBus-Subscribes ohne:
+    - klaren Guard (z.B. `useRef` für Mount-only),
+    - und Cleanup/Unsubscribe.
+  - URL-/State-Sync-Logik (Journal/Analysis) nur ändern, wenn der Canvas es explizit verlangt.
+
+- **Fehlerbehandlung statt Eskalation**
+  - Wenn nach einem Patch neue TS-/Lint-Fehler auftauchen:
+    - Ursache lokal fixen,
+    - keine globalen Regeln abschalten,
+    - kein „Fixen durch Verschieben ins Nirvana" (z.B. Export löschen, statt Typ sauber zu machen).
 
 ### 2. **No Config Weakening**
 - **DO NOT** relax TypeScript, ESLint, Vite, or Playwright configs to silence errors
@@ -101,13 +123,14 @@ When asked to make a change:
 4. Update relevant docs in `/docs/`
 
 ### Phase 4: **Validation**
-1. Suggest commands to run:
+1. Run all validation commands and ensure they pass:
    - `pnpm typecheck` (TypeScript)
    - `pnpm lint` (ESLint)
    - `pnpm test` (Vitest unit tests)
    - `pnpm test:e2e` (Playwright E2E)
-2. Highlight any remaining TODOs or manual steps
-3. Update `/docs/` with implementation notes
+2. Fix any failures according to Loop-Safety Guardrails (see §1)
+3. Highlight any remaining TODOs or manual steps
+4. Update `/docs/` with implementation notes
 
 ---
 
@@ -246,6 +269,6 @@ This is the **global overview**. For domain-specific guardrails, see:
 
 ---
 
-**Last updated**: 2025-12-03
+**Last updated**: 2025-12-05
 **Maintained by**: Sparkfined Team
 **Rulesync version**: Compatible with v1.x
