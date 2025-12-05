@@ -20,10 +20,10 @@ export default function Header({ title = 'Sparkfined' }: HeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border-moderate bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/75">
+      <header className="sticky top-0 z-40 border-b border-border glass-subtle elevation-low">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-gradient text-white shadow-glow-accent">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand to-brand-hover text-white border-glow-brand">
               <span className="text-base font-semibold">S</span>
             </div>
             <h1 className="text-lg font-semibold text-text-primary">{title}</h1>

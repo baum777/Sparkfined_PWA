@@ -61,8 +61,8 @@ export default function AppHeader() {
 
   const headerClasses = [
     'sticky top-0 z-40 border-b transition-all duration-200 ease-out motion-reduce:transition-none',
-    'bg-surface/70 text-white supports-[backdrop-filter]:bg-surface/60 backdrop-blur-md',
-    isElevated ? 'border-border/70 shadow-[0_10px_30px_rgba(0,0,0,0.35)]' : 'border-transparent',
+    'glass-subtle', // Design System glass effect
+    isElevated ? 'border-border elevation-medium' : 'border-transparent',
     isHidden ? 'motion-safe:-translate-y-full' : 'motion-safe:translate-y-0',
   ].join(' ')
 
@@ -70,12 +70,12 @@ export default function AppHeader() {
     <header className={headerClasses}>
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-4">
         <div className="flex items-center gap-3">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-400 shadow-lg shadow-emerald-500/20">
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand to-brand-hover border-glow-brand">
             <span className="text-lg font-semibold text-white">S</span>
           </div>
           <div className="leading-tight">
-            <div className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-200/90">Sparkfined</div>
-            <div className="text-base font-semibold text-white">Command Center</div>
+            <div className="text-sm font-semibold uppercase tracking-[0.12em] text-brand/90">Sparkfined</div>
+            <div className="text-base font-semibold text-text-primary">Command Center</div>
           </div>
         </div>
 
@@ -88,8 +88,8 @@ export default function AppHeader() {
                 [
                   'rounded-full px-4 py-2 text-sm font-medium transition-all duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
                   isActive
-                    ? 'bg-white/10 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]'
-                    : 'text-zinc-300 hover:bg-white/5 hover:text-white',
+                    ? 'bg-brand/10 text-brand border border-brand/20 hover-glow' // Design System classes
+                    : 'text-text-secondary hover:bg-interactive-hover hover:text-text-primary',
                 ].join(' ')
               }
             >
