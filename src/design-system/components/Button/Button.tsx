@@ -6,7 +6,10 @@ import { cn } from '@/design-system/utils/cn'
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success'
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl'
 
-type BaseButtonProps = Omit<HTMLMotionProps<'button'>, 'ref' | 'onDrag' | 'children'>
+type BaseButtonProps = Omit<
+  HTMLMotionProps<'button'>,
+  'ref' | 'children' | 'onDrag' | 'onDragStart' | 'onDragEnd'
+>
 
 export interface ButtonProps extends BaseButtonProps {
   variant?: ButtonVariant
@@ -53,7 +56,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const prefersReducedMotion = useReducedMotion()
     const isDisabled = disabled || isLoading
 
-    const { onDrag, ...safeRest } = rest as typeof rest & { onDrag?: unknown }
+    const {
+      onDrag: _onDrag,
+      onDragStart: _onDragStart,
+      onDragEnd: _onDragEnd,
+      ...safeRest
+    } = rest as typeof rest & {
+      onDrag?: unknown
+      onDragStart?: unknown
+      onDragEnd?: unknown
+    }
 
     return (
       <MotionButton
