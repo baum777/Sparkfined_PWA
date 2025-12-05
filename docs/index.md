@@ -93,6 +93,7 @@ The Design System establishes the "Alchemical Trading Interface" aesthetic:
 - ⚠️ **Gap Identified**: Current implementation uses emerald/zinc palette, design spec requires Spark/Void
 - 📋 **Module Spec Ready**: Complete architecture and token structure defined
 - 🎯 **For Codex**: DESIGN_MODULE_SPEC.md contains full implementation checklist with 60+ tasks
+- ✅ **Type Safety Update**: Button/Card Motion-Komponenten dokumentiert mit `ReactNode`-only `children` in `docs/design-system.md`.
 
 ---
 

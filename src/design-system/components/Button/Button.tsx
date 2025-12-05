@@ -6,7 +6,7 @@ import { cn } from '@/design-system/utils/cn'
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success'
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'xl'
 
-type BaseButtonProps = Omit<HTMLMotionProps<'button'>, 'ref' | 'onDrag'>
+type BaseButtonProps = Omit<HTMLMotionProps<'button'>, 'ref' | 'onDrag' | 'children'>
 
 export interface ButtonProps extends BaseButtonProps {
   variant?: ButtonVariant
@@ -14,6 +14,7 @@ export interface ButtonProps extends BaseButtonProps {
   isLoading?: boolean
   leftIcon?: ReactNode
   rightIcon?: ReactNode
+  children?: ReactNode
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
