@@ -1,3 +1,5 @@
+// TODO: design-system: candidate for migration once core DS is in place (Codex step 2+)
+// This is a V1 component using emerald theme. Will be replaced/shimmed with src/design-system/components/Button
 import React from 'react'
 import { Loader2 } from '@/lib/icons'
 import { cn } from '@/lib/ui/cn'
