@@ -10,6 +10,7 @@
 
 ### Changed
 - Recorded design-system type safety updates (Badge, Card, Alert, Input, Button, Tooltip) to align variants and props with current usage and typecheck requirements.
+- Noted in `docs/design/DESIGN_SYSTEM.md` that `useSwipeable` now guards pointer capture calls to ensure tests/environments without `setPointerCapture` remain stable.
 
 ## 2025-12-04
 

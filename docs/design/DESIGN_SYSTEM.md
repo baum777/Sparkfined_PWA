@@ -809,7 +809,7 @@ const usePullToRefresh = (onRefresh) => {
 
 All production implementations live in `src/design-system/gestures`:
 
-- `useSwipeable(options)` — handles horizontal swipe detection with configurable threshold, velocity, and callbacks for left/right actions.
+- `useSwipeable(options)` — handles horizontal swipe detection with configurable threshold, velocity, and callbacks for left/right actions, while gracefully skipping pointer capture when the runtime (e.g., JSDOM, legacy Android WebView) does not expose `setPointerCapture`.
 - `usePullToRefresh({ onRefresh, threshold, resistance })` — orchestrates the state machine described above and emits haptic feedback when the threshold is crossed.
 - `useBottomSheet({ snapPoints, onClose })` — supplies motion props for sheet/backdrop, drag-to-close logic, and spring animations tuned to Spark easing tokens.
 - `useDragReorder<T>()` — thin wrapper on top of `framer-motion`’s `Reorder` component with sensible Spark defaults for scale, elevation, and shadows.
