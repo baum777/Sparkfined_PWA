@@ -21,7 +21,7 @@ export default function AnalysisLayout({
   showHeader = true,
 }: AnalysisLayoutProps) {
   return (
-    <div className="space-y-6 rounded-2xl border border-border bg-surface/70 p-4 sm:p-6">
+    <div className="card-glass space-y-6 rounded-2xl p-4 sm:p-6">
       <div className="md:hidden">
         <AnalysisSidebarTabs tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} orientation="horizontal" />
       </div>
@@ -41,7 +41,7 @@ export default function AnalysisLayout({
               </div>
             </header>
           ) : null}
-          <div className="rounded-2xl border border-border bg-surface p-6 shadow-inner">{children}</div>
+          <div className="card-elevated rounded-2xl p-6">{children}</div>
         </section>
       </div>
     </div>

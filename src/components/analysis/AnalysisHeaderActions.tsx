@@ -9,7 +9,7 @@ interface AnalysisHeaderActionsProps {
 export function AnalysisHeaderActions({ activeTab, isMarketLoading, marketError }: AnalysisHeaderActionsProps) {
   return (
     <div className="flex flex-col items-end gap-2 text-right text-sm text-text-secondary sm:flex-row sm:items-center sm:gap-3">
-      <div className="rounded-full border border-border px-3 py-1 text-xs font-semibold uppercase tracking-wide text-text-primary">
+      <div className="rounded-full border border-border px-3 py-1 text-xs font-semibold uppercase tracking-wide text-text-primary hover-scale">
         {activeTab} view
       </div>
       {isMarketLoading ? (

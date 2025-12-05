@@ -9,7 +9,7 @@ interface WatchlistHeaderActionsProps {
 export function WatchlistHeaderActions({ assetCount, isLoading, error }: WatchlistHeaderActionsProps) {
   return (
     <div className="flex flex-col items-end gap-2 text-right text-sm text-text-secondary sm:flex-row sm:items-center sm:gap-3">
-      <div className="rounded-full border border-border px-3 py-1 text-xs font-semibold text-text-primary">
+      <div className="rounded-full border border-border px-3 py-1 text-xs font-semibold text-text-primary hover-scale">
         {assetCount} assets
       </div>
       {isLoading ? (
