@@ -318,6 +318,7 @@ export default {
         'slide-up': 'slide-up 250ms cubic-bezier(0, 0, 0.2, 1) forwards',
         'slide-down': 'slide-down 250ms cubic-bezier(0, 0, 0.2, 1) forwards',
         'slide-in-left': 'slide-in-left 350ms cubic-bezier(0, 0, 0.2, 1) forwards',
+        'slide-in-right': 'slide-in-right 350ms cubic-bezier(0, 0, 0.2, 1) forwards',
         'scale-in': 'scale-in 150ms cubic-bezier(0, 0, 0.2, 1) forwards',
         'shimmer': 'shimmer 1.5s infinite',
         'ticker': 'ticker 20s linear infinite',
@@ -338,6 +339,10 @@ export default {
         },
         'slide-in-left': {
           'from': { opacity: '0', transform: 'translateX(-20px)' },
+          'to': { opacity: '1', transform: 'translateX(0)' },
+        },
+        'slide-in-right': {
+          'from': { opacity: '0', transform: 'translateX(20px)' },
           'to': { opacity: '1', transform: 'translateX(0)' },
         },
         'scale-in': {
@@ -416,7 +421,7 @@ export default {
         '150': '1.5',
       },
       
-      // Z-index values
+      // Z-index values (Layer System)
       zIndex: {
         '0': '0',
         '10': '10',
@@ -425,6 +430,14 @@ export default {
         '40': '40',
         '50': '50',
         'auto': 'auto',
+        // Layer System tokens
+        'base': '0',
+        'panel': '10',
+        'drawer': '20',
+        'modal': '30',
+        'dropdown': '40',
+        'toast': '50',
+        'tooltip': '60',
       },
       
       // Max width values

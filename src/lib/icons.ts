@@ -63,6 +63,8 @@ export { default as FileCheck } from 'lucide-react/dist/esm/icons/file-check';
 export { default as MessageCircle } from 'lucide-react/dist/esm/icons/message-circle';
 export { default as Activity } from 'lucide-react/dist/esm/icons/activity';
 export { default as Eye } from 'lucide-react/dist/esm/icons/eye';
+export { default as Mail } from 'lucide-react/dist/esm/icons/mail';
+export { default as Webhook } from 'lucide-react/dist/esm/icons/webhook';
 
 // Additional icons (used in various components)
 export { default as RotateCw } from 'lucide-react/dist/esm/icons/rotate-cw';
