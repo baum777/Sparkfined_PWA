@@ -26,4 +26,20 @@ describe('useSwipeable', () => {
     expect(onSwipeLeft).toHaveBeenCalledTimes(1)
     expect(onSwipeRight).not.toHaveBeenCalled()
   })
+
+  it('does not throw when setPointerCapture is missing', () => {
+    const noop = vi.fn()
+    render(<SwipeComponent onSwipeLeft={noop} onSwipeRight={noop} />)
+    const target = screen.getByTestId('swipe-target') as HTMLElement & {
+      setPointerCapture?: (pointerId: number) => void
+    }
+    target.setPointerCapture = undefined
+
+    expect(() =>
+      fireEvent.pointerDown(target, {
+        pointerId: 1,
+        clientX: 200,
+      })
+    ).not.toThrow()
+  })
 })

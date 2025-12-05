@@ -40,7 +40,8 @@ export function useSwipeable({
     startX.current = event.clientX
     startTime.current = performance.now()
     setIsDragging(true)
-    event.currentTarget.setPointerCapture(event.pointerId)
+    // JSDOM (and older browsers) might not implement pointer capture, so guard the call
+    event.currentTarget.setPointerCapture?.(event.pointerId)
   }, [])
 
   const handlePointerMove = useCallback((event: React.PointerEvent<HTMLElement>) => {
