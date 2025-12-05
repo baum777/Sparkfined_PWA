@@ -193,7 +193,7 @@ export default function ChartPageV2() {
       description="Trade-ready chart workspace with indicators, replay, drawings and exports."
       actions={<ChartHeaderActions />}
     >
-      <Card className="space-y-6 rounded-3xl" data-testid="chart-page">
+      <Card variant="glass" className="space-y-6 rounded-3xl" data-testid="chart-page">
         {!hasSeenIntro && <ChartIntroBanner onDismiss={dismissIntro} />}
         {!isOnline && (
           <StateView
@@ -203,7 +203,7 @@ export default function ChartPageV2() {
           />
         )}
         {isDefaultAsset && (
-          <div className="rounded-lg border border-blue-500/20 bg-blue-950/20 p-3 text-sm">
+          <div className="card-bordered rounded-lg border-blue-500/20 bg-blue-950/20 p-3 text-sm">
             <p className="text-blue-200">
               <strong>No symbol provided.</strong> Showing default chart (SOL/USDT). Select a token from the{' '}
               <button

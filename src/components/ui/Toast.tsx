@@ -1,5 +1,11 @@
+/**
+ * Toast - Migrated to Design System
+ *
+ * Uses Design System glass-heavy, border-glow, and elevation classes
+ */
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { cn } from '@/lib/ui/cn';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -117,7 +123,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      classes: 'bg-sentiment-bull-bg text-sentiment-bull border-sentiment-bull-border',
+      classes: 'border-glow-success bg-sentiment-bull-bg/90 text-sentiment-bull',
     },
     error: {
       icon: (
@@ -125,7 +131,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      classes: 'bg-sentiment-bear-bg text-sentiment-bear border-sentiment-bear-border',
+      classes: 'border-glow-danger bg-sentiment-bear-bg/90 text-sentiment-bear',
     },
     warning: {
       icon: (
@@ -133,7 +139,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
       ),
-      classes: 'bg-sentiment-neutral-bg text-sentiment-neutral border-sentiment-neutral-border',
+      classes: 'bg-sentiment-neutral-bg/90 text-sentiment-neutral border-sentiment-neutral-border',
     },
     info: {
       icon: (
@@ -141,7 +147,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      classes: 'bg-info/10 text-info border-info/30',
+      classes: 'border-glow-brand bg-brand/10 text-brand',
     },
   };
 
@@ -150,15 +156,13 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
   return (
     <div
       role="alert"
-      className={`
-        glass-heavy border ${style.classes}
-        rounded-xl p-4 shadow-lg
-        min-w-[320px] max-w-md
-        pointer-events-auto
-        transition-all duration-300
-        ${isExiting ? 'opacity-0 translate-x-8' : 'opacity-100 translate-x-0'}
-        animate-slide-in-left
-      `}
+      className={cn(
+        'glass-heavy elevation-float rounded-2xl p-4', // Design System glass + elevation
+        'min-w-[320px] max-w-md pointer-events-auto',
+        'transition-all duration-300',
+        isExiting ? 'opacity-0 translate-x-8' : 'opacity-100 translate-x-0',
+        style.classes
+      )}
     >
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 mt-0.5">
@@ -180,7 +184,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
                 toast.action!.onClick();
                 handleRemove();
               }}
-              className="mt-2 text-xs font-semibold underline hover:no-underline"
+              className="mt-2 text-xs font-semibold underline hover:no-underline transition-colors"
             >
               {toast.action.label}
             </button>
@@ -189,7 +193,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
 
         <button
           onClick={handleRemove}
-          className="flex-shrink-0 rounded-full p-1 hover:bg-surface-hover transition-colors"
+          className="flex-shrink-0 rounded-full p-1 hover:bg-interactive-hover transition-colors"
           aria-label="Dismiss"
         >
           <svg className="w-4 h-4 text-text-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">

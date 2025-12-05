@@ -6,7 +6,7 @@ interface WatchlistLayoutProps {
 
 export default function WatchlistLayout({ children }: WatchlistLayoutProps) {
   return (
-    <div className="rounded-2xl border border-border bg-surface/80 p-4 sm:p-6">
+    <div className="card-glass rounded-2xl p-4 sm:p-6">
       <div className="space-y-6">{children}</div>
     </div>
   );

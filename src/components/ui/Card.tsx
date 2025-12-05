@@ -1,24 +1,7 @@
-// TODO: design-system: candidate for migration once core DS is in place (Codex step 2+)
-// This is a V1 component using emerald theme. Will be replaced/shimmed with src/design-system/components/Card
-import React from 'react'
-import { cn } from '@/lib/ui/cn'
-
-export type CardVariant = 'default' | 'muted' | 'interactive'
-
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: CardVariant
-  interactive?: boolean
-}
-
-const variantClasses: Record<CardVariant, string> = {
-  default: 'bg-surface border-border-subtle shadow-card-subtle',
-  muted: 'bg-surface-subtle border-border-moderate shadow-card-subtle',
-  interactive:
-    'bg-surface border-border-subtle shadow-card-subtle hover:border-border-accent hover:shadow-emerald-glow',
-}
-
 /**
- * Card
+ * Card - Migrated to Design System
+ *
+ * Uses Design System card classes (.card, .card-glass, .card-interactive, etc.) from src/styles/index.css
  *
  * Usage:
  * ```tsx
@@ -35,11 +18,35 @@ const variantClasses: Record<CardVariant, string> = {
  * </Card>
  * ```
  */
+import React from 'react'
+import { cn } from '@/lib/ui/cn'
+
+export type CardVariant = 'default' | 'muted' | 'interactive' | 'glass' | 'elevated' | 'bordered' | 'glow'
+
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: CardVariant
+  interactive?: boolean
+}
+
+// Map component variants to Design System card classes
+const variantClasses: Record<CardVariant, string> = {
+  default: 'card',
+  muted: 'card bg-surface-subtle',
+  interactive: 'card-interactive',
+  glass: 'card-glass',
+  elevated: 'card-elevated',
+  bordered: 'card-bordered',
+  glow: 'card-glow',
+}
+
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
   { variant = 'default', className, interactive, onClick, onKeyDown, tabIndex, ...props },
   ref
 ) {
   const isInteractive = interactive ?? typeof onClick === 'function'
+  
+  // If explicitly interactive but not interactive variant, use card-interactive
+  const cardClass = isInteractive && variant === 'default' ? 'card-interactive' : variantClasses[variant]
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     onKeyDown?.(event)
@@ -54,9 +61,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
     <div
       ref={ref}
       className={cn(
-        'rounded-2xl border p-6 transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
-        variantClasses[variant],
-        isInteractive && 'cursor-pointer hover:-translate-y-0.5 active:translate-y-0 focus-visible:-translate-y-0.5',
+        cardClass,
         className
       )}
       tabIndex={isInteractive ? tabIndex ?? 0 : tabIndex}

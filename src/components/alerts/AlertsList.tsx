@@ -22,7 +22,7 @@ export default function AlertsList({ alerts, activeAlertId, onSelectAlert }: Ale
   if (alerts.length === 0) {
     return (
       <div
-        className="rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center text-sm text-text-secondary"
+        className="card-bordered rounded-2xl border-dashed px-6 py-10 text-center text-sm text-text-secondary"
         data-testid="alerts-empty-state"
       >
         No alerts yet. Create your first trigger to stay ahead of market shifts.
@@ -43,8 +43,8 @@ export default function AlertsList({ alerts, activeAlertId, onSelectAlert }: Ale
             onClick={() => onSelectAlert?.(alert.id)}
             className={`rounded-2xl border px-4 py-3 text-sm text-text-secondary transition sm:px-5 sm:py-4 ${
               isActive
-                ? 'border-sentiment-bull-border bg-interactive-active'
-                : 'border-border-moderate bg-surface cursor-pointer hover:bg-interactive-hover'
+                ? 'border-glow-success bg-brand/5'
+                : 'border-border bg-surface cursor-pointer hover:bg-interactive-hover hover-lift'
             }`}
             data-testid="alerts-list-item"
             data-alert-id={alert.id}

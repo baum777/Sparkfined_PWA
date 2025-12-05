@@ -75,8 +75,8 @@ export default function AlertsPageV2() {
                       onClick={() => setStatusFilter(filter)}
                       className={`rounded-full border px-3 py-1 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
                         isActive
-                          ? 'border-brand bg-surface-hover text-text-primary'
-                          : 'border-border text-text-secondary hover:bg-surface-hover'
+                          ? 'border-glow-brand bg-brand/10 text-brand hover-glow'
+                          : 'border-border text-text-secondary hover:bg-interactive-hover hover-scale'
                       }`}
                       data-testid={`alerts-status-filter-${filter}`}
                     >
@@ -95,8 +95,8 @@ export default function AlertsPageV2() {
                       onClick={() => setTypeFilter(filter)}
                       className={`rounded-full border px-3 py-1 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
                         isActive
-                          ? 'border-brand bg-surface-hover text-text-primary'
-                          : 'border-border text-text-secondary hover:bg-surface-hover'
+                          ? 'border-glow-brand bg-brand/10 text-brand hover-glow'
+                          : 'border-border text-text-secondary hover:bg-interactive-hover hover-scale'
                       }`}
                       data-testid={`alerts-type-filter-${filter}`}
                     >

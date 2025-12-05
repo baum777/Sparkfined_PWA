@@ -1,5 +1,19 @@
-// TODO: design-system: candidate for migration once core DS is in place (Codex step 2+)
-// This is a V1 component using emerald theme. Will be replaced/shimmed with src/design-system/components/Button
+/**
+ * Button - Migrated to Design System
+ *
+ * Uses Design System button classes (.btn, .btn-primary, etc.) from src/styles/index.css
+ *
+ * Usage:
+ * ```tsx
+ * <Button variant="primary" size="md" onClick={handleSave}>
+ *   Save changes
+ * </Button>
+ *
+ * <Button variant="ghost" size="sm" aria-label="Open settings">
+ *   <SettingsIcon />
+ * </Button>
+ * ```
+ */
 import React from 'react'
 import { Loader2 } from '@/lib/icons'
 import { cn } from '@/lib/ui/cn'
@@ -17,36 +31,19 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
 }
 
-/**
- * Button
- *
- * Usage:
- * ```tsx
- * <Button variant="primary" size="md" onClick={handleSave}>
- *   Save changes
- * </Button>
- *
- * <Button variant="ghost" size="sm" aria-label="Open settings">
- *   <SettingsIcon />
- * </Button>
- * ```
- */
-
+// Map component variants to Design System button classes
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-brand text-white shadow-glow-accent hover:bg-brand-hover focus-visible:ring-brand/60',
-  secondary:
-    'bg-surface-subtle text-text-primary border border-border-moderate hover:bg-surface-hover focus-visible:ring-border-focus',
-  ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-surface-subtle focus-visible:ring-border-focus/50',
-  outline:
-    'bg-transparent text-text-primary border border-border-moderate hover:border-border-hover hover:bg-surface-subtle focus-visible:ring-border-focus',
-  destructive:
-    'bg-danger text-white border border-danger hover:bg-danger/90 focus-visible:ring-danger/60',
+  primary: 'btn-primary',
+  secondary: 'btn-secondary',
+  ghost: 'btn-ghost',
+  outline: 'btn-outline',
+  destructive: 'btn-danger',
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'h-9 px-3 text-xs',
-  md: 'h-11 px-4 text-sm',
-  lg: 'h-12 px-5 text-base',
+  sm: 'btn-sm',
+  md: '', // Default size
+  lg: 'btn-lg',
 }
 
 export default function Button({
@@ -69,18 +66,20 @@ export default function Button({
       type={type}
       disabled={disabled || isLoadingState}
       className={cn(
-        'inline-flex select-none items-center justify-center gap-2 rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-not-allowed disabled:opacity-60',
+        'btn', // Base Design System button class
         variantClasses[variant],
         sizeClasses[size],
+        isLoadingState && 'shimmer', // Design System loading animation
+        disabled && 'btn-disabled',
         className
       )}
       {...props}
     >
       {isLoadingState ? (
-        <span className="inline-flex items-center gap-2">
+        <>
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
           <span>{children}</span>
-        </span>
+        </>
       ) : (
         <>
           {leftIcon ? <span className="flex-shrink-0">{leftIcon}</span> : null}

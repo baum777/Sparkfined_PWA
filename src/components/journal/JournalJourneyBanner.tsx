@@ -9,7 +9,7 @@ const FORMATTER = new Intl.NumberFormat('en-US')
 export function JournalJourneyBanner({ snapshot }: JournalJourneyBannerProps) {
   return (
     <section data-testid="journal-journey-banner">
-      <div className="rounded-2xl border border-border-subtle bg-surface-secondary/60 px-4 py-3 text-sm text-text-primary shadow-sm md:px-5 md:py-4">
+      <div className="card-glass rounded-2xl px-4 py-3 text-sm text-text-primary md:px-5 md:py-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:gap-8">
           <div className="space-y-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Hero's journey</p>

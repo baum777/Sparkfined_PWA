@@ -53,13 +53,13 @@ export default function AlertsSnapshot() {
               label="Armed"
               value={armedCount}
               testId="dashboard-alerts-armed-count"
-              badgeClass="border border-emerald-500/30 bg-emerald-500/5"
+              badgeClass="border-glow-success bg-sentiment-bull-bg"
             />
             <StatBlock
               label="Triggered"
               value={triggeredCount}
               testId="dashboard-alerts-triggered-count"
-              badgeClass="border border-rose-500/30 bg-rose-500/5"
+              badgeClass="border-glow-danger bg-sentiment-bear-bg"
             />
           </div>
         </CardContent>
@@ -107,10 +107,10 @@ interface StatBlockProps {
 
 function StatBlock({ label, value, testId, badgeClass }: StatBlockProps) {
   return (
-    <div className="rounded-2xl border border-border-moderate bg-surface p-4 shadow-inner">
+    <div className="card-bordered rounded-2xl p-4 hover-scale">
       <p className="text-xs uppercase tracking-wide text-text-tertiary">{label}</p>
       <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-3xl font-semibold text-text-primary" data-testid={testId}>
+        <span className="text-gradient-success text-3xl font-semibold" data-testid={testId}>
           {value}
         </span>
         <span className={`rounded-full px-2 py-1 text-[11px] font-medium ${badgeClass}`}>

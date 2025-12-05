@@ -29,7 +29,7 @@ export default function BottomNav() {
   return (
     <nav
       id="main-navigation"
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/70 bg-surface/95 backdrop-blur-md supports-[backdrop-filter]:bg-surface/75 lg:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border glass-heavy elevation-high lg:hidden"
       role="navigation"
       aria-label="Main navigation"
     >
@@ -44,8 +44,8 @@ export default function BottomNav() {
                 [
                   'relative flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium tracking-tight transition-all duration-150 ease-out motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
                   isActive
-                    ? 'text-brand'
-                    : 'text-text-secondary hover:text-text-primary active:text-text-primary/80',
+                    ? 'text-brand hover-scale' // Design System: hover-scale
+                    : 'text-text-secondary hover:text-text-primary hover:bg-interactive-hover active:text-text-primary/80',
                 ].join(' ')
               }
             >

@@ -79,8 +79,8 @@ export default function Sidebar() {
       'group flex w-full rounded-2xl px-3 py-2 font-medium transition-all duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
       isCollapsed ? 'flex-col items-center justify-center gap-1 text-[11px]' : 'flex-row items-center gap-3 text-sm',
       isActive
-        ? 'bg-brand/10 text-brand shadow-[0_5px_20px_rgba(16,185,129,0.15)]'
-        : 'text-text-secondary hover:text-text-primary hover:bg-surface-hover',
+        ? 'bg-brand/10 text-brand border-glow-brand hover-glow' // Design System: border-glow, hover-glow
+        : 'text-text-secondary hover:text-text-primary hover:bg-interactive-hover hover-lift', // Design System: hover-lift
     ].join(' ');
 
   // Map labels to tour step IDs
@@ -100,7 +100,7 @@ export default function Sidebar() {
   return (
     <aside
       id="main-navigation"
-      className={`fixed left-0 top-0 hidden h-screen flex-col border-r border-border bg-surface/80 py-6 backdrop-blur-sm transition-[width,transform] duration-300 ease-out motion-reduce:transition-none lg:flex ${
+      className={`fixed left-0 top-0 hidden h-screen flex-col border-r border-border glass-subtle py-6 transition-[width,transform] duration-300 ease-out motion-reduce:transition-none lg:flex ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
       role="navigation"
@@ -170,7 +170,7 @@ export default function Sidebar() {
       <button
         type="button"
         onClick={() => setIsCollapsed((prev) => !prev)}
-        className="mx-3 mt-4 flex items-center justify-center gap-2 rounded-2xl border border-border/60 bg-surface-subtle px-3 py-2 text-xs font-medium text-text-secondary transition-all duration-200 hover:border-brand hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus motion-reduce:transition-none"
+        className="mx-3 mt-4 flex items-center justify-center gap-2 rounded-2xl border border-border bg-surface-subtle px-3 py-2 text-xs font-medium text-text-secondary transition-all duration-200 hover:border-brand hover:text-text-primary hover-scale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus motion-reduce:transition-none"
         aria-pressed={!isCollapsed}
         aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >

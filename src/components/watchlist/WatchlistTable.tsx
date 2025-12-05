@@ -11,7 +11,7 @@ interface WatchlistTableProps {
 
 export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }: WatchlistTableProps) {
   return (
-    <div className="rounded-2xl border border-border-moderate bg-surface" data-testid="watchlist-table">
+    <div className="card-bordered rounded-2xl" data-testid="watchlist-table">
       <ResponsiveTable className="sm:px-4" innerClassName="sm:min-w-[720px]">
         <div className="hidden grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary sm:grid">
           <span>Symbol</span>
@@ -30,8 +30,8 @@ export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }:
               onClick={() => onSelect?.(row.symbol)}
               className={`flex flex-col gap-4 px-4 py-4 text-sm text-text-secondary transition sm:grid sm:grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] sm:items-center sm:gap-6 ${
                 isActive
-                  ? 'cursor-pointer border-l-4 border-sentiment-bull-border bg-interactive-active'
-                  : 'cursor-pointer hover:bg-interactive-hover'
+                  ? 'cursor-pointer border-l-4 border-glow-success bg-brand/5'
+                  : 'cursor-pointer hover:bg-interactive-hover hover-lift'
               }`}
               data-testid="watchlist-token-row"
               data-symbol={row.symbol}

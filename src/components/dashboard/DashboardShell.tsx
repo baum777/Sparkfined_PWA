@@ -30,7 +30,7 @@ export default function DashboardShell({
 
   return (
     <div className="min-h-screen bg-app-gradient text-text-primary">
-      <header className="border-b border-border-subtle bg-surface-elevated/60 backdrop-blur-xl">
+      <header className="border-b border-border glass-subtle elevation-low">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
@@ -54,10 +54,10 @@ export default function DashboardShell({
                       key={tab.id}
                       type="button"
                       onClick={() => onTabSelect?.(tab.id)}
-                      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                      className={`rounded-full border px-4 py-2 text-sm font-medium transition hover-scale ${
                         isActive
-                          ? 'border-brand bg-interactive-active text-text-primary'
-                          : 'border-border-subtle text-text-secondary hover:border-border-moderate hover:bg-interactive-hover hover:text-text-primary'
+                          ? 'border-glow-brand bg-brand/10 text-brand'
+                          : 'border-border text-text-secondary hover:bg-interactive-hover hover:text-text-primary'
                       }`}
                     >
                       {tab.label}
@@ -71,7 +71,7 @@ export default function DashboardShell({
       </header>
 
       {kpiStrip ? (
-        <section className="border-b border-border-subtle bg-surface/70">
+        <section className="border-b border-border glass-subtle">
           <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6 lg:px-8">{kpiStrip}</div>
         </section>
       ) : null}

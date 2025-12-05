@@ -12,7 +12,7 @@ export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenRe
   if (!row) {
     return (
       <div
-        className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-10 text-center"
+        className="card-bordered flex min-h-[400px] flex-col items-center justify-center rounded-2xl border-dashed px-6 py-10 text-center"
         data-testid="watchlist-detail-empty"
       >
         <p className="text-sm text-text-secondary">Select an asset on the left to see more context here.</p>
@@ -22,7 +22,7 @@ export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenRe
 
   return (
     <div
-      className="space-y-6 rounded-2xl border border-border-moderate bg-surface p-6 text-text-secondary"
+      className="card-glass space-y-6 rounded-2xl p-6 text-text-secondary"
       data-testid="watchlist-detail-panel"
     >
       <div className="space-y-2">
@@ -53,13 +53,13 @@ export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenRe
       </div>
 
       <div className="space-y-4 border-t border-border-subtle pt-6">
-        <div className="rounded-xl border border-border-moderate bg-surface-subtle p-4 text-center">
+        <div className="card-bordered rounded-xl p-4 text-center">
           <p className="text-xs text-text-secondary">Quick actions</p>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => onOpenChart?.(row)}
-              className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-text-primary transition hover:border-brand hover:text-text-primary"
+              className="btn btn-outline btn-sm hover-scale"
               data-testid="button-open-chart"
             >
               Open chart
@@ -67,7 +67,7 @@ export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenRe
             <button
               type="button"
               onClick={() => onOpenReplay?.(row)}
-              className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-text-primary transition hover:border-brand hover:text-text-primary"
+              className="btn btn-outline btn-sm hover-scale"
               data-testid="button-open-replay-from-watchlist"
             >
               Replay

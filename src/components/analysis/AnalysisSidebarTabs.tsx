@@ -24,7 +24,7 @@ export default function AnalysisSidebarTabs({
     <div
       className={`flex ${
         isVertical ? 'flex-col gap-2' : 'flex-row gap-2 overflow-x-auto'
-      } rounded-2xl border border-border-subtle bg-surface p-3`}
+      } card-bordered rounded-2xl p-3`}
       role="tablist"
       aria-orientation={isVertical ? 'vertical' : 'horizontal'}
     >
@@ -39,8 +39,8 @@ export default function AnalysisSidebarTabs({
             onClick={() => onTabChange(tab.id)}
             className={`rounded-xl border px-4 py-2 text-sm font-medium transition ${
               isActive
-                ? 'border-brand bg-interactive-active text-text-primary'
-                : 'border-transparent text-text-secondary hover:border-border-moderate hover:bg-interactive-hover hover:text-text-primary'
+                ? 'border-glow-brand bg-brand/10 text-brand hover-glow'
+                : 'border-transparent text-text-secondary hover:border-border-moderate hover:bg-interactive-hover hover:text-text-primary hover-scale'
             }`}
           >
             {tab.label}

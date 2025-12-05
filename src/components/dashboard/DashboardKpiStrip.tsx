@@ -49,7 +49,7 @@ export default function DashboardKpiStrip({ items }: DashboardKpiStripProps) {
           return (
             <article
               key={item.label}
-              className="flex min-w-[min(240px,80vw)] flex-1 snap-start flex-col rounded-2xl border border-border-subtle bg-surface-skeleton/90 px-4 py-3 text-text-primary shadow-card-subtle backdrop-blur-sm md:min-w-0 md:snap-none"
+              className="card-glass hover-lift flex min-w-[min(240px,80vw)] flex-1 snap-start flex-col px-4 py-3 text-text-primary md:min-w-0 md:snap-none"
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[11px] uppercase tracking-[0.4em] text-text-tertiary">{item.label}</span>

@@ -11,14 +11,14 @@ export default function DashboardMainGrid({ primary, secondary, tertiary }: Dash
 
   return (
     <div className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-      <div className="rounded-3xl border border-border-subtle bg-surface-elevated p-6">{primary}</div>
+      <div className="card-elevated rounded-3xl p-6">{primary}</div>
       {hasSidebarContent ? (
         <div className="flex flex-col gap-6">
           {secondary ? (
-            <div className="rounded-3xl border border-border-subtle bg-surface p-6">{secondary}</div>
+            <div className="card rounded-3xl p-6">{secondary}</div>
           ) : null}
           {tertiary ? (
-            <div className="rounded-3xl border border-border-subtle bg-surface p-6">{tertiary}</div>
+            <div className="card rounded-3xl p-6">{tertiary}</div>
           ) : null}
         </div>
       ) : null}

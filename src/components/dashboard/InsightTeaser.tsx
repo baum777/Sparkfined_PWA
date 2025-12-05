@@ -21,7 +21,7 @@ export default function InsightTeaser({ title, bias, confidenceLabel, summary }:
   const handleNavigate = React.useCallback(() => navigate('/analysis-v2'), [navigate]);
 
   return (
-    <div className="rounded-lg border border-border-moderate bg-surface p-4 shadow-sm">
+    <div className="card-glass rounded-lg p-4 hover-lift">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-base font-semibold text-text-primary">{title}</h3>
         <span className={`rounded-full px-3 py-1 text-xs font-medium ${biasStyles[bias]}`}>
