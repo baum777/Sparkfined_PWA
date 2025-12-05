@@ -27,7 +27,7 @@ export default function JournalList({ entries, activeId, onSelect, onNewEntry }:
   if (!entries.length) {
     return (
       <div
-        className="flex min-h-[320px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle px-6 py-12 text-center"
+        className="card-bordered flex min-h-[320px] flex-col items-center justify-center rounded-2xl border-dashed px-6 py-12 text-center"
         data-testid="journal-empty-state"
       >
         {/* Icon */}
@@ -72,7 +72,7 @@ export default function JournalList({ entries, activeId, onSelect, onNewEntry }:
           <button
             type="button"
             onClick={onNewEntry}
-            className="mt-6 rounded-full border border-sentiment-bull-border bg-sentiment-bull-bg px-5 py-2.5 text-sm font-medium text-sentiment-bull transition hover:bg-sentiment-bull-bg/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sentiment-bull"
+            className="mt-6 rounded-full border-glow-success bg-sentiment-bull-bg px-5 py-2.5 text-sm font-medium text-sentiment-bull transition hover:bg-sentiment-bull-bg/80 hover-scale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sentiment-bull"
             data-testid="journal-empty-cta"
           >
             Create Your First Entry
@@ -93,8 +93,8 @@ export default function JournalList({ entries, activeId, onSelect, onNewEntry }:
             onClick={() => handleSelect(entry.id)}
             className={`group relative w-full rounded-xl border pr-5 pl-8 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus ${
               isActive
-                ? 'border-sentiment-bull-border bg-interactive-active shadow-[inset_0_0_0_1px_rgba(16,185,129,0.35)]'
-                : 'border-border-subtle bg-surface-subtle hover:border-border-hover hover:bg-interactive-hover focus-visible:border-border-moderate'
+                ? 'border-glow-success bg-brand/5'
+                : 'border-border bg-surface-subtle hover:border-border-hover hover:bg-interactive-hover hover-lift focus-visible:border-border-moderate'
             }`}
             role="listitem"
             aria-pressed={isActive}

@@ -32,7 +32,8 @@ export function JournalInsightCard({ insight }: JournalInsightCardProps) {
   return (
     <Card
       data-testid="journal-insight-card"
-      className="border-border-subtle bg-surface-secondary/60 text-text-primary"
+      variant="glass"
+      className="text-text-primary hover-lift"
     >
       <CardHeader className="space-y-3">
         <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.2em]">
@@ -52,7 +53,7 @@ export function JournalInsightCard({ insight }: JournalInsightCardProps) {
       <CardContent className="space-y-4">
         <p className="text-sm text-text-secondary">{insight.summary}</p>
 
-        <div className="rounded-2xl border border-border bg-surface px-4 py-3">
+        <div className="card-bordered rounded-2xl px-4 py-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-text-tertiary">Recommendation</p>
           <p className="mt-1 text-sm text-text-primary">{insight.recommendation}</p>
         </div>

@@ -17,7 +17,7 @@ export function JournalHeaderActions({ isLoading, isCreating, onNewEntry }: Jour
         type="button"
         onClick={onNewEntry}
         disabled={isLoading || isCreating}
-        className="rounded-full border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-primary transition hover:border-brand hover:bg-surface-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
+        className="rounded-full border border-border bg-surface px-4 py-2 text-xs font-semibold text-text-primary transition hover:border-brand hover:bg-interactive-hover hover:text-text-primary hover-scale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand disabled:opacity-50"
         data-testid="journal-new-entry-button"
       >
         New entry
