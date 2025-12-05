@@ -158,7 +158,7 @@ export default function WatchlistPageV2() {
             )}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
               <div className="space-y-4">
-                <div className="rounded-2xl border border-border bg-surface/80 backdrop-blur">
+                <div className="card-glass rounded-2xl">
                   <div className="space-y-3 border-b border-border px-3 py-2 text-xs sm:text-sm">
                     <div className="flex flex-wrap items-center gap-2">
                       {SESSION_FILTERS.map((filter) => {
@@ -170,8 +170,8 @@ export default function WatchlistPageV2() {
                             onClick={() => setSessionFilter(filter)}
                             className={`rounded-full border px-3 py-1 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
                               isActive
-                                ? "border-brand bg-surface-hover text-text-primary"
-                                : "border-border text-text-secondary hover:bg-surface-hover"
+                                ? "border-glow-brand bg-brand/10 text-brand hover-glow"
+                                : "border-border text-text-secondary hover:bg-interactive-hover hover-scale"
                             }`}
                             data-testid={`watchlist-session-filter-${filter}`}
                           >
@@ -191,7 +191,7 @@ export default function WatchlistPageV2() {
                             return "default";
                           })
                         }
-                        className="rounded-full border border-border px-3 py-1 font-semibold text-text-secondary transition hover:border-brand hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                        className="rounded-full border border-border px-3 py-1 font-semibold text-text-secondary transition hover:border-brand hover:text-text-primary hover-scale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                         data-testid="watchlist-sort-toggle"
                       >
                         Sort:{" "}
