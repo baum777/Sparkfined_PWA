@@ -46,17 +46,17 @@ export default function LessonsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 pb-20 md:pb-8">
+    <div className="min-h-screen bg-void-lighter pb-20 md:pb-8">
       {/* Header */}
-      <header className="border-b border-zinc-800 bg-zinc-900 p-4">
+      <header className="border-b border-smoke-light bg-smoke p-4">
         <div className="mx-auto max-w-5xl">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-cyan-950/30 p-2">
-              <BookOpen size={24} className="text-cyan-500" />
+            <div className="rounded-lg bg-spark/30 p-2">
+              <BookOpen size={24} className="text-spark" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-zinc-100">Trading Lessons</h1>
-              <p className="text-sm text-zinc-500">
+              <h1 className="text-xl font-semibold text-mist">Trading Lessons</h1>
+              <p className="text-sm text-ash">
                 Extracted wisdom from your trades
               </p>
             </div>
@@ -67,33 +67,33 @@ export default function LessonsPage() {
       <div className="mx-auto max-w-5xl p-4 pb-20 md:pb-6 space-y-4">
         {/* Stats Overview */}
         <div className="grid grid-cols-4 gap-2">
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-            <p className="text-xs text-zinc-500">Total</p>
-            <p className="text-xl font-semibold text-zinc-100">{stats.total}</p>
+          <div className="rounded-lg border border-smoke-light bg-smoke p-3 text-center">
+            <p className="text-xs text-ash">Total</p>
+            <p className="text-xl font-semibold text-mist">{stats.total}</p>
           </div>
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-            <p className="text-xs text-zinc-500">High Score</p>
-            <p className="text-xl font-semibold text-emerald-500">{stats.high_score}</p>
+          <div className="rounded-lg border border-smoke-light bg-smoke p-3 text-center">
+            <p className="text-xs text-ash">High Score</p>
+            <p className="text-xl font-semibold text-spark">{stats.high_score}</p>
           </div>
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-            <p className="text-xs text-zinc-500">Avg WR</p>
-            <p className="text-xl font-semibold text-cyan-500">
+          <div className="rounded-lg border border-smoke-light bg-smoke p-3 text-center">
+            <p className="text-xs text-ash">Avg WR</p>
+            <p className="text-xl font-semibold text-spark">
               {(stats.avg_win_rate * 100).toFixed(0)}%
             </p>
           </div>
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-            <p className="text-xs text-zinc-500">Trades</p>
-            <p className="text-xl font-semibold text-zinc-100">{stats.total_trades}</p>
+          <div className="rounded-lg border border-smoke-light bg-smoke p-3 text-center">
+            <p className="text-xs text-ash">Trades</p>
+            <p className="text-xl font-semibold text-mist">{stats.total_trades}</p>
           </div>
         </div>
 
         {/* Info Banner */}
-        <div className="rounded-lg border border-cyan-800/50 bg-cyan-950/20 p-4">
+        <div className="rounded-lg border border-spark/50 bg-spark/20 p-4">
           <div className="flex items-start gap-3">
-            <TrendingUp size={20} className="text-cyan-500 mt-0.5" />
+            <TrendingUp size={20} className="text-spark mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-cyan-400">How Lessons Work</p>
-              <p className="text-sm text-zinc-400 mt-1">
+              <p className="text-sm font-medium text-spark">How Lessons Work</p>
+              <p className="text-sm text-fog mt-1">
                 Lessons are automatically extracted after accumulating 10+ trades for a
                 pattern. They analyze what works, what fails, and provide actionable
                 checklists to improve your edge.
@@ -104,22 +104,22 @@ export default function LessonsPage() {
 
         {/* Filters */}
         {patterns.length > 0 && (
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
+          <div className="rounded-lg border border-smoke-light bg-smoke p-4 space-y-3">
             <div className="flex items-center gap-2">
-              <Filter size={16} className="text-zinc-500" />
-              <p className="text-sm font-medium text-zinc-400">Filters</p>
+              <Filter size={16} className="text-ash" />
+              <p className="text-sm font-medium text-fog">Filters</p>
             </div>
 
             {/* Pattern Filter */}
             <div>
-              <label className="text-xs text-zinc-500 mb-1 block">Pattern</label>
+              <label className="text-xs text-ash mb-1 block">Pattern</label>
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setSelectedPattern(null)}
                   className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
                     selectedPattern === null
-                      ? 'bg-cyan-600 text-white'
-                      : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                      ? 'bg-spark text-white'
+                      : 'bg-smoke-light text-fog hover:bg-smoke-lighter'
                   }`}
                 >
                   All
@@ -130,8 +130,8 @@ export default function LessonsPage() {
                     onClick={() => setSelectedPattern(pattern)}
                     className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
                       selectedPattern === pattern
-                        ? 'bg-cyan-600 text-white'
-                        : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                        ? 'bg-spark text-white'
+                        : 'bg-smoke-light text-fog hover:bg-smoke-lighter'
                     }`}
                   >
                     {pattern.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
@@ -142,7 +142,7 @@ export default function LessonsPage() {
 
             {/* Score Threshold */}
             <div>
-              <label className="text-xs text-zinc-500 mb-1 block">
+              <label className="text-xs text-ash mb-1 block">
                 Min Score: {(minScore * 100).toFixed(0)}%
               </label>
               <input
@@ -167,7 +167,7 @@ export default function LessonsPage() {
           <StateView
             type="empty"
             description="No lessons yet. Trade more to accumulate wisdom!"
-            icon={<BookOpen size={48} className="text-zinc-700" />}
+            icon={<BookOpen size={48} className="text-smoke-lighter" />}
           />
         ) : (
           <div className="space-y-4">
@@ -180,12 +180,12 @@ export default function LessonsPage() {
         {/* CTA for empty state */}
         {lessons.length === 0 && !loading && (
           <div className="mt-8 text-center">
-            <p className="text-sm text-zinc-500 mb-4">
+            <p className="text-sm text-ash mb-4">
               Start detecting signals and tracking trades to build your lesson library
             </p>
             <a
               href="/chart-v2"
-              className="inline-block rounded-lg bg-cyan-600 px-6 py-3 text-sm font-medium text-white hover:bg-cyan-700 transition-colors"
+              className="inline-block rounded-lg bg-spark px-6 py-3 text-sm font-medium text-white hover:bg-spark transition-colors"
             >
               Analyze Your First Chart
             </a>

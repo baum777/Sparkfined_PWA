@@ -3,7 +3,7 @@ import type { MouseEvent } from 'react'
 import { saveTrade } from '@/lib/db'
 import type { TradeEntry } from '@/lib/db'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
-import Button from '@/components/ui/Button'
+import { Button } from '@/design-system'
 
 interface SaveTradeModalProps {
   isOpen: boolean

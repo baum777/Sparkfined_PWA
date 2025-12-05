@@ -2,7 +2,7 @@ import { useState, useRef, useId } from 'react'
 import type { MouseEvent } from 'react'
 import { saveFeedback, getSessionId } from '@/lib/db'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
-import Button from '@/components/ui/Button'
+import { Button } from '@/design-system'
 
 interface FeedbackModalProps {
   isOpen: boolean

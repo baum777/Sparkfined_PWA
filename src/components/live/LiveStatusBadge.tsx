@@ -10,7 +10,7 @@
 
 import React from 'react';
 import { useLiveDataStore } from '@/store/liveDataStore';
-import { Badge, type BadgeVariant } from '@/components/ui/Badge';
+import { Badge, type BadgeVariant } from '@/design-system';
 
 interface LiveStatusBadgeProps {
   showLabel?: boolean;
@@ -54,17 +54,17 @@ export function LiveStatusBadge({
         {/* Pulse indicator for active status */}
         {pollingStatus === 'active' && (
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-phosphor opacity-60"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-phosphor"></span>
           </span>
         )}
 
         {/* Static dot for other statuses */}
         {pollingStatus !== 'active' && (
           <span className={`inline-flex h-2 w-2 rounded-full ${
-            pollingStatus === 'paused' ? 'bg-cyan-500' :
-            pollingStatus === 'error' || errorCount > 10 ? 'bg-amber-500' :
-            'bg-zinc-500'
+            pollingStatus === 'paused' ? 'bg-spark' :
+            pollingStatus === 'error' || errorCount > 10 ? 'bg-gold' :
+            'bg-ash'
           }`}></span>
         )}
 

@@ -18,9 +18,9 @@ export default function GrokContextPanel({ context, onRefresh }: GrokContextPane
 
   // Sentiment colors
   const sentimentColors = {
-    bullish: 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40',
-    bearish: 'text-rose-400 bg-rose-950/40 border-rose-800/40',
-    neutral: 'text-zinc-400 bg-zinc-900/40 border-zinc-800/40',
+    bullish: 'text-spark bg-spark/40 border-spark/40',
+    bearish: 'text-blood bg-blood/40 border-blood/40',
+    neutral: 'text-fog bg-smoke/40 border-smoke-light/40',
   }
 
   const sentimentEmoji = {
@@ -30,17 +30,17 @@ export default function GrokContextPanel({ context, onRefresh }: GrokContextPane
   }
 
   return (
-    <div className="rounded-xl border border-cyan-800/40 bg-cyan-950/20 p-4">
+    <div className="rounded-xl border border-spark/40 bg-spark/20 p-4">
       {/* Header */}
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xl">𝕏</span>
-          <h3 className="font-semibold text-cyan-100">Timeline Context (Grok)</h3>
+          <h3 className="font-semibold text-spark">Timeline Context (Grok)</h3>
         </div>
         {onRefresh && (
           <button
             onClick={onRefresh}
-            className="rounded border border-cyan-700 px-2 py-1 text-xs text-cyan-200 hover:bg-cyan-900/40"
+            className="rounded border border-spark px-2 py-1 text-xs text-spark hover:bg-spark/40"
           >
             🔄 Refresh
           </button>
@@ -53,15 +53,15 @@ export default function GrokContextPanel({ context, onRefresh }: GrokContextPane
           <span>{sentimentEmoji[context.sentiment]}</span>
           <span className="capitalize">{context.sentiment}</span>
         </span>
-        <span className="text-xs text-cyan-300/60">
+        <span className="text-xs text-spark/60">
           {new Date(context.fetchedAt).toLocaleString()}
         </span>
       </div>
 
       {/* Lore/Summary */}
-      <div className="mb-3 rounded-lg border border-cyan-800/30 bg-black/20 p-3">
-        <div className="text-sm font-medium text-cyan-200 mb-1">Summary</div>
-        <p className="text-sm text-cyan-100/90 leading-relaxed">{context.lore}</p>
+      <div className="mb-3 rounded-lg border border-spark/30 bg-black/20 p-3">
+        <div className="text-sm font-medium text-spark mb-1">Summary</div>
+        <p className="text-sm text-spark/90 leading-relaxed">{context.lore}</p>
       </div>
 
       {/* Key Tweets (Collapsible) */}
@@ -69,7 +69,7 @@ export default function GrokContextPanel({ context, onRefresh }: GrokContextPane
         <div>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mb-2 flex w-full items-center justify-between rounded-lg border border-cyan-800/30 bg-cyan-900/20 px-3 py-2 text-left text-sm font-medium text-cyan-200 hover:bg-cyan-900/40"
+            className="mb-2 flex w-full items-center justify-between rounded-lg border border-spark/30 bg-spark/20 px-3 py-2 text-left text-sm font-medium text-spark hover:bg-spark/40"
           >
             <span>Key Tweets ({context.keyTweets.length})</span>
             <span className="text-lg">{isExpanded ? '▼' : '▶'}</span>
@@ -80,21 +80,21 @@ export default function GrokContextPanel({ context, onRefresh }: GrokContextPane
               {context.keyTweets.map((tweet, idx) => (
                 <div
                   key={tweet.url || idx}
-                  className="rounded-lg border border-cyan-800/20 bg-black/30 p-3 text-sm"
+                  className="rounded-lg border border-spark/20 bg-black/30 p-3 text-sm"
                 >
                   {/* Author & Timestamp */}
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="font-medium text-cyan-300">{tweet.author}</span>
-                    <span className="text-xs text-cyan-400/60">
+                    <span className="font-medium text-spark">{tweet.author}</span>
+                    <span className="text-xs text-spark/60">
                       {new Date(tweet.timestamp).toLocaleDateString()}
                     </span>
                   </div>
 
                   {/* Tweet Text */}
-                  <p className="mb-2 text-cyan-100/80 leading-relaxed">{tweet.text}</p>
+                  <p className="mb-2 text-spark/80 leading-relaxed">{tweet.text}</p>
 
                   {/* Engagement Stats */}
-                  <div className="flex items-center gap-4 text-xs text-cyan-400/70">
+                  <div className="flex items-center gap-4 text-xs text-spark/70">
                     {tweet.likes !== undefined && (
                       <span>❤️ {tweet.likes.toLocaleString()}</span>
                     )}
@@ -105,7 +105,7 @@ export default function GrokContextPanel({ context, onRefresh }: GrokContextPane
                       href={tweet.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-auto text-cyan-400 hover:underline"
+                      className="ml-auto text-spark hover:underline"
                     >
                       View →
                     </a>
@@ -119,7 +119,7 @@ export default function GrokContextPanel({ context, onRefresh }: GrokContextPane
 
       {/* No Tweets Message */}
       {(!context.keyTweets || context.keyTweets.length === 0) && (
-        <div className="rounded-lg border border-cyan-800/20 bg-black/30 p-3 text-center text-sm text-cyan-300/60">
+        <div className="rounded-lg border border-spark/20 bg-black/30 p-3 text-center text-sm text-spark/60">
           No tweets found for this token
         </div>
       )}

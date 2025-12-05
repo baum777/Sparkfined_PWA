@@ -264,33 +264,33 @@ export default function AdvancedChart({
 
   return (
     <div className="flex flex-col gap-3" data-testid={testId ?? 'advanced-chart'}>
-      <div className="flex items-center justify-between text-xs text-slate-300">
+      <div className="flex items-center justify-between text-xs text-fog">
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-slate-800 px-2 py-1 text-[11px] uppercase tracking-wide text-slate-200">{viewState.timeframe}</span>
+          <span className="rounded-full bg-smoke-light px-2 py-1 text-[11px] uppercase tracking-wide text-mist">{viewState.timeframe}</span>
           {replayLabel && <span className="rounded-full bg-indigo-900/40 px-2 py-1 text-[11px] text-indigo-200">{replayLabel}</span>}
-          {source === 'cache' && <span className="rounded-full bg-amber-900/40 px-2 py-1 text-[11px] text-amber-200">Cached</span>}
+          {source === 'cache' && <span className="rounded-full bg-gold/40 px-2 py-1 text-[11px] text-gold">Cached</span>}
         {status === 'stale' && <span className="rounded-full bg-orange-900/40 px-2 py-1 text-[11px] text-orange-200">Stale</span>}
         {status === 'no-data' && (
-          <span className="rounded-full bg-slate-800 px-2 py-1 text-[11px] text-slate-300" data-testid="badge-no-data">
+          <span className="rounded-full bg-smoke-light px-2 py-1 text-[11px] text-fog" data-testid="badge-no-data">
             No data
           </span>
         )}
         {overlayMeta.indicatorCount + overlayMeta.annotationCount > 0 && (
-          <span className="rounded-full bg-slate-800/70 px-2 py-1 text-[11px] text-slate-200">
+          <span className="rounded-full bg-smoke-light/70 px-2 py-1 text-[11px] text-mist">
             {overlayMeta.indicatorCount} indicators · {overlayMeta.annotationCount} notes
           </span>
         )}
         </div>
         {lastUpdatedAt && (
-          <span className="text-slate-500">Updated {new Date(lastUpdatedAt).toLocaleTimeString()}</span>
+          <span className="text-ash">Updated {new Date(lastUpdatedAt).toLocaleTimeString()}</span>
         )}
       </div>
 
-      <div className="relative rounded-2xl border border-slate-800 bg-slate-950/70 p-2">
+      <div className="relative rounded-2xl border border-smoke-light bg-void/70 p-2">
         {status !== 'error' && (
           <div
             ref={containerRef}
-            className="h-[320px] w-full min-h-[260px] rounded-xl bg-slate-950 md:h-[420px]"
+            className="h-[320px] w-full min-h-[260px] rounded-xl bg-void md:h-[420px]"
             aria-label="advanced-chart"
           />
         )}
@@ -300,7 +300,7 @@ export default function AdvancedChart({
             {onCreateJournalAtPoint && (
               <button
                 type="button"
-                className="rounded-full bg-slate-900/70 px-3 py-1 text-[11px] text-slate-200 hover:bg-slate-800"
+                className="rounded-full bg-smoke/70 px-3 py-1 text-[11px] text-mist hover:bg-smoke-light"
                 onClick={() =>
                   onCreateJournalAtPoint({
                     price: lastCandle.c,
@@ -333,19 +333,19 @@ export default function AdvancedChart({
         )}
 
         {status === 'loading' && candles.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-slate-950/60 text-sm text-slate-400">
+          <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-void/60 text-sm text-fog">
             Loading candles…
           </div>
         )}
 
         {status === 'no-data' && candles.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-slate-950/60 text-sm text-slate-400">
+          <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-void/60 text-sm text-fog">
             No candles yet for this asset/timeframe.
           </div>
         )}
 
         {status === 'error' && candles.length === 0 && (
-          <div className="flex h-[320px] items-center justify-center rounded-2xl bg-rose-950/40 text-sm text-rose-200 md:h-[420px]">
+          <div className="flex h-[320px] items-center justify-center rounded-2xl bg-blood/40 text-sm text-blood md:h-[420px]">
             {error || 'Failed to load chart'}
           </div>
         )}
@@ -356,19 +356,19 @@ export default function AdvancedChart({
 
         {status === 'loading' && candles.length > 0 && (
           <div className="pointer-events-none absolute inset-0 flex items-start justify-end p-3">
-            <span className="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] text-slate-300">Refreshing…</span>
+            <span className="rounded-full bg-smoke/80 px-3 py-1 text-[11px] text-fog">Refreshing…</span>
           </div>
         )}
 
         {status === 'error' && candles.length > 0 && (
           <div className="pointer-events-none absolute inset-0 flex items-start justify-end p-3">
-            <span className="rounded-full bg-rose-900/80 px-3 py-1 text-[11px] text-rose-100">{error || 'Fetch error'}</span>
+            <span className="rounded-full bg-blood/80 px-3 py-1 text-[11px] text-blood">{error || 'Fetch error'}</span>
           </div>
         )}
 
         {status === 'no-data' && candles.length > 0 && (
           <div className="pointer-events-none absolute inset-0 flex items-start justify-end p-3">
-            <span className="rounded-full bg-slate-900/80 px-3 py-1 text-[11px] text-slate-200">Awaiting data</span>
+            <span className="rounded-full bg-smoke/80 px-3 py-1 text-[11px] text-mist">Awaiting data</span>
           </div>
         )}
 
@@ -376,13 +376,13 @@ export default function AdvancedChart({
       </div>
 
       {annotations && annotations.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] text-fog">
           {annotations.slice(0, 6).map((annotation) => (
             <button
               key={annotation.id}
               type="button"
               onClick={() => onAnnotationClick?.(annotation)}
-              className="rounded-full border border-slate-800 bg-slate-900/70 px-2 py-1 text-[11px] text-slate-100 transition hover:border-indigo-500 hover:text-indigo-200"
+              className="rounded-full border border-smoke-light bg-smoke/70 px-2 py-1 text-[11px] text-mist transition hover:border-indigo-500 hover:text-indigo-200"
               data-testid={`annotation-pill-${annotation.kind}`}
               title={`${annotation.kind === 'signal' ? 'Pulse signal' : annotation.kind === 'alert' ? 'Price alert' : 'Journal entry'} · ${annotation.label}`}
             >

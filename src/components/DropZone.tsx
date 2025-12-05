@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import Button from '@/components/ui/Button'
+import { Button } from '@/design-system'
 
 interface DropZoneProps {
   onReady: (payload: { file?: File; ca?: string }) => void

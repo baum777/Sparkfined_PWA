@@ -3,7 +3,7 @@
  * 
  * Displays a single KPI metric with:
  * - Value (large, color-coded)
- * - Label (small, zinc-500)
+ * - Label (small, ash)
  * - Trend (optional, small text)
  * - Icon (optional, top-left)
  * - Loading/Error states
@@ -55,9 +55,9 @@ export default function KPITile({
   
   // Color mapping
   const colorMap = {
-    up: 'text-emerald-500',
-    down: 'text-rose-500',
-    neutral: 'text-zinc-100',
+    up: 'text-spark',
+    down: 'text-blood',
+    neutral: 'text-mist',
   };
   
   const valueColor = colorMap[direction];
@@ -65,7 +65,7 @@ export default function KPITile({
   // Loading State
   if (loading) {
     return (
-      <div className="border-b border-zinc-800 bg-zinc-900 p-3 md:rounded-lg md:border">
+      <div className="border-b border-smoke-light bg-smoke p-3 md:rounded-lg md:border">
         <KPITileSkeleton />
       </div>
     );
@@ -74,7 +74,7 @@ export default function KPITile({
   // Error State
   if (error) {
     return (
-      <div className="border-b border-zinc-800 bg-rose-950/20 p-3 md:rounded-lg md:border md:border-rose-800/50">
+      <div className="border-b border-smoke-light bg-blood/20 p-3 md:rounded-lg md:border md:border-blood/50">
         <StateView
           type="error"
           description="Failed to load"
@@ -89,8 +89,8 @@ export default function KPITile({
   // Success State
   return (
     <div
-      className={`border-b border-zinc-800 bg-zinc-900 p-3 transition-all md:rounded-lg md:border ${
-        onClick ? 'cursor-pointer hover:bg-zinc-850 active:scale-[0.98]' : ''
+      className={`border-b border-smoke-light bg-smoke p-3 transition-all md:rounded-lg md:border ${
+        onClick ? 'cursor-pointer hover:bg-smoke-light active:scale-[0.98]' : ''
       }`}
       style={{
         borderRadius: 'var(--radius-md)',
@@ -103,8 +103,8 @@ export default function KPITile({
     >
       {/* Header: Label + Icon */}
       <div className="flex items-start justify-between">
-        <p className="text-xs font-medium text-zinc-500">{label}</p>
-        {Icon && <Icon size={16} className="text-zinc-600" />}
+        <p className="text-xs font-medium text-ash">{label}</p>
+        {Icon && <Icon size={16} className="text-ash" />}
       </div>
       
       {/* Body: Value + Trend */}
@@ -113,7 +113,7 @@ export default function KPITile({
           {value}
         </p>
         {trend && (
-          <span className="text-xs text-zinc-500">{trend}</span>
+          <span className="text-xs text-ash">{trend}</span>
         )}
       </div>
     </div>

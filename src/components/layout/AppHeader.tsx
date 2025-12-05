@@ -70,11 +70,11 @@ export default function AppHeader() {
     <header className={headerClasses}>
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:py-4">
         <div className="flex items-center gap-3">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-400 shadow-lg shadow-emerald-500/20">
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-spark to-teal-400 shadow-lg shadow-spark/20">
             <span className="text-lg font-semibold text-white">S</span>
           </div>
           <div className="leading-tight">
-            <div className="text-sm font-semibold uppercase tracking-[0.12em] text-emerald-200/90">Sparkfined</div>
+            <div className="text-sm font-semibold uppercase tracking-[0.12em] text-spark/90">Sparkfined</div>
             <div className="text-base font-semibold text-white">Command Center</div>
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function AppHeader() {
                   'rounded-full px-4 py-2 text-sm font-medium transition-all duration-150 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
                   isActive
                     ? 'bg-white/10 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]'
-                    : 'text-zinc-300 hover:bg-white/5 hover:text-white',
+                    : 'text-fog hover:bg-white/5 hover:text-white',
                 ].join(' ')
               }
             >

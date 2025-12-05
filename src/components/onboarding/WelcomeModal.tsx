@@ -81,14 +81,14 @@ export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) 
       <div
         ref={modalRef}
         tabIndex={-1}
-        className="relative w-full max-w-2xl mx-4 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl animate-slide-up focus:outline-none"
+        className="relative w-full max-w-2xl mx-4 bg-smoke border border-smoke-light rounded-2xl shadow-2xl animate-slide-up focus:outline-none"
         data-testid="modal-content"
       >
         {/* Close Button */}
         <button
           ref={closeButtonRef}
           onClick={handleSkip}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-100 transition-colors p-2 rounded-lg hover:bg-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+          className="absolute top-4 right-4 text-fog hover:text-mist transition-colors p-2 rounded-lg hover:bg-smoke-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spark"
           aria-label="Close"
         >
           <X size={20} />
@@ -96,20 +96,20 @@ export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) 
 
         {/* Header */}
         <div className="text-center pt-8 pb-6 px-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-2xl">
-            <Zap className="text-emerald-500" size={32} />
+          <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-gradient-to-br from-spark/20 to-spark/20 rounded-2xl">
+            <Zap className="text-spark" size={32} />
           </div>
           <h2 id={headingId} className="text-3xl font-bold mb-2">
             Welcome to Sparkfined
           </h2>
-          <p className="text-zinc-400 text-lg">
+          <p className="text-fog text-lg">
             Your AI-Powered Trading Command Center
           </p>
         </div>
 
         {/* Content */}
         <div className="px-6 pb-6">
-          <p className="text-center text-zinc-300 mb-6">
+          <p className="text-center text-fog mb-6">
             Let's personalize your experience. Choose your trading level:
           </p>
 
@@ -124,27 +124,27 @@ export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) 
                   onClick={() => setSelectedLevel(persona.level)}
                   className={`
                     relative p-5 rounded-xl border-2 transition-all text-left
-                    hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500
+                    hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spark
                     ${isSelected 
-                      ? 'border-emerald-500 bg-emerald-500/10 shadow-lg shadow-emerald-500/20' 
-                      : 'border-zinc-700 bg-zinc-800/50 hover:border-zinc-600'
+                      ? 'border-spark bg-spark/10 shadow-lg shadow-spark/20' 
+                      : 'border-smoke-lighter bg-smoke-light/50 hover:border-ash'
                     }
                   `}
                   aria-pressed={isSelected}
                 >
                   {/* Selection indicator */}
                   {isSelected && (
-                    <div className="absolute top-3 right-3 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                    <div className="absolute top-3 right-3 w-5 h-5 bg-spark rounded-full flex items-center justify-center">
                       <div className="w-2 h-2 bg-white rounded-full"></div>
                     </div>
                   )}
 
                   <Icon 
                     size={32} 
-                    className={`mb-3 ${isSelected ? 'text-emerald-400' : 'text-zinc-400'}`}
+                    className={`mb-3 ${isSelected ? 'text-spark' : 'text-fog'}`}
                   />
                   <h3 className="font-semibold text-lg mb-1">{persona.title}</h3>
-                  <p className="text-sm text-zinc-400">{persona.description}</p>
+                  <p className="text-sm text-fog">{persona.description}</p>
                 </button>
               );
             })}
@@ -154,7 +154,7 @@ export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) 
           <div className="flex gap-3">
             <button
               onClick={handleSkip}
-              className="flex-1 px-6 py-3 rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-100 font-medium transition-all hover:bg-zinc-700 hover:border-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
+              className="flex-1 px-6 py-3 rounded-lg border border-smoke-lighter bg-smoke-light text-mist font-medium transition-all hover:bg-smoke-lighter hover:border-ash focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ash"
             >
               Skip for now
             </button>
@@ -163,10 +163,10 @@ export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) 
               disabled={!selectedLevel}
               className={`
                 flex-1 px-6 py-3 rounded-lg font-semibold transition-all
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spark
                 ${selectedLevel
-                  ? 'bg-emerald-500 text-white hover:bg-emerald-600 hover:scale-105'
-                  : 'bg-zinc-700 text-zinc-500 cursor-not-allowed'
+                  ? 'bg-spark text-white hover:bg-spark hover:scale-105'
+                  : 'bg-smoke-lighter text-ash cursor-not-allowed'
                 }
               `}
             >
@@ -175,8 +175,8 @@ export function WelcomeModal({ onClose, onPersonaSelected }: WelcomeModalProps) 
           </div>
 
           {/* Footer hint */}
-          <p className="text-center text-xs text-zinc-600 mt-4">
-            You can change this later in Settings or press <kbd className="px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-400">ESC</kbd> to skip
+          <p className="text-center text-xs text-ash mt-4">
+            You can change this later in Settings or press <kbd className="px-1.5 py-0.5 bg-smoke-light rounded text-fog">ESC</kbd> to skip
           </p>
         </div>
       </div>

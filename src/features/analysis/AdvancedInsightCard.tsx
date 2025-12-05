@@ -75,8 +75,8 @@ export default function AdvancedInsightCard() {
 
   if (!sections) {
     return (
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <div className="text-sm text-zinc-400">
+      <div className="rounded-xl border border-smoke-light bg-smoke/40 p-6">
+        <div className="text-sm text-fog">
           No Advanced Insight data available. Run analysis to generate.
         </div>
       </div>
@@ -91,7 +91,7 @@ export default function AdvancedInsightCard() {
   ];
 
   return (
-    <div className="relative rounded-xl border border-zinc-800 bg-zinc-900/40 overflow-hidden">
+    <div className="relative rounded-xl border border-smoke-light bg-smoke/40 overflow-hidden">
       {/* Token Lock Overlay */}
       {isLocked && (
         <TokenLockOverlay
@@ -103,14 +103,14 @@ export default function AdvancedInsightCard() {
       )}
 
       {/* Header */}
-      <div className="border-b border-zinc-800 px-4 py-3">
+      <div className="border-b border-smoke-light px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-medium text-zinc-200">
+            <h3 className="text-sm font-medium text-mist">
               Advanced Insight
             </h3>
             {overridesCount > 0 && (
-              <span className="rounded bg-emerald-900/30 px-2 py-0.5 text-xs text-emerald-300">
+              <span className="rounded bg-spark/30 px-2 py-0.5 text-xs text-spark">
                 {overridesCount} override{overridesCount !== 1 ? 's' : ''}
               </span>
             )}
@@ -121,7 +121,7 @@ export default function AdvancedInsightCard() {
                 type="button"
                 onClick={handleResetAll}
                 aria-label="Reset all Advanced Insight overrides"
-                className="text-xs text-zinc-400 hover:text-zinc-200 transition-colors"
+                className="text-xs text-fog hover:text-mist transition-colors"
               >
                 Reset All
               </button>
@@ -129,7 +129,7 @@ export default function AdvancedInsightCard() {
         </div>
       </div>
         {/* Tabs */}
-        <div className="border-b border-zinc-800 px-4">
+        <div className="border-b border-smoke-light px-4">
           <div
             className="flex gap-1"
             role="tablist"
@@ -152,8 +152,8 @@ export default function AdvancedInsightCard() {
                     border-b-2 -mb-px
                     ${
                       activeTab === tab.id
-                        ? 'border-emerald-500 text-emerald-300'
-                        : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                        ? 'border-spark text-spark'
+                        : 'border-transparent text-fog hover:text-mist'
                     }
                   `}
                 >
@@ -211,7 +211,7 @@ function TokenLockOverlay({ access, onUnlockClick }: TokenLockOverlayProps) {
     <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/80 backdrop-blur-sm">
       <div
         ref={overlayRef}
-        className="max-w-sm rounded-lg border border-zinc-700 bg-zinc-900 p-6 text-center focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        className="max-w-sm rounded-lg border border-smoke-lighter bg-smoke p-6 text-center focus:outline-none focus:ring-2 focus:ring-spark"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -219,17 +219,17 @@ function TokenLockOverlay({ access, onUnlockClick }: TokenLockOverlayProps) {
         tabIndex={-1}
       >
         <div className="mb-3 text-3xl">🔒</div>
-        <h4 id={titleId} className="mb-2 text-sm font-medium text-zinc-200">
+        <h4 id={titleId} className="mb-2 text-sm font-medium text-mist">
           Advanced Insight Locked
         </h4>
-        <p id={descriptionId} className="mb-4 text-xs text-zinc-400">
+        <p id={descriptionId} className="mb-4 text-xs text-fog">
           {reasonText}
         </p>
         <a
           href="/access"
           onClick={onUnlockClick}
           aria-label="Unlock advanced insight access"
-          className="inline-block rounded bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700 transition-colors"
+          className="inline-block rounded bg-spark px-4 py-2 text-xs font-medium text-white hover:bg-spark transition-colors"
         >
           Unlock Access
         </a>
@@ -277,16 +277,16 @@ function MarketStructureTab({ data }: MarketStructureTabProps) {
         renderValue={(range) => (
           <div className="grid grid-cols-3 gap-2 text-xs">
             <div>
-              <span className="text-zinc-500">Low:</span>{' '}
-              <span className="text-zinc-200">${range.low.toFixed(4)}</span>
+              <span className="text-ash">Low:</span>{' '}
+              <span className="text-mist">${range.low.toFixed(4)}</span>
             </div>
             <div>
-              <span className="text-zinc-500">Mid:</span>{' '}
-              <span className="text-zinc-200">${range.mid.toFixed(4)}</span>
+              <span className="text-ash">Mid:</span>{' '}
+              <span className="text-mist">${range.mid.toFixed(4)}</span>
             </div>
             <div>
-              <span className="text-zinc-500">High:</span>{' '}
-              <span className="text-zinc-200">${range.high.toFixed(4)}</span>
+              <span className="text-ash">High:</span>{' '}
+              <span className="text-mist">${range.high.toFixed(4)}</span>
             </div>
           </div>
         )}
@@ -310,16 +310,16 @@ function MarketStructureTab({ data }: MarketStructureTabProps) {
               <span
                 className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${
                   bias.bias === 'bullish'
-                    ? 'bg-emerald-900/30 text-emerald-300'
+                    ? 'bg-spark/30 text-spark'
                     : bias.bias === 'bearish'
-                    ? 'bg-rose-900/30 text-rose-300'
-                    : 'bg-zinc-700/30 text-zinc-300'
+                    ? 'bg-blood/30 text-blood'
+                    : 'bg-smoke-lighter/30 text-fog'
                 }`}
               >
                 {bias.bias.toUpperCase()}
               </span>
             </div>
-            <p className="text-xs text-zinc-400">{bias.reason}</p>
+            <p className="text-xs text-fog">{bias.reason}</p>
           </div>
         )}
       />
@@ -340,10 +340,10 @@ function MarketStructureTab({ data }: MarketStructureTabProps) {
           <div className="space-y-1">
             {levels.map((level, i) => (
               <div key={i} className="flex items-center justify-between text-xs">
-                <span className="text-zinc-400">
+                <span className="text-fog">
                   {level.type.join(', ')} {level.label ? `(${level.label})` : ''}
                 </span>
-                <span className="text-zinc-200">${level.price.toFixed(4)}</span>
+                <span className="text-mist">${level.price.toFixed(4)}</span>
               </div>
             ))}
           </div>
@@ -366,8 +366,8 @@ function MarketStructureTab({ data }: MarketStructureTabProps) {
           <div className="space-y-1">
             {zones.map((zone, i) => (
               <div key={i} className="flex items-center justify-between text-xs">
-                <span className="text-zinc-400 capitalize">{zone.label.replace(/_/g, ' ')}</span>
-                <span className="text-zinc-200">
+                <span className="text-fog capitalize">{zone.label.replace(/_/g, ' ')}</span>
+                <span className="text-mist">
                   ${zone.from.toFixed(4)} - ${zone.to.toFixed(4)}
                 </span>
               </div>
@@ -408,18 +408,18 @@ function FlowVolumeTab({ data }: FlowVolumeTabProps) {
           <div className="space-y-2 text-xs">
             {flow.vol_24h_usd && (
               <div className="flex items-center justify-between">
-                <span className="text-zinc-400">Volume (USD):</span>
-                <span className="text-zinc-200">
+                <span className="text-fog">Volume (USD):</span>
+                <span className="text-mist">
                   ${flow.vol_24h_usd.toLocaleString()}
                 </span>
               </div>
             )}
             {flow.vol_24h_delta_pct !== undefined && (
               <div className="flex items-center justify-between">
-                <span className="text-zinc-400">24h Change:</span>
+                <span className="text-fog">24h Change:</span>
                 <span
                   className={
-                    flow.vol_24h_delta_pct > 0 ? 'text-emerald-300' : 'text-rose-300'
+                    flow.vol_24h_delta_pct > 0 ? 'text-spark' : 'text-blood'
                   }
                 >
                   {flow.vol_24h_delta_pct > 0 ? '+' : ''}
@@ -429,8 +429,8 @@ function FlowVolumeTab({ data }: FlowVolumeTabProps) {
             )}
             {flow.source && (
               <div className="flex items-center justify-between">
-                <span className="text-zinc-400">Source:</span>
-                <span className="text-zinc-500 text-[10px]">{flow.source}</span>
+                <span className="text-fog">Source:</span>
+                <span className="text-ash text-[10px]">{flow.source}</span>
               </div>
             )}
           </div>
@@ -477,15 +477,15 @@ function PlaybookTab({ data }: PlaybookTabProps) {
         renderValue={(entries) => (
           <div className="space-y-2">
             {entries.length === 0 ? (
-              <div className="text-xs text-zinc-500">No playbook entries</div>
+              <div className="text-xs text-ash">No playbook entries</div>
             ) : (
               entries.map((entry, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-2 rounded border border-zinc-800 bg-zinc-900/60 p-2"
+                  className="flex items-start gap-2 rounded border border-smoke-light bg-smoke/60 p-2"
                 >
-                  <span className="text-xs text-zinc-500">{i + 1}.</span>
-                  <span className="text-xs text-zinc-300">{entry}</span>
+                  <span className="text-xs text-ash">{i + 1}.</span>
+                  <span className="text-xs text-fog">{entry}</span>
                 </div>
               ))
             )}
@@ -526,7 +526,7 @@ function MacroTab({ data }: MacroTabProps) {
             {tags.map((tag, i) => (
               <span
                 key={i}
-                className="rounded bg-zinc-800 px-2 py-1 text-xs text-zinc-300"
+                className="rounded bg-smoke-light px-2 py-1 text-xs text-fog"
               >
                 {tag.label}
               </span>
@@ -592,12 +592,12 @@ function FieldGroup<T>({
   };
 
   return (
-    <div className="rounded border border-zinc-800 bg-zinc-900/60 p-3">
+    <div className="rounded border border-smoke-light bg-smoke/60 p-3">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-zinc-300">{label}</span>
+          <span className="text-xs font-medium text-fog">{label}</span>
           {field.is_overridden && (
-            <span className="rounded bg-amber-900/30 px-1.5 py-0.5 text-[10px] text-amber-300">
+            <span className="rounded bg-gold/30 px-1.5 py-0.5 text-[10px] text-gold">
               Edited
             </span>
           )}
@@ -608,7 +608,7 @@ function FieldGroup<T>({
               type="button"
               onClick={handleEditStart}
               aria-label={editButtonLabel}
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="text-xs text-ash hover:text-fog transition-colors"
             >
               ✏️
             </button>
@@ -618,7 +618,7 @@ function FieldGroup<T>({
               type="button"
               onClick={onReset}
               aria-label={resetButtonLabel}
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="text-xs text-ash hover:text-fog transition-colors"
             >
               ↺
             </button>
@@ -705,12 +705,12 @@ function RangeEditor({ initialValue, onSubmit, onCancel }: RangeEditorProps) {
   };
 
   const inputClass =
-    'rounded border border-zinc-700 bg-black/40 px-2 py-1 text-xs text-zinc-100 focus:border-emerald-600 focus:outline-none';
+    'rounded border border-smoke-lighter bg-black/40 px-2 py-1 text-xs text-mist focus:border-spark focus:outline-none';
 
   return (
     <div className="space-y-3 text-xs">
       <div className="grid grid-cols-2 gap-3">
-        <label className="flex flex-col gap-1 text-[11px] text-zinc-400">
+        <label className="flex flex-col gap-1 text-[11px] text-fog">
           Window (hours)
           <input
             type="number"
@@ -720,7 +720,7 @@ function RangeEditor({ initialValue, onSubmit, onCancel }: RangeEditorProps) {
             onChange={handleInputChange('window_hours')}
           />
         </label>
-        <label className="flex flex-col gap-1 text-[11px] text-zinc-400">
+        <label className="flex flex-col gap-1 text-[11px] text-fog">
           Low
           <input
             type="number"
@@ -730,7 +730,7 @@ function RangeEditor({ initialValue, onSubmit, onCancel }: RangeEditorProps) {
             onChange={handleInputChange('low')}
           />
         </label>
-        <label className="flex flex-col gap-1 text-[11px] text-zinc-400">
+        <label className="flex flex-col gap-1 text-[11px] text-fog">
           Mid
           <input
             type="number"
@@ -740,7 +740,7 @@ function RangeEditor({ initialValue, onSubmit, onCancel }: RangeEditorProps) {
             onChange={handleInputChange('mid')}
           />
         </label>
-        <label className="flex flex-col gap-1 text-[11px] text-zinc-400">
+        <label className="flex flex-col gap-1 text-[11px] text-fog">
           High
           <input
             type="number"
@@ -756,14 +756,14 @@ function RangeEditor({ initialValue, onSubmit, onCancel }: RangeEditorProps) {
           type="button"
           onClick={handleSave}
           disabled={!isValid}
-          className="rounded bg-emerald-600 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-500 disabled:bg-emerald-900/40 disabled:text-emerald-200/40"
+          className="rounded bg-spark px-3 py-1 text-xs font-medium text-white hover:bg-spark disabled:bg-spark/40 disabled:text-spark/40"
         >
           Save
         </button>
         <button
           type="button"
           onClick={handleCancel}
-          className="rounded border border-zinc-700 px-3 py-1 text-xs text-zinc-200 hover:bg-zinc-800"
+          className="rounded border border-smoke-lighter px-3 py-1 text-xs text-mist hover:bg-smoke-light"
         >
           Cancel
         </button>
@@ -807,7 +807,7 @@ function PlaybookEntriesEditor({
     <div className="space-y-2">
       <textarea
         aria-label="Edit tactical playbook entries"
-        className="h-32 w-full rounded border border-zinc-700 bg-black/40 px-3 py-2 text-xs text-zinc-100 focus:border-emerald-600 focus:outline-none"
+        className="h-32 w-full rounded border border-smoke-lighter bg-black/40 px-3 py-2 text-xs text-mist focus:border-spark focus:outline-none"
         placeholder="If price breaks above $45 -> target $50"
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
@@ -817,14 +817,14 @@ function PlaybookEntriesEditor({
           type="button"
           onClick={handleSave}
           disabled={normalizedEntries.length === 0}
-          className="rounded bg-emerald-600 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-500 disabled:bg-emerald-900/40 disabled:text-emerald-200/40"
+          className="rounded bg-spark px-3 py-1 text-xs font-medium text-white hover:bg-spark disabled:bg-spark/40 disabled:text-spark/40"
         >
           Save
         </button>
         <button
           type="button"
           onClick={handleCancel}
-          className="rounded border border-zinc-700 px-3 py-1 text-xs text-zinc-200 hover:bg-zinc-800"
+          className="rounded border border-smoke-lighter px-3 py-1 text-xs text-mist hover:bg-smoke-light"
         >
           Cancel
         </button>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '@/components/ui/Button';
+import { Button, Tooltip } from '@/design-system';
 
 export default function DashboardQuickActions() {
   const navigate = useNavigate();
@@ -23,14 +23,15 @@ export default function DashboardQuickActions() {
   return (
     <div className="flex flex-wrap items-center gap-3">
       {actions.map((action) => (
-        <Button
-          key={action.label}
-          variant="secondary"
-          size="sm"
-          onClick={() => navigate(action.path)}
-        >
-          {action.label}
-        </Button>
+        <Tooltip key={action.label} content={`Navigate to ${action.label}`}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate(action.path)}
+          >
+            {action.label}
+          </Button>
+        </Tooltip>
       ))}
     </div>
   );

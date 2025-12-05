@@ -54,17 +54,17 @@ export default function SignalsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-zinc-950 pb-20 md:pb-8">
+    <div className="min-h-screen bg-void-lighter pb-20 md:pb-8">
       {/* Header */}
-      <header className="border-b border-zinc-800 bg-zinc-900 p-4">
+      <header className="border-b border-smoke-light bg-smoke p-4">
         <div className="mx-auto max-w-5xl">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-emerald-950/30 p-2">
-              <TrendingUp size={24} className="text-emerald-500" />
+            <div className="rounded-lg bg-spark/30 p-2">
+              <TrendingUp size={24} className="text-spark" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-zinc-100">Trading Signals</h1>
-              <p className="text-sm text-zinc-500">
+              <h1 className="text-xl font-semibold text-mist">Trading Signals</h1>
+              <p className="text-sm text-ash">
                 Detected patterns & trade opportunities
               </p>
             </div>
@@ -75,34 +75,34 @@ export default function SignalsPage() {
       <div className="mx-auto max-w-5xl p-4 pb-20 md:pb-6 space-y-4">
         {/* Stats Overview */}
         <div className="grid grid-cols-4 gap-2">
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-            <p className="text-xs text-zinc-500">Total</p>
-            <p className="text-xl font-semibold text-zinc-100">{stats.total}</p>
+          <div className="rounded-lg border border-smoke-light bg-smoke p-3 text-center">
+            <p className="text-xs text-ash">Total</p>
+            <p className="text-xl font-semibold text-mist">{stats.total}</p>
           </div>
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-            <p className="text-xs text-zinc-500">High Conf.</p>
-            <p className="text-xl font-semibold text-emerald-500">{stats.high_confidence}</p>
+          <div className="rounded-lg border border-smoke-light bg-smoke p-3 text-center">
+            <p className="text-xs text-ash">High Conf.</p>
+            <p className="text-xl font-semibold text-spark">{stats.high_confidence}</p>
           </div>
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-            <p className="text-xs text-zinc-500">Long</p>
-            <p className="text-xl font-semibold text-emerald-500">{stats.long}</p>
+          <div className="rounded-lg border border-smoke-light bg-smoke p-3 text-center">
+            <p className="text-xs text-ash">Long</p>
+            <p className="text-xl font-semibold text-spark">{stats.long}</p>
           </div>
-          <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-3 text-center">
-            <p className="text-xs text-zinc-500">Short</p>
-            <p className="text-xl font-semibold text-rose-500">{stats.short}</p>
+          <div className="rounded-lg border border-smoke-light bg-smoke p-3 text-center">
+            <p className="text-xs text-ash">Short</p>
+            <p className="text-xl font-semibold text-blood">{stats.short}</p>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="rounded-lg border border-zinc-800 bg-zinc-900 p-4 space-y-3">
+        <div className="rounded-lg border border-smoke-light bg-smoke p-4 space-y-3">
           <div className="flex items-center gap-2">
-            <Filter size={16} className="text-zinc-500" />
-            <p className="text-sm font-medium text-zinc-400">Filters</p>
+            <Filter size={16} className="text-ash" />
+            <p className="text-sm font-medium text-fog">Filters</p>
           </div>
 
           {/* Pattern Filter */}
           <div>
-            <label className="text-xs text-zinc-500 mb-1 block">Pattern</label>
+            <label className="text-xs text-ash mb-1 block">Pattern</label>
             <div className="flex flex-wrap gap-2">
               {patterns.map((pattern) => (
                 <button
@@ -110,8 +110,8 @@ export default function SignalsPage() {
                   onClick={() => setSelectedPattern(pattern)}
                   className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
                     selectedPattern === pattern
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                      ? 'bg-spark text-white'
+                      : 'bg-smoke-light text-fog hover:bg-smoke-lighter'
                   }`}
                 >
                   {pattern === 'all' ? 'All' : pattern.replace('-', ' ')}
@@ -122,7 +122,7 @@ export default function SignalsPage() {
 
           {/* Confidence Threshold */}
           <div>
-            <label className="text-xs text-zinc-500 mb-1 block">
+            <label className="text-xs text-ash mb-1 block">
               Min Confidence: {(minConfidence * 100).toFixed(0)}%
             </label>
             <input
@@ -146,7 +146,7 @@ export default function SignalsPage() {
           <StateView
             type="empty"
             description="No signals match your filters"
-            icon={<AlertCircle size={48} className="text-zinc-700" />}
+            icon={<AlertCircle size={48} className="text-smoke-lighter" />}
           />
         ) : (
           <div className="space-y-3">
@@ -168,14 +168,14 @@ export default function SignalsPage() {
           onClick={() => setSelectedSignalId(null)}
         >
           <div
-            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-t-2xl bg-zinc-950 md:rounded-2xl"
+            className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-t-2xl bg-void-lighter md:rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 bg-zinc-950 border-b border-zinc-800 p-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-zinc-100">Signal Details</h2>
+            <div className="sticky top-0 bg-void-lighter border-b border-smoke-light p-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-mist">Signal Details</h2>
               <button
                 onClick={() => setSelectedSignalId(null)}
-                className="text-zinc-500 hover:text-zinc-300"
+                className="text-ash hover:text-fog"
               >
                 ✕
               </button>

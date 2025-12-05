@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import FeedbackModal from './FeedbackModal'
 import MetricsPanel from './MetricsPanel'
-import Button from '@/components/ui/Button'
+import { Button } from '@/design-system'
 import { BarChart3, MessageCircle, Moon, Sun } from '@/lib/icons'
 import { useTheme } from '@/lib/theme/useTheme'
 

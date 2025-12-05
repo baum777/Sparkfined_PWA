@@ -17,7 +17,7 @@ export function BasicModal() {
   return (
     <div className="min-h-[200px] p-6">
       <button
-        className="px-4 py-2 rounded bg-emerald-500 text-white"
+        className="px-4 py-2 rounded bg-spark text-white"
         onClick={() => setOpen(true)}
       >
         Open modal
@@ -37,23 +37,23 @@ export function BasicModal() {
           <div
             ref={modalRef}
             tabIndex={-1}
-            className="w-full max-w-md rounded-xl bg-white p-6 text-slate-900 shadow-xl"
+            className="w-full max-w-md rounded-xl bg-white p-6 text-smoke shadow-xl"
           >
             <h2 id="storybook-modal-title" className="text-xl font-semibold mb-4">
               Focus trapped modal
             </h2>
-            <p className="mb-4 text-sm text-slate-600">
+            <p className="mb-4 text-sm text-fog">
               Tabbing will cycle between the buttons and pressing escape will close the modal.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 ref={initialFocusRef}
                 onClick={() => setOpen(false)}
-                className="px-3 py-2 rounded border border-slate-300"
+                className="px-3 py-2 rounded border border-fog"
               >
                 Close
               </button>
-              <button className="px-3 py-2 rounded bg-emerald-500 text-white">
+              <button className="px-3 py-2 rounded bg-spark text-white">
                 Confirm
               </button>
             </div>

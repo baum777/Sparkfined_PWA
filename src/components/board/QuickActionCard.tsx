@@ -26,15 +26,15 @@ export default function QuickActionCard({
     return (
       <button
         onClick={onClick}
-        className="flex h-24 w-24 flex-shrink-0 flex-col items-center justify-center gap-2 bg-zinc-900 transition-all active:scale-95 snap-center"
+        className="flex h-24 w-24 flex-shrink-0 flex-col items-center justify-center gap-2 bg-smoke transition-all active:scale-95 snap-center"
         style={{
           borderRadius: 'var(--radius-lg)',
           transition: 'all var(--duration-short) var(--ease-in-out)',
         }}
         aria-label={label}
       >
-        <Icon size={24} className="text-zinc-300" />
-        <span className="text-xs font-medium text-zinc-300 text-center px-1">{label}</span>
+        <Icon size={24} className="text-fog" />
+        <span className="text-xs font-medium text-fog text-center px-1">{label}</span>
       </button>
     );
   }
@@ -43,7 +43,7 @@ export default function QuickActionCard({
   return (
     <button
       onClick={onClick}
-      className="flex h-20 w-full items-center gap-4 border border-zinc-800 bg-zinc-900 px-4 py-4 transition-all hover:bg-zinc-850 hover:scale-[1.02] active:scale-95"
+      className="flex h-20 w-full items-center gap-4 border border-smoke-light bg-smoke px-4 py-4 transition-all hover:bg-smoke-light hover:scale-[1.02] active:scale-95"
       style={{
         borderRadius: 'var(--radius-lg)',
         boxShadow: 'var(--shadow-none)',
@@ -57,8 +57,8 @@ export default function QuickActionCard({
       }}
       aria-label={label}
     >
-      <Icon size={24} className="text-zinc-300" />
-      <span className="text-sm font-medium text-zinc-300">{label}</span>
+      <Icon size={24} className="text-fog" />
+      <span className="text-sm font-medium text-fog">{label}</span>
     </button>
   );
 }

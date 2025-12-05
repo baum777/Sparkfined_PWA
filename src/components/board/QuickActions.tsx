@@ -32,7 +32,7 @@ export default function QuickActions() {
   
   return (
     <div>
-      <h2 className="mb-3 text-base font-semibold text-zinc-100 lg:hidden">Quick Actions</h2>
+      <h2 className="mb-3 text-base font-semibold text-mist lg:hidden">Quick Actions</h2>
       
       {/* Mobile: Horizontal scroll-row */}
       <div className="flex gap-3 overflow-x-auto pb-2 lg:hidden snap-x snap-mandatory">

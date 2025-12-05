@@ -80,14 +80,14 @@ export default function Select({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex h-11 w-full items-center justify-between rounded-token-lg border bg-zinc-900 px-3 py-2.5 text-sm transition-all duration-150 ease-out ${
-          isOpen ? 'border-emerald-500 ring-1 ring-emerald-500/50' : error ? 'border-rose-500' : 'border-zinc-700'
+        className={`flex h-11 w-full items-center justify-between rounded-token-lg border bg-smoke px-3 py-2.5 text-sm transition-all duration-150 ease-out ${
+          isOpen ? 'border-spark ring-1 ring-spark/50' : error ? 'border-blood' : 'border-smoke-lighter'
         } ${disabled ? 'cursor-not-allowed opacity-60' : ''} ${triggerClassName ?? ''}`}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         {...restTriggerProps}
       >
-        <span className={selectedOption ? 'text-zinc-100' : 'text-zinc-500'}>
+        <span className={selectedOption ? 'text-mist' : 'text-ash'}>
           {selectedOption?.label || placeholder}
         </span>
         {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -95,7 +95,7 @@ export default function Select({
       
       {isOpen && (
         <div
-          className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-token-md border border-zinc-700 bg-zinc-900 shadow-token-md"
+          className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-token-md border border-smoke-lighter bg-smoke shadow-token-md"
           role="listbox"
         >
           {options.map((option) => (
@@ -108,8 +108,8 @@ export default function Select({
               }}
               className={`w-full flex items-center justify-between px-3 py-2 text-sm text-left transition-colors ${
                 option.value === value 
-                  ? 'bg-emerald-500/10 text-emerald-400' 
-                  : 'text-zinc-100 hover:bg-zinc-800'
+                  ? 'bg-spark/10 text-spark' 
+                  : 'text-mist hover:bg-smoke-light'
               }`}
               role="option"
               aria-selected={option.value === value}
@@ -122,7 +122,7 @@ export default function Select({
       )}
       
       {error && (
-        <p className="mt-1 text-xs text-rose-400" role="alert">
+        <p className="mt-1 text-xs text-blood" role="alert">
           {error}
         </p>
       )}

@@ -74,7 +74,7 @@ export default function OracleHistoryList({ reports }: OracleHistoryListProps) {
                       report.score >= 6
                         ? 'bg-brand/20 text-brand'
                         : report.score >= 4
-                        ? 'bg-blue-500/20 text-blue-400'
+                        ? 'bg-spark/20 text-spark'
                         : 'bg-text-tertiary/20 text-text-tertiary'
                     }`}
                   >

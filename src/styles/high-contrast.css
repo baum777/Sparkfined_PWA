@@ -73,14 +73,14 @@
   
   /* === Backgrounds === */
   
-  .bg-zinc-900,
-  .bg-zinc-800,
-  .bg-zinc-950 {
+  .bg-smoke,
+  .bg-smoke-light,
+  .bg-void-lighter {
     background-color: #000000 !important;
   }
   
-  .bg-zinc-700,
-  .bg-zinc-600 {
+  .bg-smoke-lighter,
+  .bg-ash {
     background-color: #333333 !important;
   }
   
@@ -107,25 +107,25 @@
   
   /* === Status Colors === */
   
-  .text-emerald-500,
-  .text-emerald-400,
-  .bg-emerald-500 {
+  .text-spark,
+  .text-spark,
+  .bg-spark {
     color: rgb(var(--color-emerald)) !important;
     background-color: transparent !important;
     border-color: rgb(var(--color-emerald)) !important;
   }
   
-  .text-rose-500,
-  .text-rose-400,
-  .bg-rose-500 {
+  .text-blood,
+  .text-blood,
+  .bg-blood {
     color: rgb(var(--color-rose)) !important;
     background-color: transparent !important;
     border-color: rgb(var(--color-rose)) !important;
   }
   
-  .text-amber-500,
-  .text-amber-400,
-  .bg-amber-500 {
+  .text-gold,
+  .text-gold,
+  .bg-gold {
     color: rgb(var(--color-amber)) !important;
     background-color: transparent !important;
     border-color: rgb(var(--color-amber)) !important;

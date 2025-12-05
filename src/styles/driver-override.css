@@ -4,28 +4,28 @@
 
 /* Popover Background */
 .driver-popover {
-  background: #18181b !important; /* zinc-900 */
-  color: #f4f4f5 !important; /* zinc-100 */
-  border: 1px solid #27272a !important; /* zinc-800 */
+  background: #18181b !important; /* smoke */
+  color: #f4f4f5 !important; /* mist */
+  border: 1px solid #27272a !important; /* smoke-light */
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5) !important;
 }
 
 /* Title */
 .driver-popover-title {
-  color: #f4f4f5 !important; /* zinc-100 */
+  color: #f4f4f5 !important; /* mist */
   font-weight: 600 !important;
   font-size: 1.125rem !important;
 }
 
 /* Description */
 .driver-popover-description {
-  color: #d4d4d8 !important; /* zinc-300 */
+  color: #d4d4d8 !important; /* fog */
   line-height: 1.5 !important;
 }
 
 /* Progress Text */
 .driver-popover-progress-text {
-  color: #71717a !important; /* zinc-500 */
+  color: #71717a !important; /* ash */
   font-size: 0.875rem !important;
 }
 
@@ -41,14 +41,14 @@
 
 /* Next/Done Button */
 .driver-popover-next-btn {
-  background: #10b981 !important; /* emerald-500 */
+  background: #10b981 !important; /* spark */
   color: white !important;
   border: none !important;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
 }
 
 .driver-popover-next-btn:hover {
-  background: #059669 !important; /* emerald-600 */
+  background: #059669 !important; /* spark */
   transform: scale(1.05) !important;
 }
 
@@ -58,26 +58,26 @@
 
 /* Previous Button */
 .driver-popover-prev-btn {
-  background: #27272a !important; /* zinc-800 */
-  color: #f4f4f5 !important; /* zinc-100 */
-  border: 1px solid #3f3f46 !important; /* zinc-700 */
+  background: #27272a !important; /* smoke-light */
+  color: #f4f4f5 !important; /* mist */
+  border: 1px solid #3f3f46 !important; /* smoke-lighter */
 }
 
 .driver-popover-prev-btn:hover {
-  background: #3f3f46 !important; /* zinc-700 */
-  border-color: #52525b !important; /* zinc-600 */
+  background: #3f3f46 !important; /* smoke-lighter */
+  border-color: #52525b !important; /* ash */
 }
 
 /* Close Button */
 .driver-popover-close-btn {
   background: transparent !important;
-  color: #a1a1aa !important; /* zinc-400 */
+  color: #a1a1aa !important; /* fog */
   border: none !important;
 }
 
 .driver-popover-close-btn:hover {
-  color: #f4f4f5 !important; /* zinc-100 */
-  background: #27272a !important; /* zinc-800 */
+  color: #f4f4f5 !important; /* mist */
+  background: #27272a !important; /* smoke-light */
 }
 
 /* Arrow */
@@ -85,7 +85,7 @@
 .driver-popover-arrow-side-right.driver-popover-arrow,
 .driver-popover-arrow-side-top.driver-popover-arrow,
 .driver-popover-arrow-side-bottom.driver-popover-arrow {
-  border-color: #18181b !important; /* zinc-900 */
+  border-color: #18181b !important; /* smoke */
 }
 
 /* Overlay */
@@ -96,7 +96,7 @@
 
 /* Highlighted element */
 .driver-active-element {
-  outline: 2px solid #10b981 !important; /* emerald-500 */
+  outline: 2px solid #10b981 !important; /* spark */
   outline-offset: 4px !important;
 }
 

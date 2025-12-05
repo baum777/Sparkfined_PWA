@@ -14,7 +14,7 @@ export default function NotificationsPage() {
   const [subState, setSubState] = React.useState<"idle"|"on"|"off"|"denied"|"error">("idle");
   const [lastErr, setLastErr] = React.useState<string| null>(null);
   const VAPID = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
-  const btn  = "rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800";
+  const btn  = "rounded-lg border border-smoke-lighter px-2 py-1 text-xs text-mist hover:bg-smoke-light";
 
   // --- Server Rules Panel (minimal)
   const [srvRules, setSrvRules] = React.useState<ServerRule[]>([]);
@@ -66,7 +66,7 @@ export default function NotificationsPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-4 pb-20 md:py-6 md:pb-6">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div className="text-lg font-semibold text-zinc-100">Alert Center</div>
+        <div className="text-lg font-semibold text-mist">Alert Center</div>
         <div className="flex items-center gap-2">
           <button className={btn} onClick={askPermission}>Browser-Benachrichtigung</button>
           {VAPID ? (
@@ -98,13 +98,13 @@ export default function NotificationsPage() {
               }}>Hard Unsubscribe</button>
             </>
           ) : (
-            <span className="text-[11px] text-rose-300">VITE_VAPID_PUBLIC_KEY fehlt</span>
+            <span className="text-[11px] text-blood">VITE_VAPID_PUBLIC_KEY fehlt</span>
           )}
           <button className={btn} onClick={()=>addManualTrigger(Date.now(), { ruleId: "test", address: "test", title: "Test Trigger" })}>Test-Trigger</button>
         </div>
-        <div className="text-[11px] text-zinc-400">Push-Status: {subState}</div>
+        <div className="text-[11px] text-fog">Push-Status: {subState}</div>
       </div>
-      {lastErr && <div className="mb-3 rounded border border-rose-900 bg-rose-950/40 p-2 text-[12px] text-rose-200">Push-Fehler: {lastErr}</div>}
+      {lastErr && <div className="mb-3 rounded border border-blood bg-blood/40 p-2 text-[12px] text-blood">Push-Fehler: {lastErr}</div>}
 
       {/* Preset Wizard */}
       <div className="mb-4">
@@ -112,9 +112,9 @@ export default function NotificationsPage() {
       </div>
 
       {/* Server Rules */}
-      <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
+      <div className="mb-6 rounded-xl border border-smoke-light bg-smoke/40 p-3">
         <div className="mb-2 flex items-center justify-between">
-          <div className="text-sm text-zinc-200">Server-Rules (persistiert)</div>
+          <div className="text-sm text-mist">Server-Rules (persistiert)</div>
           <div className="flex items-center gap-2">
             <button className={btn} onClick={loadSrv}>Laden</button>
             <button className={btn} onClick={uploadAll}>Alle lokalen Regeln hochladen</button>
@@ -123,7 +123,7 @@ export default function NotificationsPage() {
         </div>
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
           {srvRules.map(r=>(
-            <div key={r.id} className="rounded border border-zinc-800 bg-black/30 p-2 text-[12px] text-zinc-200">
+            <div key={r.id} className="rounded border border-smoke-light bg-black/30 p-2 text-[12px] text-mist">
               <div className="flex items-center justify-between">
                 <div className="font-medium">{r.rule.kind}</div>
                 <label className="inline-flex items-center gap-1">
@@ -131,17 +131,17 @@ export default function NotificationsPage() {
                   aktiv
                 </label>
               </div>
-              <div className="text-zinc-400">{r.address} · {r.tf}</div>
-              <div className="text-zinc-500">id: {r.id.slice(0,8)}… · {new Date(r.updatedAt).toLocaleString()}</div>
+              <div className="text-fog">{r.address} · {r.tf}</div>
+              <div className="text-ash">id: {r.id.slice(0,8)}… · {new Date(r.updatedAt).toLocaleString()}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Ideas */}
-      <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
+      <div className="mb-6 rounded-xl border border-smoke-light bg-smoke/40 p-3">
         <div className="mb-2 flex items-center justify-between">
-          <div className="text-sm text-zinc-200">Trade-Ideas</div>
+          <div className="text-sm text-mist">Trade-Ideas</div>
           <div className="flex items-center gap-2">
             <button className={btn} onClick={loadSrv}>Aktualisieren</button>
             <button className={btn} onClick={exportIdeas}>Als Case-Study (MD) exportieren</button>
@@ -149,15 +149,15 @@ export default function NotificationsPage() {
         </div>
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
           {ideas.map(it=>(
-            <div key={it.id} className="rounded border border-zinc-800 bg-black/30 p-2 text-[12px]">
+            <div key={it.id} className="rounded border border-smoke-light bg-black/30 p-2 text-[12px]">
               <div className="flex items-center justify-between">
                 <div className="font-medium">{it.title}</div>
-                <span className="text-zinc-500">{it.status}</span>
+                <span className="text-ash">{it.status}</span>
               </div>
-              <div className="text-zinc-400">{it.address} · {it.tf} · {it.side}</div>
-              <div className="text-zinc-500">Rule: {it.links.ruleId?.slice(0,8) ?? "—"} · Journal: {it.links.journalId?.slice(0,8) ?? "—"}</div>
+              <div className="text-fog">{it.address} · {it.tf} · {it.side}</div>
+              <div className="text-ash">Rule: {it.links.ruleId?.slice(0,8) ?? "—"} · Journal: {it.links.journalId?.slice(0,8) ?? "—"}</div>
               {it.risk ? (
-                <div className="mt-2 rounded border border-emerald-800/50 bg-emerald-950/20 p-2 text-emerald-200">
+                <div className="mt-2 rounded border border-spark/50 bg-spark/20 p-2 text-spark">
                   Stop {it.risk.stopPrice} · Size {it.risk.sizeUnits?.toFixed(2)}u · Risk {it.risk.riskAmount?.toFixed(2)}
                   <div className="text-[11px]">Targets: {(it.risk.rrTargets||[]).map((t: number,i: number)=>`${it.risk!.rrList![i]}R→${t.toFixed(6)}`).join(" · ")}</div>
                 </div>
@@ -191,7 +191,7 @@ export default function NotificationsPage() {
                   }}>Outcome-Notiz</button>
                 </div>
               ) : (
-                <div className="mt-2 text-emerald-300">
+                <div className="mt-2 text-spark">
                   Exit: {it.outcome?.exitPrice ?? "—"} · P/L: {typeof it.outcome?.pnlPct==="number" ? `${it.outcome!.pnlPct!.toFixed(2)}%` : "n/a"}
                 </div>
               )}
@@ -223,10 +223,10 @@ export default function NotificationsPage() {
 
       <RuleEditor draft={draft} onChange={setDraft} onSave={()=>{ const r = create(draft); enqueue({ id: crypto.randomUUID(), ts: Date.now(), type: "user.rule.create", attrs: { id: r.id, kind: r.kind } } as any); setDraft({}); }} />
 
-      <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
-        <div className="mb-2 text-sm text-zinc-200">Regeln</div>
+      <div className="mt-4 rounded-xl border border-smoke-light bg-smoke/40 p-3">
+        <div className="mb-2 text-sm text-mist">Regeln</div>
         <table className="w-full text-[12px]">
-          <thead className="bg-zinc-900 text-zinc-400">
+          <thead className="bg-smoke text-fog">
             <tr>
               <th className="px-2 py-1 text-left">Kind</th>
               <th className="px-2 py-1 text-left">Op</th>
@@ -240,37 +240,37 @@ export default function NotificationsPage() {
           </thead>
           <tbody>
             {rules.map(r => (
-              <tr key={r.id} className="border-t border-zinc-800">
+              <tr key={r.id} className="border-t border-smoke-light">
                 <td className="px-2 py-1">{r.kind}</td>
                 <td className="px-2 py-1">{r.op}</td>
                 <td className="px-2 py-1">{r.value}</td>
                 <td className="px-2 py-1">{r.address?.slice(0,6)}{r.address?"…":""}</td>
                 <td className="px-2 py-1">{r.tf}</td>
                 <td className="px-2 py-1">
-                  <button className="rounded border border-zinc-600 px-2 py-0.5 text-[11px]" onClick={()=>update(r.id, {enabled: !r.enabled})}>{r.enabled?"ON":"OFF"}</button>
+                  <button className="rounded border border-ash px-2 py-0.5 text-[11px]" onClick={()=>update(r.id, {enabled: !r.enabled})}>{r.enabled?"ON":"OFF"}</button>
                 </td>
                 <td className="px-2 py-1">{r.lastTriggerAt ? new Date(r.lastTriggerAt).toLocaleString() : "–"}</td>
                 <td className="px-2 py-1 text-right">
-                  <button className="mr-2 rounded border border-cyan-700 px-2 py-0.5 text-[11px] text-cyan-100 hover:bg-cyan-900/20" onClick={()=>addManualTrigger(Date.now(), { ruleId: r.id, address: r.address || "test", tf: r.tf, title: `Alert: ${r.kind}`, body: `Test probe for ${r.kind}` })}>Probe</button>
-                  <button className="rounded border border-rose-900 px-2 py-0.5 text-[11px] text-rose-100 hover:bg-rose-900/20" onClick={()=>remove(r.id)}>Löschen</button>
+                  <button className="mr-2 rounded border border-spark px-2 py-0.5 text-[11px] text-spark hover:bg-spark/20" onClick={()=>addManualTrigger(Date.now(), { ruleId: r.id, address: r.address || "test", tf: r.tf, title: `Alert: ${r.kind}`, body: `Test probe for ${r.kind}` })}>Probe</button>
+                  <button className="rounded border border-blood px-2 py-0.5 text-[11px] text-blood hover:bg-blood/20" onClick={()=>remove(r.id)}>Löschen</button>
                 </td>
               </tr>
             ))}
             {rules.length===0 && (
-              <tr><td className="px-2 py-4 text-center text-zinc-500" colSpan={8}>Keine Regeln – oben erstellen.</td></tr>
+              <tr><td className="px-2 py-4 text-center text-ash" colSpan={8}>Keine Regeln – oben erstellen.</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
-      <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-3">
+      <div className="mt-4 rounded-xl border border-smoke-light bg-smoke/40 p-3">
         <div className="mb-2 flex items-center justify-between">
-          <div className="text-sm text-zinc-200">Trigger-History</div>
+          <div className="text-sm text-mist">Trigger-History</div>
           <button className={btn} onClick={clearTriggers}>Leeren</button>
         </div>
         <div className="max-h-72 overflow-auto">
           <table className="w-full text-[12px]">
-            <thead className="bg-zinc-900 text-zinc-400">
+            <thead className="bg-smoke text-fog">
               <tr>
                 <th className="px-2 py-1 text-left">Zeit</th>
                 <th className="px-2 py-1 text-left">Rule</th>
@@ -281,7 +281,7 @@ export default function NotificationsPage() {
             </thead>
             <tbody>
               {triggers.map(t => (
-                <tr key={t.id} className="border-t border-zinc-800">
+                <tr key={t.id} className="border-t border-smoke-light">
                   <td className="px-2 py-1">{new Date(t.t).toLocaleString()}</td>
                   <td className="px-2 py-1">{t.ruleId ?? "—"}</td>
                   <td className="px-2 py-1">{t.kind}</td>
@@ -289,7 +289,7 @@ export default function NotificationsPage() {
                   <td className="px-2 py-1">{t.note ?? "—"}</td>
                 </tr>
               ))}
-              {triggers.length===0 && <tr><td className="px-2 py-4 text-center text-zinc-500" colSpan={5}>Keine Trigger</td></tr>}
+              {triggers.length===0 && <tr><td className="px-2 py-4 text-center text-ash" colSpan={5}>Keine Trigger</td></tr>}
             </tbody>
           </table>
         </div>

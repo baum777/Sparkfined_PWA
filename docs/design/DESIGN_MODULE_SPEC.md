@@ -858,6 +858,218 @@ export function Modal({
 
 ---
 
+### Input Component
+
+```tsx
+// src/design-system/components/Input/Input.tsx
+
+import { forwardRef, useId } from 'react'
+import { cn } from '@/design-system/utils/cn'
+
+export type InputVariant = 'default' | 'error'
+export type InputSize = 'sm' | 'md' | 'lg'
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: React.ReactNode
+  helperText?: React.ReactNode
+  errorText?: React.ReactNode
+  leftIcon?: React.ReactNode
+  rightIcon?: React.ReactNode
+  variant?: InputVariant
+  size?: InputSize
+}
+
+const sizeStyles: Record<InputSize, string> = {
+  sm: 'h-9 rounded-md px-3 text-sm',
+  md: 'h-11 rounded-lg px-4 text-sm',
+  lg: 'h-12 rounded-xl px-5 text-base',
+}
+
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    label,
+    helperText,
+    errorText,
+    leftIcon,
+    rightIcon,
+    id,
+    variant = errorText ? 'error' : 'default',
+    size = 'md',
+    className,
+    ...props
+  },
+  ref
+) {
+  const generatedId = useId()
+  const inputId = id ?? generatedId
+  const helperId = helperText ? `${inputId}-helper` : undefined
+  const errorId = errorText ? `${inputId}-error` : undefined
+  const hasError = variant === 'error'
+
+  return (
+    <div className="w-full space-y-1.5 text-left">
+      {label ? (
+        <label htmlFor={inputId} className="block text-sm font-medium text-text-secondary">
+          {label}
+        </label>
+      ) : null}
+
+      <div className="relative">
+        {leftIcon ? (
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-text-tertiary">
+            {leftIcon}
+          </span>
+        ) : null}
+
+        <input
+          id={inputId}
+          ref={ref}
+          aria-invalid={hasError}
+          aria-describedby={hasError ? errorId : helperId}
+          className={cn(
+            'w-full border bg-smoke-light/70 text-sm text-text-primary placeholder:text-text-tertiary transition',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-spark focus-visible:ring-offset-2 focus-visible:ring-offset-void',
+            sizeStyles[size],
+            leftIcon && 'pl-10',
+            rightIcon && 'pr-10',
+            hasError ? 'border-blood focus-visible:ring-blood/60' : 'border-smoke-light focus-visible:ring-spark/40',
+            className
+          )}
+          {...props}
+        />
+
+        {rightIcon ? (
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-tertiary">
+            {rightIcon}
+          </span>
+        ) : null}
+      </div>
+
+      {hasError ? (
+        <p id={errorId} role="alert" className="flex items-center gap-2 text-xs text-blood">
+          <span className="h-1.5 w-1.5 rounded-full bg-blood" aria-hidden />
+          {errorText}
+        </p>
+      ) : helperText ? (
+        <p id={helperId} className="text-xs text-text-secondary">
+          {helperText}
+        </p>
+      ) : null}
+    </div>
+  )
+})
+```
+
+---
+
+### Tooltip Component
+
+```tsx
+// src/design-system/components/Tooltip/Tooltip.tsx
+
+import { cloneElement, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { AnimatePresence, motion } from 'framer-motion'
+import { cn } from '@/design-system/utils/cn'
+
+export type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right'
+
+interface TooltipProps {
+  content: React.ReactNode
+  placement?: TooltipPlacement
+  openDelay?: number
+  closeDelay?: number
+  children: React.ReactElement
+}
+
+export function Tooltip({ children, content, placement = 'top', openDelay = 150, closeDelay = 80 }: TooltipProps) {
+  const triggerRef = useRef<HTMLElement | null>(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const [position, setPosition] = useState({ top: 0, left: 0 })
+  const id = useId()
+
+  // Position calculation, delayed open/close handlers, scroll listeners, etc.
+  // See implementation for the full logic.
+
+  return (
+    <>
+      {cloneElement(children, {
+        ref: (node: HTMLElement | null) => {
+          triggerRef.current = node
+          const originalRef = (children as any).ref
+          if (typeof originalRef === 'function') originalRef(node)
+        },
+        onMouseEnter: (event: React.MouseEvent<HTMLElement>) => {
+          children.props.onMouseEnter?.(event)
+          setTimeout(() => setIsOpen(true), openDelay)
+        },
+        onMouseLeave: (event: React.MouseEvent<HTMLElement>) => {
+          children.props.onMouseLeave?.(event)
+          setTimeout(() => setIsOpen(false), closeDelay)
+        },
+        onFocus: (event: React.FocusEvent<HTMLElement>) => {
+          children.props.onFocus?.(event)
+          setIsOpen(true)
+        },
+        onBlur: (event: React.FocusEvent<HTMLElement>) => {
+          children.props.onBlur?.(event)
+          setIsOpen(false)
+        },
+        'aria-describedby': isOpen ? id : children.props['aria-describedby'],
+      })}
+
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {isOpen ? (
+              <motion.div
+                key={id}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                className={cn(
+                  'pointer-events-none absolute z-[1500] max-w-xs rounded-lg border border-spark/30 bg-void-lightest/95 px-3 py-2 text-xs text-mist shadow-glow-spark',
+                  placement === 'top' || placement === 'bottom' ? 'translate-x-[-50%]' : 'translate-y-[-50%]'
+                )}
+                style={{ top: position.top, left: position.left }}
+                role="tooltip"
+                id={id}
+              >
+                {content}
+              </motion.div>
+            ) : null}
+          </AnimatePresence>,
+          document.body
+        )}
+    </>
+  )
+}
+```
+
+---
+
+### Gesture Hooks Overview
+
+All gesture hooks live under `src/design-system/gestures/` and expose consistent APIs:
+
+| Hook | Purpose | Key Options | Returns |
+|------|---------|-------------|---------|
+| `useSwipeable` | Detect horizontal swipe gestures for cards/lists | `threshold`, `velocity`, `onSwipeLeft`, `onSwipeRight` | `bind` props for the target element (`onPointerDown`, etc.) |
+| `usePullToRefresh` | Implement pull-to-refresh with haptic + resistance | `onRefresh`, `threshold`, `resistance`, `onStateChange` | `containerProps`, `indicatorProps`, current `state` |
+| `useBottomSheet` | Power spring-based bottom sheets | `isOpen`, `onClose`, `snapTo`, `backdrop` options | `{ sheetProps, backdropProps }` motion bindings |
+| `useDragReorder` | Reorder lists via drag | `items`, `onReorder`, optional `axis` | `{ groupProps, getItemProps }` wrappers around `Reorder.Group`/`Reorder.Item` |
+
+Always import these hooks via:
+
+```ts
+import { useSwipeable, usePullToRefresh, useBottomSheet, useDragReorder } from '@/design-system/gestures'
+```
+
+This guarantees consistent thresholds, easing, and haptic behavior across the product.
+
+---
+
 ## Implementation Brief for Codex
 
 ### Role & Scope

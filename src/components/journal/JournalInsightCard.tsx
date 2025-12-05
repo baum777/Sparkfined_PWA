@@ -1,6 +1,5 @@
 import React from 'react'
-import { Badge } from '@/components/ui/Badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/design-system'
 import type { JournalInsight } from '@/types/journalInsights'
 
 interface JournalInsightCardProps {
@@ -37,7 +36,7 @@ export function JournalInsightCard({ insight }: JournalInsightCardProps) {
       <CardHeader className="space-y-3">
         <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.2em]">
           <Badge variant={severity.badgeVariant}>{severity.label}</Badge>
-          <Badge variant="outline" className="text-text-secondary">
+          <Badge variant="default" className="bg-transparent border-border text-text-secondary">
             {categoryLabels[insight.category] ?? insight.category.replace(/_/g, ' ')}
           </Badge>
           {typeof insight.confidence === 'number' && (

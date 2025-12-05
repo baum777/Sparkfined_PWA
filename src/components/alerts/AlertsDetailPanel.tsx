@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@/components/ui/Button';
+import { Button } from '@/design-system';
 import AlertEditDialog from '@/components/alerts/AlertEditDialog';
 import { useAlertsStore } from '@/store/alertsStore';
 import type { Alert, AlertStatus } from '@/store/alertsStore';
@@ -68,7 +68,7 @@ export default function AlertsDetailPanel({ alert, onAlertDeleted }: AlertsDetai
           <AlertEditDialog alert={alert} />
           <Button
             size="sm"
-            variant="destructive"
+            variant="danger"
             onClick={handleDelete}
             disabled={isDeleting}
             data-testid="alert-delete-button"

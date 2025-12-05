@@ -24,17 +24,17 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
   // Score styling
   const scoreColor =
     lesson.score >= 0.75
-      ? 'text-emerald-500'
+      ? 'text-spark'
       : lesson.score >= 0.6
-      ? 'text-amber-500'
-      : 'text-zinc-500'
+      ? 'text-gold'
+      : 'text-ash'
 
   const scoreBg =
     lesson.score >= 0.75
-      ? 'bg-emerald-950/30 border-emerald-800/50'
+      ? 'bg-spark/30 border-spark/50'
       : lesson.score >= 0.6
-      ? 'bg-amber-950/30 border-amber-800/50'
-      : 'bg-zinc-900 border-zinc-800'
+      ? 'bg-gold/30 border-gold/50'
+      : 'bg-smoke border-smoke-light'
 
   // Pattern display
   const patternDisplay = lesson.pattern
@@ -63,9 +63,9 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
           <div className="flex items-center gap-2">
             <BookOpen size={16} className={scoreColor} />
             <div>
-              <p className="text-sm font-semibold text-zinc-100">{patternDisplay}</p>
+              <p className="text-sm font-semibold text-mist">{patternDisplay}</p>
               {lesson.stats && (
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-ash">
                   {(lesson.stats.win_rate * 100).toFixed(0)}% WR • {lesson.stats.trades_analyzed}{' '}
                   trades
                 </p>
@@ -88,12 +88,12 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-zinc-900/50 p-2">
+          <div className="rounded-lg bg-smoke/50 p-2">
             <BookOpen size={20} className={scoreColor} />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-100">{patternDisplay}</h3>
-            <p className="text-xs text-zinc-500">Updated {timeAgo}</p>
+            <h3 className="text-lg font-semibold text-mist">{patternDisplay}</h3>
+            <p className="text-xs text-ash">Updated {timeAgo}</p>
           </div>
         </div>
 
@@ -101,63 +101,63 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
           <p className={`text-xl font-semibold ${scoreColor}`}>
             {(lesson.score * 100).toFixed(0)}%
           </p>
-          <p className="text-xs text-zinc-500">Confidence</p>
+          <p className="text-xs text-ash">Confidence</p>
         </div>
       </div>
 
       {/* Stats */}
       {lesson.stats && (
         <div className="grid grid-cols-3 gap-2">
-          <div className="rounded bg-zinc-900/50 p-2 text-center">
-            <p className="text-xs text-zinc-500">Win Rate</p>
-            <p className="text-sm font-semibold text-emerald-500">
+          <div className="rounded bg-smoke/50 p-2 text-center">
+            <p className="text-xs text-ash">Win Rate</p>
+            <p className="text-sm font-semibold text-spark">
               {(lesson.stats.win_rate * 100).toFixed(0)}%
             </p>
           </div>
-          <div className="rounded bg-zinc-900/50 p-2 text-center">
-            <p className="text-xs text-zinc-500">Avg R:R</p>
-            <p className="text-sm font-semibold text-zinc-300">
+          <div className="rounded bg-smoke/50 p-2 text-center">
+            <p className="text-xs text-ash">Avg R:R</p>
+            <p className="text-sm font-semibold text-fog">
               {lesson.stats.avg_rr.toFixed(1)}:1
             </p>
           </div>
-          <div className="rounded bg-zinc-900/50 p-2 text-center">
-            <p className="text-xs text-zinc-500">Trades</p>
-            <p className="text-sm font-semibold text-zinc-300">{lesson.stats.trades_analyzed}</p>
+          <div className="rounded bg-smoke/50 p-2 text-center">
+            <p className="text-xs text-ash">Trades</p>
+            <p className="text-sm font-semibold text-fog">{lesson.stats.trades_analyzed}</p>
           </div>
         </div>
       )}
 
       {/* When It Works */}
-      <div className="rounded-lg bg-emerald-950/20 border border-emerald-800/30 p-3">
+      <div className="rounded-lg bg-spark/20 border border-spark/30 p-3">
         <div className="flex items-center gap-2 mb-2">
-          <TrendingUp size={14} className="text-emerald-500" />
-          <p className="text-xs font-semibold text-emerald-500 uppercase tracking-wide">
+          <TrendingUp size={14} className="text-spark" />
+          <p className="text-xs font-semibold text-spark uppercase tracking-wide">
             When It Works
           </p>
         </div>
-        <p className="text-sm leading-relaxed text-zinc-300">{lesson.when_it_works}</p>
+        <p className="text-sm leading-relaxed text-fog">{lesson.when_it_works}</p>
       </div>
 
       {/* When It Fails */}
-      <div className="rounded-lg bg-rose-950/20 border border-rose-800/30 p-3">
+      <div className="rounded-lg bg-blood/20 border border-blood/30 p-3">
         <div className="flex items-center gap-2 mb-2">
-          <XCircle size={14} className="text-rose-500" />
-          <p className="text-xs font-semibold text-rose-500 uppercase tracking-wide">
+          <XCircle size={14} className="text-blood" />
+          <p className="text-xs font-semibold text-blood uppercase tracking-wide">
             When It Fails
           </p>
         </div>
-        <p className="text-sm leading-relaxed text-zinc-300">{lesson.when_it_fails}</p>
+        <p className="text-sm leading-relaxed text-fog">{lesson.when_it_fails}</p>
       </div>
 
       {/* Checklist */}
       <div>
-        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-2">
+        <p className="text-xs font-semibold text-ash uppercase tracking-wide mb-2">
           📋 Checklist
         </p>
         <ul className="space-y-1">
           {lesson.checklist.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-sm text-zinc-300">
-              <span className="text-zinc-600">•</span>
+            <li key={idx} className="flex items-start gap-2 text-sm text-fog">
+              <span className="text-ash">•</span>
               <span>{item}</span>
             </li>
           ))}
@@ -167,13 +167,13 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
       {/* DOs */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <CheckCircle2 size={14} className="text-emerald-500" />
-          <p className="text-xs font-semibold text-emerald-500 uppercase tracking-wide">DOs</p>
+          <CheckCircle2 size={14} className="text-spark" />
+          <p className="text-xs font-semibold text-spark uppercase tracking-wide">DOs</p>
         </div>
         <ul className="space-y-1">
           {lesson.dos.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-sm text-zinc-300">
-              <span className="text-emerald-600">✓</span>
+            <li key={idx} className="flex items-start gap-2 text-sm text-fog">
+              <span className="text-spark">✓</span>
               <span>{item}</span>
             </li>
           ))}
@@ -183,13 +183,13 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
       {/* DONTs */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <XCircle size={14} className="text-rose-500" />
-          <p className="text-xs font-semibold text-rose-500 uppercase tracking-wide">DON'Ts</p>
+          <XCircle size={14} className="text-blood" />
+          <p className="text-xs font-semibold text-blood uppercase tracking-wide">DON'Ts</p>
         </div>
         <ul className="space-y-1">
           {lesson.donts.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-sm text-zinc-300">
-              <span className="text-rose-600">✗</span>
+            <li key={idx} className="flex items-start gap-2 text-sm text-fog">
+              <span className="text-blood">✗</span>
               <span>{item}</span>
             </li>
           ))}
@@ -197,14 +197,14 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
       </div>
 
       {/* Next Drill */}
-      <div className="rounded-lg bg-cyan-950/20 border border-cyan-800/30 p-3">
+      <div className="rounded-lg bg-spark/20 border border-spark/30 p-3">
         <div className="flex items-center gap-2 mb-2">
-          <Target size={14} className="text-cyan-500" />
-          <p className="text-xs font-semibold text-cyan-500 uppercase tracking-wide">
+          <Target size={14} className="text-spark" />
+          <p className="text-xs font-semibold text-spark uppercase tracking-wide">
             Next Drill
           </p>
         </div>
-        <p className="text-sm leading-relaxed text-zinc-300">{lesson.next_drill}</p>
+        <p className="text-sm leading-relaxed text-fog">{lesson.next_drill}</p>
       </div>
     </div>
   )

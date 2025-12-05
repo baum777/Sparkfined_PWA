@@ -133,13 +133,13 @@ function getTourSteps(level: UserLevel): DriveStep[] {
             <div class="space-y-3">
               <p><strong>Key Features for Power Users:</strong></p>
               <ul class="list-disc list-inside text-sm space-y-1">
-                <li>Keyboard Shortcuts: Press <kbd class="px-1 py-0.5 bg-zinc-700 rounded">?</kbd> anytime</li>
+                <li>Keyboard Shortcuts: Press <kbd class="px-1 py-0.5 bg-smoke-lighter rounded">?</kbd> anytime</li>
                 <li>API Integration: Settings → Advanced</li>
                 <li>Alert Backtesting: Test rules before activation</li>
                 <li>Chart Replay: Practice strategies risk-free</li>
                 <li>AI Analysis: Unlimited token insights</li>
               </ul>
-              <p class="text-xs text-zinc-400 mt-3">Explore at your own pace. You're in control! 💪</p>
+              <p class="text-xs text-fog mt-3">Explore at your own pace. You're in control! 💪</p>
             </div>
           `,
         },

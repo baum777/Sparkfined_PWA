@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import Button from '@/components/ui/Button'
+import { Button } from '@/design-system'
 import StateView from '@/components/ui/StateView'
 import { JournalInsightCard } from '@/components/journal/JournalInsightCard'
 import { JournalSocialPreview } from '@/components/journal/JournalSocialPreview'

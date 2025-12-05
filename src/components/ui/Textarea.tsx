@@ -30,10 +30,10 @@ export default function Textarea({
   const generatedErrorId = errorId || `error-${Math.random().toString(36).substr(2, 9)}`;
   
   const baseStyles =
-    'w-full rounded-token-lg border bg-zinc-900 text-zinc-100 placeholder-zinc-500 transition-all duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface resize-none max-h-[400px] overflow-y-auto';
+    'w-full rounded-token-lg border bg-smoke text-mist placeholder-ash transition-all duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface resize-none max-h-[400px] overflow-y-auto';
   const stateStyles = error 
-    ? 'border-rose-500 focus-visible:border-rose-500 focus-visible:ring-rose-500/50'
-    : 'border-zinc-700 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/50';
+    ? 'border-blood focus-visible:border-blood focus-visible:ring-blood/50'
+    : 'border-smoke-lighter focus-visible:border-spark focus-visible:ring-spark/50';
   const sizeStyles = 'px-3 py-2.5 text-sm min-h-[88px]'; // 2 Zeilen minimum
   
   // Auto-resize logic
@@ -65,12 +65,12 @@ export default function Textarea({
         {...props}
       />
       {error && (
-        <p id={generatedErrorId} className="mt-1 text-xs text-rose-400" role="alert">
+        <p id={generatedErrorId} className="mt-1 text-xs text-blood" role="alert">
           {error}
         </p>
       )}
       {hint && !error && (
-        <p className="mt-1 text-xs text-zinc-400">{hint}</p>
+        <p className="mt-1 text-xs text-fog">{hint}</p>
       )}
     </div>
   );

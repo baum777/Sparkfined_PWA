@@ -3,9 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import AdvancedChart from '@/components/chart/AdvancedChart'
 import ChartHeaderActions from '@/components/chart/ChartHeaderActions'
 import DashboardShell from '@/components/dashboard/DashboardShell'
-import Button from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { Card, CardFooter, CardHeader } from '@/components/ui/Card'
+import { Badge, Button, Card, CardFooter, CardHeader } from '@/design-system'
 import StateView from '@/components/ui/StateView'
 import { DEFAULT_TIMEFRAME, TIMEFRAME_ORDER, type ChartTimeframe, type IndicatorPresetId } from '@/domain/chart'
 import useOhlcData from '@/hooks/useOhlcData'
@@ -203,12 +201,12 @@ export default function ChartPageV2() {
           />
         )}
         {isDefaultAsset && (
-          <div className="rounded-lg border border-blue-500/20 bg-blue-950/20 p-3 text-sm">
-            <p className="text-blue-200">
+          <div className="rounded-lg border border-spark/20 bg-void-lighter/20 p-3 text-sm">
+            <p className="text-spark">
               <strong>No symbol provided.</strong> Showing default chart (SOL/USDT). Select a token from the{' '}
               <button
                 onClick={() => navigate('/watchlist-v2')}
-                className="underline hover:text-blue-100"
+                className="underline hover:text-spark"
               >
                 Watchlist
               </button>{' '}
@@ -237,7 +235,7 @@ export default function ChartPageV2() {
               </Button>
             ))}
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               className="rounded-full px-4"
               onClick={() => refresh()}
@@ -248,7 +246,7 @@ export default function ChartPageV2() {
               Refresh
             </Button>
             <Button
-              variant="outline"
+              variant="secondary"
               size="sm"
               className="rounded-full px-4"
               onClick={handleOpenReplay}
@@ -348,19 +346,19 @@ export default function ChartPageV2() {
         <ChartLegend />
 
         {status === 'error' && !hasData && (
-          <div className="rounded-2xl border border-red-900/50 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+          <div className="rounded-2xl border border-blood/50 bg-blood/40 px-4 py-3 text-sm text-blood">
             {error || 'Failed to load chart data.'}
           </div>
         )}
 
         {status === 'stale' && (
-          <div className="rounded-2xl border border-amber-900/50 bg-amber-950/40 px-4 py-3 text-sm text-amber-100">
+          <div className="rounded-2xl border border-gold/50 bg-gold/40 px-4 py-3 text-sm text-gold">
             Showing cached candles because the network request failed.
           </div>
         )}
 
         {status === 'no-data' && (
-          <div className="rounded-2xl border border-slate-800 bg-surface-subtle px-4 py-3 text-sm text-text-secondary">
+          <div className="rounded-2xl border border-smoke-light bg-surface-subtle px-4 py-3 text-sm text-text-secondary">
             No candles available yet for {asset.symbol} on {timeframe}. Try another timeframe.
           </div>
         )}
@@ -393,13 +391,13 @@ function ChartIntroBanner({ onDismiss }: { onDismiss: () => void }) {
         </Button>
       </CardHeader>
       <CardFooter className="flex flex-wrap items-center gap-2 text-[11px] text-text-tertiary">
-        <Badge variant="outline" className="bg-surface px-2 py-1">
+        <Badge variant="default" className="bg-surface px-2 py-1">
           📓 Journal markers
         </Badge>
-        <Badge variant="outline" className="bg-surface px-2 py-1">
+        <Badge variant="default" className="bg-surface px-2 py-1">
           ⚠️ Price alerts
         </Badge>
-        <Badge variant="outline" className="bg-surface px-2 py-1">
+        <Badge variant="default" className="bg-surface px-2 py-1">
           ✨ Signals from Grok/Pulse
         </Badge>
       </CardFooter>
@@ -410,16 +408,16 @@ function ChartIntroBanner({ onDismiss }: { onDismiss: () => void }) {
 function ChartLegend() {
   return (
     <div className="flex flex-wrap items-center gap-2" data-testid="chart-legend">
-      <Badge variant="outline" className="bg-surface-subtle px-3 py-1">
+      <Badge variant="default" className="bg-surface-subtle px-3 py-1">
         ⚡ Signals
       </Badge>
-      <Badge variant="outline" className="bg-surface-subtle px-3 py-1">
+      <Badge variant="default" className="bg-surface-subtle px-3 py-1">
         ⚠️ Alerts
       </Badge>
-      <Badge variant="outline" className="bg-surface-subtle px-3 py-1">
+      <Badge variant="default" className="bg-surface-subtle px-3 py-1">
         📝 Journal
       </Badge>
-      <Badge variant="outline" className="bg-surface-subtle px-3 py-1">
+      <Badge variant="default" className="bg-surface-subtle px-3 py-1">
         Replay + Go Live in toolbar
       </Badge>
     </div>

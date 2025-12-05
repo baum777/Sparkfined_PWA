@@ -1,5 +1,5 @@
 import React from 'react'
-import Button from '@/components/ui/Button'
+import { Button } from '@/design-system'
 import { canUseNotifications, requestNotificationPermission } from '@/lib/alerts/triggerEngine'
 
 export default function NotificationsPermissionButton() {
@@ -33,7 +33,7 @@ export default function NotificationsPermissionButton() {
 
   return (
     <Button
-      variant="outline"
+      variant="secondary"
       size="sm"
       onClick={handleEnableNotifications}
       isLoading={isRequesting}

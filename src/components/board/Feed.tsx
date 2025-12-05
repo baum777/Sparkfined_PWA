@@ -53,7 +53,7 @@ export default function Feed() {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-base font-semibold text-zinc-100">Activity</h2>
+        <h2 className="text-base font-semibold text-mist">Activity</h2>
         
         {/* Filter Chips */}
         <div className="flex gap-2">
@@ -63,8 +63,8 @@ export default function Feed() {
               onClick={() => setFilter(f.id as any)}
               className={`px-2 py-1 text-xs transition-colors ${
                 filter === f.id 
-                  ? 'bg-emerald-500/20 text-emerald-400' 
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  ? 'bg-spark/20 text-spark' 
+                  : 'text-ash hover:text-fog'
               }`}
               style={{ borderRadius: 'var(--radius-sm)' }}
             >
@@ -122,7 +122,7 @@ export default function Feed() {
         <button 
           onClick={loadMore}
           disabled={loading}
-          className="mt-3 w-full py-2 text-sm text-zinc-500 transition-colors hover:text-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-3 w-full py-2 text-sm text-ash transition-colors hover:text-fog disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Loading...' : 'Load more'}
         </button>

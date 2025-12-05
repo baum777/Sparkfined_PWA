@@ -51,7 +51,7 @@ export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }:
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Price</p>
-                <p className="text-lg font-semibold text-amber-200">{row.price}</p>
+                <p className="text-lg font-semibold text-gold">{row.price}</p>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">24h change</p>

@@ -2,9 +2,15 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-04
+**Last Updated:** 2025-12-05
 
 ---
+
+## 2025-12-05
+
+### Changed
+- Recorded design-system type safety updates (Badge, Card, Alert, Input, Button, Tooltip) to align variants and props with current usage and typecheck requirements.
+- Noted in `docs/design/DESIGN_SYSTEM.md` that `useSwipeable` now guards pointer capture calls to ensure tests/environments without `setPointerCapture` remain stable.
 
 ## 2025-12-04
 
@@ -42,6 +48,11 @@
   - Added proposed 7-folder structure overview
   - Added key findings summary
   - Added "Design System Documentation (2025-12-04)" section with overview and implementation status
+  - Added "Spark Migration Status (2025-12-04)" section covering Phase 4 completion + Phase 5 stabilization ownership
+- **Refined design-system docs:**
+  - `docs/design/PHASE4_MIGRATION.md` – Added Phase 4 completion snapshot, QA surface checklist, and known risks/TODOs
+  - `docs/design/DESIGN_SYSTEM.md` – Updated Spark single-source guidance, added gestures reference, governance rules, QA checklist, and Codex playbook
+  - `docs/design/DESIGN_MODULE_SPEC.md` – Synced final APIs for Badge/Input/Tooltip, extended gesture hook specs
 
 ### Removed
 - **Cleaned up root directory:**

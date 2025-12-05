@@ -32,10 +32,10 @@ const UXShowcasePage = import.meta.env.DEV
 
 function Fallback() {
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center" data-testid="app-loading">
+    <div className="min-h-screen bg-void flex items-center justify-center" data-testid="app-loading">
       <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-slate-700 border-t-emerald-500 mb-4"></div>
-        <p className="text-slate-300 text-lg">Lade…</p>
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-smoke-light border-t-spark mb-4"></div>
+        <p className="text-mist text-lg">Lade…</p>
       </div>
     </div>
   );
@@ -89,7 +89,7 @@ export default function RoutesRoot() {
             </>
           )}
           
-          <Route path="*" element={<div className="p-6 text-zinc-400">404</div>} />
+          <Route path="*" element={<div className="p-6 text-fog">404</div>} />
         </Routes>
       </Suspense>
     </ErrorBoundary>

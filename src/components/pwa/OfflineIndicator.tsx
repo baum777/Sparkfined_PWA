@@ -25,7 +25,7 @@ export default function OfflineIndicator() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-50 bg-amber-500/90 backdrop-blur-sm border-b border-amber-600 px-4 py-2 lg:pl-24"
+      className="fixed top-0 left-0 right-0 z-50 bg-gold/90 backdrop-blur-sm border-b border-gold px-4 py-2 lg:pl-24"
       role="status"
       aria-live="polite"
       aria-label="Offline mode active"
@@ -36,7 +36,7 @@ export default function OfflineIndicator() {
           <p className="text-sm font-medium text-white">
             📡 Offline Mode
           </p>
-          <p className="text-xs text-amber-100 hidden sm:block">
+          <p className="text-xs text-gold hidden sm:block">
             Showing cached data. Changes will sync when online.
           </p>
         </div>
