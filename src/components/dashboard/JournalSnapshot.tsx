@@ -24,13 +24,13 @@ export default function JournalSnapshot({ entries }: JournalSnapshotProps) {
   const handleNavigate = React.useCallback(() => navigate('/journal-v2'), [navigate]);
 
   return (
-    <div className="rounded-lg border border-border-moderate bg-surface p-4 shadow-sm">
+    <div className="card rounded-lg p-4">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-base font-semibold text-text-primary">Recent journal entries</h3>
       </div>
       <div className="space-y-3">
         {entries.map((entry) => (
-          <div key={entry.id} className="rounded-lg border border-border-subtle bg-surface-skeleton p-3">
+          <div key={entry.id} className="card-bordered rounded-lg p-3 hover-lift">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-text-primary">{entry.title}</p>
