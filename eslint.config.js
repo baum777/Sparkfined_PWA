@@ -3,6 +3,7 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import react from "eslint-plugin-react";
 import jsxA11y from "eslint-plugin-jsx-a11y";
+import noHardcodedColors from "./eslint-rules/no-hardcoded-colors.js";
 
 export default [
   {
@@ -46,9 +47,20 @@ export default [
     },
     plugins: { 
       react,
-      'jsx-a11y': jsxA11y
+      'jsx-a11y': jsxA11y,
+      'sparkfined': {
+        rules: {
+          'no-hardcoded-colors': noHardcodedColors
+        }
+      }
     },
     rules: {
+      // Sparkfined Custom Rules
+      'sparkfined/no-hardcoded-colors': ['warn', {
+        ignoreFiles: ['tests/', 'scripts/', '.storybook/'],
+        allowedPatterns: []
+      }],
+      
       // React
       "react/react-in-jsx-scope": "off",
       
