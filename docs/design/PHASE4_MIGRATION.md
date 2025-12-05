@@ -541,6 +541,16 @@ export { haptic } from './utils/haptic'
 - [ ] Storybook stories for components
 - [ ] Visual regression tests (Percy/Chromatic)
 
+### Step 1 progress snapshot (Codex · 2025-12-05)
+
+- ✅ `src/design-system/` established with token modules, utils barrel, and public API (`src/design-system/index.ts`)
+- ✅ Spark/Void token values wired through both TypeScript (`src/design-system/tokens/*`) and CSS (`src/styles/tokens.css`)
+- ✅ Tailwind exposes Spark/Void colors, gradients, and glows to unblock DS utility classes (`bg-spark`, `shadow-glow-spark`, etc.)
+- ✅ Core components (`Button`, `Card`, `Alert`, `Modal`) implemented under `src/design-system/components/` with matching unit tests
+- ✅ Compatibility shims (`src/components/ui/{Button,Card,Alert,Modal}.tsx`) re-export the new implementations for future migrations
+- ✅ Fonts updated via `src/styles/fonts.css` + `index.css` (Inter + Space Grotesk + JetBrains Mono)
+- ⚠️ Screens/pages remain untouched—consumer migration stays deferred to Step 2+
+
 ---
 
 ## Explicit Boundaries for Step 1
