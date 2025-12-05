@@ -26,27 +26,24 @@ Please also reference the following documents as needed:
 
 ## 🚨 **Hard Guardrails for AI Assistants**
 
-### 1. **No Command Execution**
-- **NEVER** run CLI commands automatically (`npm`, `git`, `pnpm`, `npx`)
-- **SUGGEST** commands for the human to run
-- Explain what each command does and why it's needed
 
-### 2. **No Config Weakening**
+
+### 1. **No Config Weakening**
 - **DO NOT** relax TypeScript, ESLint, Vite, or Playwright configs to silence errors
 - **DO NOT** add new `any` types or `@ts-ignore` without explicit justification
 - If a config error appears, **fix the root cause**, don't mask it
 
-### 3. **No Infinite Loops / Subscriptions**
+### 2. **No Infinite Loops / Subscriptions**
 - **DO NOT** create patterns that cause React error #185 (infinite re-renders)
 - **ALWAYS** include cleanup in `useEffect` for subscriptions, timers, listeners
 - **AVOID** state updates inside render logic
 
-### 4. **Type Safety First**
+### 3. **Type Safety First**
 - Use existing types from `src/types/`
 - Prefer interfaces over inline types
 - No unsafe casts (`as any`) without documented reason
 
-### 5. **Testing Expectations**
+### 4. **Testing Expectations**
 - New features **MUST** include tests (unit or E2E)
 - E2E tests use `data-testid` attributes (never fragile selectors)
 - Tests should be deterministic (no flaky timing dependencies)
