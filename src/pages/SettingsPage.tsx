@@ -8,7 +8,6 @@ import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from ".
 import Button from "@/components/ui/Button";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useTheme, type ThemeMode } from "@/lib/theme/useTheme";
-import { OLEDModeToggle } from "@/components/settings/OLEDModeToggle";
 
 interface SettingsPageProps {
   showHeading?: boolean;
@@ -104,11 +103,6 @@ export default function SettingsPage({
             <option value="light">Light</option>
           </Select>
         </Row>
-      </div>
-
-      {/* OLED Mode Toggle */}
-      <div className="mt-4">
-        <OLEDModeToggle />
       </div>
 
       <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
