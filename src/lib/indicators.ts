@@ -1,5 +1,6 @@
 import type { ChartIndicatorOverlay, ComputedIndicator, IndicatorSeriesPoint, OhlcCandle } from '@/domain/chart'
 import type { UTCTimestamp } from 'lightweight-charts'
+import { getChartColors } from './chartColors'
 
 function toPoint(timeMs: number, value: number): IndicatorSeriesPoint {
   return { time: Math.floor(timeMs / 1000) as UTCTimestamp, value }
@@ -80,6 +81,9 @@ export function computeBollingerBands(
 export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicatorOverlay[]): ComputedIndicator[] {
   if (!overlays || overlays.length === 0) return []
 
+  // Get colors from design tokens (adapts to theme)
+  const colors = getChartColors()
+
   return overlays.flatMap<ComputedIndicator>((overlay, index) => {
     if (overlay.type === 'sma') {
       return [
@@ -88,7 +92,7 @@ export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicato
           type: 'line',
           config: overlay,
           points: computeSma(candles, overlay.period),
-          color: '#8b5cf6',
+          color: colors.accent, // purple accent
         },
       ]
     }
@@ -100,7 +104,7 @@ export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicato
           type: 'line',
           config: overlay,
           points: computeEma(candles, overlay.period),
-          color: '#22d3ee',
+          color: colors.info, // cyan info
         },
       ]
     }
@@ -115,7 +119,7 @@ export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicato
           basis: bands.basis,
           upper: bands.upper,
           lower: bands.lower,
-          color: '#fbbf24',
+          color: colors.warn, // amber warning
         },
       ]
     }

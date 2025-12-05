@@ -19,6 +19,7 @@ import type {
   OhlcCandle,
 } from '@/domain/chart'
 import type { ChartDataSource } from '@/hooks/useOhlcData'
+import { getChartColors, subscribeToThemeChanges } from '@/lib/chartColors'
 
 export type AdvancedChartProps = {
   candles: OhlcCandle[]
@@ -38,32 +39,38 @@ export type AdvancedChartProps = {
 }
 
 // Chart options (crosshair mode will be set dynamically after chart lib loads)
-const getChartOptions = (crosshairMode: CrosshairModeType) => ({
-  layout: {
-    background: { color: '#0b1221' },
-    textColor: '#d3d8e8',
-  },
-  grid: {
-    vertLines: { color: '#1c2435' },
-    horzLines: { color: '#1c2435' },
-  },
-  crosshair: {
-    mode: crosshairMode,
-  },
-  rightPriceScale: {
-    borderColor: '#293247',
-  },
-  timeScale: {
-    borderColor: '#293247',
-  },
-})
+const getChartOptions = (crosshairMode: CrosshairModeType) => {
+  const colors = getChartColors()
+  
+  return {
+    layout: {
+      background: { color: colors.background },
+      textColor: colors.textColor,
+    },
+    grid: {
+      vertLines: { color: colors.gridColor },
+      horzLines: { color: colors.gridColor },
+    },
+    crosshair: {
+      mode: crosshairMode,
+    },
+    rightPriceScale: {
+      borderColor: colors.border,
+    },
+    timeScale: {
+      borderColor: colors.border,
+    },
+  }
+}
 
 const toUtcTimestamp = (ms: number): UTCTimestamp => Math.floor(ms / 1000) as UTCTimestamp
 
 function toSeriesData(
   candles: OhlcCandle[]
 ): { candleData: CandlestickData[]; volumeData: HistogramData[] } {
+  const colors = getChartColors()
   const limited = candles.length > 2000 ? candles.slice(-2000) : candles
+  
   const candleData: CandlestickData[] = limited.map((candle) => ({
     time: toUtcTimestamp(candle.t),
     open: candle.o,
@@ -75,7 +82,7 @@ function toSeriesData(
   const volumeData: HistogramData[] = limited.map((candle) => ({
     time: toUtcTimestamp(candle.t),
     value: candle.v ?? 0,
-    color: candle.c >= candle.o ? '#42f5b3' : '#ef476f',
+    color: candle.c >= candle.o ? colors.bullColor : colors.bearColor,
   }))
 
   return { candleData, volumeData }
@@ -120,6 +127,9 @@ export default function AdvancedChart({
 
     ;(async () => {
       try {
+        // Get chart colors from design tokens
+        const colors = getChartColors()
+        
         // Dynamic import: Load lightweight-charts only when needed
         const { createChart, CrosshairMode } = await import('lightweight-charts')
 
@@ -133,18 +143,18 @@ export default function AdvancedChart({
         })
 
         const candleSeries = chart.addCandlestickSeries({
-          upColor: '#42f5b3',
-          downColor: '#ef476f',
-          borderDownColor: '#ef476f',
-          borderUpColor: '#42f5b3',
-          wickDownColor: '#ef476f',
-          wickUpColor: '#42f5b3',
+          upColor: colors.bullColor,
+          downColor: colors.bearColor,
+          borderDownColor: colors.bearColor,
+          borderUpColor: colors.bullColor,
+          wickDownColor: colors.bearColor,
+          wickUpColor: colors.bullColor,
         } as CandlestickSeriesOptions)
 
         const volumeSeries = chart.addHistogramSeries({
           priceFormat: { type: 'volume' },
           priceScaleId: 'volume',
-          color: '#293247',
+          color: colors.border,
           base: 0,
         })
 
@@ -217,6 +227,9 @@ export default function AdvancedChart({
     const chart = chartRef.current
     if (!chart) return
 
+    // Get chart colors from design tokens
+    const colors = getChartColors()
+
     Object.values(indicatorSeriesRef.current).forEach((seriesList) => {
       seriesList.forEach((series) => {
         // removeSeries is available at runtime; guard for mock compatibility with optional chaining
@@ -227,9 +240,9 @@ export default function AdvancedChart({
 
     indicators?.forEach((indicator) => {
       if (indicator.type === 'bb') {
-        const basis = chart.addLineSeries({ color: indicator.color ?? '#fbbf24', lineWidth: 2 })
-        const upper = chart.addLineSeries({ color: '#f59e0b', lineWidth: 1 })
-        const lower = chart.addLineSeries({ color: '#f59e0b', lineWidth: 1 })
+        const basis = chart.addLineSeries({ color: indicator.color ?? colors.warn, lineWidth: 2 })
+        const upper = chart.addLineSeries({ color: colors.warn, lineWidth: 1 })
+        const lower = chart.addLineSeries({ color: colors.warn, lineWidth: 1 })
         basis.setData(indicator.basis)
         upper.setData(indicator.upper)
         lower.setData(indicator.lower)
@@ -237,7 +250,7 @@ export default function AdvancedChart({
         return
       }
 
-      const line = chart.addLineSeries({ color: indicator.color ?? '#22d3ee', lineWidth: 2 })
+      const line = chart.addLineSeries({ color: indicator.color ?? colors.info, lineWidth: 2 })
       line.setData(indicator.points)
       indicatorSeriesRef.current[indicator.id] = [line]
     })
@@ -245,6 +258,10 @@ export default function AdvancedChart({
 
   useEffect(() => {
     if (!candleSeriesRef.current) return
+    
+    // Get chart colors from design tokens
+    const colors = getChartColors()
+    
     const markers: SeriesMarker<Time>[] = (annotations ?? []).map((annotation) => {
       const shape: SeriesMarkerShape = 
         annotation.kind === 'alert' ? 'arrowDown' 
@@ -254,7 +271,7 @@ export default function AdvancedChart({
       return {
         time: toUtcTimestamp(annotation.candleTime),
         position: 'aboveBar' as const,
-        color: annotation.kind === 'alert' ? '#f43f5e' : annotation.kind === 'signal' ? '#c084fc' : '#22d3ee',
+        color: annotation.kind === 'alert' ? colors.danger : annotation.kind === 'signal' ? colors.accent : colors.info,
         shape,
         text: annotation.label,
       }
