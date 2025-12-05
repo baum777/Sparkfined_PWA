@@ -1,7 +1,24 @@
 import type { Config } from 'tailwindcss'
+import { colors as dsColors } from './src/design-system/tokens/colors'
+import { typography } from './src/design-system/tokens/typography'
+import { spacing as dsSpacing, borderRadius as dsBorderRadius } from './src/design-system/tokens/spacing'
+import { glows as dsGlows } from './src/design-system/tokens/shadows'
+import { animation as animationTokens } from './src/design-system/tokens/animation'
 
 const withAlpha = (variable: string) => `rgb(var(${variable}) / <alpha-value>)`
 const withFixedAlpha = (variable: string, alpha: number | string) => `rgb(var(${variable}) / ${alpha})`
+
+const designSystemColors = {
+  void: dsColors.void,
+  spark: dsColors.spark,
+  smoke: dsColors.smoke,
+  mist: dsColors.mist,
+  gold: dsColors.gold,
+  blood: dsColors.blood,
+  phosphor: dsColors.phosphor,
+  violet: dsColors.violet,
+  ember: dsColors.ember,
+}
 
 export default {
   content: [
@@ -193,12 +210,13 @@ export default {
           900: '#0f172a',
           950: '#020617',
         },
+        ...designSystemColors,
       },
       
       fontFamily: {
-        sans: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        display: ['system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+        sans: typography.fontFamily.primary,
+        mono: typography.fontFamily.mono,
+        display: typography.fontFamily.display,
       },
       
       fontSize: {
@@ -250,6 +268,7 @@ export default {
         '72': '18rem',      // 288px
         '80': '20rem',      // 320px
         '96': '24rem',      // 384px
+        ...dsSpacing,
       },
       
       borderRadius: {
@@ -260,6 +279,7 @@ export default {
         '2xl': '20px',
         '3xl': '24px',
         full: '9999px',
+        ...dsBorderRadius,
       },
       
       boxShadow: {
@@ -271,6 +291,10 @@ export default {
         'emerald-glow-lg': '0 0 50px rgba(16, 185, 129, 0.5)',
         'emerald-glow-xl': '0 0 70px rgba(16, 185, 129, 0.6)',
         'rose-glow': '0 0 20px rgba(244, 63, 94, 0.3)',
+        'glow-spark': dsGlows.spark,
+        'glow-gold': dsGlows.gold,
+        'glow-blood': dsGlows.blood,
+        'glow-phosphor': dsGlows.phosphor,
       },
       
       backgroundImage: {
@@ -279,6 +303,9 @@ export default {
         'grid-pattern': 'linear-gradient(to right, rgb(var(--color-border) / 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgb(var(--color-border) / 0.2) 1px, transparent 1px)',
         'app-gradient': 'linear-gradient(to bottom, rgb(var(--color-bg-overlay) / 0.9) 0%, rgb(var(--color-bg)) 50%, rgb(var(--color-bg-overlay) / 0.95) 100%)',
         'surface-gradient': 'linear-gradient(135deg, rgb(var(--color-surface-subtle)) 0%, rgb(var(--color-surface-elevated)) 100%)',
+        'gradient-spark': dsColors.gradients.spark,
+        'gradient-gold': dsColors.gradients.gold,
+        'gradient-void': dsColors.gradients.void,
       },
       
       backgroundSize: {
@@ -301,6 +328,10 @@ export default {
         '500': '500ms',
         '700': '700ms',
         '1000': '1000ms',
+        fast: animationTokens.duration.fast,
+        normal: animationTokens.duration.normal,
+        slow: animationTokens.duration.slow,
+        slower: animationTokens.duration.slower,
       },
       
       transitionTimingFunction: {
@@ -309,6 +340,10 @@ export default {
         'ease-in': 'cubic-bezier(0.4, 0, 1, 1)',
         'ease-out': 'cubic-bezier(0, 0, 0.2, 1)',
         'soft': 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+        'spark-out': animationTokens.easing.out,
+        'spark-in': animationTokens.easing.in,
+        'spark-in-out': animationTokens.easing.inOut,
+        'spark-bounce': animationTokens.easing.bounce,
       },
       
       animation: {
