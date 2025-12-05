@@ -7,7 +7,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./tests/setup/idb-keyrange-polyfill.ts'],
+    setupFiles: ['./tests/setup/idb-keyrange-polyfill.ts', './tests/setupTests.ts'],
     exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**', '**/*.spec.ts'],
     coverage: {
       provider: 'v8',
