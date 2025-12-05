@@ -27,13 +27,13 @@ export default function FeedItem({
   unread,
   onClick,
 }: FeedItemProps) {
-  // Icon mapping
+  // Icon mapping (using semantic design tokens)
   const iconMap = {
-    alert: { Icon: Bell, color: 'text-emerald-500' },
-    analysis: { Icon: Search, color: 'text-cyan-500' },
-    journal: { Icon: FileText, color: 'text-cyan-500' },
-    export: { Icon: Download, color: 'text-zinc-400' },
-    error: { Icon: AlertTriangle, color: 'text-rose-500' },
+    alert: { Icon: Bell, color: 'text-brand' }, // Emerald green for alerts
+    analysis: { Icon: Search, color: 'text-info' }, // Cyan for analysis
+    journal: { Icon: FileText, color: 'text-info' }, // Cyan for journal
+    export: { Icon: Download, color: 'text-tertiary' }, // Gray for exports
+    error: { Icon: AlertTriangle, color: 'text-danger' }, // Red for errors
   };
   
   const { Icon, color } = iconMap[type];
@@ -51,9 +51,9 @@ export default function FeedItem({
   
   return (
     <div
-      className={`flex items-start gap-3 border-b border-zinc-800/50 px-3 py-2 transition-colors ${
-        unread ? 'border-l-2 border-l-emerald-500 pl-2' : ''
-      } ${onClick ? 'cursor-pointer hover:bg-zinc-900/50 active:bg-zinc-800' : ''}`}
+      className={`flex items-start gap-3 border-b border-border-subtle px-3 py-2 transition-colors ${
+        unread ? 'border-l-2 border-l-brand pl-2' : ''
+      } ${onClick ? 'cursor-pointer hover:bg-surface-hover active:bg-surface-elevated' : ''}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
@@ -61,17 +61,17 @@ export default function FeedItem({
       aria-label={`${type}: ${text}, ${getRelativeTime(timestamp)} ago`}
     >
       {/* Icon */}
-      <Icon size={20} className={unread ? color : 'text-zinc-600'} />
+      <Icon size={20} className={unread ? color : 'text-tertiary'} />
       
       {/* Text */}
       <div className="flex-1 min-w-0">
-        <p className={`text-sm line-clamp-2 ${unread ? 'text-zinc-200' : 'text-zinc-400'}`}>
+        <p className={`text-sm line-clamp-2 ${unread ? 'text-primary' : 'text-secondary'}`}>
           {text}
         </p>
       </div>
       
       {/* Timestamp */}
-      <span className="font-mono text-xs text-zinc-600 flex-shrink-0">
+      <span className="font-mono text-xs text-tertiary flex-shrink-0">
         {getRelativeTime(timestamp)}
       </span>
     </div>
