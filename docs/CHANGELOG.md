@@ -20,6 +20,13 @@
     - Accessibility guidelines (WCAG contrast ratios)
     - Migration guide from hardcoded colors to tokens
     - Quick reference section
+  
+  - `docs/design/color-integration-roadmap.md` (800+ lines) – Complete implementation roadmap
+    - 6 phases: Component Audit, Pattern Consistency, OLED Mode UI, Validation, Developer Experience, Documentation
+    - 18 concrete tasks with effort estimates (14-21h total)
+    - Success metrics (8.5/10 → 9.5/10 consistency score)
+    - Risk mitigation strategies
+    - 2-week timeline with daily breakdown
 
 ### Changed
 - **Updated design system overview:**
@@ -33,6 +40,7 @@
   - Tailwind integration comprehensive
   - Main gap: Missing utility reference documentation
   - Recommended improvements: Documentation (✅ completed), component audit (next), OLED UI toggle (future)
+- **Next Action:** Phase 1 - Component Audit (automated scan for hardcoded colors)
 
 ---
 
