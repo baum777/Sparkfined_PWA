@@ -1,10 +1,11 @@
-import { forwardRef, useId, type InputHTMLAttributes, type ReactNode } from 'react'
+import React, { forwardRef, useId, type ReactNode } from 'react'
 import { cn } from '@/design-system/utils/cn'
 
 export type InputVariant = 'default' | 'error'
 export type InputSize = 'sm' | 'md' | 'lg'
 
-export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: ReactNode
   helperText?: ReactNode
   errorText?: ReactNode

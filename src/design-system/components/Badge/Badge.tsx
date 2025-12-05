@@ -1,7 +1,17 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '@/design-system/utils/cn'
 
-export type BadgeVariant = 'default' | 'armed' | 'triggered' | 'paused'
+export type BadgeVariant =
+  | 'default'
+  | 'secondary'
+  | 'outline'
+  | 'warning'
+  | 'danger'
+  | 'success'
+  | 'muted'
+  | 'armed'
+  | 'triggered'
+  | 'paused'
 export type BadgeSize = 'sm' | 'md' | 'lg'
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
@@ -12,6 +22,12 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 const variantStyles: Record<BadgeVariant, string> = {
   default: 'bg-smoke-light/60 text-text-secondary border-smoke-light/80',
+  secondary: 'bg-smoke text-text-secondary border-smoke-light/80',
+  outline: 'bg-transparent text-text-primary border-smoke-light',
+  warning: 'bg-gold/15 text-gold border-gold/40',
+  danger: 'bg-blood/10 text-blood border-blood/40',
+  success: 'bg-phosphor/15 text-phosphor border-phosphor/40',
+  muted: 'bg-smoke/70 text-text-secondary border-smoke-light/80',
   armed: 'bg-spark/15 text-spark border-spark/40',
   triggered: 'bg-gold/15 text-gold border-gold/40',
   paused: 'bg-smoke/70 text-text-secondary border-smoke-light/80',

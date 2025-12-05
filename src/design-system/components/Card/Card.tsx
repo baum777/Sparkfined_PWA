@@ -1,10 +1,12 @@
 import { forwardRef, type HTMLAttributes } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, useReducedMotion, type HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/design-system/utils/cn'
 
-export type CardVariant = 'default' | 'interactive' | 'glow'
+export type CardVariant = 'default' | 'interactive' | 'glow' | 'muted'
 
-export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+type BaseCardProps = Omit<HTMLMotionProps<'div'>, 'ref' | 'onDrag'>
+
+export interface CardProps extends BaseCardProps {
   variant?: CardVariant
   interactive?: boolean
 }
@@ -13,12 +15,13 @@ const variantStyles: Record<CardVariant, string> = {
   default: 'bg-smoke border border-smoke-light',
   interactive: 'bg-smoke border border-smoke-light hover:border-spark',
   glow: 'bg-smoke border border-spark shadow-glow-spark',
+  muted: 'bg-smoke/70 border border-smoke-light text-text-secondary',
 }
 
 const MotionDiv = motion.div
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ variant = 'default', interactive = false, className, children, onClick, ...props }, ref) => {
+  ({ variant = 'default', interactive = false, className, children, onClick, ...rest }, ref) => {
     const prefersReducedMotion = useReducedMotion()
     const isInteractive = interactive || typeof onClick === 'function' || variant === 'interactive'
     const Component = isInteractive ? MotionDiv : 'div'
@@ -29,6 +32,8 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         }
       : {}
 
+    const { onDrag, ...safeRest } = rest as typeof rest & { onDrag?: unknown }
+
     return (
       <Component
         ref={ref}
@@ -38,11 +43,11 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           variantStyles[variant],
           className
         )}
-        tabIndex={isInteractive ? 0 : props.tabIndex}
-        role={isInteractive ? 'button' : props.role}
+        tabIndex={isInteractive ? 0 : rest.tabIndex}
+        role={isInteractive ? 'button' : rest.role}
         onClick={onClick}
         {...motionProps}
-        {...props}
+        {...safeRest}
       >
         {children}
       </Component>

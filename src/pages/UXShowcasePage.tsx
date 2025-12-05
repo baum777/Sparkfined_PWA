@@ -391,7 +391,7 @@ function Modal({
 
 function InfoTooltipIcon({ content }: { content: React.ReactNode }) {
   return (
-    <Tooltip content={content} placement="top">
+    <Tooltip content={content} position="top">
       <button
         className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-border text-text-tertiary hover:text-text-primary hover:border-border-focus transition-colors"
         aria-label="More information"
@@ -405,7 +405,7 @@ function InfoTooltipIcon({ content }: { content: React.ReactNode }) {
 function HelpTooltipCard({ title, description }: { title: string; description: string }) {
   return (
     <Tooltip
-      placement="top"
+      position="top"
       content={
         <div className="max-w-xs space-y-1">
           <p className="font-semibold text-text-primary">{title}</p>
