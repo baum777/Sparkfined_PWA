@@ -103,6 +103,9 @@ export default function SettingsPage({
             <option value="light">Light</option>
           </Select>
         </Row>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
         <Row label="Snap-to-OHLC (Default)">
           <Toggle checked={settings.snapDefault} onChange={(v)=>setSettings({snapDefault:v})}/>
         </Row>

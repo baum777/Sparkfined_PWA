@@ -55,7 +55,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden px-4 pt-32 pb-20 md:px-6 md:pt-40 md:pb-32">
         {/* Grid Background */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#27272a_1px,transparent_1px),linear-gradient(to_bottom,#27272a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20"></div>
+        <div className="absolute inset-0 bg-grid-pattern-lg opacity-20"></div>
         
         <div className="relative mx-auto max-w-5xl text-center">
           {/* Floating Stats */}
