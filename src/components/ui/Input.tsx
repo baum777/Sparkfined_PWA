@@ -1,5 +1,8 @@
-// TODO: design-system: candidate for migration once core DS is in place (Codex step 2+)
-// This is a V1 component using emerald theme. Will be replaced/shimmed with src/design-system/components/Input
+/**
+ * Input - Migrated to Design System
+ *
+ * Uses Design System .input class from src/styles/index.css
+ */
 import React from 'react'
 import { cn } from '@/lib/ui/cn'
 
@@ -25,7 +28,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
     rightIcon,
     mono = false,
     errorId,
-  errorTestId,
+    errorTestId,
     className,
     id,
     ...props
@@ -57,8 +60,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
           aria-invalid={Boolean(error)}
           aria-describedby={computedErrorId ?? helperId}
           className={cn(
-            'h-12 w-full rounded-xl border bg-surface-subtle px-4 text-sm text-text-primary placeholder:text-text-tertiary transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface',
-            error ? 'border-danger focus-visible:ring-danger/40' : 'border-border-moderate focus-visible:ring-border-focus',
+            'input', // Design System input class
+            error && 'border-danger focus:ring-danger/40',
             leftIcon && 'pl-11',
             rightIcon && 'pr-11',
             mono && 'font-mono tabular-nums',

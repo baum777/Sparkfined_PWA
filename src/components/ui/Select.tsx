@@ -1,4 +1,11 @@
+/**
+ * Select - Migrated to Design System
+ *
+ * Uses Design System tokens for colors, borders, and spacing
+ */
 import React, { useState, useRef, useEffect } from 'react';
+import { ChevronDown, ChevronUp, Check } from '@/lib/icons';
+import { cn } from '@/lib/ui/cn';
 
 interface SelectOption {
   value: string;
@@ -18,8 +25,6 @@ interface SelectProps {
   error?: string;
   triggerProps?: SelectTriggerProps;
 }
-
-import { ChevronDown, ChevronUp, Check } from '@/lib/icons';
 
 /**
  * Select component for simple option lists.
@@ -80,14 +85,18 @@ export default function Select({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex h-11 w-full items-center justify-between rounded-token-lg border bg-zinc-900 px-3 py-2.5 text-sm transition-all duration-150 ease-out ${
-          isOpen ? 'border-emerald-500 ring-1 ring-emerald-500/50' : error ? 'border-rose-500' : 'border-zinc-700'
-        } ${disabled ? 'cursor-not-allowed opacity-60' : ''} ${triggerClassName ?? ''}`}
+        className={cn(
+          'input flex items-center justify-between', // Design System input class
+          isOpen && 'border-brand ring-2 ring-brand/20',
+          error && 'border-danger',
+          disabled && 'cursor-not-allowed opacity-60',
+          triggerClassName
+        )}
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         {...restTriggerProps}
       >
-        <span className={selectedOption ? 'text-zinc-100' : 'text-zinc-500'}>
+        <span className={selectedOption ? 'text-text-primary' : 'text-text-tertiary'}>
           {selectedOption?.label || placeholder}
         </span>
         {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -95,7 +104,7 @@ export default function Select({
       
       {isOpen && (
         <div
-          className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-token-md border border-zinc-700 bg-zinc-900 shadow-token-md"
+          className="absolute z-50 mt-1 max-h-60 w-full overflow-y-auto rounded-xl border border-border bg-surface elevation-medium scrollbar-custom"
           role="listbox"
         >
           {options.map((option) => (
@@ -106,11 +115,12 @@ export default function Select({
                 onChange(option.value);
                 setIsOpen(false);
               }}
-              className={`w-full flex items-center justify-between px-3 py-2 text-sm text-left transition-colors ${
+              className={cn(
+                'w-full flex items-center justify-between px-3 py-2 text-sm text-left transition-colors',
                 option.value === value 
-                  ? 'bg-emerald-500/10 text-emerald-400' 
-                  : 'text-zinc-100 hover:bg-zinc-800'
-              }`}
+                  ? 'bg-brand/10 text-brand' 
+                  : 'text-text-primary hover:bg-interactive-hover'
+              )}
               role="option"
               aria-selected={option.value === value}
             >
@@ -122,7 +132,7 @@ export default function Select({
       )}
       
       {error && (
-        <p className="mt-1 text-xs text-rose-400" role="alert">
+        <p className="mt-1 text-xs text-danger" role="alert">
           {error}
         </p>
       )}
