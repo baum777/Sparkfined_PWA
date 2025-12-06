@@ -1,9 +1,8 @@
-import React, { Suspense, lazy, useEffect } from "react";
+import React, { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import UpdateBanner from "../components/UpdateBanner";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { SwipeNavGate } from "../components/navigation/SwipeNavGate";
-import { initializeEventSubscriptions } from "@/ai/ingest/eventSubscriptions";
 
 // Route-level code splitting (reduziert initial bundle)
 const LandingPage = lazy(() => import("../pages/LandingPage"));
@@ -42,10 +41,6 @@ function Fallback() {
 }
 
 export default function RoutesRoot() {
-  useEffect(() => {
-    initializeEventSubscriptions();
-  }, []);
-
   return (
     <ErrorBoundary>
       {/* Läuft jetzt im Router-Kontext, da main.tsx wrappt */}
