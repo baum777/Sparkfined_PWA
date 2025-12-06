@@ -40,8 +40,9 @@ export default async function handler(req: Request) {
     const ms = Date.now() - start;
     const payload = { ms, ...out };
     
-    // Only cache successful responses (with valid text content)
-    if (cacheTtlSec && out.text) {
+    // Only cache successful responses (with valid text content, no errors)
+    // Error responses (empty text or API failures) must NOT be cached
+    if (cacheTtlSec && out.text && out.text.trim().length > 0) {
       await cacheSet(cacheKey, payload, cacheTtlSec);
     }
     
@@ -53,15 +54,15 @@ export default async function handler(req: Request) {
 
 async function route(p: Req["provider"], model?: string, system?: string, user?: string, maxOutputTokens?: number){
   switch (p) {
-    case "openai": return callOpenAI(model ?? "gpt-4.1-mini", system, user!, maxOutputTokens);
+    case "openai": return callOpenAI(model ?? "gpt-4o-mini", system, user!, maxOutputTokens);
     case "grok":
-      return callGrok(model ?? "grok-4-mini", system, user!, maxOutputTokens);
+      return callGrok(model ?? "grok-beta", system, user!, maxOutputTokens);
     default: throw new Error("unknown provider");
   }
 }
 
 async function callOpenAI(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
-  const key = process.env.OPENAI_API_KEY;
+  const key = process.env.OPENAI_API_KEY?.trim();
   if (!key) throw new Error("OPENAI_API_KEY missing");
   const r = await fetch("https://api.openai.com/v1/chat/completions", {
     method:"POST",
@@ -96,7 +97,7 @@ function estimateOpenaiCost(model:string, usage:any){
 }
 
 async function callGrok(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
-  const key = process.env.GROK_API_KEY;
+  const key = process.env.GROK_API_KEY?.trim();
   if (!key) throw new Error("GROK_API_KEY missing");
   const r = await fetch("https://api.x.ai/v1/chat/completions", {
     method:"POST",

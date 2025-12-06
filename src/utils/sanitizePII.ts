@@ -57,7 +57,7 @@ const GERMAN_PHONE_REGEX = /\b(?:\+49[\s\-]?)?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s
  * Matches: (555) 123-4567, 555-123-4567, 5551234567
  * CRITICAL: Must NOT match credit cards
  */
-const US_PHONE_REGEX = /\b(?:\(\d{3}\)\s?\d{3}[-\s]?\d{4}|\d{3}[-\s]?\d{3}[-\s]?\d{4})\b/g;
+const US_PHONE_REGEX = /\b(?:\(\d{3}\)\s?\d{3}[-\s]?\d{4}|\d{3}[-\s]?\d{3}[-\s]?\d{4}|\d{10})\b/g;
 
 // =============================================================================
 // CRYPTO MASKING (PROTECT BEFORE SANITIZATION)
@@ -80,6 +80,11 @@ function maskCrypto(text: string): MaskResult {
   const map: string[] = [];
   let maskedText = text;
 
+  // Reset regex indices to avoid state pollution
+  ETH_REGEX.lastIndex = 0;
+  SOL_REGEX.lastIndex = 0;
+  BTC_REGEX.lastIndex = 0;
+
   const patterns = [
     ETH_REGEX,  // Ethereum
     SOL_REGEX,  // Solana
@@ -87,6 +92,7 @@ function maskCrypto(text: string): MaskResult {
   ];
 
   patterns.forEach((pattern) => {
+    pattern.lastIndex = 0; // Reset before each use
     maskedText = maskedText.replace(pattern, (match) => {
       const index = map.length;
       map.push(match);
@@ -141,6 +147,13 @@ export function sanitizePII(input: string): string {
   let sanitized = maskedText;
 
   // Step 2: Redact PII (order matters for determinism)
+  
+  // Reset all regex indices to avoid state pollution
+  EMAIL_REGEX.lastIndex = 0;
+  SSN_REGEX.lastIndex = 0;
+  CREDITCARD_REGEX.lastIndex = 0;
+  GERMAN_PHONE_REGEX.lastIndex = 0;
+  US_PHONE_REGEX.lastIndex = 0;
   
   // Email addresses
   sanitized = sanitized.replace(EMAIL_REGEX, "[REDACTED-EMAIL]");
