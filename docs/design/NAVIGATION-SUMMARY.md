@@ -83,7 +83,8 @@ AFTER (Proposed):
 | Location | Before | After | Change |
 |----------|--------|-------|--------|
 | **Desktop Sidebar** | 7 items | 10 items (3 sections) | ✅ +3 items |
-| **Mobile BottomNav** | 4 tabs | 6 tabs + drawer | ✅ +2 tabs + secondary access |
+| **Mobile BottomNav** | 4 tabs | 5 tabs + drawer | ✅ +1 tab + secondary access |
+| **Mobile Drawer** | None | 5 items (Alerts, Watchlist, Oracle, Lessons, Signals) | ✅ Secondary nav |
 | **Missing** | Watchlist, Signals, Lessons, Oracle (mobile) | None | ✅ All discoverable |
 
 ---

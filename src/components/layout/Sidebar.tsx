@@ -20,6 +20,9 @@ import {
   Settings,
   ChevronRight,
   Sparkles,
+  BookmarkSquare,
+  BookOpen,
+  Radio,
   type LucideIcon,
 } from '@/lib/icons';
 import { getItem, setItem } from '@/lib/safeStorage';
@@ -39,7 +42,13 @@ const primaryNavItems: NavItem[] = [
   { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
 ];
 
-const secondaryNavItems: NavItem[] = [
+const knowledgeNavItems: NavItem[] = [
+  { path: '/watchlist-v2', label: 'Watchlist', Icon: BookmarkSquare },
+  { path: '/lessons', label: 'Lessons', Icon: BookOpen },
+  { path: '/signals', label: 'Signals', Icon: Radio },
+];
+
+const systemNavItems: NavItem[] = [
   { path: '/settings-v2', label: 'Settings', Icon: Settings },
 ];
 
@@ -83,19 +92,63 @@ export default function Sidebar() {
         : 'text-text-secondary hover:text-text-primary hover:bg-interactive-hover hover-lift', // Design System: hover-lift
     ].join(' ');
 
-  // Map labels to tour step IDs
-  const getTourId = (label: string) => {
-    const idMap: Record<string, string> = {
-      'Board': 'board-link',
-      'Analyze': 'analyze-link',
-      'Chart': 'chart-link',
-      'Journal': 'journal-link',
-      'Oracle': 'oracle-link',
-      'Alerts': 'notifications-link',
-      'Settings': 'settings-link',
+  // Get tour ID and data-testid for nav item
+  const getNavIds = (label: string) => {
+    const idMap: Record<string, { tour: string; testid: string }> = {
+      'Board': { tour: 'board-link', testid: 'nav-board' },
+      'Analyze': { tour: 'analyze-link', testid: 'nav-analyze' },
+      'Chart': { tour: 'chart-link', testid: 'nav-chart' },
+      'Journal': { tour: 'journal-link', testid: 'nav-journal' },
+      'Oracle': { tour: 'oracle-link', testid: 'nav-oracle' },
+      'Alerts': { tour: 'notifications-link', testid: 'nav-alerts' },
+      'Watchlist': { tour: '', testid: 'nav-watchlist' },
+      'Lessons': { tour: '', testid: 'nav-lessons' },
+      'Signals': { tour: '', testid: 'nav-signals' },
+      'Settings': { tour: 'settings-link', testid: 'nav-settings' },
     };
-    return idMap[label] || '';
+    return idMap[label] || { tour: '', testid: '' };
   };
+
+  const renderNavItem = ({ path, label, Icon }: NavItem) => {
+    const { tour, testid } = getNavIds(label);
+    return (
+      <NavLink
+        key={path}
+        to={path}
+        id={tour || undefined}
+        data-testid={testid}
+        className={({ isActive }) => getNavClasses(isActive)}
+        aria-label={label}
+      >
+        {({ isActive }) => (
+          <>
+            <Icon
+              size={isCollapsed ? 22 : 20}
+              strokeWidth={isActive ? 2.4 : 2}
+              className="transition-transform duration-200 motion-reduce:transition-none"
+            />
+            <span
+              className={`text-current transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
+                isCollapsed ? 'text-[11px]' : 'text-sm'
+              }`}
+            >
+              {label}
+            </span>
+          </>
+        )}
+      </NavLink>
+    );
+  };
+
+  const renderSectionHeader = (title: string) => (
+    <div
+      className={`px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-text-tertiary transition-[opacity,margin] duration-200 motion-reduce:transition-none ${
+        isCollapsed ? 'opacity-0' : 'opacity-100'
+      }`}
+    >
+      {title}
+    </div>
+  );
 
   return (
     <aside
@@ -107,66 +160,39 @@ export default function Sidebar() {
       aria-label="Primary navigation"
       data-collapsed={isCollapsed}
     >
-      {/* Primary Nav */}
-      <nav className="flex-1 space-y-2 px-2">
-        {primaryNavItems.map(({ path, label, Icon }) => (
-          <NavLink
-            key={path}
-            to={path}
-            id={getTourId(label)}
-            className={({ isActive }) => getNavClasses(isActive)}
-            aria-label={label}
-          >
-            {({ isActive }) => (
-              <>
-                <Icon
-                  size={isCollapsed ? 22 : 20}
-                  strokeWidth={isActive ? 2.4 : 2}
-                  className="transition-transform duration-200 motion-reduce:transition-none"
-                />
-                <span
-                  className={`text-current transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
-                    isCollapsed ? 'text-[11px]' : 'text-sm'
-                  }`}
-                >
-                  {label}
-                </span>
-              </>
-            )}
-          </NavLink>
-        ))}
-      </nav>
-      
-      {/* Secondary Nav (Bottom) */}
+      {/* Trading Workflow Section */}
+      <div className="flex-1 overflow-y-auto">
+        {!isCollapsed && renderSectionHeader('Trading Workflow')}
+        <nav className="space-y-2 px-2">
+          {primaryNavItems.map(renderNavItem)}
+        </nav>
+
+        {/* Knowledge Base Section */}
+        {!isCollapsed && renderSectionHeader('Knowledge Base')}
+        <nav className="space-y-2 px-2">
+          {knowledgeNavItems.map(renderNavItem)}
+        </nav>
+      </div>
+
+      {/* System Section */}
+      {!isCollapsed && renderSectionHeader('System')}
       <nav className="space-y-2 px-2">
-        {secondaryNavItems.map(({ path, label, Icon }) => (
-          <NavLink
-            key={path}
-            to={path}
-            id={getTourId(label)}
-            className={({ isActive }) => getNavClasses(isActive)}
-            aria-label={label}
-          >
-            {({ isActive }) => (
-              <>
-                <Icon
-                  size={isCollapsed ? 22 : 20}
-                  strokeWidth={isActive ? 2.4 : 2}
-                  className="transition-transform duration-200 motion-reduce:transition-none"
-                />
-                <span
-                  className={`text-current transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
-                    isCollapsed ? 'text-[11px]' : 'text-sm'
-                  }`}
-                >
-                  {label}
-                </span>
-              </>
-            )}
-          </NavLink>
-        ))}
+        {systemNavItems.map(renderNavItem)}
       </nav>
 
+      {/* Gamification Footer */}
+      <div className="mt-4 space-y-2 border-t border-border/50 px-3 pt-3">
+        <div className="rounded-lg bg-brand/10 px-2 py-2 text-center text-[10px] font-semibold">
+          <div className="text-brand">🎮 XP Points</div>
+          <div className={`text-[9px] text-text-secondary transition-opacity duration-200 motion-reduce:transition-none ${
+            isCollapsed ? 'opacity-0' : 'opacity-100'
+          }`}>
+            Level up your journey
+          </div>
+        </div>
+      </div>
+
+      {/* Collapse Button */}
       <button
         type="button"
         onClick={() => setIsCollapsed((prev) => !prev)}

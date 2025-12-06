@@ -1,5 +1,7 @@
+import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { Home, BarChart3, FileText, Settings, type LucideIcon } from '@/lib/icons'
+import { Home, BarChart3, FileText, Settings, TrendingUp, Menu, type LucideIcon } from '@/lib/icons'
+import { NavigationDrawer } from './NavigationDrawer'
 
 interface NavItem {
   path: string
@@ -7,68 +9,98 @@ interface NavItem {
   Icon: LucideIcon
 }
 
-const navItems: NavItem[] = [
+const primaryNavItems: NavItem[] = [
   { path: '/dashboard-v2', label: 'Board', Icon: Home },
   { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
+  { path: '/chart-v2', label: 'Chart', Icon: TrendingUp },
   { path: '/journal-v2', label: 'Journal', Icon: FileText },
   { path: '/settings-v2', label: 'Settings', Icon: Settings },
 ]
 
 export default function BottomNav() {
-  // Map labels to tour step IDs
-  const getTourId = (label: string) => {
-    const idMap: Record<string, string> = {
-      'Board': 'board-link',
-      'Analyze': 'analyze-link',
-      'Journal': 'journal-link',
-      'Settings': 'settings-link',
+  const [isDrawerOpen, setIsDrawerOpen] = React.useState(false)
+
+  // Map labels to tour step IDs and data-testid
+  const getNavIds = (label: string) => {
+    const idMap: Record<string, { tour: string; testid: string }> = {
+      'Board': { tour: 'board-link', testid: 'nav-board' },
+      'Analyze': { tour: 'analyze-link', testid: 'nav-analyze' },
+      'Chart': { tour: 'chart-link', testid: 'nav-chart' },
+      'Journal': { tour: 'journal-link', testid: 'nav-journal' },
+      'Settings': { tour: 'settings-link', testid: 'nav-settings' },
     };
-    return idMap[label] || '';
+    return idMap[label] || { tour: '', testid: '' };
   };
 
   return (
-    <nav
-      id="main-navigation"
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border glass-heavy elevation-high lg:hidden"
-      role="navigation"
-      aria-label="Main navigation"
-    >
-      <div className="mx-auto max-w-7xl px-3 py-1.5">
-        <div className="grid grid-cols-4 gap-1.5">
-          {navItems.map(({ path, label, Icon }) => (
-            <NavLink
-              key={path}
-              to={path}
-              id={getTourId(label)}
-              className={({ isActive }) =>
-                [
-                  'relative flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium tracking-tight transition-all duration-150 ease-out motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
-                  isActive
-                    ? 'text-brand hover-scale' // Design System: hover-scale
-                    : 'text-text-secondary hover:text-text-primary hover:bg-interactive-hover active:text-text-primary/80',
-                ].join(' ')
-              }
+    <>
+      <nav
+        id="main-navigation"
+        className="fixed bottom-0 left-0 right-0 z-50 border-t border-border glass-heavy elevation-high lg:hidden"
+        role="navigation"
+        aria-label="Main navigation"
+      >
+        <div className="mx-auto max-w-7xl px-3 py-1.5">
+          <div className="grid grid-cols-6 gap-1.5">
+            {/* Primary Nav Items (5 tabs) */}
+            {primaryNavItems.map(({ path, label, Icon }) => {
+              const { tour, testid } = getNavIds(label)
+              return (
+                <NavLink
+                  key={path}
+                  to={path}
+                  id={tour || undefined}
+                  data-testid={testid}
+                  className={({ isActive }) =>
+                    [
+                      'relative flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium tracking-tight transition-all duration-150 ease-out motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+                      isActive
+                        ? 'text-brand hover-scale' // Design System: hover-scale
+                        : 'text-text-secondary hover:text-text-primary hover:bg-interactive-hover active:text-text-primary/80',
+                    ].join(' ')
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <span
+                        className={`pointer-events-none absolute inset-x-6 top-1 h-1 rounded-full bg-brand/70 transition-opacity duration-150 motion-reduce:transition-none ${
+                          isActive ? 'opacity-100' : 'opacity-0'
+                        }`}
+                        aria-hidden="true"
+                      />
+                      <Icon
+                        size={22}
+                        strokeWidth={isActive ? 2.4 : 2}
+                        className="transition-transform duration-150 motion-reduce:transition-none"
+                      />
+                      <span className="leading-none">{label}</span>
+                    </>
+                  )}
+                </NavLink>
+              )
+            })}
+
+            {/* Menu Button (More) */}
+            <button
+              type="button"
+              onClick={() => setIsDrawerOpen(true)}
+              data-testid="nav-drawer-trigger"
+              className="relative flex flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium tracking-tight transition-all duration-150 ease-out motion-reduce:transition-none hover:bg-interactive-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus text-text-secondary hover:text-text-primary"
+              aria-label="More navigation options"
             >
-              {({ isActive }) => (
-                <>
-                  <span
-                    className={`pointer-events-none absolute inset-x-6 top-1 h-1 rounded-full bg-brand/70 transition-opacity duration-150 motion-reduce:transition-none ${
-                      isActive ? 'opacity-100' : 'opacity-0'
-                    }`}
-                    aria-hidden="true"
-                  />
-                  <Icon
-                    size={22}
-                    strokeWidth={isActive ? 2.4 : 2}
-                    className="transition-transform duration-150 motion-reduce:transition-none"
-                  />
-                  <span className="leading-none">{label}</span>
-                </>
-              )}
-            </NavLink>
-          ))}
+              <Menu
+                size={22}
+                strokeWidth={2}
+                className="transition-transform duration-150 motion-reduce:transition-none"
+              />
+              <span className="leading-none">More</span>
+            </button>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+
+      {/* Navigation Drawer */}
+      <NavigationDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+    </>
   )
 }

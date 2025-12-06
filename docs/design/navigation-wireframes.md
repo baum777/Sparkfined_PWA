@@ -147,15 +147,16 @@ Styling:
 │        (Full width on mobile)    │
 │                                  │
 ├──────────────────────────────────┤
-│ 📊│📈│📉│📔│⚠️ │⚙️│ ☰   │       │  ← BottomNav (7 items)
-│ B│ A│ C│ J│Al│ S│ Menu│       │
+│ 📊│📈│📉│📔│⚙️│ ☰   │           │  ← BottomNav (5 primary + menu)
+│ B│ A│ C│ J│ S│ Menu│           │
 └──────────────────────────────────┘
 
 Tab dimensions:
 - Height: 64px (touch-friendly)
 - Icon: 24px
 - Label: 11px text
-- Spacing: Equal (1fr grid)
+- Spacing: Equal (1fr grid, 5 tabs = ~20% each)
+- Width per tab: ~64px (large touch targets)
 ```
 
 ### **Mobile Navigation Drawer (Open State)**
@@ -169,13 +170,14 @@ Tab dimensions:
 │                            ▓▓▓▓  │     from right
 │                            ▓▓▓▓  │
 ├──────────────────────────────────┤
-│ 📊│📈│📉│📔│⚠️ │⚙️│ ✕   │      │
-│ B│ A│ C│ J│Al│ S│Close│      │
+│ 📊│📈│📉│📔│⚙️│ ✕   │           │
+│ B│ A│ C│ J│ S│Close│           │
 └──────────────────────────────────┘
 
                         ┌─────────────────┐
                         │ Secondary Items:│
                         │                 │
+                        │ ⚠️  Alerts      │
                         │ 📋 Watchlist   │
                         │ 🔮 Oracle      │
                         │ 🎓 Lessons     │
@@ -342,11 +344,11 @@ Dashboard (Land here)
   │   ├─ <NavTab href="/analysis-v2" icon="Analyze" label="Analyze" />
   │   ├─ <NavTab href="/chart-v2" icon="Chart" label="Chart" />
   │   ├─ <NavTab href="/journal-v2" icon="Journal" label="Journal" />
-  │   ├─ <NavTab href="/alerts-v2" icon="Alerts" label="Alerts" />
   │   ├─ <NavTab href="/settings-v2" icon="Settings" label="Settings" />
   │   └─ <NavDrawerTrigger icon="Menu" label="More" onClick={openDrawer} />
   │
   └─ <NavigationDrawer isOpen={isOpen} onClose={closeDrawer}>
+      ├─ <DrawerItem href="/alerts-v2" icon="Alerts" label="Alerts" />
       ├─ <DrawerItem href="/watchlist-v2" icon="Watchlist" label="Watchlist" />
       ├─ <DrawerItem href="/oracle" icon="Oracle" label="Oracle" />
       ├─ <DrawerItem href="/lessons" icon="Lessons" label="Lessons" />
@@ -479,13 +481,14 @@ FOCUS STATE (Keyboard):
 
 | Aspect | BEFORE | AFTER |
 |--------|--------|-------|
-| Visible items | 4 (Board, Analyze, Journal, Settings) | 6 primary + drawer |
-| Chart | ✗ Desktop only | ✓ Mobile accessible |
-| Alerts | ✗ Desktop only | ✓ Mobile accessible |
+| Visible items | 4 (Board, Analyze, Journal, Settings) | 5 primary + drawer |
+| Chart | ✗ Desktop only | ✓ Mobile accessible (primary) |
+| Alerts | ✗ Desktop only | ✓ Mobile accessible (drawer) |
 | Oracle | ✗ Desktop only | ✓ Mobile accessible (drawer) |
 | Watchlist | ✗ Hidden | ✓ Mobile accessible (drawer) |
 | Lessons | ✗ Orphaned | ✓ Mobile accessible (drawer) |
 | Signals | ✗ Orphaned | ✓ Mobile accessible (drawer) |
+| Touch targets | ~60px (4 tabs) | ~64px (5 tabs) - better UX |
 | Discoverability | 4/10 (Mobile limited) | 10/10 (All discoverable) |
 
 ---

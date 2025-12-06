@@ -126,7 +126,7 @@ Feature-dependent pages:
 
 ### **MOBILE (< lg): Bottom Navigation + Drawer**
 
-#### **Option A: Bottom Tab Bar (Recommended)**
+#### **Bottom Tab Bar (Recommended)**
 
 ```
 Mobile Screen Layout:
@@ -138,35 +138,29 @@ Mobile Screen Layout:
 │   [Main Content Area]        │
 │                              │
 ├──────────────────────────────┤
-│📊│📈│📉│📔│⚠️ │⚙️│ ☰ MENU │  ← Primary (6) + Menu
-│ B│ A│ C│ J│ Al│ S│         │
+│📊│📈│📉│📔│⚙️│ ☰ MENU │        │  ← Primary (5) + Menu
+│ B│ A│ C│ J│ S│         │        │
 └──────────────────────────────┘
 
 TAP ☰ MENU → Drawer opens:
-┌─────────────────┐
-│ 📋 Watchlist    │
-│ 🔮 Oracle       │
-│ 🎓 Lessons      │
-│ 📡 Signals      │
-│ ────────────    │
-│ ▶️  Replay*     │
-│ 🔔 Notify*      │
-└─────────────────┘
+┌──────────────────────┐
+│ ⚠️  Alerts           │
+│ 📋 Watchlist        │
+│ 🔮 Oracle           │
+│ 🎓 Lessons          │
+│ 📡 Signals          │
+│ ──────────────────  │
+│ ▶️  Replay*         │
+│ 🔔 Notify*          │
+└──────────────────────┘
 ```
 
 **Rationale**:
-- 6 primary tabs + "More" menu (keeps UX clean)
-- No crowding (typical mobile shows 4-5 max)
+- 5 primary tabs + "More" menu (optimal mobile UX)
+- Alerts moved to drawer (reduces primary nav clutter)
+- Better touch targets (~64px per tab vs ~48px with 6)
+- No crowding (5 is the industry standard for mobile nav)
 - Contextual deep-links (Replay, Notifications) in drawer
-
-#### **Option B: Scrollable Bottom Tab (Alternative)**
-
-```
-[All 6 primary + secondary in one scrollable bar]
-📊 📈 📉 📔 ⚠️  ⚙️ 📋 🔮 🎓 📡 →
-```
-
-**Tradeoff**: More discoverable but may feel cluttered on small screens
 
 ---
 
