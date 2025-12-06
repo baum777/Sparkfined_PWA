@@ -16,7 +16,7 @@
  * E2E tests for actual push delivery are handled separately.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach, beforeAll } from 'vitest';
+import { describe, it, expect, beforeEach, vi, beforeAll } from 'vitest';
 
 // Stub env vars BEFORE any imports (using vi.stubEnv ensures proper hoisting)
 vi.stubEnv('VAPID_PUBLIC_KEY', 'test-public-key');
@@ -510,7 +510,7 @@ describe('Push Notifications API - Contract Tests', () => {
       } as any;
       const res = createVercelResponse();
 
-      await testSendHandler(req, res as any);
+      await testSendHandler(req, res);
 
       expect(res.statusCode).toBe(401);
       expect(res.body.ok).toBe(false);
@@ -585,7 +585,7 @@ describe('Push Notifications API - Contract Tests', () => {
       } as any;
       const res = createVercelResponse();
 
-      await testSendHandler(req, res as any);
+      await testSendHandler(req, res);
 
       expect(res.statusCode).toBe(405);
       expect(res.body.ok).toBe(false);
