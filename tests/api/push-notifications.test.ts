@@ -16,14 +16,14 @@
  * E2E tests for actual push delivery are handled separately.
  */
 
-// Set env vars FIRST (before ANY imports) - needed for VAPID initialization in test-send.ts
-process.env.VAPID_PUBLIC_KEY = 'test-public-key';
-process.env.VAPID_PRIVATE_KEY = 'test-private-key';
-process.env.VAPID_CONTACT = 'mailto:test@example.com';
-process.env.NODE_ENV = 'test';
-process.env.ALERTS_ADMIN_SECRET = 'test-admin-secret';
+import { describe, it, expect, beforeEach, vi, afterEach, beforeAll } from 'vitest';
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+// Stub env vars BEFORE any imports (using vi.stubEnv ensures proper hoisting)
+vi.stubEnv('VAPID_PUBLIC_KEY', 'test-public-key');
+vi.stubEnv('VAPID_PRIVATE_KEY', 'test-private-key');
+vi.stubEnv('VAPID_CONTACT', 'mailto:test@example.com');
+vi.stubEnv('NODE_ENV', 'test');
+vi.stubEnv('ALERTS_ADMIN_SECRET', 'test-admin-secret');
 
 // Mock @vercel/kv (must be before imports)
 vi.mock('../../src/lib/kv', () => ({
@@ -34,13 +34,36 @@ vi.mock('../../src/lib/kv', () => ({
   kvSMembers: vi.fn(),
 }));
 
-// Mock sha256Url
-vi.mock('../../src/lib/sha', () => ({
-  sha256Url: vi.fn().mockImplementation(async (url: string) => {
-    // Generate consistent hash from URL
-    return url.split('/').pop() || 'mock-hash-123';
-  }),
-}));
+// Polyfill crypto.subtle and btoa for jsdom environment
+beforeAll(async () => {
+  // Polyfill crypto.subtle
+  if (!globalThis.crypto) {
+    globalThis.crypto = {} as Crypto;
+  }
+  if (!globalThis.crypto.subtle) {
+    globalThis.crypto.subtle = {
+      digest: async (algorithm: string, data: Uint8Array) => {
+        // Simple mock hash - just use the data length and first/last bytes
+        const hash = new Uint8Array(32);
+        for (let i = 0; i < 32; i++) {
+          hash[i] = ((data[i % data.length] || 0) + i) % 256;
+        }
+        return hash.buffer;
+      },
+    } as any;
+  }
+
+  // Polyfill btoa (needed for sha256Url)
+  if (typeof globalThis.btoa === 'undefined') {
+    globalThis.btoa = (str: string) => {
+      return Buffer.from(str, 'binary').toString('base64');
+    };
+  }
+
+  // Load test-send handler with initial env vars
+  const module = await import('../../api/push/test-send');
+  testSendHandler = module.default;
+});
 
 // Mock web-push library
 vi.mock('web-push', () => ({
@@ -52,10 +75,11 @@ vi.mock('web-push', () => ({
 
 import subscribeHandler from '../../api/push/subscribe';
 import unsubscribeHandler from '../../api/push/unsubscribe';
-import testSendHandler from '../../api/push/test-send';
 import { kvSet, kvDel, kvSAdd } from '../../src/lib/kv';
-import { sha256Url } from '../../src/lib/sha';
 import webpush from 'web-push';
+
+// Import test-send handler dynamically to allow env var changes
+let testSendHandler: any;
 
 // Helper: Create mock PushSubscription
 function createMockSubscription(endpoint?: string) {
@@ -111,23 +135,41 @@ function createVercelResponse(): any {
   return res;
 }
 
+// Helper: Reload test-send handler with current env vars
+// Note: This clears module cache and reimports, allowing env var changes to take effect
+async function reloadTestSendHandler() {
+  // Clear the module cache to force reload
+  vi.resetModules();
+
+  // Re-setup mocks that were cleared
+  vi.mocked(webpush.setVapidDetails).mockClear();
+  vi.mocked(webpush.sendNotification).mockResolvedValue({ statusCode: 201 } as any);
+
+  // Reimport the handler with current env vars
+  const module = await import('../../api/push/test-send');
+  testSendHandler = module.default;
+}
+
 describe('Push Notifications API - Contract Tests', () => {
-  // Save original env vars
-  const originalEnv = { ...process.env };
-
   beforeEach(() => {
+    // Clear call history AND reset implementations to defaults
     vi.clearAllMocks();
-    // Reset env vars
-    process.env.NODE_ENV = 'test';
-    process.env.VAPID_PUBLIC_KEY = 'test-public-key';
-    process.env.VAPID_PRIVATE_KEY = 'test-private-key';
-    process.env.VAPID_CONTACT = 'mailto:test@example.com';
-    process.env.ALERTS_ADMIN_SECRET = 'test-admin-secret';
-  });
 
-  afterEach(() => {
-    // Restore original env
-    process.env = { ...originalEnv };
+    // Reset KV mocks to default resolved values
+    vi.mocked(kvSet).mockResolvedValue(undefined);
+    vi.mocked(kvDel).mockResolvedValue(1);
+    vi.mocked(kvSAdd).mockResolvedValue(undefined);
+
+    // Reset webpush mock
+    vi.mocked(webpush.sendNotification).mockResolvedValue({ statusCode: 201 } as any);
+
+    // Env vars are stubbed at the top level using vi.stubEnv
+    // Reset them here if individual tests modify them
+    vi.stubEnv('NODE_ENV', 'test');
+    vi.stubEnv('VAPID_PUBLIC_KEY', 'test-public-key');
+    vi.stubEnv('VAPID_PRIVATE_KEY', 'test-private-key');
+    vi.stubEnv('VAPID_CONTACT', 'mailto:test@example.com');
+    vi.stubEnv('ALERTS_ADMIN_SECRET', 'test-admin-secret');
   });
 
   describe('POST /api/push/subscribe - Subscription Storage', () => {
@@ -400,8 +442,9 @@ describe('Push Notifications API - Contract Tests', () => {
     });
 
     it('should return 500 if VAPID keys are missing', async () => {
-      delete process.env.VAPID_PUBLIC_KEY;
-      delete process.env.VAPID_PRIVATE_KEY;
+      vi.stubEnv('VAPID_PUBLIC_KEY', '');
+      vi.stubEnv('VAPID_PRIVATE_KEY', '');
+      await reloadTestSendHandler();
 
       const subscription = createMockSubscription();
 
@@ -416,6 +459,11 @@ describe('Push Notifications API - Contract Tests', () => {
       expect(res.statusCode).toBe(500);
       expect(res.body.ok).toBe(false);
       expect(res.body.error).toContain('VAPID keys missing');
+
+      // Restore env vars and reload for subsequent tests
+      vi.stubEnv('VAPID_PUBLIC_KEY', 'test-public-key');
+      vi.stubEnv('VAPID_PRIVATE_KEY', 'test-private-key');
+      await reloadTestSendHandler();
     });
 
     it('should return 400 if subscription is missing', async () => {
@@ -481,8 +529,9 @@ describe('Push Notifications API - Contract Tests', () => {
     });
 
     it('should return 503 if ALERTS_ADMIN_SECRET is missing in production', async () => {
-      delete process.env.ALERTS_ADMIN_SECRET;
-      process.env.NODE_ENV = 'production';
+      vi.stubEnv('ALERTS_ADMIN_SECRET', '');
+      vi.stubEnv('NODE_ENV', 'production');
+      await reloadTestSendHandler();
 
       const subscription = createMockSubscription();
 
@@ -494,11 +543,17 @@ describe('Push Notifications API - Contract Tests', () => {
       expect(res.statusCode).toBe(503);
       expect(res.body.ok).toBe(false);
       expect(res.body.error).toContain('push test disabled');
+
+      // Restore env vars and reload for subsequent tests
+      vi.stubEnv('ALERTS_ADMIN_SECRET', 'test-admin-secret');
+      vi.stubEnv('NODE_ENV', 'test');
+      await reloadTestSendHandler();
     });
 
     it('should allow request without auth in non-production', async () => {
-      delete process.env.ALERTS_ADMIN_SECRET;
-      process.env.NODE_ENV = 'development';
+      vi.stubEnv('ALERTS_ADMIN_SECRET', '');
+      vi.stubEnv('NODE_ENV', 'development');
+      await reloadTestSendHandler();
 
       const subscription = createMockSubscription();
 
@@ -510,6 +565,11 @@ describe('Push Notifications API - Contract Tests', () => {
       // Should succeed in non-production even without auth
       expect(res.statusCode).toBe(200);
       expect(res.body.ok).toBe(true);
+
+      // Restore env vars and reload for subsequent tests
+      vi.stubEnv('ALERTS_ADMIN_SECRET', 'test-admin-secret');
+      vi.stubEnv('NODE_ENV', 'test');
+      await reloadTestSendHandler();
     });
 
     it('should return 405 for non-POST requests', async () => {
