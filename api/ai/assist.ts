@@ -1,6 +1,8 @@
 // Server-side Router: OpenAI / Grok (xAI)
 export const config = { runtime: "edge" };
 
+import { sanitizePII } from "../src/utils/sanitizePII";
+
 const json = (obj:any, status=200)=> new Response(JSON.stringify(obj), { status, headers:{ "content-type":"application/json; charset=utf-8" }});
 
 type Req = {
@@ -25,18 +27,26 @@ export default async function handler(req: Request) {
     if (!provider) return json({ ok:false, error:"provider required" }, 400);
     const prompt = templateId ? render(templateId, vars || {}) : { system, user };
     if (!prompt.user) return json({ ok:false, error:"user or templateId required" }, 400);
+    
+    // PII Sanitization: Redact sensitive data before sending to AI providers
+    const sanitizedPrompt = {
+      system: prompt.system ? sanitizePII(prompt.system) : undefined,
+      user: sanitizePII(prompt.user),
+    };
+    
     const caps = { maxCostUsd: Math.min(...[maxOrInf(maxCostUsd), maxOrInf(envCap)].filter(n=>Number.isFinite(n))) };
     // Preflight: grobe Kostenabschätzung (chars/4 ≈ tokens)
-    const est = estimatePromptCost(provider, model, prompt.system, prompt.user);
+    const est = estimatePromptCost(provider, model, sanitizedPrompt.system, sanitizedPrompt.user);
     if (caps.maxCostUsd && est.inCostUsd > caps.maxCostUsd) {
       return json({ ok:false, error:`prompt cost (${est.inCostUsd.toFixed(4)}$) exceeds cap (${caps.maxCostUsd}$)` }, 200);
     }
     // Soft cache (best-effort; Edge-isolate, optional)
-    const cacheKey = await keyFor(provider, model, prompt.system, prompt.user);
+    // Cache key includes sanitized prompt to prevent cache poisoning
+    const cacheKey = await keyFor(provider, model, sanitizedPrompt.system, sanitizedPrompt.user);
     const cached = cacheTtlSec ? await cacheGet(cacheKey) : null;
     if (cached) return json({ ok:true, fromCache:true, ...cached }, 200);
     const start = Date.now();
-    const out = await route(provider, model, prompt.system, prompt.user, clampTokens(maxOutputTokens));
+    const out = await route(provider, model, sanitizedPrompt.system, sanitizedPrompt.user, clampTokens(maxOutputTokens));
     const ms = Date.now() - start;
     const payload = { ms, ...out };
     
