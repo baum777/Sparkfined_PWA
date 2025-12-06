@@ -56,8 +56,9 @@ const GERMAN_PHONE_REGEX = /\b(?:\+49[\s\-]?)?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s
  * US phone numbers (various formats)
  * Matches: (555) 123-4567, 555-123-4567, 5551234567
  * CRITICAL: Must NOT match credit cards
+ * Note: Parentheses format has no leading \b because \b doesn't work before '('
  */
-const US_PHONE_REGEX = /\b(?:\(\d{3}\)\s?\d{3}[-\s]?\d{4}|\d{3}[-\s]?\d{3}[-\s]?\d{4}|\d{10})\b/g;
+const US_PHONE_REGEX = /\(\d{3}\)\s?\d{3}[-\s]?\d{4}|\b(?:\d{3}[-\s]\d{3}[-\s]\d{4}|\d{10})\b/g;
 
 // =============================================================================
 // CRYPTO MASKING (PROTECT BEFORE SANITIZATION)
