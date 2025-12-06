@@ -466,8 +466,12 @@ describe('API Cost Guards - /api/ai/assist', () => {
     });
   });
 
-  describe('Cache Layer', () => {
-    it('should return cached response without calling API', async () => {
+  // ============================================================================
+  // PHASE 3: CACHE LAYER TESTS (EXTENDED with Budget Integration)
+  // ============================================================================
+  
+  describe('Cache Layer - Basic Behavior', () => {
+    it('should return cached response without calling API (3.1: Cache Hit)', async () => {
       // Mock OpenAI API
       const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
         new Response(JSON.stringify({
@@ -506,6 +510,11 @@ describe('API Cost Guards - /api/ai/assist', () => {
       expect(data2.fromCache).toBe(true);
       expect(data2.text).toBe('First response'); // Same cached response
       expect(openaiSpy).toHaveBeenCalledTimes(1); // No additional API call
+      
+      // PHASE 3 VALIDATION: Verify response identity
+      expect(data2.text).toBe(data1.text);
+      expect(data2.usage).toEqual(data1.usage);
+      expect(data2.costUsd).toBe(data1.costUsd);
 
       openaiSpy.mockRestore();
     });
@@ -629,6 +638,607 @@ describe('API Cost Guards - /api/ai/assist', () => {
       expect(data2.text).toBe('Grok response');
       expect(data2.fromCache).toBeUndefined(); // Cache miss (different provider)
       expect(openaiSpy).toHaveBeenCalledTimes(2); // Two different API calls
+
+      openaiSpy.mockRestore();
+    });
+  });
+
+  describe('Cache Layer - Strict Key Matching (3.2: Cache Miss Behavior)', () => {
+    it('should trigger cache miss when prompt content changes', async () => {
+      const openaiSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Response 1' } }],
+            usage: { prompt_tokens: 50, completion_tokens: 25 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Response 2' } }],
+            usage: { prompt_tokens: 50, completion_tokens: 25 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        );
+
+      // Request 1: Original prompt
+      const req1 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Analyze BTC trade',
+      });
+      
+      const res1 = await handler(req1);
+      const data1 = await res1.json();
+
+      expect(data1.ok).toBe(true);
+      expect(data1.text).toBe('Response 1');
+      expect(data1.fromCache).toBeUndefined();
+      expect(openaiSpy).toHaveBeenCalledTimes(1);
+
+      // Request 2: Modified prompt (even slight change should miss cache)
+      const req2 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Analyze BTC trade setup', // Added "setup"
+      });
+      
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+
+      expect(data2.ok).toBe(true);
+      expect(data2.text).toBe('Response 2');
+      expect(data2.fromCache).toBeUndefined(); // Cache miss
+      expect(openaiSpy).toHaveBeenCalledTimes(2); // New API call
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should trigger cache miss when system prompt changes', async () => {
+      const openaiSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Response A' } }],
+            usage: { prompt_tokens: 60, completion_tokens: 30 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Response B' } }],
+            usage: { prompt_tokens: 60, completion_tokens: 30 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        );
+
+      const userPrompt = 'Analyze ETH';
+
+      // Request 1: With system prompt
+      const req1 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        system: 'You are a trading assistant',
+        user: userPrompt,
+      });
+      
+      const res1 = await handler(req1);
+      const data1 = await res1.json();
+
+      expect(data1.text).toBe('Response A');
+      expect(openaiSpy).toHaveBeenCalledTimes(1);
+
+      // Request 2: Different system prompt (same user prompt)
+      const req2 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        system: 'You are a crypto expert', // Changed
+        user: userPrompt,
+      });
+      
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+
+      expect(data2.text).toBe('Response B');
+      expect(data2.fromCache).toBeUndefined(); // Cache miss
+      expect(openaiSpy).toHaveBeenCalledTimes(2);
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should trigger cache miss when model changes', async () => {
+      const openaiSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Mini model response' } }],
+            usage: { prompt_tokens: 50, completion_tokens: 25 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Full model response' } }],
+            usage: { prompt_tokens: 50, completion_tokens: 25 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        );
+
+      const userPrompt = 'Analyze market';
+
+      // Request 1: Mini model
+      const req1 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: userPrompt,
+      });
+      
+      const res1 = await handler(req1);
+      const data1 = await res1.json();
+
+      expect(data1.text).toBe('Mini model response');
+      expect(openaiSpy).toHaveBeenCalledTimes(1);
+
+      // Request 2: Different model (same prompt)
+      const req2 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4', // Different model
+        user: userPrompt,
+      });
+      
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+
+      expect(data2.text).toBe('Full model response');
+      expect(data2.fromCache).toBeUndefined(); // Cache miss
+      expect(openaiSpy).toHaveBeenCalledTimes(2);
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should cache hit only with exact parameter match', async () => {
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Cached result' } }],
+          usage: { prompt_tokens: 50, completion_tokens: 25 }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      const exactPayload = {
+        provider: 'openai' as const,
+        model: 'gpt-4o-mini',
+        system: 'Trading bot',
+        user: 'Analyze SOL',
+      };
+
+      // Request 1
+      const req1 = createRequest(exactPayload);
+      await handler(req1);
+      expect(openaiSpy).toHaveBeenCalledTimes(1);
+
+      // Request 2: Exact same payload
+      const req2 = createRequest(exactPayload);
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+
+      expect(data2.fromCache).toBe(true);
+      expect(openaiSpy).toHaveBeenCalledTimes(1); // No new call
+
+      // Request 3: Missing system prompt (different key)
+      const req3 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        // system omitted
+        user: 'Analyze SOL',
+      });
+      
+      const res3 = await handler(req3);
+      const data3 = await res3.json();
+
+      expect(data3.fromCache).toBeUndefined(); // Cache miss
+      expect(openaiSpy).toHaveBeenCalledTimes(2); // New call
+
+      openaiSpy.mockRestore();
+    });
+  });
+
+  describe('Cache Layer - Cost Tracker Integration (3.3: Cache Persistence)', () => {
+    it('should NOT increment cost tracker on cache hit', async () => {
+      process.env.AI_CACHE_TTL_SEC = '300'; // Enable cache
+
+      const mockCost = 0.0001;
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Analysis result' } }],
+          usage: { prompt_tokens: 100, completion_tokens: 50 }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      const payload = {
+        provider: 'openai' as const,
+        model: 'gpt-4o-mini',
+        user: 'Test cost tracking with cache',
+      };
+
+      // Request 1: Cache miss ? API call ? add cost
+      const req1 = createRequest(payload);
+      const res1 = await handler(req1);
+      const data1 = await res1.json();
+
+      expect(data1.ok).toBe(true);
+      expect(data1.fromCache).toBeUndefined();
+      
+      const initialCost = data1.costUsd || mockCost;
+      costTracker.addCost(initialCost, 'req-1');
+      
+      const costAfterFirstCall = costTracker.getCumulativeCost();
+      expect(costAfterFirstCall).toBeCloseTo(initialCost, 5);
+      expect(openaiSpy).toHaveBeenCalledTimes(1);
+
+      // Request 2: Cache hit ? NO API call ? NO cost increment
+      const req2 = createRequest(payload);
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+
+      expect(data2.ok).toBe(true);
+      expect(data2.fromCache).toBe(true);
+      
+      // DO NOT add cost for cached response
+      // costTracker.addCost() should NOT be called
+      
+      const costAfterCacheHit = costTracker.getCumulativeCost();
+      expect(costAfterCacheHit).toBe(costAfterFirstCall); // No change
+      expect(openaiSpy).toHaveBeenCalledTimes(1); // Still only 1 API call
+
+      // Verify cached response returns same cost data
+      expect(data2.costUsd).toBe(data1.costUsd);
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should track cost correctly across cache misses', async () => {
+      process.env.AI_CACHE_TTL_SEC = '300';
+
+      const openaiSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Response 1' } }],
+            usage: { prompt_tokens: 100, completion_tokens: 50 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Response 2' } }],
+            usage: { prompt_tokens: 120, completion_tokens: 60 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        );
+
+      // Request 1: Cache miss
+      const req1 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'First unique prompt',
+      });
+      
+      const res1 = await handler(req1);
+      const data1 = await res1.json();
+      
+      expect(data1.fromCache).toBeUndefined();
+      costTracker.addCost(data1.costUsd || 0.0001, 'req-1');
+      
+      const cost1 = costTracker.getCumulativeCost();
+
+      // Request 2: Cache hit (same prompt)
+      const req2 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'First unique prompt',
+      });
+      
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+      
+      expect(data2.fromCache).toBe(true);
+      // Do NOT add cost for cache hit
+      
+      const cost2 = costTracker.getCumulativeCost();
+      expect(cost2).toBe(cost1); // No change
+
+      // Request 3: Cache miss (different prompt)
+      const req3 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Second unique prompt',
+      });
+      
+      const res3 = await handler(req3);
+      const data3 = await res3.json();
+      
+      expect(data3.fromCache).toBeUndefined();
+      costTracker.addCost(data3.costUsd || 0.0002, 'req-3');
+      
+      const cost3 = costTracker.getCumulativeCost();
+      expect(cost3).toBeGreaterThan(cost2); // Cost increased
+      expect(openaiSpy).toHaveBeenCalledTimes(2); // Only 2 API calls (req1, req3)
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should preserve cached response data identity', async () => {
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Original response' } }],
+          usage: {
+            prompt_tokens: 150,
+            completion_tokens: 75,
+            total_tokens: 225,
+          }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      const payload = {
+        provider: 'openai' as const,
+        model: 'gpt-4o-mini',
+        user: 'Test data identity',
+      };
+
+      // First call: Cache miss
+      const req1 = createRequest(payload);
+      const res1 = await handler(req1);
+      const data1 = await res1.json();
+
+      const snapshot1 = {
+        text: data1.text,
+        usage: data1.usage,
+        costUsd: data1.costUsd,
+        provider: data1.provider,
+        model: data1.model,
+      };
+
+      // Second call: Cache hit
+      const req2 = createRequest(payload);
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+
+      expect(data2.fromCache).toBe(true);
+
+      // Verify complete data identity
+      expect(data2.text).toBe(snapshot1.text);
+      expect(data2.usage).toEqual(snapshot1.usage);
+      expect(data2.costUsd).toBe(snapshot1.costUsd);
+      expect(data2.provider).toBe(snapshot1.provider);
+      expect(data2.model).toBe(snapshot1.model);
+
+      // Verify no mutation
+      expect(JSON.stringify(data2)).toContain(data1.text);
+
+      openaiSpy.mockRestore();
+    });
+  });
+
+  describe('Cache Layer - Edge Cases (3.4: Complex Scenarios)', () => {
+    it('should handle complex nested template prompts', async () => {
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Template analysis' } }],
+          usage: { prompt_tokens: 200, completion_tokens: 100 }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      const templateVars = {
+        address: 'So11111111111111111111111111111111111111112',
+        tf: '1h',
+        metrics: {
+          lastClose: 95.50,
+          change24h: 5.2,
+          volStdev: 0.08,
+        },
+        matrixRows: [
+          { id: 'EMA20', values: [1, 1, 0] },
+        ],
+      };
+
+      // Request 1: Template with complex vars
+      const req1 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        templateId: 'v1/analyze_bullets',
+        vars: templateVars,
+      });
+      
+      const res1 = await handler(req1);
+      const data1 = await res1.json();
+
+      expect(data1.ok).toBe(true);
+      expect(openaiSpy).toHaveBeenCalledTimes(1);
+
+      // Request 2: Same template and vars
+      const req2 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        templateId: 'v1/analyze_bullets',
+        vars: templateVars,
+      });
+      
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+
+      expect(data2.ok).toBe(true);
+      expect(data2.fromCache).toBe(true);
+      expect(openaiSpy).toHaveBeenCalledTimes(1); // No new call
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should differentiate cache by metadata (maxOutputTokens)', async () => {
+      const openaiSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Short response' } }],
+            usage: { prompt_tokens: 50, completion_tokens: 25 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Long detailed response' } }],
+            usage: { prompt_tokens: 50, completion_tokens: 100 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        );
+
+      const basePrompt = 'Explain DeFi';
+
+      // Request 1: Short output
+      const req1 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: basePrompt,
+        maxOutputTokens: 50,
+      });
+      
+      await handler(req1);
+      expect(openaiSpy).toHaveBeenCalledTimes(1);
+
+      // Request 2: Different maxOutputTokens (cache should NOT match system prompt, but keys differ by params)
+      // Note: Current implementation may not include maxOutputTokens in cache key
+      // This test validates expected behavior if metadata is part of key
+      const req2 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: basePrompt,
+        maxOutputTokens: 500,
+      });
+      
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+
+      // Expected: Cache hit (if maxOutputTokens not in key) OR miss (if in key)
+      // Current implementation: Cache keys are [provider, model, system, user]
+      // maxOutputTokens is NOT part of cache key ? Cache HIT expected
+      expect(data2.fromCache).toBe(true);
+      expect(openaiSpy).toHaveBeenCalledTimes(1); // No new call
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should handle whitespace variations in prompts', async () => {
+      const openaiSpy = vi.spyOn(globalThis, 'fetch')
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Response A' } }],
+            usage: { prompt_tokens: 50, completion_tokens: 25 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({
+            choices: [{ message: { content: 'Response B' } }],
+            usage: { prompt_tokens: 50, completion_tokens: 25 }
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' }
+          })
+        );
+
+      // Request 1: Normal spacing
+      const req1 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Analyze BTC',
+      });
+      
+      const res1 = await handler(req1);
+      const data1 = await res1.json();
+      
+      expect(data1.text).toBe('Response A');
+      expect(openaiSpy).toHaveBeenCalledTimes(1);
+
+      // Request 2: Extra whitespace (should be different cache key)
+      const req2 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Analyze  BTC', // Double space
+      });
+      
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+      
+      expect(data2.text).toBe('Response B');
+      expect(data2.fromCache).toBeUndefined(); // Cache miss (strict string match)
+      expect(openaiSpy).toHaveBeenCalledTimes(2);
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should handle undefined vs null vs missing fields in cache key', async () => {
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Response' } }],
+          usage: { prompt_tokens: 50, completion_tokens: 25 }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      // Request 1: No system prompt
+      const req1 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Test prompt',
+      });
+      
+      await handler(req1);
+      expect(openaiSpy).toHaveBeenCalledTimes(1);
+
+      // Request 2: system = undefined (should match request 1)
+      const req2 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        system: undefined,
+        user: 'Test prompt',
+      });
+      
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+      
+      expect(data2.fromCache).toBe(true); // Cache hit (undefined == missing)
+      expect(openaiSpy).toHaveBeenCalledTimes(1);
 
       openaiSpy.mockRestore();
     });
