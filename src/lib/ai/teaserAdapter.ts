@@ -10,7 +10,6 @@
  * DoD: Response < 2s, UI non-blocking
  */
 
-import OpenAI from 'openai'
 import type {
   AITeaserAnalysis,
   OCRResult,
@@ -114,12 +113,15 @@ async function getOpenAITeaser(payload: TeaserPayload): Promise<AITeaserAnalysis
     throw new Error('OpenAI API key not configured')
   }
 
+  // Lazy load OpenAI SDK (only when AI provider is enabled)
+  const { default: OpenAI } = await import('openai')
+
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY, dangerouslyAllowBrowser: true })
 
   const systemPrompt = buildSystemPrompt(payload)
   const userPrompt = buildUserPrompt(payload)
 
-  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+  const messages: Parameters<typeof openai.chat.completions.create>[0]['messages'] = [
     { role: 'system', content: systemPrompt },
   ]
 
@@ -156,6 +158,9 @@ async function getGrokTeaser(payload: TeaserPayload): Promise<AITeaserAnalysis> 
     throw new Error('Grok API key not configured')
   }
 
+  // Lazy load OpenAI SDK (Grok uses OpenAI-compatible API)
+  const { default: OpenAI } = await import('openai')
+
   // Grok uses OpenAI-compatible API
   const grok = new OpenAI({
     apiKey: GROK_API_KEY,
@@ -166,7 +171,7 @@ async function getGrokTeaser(payload: TeaserPayload): Promise<AITeaserAnalysis> 
   const systemPrompt = buildSystemPrompt(payload)
   const userPrompt = buildUserPrompt(payload)
 
-  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+  const messages: Parameters<typeof grok.chat.completions.create>[0]['messages'] = [
     { role: 'system', content: systemPrompt },
   ]
 
