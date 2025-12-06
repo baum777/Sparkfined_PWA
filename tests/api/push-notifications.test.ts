@@ -41,16 +41,21 @@ beforeAll(async () => {
     globalThis.crypto = {} as Crypto;
   }
   if (!globalThis.crypto.subtle) {
-    globalThis.crypto.subtle = {
-      digest: async (algorithm: string, data: Uint8Array) => {
-        // Simple mock hash - just use the data length and first/last bytes
-        const hash = new Uint8Array(32);
-        for (let i = 0; i < 32; i++) {
-          hash[i] = ((data[i % data.length] || 0) + i) % 256;
-        }
-        return hash.buffer;
-      },
-    } as any;
+    // Use Object.defineProperty since subtle is read-only
+    Object.defineProperty(globalThis.crypto, 'subtle', {
+      value: {
+        digest: async (algorithm: string, data: Uint8Array) => {
+          // Simple mock hash - just use the data length and first/last bytes
+          const hash = new Uint8Array(32);
+          for (let i = 0; i < 32; i++) {
+            hash[i] = ((data[i % data.length] || 0) + i) % 256;
+          }
+          return hash.buffer;
+        },
+      } as SubtleCrypto,
+      writable: true,
+      configurable: true,
+    });
   }
 
   // Polyfill btoa (needed for sha256Url)
@@ -156,9 +161,9 @@ describe('Push Notifications API - Contract Tests', () => {
     vi.clearAllMocks();
 
     // Reset KV mocks to default resolved values
-    vi.mocked(kvSet).mockResolvedValue(undefined);
+    vi.mocked(kvSet).mockResolvedValue(undefined as any);
     vi.mocked(kvDel).mockResolvedValue(1);
-    vi.mocked(kvSAdd).mockResolvedValue(undefined);
+    vi.mocked(kvSAdd).mockResolvedValue(undefined as any);
 
     // Reset webpush mock
     vi.mocked(webpush.sendNotification).mockResolvedValue({ statusCode: 201 } as any);
