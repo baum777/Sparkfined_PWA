@@ -2586,6 +2586,437 @@ describe('API Cost Guards - /api/ai/assist', () => {
     });
   });
 
+  // ============================================================================
+  // PHASE 5: PII SANITIZATION TESTS (NEW - Major Feature)
+  // ============================================================================
+  
+  describe('PII Sanitization - Phone Numbers (5.1)', () => {
+    it('should redact German mobile format (0176-12345678)', () => {
+      const input = 'Call me at 0176-12345678 for details';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Call me at [REDACTED-PHONE] for details');
+      expect(sanitized).not.toContain('0176');
+      
+      // Detection
+      const detected = detectPIITypes(input);
+      expect(detected).toContain('phone');
+    });
+
+    it('should redact German format with spaces (+49 176 12345678)', () => {
+      const input = 'Contact: +49 176 12345678';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Contact: [REDACTED-PHONE]');
+      expect(sanitized).not.toContain('+49');
+    });
+
+    it('should redact US format with parentheses ((555) 123-4567)', () => {
+      const input = 'Phone: (555) 123-4567';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Phone: [REDACTED-PHONE]');
+      expect(sanitized).not.toContain('555');
+    });
+
+    it('should redact US format with dashes (555-123-4567)', () => {
+      const input = 'Call 555-123-4567 anytime';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Call [REDACTED-PHONE] anytime');
+    });
+
+    it('should redact multiple phone numbers', () => {
+      const input = 'Primary: 0176-1234567, Secondary: 0172-9876543';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Primary: [REDACTED-PHONE], Secondary: [REDACTED-PHONE]');
+      expect(sanitized).not.toContain('0176');
+      expect(sanitized).not.toContain('0172');
+    });
+
+    it('should handle mixed phone formatting in single text', () => {
+      const input = 'Mobile: +49 176 1234567 or Office: (555) 123-4567';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toContain('[REDACTED-PHONE]');
+      expect(sanitized.match(/\[REDACTED-PHONE\]/g)?.length).toBe(2);
+    });
+  });
+
+  describe('PII Sanitization - Email Addresses (5.2)', () => {
+    it('should redact simple email address', () => {
+      const input = 'Reach out to john.doe@example.com';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Reach out to [REDACTED-EMAIL]');
+      expect(sanitized).not.toContain('john.doe');
+      expect(sanitized).not.toContain('@example.com');
+      
+      // Detection
+      const detected = detectPIITypes(input);
+      expect(detected).toContain('email');
+    });
+
+    it('should redact multiple email addresses', () => {
+      const input = 'CC: alice@test.com, bob@example.org';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('CC: [REDACTED-EMAIL], [REDACTED-EMAIL]');
+      expect(sanitized).not.toContain('alice');
+      expect(sanitized).not.toContain('bob');
+    });
+
+    it('should redact email with special characters in local part', () => {
+      const input = 'Contact: user+tag@subdomain.example.com';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Contact: [REDACTED-EMAIL]');
+      expect(sanitized).not.toContain('user+tag');
+    });
+
+    it('should redact email with subdomain', () => {
+      const input = 'Support: help@support.crypto.io';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Support: [REDACTED-EMAIL]');
+      expect(sanitized).not.toContain('support.crypto.io');
+    });
+
+    it('should handle email with trailing period edge case', () => {
+      const input = 'Email user@example.com.';
+      const sanitized = mockSanitizePII(input);
+      
+      // Should redact email, period remains
+      expect(sanitized).toContain('[REDACTED-EMAIL]');
+      expect(sanitized).not.toContain('user@example.com');
+    });
+
+    it('should redact email in complex sentence', () => {
+      const input = 'Send the report to admin@company.org before 5pm';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Send the report to [REDACTED-EMAIL] before 5pm');
+    });
+  });
+
+  describe('PII Sanitization - Credit Card Numbers (5.3)', () => {
+    it('should redact Visa format with spaces (4242 4242 4242 4242)', () => {
+      const input = 'Card: 4242 4242 4242 4242';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Card: [REDACTED-CC]');
+      expect(sanitized).not.toContain('4242');
+      
+      // Detection
+      const detected = detectPIITypes(input);
+      expect(detected).toContain('creditcard');
+    });
+
+    it('should redact Mastercard format with dashes (5555-4444-3333-2222)', () => {
+      const input = 'Payment: 5555-4444-3333-2222';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Payment: [REDACTED-CC]');
+      expect(sanitized).not.toContain('5555');
+    });
+
+    it('should redact card number without separators (4532123456789010)', () => {
+      const input = 'CC: 4532123456789010';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('CC: [REDACTED-CC]');
+    });
+
+    it('should redact mixed format card numbers', () => {
+      const input = 'Card1: 4242-4242-4242-4242 Card2: 5555 4444 3333 2222';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Card1: [REDACTED-CC] Card2: [REDACTED-CC]');
+      expect(sanitized.match(/\[REDACTED-CC\]/g)?.length).toBe(2);
+    });
+  });
+
+  describe('PII Sanitization - SSN (5.4)', () => {
+    it('should redact US Social Security Number (123-45-6789)', () => {
+      const input = 'SSN: 123-45-6789';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('SSN: [REDACTED-SSN]');
+      expect(sanitized).not.toContain('123-45-6789');
+      
+      // Detection
+      const detected = detectPIITypes(input);
+      expect(detected).toContain('ssn');
+    });
+
+    it('should redact SSN in context', () => {
+      const input = 'Employee ID: 987-65-4321 (SSN)';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Employee ID: [REDACTED-SSN] (SSN)');
+    });
+
+    it('should redact multiple SSNs', () => {
+      const input = 'Person1: 111-22-3333, Person2: 444-55-6666';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Person1: [REDACTED-SSN], Person2: [REDACTED-SSN]');
+      expect(sanitized.match(/\[REDACTED-SSN\]/g)?.length).toBe(2);
+    });
+  });
+
+  describe('PII Sanitization - Mixed PII (5.5)', () => {
+    it('should redact email and phone in same text', () => {
+      const input = 'Email: support@crypto.io Phone: 0172-9876543';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe('Email: [REDACTED-EMAIL] Phone: [REDACTED-PHONE]');
+      expect(sanitized).not.toContain('support@crypto.io');
+      expect(sanitized).not.toContain('0172');
+      
+      // Detection
+      const detected = detectPIITypes(input);
+      expect(detected).toContain('email');
+      expect(detected).toContain('phone');
+      expect(detected).toHaveLength(2);
+    });
+
+    it('should redact all PII types in complex text', () => {
+      const input = 'Contact John at john@example.com or 555-123-4567. Card: 4242-4242-4242-4242. SSN: 123-45-6789.';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toContain('[REDACTED-EMAIL]');
+      expect(sanitized).toContain('[REDACTED-PHONE]');
+      expect(sanitized).toContain('[REDACTED-CC]');
+      expect(sanitized).toContain('[REDACTED-SSN]');
+      
+      // All PII removed
+      expect(sanitized).not.toContain('john@example.com');
+      expect(sanitized).not.toContain('555-123-4567');
+      expect(sanitized).not.toContain('4242');
+      expect(sanitized).not.toContain('123-45-6789');
+    });
+
+    it('should handle multiple instances of different PII types', () => {
+      const input = 'Primary: alice@test.com, Secondary: bob@example.org. Phones: 555-1111, 555-2222.';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized.match(/\[REDACTED-EMAIL\]/g)?.length).toBe(2);
+      expect(sanitized.match(/\[REDACTED-PHONE\]/g)?.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should preserve text structure while redacting PII', () => {
+      const input = 'Dear customer, your order details: Email: user@example.com, Phone: (555) 123-4567';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toContain('Dear customer');
+      expect(sanitized).toContain('your order details');
+      expect(sanitized).toContain('[REDACTED-EMAIL]');
+      expect(sanitized).toContain('[REDACTED-PHONE]');
+    });
+  });
+
+  describe('PII Sanitization - Clean Inputs (5.6: Control Group)', () => {
+    it('should not modify text without PII', () => {
+      const input = 'Analyze SOL trade setup on 1h timeframe';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe(input); // Unchanged
+      
+      // No PII detected
+      const detected = detectPIITypes(input);
+      expect(detected).toHaveLength(0);
+    });
+
+    it('should not modify trading discussion', () => {
+      const input = 'BTC broke resistance at $65000. Entry at $64500, stop at $63000.';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe(input);
+    });
+
+    it('should not modify technical analysis text', () => {
+      const input = 'RSI at 45.5, MACD crossover detected on 4h chart';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe(input);
+    });
+
+    it('should handle numbers that are not PII', () => {
+      const input = 'Price: $123.45, Volume: 1234567890';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe(input);
+    });
+
+    it('should not create false positives with similar patterns', () => {
+      const input = 'Chart ID: 2024-01-15, Timestamp: 123456789';
+      const sanitized = mockSanitizePII(input);
+      
+      // Should NOT match SSN pattern (needs exact format)
+      expect(sanitized).toBe(input);
+    });
+  });
+
+  describe('PII Sanitization - Crypto Addresses (5.7: Must NOT Redact)', () => {
+    it('should NOT redact Ethereum addresses', () => {
+      const input = 'Wallet: 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe(input); // Unchanged
+      expect(sanitized).toContain('0x742d35Cc');
+      
+      // No PII detected
+      const detected = detectPIITypes(input);
+      expect(detected).toHaveLength(0);
+    });
+
+    it('should NOT redact Solana addresses (base58)', () => {
+      const input = 'Address: So11111111111111111111111111111111111111112';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe(input);
+      expect(sanitized).toContain('So11111111111111111111111111111111111111112');
+    });
+
+    it('should NOT redact Bitcoin addresses (bech32)', () => {
+      const input = 'BTC: bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe(input);
+      expect(sanitized).toContain('bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh');
+    });
+
+    it('should handle crypto addresses in trading prompts', () => {
+      const input = 'Analyze token 0xdAC17F958D2ee523a2206206994597C13D831ec7 on Ethereum';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe(input);
+      expect(sanitized).toContain('0xdAC17F958D2ee523a2206206994597C13D831ec7');
+    });
+
+    it('should differentiate between crypto addresses and emails', () => {
+      const input = 'Token: 0xabc123def456 Email: user@example.com';
+      const sanitized = mockSanitizePII(input);
+      
+      // Crypto address preserved, email redacted
+      expect(sanitized).toContain('0xabc123def456');
+      expect(sanitized).toContain('[REDACTED-EMAIL]');
+      expect(sanitized).not.toContain('user@example.com');
+    });
+
+    it('should handle multiple crypto addresses without mutation', () => {
+      const input = 'Pair: 0xAAA / 0xBBB on Uniswap';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe(input);
+    });
+  });
+
+  describe('PII Sanitization - Detection Tests (5.8)', () => {
+    it('should correctly detect phone type', () => {
+      const input = 'Call 0176-12345678';
+      const detected = detectPIITypes(input);
+      
+      expect(detected).toContain('phone');
+      expect(detected).toHaveLength(1);
+    });
+
+    it('should correctly detect email type', () => {
+      const input = 'Contact john@example.com';
+      const detected = detectPIITypes(input);
+      
+      expect(detected).toContain('email');
+      expect(detected).toHaveLength(1);
+    });
+
+    it('should correctly detect credit card type', () => {
+      const input = 'Card: 4242-4242-4242-4242';
+      const detected = detectPIITypes(input);
+      
+      expect(detected).toContain('creditcard');
+      expect(detected).toHaveLength(1);
+    });
+
+    it('should correctly detect SSN type', () => {
+      const input = 'SSN: 123-45-6789';
+      const detected = detectPIITypes(input);
+      
+      expect(detected).toContain('ssn');
+      expect(detected).toHaveLength(1);
+    });
+
+    it('should detect multiple PII types', () => {
+      const input = 'Email: john@example.com Phone: 555-123-4567';
+      const detected = detectPIITypes(input);
+      
+      expect(detected).toContain('email');
+      expect(detected).toContain('phone');
+      expect(detected).toHaveLength(2);
+    });
+
+    it('should return empty array for clean text', () => {
+      const input = 'Analyze BTC trade setup';
+      const detected = detectPIITypes(input);
+      
+      expect(detected).toHaveLength(0);
+    });
+
+    it('should return empty array for crypto addresses', () => {
+      const input = 'Wallet: 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb';
+      const detected = detectPIITypes(input);
+      
+      expect(detected).toHaveLength(0);
+    });
+  });
+
+  describe('PII Sanitization - Idempotency & Performance', () => {
+    it('should be idempotent (same result on repeated calls)', () => {
+      const input = 'Email: user@example.com Phone: 555-1234';
+      
+      const sanitized1 = mockSanitizePII(input);
+      const sanitized2 = mockSanitizePII(sanitized1);
+      const sanitized3 = mockSanitizePII(sanitized2);
+      
+      expect(sanitized1).toBe(sanitized2);
+      expect(sanitized2).toBe(sanitized3);
+      expect(sanitized1).toContain('[REDACTED-EMAIL]');
+      expect(sanitized1).toContain('[REDACTED-PHONE]');
+    });
+
+    it('should handle already redacted text gracefully', () => {
+      const input = 'Contact: [REDACTED-EMAIL] Phone: [REDACTED-PHONE]';
+      const sanitized = mockSanitizePII(input);
+      
+      expect(sanitized).toBe(input); // No change
+    });
+
+    it('should perform consistently on large text', () => {
+      const largeText = 'Trading analysis: '.repeat(100) + 'Contact: user@example.com';
+      
+      const start = Date.now();
+      const sanitized = mockSanitizePII(largeText);
+      const duration = Date.now() - start;
+      
+      expect(sanitized).toContain('[REDACTED-EMAIL]');
+      expect(duration).toBeLessThan(100); // Should be fast
+    });
+
+    it('should validate all PII_TEST_CASES', () => {
+      PII_TEST_CASES.forEach(testCase => {
+        const sanitized = mockSanitizePII(testCase.input);
+        const detected = detectPIITypes(testCase.input);
+        
+        // Verify sanitization
+        expect(sanitized).toBe(testCase.expected);
+        
+        // Verify detection
+        expect(detected.sort()).toEqual(testCase.piiTypes.sort());
+      });
+    });
+  });
+
   describe('Cost Calculation', () => {
     it('should calculate OpenAI cost from usage data', async () => {
       // Disable cache for this test
