@@ -33,8 +33,15 @@ const BTC_REGEX = /\bbc1[a-zA-Z0-9]{25,59}\b/g;
 /**
  * Checks if text contains any crypto addresses
  * Used to prevent false positives in PII detection
+ * 
+ * Resets regex state before testing to ensure consistent results
  */
 function hasCryptoAddresses(text: string): boolean {
+  // Reset regex state before testing
+  ETH_REGEX.lastIndex = 0;
+  SOL_REGEX.lastIndex = 0;
+  BTC_REGEX.lastIndex = 0;
+  
   return (
     ETH_REGEX.test(text) ||
     SOL_REGEX.test(text) ||
@@ -94,9 +101,6 @@ export function detectPIITypes(input: string): string[] {
   // Credit card detection (must exclude crypto addresses)
   CREDITCARD_REGEX.lastIndex = 0;
   if (CREDITCARD_REGEX.test(input)) {
-    // Check if this might be a crypto address
-    ETH_REGEX.lastIndex = 0;
-    SOL_REGEX.lastIndex = 0;
     if (!hasCryptoAddresses(input)) {
       types.add("creditcard");
     }
@@ -105,12 +109,6 @@ export function detectPIITypes(input: string): string[] {
   // Phone detection (must exclude crypto addresses)
   PHONE_REGEX.lastIndex = 0;
   if (PHONE_REGEX.test(input)) {
-    // Reset crypto regex indices
-    ETH_REGEX.lastIndex = 0;
-    SOL_REGEX.lastIndex = 0;
-    BTC_REGEX.lastIndex = 0;
-    
-    // Only add if no crypto addresses present
     if (!hasCryptoAddresses(input)) {
       types.add("phone");
     }
