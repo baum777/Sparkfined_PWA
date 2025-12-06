@@ -16,7 +16,8 @@
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const SSN_REGEX = /\b\d{3}-\d{2}-\d{4}\b/g;
 const CREDITCARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
-const PHONE_REGEX = /\b(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?)\d{3}[\s.-]?\d{3,4}\b/g;
+const GERMAN_PHONE_REGEX = /\b(?:\+49[\s\-]?)?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4}\b/g;
+const US_PHONE_REGEX = /\b(?:\(\d{3}\)\s?\d{3}[-\s]?\d{4}|\d{3}[-\s]?\d{3}[-\s]?\d{4})\b/g;
 
 // =============================================================================
 // CRYPTO ADDRESS PATTERNS (Must NOT be classified as PII)
@@ -82,7 +83,8 @@ export function detectPIITypes(input: string): string[] {
   EMAIL_REGEX.lastIndex = 0;
   SSN_REGEX.lastIndex = 0;
   CREDITCARD_REGEX.lastIndex = 0;
-  PHONE_REGEX.lastIndex = 0;
+  GERMAN_PHONE_REGEX.lastIndex = 0;
+  US_PHONE_REGEX.lastIndex = 0;
   ETH_REGEX.lastIndex = 0;
   SOL_REGEX.lastIndex = 0;
   BTC_REGEX.lastIndex = 0;
@@ -107,9 +109,12 @@ export function detectPIITypes(input: string): string[] {
   }
 
   // Phone detection (must exclude crypto addresses)
-  PHONE_REGEX.lastIndex = 0;
-  if (PHONE_REGEX.test(input)) {
-    if (!hasCryptoAddresses(input)) {
+  // Check crypto first to prevent false positives
+  if (!hasCryptoAddresses(input)) {
+    GERMAN_PHONE_REGEX.lastIndex = 0;
+    US_PHONE_REGEX.lastIndex = 0;
+    
+    if (GERMAN_PHONE_REGEX.test(input) || US_PHONE_REGEX.test(input)) {
       types.add("phone");
     }
   }

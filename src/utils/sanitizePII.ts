@@ -46,13 +46,18 @@ const SSN_REGEX = /\b\d{3}-\d{2}-\d{4}\b/g;
 const CREDITCARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
 
 /**
- * Phone numbers (various international formats)
- * Matches: +49 176 12345678, 0176-12345678, (555) 123-4567, 555-123-4567
- * 
- * CRITICAL: Must NOT match credit cards or crypto addresses
- * Uses specific structure to require separators or parentheses
+ * German mobile phone numbers
+ * Matches: +49 176 12345678, 0176-12345678, 0176 1234567
+ * Prefix +49 or 0, then mobile codes (15x, 16x, 17x)
  */
-const PHONE_REGEX = /\b(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?)\d{3}[\s.-]?\d{3,4}\b/g;
+const GERMAN_PHONE_REGEX = /\b(?:\+49[\s\-]?)?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4}\b/g;
+
+/**
+ * US phone numbers (various formats)
+ * Matches: (555) 123-4567, 555-123-4567, 5551234567
+ * CRITICAL: Must NOT match credit cards
+ */
+const US_PHONE_REGEX = /\b(?:\(\d{3}\)\s?\d{3}[-\s]?\d{4}|\d{3}[-\s]?\d{3}[-\s]?\d{4})\b/g;
 
 // =============================================================================
 // CRYPTO MASKING (PROTECT BEFORE SANITIZATION)
@@ -146,8 +151,9 @@ export function sanitizePII(input: string): string {
   // Credit Card numbers
   sanitized = sanitized.replace(CREDITCARD_REGEX, "[REDACTED-CC]");
 
-  // Phone numbers (must be last to avoid conflicts)
-  sanitized = sanitized.replace(PHONE_REGEX, "[REDACTED-PHONE]");
+  // Phone numbers (German and US formats - must be last to avoid conflicts)
+  sanitized = sanitized.replace(GERMAN_PHONE_REGEX, "[REDACTED-PHONE]");
+  sanitized = sanitized.replace(US_PHONE_REGEX, "[REDACTED-PHONE]");
 
   // Step 3: Restore crypto addresses unchanged
   return restoreCrypto(sanitized, map);
