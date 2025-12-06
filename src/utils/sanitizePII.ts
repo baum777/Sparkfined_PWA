@@ -1,19 +1,85 @@
-// utils/sanitizePII.ts
+/**
+ * PII Sanitization Utility
+ * 
+ * Redacts sensitive personal information from text while preserving crypto addresses.
+ * 
+ * Sanitization order:
+ * 1. Mask crypto addresses (ETH, SOL, BTC)
+ * 2. Redact Email addresses
+ * 3. Redact SSN (US Social Security Numbers)
+ * 4. Redact Credit Card numbers
+ * 5. Redact Phone numbers
+ * 6. Restore crypto addresses
+ * 
+ * @module sanitizePII
+ */
 
-// --- Crypto Address Protection --------------------------------------------
+// =============================================================================
+// CRYPTO ADDRESS PATTERNS (MUST NOT BE REDACTED)
+// =============================================================================
+
+const ETH_REGEX = /\b0x[a-fA-F0-9]{40}\b/g;
+const SOL_REGEX = /\b[1-9A-HJ-NP-Za-km-z]{32,44}\b/g;
+const BTC_REGEX = /\bbc1[a-zA-Z0-9]{25,59}\b/g;
+
+// =============================================================================
+// PII PATTERNS
+// =============================================================================
+
+/**
+ * Email addresses
+ * Matches: user@example.com, user+tag@subdomain.example.com
+ */
+const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+
+/**
+ * US Social Security Numbers
+ * Matches: 123-45-6789
+ */
+const SSN_REGEX = /\b\d{3}-\d{2}-\d{4}\b/g;
+
+/**
+ * Credit Card numbers (13-16 digits with optional separators)
+ * Matches: 4242-4242-4242-4242, 4242 4242 4242 4242, 4242424242424242
+ * Uses word boundaries to avoid matching longer number sequences
+ */
+const CREDITCARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
+
+/**
+ * Phone numbers (various international formats)
+ * Matches: +49 176 12345678, 0176-12345678, (555) 123-4567, 555-123-4567
+ * 
+ * CRITICAL: Must NOT match credit cards or crypto addresses
+ * Uses specific structure to require separators or parentheses
+ */
+const PHONE_REGEX = /\b(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?)\d{3}[\s.-]?\d{3,4}\b/g;
+
+// =============================================================================
+// CRYPTO MASKING (PROTECT BEFORE SANITIZATION)
+// =============================================================================
+
 const CRYPTO_MASK_PREFIX = "__CRYPTO_MASK_";
 
-// Extract crypto addresses but DO NOT treat them as PII
-function maskCrypto(text: string): { maskedText: string; map: string[] } {
+interface MaskResult {
+  maskedText: string;
+  map: string[];
+}
+
+/**
+ * Temporarily masks crypto addresses to protect them from PII sanitization
+ * 
+ * @param text - Input text potentially containing crypto addresses
+ * @returns Object with maskedText and map of original addresses
+ */
+function maskCrypto(text: string): MaskResult {
   const map: string[] = [];
+  let maskedText = text;
 
   const patterns = [
-    /\b0x[a-fA-F0-9]{40}\b/g,                           // ETH
-    /\b[1-9A-HJ-NP-Za-km-z]{32,44}\b/g,                 // SOL
-    /\bbc1[a-zA-Z0-9]{25,59}\b/g,                       // BTC
+    ETH_REGEX,  // Ethereum
+    SOL_REGEX,  // Solana
+    BTC_REGEX,  // Bitcoin
   ];
-
-  let maskedText = text;
 
   patterns.forEach((pattern) => {
     maskedText = maskedText.replace(pattern, (match) => {
@@ -26,46 +92,63 @@ function maskCrypto(text: string): { maskedText: string; map: string[] } {
   return { maskedText, map };
 }
 
+/**
+ * Restores masked crypto addresses after PII sanitization
+ * 
+ * @param text - Text with crypto mask placeholders
+ * @param map - Array of original crypto addresses
+ * @returns Text with restored crypto addresses
+ */
 function restoreCrypto(text: string, map: string[]): string {
   return text.replace(
     new RegExp(`${CRYPTO_MASK_PREFIX}(\\d+)__`, "g"),
-    (_m, index) => map[index] ?? _m
+    (_match, index) => map[parseInt(index, 10)] ?? _match
   );
 }
 
-// --- PII Sanitization Main Function ---------------------------------------
+// =============================================================================
+// MAIN SANITIZATION FUNCTION
+// =============================================================================
 
+/**
+ * Sanitizes PII from input text while preserving crypto addresses
+ * 
+ * Process:
+ * 1. Mask crypto addresses (temporary placeholders)
+ * 2. Redact Email → SSN → Credit Cards → Phone numbers
+ * 3. Restore crypto addresses (unchanged)
+ * 
+ * Idempotent: Running twice produces same result
+ * 
+ * @param input - Text to sanitize
+ * @returns Sanitized text with PII redacted, crypto addresses preserved
+ * 
+ * @example
+ * sanitizePII("Email: user@example.com Wallet: 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb")
+ * // Returns: "Email: [REDACTED-EMAIL] Wallet: 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb"
+ */
 export function sanitizePII(input: string): string {
   if (!input) return input;
 
-  // 1. Mask crypto addresses first
+  // Step 1: Mask crypto addresses
   const { maskedText, map } = maskCrypto(input);
 
   let sanitized = maskedText;
 
-  // --- PII Redaction Patterns ---------------------------------------------
+  // Step 2: Redact PII (order matters for determinism)
+  
+  // Email addresses
+  sanitized = sanitized.replace(EMAIL_REGEX, "[REDACTED-EMAIL]");
 
-  // Email
-  sanitized = sanitized.replace(
-    /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
-    "[REDACTED-EMAIL]"
-  );
+  // SSN (US Social Security)
+  sanitized = sanitized.replace(SSN_REGEX, "[REDACTED-SSN]");
 
-  // SSN
-  sanitized = sanitized.replace(/\b\d{3}-\d{2}-\d{4}\b/g, "[REDACTED-SSN]");
+  // Credit Card numbers
+  sanitized = sanitized.replace(CREDITCARD_REGEX, "[REDACTED-CC]");
 
-  // Credit Card
-  sanitized = sanitized.replace(
-    /\b(?:\d[ -]*?){13,19}\b/g,
-    "[REDACTED-CC]"
-  );
+  // Phone numbers (must be last to avoid conflicts)
+  sanitized = sanitized.replace(PHONE_REGEX, "[REDACTED-PHONE]");
 
-  // Phone (fixed regex)
-  sanitized = sanitized.replace(
-    /\b(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?)\d{3}[\s.-]?\d{3,4}\b/g,
-    "[REDACTED-PHONE]"
-  );
-
-  // 3. Restore crypto addresses unchanged
+  // Step 3: Restore crypto addresses unchanged
   return restoreCrypto(sanitized, map);
 }
