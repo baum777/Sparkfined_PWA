@@ -1,7 +1,7 @@
 // Server-side Router: OpenAI / Grok (xAI)
 export const config = { runtime: "edge" };
 
-const json = (obj:any, status=200)=> new Response(JSON.stringify(obj), { status, headers:{ "content-type":"application/json" }});
+const json = (obj:any, status=200)=> new Response(JSON.stringify(obj), { status, headers:{ "content-type":"application/json; charset=utf-8" }});
 
 type Req = {
   provider: "openai" | "grok";
@@ -39,7 +39,12 @@ export default async function handler(req: Request) {
     const out = await route(provider, model, prompt.system, prompt.user, clampTokens(maxOutputTokens));
     const ms = Date.now() - start;
     const payload = { ms, ...out };
-    if (cacheTtlSec) await cacheSet(cacheKey, payload, cacheTtlSec);
+    
+    // Only cache successful responses (with valid text content)
+    if (cacheTtlSec && out.text) {
+      await cacheSet(cacheKey, payload, cacheTtlSec);
+    }
+    
     return json({ ok:true, ...payload });
   } catch (e:any) {
     return json({ ok:false, error: String(e?.message ?? e) }, 200);
@@ -82,11 +87,12 @@ async function callOpenAI(model: string, system: string|undefined, user: string,
 }
 function estimateOpenaiCost(model:string, usage:any){
   // simple lookup; adjust later if nötig
-  const inTok  = usage?.prompt_tokens ?? 0;
-  const outTok = usage?.completion_tokens ?? 0;
+  const inTok  = Number(usage?.prompt_tokens) || 0;
+  const outTok = Number(usage?.completion_tokens) || 0;
   // rough $/1k tok (mini models as example)
   const price = /mini|small/i.test(model) ? { in:0.00015, out:0.0006 } : { in:0.005, out:0.015 };
-  return ((inTok/1000)*price.in + (outTok/1000)*price.out);
+  const cost = ((inTok/1000)*price.in + (outTok/1000)*price.out);
+  return Number.isFinite(cost) ? cost : 0;
 }
 
 async function callGrok(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
