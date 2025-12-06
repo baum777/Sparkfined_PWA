@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { SettingsProvider } from './state/settings'
 import { TelemetryProvider } from './state/telemetry'
 import { AIProviderState } from './state/ai'
@@ -12,9 +12,11 @@ import './styles/App.css'
 import { ThemeProvider } from '@/lib/theme/theme-provider'
 import { checkAlerts, notifyAlertTriggered } from '@/lib/alerts/triggerEngine'
 import { useAlertsStore } from '@/store/alertsStore'
-import OnboardingWizard from '@/components/onboarding/OnboardingWizard'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { ToastProvider } from '@/components/ui/Toast'
+
+// Lazy load OnboardingWizard - only load when needed (reduces initial bundle)
+const OnboardingWizard = lazy(() => import('@/components/onboarding/OnboardingWizard'))
 
 function App() {
   const hasCompletedOnboarding = useOnboardingStore((state) => state.hasCompletedOnboarding)
@@ -67,7 +69,11 @@ function App() {
 
   return (
     <>
-      {!hasCompletedOnboarding && <OnboardingWizard />}
+      {!hasCompletedOnboarding && (
+        <Suspense fallback={null}>
+          <OnboardingWizard />
+        </Suspense>
+      )}
       <TelemetryProvider>
         <ThemeProvider>
           <SettingsProvider>

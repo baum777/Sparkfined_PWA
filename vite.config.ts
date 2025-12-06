@@ -149,10 +149,12 @@ export default defineConfig(({ mode }) => ({
           
           // Only process node_modules
           if (!id.includes('node_modules')) {
-            // App code splitting (optional, Vite handles this automatically)
+            // App code splitting - more aggressive splitting for better caching
+            if (id.includes('/components/journal/')) return 'chunk-journal-components';
             if (id.includes('/sections/chart/')) return 'chunk-chart';
             if (id.includes('/sections/analyze/')) return 'chunk-analyze';
             if (id.includes('/sections/signals/')) return 'chunk-signals';
+            if (id.includes('/ai/')) return 'chunk-ai';
             return undefined;
           }
 
@@ -186,9 +188,20 @@ export default defineConfig(({ mode }) => ({
             return 'vendor-onboarding';
           }
 
-          // 5. Generic vendor (everything else: zustand, lucide-react, etc.)
+          // 5. Lucide Icons - Split separately for better caching
+          // Icons are used across all pages but rarely change
+          if (id.includes('lucide-react')) {
+            return 'vendor-icons';
+          }
+
+          // 6. Zustand (State management) - Small but critical
+          if (id.includes('zustand')) {
+            return 'vendor-state';
+          }
+
+          // 7. Generic vendor (everything else: OpenAI SDK, workbox, etc.)
           // Small libraries that don't need separate chunks
-          // Expected: ~30KB gzip (after OCR/Onboarding split)
+          // Expected: ~30KB gzip (after splitting above)
           return 'vendor';
         },
       },

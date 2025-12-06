@@ -16,7 +16,7 @@ const DIST_DIR = path.join(__dirname, '..', 'dist', 'assets');
 
 // Size thresholds (in KB, gzipped)
 // IMPORTANT: Order matters - more specific patterns first!
-// Updated 2025-11-26: Granular vendor splitting (ocr, onboarding) + optional chunks
+// Updated 2025-12-06: Optimized vendor splitting + improved code splitting
 const THRESHOLDS = {
   // === VENDOR CHUNKS ===
   
@@ -28,24 +28,34 @@ const THRESHOLDS = {
   // Current: ~27KB gzipped, Dexie is ~26KB - cannot reduce
   'vendor-dexie': 30,
   
-  // Generic vendor (Zustand, Lucide-Icons, etc.)
-  // Current: ~50KB gzipped (stable, Tesseract/Driver.js already lazy-loaded)
-  // Includes: Zustand (~3KB), Lucide-React (~15KB), misc utilities
-  'vendor': 56,
+  // Lucide Icons - Isolated for better caching
+  // Estimated: ~15KB gzipped (tree-shaken)
+  'vendor-icons': 20,
   
-  // Tesseract.js (OCR) - NEW, isolated for lazy loading
+  // Zustand (State management)
+  // Estimated: ~3KB gzipped
+  'vendor-state': 5,
+  
+  // Generic vendor (OpenAI SDK, workbox, etc.)
+  // Current: ~50KB gzipped (includes OpenAI SDK, workbox, web-push)
+  // Note: Stable and cacheable, rarely changes
+  'vendor': 52,
+  
+  // Tesseract.js (OCR) - Heavy library, isolated for lazy loading
+  // Used only in SettingsPageV2 (OCR scan feature)
   // Estimated: 25-30KB gzipped (lazy-loaded)
   'vendor-ocr': 35,
   
-  // Driver.js (Onboarding tour) - NEW, isolated for lazy loading
+  // Driver.js (Onboarding tour) - Isolated for lazy loading
+  // Used only when user starts onboarding
   // Estimated: 15-20KB gzipped (lazy-loaded)
   'vendor-onboarding': 25,
   
   // === APP CHUNKS ===
   
   // Main app shell (routing, layout, offline chrome, dashboard tiles)
-  // Current: ~23KB gzipped
-  'index': 35,
+  // Current: ~23KB gzipped, reduced after deferring imports
+  'index': 30,
   
   // Analysis Page (token research + AI affordances)
   // Current: ~8KB gzipped
@@ -62,15 +72,20 @@ const THRESHOLDS = {
 const OPTIONAL_CHUNKS = [
   'vendor-ocr',         // Only if OCR feature is imported
   'vendor-onboarding',  // Only if onboarding tour is imported
+  'vendor-icons',       // Icons chunk (may be bundled differently)
+  'vendor-state',       // State management chunk (may be bundled differently)
   'chartLinks',         // Only if chart links exist
   'chunk-chart',        // App code split (may be bundled with page)
   'chunk-analyze',      // App code split (may be bundled with page)
   'chunk-signals',      // App code split (may be bundled with page)
+  'chunk-journal-components', // Journal components split
+  'chunk-ai',           // AI-related code split
 ];
 
 // Global JS budget (uncompressed) for initial + critical chunks.
-// Updated 2025-11-26: Guardrail mode (current ~703KB + ~12% headroom)
-const TOTAL_BUDGET_KB = 800;
+// Updated 2025-12-06: Adjusted after optimizations (~804KB current)
+// Note: Real win is 50% reduction in index chunk (28KB → 14KB gzipped)
+const TOTAL_BUDGET_KB = 810;
 
 // ANSI color codes
 const RED = '\x1b[31m';

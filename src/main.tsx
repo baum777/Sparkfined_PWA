@@ -4,15 +4,11 @@ import App from './App'
 import './styles/index.css'
 import './styles/driver-override.css'
 import { BrowserRouter } from 'react-router-dom'
-import { initializeLayoutToggles } from './lib/layout-toggle'
 import { AppErrorBoundary } from '@/app/AppErrorBoundary'
 import { logError } from '@/lib/log-error'
 import { validateEnv } from '@/lib/env'
-import { autoCheckAssets } from '@/lib/debug-assets'
 import { installGlobalErrorHooks } from '@/diagnostics/crash-report'
 import { installBootguard } from '@/diagnostics/bootguard'
-import { initializeEventSubscriptions } from '@/ai/ingest/eventSubscriptions'
-import { initializeLiveData } from '@/lib/live/liveDataManager'
 
 // CRITICAL: Install boot guard FIRST (captures errors before React)
 installBootguard()
@@ -25,29 +21,6 @@ try {
   validateEnv()
 } catch (error) {
   console.warn('[main.tsx] ENV validation failed:', error)
-}
-
-// Initialize layout toggles BEFORE React render
-// Wrap in try-catch to prevent blocking app initialization
-try {
-  initializeLayoutToggles()
-} catch (error) {
-  console.warn('[main.tsx] Layout toggle initialization failed:', error)
-  // Continue anyway - app should still work
-}
-
-// Initialize Grok trend subscriptions once on boot
-try {
-  initializeEventSubscriptions()
-} catch (error) {
-  console.warn('[main.tsx] Event subscription initialization failed:', error)
-}
-
-// Initialize Live Data v1 (if enabled via feature flag)
-try {
-  initializeLiveData()
-} catch (error) {
-  console.warn('[main.tsx] Live data initialization failed:', error)
 }
 
 if (import.meta.env.DEV) {
@@ -183,14 +156,81 @@ if (!rootElement) {
   )
 }
 
-// Hydration hint for Lighthouse (main thread idle sooner)
+// Defer non-critical initialization until after React hydration
+// This reduces the initial bundle size by deferring these imports
 if ('requestIdleCallback' in window) {
   (window as any).requestIdleCallback(() => {
     if (import.meta.env.DEV) console.log('[idle] app settled')
+    
+    // Initialize layout toggles (deferred - not critical for initial render)
+    import('./lib/layout-toggle').then(({ initializeLayoutToggles }) => {
+      try {
+        initializeLayoutToggles()
+      } catch (error) {
+        console.warn('[main.tsx] Layout toggle initialization failed:', error)
+      }
+    }).catch(error => console.warn('[main.tsx] Failed to load layout-toggle:', error))
+    
+    // Initialize event subscriptions (deferred)
+    import('@/ai/ingest/eventSubscriptions').then(({ initializeEventSubscriptions }) => {
+      try {
+        initializeEventSubscriptions()
+      } catch (error) {
+        console.warn('[main.tsx] Event subscription initialization failed:', error)
+      }
+    }).catch(error => console.warn('[main.tsx] Failed to load event subscriptions:', error))
+    
+    // Initialize Live Data (deferred)
+    import('@/lib/live/liveDataManager').then(({ initializeLiveData }) => {
+      try {
+        initializeLiveData()
+      } catch (error) {
+        console.warn('[main.tsx] Live data initialization failed:', error)
+      }
+    }).catch(error => console.warn('[main.tsx] Failed to load live data manager:', error))
+    
+    // Auto-check assets (deferred - only in production)
+    if (import.meta.env.PROD) {
+      import('@/lib/debug-assets').then(({ autoCheckAssets }) => {
+        autoCheckAssets()
+      }).catch(error => console.warn('[main.tsx] Failed to load debug-assets:', error))
+    }
   })
-}
-
-// CRITICAL FIX: Auto-check assets in preview/prod to diagnose load failures
-if (import.meta.env.PROD) {
-  autoCheckAssets()
+} else {
+  // Fallback for browsers without requestIdleCallback
+  setTimeout(() => {
+    // Initialize layout toggles (deferred)
+    import('./lib/layout-toggle').then(({ initializeLayoutToggles }) => {
+      try {
+        initializeLayoutToggles()
+      } catch (error) {
+        console.warn('[main.tsx] Layout toggle initialization failed:', error)
+      }
+    }).catch(error => console.warn('[main.tsx] Failed to load layout-toggle:', error))
+    
+    // Initialize event subscriptions (deferred)
+    import('@/ai/ingest/eventSubscriptions').then(({ initializeEventSubscriptions }) => {
+      try {
+        initializeEventSubscriptions()
+      } catch (error) {
+        console.warn('[main.tsx] Event subscription initialization failed:', error)
+      }
+    }).catch(error => console.warn('[main.tsx] Failed to load event subscriptions:', error))
+    
+    // Initialize Live Data (deferred)
+    import('@/lib/live/liveDataManager').then(({ initializeLiveData }) => {
+      try {
+        initializeLiveData()
+      } catch (error) {
+        console.warn('[main.tsx] Live data initialization failed:', error)
+      }
+    }).catch(error => console.warn('[main.tsx] Failed to load live data manager:', error))
+    
+    // Auto-check assets (deferred - only in production)
+    if (import.meta.env.PROD) {
+      import('@/lib/debug-assets').then(({ autoCheckAssets }) => {
+        autoCheckAssets()
+      }).catch(error => console.warn('[main.tsx] Failed to load debug-assets:', error))
+    }
+  }, 100)
 }
