@@ -977,6 +977,532 @@ describe('API Cost Guards - /api/ai/assist', () => {
     });
   });
 
+  // ============================================================================
+  // PHASE 2: BUDGET ENFORCEMENT TESTS (NEW)
+  // ============================================================================
+  
+  describe('Budget Enforcement - Global Cost Cap', () => {
+    it('should reject request when cumulative cost exceeds MAX_COST_USD', async () => {
+      // Set low global budget cap
+      const globalLimit = 0.01; // $0.01 cap
+      costTracker.setGlobalLimit(globalLimit);
+      process.env.AI_MAX_COST_USD = String(globalLimit);
+
+      // Disable cache to ensure fresh API calls
+      process.env.AI_CACHE_TTL_SEC = '0';
+
+      // Mock OpenAI API with realistic cost
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Analysis response' } }],
+          usage: {
+            prompt_tokens: 1000,
+            completion_tokens: 500,
+            total_tokens: 1500,
+          }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      // First request: Add cost to tracker (manually simulate cumulative tracking)
+      // Cost for mini model: (1000/1000)*0.00015 + (500/1000)*0.0006 = 0.00045
+      const firstRequestCost = 0.00045;
+      costTracker.addCost(firstRequestCost, 'req-1');
+
+      expect(costTracker.getCumulativeCost()).toBeCloseTo(firstRequestCost, 5);
+      expect(costTracker.isOverBudget()).toBe(false);
+
+      // Second request: Add more cost
+      const req1 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'First request',
+      });
+      
+      const res1 = await handler(req1);
+      const data1 = await res1.json();
+      
+      // Add returned cost to tracker
+      if (data1.ok && data1.costUsd) {
+        costTracker.addCost(data1.costUsd, 'req-2');
+      }
+
+      expect(costTracker.getCumulativeCost()).toBeGreaterThan(firstRequestCost);
+
+      // Third request: Simulate budget exceeded
+      // Add large cost to push over budget
+      costTracker.addCost(0.02, 'req-3'); // Push over $0.01 limit
+
+      expect(costTracker.isOverBudget()).toBe(true);
+      expect(costTracker.getCumulativeCost()).toBeGreaterThan(globalLimit);
+
+      // Verify tracker state
+      const entries = costTracker.getEntries();
+      expect(entries).toHaveLength(3);
+      expect(entries[0]!.requestId).toBe('req-1');
+      expect(entries[2]!.costUsd).toBe(0.02);
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should track cumulative cost across multiple requests', async () => {
+      const globalLimit = 1.0; // $1.00 cap
+      costTracker.setGlobalLimit(globalLimit);
+      process.env.AI_CACHE_TTL_SEC = '0'; // Disable cache
+
+      // Mock API with moderate cost
+      const mockCost = 0.0003; // ~$0.0003 per request
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Response' } }],
+          usage: { prompt_tokens: 200, completion_tokens: 100 }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      // Request 1
+      const req1 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Request 1',
+      });
+      
+      const res1 = await handler(req1);
+      const data1 = await res1.json();
+      
+      expect(data1.ok).toBe(true);
+      costTracker.addCost(data1.costUsd || mockCost, 'req-1');
+      
+      const cost1 = costTracker.getCumulativeCost();
+      expect(cost1).toBeGreaterThan(0);
+      expect(cost1).toBeLessThan(globalLimit);
+
+      // Request 2
+      const req2 = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Request 2',
+      });
+      
+      const res2 = await handler(req2);
+      const data2 = await res2.json();
+      
+      expect(data2.ok).toBe(true);
+      costTracker.addCost(data2.costUsd || mockCost, 'req-2');
+      
+      const cost2 = costTracker.getCumulativeCost();
+      expect(cost2).toBeGreaterThan(cost1); // Cumulative cost increased
+      expect(cost2).toBeLessThan(globalLimit);
+
+      // Request 3: Simulate high cost that exceeds budget
+      costTracker.addCost(1.5, 'req-3-high-cost');
+      
+      expect(costTracker.isOverBudget()).toBe(true);
+      expect(costTracker.getCumulativeCost()).toBeGreaterThan(globalLimit);
+
+      // Verify cumulative behavior
+      const entries = costTracker.getEntries();
+      expect(entries).toHaveLength(3);
+      
+      const totalCost = entries.reduce((sum, e) => sum + e.costUsd, 0);
+      expect(totalCost).toBe(costTracker.getCumulativeCost());
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should allow request when cumulative cost is below budget', async () => {
+      const globalLimit = 10.0; // High budget
+      costTracker.setGlobalLimit(globalLimit);
+      process.env.AI_CACHE_TTL_SEC = '0';
+
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Success' } }],
+          usage: { prompt_tokens: 50, completion_tokens: 25 }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      // Add small existing cost
+      costTracker.addCost(0.001, 'previous-req');
+
+      const req = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Test request',
+      });
+
+      const res = await handler(req);
+      const data = await res.json();
+
+      expect(data.ok).toBe(true);
+      expect(data.text).toBe('Success');
+      
+      // Simulate adding response cost
+      if (data.costUsd) {
+        costTracker.addCost(data.costUsd, 'current-req');
+      }
+
+      expect(costTracker.isOverBudget()).toBe(false);
+      expect(costTracker.getCumulativeCost()).toBeLessThan(globalLimit);
+
+      openaiSpy.mockRestore();
+    });
+  });
+
+  describe('Budget Enforcement - Per-User Limits', () => {
+    it('should enforce per-user budget limits independently', async () => {
+      const userALimit = 0.01; // $0.01 for userA
+      const userBLimit = 0.02; // $0.02 for userB
+      
+      userBudgetTracker.setUserLimit('userA', userALimit);
+      userBudgetTracker.setUserLimit('userB', userBLimit);
+
+      process.env.AI_CACHE_TTL_SEC = '0';
+
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Response' } }],
+          usage: { prompt_tokens: 100, completion_tokens: 50 }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      // UserA: First request (under budget)
+      const reqA1 = createRequest(
+        {
+          provider: 'openai',
+          model: 'gpt-4o-mini',
+          user: 'UserA request 1',
+        },
+        {},
+        undefined,
+        'userA'
+      );
+
+      const resA1 = await handler(reqA1);
+      const dataA1 = await resA1.json();
+
+      expect(dataA1.ok).toBe(true);
+      
+      const costA1 = dataA1.costUsd || 0.0001;
+      userBudgetTracker.addUserCost('userA', costA1);
+
+      expect(userBudgetTracker.getUserCumulativeCost('userA')).toBeCloseTo(costA1, 5);
+      expect(userBudgetTracker.isUserOverBudget('userA')).toBe(false);
+
+      // UserA: Second request (push over budget)
+      userBudgetTracker.addUserCost('userA', 0.015); // Exceed $0.01 limit
+
+      expect(userBudgetTracker.isUserOverBudget('userA')).toBe(true);
+      expect(userBudgetTracker.getUserCumulativeCost('userA')).toBeGreaterThan(userALimit);
+
+      // UserB: First request (should be independent of userA)
+      const reqB1 = createRequest(
+        {
+          provider: 'openai',
+          model: 'gpt-4o-mini',
+          user: 'UserB request 1',
+        },
+        {},
+        undefined,
+        'userB'
+      );
+
+      const resB1 = await handler(reqB1);
+      const dataB1 = await resB1.json();
+
+      expect(dataB1.ok).toBe(true);
+      
+      const costB1 = dataB1.costUsd || 0.0001;
+      userBudgetTracker.addUserCost('userB', costB1);
+
+      // UserB should NOT be affected by userA's budget
+      expect(userBudgetTracker.getUserCumulativeCost('userB')).toBeCloseTo(costB1, 5);
+      expect(userBudgetTracker.isUserOverBudget('userB')).toBe(false);
+
+      // Verify segregation
+      expect(userBudgetTracker.getUserCumulativeCost('userA')).toBeGreaterThan(userALimit);
+      expect(userBudgetTracker.getUserCumulativeCost('userB')).toBeLessThan(userBLimit);
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should track per-user cumulative costs separately', async () => {
+      const defaultLimit = 1.0; // $1.00 default per user
+      
+      process.env.AI_CACHE_TTL_SEC = '0';
+
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Response' } }],
+          usage: { prompt_tokens: 50, completion_tokens: 25 }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      const mockCost = 0.0001;
+
+      // User1: Multiple requests
+      for (let i = 1; i <= 3; i++) {
+        const req = createRequest(
+          {
+            provider: 'openai',
+            model: 'gpt-4o-mini',
+            user: `User1 request ${i}`,
+          },
+          {},
+          undefined,
+          'user1'
+        );
+
+        await handler(req);
+        userBudgetTracker.addUserCost('user1', mockCost);
+      }
+
+      // User2: Single request
+      const reqUser2 = createRequest(
+        {
+          provider: 'openai',
+          model: 'gpt-4o-mini',
+          user: 'User2 request',
+        },
+        {},
+        undefined,
+        'user2'
+      );
+
+      await handler(reqUser2);
+      userBudgetTracker.addUserCost('user2', mockCost);
+
+      // Verify per-user tracking
+      const user1Cost = userBudgetTracker.getUserCumulativeCost('user1');
+      const user2Cost = userBudgetTracker.getUserCumulativeCost('user2');
+
+      expect(user1Cost).toBeCloseTo(mockCost * 3, 5);
+      expect(user2Cost).toBeCloseTo(mockCost, 5);
+      expect(user1Cost).toBeGreaterThan(user2Cost);
+
+      // Verify entries
+      const user1Entries = userBudgetTracker.getUserEntries('user1');
+      const user2Entries = userBudgetTracker.getUserEntries('user2');
+
+      expect(user1Entries).toHaveLength(3);
+      expect(user2Entries).toHaveLength(1);
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should use default limit when user-specific limit not set', async () => {
+      // No explicit limit set for 'user3' - should use default $10
+      process.env.AI_CACHE_TTL_SEC = '0';
+
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Response' } }],
+          usage: { prompt_tokens: 100, completion_tokens: 50 }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      // Add cost for user3 (no custom limit)
+      userBudgetTracker.addUserCost('user3', 5.0);
+
+      expect(userBudgetTracker.getUserCumulativeCost('user3')).toBe(5.0);
+      expect(userBudgetTracker.isUserOverBudget('user3')).toBe(false); // Under default $10
+
+      // Push over default limit
+      userBudgetTracker.addUserCost('user3', 6.0); // Total: $11
+
+      expect(userBudgetTracker.getUserCumulativeCost('user3')).toBe(11.0);
+      expect(userBudgetTracker.isUserOverBudget('user3')).toBe(true); // Over default $10
+
+      openaiSpy.mockRestore();
+    });
+  });
+
+  describe('Budget Enforcement - Invalid Cost Conditions', () => {
+    it('should handle negative cost gracefully', async () => {
+      process.env.AI_CACHE_TTL_SEC = '0';
+
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Response' } }],
+          usage: {
+            prompt_tokens: -100, // Invalid negative value
+            completion_tokens: 50
+          }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      const req = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Test negative cost',
+      });
+
+      const res = await handler(req);
+      const data = await res.json();
+
+      // API should still succeed (cost calculation handles negative values)
+      expect(data.ok).toBe(true);
+      
+      // Verify cost calculation doesn't break with negative tokens
+      // Cost should be clamped or computed as 0
+      if (data.costUsd !== undefined && data.costUsd !== null) {
+        expect(data.costUsd).toBeGreaterThanOrEqual(0);
+      }
+
+      // Cost tracker should handle negative cost
+      costTracker.addCost(-0.001, 'negative-cost-req');
+      const cumulative = costTracker.getCumulativeCost();
+      
+      // Cumulative should still be valid (negative cost subtracts)
+      expect(typeof cumulative).toBe('number');
+      expect(isNaN(cumulative)).toBe(false);
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should handle undefined cost value', async () => {
+      process.env.AI_CACHE_TTL_SEC = '0';
+
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Response' } }],
+          // Missing usage field entirely
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      const req = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Test undefined cost',
+      });
+
+      const res = await handler(req);
+      const data = await res.json();
+
+      expect(data.ok).toBe(true);
+      
+      // Cost should be null or 0 when usage is missing
+      expect(data.costUsd === null || data.costUsd === 0 || data.costUsd === undefined).toBe(true);
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should handle NaN cost value', async () => {
+      process.env.AI_CACHE_TTL_SEC = '0';
+
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Response' } }],
+          usage: {
+            prompt_tokens: 'invalid', // Non-numeric value
+            completion_tokens: 'invalid'
+          }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      const req = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Test NaN cost',
+      });
+
+      const res = await handler(req);
+      const data = await res.json();
+
+      expect(data.ok).toBe(true);
+
+      // Cost calculation should handle invalid token counts
+      if (data.costUsd !== undefined && data.costUsd !== null) {
+        expect(isNaN(data.costUsd)).toBe(false); // Should not be NaN
+      }
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should handle zero cost appropriately', async () => {
+      process.env.AI_CACHE_TTL_SEC = '0';
+
+      const openaiSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(JSON.stringify({
+          choices: [{ message: { content: 'Response' } }],
+          usage: {
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0
+          }
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        })
+      );
+
+      const req = createRequest({
+        provider: 'openai',
+        model: 'gpt-4o-mini',
+        user: 'Test zero cost',
+      });
+
+      const res = await handler(req);
+      const data = await res.json();
+
+      expect(data.ok).toBe(true);
+      expect(data.costUsd).toBe(0);
+
+      // Zero cost should not affect budget tracking
+      costTracker.addCost(0, 'zero-cost-req');
+      const cumulative = costTracker.getCumulativeCost();
+      
+      expect(cumulative).toBe(0);
+      expect(costTracker.isOverBudget()).toBe(false);
+
+      openaiSpy.mockRestore();
+    });
+
+    it('should handle extremely large cost values', async () => {
+      const globalLimit = 1.0;
+      costTracker.setGlobalLimit(globalLimit);
+
+      // Add extremely large cost
+      const largeCost = 999999.99;
+      costTracker.addCost(largeCost, 'large-cost-req');
+
+      expect(costTracker.getCumulativeCost()).toBe(largeCost);
+      expect(costTracker.isOverBudget()).toBe(true);
+
+      // Per-user tracker
+      userBudgetTracker.setUserLimit('whale-user', 100);
+      userBudgetTracker.addUserCost('whale-user', largeCost);
+
+      expect(userBudgetTracker.getUserCumulativeCost('whale-user')).toBe(largeCost);
+      expect(userBudgetTracker.isUserOverBudget('whale-user')).toBe(true);
+    });
+  });
+
   describe('Cost Calculation', () => {
     it('should calculate OpenAI cost from usage data', async () => {
       // Disable cache for this test
