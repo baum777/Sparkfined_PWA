@@ -7,7 +7,7 @@
 // App Shell
 export { default as Sidebar } from './Sidebar';
 export { default as BottomNav } from './BottomNav';
-export { default as AppHeader } from './AppHeader';
+export { NavigationDrawer } from './NavigationDrawer';
 
 // Page Layout System
 export {
