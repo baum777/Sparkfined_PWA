@@ -84,8 +84,6 @@ export { default as Minus } from 'lucide-react/dist/esm/icons/minus';
 export { default as BookmarkPlus } from 'lucide-react/dist/esm/icons/bookmark-plus';
 export { default as RefreshCw } from 'lucide-react/dist/esm/icons/refresh-cw';
 export { default as ExternalLink } from 'lucide-react/dist/esm/icons/external-link';
-export { default as BookmarkSquare } from 'lucide-react/dist/esm/icons/bookmark-square';
-export { default as Radio } from 'lucide-react/dist/esm/icons/radio';
 
 // Type export for LucideIcon (used in component props)
 export type { LucideIcon } from 'lucide-react';

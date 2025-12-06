@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { Bell, BookmarkSquare, Sparkles, BookOpen, Radio, X, type LucideIcon } from '@/lib/icons'
+import { Bell, BookmarkPlus, Sparkles, BookOpen, Zap, X, type LucideIcon } from '@/lib/icons'
 
 interface DrawerNavItem {
   path: string
@@ -26,10 +26,10 @@ interface NavigationDrawerProps {
 
 const drawerItems: DrawerNavItem[] = [
   { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
-  { path: '/watchlist-v2', label: 'Watchlist', Icon: BookmarkSquare },
+  { path: '/watchlist-v2', label: 'Watchlist', Icon: BookmarkPlus },
   { path: '/oracle', label: 'Oracle', Icon: Sparkles },
   { path: '/lessons', label: 'Lessons', Icon: BookOpen },
-  { path: '/signals', label: 'Signals', Icon: Radio },
+  { path: '/signals', label: 'Signals', Icon: Zap },
 ]
 
 const getTestId = (label: string) => {

@@ -20,9 +20,9 @@ import {
   Settings,
   ChevronRight,
   Sparkles,
-  BookmarkSquare,
+  BookmarkPlus,
   BookOpen,
-  Radio,
+  Zap,
   type LucideIcon,
 } from '@/lib/icons';
 import { getItem, setItem } from '@/lib/safeStorage';
@@ -43,9 +43,9 @@ const primaryNavItems: NavItem[] = [
 ];
 
 const knowledgeNavItems: NavItem[] = [
-  { path: '/watchlist-v2', label: 'Watchlist', Icon: BookmarkSquare },
+  { path: '/watchlist-v2', label: 'Watchlist', Icon: BookmarkPlus },
   { path: '/lessons', label: 'Lessons', Icon: BookOpen },
-  { path: '/signals', label: 'Signals', Icon: Radio },
+  { path: '/signals', label: 'Signals', Icon: Zap },
 ];
 
 const systemNavItems: NavItem[] = [
