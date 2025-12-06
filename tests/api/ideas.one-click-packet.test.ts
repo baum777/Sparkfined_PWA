@@ -508,9 +508,9 @@ describe('API Integration Tests - One-Click Packet', () => {
 
       // Extract IDs
       const [journalRes, ruleRes, ideaRes] = results;
-      const journalData = await journalRes.json();
-      const ruleData = await ruleRes.json();
-      const ideaData = await ideaRes.json();
+      const journalData = await journalRes!.json();
+      const ruleData = await ruleRes!.json();
+      const ideaData = await ideaRes!.json();
 
       // All IDs should be unique
       const ids = [journalData.note.id, ruleData.id, ideaData.idea.id];
