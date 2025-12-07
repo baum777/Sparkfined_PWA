@@ -79,7 +79,20 @@ export default async function handler(req: Request) {
     }
     // Soft cache (best-effort; Edge-isolate, optional)
     // Cache key includes sanitized prompt to prevent cache poisoning
-    const cacheKey = await keyFor(provider, model, sanitizedPrompt.system, sanitizedPrompt.user);
+    // Salt cache per provider key so invalid-key swaps bypass stale cache (spec 4.2)
+    const cacheSalt =
+      provider === "openai"
+        ? process.env.OPENAI_API_KEY ?? ""
+        : provider === "grok"
+        ? process.env.GROK_API_KEY ?? ""
+        : "";
+    const cacheKey = await keyFor(
+      provider,
+      model,
+      sanitizedPrompt.system,
+      sanitizedPrompt.user,
+      cacheSalt
+    );
     const cached = cacheTtlSec ? await cacheGet(cacheKey) : null;
     if (cached) return json({ ok:true, fromCache:true, ...cached }, 200);
     const start = Date.now();
@@ -327,8 +340,8 @@ function clampTokens(maxOutput?: number){ return Math.max(64, Math.min(4000, max
 
 // soft cache (best-effort while isolate lives)
 const CACHE = new Map<string, { v:any; exp:number }>();
-async function keyFor(p:any,m:any,s:any,u:any){
-  const json = JSON.stringify([p,m,s,u]);
+async function keyFor(...parts:any[]){
+  const json = JSON.stringify(parts);
   const enc = new TextEncoder().encode(json);
   const buf = await crypto.subtle.digest("SHA-256", enc);
   return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
