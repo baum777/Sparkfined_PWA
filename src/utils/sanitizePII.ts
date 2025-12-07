@@ -61,6 +61,18 @@ const GERMAN_PHONE_REGEX = /\+?49[\s\-]?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d
  */
 const US_PHONE_REGEX = /(?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b/g;
 
+// Wrapped variants to preserve preceding character (space, punctuation)
+// Group 1 = prefix (may be space/colon/start)
+// Group 2 = actual phone number
+const GERMAN_MOBILE_WRAPPED_REGEX =
+  /(^|[^\d])(\+?49[\s\-]?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4,5}\b|0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b)/g;
+
+const US_PHONE_WRAPPED_REGEX =
+  /(^|[^\d])((?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b)/g;
+
+const LOCAL_SHORT_PHONE_REGEX =
+  /(^|[^\d])(\d{3}[-\s]\d{4}\b)/g;
+
 // =============================================================================
 // CRYPTO MASKING (PROTECT BEFORE SANITIZATION)
 // =============================================================================
@@ -153,9 +165,21 @@ export function sanitizePII(input: string): string {
   // Credit Card numbers
   sanitized = sanitized.replace(CREDITCARD_REGEX, "[REDACTED-CC]");
 
-  // Phone numbers (German and US formats - must be last to avoid conflicts)
-  sanitized = sanitized.replace(GERMAN_PHONE_REGEX, "[REDACTED-PHONE]");
-  sanitized = sanitized.replace(US_PHONE_REGEX, "[REDACTED-PHONE]");
+  // Phone numbers (German, US, local short) – preserve spacing & prefixes
+  // Pattern captures prefix (group 1) + number (group 2)
+  sanitized = sanitized
+    .replace(
+      GERMAN_MOBILE_WRAPPED_REGEX,
+      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
+    )
+    .replace(
+      US_PHONE_WRAPPED_REGEX,
+      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
+    )
+    .replace(
+      LOCAL_SHORT_PHONE_REGEX,
+      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
+    );
 
   // Step 3: Restore crypto addresses unchanged
   return restoreCrypto(sanitized, map);

@@ -16,8 +16,16 @@
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const SSN_REGEX = /\b\d{3}-\d{2}-\d{4}\b/g;
 const CREDITCARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
-const GERMAN_PHONE_REGEX = /\+?49[\s\-]?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4,5}\b|(?:^|[^\d])0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
-const US_PHONE_REGEX = /(?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b/g;
+
+// Wrapped variants for detection (same as sanitizePII.ts)
+const GERMAN_MOBILE_WRAPPED_REGEX =
+  /(^|[^\d])(\+?49[\s\-]?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4,5}\b|0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b)/g;
+
+const US_PHONE_WRAPPED_REGEX =
+  /(^|[^\d])((?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b)/g;
+
+const LOCAL_SHORT_PHONE_REGEX =
+  /(^|[^\d])(\d{3}[-\s]\d{4}\b)/g;
 
 // =============================================================================
 // CRYPTO ADDRESS PATTERNS (Must NOT be classified as PII)
@@ -83,8 +91,9 @@ export function detectPIITypes(input: string): string[] {
   EMAIL_REGEX.lastIndex = 0;
   SSN_REGEX.lastIndex = 0;
   CREDITCARD_REGEX.lastIndex = 0;
-  GERMAN_PHONE_REGEX.lastIndex = 0;
-  US_PHONE_REGEX.lastIndex = 0;
+  GERMAN_MOBILE_WRAPPED_REGEX.lastIndex = 0;
+  US_PHONE_WRAPPED_REGEX.lastIndex = 0;
+  LOCAL_SHORT_PHONE_REGEX.lastIndex = 0;
   ETH_REGEX.lastIndex = 0;
   SOL_REGEX.lastIndex = 0;
   BTC_REGEX.lastIndex = 0;
@@ -111,10 +120,15 @@ export function detectPIITypes(input: string): string[] {
   // Phone detection (must exclude crypto addresses)
   // Check crypto first to prevent false positives
   if (!hasCryptoAddresses(input)) {
-    GERMAN_PHONE_REGEX.lastIndex = 0;
-    US_PHONE_REGEX.lastIndex = 0;
+    GERMAN_MOBILE_WRAPPED_REGEX.lastIndex = 0;
+    US_PHONE_WRAPPED_REGEX.lastIndex = 0;
+    LOCAL_SHORT_PHONE_REGEX.lastIndex = 0;
     
-    if (GERMAN_PHONE_REGEX.test(input) || US_PHONE_REGEX.test(input)) {
+    if (
+      GERMAN_MOBILE_WRAPPED_REGEX.test(input) || 
+      US_PHONE_WRAPPED_REGEX.test(input) ||
+      LOCAL_SHORT_PHONE_REGEX.test(input)
+    ) {
       types.add("phone");
     }
   }
