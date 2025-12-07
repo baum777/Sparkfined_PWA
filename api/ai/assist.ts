@@ -1,7 +1,7 @@
 // Server-side Router: OpenAI / Grok (xAI)
 export const config = { runtime: "edge" };
 
-import { sanitizePII } from "../src/utils/sanitizePII";
+import { sanitizePII } from "../../src/utils/sanitizePII";
 
 const json = (obj:any, status=200)=> new Response(JSON.stringify(obj), { status, headers:{ "content-type":"application/json; charset=utf-8" }});
 
