@@ -2,9 +2,20 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-05
+**Last Updated:** 2025-12-06
 
 ---
+
+## 2025-12-06
+
+### Changed
+- **Bundle hardening & chart isolation:**
+  - Split the charting stack (lightweight-charts + fancy-canvas) into `vendor-charts` to keep the default vendor chunk lean for the start route.
+  - Routed `@remix-run/router` into `vendor-react` to avoid dragging chart code into the core shell preload path.
+  - Extended bundle-size guardrails to track the new `vendor-charts` threshold.
+
+### Context
+- Follow-up bundle optimization to keep `vendor` chunks below budget and protect perceived PWA start performance while preserving headroom for upcoming features.
 
 ## 2025-12-05
 
