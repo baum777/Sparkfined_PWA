@@ -165,20 +165,33 @@ export function sanitizePII(input: string): string {
   // Credit Card numbers
   sanitized = sanitized.replace(CREDITCARD_REGEX, "[REDACTED-CC]");
 
-  // Phone numbers (German, US, local short) – preserve spacing & prefixes
-  // Pattern captures prefix (group 1) + number (group 2)
+  // Phone numbers (German, US, local short) – preserve spacing & vermeiden Over-Redaction
+  // Nur Strings mit „Formatzeichen" (Leerzeichen, Bindestrich, Klammern, +) werden als Phone behandelt.
+  const hasPhoneFormatting = (num: string) => /[()\s\-+]/.test(num);
+  
   sanitized = sanitized
     .replace(
       GERMAN_MOBILE_WRAPPED_REGEX,
-      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
+      (_match: string, prefix: string, num: string) => {
+        if (!hasPhoneFormatting(num)) {
+          // z.B. Volume: 1234567890 → nicht als Phone werten
+          return `${prefix}${num}`;
+        }
+        return `${prefix}[REDACTED-PHONE]`;
+      }
     )
     .replace(
       US_PHONE_WRAPPED_REGEX,
-      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
+      (_match: string, prefix: string, num: string) => {
+        if (!hasPhoneFormatting(num)) {
+          return `${prefix}${num}`;
+        }
+        return `${prefix}[REDACTED-PHONE]`;
+      }
     )
     .replace(
       LOCAL_SHORT_PHONE_REGEX,
-      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
+      (_match: string, prefix: string, num: string) => `${prefix}[REDACTED-PHONE]`
     );
 
   // Step 3: Restore crypto addresses unchanged
