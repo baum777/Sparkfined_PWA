@@ -2,7 +2,7 @@
 // Handles trades, events, metrics, feedback, journal, and replay storage with offline-first approach
 
 const DB_NAME = 'sparkfined-ta-pwa'
-const DB_VERSION = 4 // Bumped for journal_insights store (Loop J3-C)
+const DB_VERSION = 5 // Bumped for journal schema migration (v5)
 
 export interface TradeEntry {
   id?: number
@@ -48,6 +48,47 @@ import type { JournalInsightRecord } from '@/types/journalInsights'
 export type { JournalEntry, ReplaySession, JournalInsightRecord }
 
 let dbInstance: IDBDatabase | null = null
+
+export function resetDbInstance(): void {
+  if (dbInstance) {
+    dbInstance.close?.()
+  }
+  dbInstance = null
+}
+
+function normalizeJournalEntryV5(entry: any): JournalEntry {
+  const now = Date.now()
+  const timestamp = entry.timestamp ?? entry.createdAt ?? now
+
+  return {
+    id: entry.id || crypto.randomUUID(),
+    ticker: entry.ticker || entry.title || 'MANUAL',
+    address: entry.address || 'legacy-import',
+    setup: entry.setup || 'custom',
+    emotion: entry.emotion || 'custom',
+    status: entry.status || 'active',
+    timestamp,
+    createdAt: entry.createdAt ?? timestamp,
+    updatedAt: entry.updatedAt ?? timestamp,
+    thesis: entry.thesis || entry.notes || entry.title,
+    outcome: entry.outcome,
+    customTags: entry.customTags || entry.tags,
+    journeyMeta: entry.journeyMeta,
+  }
+}
+
+function migrateJournalEntriesToV5(transaction: IDBTransaction): void {
+  const store = transaction.objectStore('journal_entries')
+  const getAllRequest = store.getAll()
+
+  getAllRequest.onsuccess = () => {
+    const entries = (getAllRequest.result || []) as JournalEntry[]
+    entries.forEach((entry) => {
+      const normalized = normalizeJournalEntryV5(entry)
+      store.put(normalized)
+    })
+  }
+}
 
 // Initialize IndexedDB
 export async function initDB(): Promise<IDBDatabase> {
@@ -141,6 +182,10 @@ export async function initDB(): Promise<IDBDatabase> {
         insightsStore.createIndex('generatedAt', 'generatedAt', { unique: false })
         insightsStore.createIndex('category', 'category', { unique: false })
         insightsStore.createIndex('severity', 'severity', { unique: false })
+      }
+
+      if (event.oldVersion < 5 && request.transaction?.objectStoreNames.contains('journal_entries')) {
+        migrateJournalEntriesToV5(request.transaction)
       }
     }
   })

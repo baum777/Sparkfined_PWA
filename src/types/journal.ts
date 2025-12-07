@@ -257,6 +257,25 @@ export type EmotionStats = {
 };
 
 // ============================================================================
+// IMPORT TYPES
+// ============================================================================
+
+export type LegacyJournalEntryV4 = {
+  id: string;
+  title: string;
+  notes?: string;
+  date?: string;
+  direction?: 'long' | 'short';
+  pnl?: string;
+  tags?: string[];
+};
+
+export type JournalImportPayload = {
+  version: number;
+  entries: Array<JournalEntry | LegacyJournalEntryV4>;
+};
+
+// ============================================================================
 // EXPORT TYPES
 // ============================================================================
 

@@ -234,6 +234,10 @@ function buildQuickEntryTicker(title: string): string {
 export async function createQuickJournalEntry(input: QuickEntryInput): Promise<JournalEntry> {
   const now = Date.now();
   const title = input.title.trim();
+
+  if (!title) {
+    throw new Error('Journal title is required');
+  }
   const notes = input.notes.trim();
   const thesisSections = [title, notes].filter(Boolean);
   const thesis = thesisSections.join('\n\n') || undefined;

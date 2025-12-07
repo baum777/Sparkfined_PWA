@@ -21,7 +21,7 @@ export default function AnalysisLayout({
   showHeader = true,
 }: AnalysisLayoutProps) {
   return (
-    <div className="card-glass space-y-6 rounded-2xl p-4 sm:p-6">
+    <div className="card-glass space-y-6 rounded-2xl p-4 sm:p-6" data-testid="analysis-layout">
       <div className="md:hidden">
         <AnalysisSidebarTabs tabs={tabs} activeTab={activeTab} onTabChange={onTabChange} orientation="horizontal" />
       </div>

@@ -209,8 +209,8 @@ export default function AnalysisPageV2() {
       const statsLoading = !analysisStats.length && isMarketLoading;
       const statsError = marketError && !analysisStats.length ? marketError : null;
 
-      return (
-        <div className="space-y-6">
+          return (
+        <div className="space-y-6" data-testid="analysis-overview-section">
           <div className="space-y-4">
             <p className="text-xs uppercase tracking-[0.25em] text-text-tertiary">Current AI Insight</p>
             <h2 className="text-2xl font-semibold text-text-primary">{summaryHeadline}</h2>
@@ -226,11 +226,15 @@ export default function AnalysisPageV2() {
               showMockBadge={isInsightMock}
               title="Analysis snapshot"
               description={statsDescription}
+              dataTestId="analysis-overview-stats"
             />
           </div>
 
           {trendInsight ? (
-            <div className="space-y-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/5 p-4">
+            <div
+              className="space-y-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/5 p-4"
+              data-testid="analysis-trend-block"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-xs uppercase tracking-[0.25em] text-emerald-200/80">Social trend</p>
@@ -307,7 +311,7 @@ export default function AnalysisPageV2() {
       }
     >
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8">
-        <section className="space-y-3">
+        <section className="space-y-3" data-testid="analysis-page-root">
           <div className="space-y-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Pattern analysis</p>
             <p className="text-base text-text-primary">Deep dives into setups, timing, and sentiment.</p>

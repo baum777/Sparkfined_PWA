@@ -22,9 +22,11 @@ import {
   markAsActive,
   closeEntry,
   exportEntries,
+  importJournalEntries,
 } from '@/lib/JournalService';
-import { initDB } from '@/lib/db';
-import type { JournalEntry, TradeOutcome } from '@/types/journal';
+import { initDB, resetDbInstance } from '@/lib/db';
+import type { JournalEntry, JournalImportPayload, TradeOutcome } from '@/types/journal';
+import { createQuickJournalEntry } from '@/store/journalStore';
 
 // Helper: Clear journal_entries store before each test
 async function clearJournalStore(): Promise<void> {
@@ -48,6 +50,36 @@ async function countEntries(): Promise<number> {
     const request = store.count();
 
     request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function seedLegacyV4Database(): Promise<void> {
+  resetDbInstance();
+
+  await new Promise<void>((resolve, reject) => {
+    const deleteRequest = indexedDB.deleteDatabase('sparkfined-ta-pwa');
+    deleteRequest.onsuccess = () => resolve();
+    deleteRequest.onerror = () => reject(deleteRequest.error);
+  });
+
+  await new Promise<void>((resolve, reject) => {
+    const request = indexedDB.open('sparkfined-ta-pwa', 4);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (db.objectStoreNames.contains('journal_entries')) {
+        db.deleteObjectStore('journal_entries');
+      }
+      const store = db.createObjectStore('journal_entries', { keyPath: 'id' });
+      store.add({ id: 'legacy-1', title: 'Legacy Migration Entry', createdAt: 1_700_000_000_000 });
+    };
+
+    request.onsuccess = () => {
+      request.result.close();
+      resolve();
+    };
+
     request.onerror = () => reject(request.error);
   });
 }
@@ -541,7 +573,128 @@ describe('Journal CRUD Operations', () => {
     });
   });
 
+  describe('Import & Migration', () => {
+    it('imports entries and merges with existing ones without creating duplicate IDs', async () => {
+      const existing = await createEntry({
+        ticker: 'SOL',
+        address: 'existing',
+        setup: 'breakout',
+        emotion: 'confident',
+        status: 'active',
+        timestamp: Date.now(),
+        thesis: 'Existing thesis',
+      });
+
+      const payload: JournalImportPayload = {
+        version: 5,
+        entries: [
+          { ...existing, thesis: 'Merged thesis' },
+          {
+            id: 'import-1',
+            ticker: 'NEW',
+            address: 'new-address',
+            setup: 'custom',
+            emotion: 'custom',
+            status: 'active',
+            timestamp: Date.now(),
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          },
+        ],
+      };
+
+      const result = await importJournalEntries(payload, 'merge');
+
+      expect(result.imported).toBe(1);
+      expect(result.updated).toBe(1);
+      expect(result.skipped).toBe(0);
+
+      const entries = await queryEntries();
+      const merged = entries.find((entry) => entry.id === existing.id);
+      const imported = entries.find((entry) => entry.id === 'import-1');
+
+      expect(merged?.thesis).toBe('Merged thesis');
+      expect(imported).toBeTruthy();
+    });
+
+    it('skips payload duplicates when replacing the store', async () => {
+      const payload: JournalImportPayload = {
+        version: 5,
+        entries: [
+          {
+            id: 'dupe-1',
+            ticker: 'DUP',
+            address: 'dup-address',
+            setup: 'custom',
+            emotion: 'custom',
+            status: 'active',
+            timestamp: Date.now(),
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          },
+          {
+            id: 'dupe-1',
+            ticker: 'DUP',
+            address: 'dup-address',
+            setup: 'custom',
+            emotion: 'custom',
+            status: 'active',
+            timestamp: Date.now(),
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          },
+        ],
+      };
+
+      const result = await importJournalEntries(payload, 'replace');
+
+      expect(result.imported).toBe(1);
+      expect(result.updated).toBe(0);
+      expect(result.skipped).toBe(1);
+
+      const entries = await queryEntries();
+      expect(entries).toHaveLength(1);
+    });
+
+    it(
+      'migrates legacy v4 journal entries to v5 schema on DB upgrade',
+      async () => {
+        await seedLegacyV4Database();
+
+        await initDB();
+
+        const entries = await queryEntries();
+        const migrated = entries.find((entry) => entry.id === 'legacy-1');
+
+        expect(migrated).toBeTruthy();
+        expect(migrated?.setup).toBe('custom');
+        expect(migrated?.emotion).toBe('custom');
+        expect(migrated?.status).toBe('active');
+        expect(migrated?.timestamp).toBeTruthy();
+      },
+      10000,
+    );
+  });
+
   describe('Edge Cases', () => {
+    it('rejects creating journal with empty title', async () => {
+      await expect(
+        createQuickJournalEntry({
+          title: '',
+          notes: 'Should fail',
+        }),
+      ).rejects.toThrow('Journal title is required');
+    });
+
+    it('rejects creating journal with whitespace-only title', async () => {
+      await expect(
+        createQuickJournalEntry({
+          title: '   ',
+          notes: 'Should fail',
+        }),
+      ).rejects.toThrow('Journal title is required');
+    });
+
     it('should handle large notes (>10KB text)', async () => {
       const largeNotes = 'A'.repeat(15000); // 15KB of text
 

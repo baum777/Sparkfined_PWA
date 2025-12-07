@@ -29,7 +29,8 @@ Push Notifications funktionieren nur **manuell getestet**. Es gibt:
 **Aktueller Stand**:
 - ✅ API Contract Tests in `tests/api/push-notifications.test.ts`
 - ✅ VAPID Setup Doku in `docs/core/setup/push-notifications.md`
-- ⚠️ PushManager Mock + E2E Alert→Push Flow fehlen noch
+- ✅ PushManager Mock + E2E Alert→Push Flow: Vitest in `tests/unit/push.service.test.ts`, Playwright in `tests/e2e/alerts/alerts.push.spec.ts`
+- ✅ Permission-Denied + VAPID-Fallbacks abgedeckt (unit mocks + UI-Fallback im Push-Client)
 
 ---
 

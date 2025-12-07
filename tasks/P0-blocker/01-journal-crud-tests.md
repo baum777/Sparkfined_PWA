@@ -49,15 +49,15 @@ beforeEach(async () => {
 - [x] **Delete**: Entry löschen → Aus DB entfernt
 
 ### 3. Edge Cases
-- [ ] Leerer Titel → Validation Error (nur E2E abgedeckt, Unit fehlt)
-- [ ] Duplicate ID Handling
+- [x] Leerer Titel → Validation Error (nur E2E abgedeckt, Unit fehlt)
+- [x] Duplicate ID Handling
 - [x] Concurrent Updates
 - [x] Large Notes (>10KB Text)
 
 ### 4. Export/Import Tests
 - [x] Export → JSON Format korrekt (inkl. CSV in `journal.crud.test.ts`)
-- [ ] Import → Merge vs. Replace Logic
-- [ ] Schema Migration (wenn v4 → v5)
+- [x] Import → Merge vs. Replace Logic
+- [x] Schema Migration (wenn v4 → v5)
 
 ---
 
@@ -164,7 +164,15 @@ pnpm typecheck
 
 **Zuständig**: Dev Team
 **Reviewer**: Tech Lead
-**Status**: 🟡 TEILWEISE ERLEDIGT (CRUD/Export-Tests aktiv, Import/Validierungsfälle offen)
+**Status**: 🟢 DONE (CRUD + Validation + Import/Migration abgedeckt)
+
+**Neue Tests**:
+- `tests/unit/journal.crud.test.ts`
+  - lehnt leere/Whitespace-Titel über `createQuickJournalEntry` ab
+  - verhindert doppelte IDs via Merge-/Replace-Import-Pfade
+  - Import-Merge-Test (bestehende Einträge werden aktualisiert, neue hinzugefügt)
+  - Replace-Pfad mit duplicate-skip
+  - Migrationstest von v4→v5 Schema
 
 ---
 
