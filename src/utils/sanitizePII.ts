@@ -50,25 +50,28 @@ const CREDITCARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
  * Matches: +49 176 12345678, 0176-12345678, 0176 1234567
  * Prefix +49 or 0, then mobile codes (15x, 16x, 17x)
  * Captures full number INCLUDING international prefix
+ * Requires at least one separator to avoid matching plain digit sequences
  */
-const GERMAN_PHONE_REGEX = /\+?49[\s\-]?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4,5}\b|(?:^|[^\d])0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
+const GERMAN_PHONE_REGEX = /\+?49[\s\-](?:0?1[5-7][0-9])[\s\-]\d{3,4}[\s\-]\d{4,5}\b|(?:^|[^\d])0?1[5-7][0-9][\s\-]\d{3,4}[\s\-]\d{4,5}\b/g;
 
 /**
  * US phone numbers (various formats)
- * Matches: +1 (555) 123-4567, (555) 123-4567, 555-123-4567, 5551234567
+ * Matches: +1 (555) 123-4567, (555) 123-4567, 555-123-4567
  * Captures full number INCLUDING +1 country code if present
  * CRITICAL: Must NOT match credit cards (uses word boundaries and format checks)
+ * Require at least one separator/formatting to avoid matching plain 10-digit numbers
+ * (e.g. volumes like 1234567890 should NOT be treated as phone)
  */
-const US_PHONE_REGEX = /(?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b/g;
+const US_PHONE_REGEX = /(?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]\d{3}[\s\-]\d{4}\b/g;
 
 // Wrapped variants to preserve preceding character (space, punctuation)
 // Group 1 = prefix (may be space/colon/start)
 // Group 2 = actual phone number
 const GERMAN_MOBILE_WRAPPED_REGEX =
-  /(^|[^\d])(\+?49[\s\-]?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4,5}\b|0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b)/g;
+  /(^|[^\d])(\+?49[\s\-](?:0?1[5-7][0-9])[\s\-]\d{3,4}[\s\-]\d{4,5}\b|0?1[5-7][0-9][\s\-]\d{3,4}[\s\-]\d{4,5}\b)/g;
 
 const US_PHONE_WRAPPED_REGEX =
-  /(^|[^\d])((?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b)/g;
+  /(^|[^\d])((?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]\d{3}[\s\-]\d{4}\b)/g;
 
 const LOCAL_SHORT_PHONE_REGEX =
   /(^|[^\d])(\d{3}[-\s]\d{4}\b)/g;
@@ -165,33 +168,21 @@ export function sanitizePII(input: string): string {
   // Credit Card numbers
   sanitized = sanitized.replace(CREDITCARD_REGEX, "[REDACTED-CC]");
 
-  // Phone numbers (German, US, local short) – preserve spacing & vermeiden Over-Redaction
-  // Nur Strings mit „Formatzeichen" (Leerzeichen, Bindestrich, Klammern, +) werden als Phone behandelt.
-  const hasPhoneFormatting = (num: string) => /[()\s\-+]/.test(num);
-  
+  // Phone numbers (German, US, local short) – preserve spacing & prefixes
+  // Regexes enforce at least one separator/formatting character
+  // (plain digit-only sequences like 1234567890 won't match)
   sanitized = sanitized
     .replace(
       GERMAN_MOBILE_WRAPPED_REGEX,
-      (_match: string, prefix: string, num: string) => {
-        if (!hasPhoneFormatting(num)) {
-          // z.B. Volume: 1234567890 → nicht als Phone werten
-          return `${prefix}${num}`;
-        }
-        return `${prefix}[REDACTED-PHONE]`;
-      }
+      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
     )
     .replace(
       US_PHONE_WRAPPED_REGEX,
-      (_match: string, prefix: string, num: string) => {
-        if (!hasPhoneFormatting(num)) {
-          return `${prefix}${num}`;
-        }
-        return `${prefix}[REDACTED-PHONE]`;
-      }
+      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
     )
     .replace(
       LOCAL_SHORT_PHONE_REGEX,
-      (_match: string, prefix: string, num: string) => `${prefix}[REDACTED-PHONE]`
+      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
     );
 
   // Step 3: Restore crypto addresses unchanged

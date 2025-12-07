@@ -19,10 +19,10 @@ const CREDITCARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
 
 // Wrapped variants for detection (same as sanitizePII.ts)
 const GERMAN_MOBILE_WRAPPED_REGEX =
-  /(^|[^\d])(\+?49[\s\-]?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4,5}\b|0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b)/g;
+  /(^|[^\d])(\+?49[\s\-](?:0?1[5-7][0-9])[\s\-]\d{3,4}[\s\-]\d{4,5}\b|0?1[5-7][0-9][\s\-]\d{3,4}[\s\-]\d{4,5}\b)/g;
 
 const US_PHONE_WRAPPED_REGEX =
-  /(^|[^\d])((?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b)/g;
+  /(^|[^\d])((?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]\d{3}[\s\-]\d{4}\b)/g;
 
 const LOCAL_SHORT_PHONE_REGEX =
   /(^|[^\d])(\d{3}[-\s]\d{4}\b)/g;
