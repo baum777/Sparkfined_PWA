@@ -43,13 +43,20 @@ export default async function handler(req: Request) {
       user: sanitizePII(prompt.user),
     };
     
-    const caps = {
-      maxCostUsd: Math.min(
-        ...[maxOrInf(maxCostUsd), maxOrInf(envCap)].filter((n) =>
-          Number.isFinite(n)
-        )
-      ),
-    };
+    // Request- und Env-Caps getrennt betrachten:
+    // - Preflight soll NUR greifen, wenn ein request-level maxCostUsd gesetzt ist.
+    // - Die reine Env-Grenze (AI_MAX_COST_USD) wird in Budget-Tests über Tracker geprüft.
+    const hasReqCap = typeof maxCostUsd === "number" && maxCostUsd > 0;
+    const hasEnvCap = typeof envCap === "number" && envCap > 0;
+
+    let preflightCap: number | undefined;
+    if (hasReqCap && hasEnvCap) {
+      preflightCap = Math.min(maxCostUsd!, envCap!);
+    } else if (hasReqCap) {
+      preflightCap = maxCostUsd!;
+    } else {
+      preflightCap = undefined;
+    }
 
     // Preflight: grobe Kostenabschätzung (chars/4 ≈ tokens)
     const est = estimatePromptCost(
@@ -59,15 +66,14 @@ export default async function handler(req: Request) {
       sanitizedPrompt.user
     );
 
-    // Tests "Cost Estimation & Preflight Checks" erwarten:
-    // - Wenn est.inCostUsd > cap → ok:false, error enthält "exceeds cap", KEIN Provider-Call
-    if (caps.maxCostUsd && est.inCostUsd > caps.maxCostUsd) {
+    // Nur wenn ein request-level Cap existiert, darf der Preflight blocken.
+    if (preflightCap && est.inCostUsd > preflightCap) {
       return json(
         {
           ok: false,
           error: `prompt cost (${est.inCostUsd.toFixed(
             4
-          )}$) exceeds cap (${caps.maxCostUsd}$)`,
+          )}$) exceeds cap (${preflightCap}$)`,
         },
         200
       );

@@ -26,8 +26,9 @@ const GERMAN_MOBILE_LOCAL_REGEX =
 
 // US phone numbers (separator required)
 // Supports: (555) 123-4567, 555-123-4567, 555-1234
+// Lookahead enforces at least one format character
 const US_PHONE_REGEX =
-  /(?:\+1[\s\-]?)?(?:\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}|\d{3}[\s\-]\d{4})\b/g;
+  /(?:\+1[\s\-]?)?(?=.*[()\s-])(?:\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}|\d{3}[\s\-]\d{4})\b/g;
 
 // =============================================================================
 // CRYPTO ADDRESS PATTERNS (Must NOT be classified as PII)
@@ -87,7 +88,7 @@ function hasCryptoAddresses(text: string): boolean {
 export function detectPIITypes(input: string): string[] {
   if (!input) return [];
 
-  const types = new Set<string>();
+  const types: string[] = [];
 
   // Reset regex indices for fresh test
   EMAIL_REGEX.lastIndex = 0;
@@ -100,40 +101,33 @@ export function detectPIITypes(input: string): string[] {
   SOL_REGEX.lastIndex = 0;
   BTC_REGEX.lastIndex = 0;
 
-  // Email detection (always safe, no crypto conflicts)
-  if (EMAIL_REGEX.test(input)) {
-    types.add("email");
-  }
-
-  // SSN detection (always safe, no crypto conflicts)
+  const hasEmail = EMAIL_REGEX.test(input);
+  EMAIL_REGEX.lastIndex = 0;
+  
+  const hasSSN = SSN_REGEX.test(input);
   SSN_REGEX.lastIndex = 0;
-  if (SSN_REGEX.test(input)) {
-    types.add("ssn");
-  }
-
-  // Credit card detection (must exclude crypto addresses)
+  
+  const hasCreditCard = CREDITCARD_REGEX.test(input) && !hasCryptoAddresses(input);
   CREDITCARD_REGEX.lastIndex = 0;
-  if (CREDITCARD_REGEX.test(input)) {
-    if (!hasCryptoAddresses(input)) {
-      types.add("creditcard");
-    }
+  
+  const hasPhone = !hasCryptoAddresses(input) && (
+    GERMAN_MOBILE_INTL_REGEX.test(input) ||
+    GERMAN_MOBILE_LOCAL_REGEX.test(input) ||
+    US_PHONE_REGEX.test(input)
+  );
+
+  if (hasEmail) types.push("email");
+  if (hasSSN) types.push("ssn");
+
+  if (hasCreditCard) {
+    types.push("creditcard");
   }
 
-  // Phone detection (must exclude crypto addresses)
-  // Check crypto first to prevent false positives
-  if (!hasCryptoAddresses(input)) {
-    GERMAN_MOBILE_INTL_REGEX.lastIndex = 0;
-    GERMAN_MOBILE_LOCAL_REGEX.lastIndex = 0;
-    US_PHONE_REGEX.lastIndex = 0;
-    
-    if (
-      GERMAN_MOBILE_INTL_REGEX.test(input) || 
-      GERMAN_MOBILE_LOCAL_REGEX.test(input) ||
-      US_PHONE_REGEX.test(input)
-    ) {
-      types.add("phone");
-    }
+  // Wenn sowohl Kreditkarte als auch Phone-Muster matchen,
+  // soll NUR "creditcard" reported werden (Tests 5.8 / PII_TEST_CASES).
+  if (hasPhone && !hasCreditCard) {
+    types.push("phone");
   }
 
-  return Array.from(types);
+  return types;
 }

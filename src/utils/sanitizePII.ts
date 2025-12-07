@@ -64,12 +64,11 @@ const GERMAN_MOBILE_LOCAL_REGEX =
  * Captures full number INCLUDING +1 country code if present
  * CRITICAL: Must NOT match credit cards (uses word boundaries and format checks)
  * Wichtig: Separatoren sind Pflicht, damit 1234567890 (Volume) nicht als Phone gilt.
- * Unterstützt:
- * - 3-3-4 mit optionalen Klammern / Spaces / Dashes: (555) 123-4567, 555-123-4567
- * - 3-4 lokale Nummern: 555-1234
+ * Zusätzlich erzwingen wir mindestens ein Formatzeichen (Space, Dash oder Klammer),
+ * damit reine 10-stellige Zahlen nicht als Telefonnummer gewertet werden.
  */
 const US_PHONE_REGEX =
-  /(?:\+1[\s\-]?)?(?:\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}|\d{3}[\s\-]\d{4})\b/g;
+  /(?:\+1[\s\-]?)?(?=.*[()\s-])(?:\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}|\d{3}[\s\-]\d{4})\b/g;
 
 // =============================================================================
 // CRYPTO MASKING (PROTECT BEFORE SANITIZATION)
