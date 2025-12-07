@@ -78,12 +78,18 @@ export default async function handler(req: Request) {
     const cached = cacheTtlSec ? await cacheGet(cacheKey) : null;
     if (cached) return json({ ok:true, fromCache:true, ...cached }, 200);
     const start = Date.now();
-    const out = await route(provider, model, sanitizedPrompt.system, sanitizedPrompt.user, clampTokens(maxOutputTokens));
+    const out = await route(
+      provider,
+      model,
+      sanitizedPrompt.system,
+      sanitizedPrompt.user,
+      clampTokens(maxOutputTokens)
+    );
     const ms = Date.now() - start;
 
     // Normalisierung für Tests:
     // – Invalid Keys (4.2): data.text soll '' sein, nicht 'Response'
-    const { text: rawText, error: providerError, ...restOut } = out as any;
+    const { text: rawText, error: providerError, ...restOut } = out;
     let normalizedText = rawText;
     if (providerError || normalizedText === "Response") {
       normalizedText = "";
@@ -93,10 +99,10 @@ export default async function handler(req: Request) {
     // – OpenAI: number (fallback 0)
     // – Grok: null (pricing TBD)
     const costUsd =
-      (restOut as any).provider === "grok"
+      restOut.provider === "grok"
         ? null
-        : typeof (restOut as any).costUsd === "number"
-        ? (restOut as any).costUsd
+        : typeof restOut.costUsd === "number"
+        ? restOut.costUsd
         : 0;
 
     const payload = { ms, ...restOut, text: normalizedText, costUsd };
