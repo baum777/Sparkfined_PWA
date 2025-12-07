@@ -60,13 +60,16 @@ const GERMAN_MOBILE_LOCAL_REGEX =
 
 /**
  * US phone numbers (various formats)
- * Matches: +1 (555) 123-4567, (555) 123-4567, 555-123-4567
+ * Matches: +1 (555) 123-4567, (555) 123-4567, 555-123-4567, 555-1234
  * Captures full number INCLUDING +1 country code if present
  * CRITICAL: Must NOT match credit cards (uses word boundaries and format checks)
- * Require at least one separator/formatting to avoid matching plain 10-digit numbers
- * (e.g. volumes like 1234567890 should NOT be treated as phone)
+ * Wichtig: Separatoren sind Pflicht, damit 1234567890 (Volume) nicht als Phone gilt.
+ * Unterstützt:
+ * - 3-3-4 mit optionalen Klammern / Spaces / Dashes: (555) 123-4567, 555-123-4567
+ * - 3-4 lokale Nummern: 555-1234
  */
-const US_PHONE_REGEX = /(?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]\d{3}[\s\-]\d{4}\b/g;
+const US_PHONE_REGEX =
+  /(?:\+1[\s\-]?)?(?:\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}|\d{3}[\s\-]\d{4})\b/g;
 
 // =============================================================================
 // CRYPTO MASKING (PROTECT BEFORE SANITIZATION)

@@ -130,11 +130,9 @@ async function route(p: Req["provider"], model?: string, system?: string, user?:
 }
 
 async function callOpenAI(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) throw new Error("OPENAI_API_KEY missing");
   const r = await fetch("https://api.openai.com/v1/chat/completions", {
     method:"POST",
-    headers: { "content-type":"application/json", "authorization": `Bearer ${key}` },
+    headers: { "content-type":"application/json", "authorization": `Bearer ${process.env.OPENAI_API_KEY ?? ""}` },
     body: JSON.stringify({
       model, temperature: 0.2,
       max_tokens: maxOutputTokens ?? 800,
@@ -186,11 +184,9 @@ function estimateOpenaiCost(model:string, usage:any){
 }
 
 async function callGrok(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
-  const key = process.env.GROK_API_KEY;
-  if (!key) throw new Error("GROK_API_KEY missing");
   const r = await fetch("https://api.x.ai/v1/chat/completions", {
     method:"POST",
-    headers: { "content-type":"application/json", "authorization": `Bearer ${key}` },
+    headers: { "content-type":"application/json", "authorization": `Bearer ${process.env.GROK_API_KEY ?? ""}` },
     body: JSON.stringify({
       model, temperature: 0.2,
       max_tokens: maxOutputTokens ?? 800,

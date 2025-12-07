@@ -25,8 +25,9 @@ const GERMAN_MOBILE_LOCAL_REGEX =
   /\b0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
 
 // US phone numbers (separator required)
+// Supports: (555) 123-4567, 555-123-4567, 555-1234
 const US_PHONE_REGEX =
-  /(?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]\d{3}[\s\-]\d{4}\b/g;
+  /(?:\+1[\s\-]?)?(?:\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}|\d{3}[\s\-]\d{4})\b/g;
 
 // =============================================================================
 // CRYPTO ADDRESS PATTERNS (Must NOT be classified as PII)
