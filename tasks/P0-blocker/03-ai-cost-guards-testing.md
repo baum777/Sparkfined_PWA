@@ -347,5 +347,5 @@ Nach Launch überwachen:
 ---
 
 **Owner**: Backend Team
-**Status**: 🔴 KRITISCH - NICHT GESTARTET
+**Status**: ✅ DONE (abgedeckt in `tests/api/ai-cost-guards.test.ts`)
 **Deadline**: Vor Production Deploy (Woche 2)

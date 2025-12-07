@@ -21,6 +21,11 @@ E2E Test-Suite hat kritische Lücken:
 - `tests/e2e/journal/journal.flows.spec.ts` - Flaky
 - `tests/cases/analyze-bullets-ai/ABA-INTEG-010.test.ts` - Geskippt
 
+**Aktueller Stand**:
+- ✅ `tests/e2e/replay.spec.ts` reaktiviert mit OHLC-Mocks
+- ✅ Journal Flows stabilisiert (Scroll/DB-Cleanup in `tests/e2e/journal/journal.flows.spec.ts`)
+- ⚠️ Analyze Page/Idea-Packet E2E weiterhin fehlend
+
 ---
 
 ## Test Status Overview
@@ -385,5 +390,5 @@ pnpm test:e2e:ui
 ---
 
 **Owner**: QA + Frontend Team
-**Status**: 🔴 KRITISCH - NICHT GESTARTET
+**Status**: 🟡 TEILWEISE ERLEDIGT (Replay/Journal Flows stabilisiert, Analyze-E2E noch offen)
 **Deadline**: Woche 2 (Sprint 2)

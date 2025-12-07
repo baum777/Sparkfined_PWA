@@ -43,19 +43,19 @@ beforeEach(async () => {
 ```
 
 ### 2. CRUD Lifecycle Tests
-- [ ] **Create**: Entry erstellen → Prüfen ob in DB
-- [ ] **Read**: Entries abrufen → Sortierung (newest first)
-- [ ] **Update**: Notes ändern → Persistenz prüfen
-- [ ] **Delete**: Entry löschen → Aus DB entfernt
+- [x] **Create**: Entry erstellen → Prüfen ob in DB (siehe `tests/unit/journal.crud.test.ts`)
+- [x] **Read**: Entries abrufen → Sortierung (newest first)
+- [x] **Update**: Notes ändern → Persistenz prüfen
+- [x] **Delete**: Entry löschen → Aus DB entfernt
 
 ### 3. Edge Cases
-- [ ] Leerer Titel → Validation Error
+- [ ] Leerer Titel → Validation Error (nur E2E abgedeckt, Unit fehlt)
 - [ ] Duplicate ID Handling
-- [ ] Concurrent Updates
-- [ ] Large Notes (>10KB Text)
+- [x] Concurrent Updates
+- [x] Large Notes (>10KB Text)
 
 ### 4. Export/Import Tests
-- [ ] Export → JSON Format korrekt
+- [x] Export → JSON Format korrekt (inkl. CSV in `journal.crud.test.ts`)
 - [ ] Import → Merge vs. Replace Logic
 - [ ] Schema Migration (wenn v4 → v5)
 
@@ -164,7 +164,7 @@ pnpm typecheck
 
 **Zuständig**: Dev Team
 **Reviewer**: Tech Lead
-**Status**: 🔴 NICHT GESTARTET
+**Status**: 🟡 TEILWEISE ERLEDIGT (CRUD/Export-Tests aktiv, Import/Validierungsfälle offen)
 
 ---
 
