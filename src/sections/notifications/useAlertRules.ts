@@ -1,4 +1,5 @@
 import React from "react";
+import { pushClient } from "../../lib/push";
 import type { UiAlertRule, AlertTrigger } from "./types";
 
 const RULES_KEY = "sparkfined.alerts.v1";
@@ -26,12 +27,18 @@ export function useAlertRules() {
       }
       // optional browser notification
       if (Notification?.permission === "granted") {
-        try { 
-          new Notification(`Alert: ${trig.kind}`, { body: `t=${new Date(trig.t).toLocaleString()}  c=${trig.c ?? "-"}` }); 
+        try {
+          new Notification(`Alert: ${trig.kind}`, { body: `t=${new Date(trig.t).toLocaleString()}  c=${trig.c ?? "-"}` });
         } catch (err) {
           console.error('Failed to show notification:', err);
         }
       }
+      void pushClient.queueAlertPush({
+        alertId: detail?.ruleId || trig.id,
+        title: detail?.title || `Alert triggered: ${trig.kind}`,
+        body: detail?.body || String(trig.c ?? ""),
+        url: detail?.url || "/notifications",
+      });
     };
     window.addEventListener("alerts:trigger" as any, onEvt as any);
     return () => window.removeEventListener("alerts:trigger" as any, onEvt as any);
@@ -64,6 +71,12 @@ export function useAlertRules() {
   const clearTriggers = () => setTriggers([]);
   const addManualTrigger = (t:number, payload:any) => {
     setTriggers(ts => [{ ts:t, ...payload }, ...ts].slice(0, 2000));
+    void pushClient.queueAlertPush({
+      alertId: payload?.ruleId || "manual",
+      title: payload?.title || "Alert ausgelöst",
+      body: payload?.body || String(payload?.c ?? payload?.price ?? ""),
+      url: payload?.url || "/notifications",
+    });
     // zus?tzlich serverseitig dispatchen
     try {
       fetch("/api/alerts/dispatch", {

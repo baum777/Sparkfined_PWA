@@ -22,6 +22,8 @@ import type {
   SetupTag,
   EmotionTag,
   TradeOutcome,
+  JournalImportPayload,
+  LegacyJournalEntryV4,
 } from '@/types/journal'
 import type { JournalEvent } from '@/types/journalEvents'
 
@@ -97,6 +99,11 @@ export async function createEntry(
     createdAt: now,
     updatedAt: now,
     ...entry,
+  }
+
+  const existing = await getEntry(newEntry.id)
+  if (existing) {
+    throw new Error(`Duplicate journal entry id: ${newEntry.id}`)
   }
 
   return new Promise((resolve, reject) => {
@@ -627,4 +634,139 @@ export async function exportEntries(
   }
 
   throw new Error(`Unsupported format: ${format}`)
+}
+
+// ============================================================================
+// IMPORT & MERGE
+// ============================================================================
+
+function deriveTickerFromTitle(title?: string): string {
+  if (!title) return 'MANUAL'
+  const sanitized = title.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
+  return sanitized.slice(0, 12) || 'MANUAL'
+}
+
+function normalizeLegacyV4(entry: LegacyJournalEntryV4): JournalEntry {
+  const now = Date.now()
+  const thesisSections = [entry.title?.trim(), entry.notes?.trim()].filter(Boolean)
+
+  return {
+    id: entry.id || crypto.randomUUID(),
+    ticker: deriveTickerFromTitle(entry.title),
+    address: 'legacy-import',
+    setup: 'custom',
+    emotion: 'custom',
+    status: 'active',
+    timestamp: now,
+    createdAt: now,
+    updatedAt: now,
+    thesis: thesisSections.join('\n\n') || undefined,
+    customTags: entry.tags,
+  }
+}
+
+function ensureCurrentSchema(entry: JournalEntry | LegacyJournalEntryV4): JournalEntry {
+  if ('ticker' in entry) {
+    const timestamp = entry.timestamp ?? entry.createdAt ?? Date.now()
+    return {
+      ...entry,
+      id: entry.id || crypto.randomUUID(),
+      ticker: entry.ticker || 'MANUAL',
+      address: entry.address || 'manual-entry',
+      setup: entry.setup || 'custom',
+      emotion: entry.emotion || 'custom',
+      status: entry.status || 'active',
+      timestamp,
+      createdAt: entry.createdAt ?? timestamp,
+      updatedAt: entry.updatedAt ?? timestamp,
+    }
+  }
+
+  return normalizeLegacyV4(entry)
+}
+
+function mergePersistedEntry(
+  existing: JournalEntry,
+  incoming: JournalEntry,
+): JournalEntry {
+  return {
+    ...existing,
+    ...incoming,
+    createdAt: existing.createdAt ?? incoming.createdAt,
+    timestamp: existing.timestamp ?? incoming.timestamp,
+    updatedAt: incoming.updatedAt ?? Date.now(),
+  }
+}
+
+export async function importJournalEntries(
+  payload: JournalImportPayload,
+  strategy: 'merge' | 'replace' = 'merge',
+): Promise<{ imported: number; updated: number; skipped: number }> {
+  const db = await initDB()
+
+  const normalizedEntries = payload.entries.map((entry) =>
+    payload.version <= 4 ? normalizeLegacyV4(entry as LegacyJournalEntryV4) : ensureCurrentSchema(entry),
+  )
+
+  const existingEntries = await new Promise<JournalEntry[]>((resolve, reject) => {
+    const transaction = db.transaction(['journal_entries'], 'readonly')
+    const store = transaction.objectStore('journal_entries')
+    const request = store.getAll()
+
+    request.onsuccess = () => resolve(request.result as JournalEntry[])
+    request.onerror = () => reject(request.error)
+  })
+
+  const existingMap = new Map(existingEntries.map((entry) => [entry.id, entry]))
+  const seenIds = new Set<string>()
+  const toPersist: JournalEntry[] = []
+
+  let imported = 0
+  let updated = 0
+  let skipped = 0
+
+  for (const entry of normalizedEntries) {
+    if (seenIds.has(entry.id)) {
+      skipped += 1
+      continue
+    }
+    seenIds.add(entry.id)
+
+    if (strategy === 'replace') {
+      toPersist.push(entry)
+      continue
+    }
+
+    const existing = existingMap.get(entry.id)
+    if (existing) {
+      toPersist.push(mergePersistedEntry(existing, entry))
+      updated += 1
+    } else {
+      toPersist.push(entry)
+      imported += 1
+    }
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    const transaction = db.transaction(['journal_entries'], 'readwrite')
+    const store = transaction.objectStore('journal_entries')
+
+    if (strategy === 'replace') {
+      store.clear()
+    }
+
+    toPersist.forEach((entry) => {
+      store.put(entry)
+    })
+
+    transaction.oncomplete = () => resolve()
+    transaction.onerror = () => reject(transaction.error)
+  })
+
+  if (strategy === 'replace') {
+    imported = toPersist.length
+    updated = 0
+  }
+
+  return { imported, updated, skipped }
 }

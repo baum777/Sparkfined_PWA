@@ -23,6 +23,7 @@ interface AnalysisOverviewStatsProps {
   showMockBadge?: boolean;
   title?: string;
   description?: string;
+  dataTestId?: string;
 }
 
 export default function AnalysisOverviewStats({
@@ -33,6 +34,7 @@ export default function AnalysisOverviewStats({
   showMockBadge = false,
   title = 'Analysis snapshot',
   description,
+  dataTestId,
 }: AnalysisOverviewStatsProps) {
   if (isLoading) {
     return (
@@ -76,7 +78,7 @@ export default function AnalysisOverviewStats({
   }
 
   return (
-    <Card className="border-border-subtle bg-surface">
+    <Card className="border-border-subtle bg-surface" data-testid={dataTestId}>
       <CardHeader className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <CardTitle className="text-base">{title}</CardTitle>
@@ -90,6 +92,7 @@ export default function AnalysisOverviewStats({
             <article
               key={stat.id}
               className="flex items-start gap-4 rounded-2xl border border-border-subtle bg-surface-subtle/70 p-4"
+              data-testid={`analysis-stat-${stat.id}`}
             >
               <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${toneIconClass(stat.tone)}`}>
                 <stat.icon size={22} aria-hidden="true" />

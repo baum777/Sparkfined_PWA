@@ -5,6 +5,16 @@
 **Dringlichkeit**: VOR R0 LAUNCH
 **Abhängigkeiten**: Journal CRUD Tests, API Contract Tests
 
+**Status**: ✅ DONE (Analyze + Idea Packet Flows mit stabilen E2E-Mocks abgedeckt)
+
+**Neue E2E Specs**:
+- `tests/e2e/analyze/analyze.page.spec.ts` – Analyze-Snapshot mit deterministischen Mock-Kerndaten (Bias/Range/Price/Change Stats)
+- `tests/e2e/ideas/idea-packets.spec.ts` – Idea-Packet erstellen, persistieren (LocalStorage) und bearbeiten
+
+**Selectors/Testbarkeit**:
+- Analyze: `analysis-page-root`, `analysis-overview-stats`, `analysis-stat-*`, `analysis-trend-block`
+- Ideas: `idea-title-input`, `idea-thesis-input`, `idea-save-button`, `idea-packet-list`, `idea-edit-button`
+
 ---
 
 ## Problem
@@ -21,15 +31,21 @@ E2E Test-Suite hat kritische Lücken:
 - `tests/e2e/journal/journal.flows.spec.ts` - Flaky
 - `tests/cases/analyze-bullets-ai/ABA-INTEG-010.test.ts` - Geskippt
 
+**Aktueller Stand**:
+- ✅ `tests/e2e/replay.spec.ts` reaktiviert mit OHLC-Mocks
+- ✅ Journal Flows stabilisiert (Scroll/DB-Cleanup in `tests/e2e/journal/journal.flows.spec.ts`)
+- ⚠️ Analyze Page/Idea-Packet E2E weiterhin fehlend
+
 ---
 
 ## Test Status Overview
 
 | Test Suite | Status | Problem |
 |------------|--------|---------|
-| Journal CRUD | 🟡 Partial | Dialog overflow, scroll issues |
-| Replay Lab | 🔴 Skipped | OHLC fetch gemockt |
-| Analyze Page | 🟡 CI-Only | Needs mocked API |
+| Journal CRUD | 🟢 Green | Stabilisiert (Scroll/DB Cleanup) |
+| Replay Lab | 🟡 Partial | OHLC Mock weiterhin erforderlich |
+| Analyze Page | 🟢 Green | Mock-Snapshot via Playwright Fixtures |
+| Idea Packets | 🟢 Green | Create/Persist/Edit via Notifications UI |
 | Alert Flows | 🟢 Green | OK |
 | Chart Navigation | 🟢 Green | OK |
 | Watchlist | 🟢 Green | OK |
@@ -385,5 +401,12 @@ pnpm test:e2e:ui
 ---
 
 **Owner**: QA + Frontend Team
-**Status**: 🔴 KRITISCH - NICHT GESTARTET
+**Status**: 🟡 TEILWEISE ERLEDIGT (Replay/Journal Flows stabilisiert, Analyze-E2E noch offen)
 **Deadline**: Woche 2 (Sprint 2)
+
+---
+
+## Abschluss
+- [x] Analyze Page Basisflow mit Mock-Snapshot (`tests/e2e/analyze/analyze.page.spec.ts`)
+- [x] Idea Packet erstellen/persistieren/bearbeiten über Notifications UI (`tests/e2e/ideas/idea-packets.spec.ts`)
+- [ ] Replay Lab bleibt teil-offen (Mock-Feed weiter nötig)

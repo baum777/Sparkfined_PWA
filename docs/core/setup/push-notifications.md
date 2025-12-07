@@ -39,10 +39,11 @@ ALERTS_ADMIN_SECRET=<strong_random_token>
 ## Mocking and verification
 
 1) **Mock subscription** — Use `tests/data/mock-push-subscription.json` in tests or manual calls to avoid real device registrations.
-2) **Smoke tests** — With env vars set, run:
+2) **Push client & queue** — The browser-facing logic lives in `src/lib/push.ts` and records attempts via `src/store/pushQueueStore.ts`. Tests can stub `Notification`, `navigator.serviceWorker`, and `PushManager` (see `tests/mocks/push-manager.ts`).
+3) **Smoke tests** — With env vars set, run:
    - `pnpm vitest --run --testNamePattern="push"`
    - `pnpm lint api/push src/pages/NotificationsPage.tsx`
-3) **Manual probe** — Trigger a guarded send using curl:
+4) **Manual probe** — Trigger a guarded send using curl:
 
 ```bash
 curl -X POST http://localhost:3000/api/push/test-send \

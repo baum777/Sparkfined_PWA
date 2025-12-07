@@ -919,6 +919,7 @@ Checklist:
 - [ ] Ensure tests run locally via pnpm test:e2e (or equivalent).
 - [ ] Add CI step to run E2E tests on each PR / main push.
 - [ ] Make E2E tests fast and deterministic (no flakiness).
+- [x] Add deterministic Analyze + Idea Packet specs (analysis-v2 snapshot, notifications idea form).
 - [ ] Add basic reporting (which scenarios passed/failed).
 
 Handoff to Claude:

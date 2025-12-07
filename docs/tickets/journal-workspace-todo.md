@@ -19,6 +19,9 @@ sources:
 2. `/api/journal` normalisation and metric recomputation untested.
 3. AI condense flow lacks clearance for PII stripping and cost guard.
 
+## Fortschritt 2025-12-05
+- Journal CRUD Vitest-Suite erweitert: Titel-Validation, Duplicate-ID-Schutz, Import/Merge- und v4→v5-Migrationspfad abgedeckt.
+
 ## Tasks
 - [ ] Re-implement `tests/unit/journal.crud.test.ts` using Dexie in-memory adapter or vi-mocked IndexedDB; cover CRUD lifecycle + export/import.
 - [ ] Add Vitest contract tests for `/api/journal`:

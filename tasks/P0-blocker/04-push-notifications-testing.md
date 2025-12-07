@@ -26,6 +26,12 @@ Push Notifications funktionieren nur **manuell getestet**. Es gibt:
 - `src/components/alerts/NotificationsPermissionButton.tsx` - Permission UI
 - `src/hooks/useAlertRules.ts` - Ungetestet
 
+**Aktueller Stand**:
+- ✅ API Contract Tests in `tests/api/push-notifications.test.ts`
+- ✅ VAPID Setup Doku in `docs/core/setup/push-notifications.md`
+- ✅ PushManager Mock + E2E Alert→Push Flow: Vitest in `tests/unit/push.service.test.ts`, Playwright in `tests/e2e/alerts/alerts.push.spec.ts`
+- ✅ Permission-Denied + VAPID-Fallbacks abgedeckt (unit mocks + UI-Fallback im Push-Client)
+
 ---
 
 ## Push Notification Flow (Aktuell)
@@ -408,5 +414,5 @@ pnpm dev
 ---
 
 **Owner**: Frontend + Backend Team
-**Status**: 🔴 KRITISCH - NICHT GESTARTET
+**Status**: 🟡 TEILWEISE ERLEDIGT (API-Contract-Tests vorhanden, PushManager-Mock/E2E fehlen)
 **Deadline**: Woche 2 (Sprint 2)
