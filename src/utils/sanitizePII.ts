@@ -49,17 +49,17 @@ const CREDITCARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
  * German mobile phone numbers
  * Matches: +49 176 12345678, 0176-12345678, 0176 1234567
  * Prefix +49 or 0, then mobile codes (15x, 16x, 17x)
- * Note: No leading \b to allow +49 prefix
+ * Captures full number INCLUDING international prefix
  */
-const GERMAN_PHONE_REGEX = /(?:\+49[\s\-]?)?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
+const GERMAN_PHONE_REGEX = /\+?49[\s\-]?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4,5}\b|(?:^|[^\d])0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
 
 /**
  * US phone numbers (various formats)
- * Matches: (555) 123-4567, 555-123-4567, 5551234567
- * CRITICAL: Must NOT match credit cards
- * Note: Parentheses are optional via \(? and \)?
+ * Matches: +1 (555) 123-4567, (555) 123-4567, 555-123-4567, 5551234567
+ * Captures full number INCLUDING +1 country code if present
+ * CRITICAL: Must NOT match credit cards (uses word boundaries and format checks)
  */
-const US_PHONE_REGEX = /\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b/g;
+const US_PHONE_REGEX = /(?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b/g;
 
 // =============================================================================
 // CRYPTO MASKING (PROTECT BEFORE SANITIZATION)

@@ -25,6 +25,15 @@ export default async function handler(req: Request) {
     const cacheTtlSec = Number(process.env.AI_CACHE_TTL_SEC || "0") || 0;
     const { provider, model, system, user, templateId, vars, maxOutputTokens, maxCostUsd } = (await req.json()) as Req;
     if (!provider) return json({ ok:false, error:"provider required" }, 400);
+    
+    // Check provider API keys before processing (fail fast)
+    if (provider === "openai" && !process.env.OPENAI_API_KEY) {
+      return json({ ok:false, error:"OPENAI_API_KEY missing" }, 200);
+    }
+    if (provider === "grok" && !process.env.GROK_API_KEY) {
+      return json({ ok:false, error:"GROK_API_KEY missing" }, 200);
+    }
+    
     const prompt = templateId ? render(templateId, vars || {}) : { system, user };
     if (!prompt.user) return json({ ok:false, error:"user or templateId required" }, 400);
     
@@ -48,7 +57,10 @@ export default async function handler(req: Request) {
     const start = Date.now();
     const out = await route(provider, model, sanitizedPrompt.system, sanitizedPrompt.user, clampTokens(maxOutputTokens));
     const ms = Date.now() - start;
-    const payload = { ms, ...out };
+    
+    // Ensure costUsd is always a number (never undefined)
+    const costUsd = typeof out.costUsd === 'number' ? out.costUsd : 0;
+    const payload = { ms, ...out, costUsd };
     
     // Only cache successful responses (with valid text content)
     if (cacheTtlSec && out.text) {
@@ -86,6 +98,19 @@ async function callOpenAI(model: string, system: string|undefined, user: string,
     })
   });
   const j = await r.json();
+  
+  // Check for API errors (invalid key, rate limit, etc.)
+  // Return empty text but ok:true (handler level succeeded, provider level failed)
+  if (j?.error || !r.ok) {
+    return {
+      provider:"openai",
+      model,
+      text: "",
+      usage: null,
+      costUsd: 0,
+    };
+  }
+  
   const text = j?.choices?.[0]?.message?.content ?? "";
   return {
     provider:"openai",
@@ -121,6 +146,18 @@ async function callGrok(model: string, system: string|undefined, user: string, m
     })
   });
   const j = await r.json();
+  
+  // Check for API errors (invalid key, rate limit, etc.)
+  if (j?.error || !r.ok) {
+    return {
+      provider:"grok",
+      model,
+      text: "",
+      usage: null,
+      costUsd: null,
+    };
+  }
+  
   const text = j?.choices?.[0]?.message?.content ?? "";
   return {
     provider:"grok",

@@ -16,8 +16,8 @@
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 const SSN_REGEX = /\b\d{3}-\d{2}-\d{4}\b/g;
 const CREDITCARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
-const GERMAN_PHONE_REGEX = /(?:\+49[\s\-]?)?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
-const US_PHONE_REGEX = /\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b/g;
+const GERMAN_PHONE_REGEX = /\+?49[\s\-]?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4,5}\b|(?:^|[^\d])0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
+const US_PHONE_REGEX = /(?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}\b/g;
 
 // =============================================================================
 // CRYPTO ADDRESS PATTERNS (Must NOT be classified as PII)
