@@ -1,0 +1,424 @@
+{
+  "routes": [
+    {
+      "path": "/",
+      "name": "Root",
+      "type": "page",
+      "children": [
+        {
+          "path": "/landing",
+          "name": "Landing",
+          "type": "page"
+        },
+        {
+          "path": "/app",
+          "name": "AppShell",
+          "type": "layout",
+          "children": [
+            {
+              "path": "/app/dashboard",
+              "name": "Dashboard",
+              "type": "page"
+            },
+            {
+              "path": "/app/markets",
+              "name": "Markets",
+              "type": "section",
+              "children": [
+                {
+                  "path": "/app/markets/spot",
+                  "name": "SpotMarkets",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/markets/favorites",
+                  "name": "FavoriteMarkets",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/markets/search",
+                  "name": "MarketSearch",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/markets/token/:address",
+                  "name": "TokenDetail",
+                  "type": "page"
+                }
+              ]
+            },
+            {
+              "path": "/app/journal",
+              "name": "Journal",
+              "type": "section",
+              "tabs": [
+                "entries",
+                "insights",
+                "journey",
+                "social",
+                "templates",
+                "settings"
+              ],
+              "children": [
+                {
+                  "path": "/app/journal",
+                  "name": "JournalEntriesTab",
+                  "type": "page",
+                  "tab": "entries",
+                  "children": [
+                    {
+                      "path": "/app/journal/new",
+                      "name": "JournalNew",
+                      "type": "group",
+                      "children": [
+                        {
+                          "path": "/app/journal/new/quick",
+                          "name": "JournalNewQuick",
+                          "type": "page"
+                        },
+                        {
+                          "path": "/app/journal/new/advanced",
+                          "name": "JournalNewAdvanced",
+                          "type": "page"
+                        },
+                        {
+                          "path": "/app/journal/new/import",
+                          "name": "JournalNewImport",
+                          "type": "page"
+                        }
+                      ]
+                    },
+                    {
+                      "path": "/app/journal/:entryId",
+                      "name": "JournalEntryDetail",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/bulk",
+                      "name": "JournalBulkActions",
+                      "type": "page"
+                    }
+                  ]
+                },
+                {
+                  "path": "/app/journal/insights",
+                  "name": "JournalInsightsTab",
+                  "type": "page",
+                  "tab": "insights",
+                  "children": [
+                    {
+                      "path": "/app/journal/insights/list",
+                      "name": "JournalInsightsList",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/insights/:insightId",
+                      "name": "JournalInsightDetail",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/insights/history",
+                      "name": "JournalInsightsHistory",
+                      "type": "page"
+                    }
+                  ]
+                },
+                {
+                  "path": "/app/journal/journey",
+                  "name": "JournalJourneyTab",
+                  "type": "page",
+                  "tab": "journey",
+                  "children": [
+                    {
+                      "path": "/app/journal/journey/timeline",
+                      "name": "JournalJourneyTimeline",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/journey/snapshots",
+                      "name": "JournalJourneySnapshots",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/journey/goals",
+                      "name": "JournalJourneyGoals",
+                      "type": "page"
+                    }
+                  ]
+                },
+                {
+                  "path": "/app/journal/social",
+                  "name": "JournalSocialTab",
+                  "type": "page",
+                  "tab": "social",
+                  "children": [
+                    {
+                      "path": "/app/journal/social/previews",
+                      "name": "JournalSocialPreviews",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/social/templates",
+                      "name": "JournalSocialTemplates",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/social/export",
+                      "name": "JournalSocialExport",
+                      "type": "page"
+                    }
+                  ]
+                },
+                {
+                  "path": "/app/journal/templates",
+                  "name": "JournalTemplatesTab",
+                  "type": "page",
+                  "tab": "templates",
+                  "children": [
+                    {
+                      "path": "/app/journal/templates/list",
+                      "name": "JournalTemplateList",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/templates/:templateId",
+                      "name": "JournalTemplateDetail",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/templates/new",
+                      "name": "JournalTemplateNew",
+                      "type": "page"
+                    }
+                  ]
+                },
+                {
+                  "path": "/app/journal/settings",
+                  "name": "JournalSettingsTab",
+                  "type": "page",
+                  "tab": "settings",
+                  "children": [
+                    {
+                      "path": "/app/journal/settings/tags",
+                      "name": "JournalTagManager",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/settings/privacy",
+                      "name": "JournalPrivacySettings",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/settings/ai",
+                      "name": "JournalAISettings",
+                      "type": "page"
+                    },
+                    {
+                      "path": "/app/journal/settings/export",
+                      "name": "JournalExportImport",
+                      "type": "page"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "path": "/app/replay",
+              "name": "Replay",
+              "type": "section",
+              "children": [
+                {
+                  "path": "/app/replay/sessions",
+                  "name": "ReplaySessions",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/replay/session/:id",
+                  "name": "ReplaySessionDetail",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/replay/journal-link",
+                  "name": "ReplayJournalLink",
+                  "type": "page"
+                }
+              ]
+            },
+            {
+              "path": "/app/alerts",
+              "name": "Alerts",
+              "type": "section",
+              "children": [
+                {
+                  "path": "/app/alerts/list",
+                  "name": "AlertsList",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/alerts/new",
+                  "name": "AlertNew",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/alerts/:alertId",
+                  "name": "AlertDetail",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/alerts/history",
+                  "name": "AlertsHistory",
+                  "type": "page"
+                }
+              ]
+            },
+            {
+              "path": "/app/watchlists",
+              "name": "Watchlists",
+              "type": "section",
+              "children": [
+                {
+                  "path": "/app/watchlists/list",
+                  "name": "WatchlistsList",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/watchlists/:id",
+                  "name": "WatchlistDetail",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/watchlists/new",
+                  "name": "WatchlistNew",
+                  "type": "page"
+                }
+              ]
+            },
+            {
+              "path": "/app/analysis",
+              "name": "Analysis",
+              "type": "section",
+              "children": [
+                {
+                  "path": "/app/analysis/token/:address",
+                  "name": "TokenAnalysis",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/analysis/teaser-vision",
+                  "name": "TeaserVision",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/analysis/daily-oracle",
+                  "name": "DailyOracle",
+                  "type": "page"
+                }
+              ]
+            },
+            {
+              "path": "/app/settings",
+              "name": "Settings",
+              "type": "section",
+              "children": [
+                {
+                  "path": "/app/settings/profile",
+                  "name": "ProfileSettings",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/settings/theme",
+                  "name": "ThemeSettings",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/settings/integrations",
+                  "name": "IntegrationSettings",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/settings/advanced",
+                  "name": "AdvancedSettings",
+                  "type": "page"
+                }
+              ]
+            },
+            {
+              "path": "/app/help",
+              "name": "Help",
+              "type": "section",
+              "children": [
+                {
+                  "path": "/app/help/onboarding",
+                  "name": "HelpOnboarding",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/help/journal",
+                  "name": "HelpJournal",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/help/ai-insights",
+                  "name": "HelpAIInsights",
+                  "type": "page"
+                },
+                {
+                  "path": "/app/help/changelog",
+                  "name": "Changelog",
+                  "type": "page"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "/api",
+          "name": "ApiRoot",
+          "type": "api",
+          "children": [
+            {
+              "path": "/api/ai/assist",
+              "name": "AiAssist",
+              "type": "api"
+            },
+            {
+              "path": "/api/journal",
+              "name": "JournalApi",
+              "type": "api"
+            },
+            {
+              "path": "/api/journal/insights",
+              "name": "JournalInsightsApi",
+              "type": "api"
+            },
+            {
+              "path": "/api/replay",
+              "name": "ReplayApi",
+              "type": "api"
+            },
+            {
+              "path": "/api/alerts",
+              "name": "AlertsApi",
+              "type": "api"
+            },
+            {
+              "path": "/api/watchlists",
+              "name": "WatchlistsApi",
+              "type": "api"
+            },
+            {
+              "path": "/api/oracle",
+              "name": "DailyOracleApi",
+              "type": "api"
+            },
+            {
+              "path": "/api/push",
+              "name": "PushNotificationsApi",
+              "type": "api"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
