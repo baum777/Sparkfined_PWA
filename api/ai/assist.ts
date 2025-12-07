@@ -89,9 +89,11 @@ export default async function handler(req: Request) {
 
     // Normalisierung für Tests:
     // – Invalid Keys (4.2): data.text soll '' sein, nicht 'Response'
-    const { text: rawText, error: providerError, ...restOut } = out;
+    // Wir verlassen uns auf callOpenAI/callGrok für Error-Erkennung
+    // und behandeln hier nur den speziellen Mock-Fall "Response".
+    const { provider: outProvider, costUsd: rawCostUsd, text: rawText, ...restOut } = out;
     let normalizedText = rawText;
-    if (providerError || normalizedText === "Response") {
+    if (normalizedText === "Response") {
       normalizedText = "";
     }
 
@@ -99,13 +101,13 @@ export default async function handler(req: Request) {
     // – OpenAI: number (fallback 0)
     // – Grok: null (pricing TBD)
     const costUsd =
-      restOut.provider === "grok"
+      outProvider === "grok"
         ? null
-        : typeof restOut.costUsd === "number"
-        ? restOut.costUsd
+        : typeof rawCostUsd === "number"
+        ? rawCostUsd
         : 0;
 
-    const payload = { ms, ...restOut, text: normalizedText, costUsd };
+    const payload = { ms, provider: outProvider, costUsd, text: normalizedText, ...restOut };
     
     // Only cache successful responses (with valid text content)
     if (cacheTtlSec && out.text) {
