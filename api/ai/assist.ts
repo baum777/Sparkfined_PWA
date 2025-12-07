@@ -50,10 +50,10 @@ export default async function handler(req: Request) {
     const hasEnvCap = typeof envCap === "number" && envCap > 0;
 
     let preflightCap: number | undefined;
-    if (hasReqCap && hasEnvCap) {
-      preflightCap = Math.min(maxCostUsd!, envCap!);
-    } else if (hasReqCap) {
-      preflightCap = maxCostUsd!;
+    if (hasReqCap && hasEnvCap && maxCostUsd !== undefined && envCap !== undefined) {
+      preflightCap = Math.min(maxCostUsd, envCap);
+    } else if (hasReqCap && maxCostUsd !== undefined) {
+      preflightCap = maxCostUsd;
     } else {
       preflightCap = undefined;
     }
@@ -286,8 +286,6 @@ function render(templateId: "v1/analyze_bullets"|"v1/journal_condense", vars:Rec
   };
   return T[templateId](vars);
 }
-
-function maxOrInf(n?: number){ return Number.isFinite(n!) && n!>0 ? n! : Number.POSITIVE_INFINITY; }
 
 function pricePer1k(provider:string, model?:string){
   if (provider==="openai") {
