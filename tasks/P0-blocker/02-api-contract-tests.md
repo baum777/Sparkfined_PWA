@@ -291,5 +291,5 @@ pnpm typecheck
 ---
 
 **Owner**: Backend Team
-**Status**: 🔴 NICHT GESTARTET
+**Status**: ✅ DONE (siehe `tests/api/*.contract.test.ts`, `tests/api/*.api.test.ts`)
 **Deadline**: Woche 1 (Sprint 1)
