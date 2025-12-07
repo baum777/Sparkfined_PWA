@@ -48,16 +48,27 @@ const CREDITCARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
 /**
  * German mobile phone numbers
  * Matches: +49 176 12345678, 0176-12345678, 0176 1234567
- * Prefix +49 or 0, then mobile codes (15x, 16x, 17x)
+ * Wir trennen zwei Fälle:
+ * - International: +49 176 12345678
+ * - Lokal: 0176-12345678, 0172-9876543 etc.
  */
-const GERMAN_PHONE_REGEX = /\b(?:\+49[\s\-]?)?(?:0?1[5-7][0-9])[\s\-]?\d{3,4}[\s\-]?\d{4}\b/g;
+const GERMAN_MOBILE_INTL_REGEX =
+  /\+49[\s\-]?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
+
+const GERMAN_MOBILE_LOCAL_REGEX =
+  /\b0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
 
 /**
  * US phone numbers (various formats)
- * Matches: (555) 123-4567, 555-123-4567, 5551234567
- * CRITICAL: Must NOT match credit cards
+ * Matches: +1 (555) 123-4567, (555) 123-4567, 555-123-4567, 555-1234
+ * Captures full number INCLUDING +1 country code if present
+ * CRITICAL: Must NOT match credit cards (uses word boundaries and format checks)
+ * Wichtig: Separatoren sind Pflicht, damit 1234567890 (Volume) nicht als Phone gilt.
+ * Zusätzlich erzwingen wir mindestens ein Formatzeichen (Space, Dash oder Klammer),
+ * damit reine 10-stellige Zahlen nicht als Telefonnummer gewertet werden.
  */
-const US_PHONE_REGEX = /\b(?:\(\d{3}\)\s?\d{3}[-\s]?\d{4}|\d{3}[-\s]?\d{3}[-\s]?\d{4})\b/g;
+const US_PHONE_REGEX =
+  /(?:\+1[\s\-]?)?(?=.*[()\s-])(?:\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{4}|\d{3}[\s\-]\d{4})\b/g;
 
 // =============================================================================
 // CRYPTO MASKING (PROTECT BEFORE SANITIZATION)
@@ -151,8 +162,9 @@ export function sanitizePII(input: string): string {
   // Credit Card numbers
   sanitized = sanitized.replace(CREDITCARD_REGEX, "[REDACTED-CC]");
 
-  // Phone numbers (German and US formats - must be last to avoid conflicts)
-  sanitized = sanitized.replace(GERMAN_PHONE_REGEX, "[REDACTED-PHONE]");
+  // Phone numbers (German + US) – German zuerst, damit +49 176 ... korrekt gepackt wird
+  sanitized = sanitized.replace(GERMAN_MOBILE_INTL_REGEX, "[REDACTED-PHONE]");
+  sanitized = sanitized.replace(GERMAN_MOBILE_LOCAL_REGEX, "[REDACTED-PHONE]");
   sanitized = sanitized.replace(US_PHONE_REGEX, "[REDACTED-PHONE]");
 
   // Step 3: Restore crypto addresses unchanged

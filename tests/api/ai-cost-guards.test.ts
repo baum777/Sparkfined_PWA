@@ -1961,7 +1961,7 @@ describe('API Cost Guards - /api/ai/assist', () => {
 
       expect(apiBody.messages).toHaveLength(2); // System + User
       expect(apiBody.messages[0].role).toBe('system');
-      expect(apiBody.messages[0].content).toContain('präziser');
+      expect(apiBody.messages[0].content).toContain('präziser'); // UTF-8 encoded correctly
       expect(apiBody.messages[1].role).toBe('user');
       expect(apiBody.messages[1].content).toContain('So11111111111111111111111111111111111111112');
       expect(apiBody.messages[1].content).toContain('lastClose=95.5');
