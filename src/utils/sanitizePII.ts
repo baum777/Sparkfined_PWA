@@ -48,11 +48,15 @@ const CREDITCARD_REGEX = /\b(?:\d{4}[-\s]?){3}\d{4}\b/g;
 /**
  * German mobile phone numbers
  * Matches: +49 176 12345678, 0176-12345678, 0176 1234567
- * Prefix +49 or 0, then mobile codes (15x, 16x, 17x)
- * Captures full number INCLUDING international prefix
- * Requires at least one separator to avoid matching plain digit sequences
+ * Wir trennen zwei Fälle:
+ * - International: +49 176 12345678
+ * - Lokal: 0176-12345678, 0172-9876543 etc.
  */
-const GERMAN_PHONE_REGEX = /\+?49[\s\-](?:0?1[5-7][0-9])[\s\-]\d{3,4}[\s\-]\d{4,5}\b|(?:^|[^\d])0?1[5-7][0-9][\s\-]\d{3,4}[\s\-]\d{4,5}\b/g;
+const GERMAN_MOBILE_INTL_REGEX =
+  /\+49[\s\-]?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
+
+const GERMAN_MOBILE_LOCAL_REGEX =
+  /\b0?1[5-7][0-9][\s\-]?\d{3,4}[\s\-]?\d{4,5}\b/g;
 
 /**
  * US phone numbers (various formats)
@@ -63,18 +67,6 @@ const GERMAN_PHONE_REGEX = /\+?49[\s\-](?:0?1[5-7][0-9])[\s\-]\d{3,4}[\s\-]\d{4,
  * (e.g. volumes like 1234567890 should NOT be treated as phone)
  */
 const US_PHONE_REGEX = /(?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]\d{3}[\s\-]\d{4}\b/g;
-
-// Wrapped variants to preserve preceding character (space, punctuation)
-// Group 1 = prefix (may be space/colon/start)
-// Group 2 = actual phone number
-const GERMAN_MOBILE_WRAPPED_REGEX =
-  /(^|[^\d])(\+?49[\s\-](?:0?1[5-7][0-9])[\s\-]\d{3,4}[\s\-]\d{4,5}\b|0?1[5-7][0-9][\s\-]\d{3,4}[\s\-]\d{4,5}\b)/g;
-
-const US_PHONE_WRAPPED_REGEX =
-  /(^|[^\d])((?:\+1[\s\-]?)?\(?\d{3}\)?[\s\-]\d{3}[\s\-]\d{4}\b)/g;
-
-const LOCAL_SHORT_PHONE_REGEX =
-  /(^|[^\d])(\d{3}[-\s]\d{4}\b)/g;
 
 // =============================================================================
 // CRYPTO MASKING (PROTECT BEFORE SANITIZATION)
@@ -168,22 +160,10 @@ export function sanitizePII(input: string): string {
   // Credit Card numbers
   sanitized = sanitized.replace(CREDITCARD_REGEX, "[REDACTED-CC]");
 
-  // Phone numbers (German, US, local short) – preserve spacing & prefixes
-  // Regexes enforce at least one separator/formatting character
-  // (plain digit-only sequences like 1234567890 won't match)
-  sanitized = sanitized
-    .replace(
-      GERMAN_MOBILE_WRAPPED_REGEX,
-      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
-    )
-    .replace(
-      US_PHONE_WRAPPED_REGEX,
-      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
-    )
-    .replace(
-      LOCAL_SHORT_PHONE_REGEX,
-      (_match: string, prefix: string, _num: string) => `${prefix}[REDACTED-PHONE]`
-    );
+  // Phone numbers (German + US) – German zuerst, damit +49 176 ... korrekt gepackt wird
+  sanitized = sanitized.replace(GERMAN_MOBILE_INTL_REGEX, "[REDACTED-PHONE]");
+  sanitized = sanitized.replace(GERMAN_MOBILE_LOCAL_REGEX, "[REDACTED-PHONE]");
+  sanitized = sanitized.replace(US_PHONE_REGEX, "[REDACTED-PHONE]");
 
   // Step 3: Restore crypto addresses unchanged
   return restoreCrypto(sanitized, map);
