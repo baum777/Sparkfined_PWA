@@ -64,7 +64,8 @@ export default async function handler(req: Request) {
       sanitizedPrompt.user
     );
 
-    // Nur wenn ein request-level Cap existiert, darf der Preflight blocken.
+    // Preflight block: wenn effectiveCap (MIN von env/request) überschritten wird
+    // Test-driven: nur blocken wenn IRGENDEIN Cap gesetzt ist UND überschritten
     if (preflightCap && est.inCostUsd > preflightCap) {
       return json(
         {
@@ -134,31 +135,52 @@ async function route(p: Req["provider"], model?: string, system?: string, user?:
 }
 
 async function callOpenAI(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
-  const r = await fetch("https://api.openai.com/v1/chat/completions", {
-    method:"POST",
-    headers: { "content-type":"application/json", "authorization": `Bearer ${process.env.OPENAI_API_KEY ?? ""}` },
-    body: JSON.stringify({
-      model, temperature: 0.2,
-      max_tokens: maxOutputTokens ?? 800,
-      messages: [
-        ...(system ? [{ role:"system", content: system }] : []),
-        { role:"user", content: user }
-      ]
-    })
-  });
-  const j = await r.json();
-  
-  // Check for API errors (invalid key, invalid payload, rate limit, etc.)
-  // ANY of these count as provider error:
-  // - j.error present
-  // - HTTP not ok
-  // - j ist kein Objekt (z.B. 'Response' o.ä. aus Mocks)
-  const isErrorShape =
-    !r.ok ||
-    (j && typeof j !== "object") ||
-    (j && typeof j === "object" && j.error);
-  
-  if (isErrorShape) {
+  try {
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method:"POST",
+      headers: { "content-type":"application/json", "authorization": `Bearer ${process.env.OPENAI_API_KEY ?? ""}` },
+      body: JSON.stringify({
+        model, temperature: 0.2,
+        max_tokens: maxOutputTokens ?? 800,
+        messages: [
+          ...(system ? [{ role:"system", content: system }] : []),
+          { role:"user", content: user }
+        ]
+      })
+    });
+    const j = await r.json();
+    
+    // Check for API errors (invalid key, invalid payload, rate limit, etc.)
+    // ANY of these count as provider error:
+    // - j.error present
+    // - HTTP not ok
+    // - j ist kein Objekt (z.B. 'Response' o.ä. aus Mocks)
+    const isErrorShape =
+      !r.ok ||
+      (j && typeof j !== "object") ||
+      (j && typeof j === "object" && j.error);
+    
+    if (isErrorShape) {
+      return {
+        provider:"openai",
+        model,
+        text: "",
+        usage: null,
+        costUsd: 0,
+      };
+    }
+    
+    const text = j?.choices?.[0]?.message?.content ?? "";
+    return {
+      provider:"openai",
+      model,
+      text,
+      usage: j?.usage ?? null,
+      costUsd: estimateOpenaiCost(model, j?.usage),
+    };
+  } catch (_) {
+    // Network errors, JSON parse errors, mock failures → treat as provider error
+    // Test 4.2 (Invalid Keys) expects: ok:true, text:'', fetch called 1x
     return {
       provider:"openai",
       model,
@@ -167,15 +189,6 @@ async function callOpenAI(model: string, system: string|undefined, user: string,
       costUsd: 0,
     };
   }
-  
-  const text = j?.choices?.[0]?.message?.content ?? "";
-  return {
-    provider:"openai",
-    model,
-    text,
-    usage: j?.usage ?? null,
-    costUsd: estimateOpenaiCost(model, j?.usage),
-  };
 }
 function estimateOpenaiCost(model:string, usage:any){
   // simple lookup; adjust later if nötig
@@ -188,27 +201,47 @@ function estimateOpenaiCost(model:string, usage:any){
 }
 
 async function callGrok(model: string, system: string|undefined, user: string, maxOutputTokens?: number){
-  const r = await fetch("https://api.x.ai/v1/chat/completions", {
-    method:"POST",
-    headers: { "content-type":"application/json", "authorization": `Bearer ${process.env.GROK_API_KEY ?? ""}` },
-    body: JSON.stringify({
-      model, temperature: 0.2,
-      max_tokens: maxOutputTokens ?? 800,
-      messages: [
-        ...(system ? [{ role:"system", content: system }] : []),
-        { role:"user", content: user }
-      ]
-    })
-  });
-  const j = await r.json();
-  
-  // Check for API errors (invalid key, rate limit, etc.)
-  const isErrorShape =
-    !r.ok ||
-    (j && typeof j !== "object") ||
-    (j && typeof j === "object" && j.error);
-  
-  if (isErrorShape) {
+  try {
+    const r = await fetch("https://api.x.ai/v1/chat/completions", {
+      method:"POST",
+      headers: { "content-type":"application/json", "authorization": `Bearer ${process.env.GROK_API_KEY ?? ""}` },
+      body: JSON.stringify({
+        model, temperature: 0.2,
+        max_tokens: maxOutputTokens ?? 800,
+        messages: [
+          ...(system ? [{ role:"system", content: system }] : []),
+          { role:"user", content: user }
+        ]
+      })
+    });
+    const j = await r.json();
+    
+    // Check for API errors (invalid key, rate limit, etc.)
+    const isErrorShape =
+      !r.ok ||
+      (j && typeof j !== "object") ||
+      (j && typeof j === "object" && j.error);
+    
+    if (isErrorShape) {
+      return {
+        provider:"grok",
+        model,
+        text: "",
+        usage: null,
+        costUsd: null,
+      };
+    }
+    
+    const text = j?.choices?.[0]?.message?.content ?? "";
+    return {
+      provider:"grok",
+      model,
+      text,
+      usage: j?.usage ?? null,
+      costUsd: null as number | null // xAI pricing TBD
+    };
+  } catch (_) {
+    // Network errors, JSON parse errors, mock failures → treat as provider error
     return {
       provider:"grok",
       model,
@@ -217,15 +250,6 @@ async function callGrok(model: string, system: string|undefined, user: string, m
       costUsd: null,
     };
   }
-  
-  const text = j?.choices?.[0]?.message?.content ?? "";
-  return {
-    provider:"grok",
-    model,
-    text,
-    usage: j?.usage ?? null,
-    costUsd: null as number | null // xAI pricing TBD
-  };
 }
 
 function ensureAiProxyAuthorized(req: Request): Response | null {
