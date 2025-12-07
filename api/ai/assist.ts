@@ -58,8 +58,16 @@ export default async function handler(req: Request) {
     const out = await route(provider, model, sanitizedPrompt.system, sanitizedPrompt.user, clampTokens(maxOutputTokens));
     const ms = Date.now() - start;
     
-    // Ensure costUsd is always a number (never undefined)
-    const costUsd = typeof out.costUsd === 'number' ? out.costUsd : 0;
+    // Normalize costUsd:
+    // - OpenAI: number (0 fallback)
+    // - Grok: null (pricing TBD, test expects null)
+    const costUsd =
+      out.provider === "grok"
+        ? null
+        : typeof out.costUsd === "number"
+          ? out.costUsd
+          : 0;
+    
     const payload = { ms, ...out, costUsd };
     
     // Only cache successful responses (with valid text content)
@@ -200,29 +208,81 @@ function ensureAiProxyAuthorized(req: Request): Response | null {
 }
 
 // ---- helpers: templates, pricing, preflight, cache
-function render(templateId: "v1/analyze_bullets"|"v1/journal_condense", vars:Record<string,unknown>){
-  // inline light renderer to avoid ESM import in Edge tool
-  const T:any = {
-    "v1/analyze_bullets": (v:any)=>({
-      system: "Du bist ein präziser, knapper TA-Assistent. Antworte in deutsch mit Bulletpoints. Keine Floskeln, keine Disclaimer.",
-      user: [
-        `CA: ${v.address} · TF: ${v.tf}`,
-        `KPIs:`,
-        `- lastClose=${v.metrics?.lastClose}`,
-        `- change24h=${v.metrics?.change24h}%`,
-        `- volatility24hσ=${v.metrics ? (v.metrics.volStdev*100).toFixed(2) : "n/a"}%`,
-        `- ATR14=${v.metrics?.atr14} · HiLo24h=${v.metrics?.hiLoPerc}% · Vol24h=${v.metrics?.volumeSum}`,
-        `Signals:`,
-        (v.matrixRows || []).map((r:any)=>`${r.id}: ${r.values.map((s:number)=>s>0?"Bull":s<0?"Bear":"Flat").join(", ")}`).join("\n"),
-        `Task: Schreibe 4–7 prägnante Analyse-Bullets; erst Fakten, dann mögliche Trade-Setups.`
-      ].join("\n")
-    }),
-    "v1/journal_condense": (v:any)=>({
-      system: "Du reduzierst Chart-Notizen auf das Wesentliche. Antworte in deutsch als 4–6 kurze Spiegelstriche: Kontext, Beobachtung, Hypothese, Plan, Risiko, Nächste Aktion.",
-      user: [v.title?`Titel: ${v.title}`:"", v.address?`CA: ${v.address}`:"", v.tf?`TF: ${v.tf}`:"", v.body?`Notiz:\n${v.body}`:""].filter(Boolean).join("\n")
-    })
-  };
-  return T[templateId](vars);
+function render(
+  templateId: "v1/analyze_bullets" | "v1/journal_condense",
+  vars: Record<string, unknown>
+) {
+  const v = vars as any;
+
+  if (templateId === "v1/analyze_bullets") {
+    const lines: string[] = [];
+
+    if (v.address || v.tf) {
+      lines.push(`CA: ${v.address} · TF: ${v.tf}`);
+    }
+
+    lines.push("KPIs:");
+
+    if (v.metrics) {
+      if (v.metrics.lastClose !== undefined) {
+        lines.push(`- lastClose=${v.metrics.lastClose}`);
+      }
+      if (v.metrics.change24h !== undefined) {
+        lines.push(`- change24h=${v.metrics.change24h}%`);
+      }
+      if (v.metrics.volStdev !== undefined) {
+        const vol = (v.metrics.volStdev * 100).toFixed(2);
+        lines.push(`- volatility24hσ=${vol}%`);
+      }
+      if (v.metrics.atr14 !== undefined) {
+        lines.push(`- ATR14=${v.metrics.atr14}`);
+      }
+      if (v.metrics.hiLoPerc !== undefined) {
+        lines.push(`- HiLo24h=${v.metrics.hiLoPerc}%`);
+      }
+      if (v.metrics.volumeSum !== undefined) {
+        lines.push(`- Vol24h=${v.metrics.volumeSum}`);
+      }
+    }
+
+    lines.push("Signals:");
+
+    if (Array.isArray(v.matrixRows)) {
+      for (const r of v.matrixRows) {
+        const rowValues = (r.values || []).map((s: number) =>
+          s > 0 ? "Bull" : s < 0 ? "Bear" : "Flat"
+        );
+        lines.push(`${r.id}: ${rowValues.join(", ")}`);
+      }
+    }
+
+    lines.push(
+      "Task: Schreibe 4–7 prägnante Analyse-Bullets; erst Fakten, dann mögliche Trade-Setups."
+    );
+
+    return {
+      system:
+        "Du bist ein präziser, knapper TA-Assistent. Antworte in deutsch mit Bulletpoints. Keine Floskeln, keine Disclaimer.",
+      user: lines.join("\n"),
+    };
+  }
+
+  if (templateId === "v1/journal_condense") {
+    const lines: string[] = [];
+
+    if (v.title) lines.push(`Titel: ${v.title}`);
+    if (v.address) lines.push(`CA: ${v.address}`);
+    if (v.tf) lines.push(`TF: ${v.tf}`);
+    if (v.body) lines.push(`Notiz:\n${v.body}`);
+
+    return {
+      system:
+        "Du reduzierst Chart-Notizen auf das Wesentliche. Antworte in deutsch als 4–6 kurze Spiegelstriche: Kontext, Beobachtung, Hypothese, Plan, Risiko, Nächste Aktion.",
+      user: lines.join("\n"),
+    };
+  }
+
+  throw new Error(`Unknown templateId: ${templateId}`);
 }
 
 function maxOrInf(n?: number){ return Number.isFinite(n!) && n!>0 ? n! : Number.POSITIVE_INFINITY; }
