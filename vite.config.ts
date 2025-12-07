@@ -163,7 +163,7 @@ export default defineConfig(({ mode }) => ({
           // 1. React Ecosystem (React + ReactDOM + Scheduler + React-Router)
           // Note: React-Router is bundled with React (always used together)
           // Current: ~55KB gzip
-          if (id.includes('react') || id.includes('scheduler') || id.includes('react-router')) {
+          if (id.includes('react') || id.includes('scheduler') || id.includes('react-router') || id.includes('@remix-run/router')) {
             return 'vendor-react';
           }
 
@@ -194,12 +194,18 @@ export default defineConfig(({ mode }) => ({
             return 'vendor-icons';
           }
 
-          // 6. Zustand (State management) - Small but critical
+          // 6. Charting (lightweight-charts + fancy-canvas) - Heavy visual library
+          // Keep isolated so the main vendor chunk stays lean and only loads when charts are opened.
+          if (id.includes('lightweight-charts') || id.includes('fancy-canvas')) {
+            return 'vendor-charts';
+          }
+
+          // 7. Zustand (State management) - Small but critical
           if (id.includes('zustand')) {
             return 'vendor-state';
           }
 
-          // 7. Generic vendor (everything else: OpenAI SDK, workbox, etc.)
+          // 8. Generic vendor (everything else: OpenAI SDK, workbox, etc.)
           // Small libraries that don't need separate chunks
           // Expected: ~30KB gzip (after splitting above)
           return 'vendor';

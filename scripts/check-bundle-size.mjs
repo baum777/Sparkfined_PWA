@@ -31,7 +31,11 @@ const THRESHOLDS = {
   // Lucide Icons - Isolated for better caching
   // Estimated: ~15KB gzipped (tree-shaken)
   'vendor-icons': 20,
-  
+
+  // Charting stack (lightweight-charts + fancy-canvas)
+  // Heavy but lazy-loaded; keep headroom for visual features without blocking main shell
+  'vendor-charts': 60,
+
   // Zustand (State management)
   // Estimated: ~3KB gzipped
   'vendor-state': 5,
@@ -85,7 +89,12 @@ const OPTIONAL_CHUNKS = [
 // Global JS budget (uncompressed) for initial + critical chunks.
 // Updated 2025-12-06: Adjusted after optimizations (~804KB current)
 // Note: Real win is 50% reduction in index chunk (28KB → 14KB gzipped)
-const TOTAL_BUDGET_KB = 810;
+const TOTAL_BUDGET_KB = 850;
+
+// Critical-path bundles (initial load). Keep these lean even if deep-feature
+// chunks grow due to lazy loading (e.g., charts, OCR).
+const CRITICAL_CHUNKS = ['index', 'vendor-react', 'vendor-dexie'];
+const CRITICAL_BUDGET_KB = 330;
 
 // ANSI color codes
 const RED = '\x1b[31m';
@@ -198,13 +207,19 @@ function checkBundleSizes() {
   // Check total bundle size (uncompressed)
   console.log(`${BOLD}📊 Total Bundle Size${RESET}`);
   let totalSizeKB = 0;
+  let criticalSizeKB = 0;
   for (const file of files) {
     const filePath = path.join(DIST_DIR, file);
     const stats = fs.statSync(filePath);
     totalSizeKB += Math.round(stats.size / 1024);
+
+    if (CRITICAL_CHUNKS.some((pattern) => file.includes(pattern))) {
+      criticalSizeKB += Math.round(stats.size / 1024);
+    }
   }
 
   const totalPercent = Math.round((totalSizeKB / TOTAL_BUDGET_KB) * 100);
+  const criticalPercent = Math.round((criticalSizeKB / CRITICAL_BUDGET_KB) * 100);
 
   if (totalSizeKB > TOTAL_BUDGET_KB) {
     console.log(`  ${RED}✗${RESET} Total: ${totalSizeKB}KB / ${TOTAL_BUDGET_KB}KB (${totalPercent}%) - EXCEEDS BUDGET`);
@@ -215,6 +230,15 @@ function checkBundleSizes() {
     console.log(`  ${YELLOW}⚠${RESET} Total: ${totalSizeKB}KB / ${TOTAL_BUDGET_KB}KB (${totalPercent}%) - approaching limit`);
   } else {
     console.log(`  ${GREEN}✓${RESET} Total: ${totalSizeKB}KB / ${TOTAL_BUDGET_KB}KB (${totalPercent}%)`);
+  }
+
+  if (criticalSizeKB > CRITICAL_BUDGET_KB) {
+    console.log(`  ${RED}✗${RESET} Critical: ${criticalSizeKB}KB / ${CRITICAL_BUDGET_KB}KB (${criticalPercent}%) - EXCEEDS BUDGET`);
+    process.exit(1);
+  } else if (criticalPercent > 90) {
+    console.log(`  ${YELLOW}⚠${RESET} Critical: ${criticalSizeKB}KB / ${CRITICAL_BUDGET_KB}KB (${criticalPercent}%) - approaching limit`);
+  } else {
+    console.log(`  ${GREEN}✓${RESET} Critical: ${criticalSizeKB}KB / ${CRITICAL_BUDGET_KB}KB (${criticalPercent}%)`);
   }
 
   console.log(`\n${GREEN}${BOLD}✓ All bundles within size limits!${RESET}\n`);
