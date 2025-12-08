@@ -798,3 +798,36 @@ Commands & Results:
 - pnpm lint (pass; existing warnings on unrelated files)
 - pnpm test -- --reporter=dot (pass)
 - pnpm test:e2e (fail – Playwright browsers not installed; install via `pnpm exec playwright install`)
+
+### 2025-12-08 – P1-Critical Audit (tasks/P1-critical)
+
+Date: 2025-12-08
+Agent: Codex
+Section: P1-Critical Audit & Action (Tasks 01–05)
+Branch: (current)
+
+Actions:
+- Alle fünf P1-critical Taskseiten gesichtet und kategorisiert (A/B/C) mit neuem Audit-Block 2025-12-08.
+- Dokumentiert, dass OHLC-Livepfad (`getTokenSnapshot`) weiterhin stubbed ist und Replay/Provider-Aufgaben offen bleiben.
+- Festgehalten, dass Chart-Snapshot-, Export-Pipeline- und Signal-Matrix-Flows unverändert stubbed oder unverdrahtet sind; Quick-Wins identifiziert (Unit-Tests für signalDb, minimaler JSON-Export, Canvas-Capture Helper), aber nicht umgesetzt.
+- Status-Felder auf "🔴 OFFEN" aktualisiert, um den fehlenden Implementierungsstand transparent zu halten.
+
+Commands & Results:
+- (Keine Build/Typecheck-Änderungen erforderlich vor Audit; Tests folgen im aktuellen Run.)
+
+New open points:
+- OP-P1C-01: Live-OHLC-Provider-Kette + Replay Integration neu planen und sequenzieren.
+- OP-P1C-02: Minimalen JSON-Export als Quick-Win priorisieren (ExportService stub entfernen).
+- OP-P1C-03: signalDb-CRUDs mit Unit-Tests absichern, bevor Cron/Strategien verdrahtet werden.
+
+Date: 2025-12-09
+Agent: Codex
+Section: Vitest RangeError (COLUMNS=0) – Dot Reporter
+Branch: work
+
+Actions:
+- Identified Vitest progress renderer crash caused by `process.stdout.columns` resolving to `0` in the execution environment, which yielded `Infinity` for dot layout rows.
+- Normalized stdout column width to a sane default (80) during Vitest config load and added a defensive setup helper to ensure reporters receive a finite width in constrained shells.
+
+Commands & Results:
+- pnpm vitest run --reporter=dot (pass; 80 files, 557 tests, 35 skipped)

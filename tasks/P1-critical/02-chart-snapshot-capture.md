@@ -38,6 +38,18 @@ Implementiere **Canvas-to-Image Snapshot Capture**:
 - Anzeige in Social Preview
 - Export für Sharing
 
+## Audit 2025-12-08 (Codex)
+
+- Status: Snapshot-Funktion ist weiterhin stubbed (`captureChartSnapshot` gibt `undefined` zurück), Journal-Integration fehlt.
+- Kategorie A – Bereits erfüllt
+  - [ ] Keine Punkte abgeschlossen; weder Capture-API noch Journal-Speicherung sind aktiv im Code.
+- Kategorie B – Kleine, fokussierte Tasks
+  - [ ] HTMLCanvas-Capture (z.B. via `canvas.toBlob`) implementieren und mit unit test absichern, ohne UI-Umbau.
+- Kategorie C – Große / Epische Themen (offen)
+  - [ ] Vollständige Journal-Integration inkl. Screenshot-Feld und Social Preview.
+  - [ ] UI-Flow "Save to Journal" inkl. Routing/Redirects und Datenvalidierung.
+  - [ ] Performance/Compression-Pfad und Lazy Loading für größere Screenshots.
+
 ---
 
 ## Tasks
@@ -516,5 +528,5 @@ pnpm dev
 ---
 
 **Owner**: Frontend Team
-**Status**: 🟠 NICHT GESTARTET
+**Status**: 🔴 OFFEN – Snapshot-Stub aktiv; siehe Audit 2025-12-08
 **Deadline**: Woche 3-4 (Sprint 3)

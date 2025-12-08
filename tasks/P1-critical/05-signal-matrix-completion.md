@@ -32,6 +32,18 @@ Vollständige **Signal Matrix** Implementation:
 - UI Display (Signal Matrix Page)
 - Test Coverage >80%
 
+## Audit 2025-12-08 (Codex)
+
+- Status: Signal-Flow bleibt fragmentiert – `signalDb` existiert, aber keine Cron-Route oder Live-Detection-Strategien sind verdrahtet.
+- Kategorie A – Bereits erfüllt
+  - [ ] Keine End-to-End-Kette aktiv; vorhandene `signalDb`-API ist ungetestet und ohne Rules/Orchestrator-Anbindung.
+- Kategorie B – Kleine, fokussierte Tasks
+  - [ ] Unit-Tests für bestehende `signalDb`-CRUDs hinzufügen, um Schema-Stabilität abzusichern.
+- Kategorie C – Große / Epische Themen (offen)
+  - [ ] Regel-Auswertung + Cron-Handler implementieren und absichern (Auth, Push, Telemetrie).
+  - [ ] Provider-basierte Signal-Strategien mit Live-OHLC anbinden (abhängig von Replay/Market-Datenpfad).
+  - [ ] SignalsPage-UI mit realen Datenquellen und Watchlist-Konnektor verdrahten.
+
 ---
 
 ## Tasks
@@ -485,5 +497,5 @@ pnpm dev
 ---
 
 **Owner**: Backend + Data Team
-**Status**: 🟠 NICHT GESTARTET
+**Status**: 🔴 OFFEN – fehlende Cron/Strategien; siehe Audit 2025-12-08
 **Deadline**: Woche 4-5 (Sprint 4-5)

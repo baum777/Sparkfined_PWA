@@ -34,6 +34,18 @@ Implementiere **effizienten SWR Cache** für Market Data:
 - Request Deduplication
 - Provider Health Tracking
 
+## Audit 2025-12-08 (Codex)
+
+- Status: `getTokenSnapshot` ist weiterhin unimplementiert (wirft "Not implemented"), kein SWR-Cache existiert.
+- Kategorie A – Bereits erfüllt
+  - [ ] Keine Umsetzung gefunden; Provider-Muxing und Cache fehlen vollständig.
+- Kategorie B – Kleine, fokussierte Tasks
+  - [ ] Dedizierten SWRCache-Helper implementieren und als Grundlage in `marketOrchestrator` einhängen (ohne neue Provider). 
+- Kategorie C – Große / Epische Themen (offen)
+  - [ ] Provider-Kette finalisieren (Moralis/DexPaprika/DexScreener) inkl. Health-Tracking.
+  - [ ] Cache-Invalidation/forceRefresh-Flows und Telemetrie verdrahten.
+  - [ ] Regressionstests (unit + integration) für Cache/Provider-Order aufbauen.
+
 ---
 
 ## Tasks
@@ -505,5 +517,5 @@ pnpm dev
 ---
 
 **Owner**: Backend + Data Team
-**Status**: 🟠 NICHT GESTARTET
+**Status**: 🔴 OFFEN – Snapshot/Cache fehlen; siehe Audit 2025-12-08
 **Deadline**: Woche 3-4 (Sprint 3)
