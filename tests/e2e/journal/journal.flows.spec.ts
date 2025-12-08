@@ -98,6 +98,23 @@ test.describe('journal flows', () => {
     await expect(longRows).toHaveCount(0);
   });
 
+  test('@journal search narrows entries and can be reset', async ({ page }) => {
+    const searchInput = page.getByTestId('journal-search-input');
+
+    await searchInput.fill('breakout');
+    const filteredRows = page.locator('[data-testid="journal-list-item"]');
+    await expect(filteredRows).toHaveCount(1);
+    await expect(filteredRows.first()).toContainText('BTC breakout retest');
+
+    await searchInput.fill('no-match-query');
+    await expect(page.getByTestId('journal-empty-state')).toBeVisible();
+
+    await page.getByTestId('journal-empty-reset').click();
+    await expect(searchInput).toHaveValue('');
+    const resetCount = await page.getByTestId('journal-list-item').count();
+    expect(resetCount).toBeGreaterThan(1);
+  });
+
   test('@journal respects entry query params on load', async ({ page }) => {
     await page.goto('/journal-v2?entry=2');
     await awaitStableUI(page);

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { JournalEntry } from '@/store/journalStore';
 import { updateJournalEntryNotes, useJournalStore } from '@/store/journalStore';
 
@@ -14,6 +14,7 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const notesInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     setDraftNotes(entry?.notes ?? '');
@@ -79,6 +80,20 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
       setIsSaving(false);
     }
   }, [draftNotes, entry, updateEntry]);
+
+  useEffect(() => {
+    if (!isEditing) {
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      notesInputRef.current?.focus();
+      notesInputRef.current?.setSelectionRange(notesInputRef.current.value.length, notesInputRef.current.value.length);
+    }, 10);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [isEditing]);
 
   const handleDelete = useCallback(async () => {
     if (!entry) {
@@ -185,6 +200,7 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
               rows={6}
               className="w-full rounded-xl border border-border-moderate bg-surface-elevated p-3 text-sm text-text-primary shadow-inner outline-none transition focus:border-border-hover focus:ring-2 focus:ring-border-focus"
               disabled={isSaving}
+              ref={notesInputRef}
               data-testid="journal-detail-notes-input"
             />
             {(errorMessage || draftNotes.trim().length === 0) && (
@@ -221,7 +237,17 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
             {entry.notes}
           </div>
         ) : (
-          <div className="text-sm text-text-secondary">No notes for this entry yet.</div>
+          <div className="flex items-start justify-between gap-3 text-sm text-text-secondary">
+            <span>No notes for this entry yet — add a quick takeaway.</span>
+            <button
+              type="button"
+              onClick={handleStartEdit}
+              className="rounded-full border border-border-subtle px-3 py-1 text-xs font-medium text-text-primary transition hover:border-border-hover hover:bg-interactive-hover"
+              data-testid="journal-start-notes"
+            >
+              Add notes
+            </button>
+          </div>
         )}
         {entry.sourceUrl ? (
             <a

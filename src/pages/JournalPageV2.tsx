@@ -10,6 +10,7 @@ import { JournalHeaderActions } from '@/components/journal/JournalHeaderActions'
 import { computeUserJourneySnapshotFromEntries } from '@/lib/journal/journey-snapshot';
 import { createQuickJournalEntry, loadJournalEntries, useJournalStore } from '@/store/journalStore';
 import { JournalInsightsPanel } from '@/components/journal/JournalInsightsPanel';
+import { Search } from '@/lib/icons';
 
 type DirectionFilter = 'all' | 'long' | 'short';
 
@@ -26,6 +27,7 @@ export default function JournalPageV2() {
   const location = useLocation();
   const [, setSearchParams] = useSearchParams();
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createErrorMessage, setCreateErrorMessage] = useState<string | null>(null);
@@ -93,12 +95,24 @@ export default function JournalPageV2() {
     }
   }, [entries, entryFromUrl, activeId, setActiveId]);
 
-  const filteredEntries = useMemo(() => {
+  const directionFilteredEntries = useMemo(() => {
     if (directionFilter === 'all') {
       return entries;
     }
     return entries.filter((entry) => entry.direction === directionFilter);
   }, [directionFilter, entries]);
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  const filteredEntries = useMemo(() => {
+    if (!normalizedQuery) {
+      return directionFilteredEntries;
+    }
+    return directionFilteredEntries.filter((entry) => {
+      const haystacks = [entry.title, entry.notes ?? ''];
+      return haystacks.some((value) => value.toLowerCase().includes(normalizedQuery));
+    });
+  }, [directionFilteredEntries, normalizedQuery]);
 
   const directionCounts = useMemo(() => {
     return {
@@ -149,6 +163,24 @@ export default function JournalPageV2() {
     [directionCounts.all, directionCounts.long, directionCounts.short],
   );
 
+  const listEmptyState = useMemo(
+    () =>
+      filteredEntries.length === 0 && entries.length
+        ? {
+            title: 'No entries match your filters',
+            description: 'Adjust the direction filter or clear your search to see your saved trades again.',
+            actionLabel: 'Clear filters',
+            onAction: () => {
+              setDirectionFilter('all');
+              setSearchQuery('');
+            },
+          }
+        : undefined,
+    [entries.length, filteredEntries.length, setDirectionFilter, setSearchQuery],
+  );
+
+  const hasFiltersApplied = directionFilter !== 'all' || Boolean(normalizedQuery);
+
   const handleCreateEntry = useCallback(
     async ({ title, notes }: { title: string; notes: string }) => {
       setIsCreating(true);
@@ -173,7 +205,7 @@ export default function JournalPageV2() {
     [addEntry, setActiveId, setSearchParams],
   );
 
-  const headerDescription = `${entries.length} recent entries · Focus on clarity, context, conviction`;
+  const headerDescription = `${entries.length} recent entries · Quick filters and inline edits to stay in flow`;
 
   return (
     <DashboardShell
@@ -228,27 +260,61 @@ export default function JournalPageV2() {
           <JournalLayout
             list={
               <div className="flex h-full flex-col space-y-3">
-                <p className="text-xs uppercase tracking-wider text-text-tertiary">Entries</p>
+                <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+                  <div className="space-y-0.5">
+                    <p className="text-xs uppercase tracking-wider text-text-tertiary">Entries</p>
+                    <p className="text-xs text-text-secondary">
+                      Showing {filteredEntries.length} of {entries.length} saved logs
+                    </p>
+                  </div>
+                  <p className="text-xs text-text-tertiary">Filter by direction or search through notes.</p>
+                </div>
                 <div className="flex h-full flex-col rounded-2xl border border-border bg-surface/80 backdrop-blur">
-                  <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-                    {directionFilters.map((filter) => {
-                      const isActive = directionFilter === filter.value;
-                      return (
+                  <div className="flex flex-col gap-2 border-b border-border px-3 py-2 md:flex-row md:items-center md:justify-between">
+                    <div className="flex flex-wrap items-center gap-2">
+                      {directionFilters.map((filter) => {
+                        const isActive = directionFilter === filter.value;
+                        return (
+                          <button
+                            key={filter.value}
+                            type="button"
+                            onClick={() => setDirectionFilter(filter.value)}
+                            className={`rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+                              isActive
+                                ? 'border-brand bg-surface-hover text-text-primary'
+                                : 'border-border text-text-secondary hover:bg-surface-hover'
+                            }`}
+                            data-testid={`journal-filter-${filter.value}`}
+                          >
+                            {filter.label}
+                          </button>
+                        );
+                      })}
+                      {hasFiltersApplied ? (
                         <button
-                          key={filter.value}
                           type="button"
-                          onClick={() => setDirectionFilter(filter.value)}
-                          className={`rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
-                            isActive
-                              ? 'border-brand bg-surface-hover text-text-primary'
-                              : 'border-border text-text-secondary hover:bg-surface-hover'
-                          }`}
-                          data-testid={`journal-filter-${filter.value}`}
+                          onClick={() => {
+                            setDirectionFilter('all');
+                            setSearchQuery('');
+                          }}
+                          className="rounded-full border border-border-subtle px-3 py-1 text-xs font-medium text-text-secondary transition hover:border-border-hover hover:bg-interactive-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+                          data-testid="journal-clear-filters"
                         >
-                          {filter.label}
+                          Reset
                         </button>
-                      );
-                    })}
+                      ) : null}
+                    </div>
+                    <label className="flex w-full items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 text-sm text-text-primary shadow-inner transition focus-within:border-border-hover focus-within:ring-2 focus-within:ring-border-focus md:w-auto md:min-w-[260px]">
+                      <Search size={16} className="text-text-tertiary" aria-hidden />
+                      <input
+                        type="search"
+                        value={searchQuery}
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        placeholder="Search by title or notes"
+                        className="w-full bg-transparent text-sm outline-none placeholder:text-text-secondary"
+                        data-testid="journal-search-input"
+                      />
+                    </label>
                   </div>
                   <div className="flex-1 overflow-y-auto p-2">
                     {isLoading ? (
@@ -263,6 +329,7 @@ export default function JournalPageV2() {
                         activeId={activeId}
                         onSelect={handleSelectEntry}
                         onNewEntry={() => setIsNewDialogOpen(true)}
+                        emptyState={listEmptyState}
                       />
                     )}
                   </div>

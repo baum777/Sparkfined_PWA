@@ -58,6 +58,12 @@ sources:
 - Payload enthält versionierte Metadaten (`entryId`, `updatedFields`, Journey-/XP-Felder), aber weiterhin keinen Thesis-Text oder PII.
 - Fehler beim POST werden bewusst geschluckt, damit Offline-Mode/Telemetry-Ausfälle den Journal-Flow nicht blockieren.
 
+## P2 UX Polish (Journal V2)
+- **Schneller finden:** JournalPageV2 nutzt jetzt einen Such-Input + Richtungsfilter in einer gemeinsamen Leiste (Search-Test-ID `journal-search-input`). Leere Filterzustände zeigen eine freundliche Rückmeldung mit Reset-CTA.
+- **Listenlesbarkeit:** JournalList hebt Titel/Datum/Direction klarer hervor, blendet PnL und Notes-Preview kompakt ein und bietet einen Reset-CTA beim gefilterten Leerzustand.
+- **Notes-Flow:** JournalDetailPanel fokussiert das Notes-Feld automatisch beim Editieren und bietet eine "Add notes"-CTA, wenn noch kein Text existiert.
+- **Entry-Dialog:** JournalNewEntryDialog führt Nutzer:innen mit konkreter Microcopy zu Titel+Takeaway und verdeutlicht den Abschluss mit "Save & open entry".
+
 ### Journey & XP Telemetry (Loop J2-B)
 - `src/types/telemetry.ts` definiert ein versioniertes Envelope (`schemaVersion: 1`) für Journal-Telemetry inkl. Journey-Feldern (`phase`, `xpTotal`, `streak`, `qualityScore`).
 - `mapJournalEventToTelemetryEvent` (`src/lib/journal/journalTelemetry.ts`) verwandelt `JournalEvent` + optionales `journeyMeta` in ein stabiles Telemetry-Event, das von `initializeJournalEventSubscriptions` an `/api/telemetry` gesendet wird (`{ source: "sparkfined", events: [...] }`).
