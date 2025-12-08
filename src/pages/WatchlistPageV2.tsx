@@ -1,18 +1,19 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import DashboardShell from "@/components/dashboard/DashboardShell";
-import WatchlistLayout from "@/components/watchlist/WatchlistLayout";
-import WatchlistTable from "@/components/watchlist/WatchlistTable";
-import WatchlistDetailPanel from "@/components/watchlist/WatchlistDetailPanel";
-import { WatchlistHeaderActions } from "@/components/watchlist/WatchlistHeaderActions";
-import { LiveStatusBadge } from "@/components/live/LiveStatusBadge";
-import { fetchWatchlistQuotes } from "@/features/market/watchlistData";
-import { useWatchlistStore } from "@/store/watchlistStore";
-import type { WatchlistRow } from "@/store/watchlistStore";
-import { DEFAULT_TIMEFRAME } from "@/domain/chart";
-import { buildChartUrl, buildReplayUrl } from "@/lib/chartLinks";
-import { useOnlineStatus } from "@/hooks/useOnlineStatus";
-import StateView from "@/components/ui/StateView";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import DashboardShell from '@/components/dashboard/DashboardShell';
+import WatchlistTable from '@/components/watchlist/WatchlistTable';
+import WatchlistDetailPanel from '@/components/watchlist/WatchlistDetailPanel';
+import { WatchlistHeaderActions } from '@/components/watchlist/WatchlistHeaderActions';
+import { LiveStatusBadge } from '@/components/live/LiveStatusBadge';
+import { fetchWatchlistQuotes } from '@/features/market/watchlistData';
+import { useWatchlistStore } from '@/store/watchlistStore';
+import type { WatchlistRow } from '@/store/watchlistStore';
+import { DEFAULT_TIMEFRAME } from '@/domain/chart';
+import { buildChartUrl, buildReplayUrl } from '@/lib/chartLinks';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import StateView from '@/components/ui/StateView';
+import { FilterPills } from '@/components/layout/FilterPills';
+import { SkeletonCard, SkeletonTable } from '@/components/ui/Skeleton';
 
 type SessionFilter = "all" | "London" | "NY" | "Asia";
 type SortMode = "default" | "top-movers" | "alphabetical";
@@ -71,7 +72,9 @@ export default function WatchlistPageV2() {
     });
   }, [rows, loadQuotes, setError, setLoading]);
   const assetCount = rows.length;
-  const headerDescription = `${assetCount} assets watched \u00b7 Quickly scan risk, momentum and context`;
+  const headerDescription = `${assetCount} assets watched \u00b7 Track sessions, sentiment and next moves.`;
+  const showSkeleton = isLoading && rows.length === 0;
+  const showEmptyState = !isLoading && rows.length === 0;
   const visibleRows = React.useMemo(() => {
     const filteredRows =
       sessionFilter === "all" ? rows : rows.filter((row) => row.session === sessionFilter);
@@ -117,6 +120,15 @@ export default function WatchlistPageV2() {
     },
     [navigate]
   );
+  const handleRetryFetch = React.useCallback(() => {
+    if (!rows.length) {
+      return;
+    }
+    const symbols = rows.map((row) => row.symbol);
+    loadQuotes(symbols).catch(() => {
+      /* handled in loadQuotes */
+    });
+  }, [loadQuotes, rows]);
 
   return (
     <div data-testid="watchlist-page">
@@ -125,96 +137,78 @@ export default function WatchlistPageV2() {
         description={headerDescription}
         actions={<WatchlistHeaderActions assetCount={assetCount} isLoading={isLoading} error={error} />}
       >
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8">
-        <section className="space-y-3">
-          <div className="space-y-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Watchlist</p>
-            <p className="text-base text-text-primary">Your curated tokens, ready for focused tracking.</p>
-            <p className="text-sm text-text-secondary">
-              Filter, sort, and drill into price action without leaving your command center.
-            </p>
-          </div>
-          <div className="space-y-1 text-xs">
-            {isLoading && <p className="text-text-tertiary">Refreshing your watchlist…</p>}
-            {!isLoading && error && (
-              <p className="font-medium text-warn">Price data unavailable, showing last known values.</p>
-            )}
-            {!isLoading && !error && (
-              <p className="text-text-secondary">Live prices refresh automatically while Grok monitors flows.</p>
-            )}
-          </div>
-        </section>
-
-        <section>
-          <WatchlistLayout>
-            {!isOnline && (
-              <div className="mb-4" data-testid="watchlist-offline-banner">
-                <StateView
-                  type="offline"
-                  description="You're offline. Showing last cached prices."
-                  compact
-                />
-              </div>
-            )}
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-              <div className="space-y-4">
-                <div className="card-glass rounded-2xl">
-                  <div className="space-y-3 border-b border-border px-3 py-2 text-xs sm:text-sm">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {SESSION_FILTERS.map((filter) => {
-                        const isActive = sessionFilter === filter;
-                        return (
-                          <button
-                            key={filter}
-                            type="button"
-                            onClick={() => setSessionFilter(filter)}
-                            className={`rounded-full border px-3 py-1 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
-                              isActive
-                                ? "border-glow-brand bg-brand/10 text-brand hover-glow"
-                                : "border-border text-text-secondary hover:bg-interactive-hover hover-scale"
-                            }`}
-                            data-testid={`watchlist-session-filter-${filter}`}
-                          >
-                            {filter === "all" ? "All" : filter}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <LiveStatusBadge showLabel />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setSortMode((prev) => {
-                            if (prev === "default") return "top-movers";
-                            if (prev === "top-movers") return "alphabetical";
-                            return "default";
-                          })
-                        }
-                        className="rounded-full border border-border px-3 py-1 font-semibold text-text-secondary transition hover:border-brand hover:text-text-primary hover-scale focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                        data-testid="watchlist-sort-toggle"
-                      >
-                        Sort:{" "}
-                        {sortMode === "default"
-                          ? "Default"
-                          : sortMode === "top-movers"
-                            ? "Top Movers"
-                            : "A-Z"}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="p-2">
-                    <WatchlistTable rows={visibleRows} activeSymbol={activeSymbol} trends={trends} onSelect={setActiveSymbol} />
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <WatchlistDetailPanel row={activeRow} trend={activeTrend} onOpenChart={openChart} onOpenReplay={openReplay} />
+        <div className="space-y-6 text-text-primary">
+          <section className="rounded-3xl border border-border/70 bg-surface/80 px-4 py-4 shadow-card-subtle backdrop-blur-lg sm:px-6 sm:py-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <FilterPills options={SESSION_FILTERS} active={sessionFilter} onChange={setSessionFilter} className="w-full lg:w-auto" />
+              <div className="flex flex-wrap items-center gap-3">
+                <LiveStatusBadge showLabel />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSortMode((prev) => {
+                      if (prev === "default") return "top-movers";
+                      if (prev === "top-movers") return "alphabetical";
+                      return "default";
+                    })
+                  }
+                  className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-text-secondary transition hover:border-brand hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                  data-testid="watchlist-sort-toggle"
+                >
+                  Sort:{" "}
+                  {sortMode === "default" ? "Default" : sortMode === "top-movers" ? "Top Movers" : "A-Z"}
+                </button>
               </div>
             </div>
-          </WatchlistLayout>
-        </section>
-      </div>
+            {!isLoading && !error && (
+              <p className="mt-3 text-xs text-text-secondary">
+                Filter, sort, and drill into price action without leaving your command center.
+              </p>
+            )}
+          </section>
+
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+            <section className="space-y-4 rounded-3xl border border-border/70 bg-surface/90 p-4 shadow-card-subtle backdrop-blur-lg sm:p-6">
+              {!isOnline && (
+                <div className="rounded-2xl border border-border/70 bg-surface-subtle/80" data-testid="watchlist-offline-banner">
+                  <StateView type="offline" description="You're offline. Showing last cached prices." compact />
+                </div>
+              )}
+              {error && (
+                <div className="rounded-2xl border border-danger/40 bg-danger/5">
+                  <StateView type="error" description={error} actionLabel="Retry" onAction={handleRetryFetch} compact />
+                </div>
+              )}
+              {showSkeleton ? (
+                <SkeletonTable rows={6} />
+              ) : showEmptyState ? (
+                <div className="rounded-3xl border border-border/60 bg-surface-subtle/60">
+                  <StateView
+                    type="empty"
+                    title="No assets yet"
+                    description="Add an instrument from Discover to start tracking it here."
+                    compact
+                  />
+                </div>
+              ) : (
+                <WatchlistTable rows={visibleRows} activeSymbol={activeSymbol} trends={trends} onSelect={setActiveSymbol} />
+              )}
+            </section>
+
+            <section className="rounded-3xl border border-border/70 bg-surface/90 p-4 shadow-card-subtle backdrop-blur-lg sm:p-6">
+              {isLoading && !activeRow ? (
+                <SkeletonCard />
+              ) : (
+                <WatchlistDetailPanel
+                  row={activeRow}
+                  trend={activeTrend}
+                  onOpenChart={openChart}
+                  onOpenReplay={openReplay}
+                />
+              )}
+            </section>
+          </div>
+        </div>
       </DashboardShell>
     </div>
   );

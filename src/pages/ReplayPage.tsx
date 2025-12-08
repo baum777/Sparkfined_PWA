@@ -1,12 +1,16 @@
 import React from "react"
 import { useParams, useNavigate, useSearchParams } from "react-router-dom"
 import ReplayPlayer from "@/components/ReplayPlayer"
+import DashboardShell from "@/components/dashboard/DashboardShell"
 import PatternDashboard from "@/components/PatternDashboard"
 import type { ReplaySession, JournalEntry, ReplayBookmark, SetupTag, EmotionTag } from "@/types/journal"
 import { getSession, addBookmark, deleteBookmark } from "@/lib/ReplayService"
 import { calculatePatternStats, queryEntries } from "@/lib/JournalService"
 import { OhlcReplayEngine } from "@/lib/replay/ohlcReplayEngine"
 import AdvancedChart from "@/components/chart/AdvancedChart"
+import Button from "@/components/ui/Button"
+import StateView from "@/components/ui/StateView"
+import { FilterPills } from "@/components/layout/FilterPills"
 import { DEFAULT_TIMEFRAME, type ChartAnnotation, type ChartMode, type ChartTimeframe } from "@/domain/chart"
 import useOhlcData from "@/hooks/useOhlcData"
 import { useIndicators } from "@/hooks/useIndicators"
@@ -25,13 +29,15 @@ const DEFAULT_ASSET = {
   network: "solana",
 }
 
+const SUPPORTED_TIMEFRAMES: ChartTimeframe[] = ["15m", "1h", "4h", "1d"]
+
 const SYMBOL_TO_ASSET: Record<string, { address: string; network: string; symbol: string }> = {
   SOLUSDT: DEFAULT_ASSET,
 }
 
 function resolveTimeframe(candidate?: string | null): ChartTimeframe {
   const maybe = candidate as ChartTimeframe | undefined
-  if (maybe && ["15m", "1h", "4h", "1d"].includes(maybe)) return maybe
+  if (maybe && SUPPORTED_TIMEFRAMES.includes(maybe)) return maybe
   return DEFAULT_TIMEFRAME
 }
 
@@ -311,235 +317,170 @@ function speedToMs(speed: number): number {
     setViewMode((prev) => (prev === "player" ? "dashboard" : "player"))
   }
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="mb-4 text-4xl">⏳</div>
-          <p className="text-sm text-secondary">Loading replay...</p>
-        </div>
-      </div>
-    )
-  }
+  const isHydrating = loading && viewMode === "player" && !session
 
   return (
-    <div className="min-h-screen bg-bg p-4" data-testid="replay-page">
-      <div className="mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-primary">
-              {viewMode === "player" ? "🎬 Replay Player" : "📊 Pattern Dashboard"}
-            </h1>
-            <p className="text-sm text-secondary">
-              {viewMode === "player"
-                ? "Playback and analyze your trades frame-by-frame"
-                : "Discover patterns and insights from your trading history"}
-            </p>
+    <div data-testid="replay-page">
+      <DashboardShell
+        title="Replay"
+        description="Historical playback and pattern analytics to stress-test your execution."
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={toggleViewMode}>
+              {viewMode === "player" ? "View dashboard" : "View player"}
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => navigate("/journal-v2")}>
+              Journal
+            </Button>
           </div>
-
-          <div className="flex items-center gap-2">
-            {/* View Toggle */}
-            <button
-              onClick={toggleViewMode}
-              className="rounded-lg border border-subtle bg-surface/80 px-4 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary"
-            >
-              {viewMode === "player" ? "📊 Dashboard" : "🎬 Player"}
-            </button>
-
-            {/* Back Button */}
-            <button
-              onClick={() => navigate("/journal-v2")}
-              className="rounded-lg border border-subtle bg-surface/80 px-4 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary"
-            >
-              ← Journal
-            </button>
-          </div>
-        </div>
-
-        {viewMode === "player" && (
-          <div
-            className="mb-4 rounded-xl border border-subtle bg-surface/70 px-4 py-3 text-sm text-secondary"
-            data-testid="replay-mode-banner"
-          >
-            You’re in replay mode — scrub historical candles, jump to annotations and signals, then hit “Go live” to return to the
-            latest price action.
-          </div>
-        )}
-
-        {/* Player View */}
-        {viewMode === "player" && (
-          <div className="mb-4 flex flex-wrap items-center gap-2 text-sm text-secondary">
-            {(["15m", "1h", "4h", "1d"] as ChartTimeframe[]).map((tf) => (
-              <button
-                key={tf}
-                onClick={() => handleTimeframeChange(tf)}
-                className={`rounded-full px-3 py-1 ${
-                  timeframe === tf
-                    ? "bg-info text-bg"
-                    : "border border-subtle bg-surface/70 text-secondary"
-                }`}
+        }
+      >
+        <div className="space-y-6">
+          {viewMode === "player" ? (
+            <>
+              <div
+                className="rounded-3xl border border-border/70 bg-surface/90 px-4 py-3 text-sm text-text-secondary shadow-card-subtle backdrop-blur-lg"
+                data-testid="replay-mode-banner"
               >
-                {tf}
-              </button>
-            ))}
-            <button
-              onClick={() => refresh()}
-              className="rounded-full border border-subtle bg-surface/70 px-3 py-1 text-secondary"
-              disabled={status === "loading"}
-            >
-              Refresh data
-            </button>
-            <button
-              onClick={handleGoLive}
-              className="rounded-full border border-brand bg-brand/10 px-3 py-1 text-brand"
-              disabled={!candles.length}
-              data-testid="button-go-live"
-              title="Jump to the latest candle"
-            >
-              Go live
-            </button>
-            {status === "stale" && <span className="text-warn">Using cached data</span>}
-            {status === "no-data" && <span className="text-secondary">No candles yet</span>}
-            {status === "error" && <span className="text-danger">{error}</span>}
-            <span className="rounded-full border border-subtle px-2 py-0.5 text-xs uppercase text-tertiary">{mode}</span>
-          </div>
-        )}
+                You’re in replay mode — scrub historical candles, jump to annotations and signals, then hit “Go live” to return to live
+                price action.
+              </div>
 
-        {/* Player View */}
-        {viewMode === "player" && session && (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            {/* Chart Area (2/3 width on large screens) */}
-            <div className="lg:col-span-2">
-              <div className="rounded-xl border border-subtle bg-surface/70 p-4">
-                <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-primary">
-                    📈 Chart View
-                  </h3>
-                  <button
-                    onClick={handleOpenChart}
-                    className="rounded-lg border border-info/40 bg-info/10 px-3 py-1 text-xs font-medium text-info transition-colors hover:bg-info/20"
-                    title="Open this asset in the live chart"
-                  >
-                    Open in Chart →
-                  </button>
-                </div>
-
-                <AdvancedChart
-                  candles={candles}
-                  status={status}
-                  source={source}
-                  viewState={replayViewState}
-                  error={error}
-                  replayLabel={`Replay: ${session.name ?? session.id}`}
-                  lastUpdatedAt={lastUpdatedAt}
-                  indicators={indicators}
-                  annotations={annotations}
-                  onCreateJournalAtPoint={() => {
-                    void createJournalDraft({
-                      address: asset.address,
-                      symbol: asset.symbol,
-                      price: candles[candles.length - 1]?.c ?? 0,
-                      time: candles[candles.length - 1]?.t ?? Date.now(),
-                      timeframe,
-                    })
-                    track('chart.journal_created_from_chart', { address: asset.address, timeframe })
-                  }}
-                  onCreateAlertAtPoint={() => {
-                    createAlertDraft({
-                      address: asset.address,
-                      symbol: asset.symbol,
-                      price: candles[candles.length - 1]?.c ?? 0,
-                      time: candles[candles.length - 1]?.t ?? Date.now(),
-                      timeframe,
-                    })
-                    track('chart.alert_created_from_chart', { address: asset.address, timeframe })
-                  }}
-                  onAnnotationClick={(annotation) => handleJumpToAnnotation(annotation)}
-                />
-
-                {candles.length > 0 && (
-                  <div className="mt-3 text-xs text-secondary">
-                    Frame {currentFrame + 1} / {candles.length}
+              <section className="space-y-4 rounded-3xl border border-border/70 bg-surface/90 p-4 shadow-card-subtle backdrop-blur-lg sm:p-6">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <FilterPills options={SUPPORTED_TIMEFRAMES} active={timeframe} onChange={handleTimeframeChange} />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => refresh()} disabled={status === "loading"}>
+                      Refresh data
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={handleGoLive}
+                      disabled={!candles.length}
+                      data-testid="button-go-live"
+                      title="Jump to the latest candle"
+                    >
+                      Go live
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={handleOpenChart}>
+                      Open live chart
+                    </Button>
+                    <span className="rounded-full border border-border/70 px-2 py-0.5 text-xs uppercase text-text-tertiary">{mode}</span>
                   </div>
-                )}
-                {candles.length === 0 && status === "no-data" && (
-                  <div className="mt-3 text-xs text-secondary">No replay frames yet for this timeframe.</div>
-                )}
-              </div>
-            </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-text-secondary">
+                  {status === "stale" && <span className="text-warn">Using cached data</span>}
+                  {status === "no-data" && <span>No candles yet</span>}
+                  {status === "error" && <span className="text-danger">{error}</span>}
+                </div>
+              </section>
 
-            {/* Player Controls (1/3 width on large screens) */}
-            <div className="lg:col-span-1">
-              <ReplayPlayer
-                session={session}
-                currentFrame={currentFrame}
-                totalFrames={candles.length}
-                isPlaying={hasFrames && isPlaying}
-                speed={speed}
-                onPlay={handlePlay}
-                onPause={handlePause}
-                onSeek={handleSeek}
-                onSpeedChange={handleSpeedChange}
-                onAddBookmark={handleAddBookmark}
-                onDeleteBookmark={handleDeleteBookmark}
-                onJumpToBookmark={handleJumpToBookmark}
-              />
-            </div>
-          </div>
-        )}
+              {isHydrating ? (
+                <div className="rounded-3xl border border-border/70 bg-surface/90 shadow-card-subtle">
+                  <StateView type="loading" description="Loading replay session…" />
+                </div>
+              ) : session ? (
+                <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+                  <div className="space-y-3 rounded-3xl border border-border/70 bg-surface/90 p-4 shadow-card-subtle backdrop-blur-lg sm:p-6">
+                    <div className="flex items-center justify-between gap-3 text-sm text-text-secondary">
+                      <h3 className="text-base font-semibold text-text-primary">Chart View</h3>
+                      <Button variant="ghost" size="sm" onClick={handleOpenChart}>
+                        Open live chart
+                      </Button>
+                    </div>
 
-        {/* Player View - No Session */}
-        {viewMode === "player" && !session && (
-          <div className="rounded-xl border border-subtle bg-surface/70 p-8 text-center">
-            <div className="mb-4 text-6xl">🎬</div>
-            <h2 className="mb-2 text-xl font-bold text-primary">
-              No Replay Session Selected
-            </h2>
-            <p className="mb-6 text-sm text-secondary">
-              Select a journal entry and create a replay session, or browse patterns in the dashboard.
-            </p>
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={() => setViewMode("dashboard")}
-                className="rounded-lg border border-info/40 bg-info/10 px-4 py-2 text-sm font-medium text-info transition-colors hover:bg-info/20"
-              >
-                📊 View Dashboard
-              </button>
-              <button
-                onClick={() => navigate("/journal-v2")}
-                className="rounded-lg border border-subtle bg-surface/80 px-4 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary"
-              >
-                ← Back to Journal
-              </button>
-            </div>
-          </div>
-        )}
+                    <AdvancedChart
+                      candles={candles}
+                      status={status}
+                      source={source}
+                      viewState={replayViewState}
+                      error={error}
+                      replayLabel={`Replay: ${session.name ?? session.id}`}
+                      lastUpdatedAt={lastUpdatedAt}
+                      indicators={indicators}
+                      annotations={annotations}
+                      onCreateJournalAtPoint={() => {
+                        void createJournalDraft({
+                          address: asset.address,
+                          symbol: asset.symbol,
+                          price: candles[candles.length - 1]?.c ?? 0,
+                          time: candles[candles.length - 1]?.t ?? Date.now(),
+                          timeframe,
+                        })
+                        track('chart.journal_created_from_chart', { address: asset.address, timeframe })
+                      }}
+                      onCreateAlertAtPoint={() => {
+                        createAlertDraft({
+                          address: asset.address,
+                          symbol: asset.symbol,
+                          price: candles[candles.length - 1]?.c ?? 0,
+                          time: candles[candles.length - 1]?.t ?? Date.now(),
+                          timeframe,
+                        })
+                        track('chart.alert_created_from_chart', { address: asset.address, timeframe })
+                      }}
+                      onAnnotationClick={(annotation) => handleJumpToAnnotation(annotation)}
+                    />
 
-        {/* Dashboard View */}
-        {viewMode === "dashboard" && (
-          <div>
-            {patternStats ? (
-              <PatternDashboard
-                stats={patternStats}
-                entries={entries}
-                onFilterByPattern={handleFilterByPattern}
-                onViewEntry={handleViewEntry}
-              />
-            ) : (
-              <div className="rounded-xl border border-subtle bg-surface/70 p-8 text-center">
-                <div className="mb-4 text-6xl">📊</div>
-                <h2 className="mb-2 text-xl font-bold text-primary">
-                  No Data Yet
-                </h2>
-                <p className="text-sm text-secondary">
-                  Close some trades in your journal to see pattern analysis.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+                    {candles.length > 0 && (
+                      <p className="text-xs text-text-secondary">
+                        Frame {currentFrame + 1} / {candles.length}
+                      </p>
+                    )}
+                    {candles.length === 0 && status === "no-data" && (
+                      <p className="text-xs text-text-secondary">No replay frames yet for this timeframe.</p>
+                    )}
+                  </div>
+
+                  <ReplayPlayer
+                    session={session}
+                    currentFrame={currentFrame}
+                    totalFrames={candles.length}
+                    isPlaying={hasFrames && isPlaying}
+                    speed={speed}
+                    onPlay={handlePlay}
+                    onPause={handlePause}
+                    onSeek={handleSeek}
+                    onSpeedChange={handleSpeedChange}
+                    onAddBookmark={handleAddBookmark}
+                    onDeleteBookmark={handleDeleteBookmark}
+                    onJumpToBookmark={handleJumpToBookmark}
+                  />
+                </div>
+              ) : (
+                <div className="rounded-3xl border border-border/70 bg-surface/90 p-8 text-center shadow-card-subtle">
+                  <StateView
+                    type="empty"
+                    title="No replay session selected"
+                    description="Create a replay from your journal or open the dashboard to explore patterns."
+                    actionLabel="View dashboard"
+                    onAction={() => setViewMode("dashboard")}
+                  />
+                </div>
+              )}
+            </>
+          ) : (
+            <section className="rounded-3xl border border-border/70 bg-surface/90 p-4 shadow-card-subtle backdrop-blur-lg sm:p-6">
+              {patternStats ? (
+                <PatternDashboard
+                  stats={patternStats}
+                  entries={entries}
+                  onFilterByPattern={handleFilterByPattern}
+                  onViewEntry={handleViewEntry}
+                />
+              ) : (
+                <StateView
+                  type="empty"
+                  title="No data yet"
+                  description="Close some trades in your journal to see pattern analysis."
+                  compact={false}
+                />
+              )}
+            </section>
+          )}
+        </div>
+      </DashboardShell>
     </div>
   )
 }

@@ -104,28 +104,28 @@ export default function ReplayPlayer({
   };
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+    <div className="rounded-3xl border border-border/70 bg-surface/80 p-4 shadow-card-subtle">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-zinc-200">
+          <h3 className="text-sm font-semibold text-text-primary">
             Replay: {session.name || "Untitled Session"}
           </h3>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-text-secondary">
             {formatTime(currentFrame)} / {formatTime(totalFrames)}
           </p>
         </div>
         <div className="flex items-center gap-2">
           {/* Speed Controls */}
-          <div className="flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/80 px-2 py-1">
+          <div className="flex items-center gap-1 rounded-full border border-border/70 bg-surface/70 px-2 py-1">
             {[0.5, 1, 2, 4].map((s) => (
               <button
                 key={s}
                 onClick={() => onSpeedChange(s)}
                 className={`rounded px-2 py-1 text-xs font-medium transition-colors ${
                   speed === s
-                    ? "bg-cyan-500/20 text-cyan-400"
-                    : "text-zinc-500 hover:text-zinc-300"
+                    ? "bg-info/20 text-info"
+                    : "text-text-secondary hover:text-text-primary"
                 }`}
               >
                 {s}x
@@ -136,10 +136,10 @@ export default function ReplayPlayer({
           {/* Bookmark Toggle */}
           <button
             onClick={() => setShowBookmarks(!showBookmarks)}
-            className={`rounded-lg border px-3 py-1 text-xs font-medium transition-colors ${
+            className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
               showBookmarks
-                ? "border-amber-500/50 bg-amber-500/10 text-amber-400"
-                : "border-zinc-800 bg-zinc-900/80 text-zinc-400 hover:text-zinc-200"
+                ? "border-warn/60 bg-warn/10 text-warn"
+                : "border-border/70 bg-surface/70 text-text-secondary hover:text-text-primary"
             }`}
           >
             🔖 Bookmarks ({session.bookmarks?.length || 0})
@@ -150,21 +150,18 @@ export default function ReplayPlayer({
       {/* Timeline */}
       <div className="mb-4">
         <div
-          className="relative h-12 cursor-pointer rounded-lg border border-zinc-800 bg-zinc-950"
+          className="relative h-12 cursor-pointer rounded-2xl border border-border/70 bg-surface/80"
           onClick={handleScrub}
         >
           {/* Progress Bar */}
-          <div
-            className="absolute left-0 top-0 h-full rounded-lg bg-cyan-500/20 transition-all"
-            style={{ width: `${progress}%` }}
-          />
+          <div className="absolute left-0 top-0 h-full rounded-2xl bg-info/20 transition-all" style={{ width: `${progress}%` }} />
 
           {/* Transaction Markers */}
           {transactionMarkers.map((marker, idx) => (
             <div
               key={`tx-${idx}`}
               className={`absolute top-0 h-full w-1 ${
-                marker.type === "buy" ? "bg-green-500" : "bg-red-500"
+                marker.type === "buy" ? "bg-sentiment-bull" : "bg-sentiment-bear"
               }`}
               style={{ left: `${marker.position}%` }}
               title={marker.type === "buy" ? "Buy" : "Sell"}
@@ -183,7 +180,7 @@ export default function ReplayPlayer({
                   e.stopPropagation();
                   onJumpToBookmark(bookmark.frame);
                 }}
-                className="text-amber-400 hover:text-amber-300"
+                className="text-warn hover:text-warn/80"
                 title={bookmark.note}
               >
                 🔖
@@ -192,11 +189,8 @@ export default function ReplayPlayer({
           ))}
 
           {/* Playhead */}
-          <div
-            className="absolute top-0 h-full w-0.5 bg-cyan-400"
-            style={{ left: `${progress}%` }}
-          >
-            <div className="absolute -top-1 -left-1.5 h-4 w-4 rounded-full border-2 border-cyan-400 bg-zinc-900" />
+          <div className="absolute top-0 h-full w-0.5 bg-info" style={{ left: `${progress}%` }}>
+            <div className="absolute -top-1 -left-1.5 h-4 w-4 rounded-full border-2 border-info bg-surface/90" />
           </div>
         </div>
       </div>
@@ -207,7 +201,7 @@ export default function ReplayPlayer({
         <button
           onClick={() => onSeek(Math.max(0, currentFrame - 10))}
           disabled={currentFrame === 0}
-          className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 disabled:opacity-50"
+          className="rounded-full border border-border/70 bg-surface/70 px-3 py-2 text-text-secondary transition-colors hover:bg-interactive-hover hover:text-text-primary disabled:opacity-50"
         >
           ⏮
         </button>
@@ -215,7 +209,7 @@ export default function ReplayPlayer({
         {/* Play/Pause */}
         <button
           onClick={isPlaying ? onPause : onPlay}
-          className="rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-6 py-2 text-xl font-bold text-cyan-400 transition-all hover:bg-cyan-500/20"
+          className="rounded-full border border-brand/60 bg-brand/10 px-6 py-2 text-xl font-bold text-brand transition-all hover:bg-brand/20"
         >
           {isPlaying ? "⏸" : "▶"}
         </button>
@@ -224,7 +218,7 @@ export default function ReplayPlayer({
         <button
           onClick={() => onSeek(Math.min(totalFrames, currentFrame + 10))}
           disabled={currentFrame >= totalFrames}
-          className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200 disabled:opacity-50"
+          className="rounded-full border border-border/70 bg-surface/70 px-3 py-2 text-text-secondary transition-colors hover:bg-interactive-hover hover:text-text-primary disabled:opacity-50"
         >
           ⏭
         </button>
@@ -232,7 +226,7 @@ export default function ReplayPlayer({
         {/* Add Bookmark */}
         <button
           onClick={handleAddBookmark}
-          className="ml-4 rounded-lg border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-400 transition-colors hover:bg-amber-500/20"
+          className="ml-4 rounded-full border border-warn/60 bg-warn/10 px-4 py-2 text-sm font-medium text-warn transition-colors hover:bg-warn/20"
         >
           🔖 Add Bookmark
         </button>
@@ -246,17 +240,17 @@ export default function ReplayPlayer({
             value={bookmarkNote}
             onChange={(e) => setBookmarkNote(e.target.value)}
             placeholder="Bookmark note (optional)..."
-            className="flex-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 focus:border-cyan-500/50 focus:outline-none"
+            className="flex-1 rounded-2xl border border-border/70 bg-surface/80 px-3 py-2 text-sm text-text-primary placeholder-text-secondary/70 focus:border-brand focus:outline-none"
           />
           <button
             onClick={handleAddBookmark}
-            className="rounded-lg border border-green-500/50 bg-green-500/10 px-4 py-2 text-sm font-medium text-green-400"
+            className="rounded-full border border-success/50 bg-success/10 px-4 py-2 text-sm font-medium text-success"
           >
             Save
           </button>
           <button
             onClick={() => setBookmarkNote("")}
-            className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-4 py-2 text-sm font-medium text-zinc-400"
+            className="rounded-full border border-border/70 bg-surface/70 px-4 py-2 text-sm font-medium text-text-secondary"
           >
             Cancel
           </button>
@@ -265,12 +259,12 @@ export default function ReplayPlayer({
 
       {/* Bookmarks List */}
       {showBookmarks && (
-        <div className="mt-4 rounded-lg border border-zinc-800 bg-zinc-950 p-3">
-          <h4 className="mb-2 text-xs font-semibold text-zinc-400">
+        <div className="mt-4 rounded-2xl border border-border/70 bg-surface/80 p-3">
+          <h4 className="mb-2 text-xs font-semibold text-text-secondary">
             Bookmarks ({session.bookmarks?.length || 0})
           </h4>
           {!session.bookmarks || session.bookmarks.length === 0 ? (
-            <p className="text-xs text-zinc-600">
+            <p className="text-xs text-text-secondary">
               No bookmarks yet. Add bookmarks during replay to mark important moments.
             </p>
           ) : (
@@ -278,26 +272,26 @@ export default function ReplayPlayer({
               {session.bookmarks.map((bookmark) => (
                 <div
                   key={bookmark.id}
-                  className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/40 p-2"
+                  className="flex items-center justify-between rounded-2xl border border-border/70 bg-surface/70 p-2"
                 >
                   <div className="flex-1">
-                    <p className="text-xs font-medium text-zinc-300">
+                    <p className="text-xs font-medium text-text-primary">
                       {bookmark.note}
                     </p>
-                    <p className="text-xs text-zinc-600">
+                    <p className="text-xs text-text-secondary">
                       {formatTime(bookmark.frame)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onJumpToBookmark(bookmark.frame)}
-                      className="rounded px-2 py-1 text-xs text-cyan-400 hover:bg-cyan-500/10"
+                      className="rounded px-2 py-1 text-xs text-info hover:bg-info/10"
                     >
                       Jump
                     </button>
                     <button
                       onClick={() => onDeleteBookmark(bookmark.id)}
-                      className="rounded px-2 py-1 text-xs text-red-400 hover:bg-red-500/10"
+                      className="rounded px-2 py-1 text-xs text-danger hover:bg-danger/10"
                     >
                       Delete
                     </button>
@@ -310,29 +304,29 @@ export default function ReplayPlayer({
       )}
 
       {/* Session Info */}
-      <div className="mt-4 rounded-lg border border-zinc-800 bg-zinc-950 p-3">
-        <div className="grid grid-cols-2 gap-2 text-xs">
+      <div className="mt-4 rounded-2xl border border-border/70 bg-surface/80 p-3">
+        <div className="grid grid-cols-2 gap-2 text-xs text-text-secondary">
           <div>
-            <span className="text-zinc-600">Journal Entry:</span>{" "}
-            <span className="text-zinc-300">
+            <span className="text-text-tertiary">Journal Entry:</span>{" "}
+            <span className="text-text-primary">
               {session.journalEntryId ? "Linked" : "None"}
             </span>
           </div>
           <div>
-            <span className="text-zinc-600">OHLC Cached:</span>{" "}
-            <span className="text-zinc-300">
+            <span className="text-text-tertiary">OHLC Cached:</span>{" "}
+            <span className="text-text-primary">
               {session.ohlcCache ? `${session.ohlcCache.length} points` : "No"}
             </span>
           </div>
           <div>
-            <span className="text-zinc-600">Created:</span>{" "}
-            <span className="text-zinc-300">
+            <span className="text-text-tertiary">Created:</span>{" "}
+            <span className="text-text-primary">
               {new Date(session.createdAt).toLocaleDateString()}
             </span>
           </div>
           <div>
-            <span className="text-zinc-600">Duration:</span>{" "}
-            <span className="text-zinc-300">{formatTime(totalFrames)}</span>
+            <span className="text-text-tertiary">Duration:</span>{" "}
+            <span className="text-text-primary">{formatTime(totalFrames)}</span>
           </div>
         </div>
       </div>

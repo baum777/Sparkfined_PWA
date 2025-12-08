@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardFooter, CardHeader } from '@/components/ui/Card'
 import StateView from '@/components/ui/StateView'
+import { SkeletonChartCard } from '@/components/ui/Skeleton'
 import { DEFAULT_TIMEFRAME, TIMEFRAME_ORDER, type ChartTimeframe, type IndicatorPresetId } from '@/domain/chart'
 import useOhlcData from '@/hooks/useOhlcData'
 import { useIndicators } from '@/hooks/useIndicators'
@@ -187,111 +188,81 @@ export default function ChartPageV2() {
     }
   }, [annotations, asset.address, timeframe, track])
 
+  const headerMeta = `${asset.symbol} · ${timeframe.toUpperCase()} · ${
+    source === 'live' ? 'Live feed' : 'Cached snapshot'
+  }`
+  const showChartSkeleton = status === 'loading' && !hasData
+
   return (
     <DashboardShell
       title="Chart"
       description="Trade-ready chart workspace with indicators, replay, drawings and exports."
-      actions={<ChartHeaderActions />}
+      meta={headerMeta}
+      actions={
+        <ChartHeaderActions
+          timeframe={timeframe}
+          supportedTimeframes={SUPPORTED_TIMEFRAMES}
+          onTimeframeChange={handleTimeframeChange}
+          onRefresh={refresh}
+          onOpenReplay={handleOpenReplay}
+          isRefreshing={status === 'loading'}
+        />
+      }
     >
-      <Card variant="glass" className="space-y-6 rounded-3xl" data-testid="chart-page">
+      <div className="space-y-6" data-testid="chart-page">
         {!hasSeenIntro && <ChartIntroBanner onDismiss={dismissIntro} />}
         {!isOnline && (
-          <StateView
-            type="offline"
-            description="You're offline. Showing last cached chart data."
-            compact
-          />
+          <div className="rounded-3xl border border-border/70 bg-surface/80">
+            <StateView type="offline" description="You're offline. Showing last cached chart data." compact />
+          </div>
         )}
         {isDefaultAsset && (
-          <div className="card-bordered rounded-lg border-info/40 bg-info/10 p-3 text-sm">
-            <p className="text-info">
-              <strong>No symbol provided.</strong> Showing default chart (SOL/USDT). Select a token from the{' '}
-              <button
-                onClick={() => navigate('/watchlist-v2')}
-                className="underline hover:text-info/80"
-              >
-                Watchlist
-              </button>{' '}
-              to view other charts.
-            </p>
+          <div className="rounded-3xl border border-info/40 bg-info/10 px-4 py-3 text-sm text-info">
+            <strong>No symbol provided.</strong> Showing default chart (SOL/USDT). Select a token from the{' '}
+            <button onClick={() => navigate('/watchlist-v2')} className="underline hover:text-info/80">
+              Watchlist
+            </button>{' '}
+            to view other charts.
           </div>
         )}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold text-text-primary">Advanced chart</h2>
-            <p className="mt-2 text-sm text-text-secondary">
-              Lightweight chart backed by cached OHLC snapshots for offline resilience.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {timeframeButtons.map((item) => (
-              <Button
-                key={item.value}
-                size="sm"
-                variant={timeframe === item.value ? 'primary' : 'ghost'}
-                className="rounded-full px-4"
-                onClick={() => handleTimeframeChange(item.value)}
-                title={`Switch to ${item.label} candles`}
-              >
-                {item.label}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full px-4"
-              onClick={() => refresh()}
-              disabled={status === 'loading'}
-              data-testid="button-refresh-chart"
-              title="Refetch candles"
-            >
-              Refresh
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full px-4"
-              onClick={handleOpenReplay}
-              data-testid="button-open-replay"
-              title="Open replay with current asset/timeframe"
-            >
-              Open replay
-            </Button>
-          </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-3" data-testid="indicator-toolbar">
-          <span className="text-xs uppercase tracking-wide text-text-secondary">Indicators</span>
-          {indicatorButtons.map((button) => {
-            const isActive = overlays.some((item) => JSON.stringify(item) === JSON.stringify(button.overlay))
-            return (
-              <Button
-                key={button.key}
-                size="sm"
-                variant={isActive ? 'secondary' : 'ghost'}
-                className="rounded-full px-4 text-xs"
-                onClick={() => {
-                  toggleOverlay(asset.address, button.overlay)
-                  track('chart.indicator_toggled', {
-                    indicator: button.overlay,
-                    active: !isActive,
-                    address: asset.address,
-                    timeframe,
-                  })
-                }}
-                data-testid={`indicator-toggle-${button.key}`}
-                title={
-                  button.overlay.type === 'bb'
-                    ? 'BB 20/2 – volatility bands for squeezes and breakouts'
-                    : `${button.label} – smoothing to contextualize moves`
-                }
-              >
-                {button.label}
-              </Button>
-            )
-          })}
-          <div className="flex items-center gap-2 text-xs text-text-secondary">
-            Preset:
+        <section
+          className="space-y-4 rounded-3xl border border-border/70 bg-surface/90 p-4 shadow-card-subtle backdrop-blur-lg sm:p-6"
+          data-testid="indicator-toolbar"
+        >
+          <div className="flex flex-wrap items-center gap-3 text-xs text-text-secondary">
+            <span className="uppercase tracking-[0.3em] text-text-tertiary">Indicators</span>
+            {indicatorButtons.map((button) => {
+              const isActive = overlays.some((item) => JSON.stringify(item) === JSON.stringify(button.overlay))
+              return (
+                <Button
+                  key={button.key}
+                  size="sm"
+                  variant={isActive ? 'secondary' : 'ghost'}
+                  className="rounded-full px-4 text-xs"
+                  onClick={() => {
+                    toggleOverlay(asset.address, button.overlay)
+                    track('chart.indicator_toggled', {
+                      indicator: button.overlay,
+                      active: !isActive,
+                      address: asset.address,
+                      timeframe,
+                    })
+                  }}
+                  data-testid={`indicator-toggle-${button.key}`}
+                  title={
+                    button.overlay.type === 'bb'
+                      ? 'BB 20/2 – volatility bands for squeezes and breakouts'
+                      : `${button.label} – smoothing to contextualize moves`
+                  }
+                >
+                  {button.label}
+                </Button>
+              )
+            })}
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
+            <span className="uppercase tracking-wide text-text-tertiary">Preset</span>
             {(
               [
                 { id: 'scalper', label: 'Scalper' },
@@ -312,40 +283,47 @@ export default function ChartPageV2() {
               </Button>
             ))}
           </div>
-        </div>
+        </section>
 
-        <AdvancedChart
-          candles={candles}
-          status={status}
-          source={source}
-          viewState={viewState}
-          error={error}
-          lastUpdatedAt={lastUpdatedAt}
-          indicators={indicators}
-          annotations={annotations}
-          testId="chart-workspace"
-          onCreateJournalAtPoint={() => {
-            void createJournalDraft(creationContext)
-            track('chart.journal_created_from_chart', { address: asset.address, timeframe })
-          }}
-          onCreateAlertAtPoint={() => {
-            createAlertDraft({ ...creationContext, timeframe })
-            track('chart.alert_created_from_chart', { address: asset.address, timeframe })
-          }}
-          onAnnotationClick={(annotation) => {
-            track('chart.annotation_jump', { address: asset.address, timeframe, kind: annotation.kind })
-            setSearchParams((current) => {
-              const next = new URLSearchParams(current)
-              next.set('timeframe', timeframe)
-              next.set('address', asset.address)
-              next.set('network', asset.network)
-              next.set('focus', String(annotation.candleTime))
-              return next
-            })
-          }}
-        />
-
-        <ChartLegend />
+        {showChartSkeleton ? (
+          <Card variant="glass" className="rounded-3xl p-4 sm:p-6">
+            <SkeletonChartCard />
+          </Card>
+        ) : (
+          <Card variant="glass" className="space-y-6 rounded-3xl p-4 sm:p-6">
+            <AdvancedChart
+              candles={candles}
+              status={status}
+              source={source}
+              viewState={viewState}
+              error={error}
+              lastUpdatedAt={lastUpdatedAt}
+              indicators={indicators}
+              annotations={annotations}
+              testId="chart-workspace"
+              onCreateJournalAtPoint={() => {
+                void createJournalDraft(creationContext)
+                track('chart.journal_created_from_chart', { address: asset.address, timeframe })
+              }}
+              onCreateAlertAtPoint={() => {
+                createAlertDraft({ ...creationContext, timeframe })
+                track('chart.alert_created_from_chart', { address: asset.address, timeframe })
+              }}
+              onAnnotationClick={(annotation) => {
+                track('chart.annotation_jump', { address: asset.address, timeframe, kind: annotation.kind })
+                setSearchParams((current) => {
+                  const next = new URLSearchParams(current)
+                  next.set('timeframe', timeframe)
+                  next.set('address', asset.address)
+                  next.set('network', asset.network)
+                  next.set('focus', String(annotation.candleTime))
+                  return next
+                })
+              }}
+            />
+            <ChartLegend />
+          </Card>
+        )}
 
         {status === 'error' && !hasData && (
           <div className="rounded-2xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
@@ -360,11 +338,11 @@ export default function ChartPageV2() {
         )}
 
         {status === 'no-data' && (
-          <div className="rounded-2xl border border-subtle bg-surface-subtle px-4 py-3 text-sm text-text-secondary">
+          <div className="rounded-2xl border border-border/60 bg-surface-subtle px-4 py-3 text-sm text-text-secondary">
             No candles available yet for {asset.symbol} on {timeframe}. Try another timeframe.
           </div>
         )}
-      </Card>
+      </div>
     </DashboardShell>
   )
 }
