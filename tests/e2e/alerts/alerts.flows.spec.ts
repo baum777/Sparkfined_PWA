@@ -1,7 +1,18 @@
+import type { Page } from '@playwright/test';
 import { expect, test } from '../fixtures/baseTest';
 import { visitAlerts } from '../fixtures/navigation';
 import { ALERT_IDS } from '../fixtures/testData';
 import { awaitStableUI } from '../utils/wait';
+
+async function createAlert(page: Page, symbol: string) {
+  await page.getByTestId('alerts-new-alert-button').click();
+  await page.getByTestId('alert-create-dialog').waitFor();
+  await page.getByTestId('alert-symbol-input').fill(symbol);
+  await page.getByTestId('alert-condition-input').fill('Automation condition for alert lifecycle.');
+  await page.getByTestId('alert-threshold-input').fill('123');
+  await page.getByTestId('alert-submit-button').click();
+  await page.waitForSelector('[data-testid="alert-create-dialog"]', { state: 'detached' });
+}
 
 test.describe('alerts flows', () => {
   test.beforeEach(async ({ page }) => {
@@ -56,5 +67,27 @@ test.describe('alerts flows', () => {
     await page.getByTestId('alerts-type-filter-price-below').click();
 
     await expect(page.getByTestId('alerts-empty-state')).toBeVisible();
+  });
+
+  test('@alerts deleting the active alert clears the detail panel and URL', async ({ page }) => {
+    const tempSymbol = 'E2ECLR';
+    await createAlert(page, tempSymbol);
+
+    const created = page.locator('[data-testid="alerts-list-item"]').filter({ hasText: tempSymbol }).first();
+    const alertId = await created.getAttribute('data-alert-id');
+    expect(alertId).toBeTruthy();
+
+    await created.click();
+    await expect(page.getByTestId('alerts-detail-panel')).toBeVisible();
+
+    page.once('dialog', (dialog) => dialog.accept());
+    await page.getByTestId('alert-delete-button').click();
+
+    if (alertId) {
+      await expect(page.locator(`[data-alert-id="${alertId}"]`)).toHaveCount(0);
+    }
+
+    await expect(page.getByTestId('alerts-detail-empty')).toBeVisible();
+    await expect(page).not.toHaveURL(/alert=/);
   });
 });

@@ -148,7 +148,7 @@ export default function WatchlistPageV2() {
         <section>
           <WatchlistLayout>
             {!isOnline && (
-              <div className="mb-4">
+              <div className="mb-4" data-testid="watchlist-offline-banner">
                 <StateView
                   type="offline"
                   description="You're offline. Showing last cached prices."

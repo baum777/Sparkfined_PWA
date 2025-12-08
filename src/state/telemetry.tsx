@@ -65,9 +65,13 @@ function writeBuffer(buf: TelemetryEvent[]) {
 export function TelemetryProvider({ children }: { children: React.ReactNode }) {
   const [flags, _setFlags] = React.useState<TelemetryFlags>(readFlags);
   const [buffer, setBuffer] = React.useState<TelemetryEvent[]>(readBuffer);
+  const bufferRef = React.useRef(buffer);
 
   React.useEffect(() => writeFlags(flags), [flags]);
   React.useEffect(() => writeBuffer(buffer), [buffer]);
+  React.useEffect(() => {
+    bufferRef.current = buffer;
+  }, [buffer]);
 
   const setFlags = (patch: Partial<TelemetryFlags>) => _setFlags(s => ({ ...s, ...patch }));
 
@@ -77,8 +81,9 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
     setBuffer(buf => [ev, ...buf].slice(0, 2000));
   };
 
-  const drain = () => {
-    if (buffer.length === 0) return;
+  const drain = React.useCallback(() => {
+    const currentBuffer = bufferRef.current;
+    if (currentBuffer.length === 0) return;
 
     if (import.meta.env.DEV) {
       // Dev mode: avoid noisy 500s from the stub API but still clear the buffer.
@@ -86,25 +91,30 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const payload = { source: "sparkfined", version: 1, events: buffer.slice().reverse() };
+    const payload = { source: "sparkfined", version: 1, events: currentBuffer.slice().reverse() };
     const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
     const ok = !!navigator.sendBeacon && navigator.sendBeacon("/api/telemetry", blob);
     if (!ok) {
-      fetch("/api/telemetry", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(()=>{});
+      fetch("/api/telemetry", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch(() => {});
     }
     setBuffer([]);
-  };
+  }, []);
 
   // periodic drain & on visibility change (browser-only)
   React.useEffect(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
-    
+
     const iv = setInterval(drain, 15000);
     const onHide = () => document.visibilityState === "hidden" && drain();
     document.addEventListener("visibilitychange", onHide);
     window.addEventListener("beforeunload", drain);
     return () => { clearInterval(iv); document.removeEventListener("visibilitychange", onHide); window.removeEventListener("beforeunload", drain); };
-  }, [buffer.length]);
+  }, [drain]);
 
   return <TelemetryCtx.Provider value={{ flags, setFlags, enqueue, drain, buffer }}>{children}</TelemetryCtx.Provider>;
 }

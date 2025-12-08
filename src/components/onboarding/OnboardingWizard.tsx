@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Button from '@/components/ui/Button'
 import { Bell, BookOpen, Star, X, type LucideIcon } from '@/lib/icons'
 import { useOnboardingStore } from '@/store/onboardingStore'
+import { useTelemetry } from '@/state/telemetry'
 
 type StepDefinition = {
   id: string
@@ -46,6 +47,7 @@ export default function OnboardingWizard() {
   const completeStep = useOnboardingStore((state) => state.completeStep)
   const skipOnboarding = useOnboardingStore((state) => state.skipOnboarding)
   const [currentStepIndex, setCurrentStepIndex] = React.useState(0)
+  const { enqueue } = useTelemetry()
 
   if (hasCompletedOnboarding) {
     return null
@@ -58,8 +60,22 @@ export default function OnboardingWizard() {
     return null
   }
 
+  const recordAction = React.useCallback(
+    (action: 'advance' | 'skip', step: StepDefinition) => {
+      const id = `${action}-${step.id}-${Date.now()}`
+      enqueue({
+        id,
+        ts: Date.now(),
+        type: `onboarding.${action}`,
+        attrs: { step: step.id, target: step.targetRoute },
+      })
+    },
+    [enqueue],
+  )
+
   const handleNext = () => {
     completeStep(activeStep.id)
+    recordAction('advance', activeStep)
     if (safeIndex === STEPS.length - 1) {
       navigate(activeStep.targetRoute)
       return
@@ -68,11 +84,12 @@ export default function OnboardingWizard() {
   }
 
   const handleSkip = () => {
+    recordAction('skip', activeStep)
     skipOnboarding()
   }
 
   const handleClose = () => {
-    skipOnboarding()
+    handleSkip()
   }
 
   return (
@@ -134,7 +151,13 @@ export default function OnboardingWizard() {
                   <activeStep.icon className="h-8 w-8 text-brand" aria-hidden="true" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-text-primary">{activeStep.title}</h3>
+                  <h3
+                    className="text-xl font-semibold text-text-primary"
+                    data-testid="onboarding-active-step-title"
+                    data-step-id={activeStep.id}
+                  >
+                    {activeStep.title}
+                  </h3>
                   <p className="mt-1 text-sm text-text-secondary">{activeStep.description}</p>
                 </div>
               </div>
@@ -178,6 +201,9 @@ export default function OnboardingWizard() {
                     ]
                       .filter(Boolean)
                       .join(' ')}
+                    data-testid="onboarding-step-item"
+                    data-step-id={step.id}
+                    data-step-state={isComplete ? 'complete' : 'pending'}
                   >
                     <step.icon className="h-5 w-5 text-text-secondary" aria-hidden="true" />
                     <div>
