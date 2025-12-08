@@ -4,28 +4,28 @@
 
 /* Popover Background */
 .driver-popover {
-  background: #18181b !important; /* zinc-900 */
-  color: #f4f4f5 !important; /* zinc-100 */
-  border: 1px solid #27272a !important; /* zinc-800 */
+  background: rgb(var(--color-surface)) !important;
+  color: rgb(var(--color-text-primary)) !important;
+  border: 1px solid rgb(var(--color-border)) !important;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5) !important;
 }
 
 /* Title */
 .driver-popover-title {
-  color: #f4f4f5 !important; /* zinc-100 */
+  color: rgb(var(--color-text-primary)) !important;
   font-weight: 600 !important;
   font-size: 1.125rem !important;
 }
 
 /* Description */
 .driver-popover-description {
-  color: #d4d4d8 !important; /* zinc-300 */
+  color: rgb(var(--color-text-secondary)) !important;
   line-height: 1.5 !important;
 }
 
 /* Progress Text */
 .driver-popover-progress-text {
-  color: #71717a !important; /* zinc-500 */
+  color: rgb(var(--color-text-tertiary)) !important;
   font-size: 0.875rem !important;
 }
 
@@ -41,14 +41,14 @@
 
 /* Next/Done Button */
 .driver-popover-next-btn {
-  background: #10b981 !important; /* emerald-500 */
-  color: white !important;
+  background: rgb(var(--color-brand)) !important;
+  color: rgb(var(--color-bg)) !important;
   border: none !important;
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
 }
 
 .driver-popover-next-btn:hover {
-  background: #059669 !important; /* emerald-600 */
+  background: rgb(var(--color-brand-hover)) !important;
   transform: scale(1.05) !important;
 }
 
@@ -58,26 +58,26 @@
 
 /* Previous Button */
 .driver-popover-prev-btn {
-  background: #27272a !important; /* zinc-800 */
-  color: #f4f4f5 !important; /* zinc-100 */
-  border: 1px solid #3f3f46 !important; /* zinc-700 */
+  background: rgb(var(--color-surface-hover)) !important;
+  color: rgb(var(--color-text-primary)) !important;
+  border: 1px solid rgb(var(--color-border)) !important;
 }
 
 .driver-popover-prev-btn:hover {
-  background: #3f3f46 !important; /* zinc-700 */
-  border-color: #52525b !important; /* zinc-600 */
+  background: rgb(var(--color-surface-elevated)) !important;
+  border-color: rgba(var(--color-border-contrast) / 0.25) !important;
 }
 
 /* Close Button */
 .driver-popover-close-btn {
   background: transparent !important;
-  color: #a1a1aa !important; /* zinc-400 */
+  color: rgb(var(--color-text-secondary)) !important;
   border: none !important;
 }
 
 .driver-popover-close-btn:hover {
-  color: #f4f4f5 !important; /* zinc-100 */
-  background: #27272a !important; /* zinc-800 */
+  color: rgb(var(--color-text-primary)) !important;
+  background: rgb(var(--color-surface-hover)) !important;
 }
 
 /* Arrow */
@@ -85,27 +85,27 @@
 .driver-popover-arrow-side-right.driver-popover-arrow,
 .driver-popover-arrow-side-top.driver-popover-arrow,
 .driver-popover-arrow-side-bottom.driver-popover-arrow {
-  border-color: #18181b !important; /* zinc-900 */
+  border-color: rgb(var(--color-surface)) !important;
 }
 
 /* Overlay */
 .driver-overlay {
-  background-color: rgba(0, 0, 0, 0.8) !important;
+  background-color: rgba(var(--color-bg) / 0.8) !important;
   backdrop-filter: blur(4px) !important;
 }
 
 /* Highlighted element */
 .driver-active-element {
-  outline: 2px solid #10b981 !important; /* emerald-500 */
+  outline: 2px solid rgb(var(--color-brand)) !important;
   outline-offset: 4px !important;
 }
 
 /* Keyboard shortcuts in description */
 .driver-popover-description kbd {
-  background: #27272a;
+  background: rgb(var(--color-surface-hover));
   padding: 2px 6px;
   border-radius: 4px;
   font-family: monospace;
   font-size: 0.875em;
-  border: 1px solid #3f3f46;
+  border: 1px solid rgb(var(--color-border));
 }

@@ -30,16 +30,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #18181b; /* zinc-900 */
+  background: rgb(var(--color-surface));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #3f3f46; /* zinc-700 */
+  background: rgb(var(--color-border));
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #52525b; /* zinc-600 */
+  background: rgba(var(--color-border-contrast) / 0.18);
 }
 
 /* Smooth scroll is managed globally in index.css to honor reduced-motion */

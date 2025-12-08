@@ -203,12 +203,12 @@ export default function ChartPageV2() {
           />
         )}
         {isDefaultAsset && (
-          <div className="card-bordered rounded-lg border-blue-500/20 bg-blue-950/20 p-3 text-sm">
-            <p className="text-blue-200">
+          <div className="card-bordered rounded-lg border-info/40 bg-info/10 p-3 text-sm">
+            <p className="text-info">
               <strong>No symbol provided.</strong> Showing default chart (SOL/USDT). Select a token from the{' '}
               <button
                 onClick={() => navigate('/watchlist-v2')}
-                className="underline hover:text-blue-100"
+                className="underline hover:text-info/80"
               >
                 Watchlist
               </button>{' '}
@@ -348,19 +348,19 @@ export default function ChartPageV2() {
         <ChartLegend />
 
         {status === 'error' && !hasData && (
-          <div className="rounded-2xl border border-red-900/50 bg-red-950/40 px-4 py-3 text-sm text-red-200">
+          <div className="rounded-2xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
             {error || 'Failed to load chart data.'}
           </div>
         )}
 
         {status === 'stale' && (
-          <div className="rounded-2xl border border-amber-900/50 bg-amber-950/40 px-4 py-3 text-sm text-amber-100">
+          <div className="rounded-2xl border border-warn/40 bg-warn/10 px-4 py-3 text-sm text-warn">
             Showing cached candles because the network request failed.
           </div>
         )}
 
         {status === 'no-data' && (
-          <div className="rounded-2xl border border-slate-800 bg-surface-subtle px-4 py-3 text-sm text-text-secondary">
+          <div className="rounded-2xl border border-subtle bg-surface-subtle px-4 py-3 text-sm text-text-secondary">
             No candles available yet for {asset.symbol} on {timeframe}. Try another timeframe.
           </div>
         )}

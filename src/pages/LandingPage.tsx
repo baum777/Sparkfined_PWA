@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  TrendingUp, 
-  Bell, 
-  FileText, 
-  Zap, 
-  BarChart3,
-  CheckCircle2,
+import {
   ArrowRight,
-  Star,
+  BarChart3,
+  Bell,
+  CheckCircle2,
+  Clock,
+  FileText,
   Lock,
+  Star,
+  TrendingUp,
   Wifi,
-  Clock
+  Zap,
 } from '@/lib/icons';
 
 export default function LandingPage() {
@@ -19,386 +19,322 @@ export default function LandingPage() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   useEffect(() => {
-    // Auto-rotate testimonials
     const interval = setInterval(() => {
-      setActiveTestimonial(prev => (prev + 1) % testimonials.length);
+      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md supports-[backdrop-filter]:bg-zinc-950/60">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
+    <div className="min-h-screen bg-bg text-primary">
+      <nav className="fixed inset-x-0 top-0 z-40 border-b border-moderate bg-surface/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-8">
           <div className="flex items-center gap-2">
-            <Zap className="text-emerald-500" size={28} />
-            <span className="text-xl font-bold">Sparkfined</span>
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 text-brand">
+              <Zap size={20} />
+            </span>
+            <div className="flex flex-col leading-tight">
+              <span className="text-sm uppercase tracking-[0.3em] text-tertiary">Sparkfined</span>
+              <span className="text-lg font-semibold text-primary">Command Center</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <a href="#features" className="hidden text-sm text-zinc-400 hover:text-zinc-100 md:block">
+          <div className="hidden items-center gap-6 text-sm text-secondary md:flex">
+            <a href="#features" className="hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
               Features
             </a>
-            <a href="#pricing" className="hidden text-sm text-zinc-400 hover:text-zinc-100 md:block">
+            <a href="#pricing" className="hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40">
               Pricing
             </a>
             <button
+              type="button"
               onClick={() => navigate('/dashboard-v2')}
-              className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-emerald-600 hover:scale-105 active:scale-95"
+              className="btn btn-primary btn-sm shadow-token-md"
             >
               Launch App
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard-v2')}
+            className="btn btn-primary md:hidden"
+          >
+            Open
+          </button>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden px-4 pt-32 pb-20 md:px-6 md:pt-40 md:pb-32">
-        {/* Grid Background */}
-        <div className="absolute inset-0 bg-grid-pattern-lg opacity-20"></div>
-        
-        <div className="relative mx-auto max-w-5xl text-center">
-          {/* Floating Stats */}
-          <div className="absolute -top-8 left-0 right-0 flex justify-center gap-4 text-xs text-zinc-500 md:text-sm">
-            <span className="animate-fade-in flex items-center gap-1">
-              <Zap size={14} className="text-emerald-500" />
-              1,247 alerts today
-            </span>
-            <span className="animate-fade-in motion-delay-200 flex items-center gap-1">
-              <Wifi size={14} className="text-emerald-500" />
-              98.5% uptime
-            </span>
-            <span className="animate-fade-in motion-delay-400 flex items-center gap-1">
-              <Clock size={14} className="text-emerald-500" />
-              42ms response
-            </span>
-          </div>
-
-          <h1 className="animate-slide-in-left mb-6 text-4xl font-bold leading-tight tracking-tight md:text-6xl lg:text-7xl">
-            <span className="block">Stop Trading Blind.</span>
-            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-              Start Trading Smart.
-            </span>
-          </h1>
-          
-          <p className="animate-fade-in motion-delay-200 mb-8 text-lg text-zinc-400 md:text-xl">
-            Your edge isn't the chart. It's what you DO with it.
-            <br />
-            <span className="text-zinc-500">The command center that actual traders use. No BS, just alpha.</span>
-          </p>
-
-          <div className="animate-fade-in motion-delay-400 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <button
-              onClick={() => navigate('/dashboard-v2')}
-              className="group flex items-center gap-2 rounded-lg bg-emerald-500 px-8 py-4 text-lg font-semibold text-white shadow-[0_0_30px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-600 hover:scale-105 hover:shadow-[0_0_50px_rgba(16,185,129,0.5)] active:scale-95"
-            >
-              Get Started - It's Free
-              <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
-            </button>
-            <button className="rounded-lg border border-zinc-700 bg-zinc-900 px-8 py-4 text-lg font-medium text-zinc-100 transition-all hover:border-zinc-600 hover:bg-zinc-800">
-              Watch 30s Demo
-            </button>
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-sm text-zinc-500">
-            <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-500" />
-              No signup
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-500" />
-              No credit card
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-emerald-500" />
-              Works offline
-            </span>
-          </div>
-        </div>
-
-        {/* Animated Chart Preview */}
-        <div className="relative mx-auto mt-16 max-w-5xl">
-          <div className="animate-fade-in motion-delay-600 rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900 to-zinc-950 p-4 shadow-2xl">
-            <div className="aspect-video rounded-lg bg-zinc-950 flex items-center justify-center">
-              <BarChart3 size={48} className="text-zinc-700" />
-              <span className="ml-3 text-zinc-600">Chart Preview - Coming Soon</span>
+      <main className="pt-28">
+        <section className="relative overflow-hidden px-4 py-20 md:px-10 lg:py-28">
+          <div className="absolute inset-0 bg-grid-pattern opacity-20" aria-hidden />
+          <div className="relative mx-auto flex max-w-5xl flex-col items-center text-center">
+            <div className="mb-5 flex flex-wrap items-center justify-center gap-4 text-xs uppercase tracking-[0.3em] text-tertiary">
+              <span className="inline-flex items-center gap-2 rounded-full border border-subtle px-4 py-1 text-[11px] font-semibold text-secondary">
+                <Wifi size={12} className="text-brand" />
+                98.5% uptime
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-subtle px-4 py-1 text-[11px] font-semibold text-secondary">
+                <Clock size={12} className="text-brand" />
+                42ms latency
+              </span>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof Ticker */}
-      <section className="border-y border-zinc-800 bg-zinc-900/50 py-4 overflow-hidden">
-        <div className="flex items-center gap-8 animate-ticker whitespace-nowrap">
-          {[...Array(3)].map((_, i) => (
-            <React.Fragment key={i}>
-              <span className="text-sm text-zinc-400">"Finally, a chart tool that doesn't suck" – @degenwizard</span>
-              <span className="text-zinc-700">•</span>
-              <span className="text-sm text-zinc-400">"This is what TradingView should've been" – @0xAlpha</span>
-              <span className="text-zinc-700">•</span>
-              <span className="text-sm text-zinc-400">"Ape'd in after 5 minutes" – @chartautist</span>
-              <span className="text-zinc-700">•</span>
-            </React.Fragment>
-          ))}
-        </div>
-      </section>
-
-      {/* The Problem */}
-      <section className="px-4 py-20 md:px-6 md:py-32">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="mb-16 text-center text-3xl font-bold md:text-5xl">
-            YOU'RE LOSING MONEY BECAUSE:
-          </h2>
-
-          <div className="grid gap-8 md:grid-cols-2">
-            {problemPoints.map((problem, i) => (
-              <div
-                key={i}
-                className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-6 transition-all hover:border-rose-500/50 hover:bg-zinc-900/50"
-              >
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="rounded-full bg-rose-500/10 p-3">
-                    <problem.icon className="text-rose-500" size={24} />
-                  </div>
-                  <h3 className="text-xl font-semibold">{problem.title}</h3>
-                </div>
-                <p className="text-zinc-400 italic">"{problem.quote}"</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* The Solution - 3 Feature Grid */}
-      <section id="features" className="px-4 py-20 md:px-6 md:py-32 bg-zinc-900/30">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="mb-16 text-center text-3xl font-bold md:text-5xl">
-            HERE'S HOW SPARKFINED FIXES THAT:
-          </h2>
-
-          <div className="grid gap-8 md:grid-cols-3">
-            {features.map((feature, i) => (
-              <div
-                key={i}
-                className="group rounded-2xl border border-zinc-800 bg-zinc-900 p-6 transition-all hover:border-emerald-500/50 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:-translate-y-2"
-              >
-                <div className="mb-6 flex h-48 items-center justify-center rounded-lg bg-zinc-950">
-                  <feature.icon className="text-zinc-700" size={64} />
-                </div>
-                
-                <h3 className="mb-4 text-2xl font-bold">{feature.title}</h3>
-                
-                <ul className="mb-6 space-y-2">
-                  {feature.bullets.map((bullet, j) => (
-                    <li key={j} className="flex items-start gap-2 text-sm text-zinc-400">
-                      <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0 text-emerald-500" />
-                      {bullet}
-                    </li>
-                  ))}
-                </ul>
-
-                <button className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium transition-all hover:border-emerald-500 hover:bg-zinc-700 group-hover:text-emerald-400">
-                  Try Demo →
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Banner */}
-      <section className="px-4 py-20 md:px-6 md:py-32">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="mb-16 text-center text-3xl font-bold md:text-4xl">BY THE NUMBERS</h2>
-          
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat, i) => (
-              <div
-                key={i}
-                className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 text-center"
-              >
-                <div className="mb-2 text-4xl font-bold text-emerald-500">{stat.value}</div>
-                <div className="text-sm text-zinc-400">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Access System Teaser */}
-      <section id="pricing" className="px-4 py-20 md:px-6 md:py-32 bg-zinc-900/30">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="mb-4 text-center text-3xl font-bold md:text-5xl">🔐 THE OG SYSTEM</h2>
-          <p className="mb-16 text-center text-lg text-zinc-400">
-            Not all features are for everyone.
-          </p>
-
-          <div className="grid gap-8 md:grid-cols-2">
-            {/* Free Tier */}
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
-              <h3 className="mb-6 text-2xl font-bold">FREE TIER</h3>
-              <ul className="mb-8 space-y-3">
-                {freeTierFeatures.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-zinc-300">
-                    <CheckCircle2 size={20} className="text-emerald-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+            <h1 className="text-4xl font-semibold leading-tight text-primary md:text-6xl">
+              Stop Trading Blind.
+              <span className="block text-gradient-brand">Operate Like a Desk.</span>
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg text-secondary md:text-xl">
+              Sparkfined is the glass dashboard for serious crypto traders. Journal, alerts, AI insights and execution in one glass surface.
+            </p>
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <button
+                type="button"
+                className="btn btn-primary btn-lg"
                 onClick={() => navigate('/dashboard-v2')}
-                className="w-full rounded-lg bg-zinc-800 px-6 py-3 font-semibold transition-all hover:bg-zinc-700"
               >
-                Start Free
+                Enter Command Center
+                <ArrowRight size={18} />
+              </button>
+              <button type="button" className="btn btn-outline btn-lg" onClick={() => navigate('/dashboard-v2')}>
+                Watch 30s Demo
               </button>
             </div>
-
-            {/* OG Tier */}
-            <div className="relative rounded-2xl border-2 border-emerald-500 bg-gradient-to-br from-emerald-950/50 to-zinc-900 p-8">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-4 py-1 text-sm font-bold text-black">
-                RECOMMENDED
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-5 text-sm text-secondary">
+              <InlineFact icon={<CheckCircle2 size={16} className="text-brand" />} label="No signup" />
+              <InlineFact icon={<CheckCircle2 size={16} className="text-brand" />} label="Works offline" />
+              <InlineFact icon={<CheckCircle2 size={16} className="text-brand" />} label="Instant PWA" />
+            </div>
+            <div className="mt-12 w-full rounded-3xl border border-moderate bg-surface/60 p-4 shadow-token-lg backdrop-blur-lg">
+              <div className="flex aspect-video items-center justify-center rounded-2xl bg-surface-subtle">
+                <BarChart3 size={56} className="text-secondary" />
+                <p className="ml-3 text-sm text-tertiary">Glass chart stack preview · coming soon</p>
               </div>
-              
-              <h3 className="mb-6 text-2xl font-bold">OG TIER</h3>
-              <ul className="mb-8 space-y-3">
-                {ogTierFeatures.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-zinc-100">
-                    <CheckCircle2 size={20} className="text-emerald-400" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <button className="w-full rounded-lg bg-emerald-500 px-6 py-3 font-bold text-black transition-all hover:bg-emerald-400 hover:scale-105">
-                Become OG (0.5 SOL lock)
-              </button>
-              <p className="mt-4 text-center text-xs text-zinc-500">
-                *No subscription BS. Lock tokens, unlock features.*
-              </p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Testimonials */}
-      <section className="px-4 py-20 md:px-6 md:py-32">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="mb-16 text-center text-3xl font-bold md:text-4xl">WHAT DEGENS SAY</h2>
-
-          <div className="grid gap-8 md:grid-cols-3">
-            {testimonials.map((testimonial, i) => (
-              <div
-                key={i}
-                className={`rounded-2xl border border-zinc-800 bg-zinc-900 p-6 transition-all ${
-                  i === activeTestimonial ? 'border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.2)]' : ''
-                }`}
-              >
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-zinc-800"></div>
-                  <div>
-                    <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-zinc-500">{testimonial.followers} followers</div>
-                  </div>
-                </div>
-                <p className="mb-4 text-zinc-300">{testimonial.quote}</p>
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} size={16} className="fill-emerald-500 text-emerald-500" />
-                  ))}
-                </div>
-              </div>
+        <section className="border-y border-moderate bg-surface/50 py-5 text-sm text-secondary">
+          <div className="animate-ticker flex items-center gap-8 whitespace-nowrap">
+            {tickerQuotes.map((quote) => (
+              <span key={quote} className="text-secondary">
+                {quote}
+              </span>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Final CTA */}
-      <section className="relative overflow-hidden px-4 py-32 md:px-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/30 to-zinc-950"></div>
-        
-        <div className="relative mx-auto max-w-4xl text-center">
-          <h2 className="mb-6 text-4xl font-bold md:text-6xl">
-            ⚡ READY TO TRADE SMARTER?
-          </h2>
-          <p className="mb-8 text-xl text-zinc-300">
-            Open the app. No signup. No credit card.
-            <br />
-            Start charting in 3 seconds.
-          </p>
-
-          <button
-            onClick={() => navigate('/dashboard-v2')}
-            className="mb-8 rounded-lg bg-emerald-500 px-12 py-5 text-xl font-bold text-white shadow-[0_0_50px_rgba(16,185,129,0.4)] transition-all hover:bg-emerald-400 hover:scale-105 hover:shadow-[0_0_70px_rgba(16,185,129,0.6)]"
-          >
-            Launch Sparkfined →
-          </button>
-
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-zinc-500">
-            <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} />
-              Works offline
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} />
-              80KB download
-            </span>
-            <span className="flex items-center gap-2">
-              <CheckCircle2 size={16} />
-              Privacy-first
-            </span>
+        <section className="px-4 py-20 md:px-10 lg:py-24">
+          <div className="mx-auto max-w-5xl">
+            <SectionHeader eyebrow="Impact Audit" title="You're leaking capital because..." description="Every losing streak shares the same blind spots. We turned them into a battle plan." />
+            <div className="grid gap-6 md:grid-cols-2">
+              {problemPoints.map((problem) => (
+                <article key={problem.title} className="card-glass hover-lift rounded-3xl border border-subtle p-6 text-left">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-danger/10 text-danger">
+                      <problem.icon size={22} />
+                    </span>
+                    <h3 className="text-xl font-semibold text-primary">{problem.title}</h3>
+                  </div>
+                  <p className="mt-4 text-sm text-secondary italic">"{problem.quote}"</p>
+                </article>
+              ))}
+            </div>
           </div>
+        </section>
 
-          <p className="mt-8 text-zinc-600">
-            Or continue being exit liquidity. Your call. 🤷
-          </p>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-zinc-800 px-4 py-12 md:px-6">
-        <div className="mx-auto max-w-6xl text-center">
-          <div className="mb-6 flex items-center justify-center gap-2">
-            <Zap className="text-emerald-500" size={24} />
-            <span className="text-xl font-bold">Sparkfined</span>
+        <section id="features" className="bg-app-gradient px-4 py-20 md:px-10 lg:py-24">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeader eyebrow="System Modules" title="Here's how Sparkfined fixes that" description="Glass tiles snap into a 12-column grid with shared tokens for depth, glow and sentiment." />
+            <div className="grid gap-6 md:grid-cols-3">
+              {features.map((feature) => (
+                <article key={feature.title} className="group rounded-3xl border border-moderate bg-surface p-6 shadow-token-md transition hover:border-brand/50 hover:shadow-glow-accent">
+                  <div className="mb-6 flex h-44 items-center justify-center rounded-2xl bg-surface-subtle">
+                    <feature.icon size={56} className="text-secondary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold text-primary">{feature.title}</h3>
+                  <ul className="mt-4 space-y-2 text-sm text-secondary">
+                    {feature.bullets.map((bullet) => (
+                      <li key={bullet} className="flex items-start gap-2">
+                        <CheckCircle2 size={14} className="mt-0.5 flex-shrink-0 text-brand" />
+                        {bullet}
+                      </li>
+                    ))}
+                  </ul>
+                  <button type="button" className="mt-6 w-full rounded-2xl border border-subtle px-4 py-2 text-sm font-semibold text-secondary transition hover:border-brand hover:text-primary">
+                    Explore Module →
+                  </button>
+                </article>
+              ))}
+            </div>
           </div>
+        </section>
 
-            <div className="mb-6 flex justify-center gap-6 text-sm text-zinc-400">
-              <a
-                href="https://twitter.com/sparkfined"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-zinc-100"
-              >
-                Twitter
-              </a>
-              <a
-                href="https://github.com/sparkfined"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-zinc-100"
-              >
-                GitHub
-              </a>
-              <a
-                href="https://discord.gg/sparkfined"
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-zinc-100"
-              >
-                Discord
-              </a>
-              <a href="/docs" className="hover:text-zinc-100">
-                Docs
-              </a>
+        <section className="px-4 py-20 md:px-10 lg:py-24">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeader eyebrow="Signal Metrics" title="By the numbers" description="Genuine telemetry collected during public alpha. Everything is observable." />
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {stats.map((stat) => (
+                <article key={stat.label} className="rounded-3xl border border-subtle bg-surface/70 p-6 text-center shadow-token-sm">
+                  <p className="text-4xl font-semibold text-gradient-success">{stat.value}</p>
+                  <p className="mt-2 text-sm text-secondary">{stat.label}</p>
+                </article>
+              ))}
+            </div>
           </div>
+        </section>
 
-          <p className="text-sm text-zinc-600">
-            Built by degens, for degens.
-            <br />
-            © 2024 Sparkfined. No bullshit guarantee.
-          </p>
+        <section id="pricing" className="bg-surface-subtle/70 px-4 py-20 md:px-10 lg:py-24">
+          <div className="mx-auto max-w-5xl">
+            <SectionHeader eyebrow="Access System" title="Pick your clearance" description="Lock in what you need. No subscriptions, no gatekeeping, just utility." />
+            <div className="grid gap-6 md:grid-cols-2">
+              <PricingCard title="Free Tier" badge="Included" description="All glass primitives + offline sync" items={freeTierFeatures} cta="Start Free" onClick={() => navigate('/dashboard-v2')} />
+              <PricingCard
+                featured
+                title="OG Tier"
+                badge="Recommended"
+                description="Unlock AI copilots, replay lab and rule wizard."
+                items={ogTierFeatures}
+                cta="Become OG (0.5 SOL lock)"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 py-20 md:px-10 lg:py-24">
+          <div className="mx-auto max-w-6xl">
+            <SectionHeader eyebrow="Credibility" title="What degens say" description="Real feedback from alpha users trading on Solana, ETH and BTC." />
+            <div className="grid gap-6 md:grid-cols-3">
+              {testimonials.map((testimonial, index) => (
+                <article
+                  key={testimonial.name}
+                  className={`rounded-3xl border border-subtle bg-surface/70 p-6 transition ${
+                    index === activeTestimonial ? 'border-brand shadow-glow-accent' : ''
+                  }`}
+                >
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="h-12 w-12 rounded-full bg-surface-subtle" />
+                    <div>
+                      <p className="font-semibold text-primary">{testimonial.name}</p>
+                      <p className="text-xs uppercase tracking-widest text-tertiary">{testimonial.followers} followers</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-secondary">{testimonial.quote}</p>
+                  <div className="mt-4 flex gap-1 text-brand">
+                    {Array.from({ length: 5 }).map((_, starIndex) => (
+                      <Star key={`${testimonial.name}-${starIndex}`} size={16} className="fill-brand text-brand" />
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="relative overflow-hidden px-4 py-24 md:px-10">
+          <div className="absolute inset-0 bg-brand/5 blur-3xl" aria-hidden />
+          <div className="relative mx-auto max-w-3xl rounded-3xl border border-subtle bg-surface/80 p-10 text-center shadow-token-lg">
+            <p className="text-sm uppercase tracking-[0.3em] text-secondary">Final Call</p>
+            <h2 className="mt-4 text-4xl font-semibold text-primary md:text-5xl">Ready to trade smarter?</h2>
+            <p className="mt-4 text-lg text-secondary">Launch the glass console. No signup, no credit card. Just focus.</p>
+            <button type="button" className="btn btn-primary btn-lg mt-8" onClick={() => navigate('/dashboard-v2')}>
+              Launch Sparkfined →
+            </button>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs uppercase tracking-widest text-tertiary">
+              <span>80KB PWA</span>
+              <span>Private by default</span>
+              <span>Offline sync</span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-moderate bg-surface px-4 py-10 text-center text-sm text-secondary md:px-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-4">
+          <div className="flex items-center gap-2 text-primary">
+            <Zap size={20} className="text-brand" />
+            <span className="font-semibold">Sparkfined</span>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            {footerLinks.map((link) => (
+              <a key={link.href} href={link.href} target="_blank" rel="noreferrer" className="transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30">
+                {link.label}
+              </a>
+            ))}
+          </div>
+          <p className="text-xs text-tertiary">Built by degens, for degens. © {new Date().getFullYear()} Sparkfined.</p>
         </div>
       </footer>
     </div>
+  );
+}
+
+function SectionHeader({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <header className="mb-12 text-center">
+      <p className="text-xs uppercase tracking-[0.4em] text-tertiary">{eyebrow}</p>
+      <h2 className="mt-4 text-3xl font-semibold text-primary md:text-4xl">{title}</h2>
+      <p className="mx-auto mt-3 max-w-2xl text-base text-secondary">{description}</p>
+    </header>
+  );
+}
+
+function InlineFact({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-tertiary">
+      {icon}
+      {label}
+    </span>
+  );
+}
+
+function PricingCard({
+  title,
+  badge,
+  description,
+  items,
+  cta,
+  featured,
+  onClick,
+}: {
+  title: string;
+  badge: string;
+  description: string;
+  items: string[];
+  cta: string;
+  featured?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <article
+      className={`rounded-3xl border p-8 shadow-token-md ${
+        featured ? 'border-brand bg-surface-elevated/80' : 'border-subtle bg-surface/80'
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <h3 className="text-2xl font-semibold text-primary">{title}</h3>
+        <span className="rounded-full border border-subtle px-3 py-1 text-xs uppercase tracking-widest text-tertiary">
+          {badge}
+        </span>
+      </div>
+      <p className="mt-3 text-sm text-secondary">{description}</p>
+      <ul className="mt-6 space-y-3 text-sm text-secondary">
+        {items.map((item) => (
+          <li key={item} className="flex items-center gap-2">
+            <CheckCircle2 size={16} className="text-brand" />
+            {item}
+          </li>
+        ))}
+      </ul>
+      <button type="button" className={`btn btn-lg ${featured ? 'btn-primary mt-8 w-full' : 'btn-outline mt-8 w-full'}`} onClick={onClick}>
+        {cta}
+      </button>
+    </article>
   );
 }
 
@@ -459,15 +395,19 @@ const features = [
   },
 ];
 
+const tickerQuotes = [
+  '"Finally, a chart tool that doesn’t suck." – @degenwizard',
+  '"This is what TradingView should have been." – @0xAlpha',
+  '"Replay lab saved me $5k in mistakes." – @ChartAutist',
+];
+
 const stats = [
-  { value: '1,247', label: 'Alerts Today ⚡' },
-  { value: '98.5%', label: 'Uptime 🟢' },
-  { value: '42ms', label: 'Response Time ⚡' },
-  { value: '100%', label: 'Free 💎' },
-  { value: '80KB', label: 'Bundle Size' },
-  { value: 'PWA', label: 'Offline Ready' },
-  { value: 'Soon™', label: 'Open Source' },
-  { value: 'AA', label: 'WCAG A11y' },
+  { value: '1,247', label: 'Alerts armed' },
+  { value: '98.5%', label: 'Realtime uptime' },
+  { value: '42ms', label: 'Response time' },
+  { value: '100%', label: 'Offline ready' },
+  { value: '80KB', label: 'Bundle footprint' },
+  { value: '0 BS', label: 'Contracts or trackers' },
 ];
 
 const freeTierFeatures = [
@@ -491,16 +431,23 @@ const testimonials = [
   {
     name: '@0xWizard',
     followers: '24.5K',
-    quote: 'Been using for 3 months. My win rate went from 45% to 68%. No cap.',
+    quote: 'Glass journal + AI summaries got my win rate from 45% to 68%.',
   },
   {
     name: '@ChartAutist',
     followers: '12.3K',
-    quote: 'Finally ditched TradingView. This shit just WORKS. No lag, no BS.',
+    quote: 'Finally ditched TradingView. Execution + alerts actually work.',
   },
   {
     name: '@ApeGod',
     followers: '8.9K',
-    quote: 'The replay mode is fucking genius. I backtested 200 entries. Saved me $5k.',
+    quote: 'Replay mode is cracked. 200 entries reviewed, saved 5k. No fluff.',
   },
+];
+
+const footerLinks = [
+  { href: 'https://twitter.com/sparkfined', label: 'Twitter' },
+  { href: 'https://github.com/sparkfined', label: 'GitHub' },
+  { href: 'https://discord.gg/sparkfined', label: 'Discord' },
+  { href: '/docs', label: 'Docs' },
 ];

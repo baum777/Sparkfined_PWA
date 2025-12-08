@@ -283,22 +283,22 @@ export default function ReplayPage() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <div className="mb-4 text-4xl">⏳</div>
-          <p className="text-sm text-zinc-500">Loading replay...</p>
+          <p className="text-sm text-secondary">Loading replay...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-4" data-testid="replay-page">
+    <div className="min-h-screen bg-bg p-4" data-testid="replay-page">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-zinc-100">
+            <h1 className="text-2xl font-bold text-primary">
               {viewMode === "player" ? "🎬 Replay Player" : "📊 Pattern Dashboard"}
             </h1>
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-secondary">
               {viewMode === "player"
                 ? "Playback and analyze your trades frame-by-frame"
                 : "Discover patterns and insights from your trading history"}
@@ -309,7 +309,7 @@ export default function ReplayPage() {
             {/* View Toggle */}
             <button
               onClick={toggleViewMode}
-              className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
+              className="rounded-lg border border-subtle bg-surface/80 px-4 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary"
             >
               {viewMode === "player" ? "📊 Dashboard" : "🎬 Player"}
             </button>
@@ -317,7 +317,7 @@ export default function ReplayPage() {
             {/* Back Button */}
             <button
               onClick={() => navigate("/journal-v2")}
-              className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
+              className="rounded-lg border border-subtle bg-surface/80 px-4 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary"
             >
               ← Journal
             </button>
@@ -326,7 +326,7 @@ export default function ReplayPage() {
 
         {viewMode === "player" && (
           <div
-            className="mb-4 rounded-xl border border-zinc-800 bg-zinc-900/70 px-4 py-3 text-sm text-zinc-300"
+            className="mb-4 rounded-xl border border-subtle bg-surface/70 px-4 py-3 text-sm text-secondary"
             data-testid="replay-mode-banner"
           >
             You’re in replay mode — scrub historical candles, jump to annotations and signals, then hit “Go live” to return to the
@@ -336,15 +336,15 @@ export default function ReplayPage() {
 
         {/* Player View */}
         {viewMode === "player" && (
-          <div className="mb-4 flex flex-wrap items-center gap-2 text-sm text-zinc-300">
+          <div className="mb-4 flex flex-wrap items-center gap-2 text-sm text-secondary">
             {(["15m", "1h", "4h", "1d"] as ChartTimeframe[]).map((tf) => (
               <button
                 key={tf}
                 onClick={() => handleTimeframeChange(tf)}
                 className={`rounded-full px-3 py-1 ${
                   timeframe === tf
-                    ? "bg-cyan-600 text-white"
-                    : "border border-zinc-800 bg-zinc-900/80 text-zinc-300"
+                    ? "bg-info text-bg"
+                    : "border border-subtle bg-surface/70 text-secondary"
                 }`}
               >
                 {tf}
@@ -352,24 +352,24 @@ export default function ReplayPage() {
             ))}
             <button
               onClick={() => refresh()}
-              className="rounded-full border border-zinc-800 bg-zinc-900/80 px-3 py-1 text-zinc-300"
+              className="rounded-full border border-subtle bg-surface/70 px-3 py-1 text-secondary"
               disabled={status === "loading"}
             >
               Refresh data
             </button>
             <button
               onClick={handleGoLive}
-              className="rounded-full border border-emerald-700 bg-emerald-900/40 px-3 py-1 text-emerald-200"
+              className="rounded-full border border-brand bg-brand/10 px-3 py-1 text-brand"
               disabled={!candles.length}
               data-testid="button-go-live"
               title="Jump to the latest candle"
             >
               Go live
             </button>
-            {status === "stale" && <span className="text-amber-300">Using cached data</span>}
-            {status === "no-data" && <span className="text-zinc-400">No candles yet</span>}
-            {status === "error" && <span className="text-rose-300">{error}</span>}
-            <span className="rounded-full border border-zinc-800 px-2 py-0.5 text-xs uppercase text-zinc-400">{mode}</span>
+            {status === "stale" && <span className="text-warn">Using cached data</span>}
+            {status === "no-data" && <span className="text-secondary">No candles yet</span>}
+            {status === "error" && <span className="text-danger">{error}</span>}
+            <span className="rounded-full border border-subtle px-2 py-0.5 text-xs uppercase text-tertiary">{mode}</span>
           </div>
         )}
 
@@ -378,14 +378,14 @@ export default function ReplayPage() {
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             {/* Chart Area (2/3 width on large screens) */}
             <div className="lg:col-span-2">
-              <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
+              <div className="rounded-xl border border-subtle bg-surface/70 p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-zinc-200">
+                  <h3 className="text-sm font-semibold text-primary">
                     📈 Chart View
                   </h3>
                   <button
                     onClick={handleOpenChart}
-                    className="rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-400 transition-colors hover:bg-cyan-500/20"
+                    className="rounded-lg border border-info/40 bg-info/10 px-3 py-1 text-xs font-medium text-info transition-colors hover:bg-info/20"
                     title="Open this asset in the live chart"
                   >
                     Open in Chart →
@@ -426,12 +426,12 @@ export default function ReplayPage() {
                 />
 
                 {candles.length > 0 && (
-                  <div className="mt-3 text-xs text-zinc-500">
+                  <div className="mt-3 text-xs text-secondary">
                     Frame {currentFrame + 1} / {candles.length}
                   </div>
                 )}
                 {candles.length === 0 && status === "no-data" && (
-                  <div className="mt-3 text-xs text-zinc-500">No replay frames yet for this timeframe.</div>
+                  <div className="mt-3 text-xs text-secondary">No replay frames yet for this timeframe.</div>
                 )}
               </div>
             </div>
@@ -458,24 +458,24 @@ export default function ReplayPage() {
 
         {/* Player View - No Session */}
         {viewMode === "player" && !session && (
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-8 text-center">
+          <div className="rounded-xl border border-subtle bg-surface/70 p-8 text-center">
             <div className="mb-4 text-6xl">🎬</div>
-            <h2 className="mb-2 text-xl font-bold text-zinc-200">
+            <h2 className="mb-2 text-xl font-bold text-primary">
               No Replay Session Selected
             </h2>
-            <p className="mb-6 text-sm text-zinc-500">
+            <p className="mb-6 text-sm text-secondary">
               Select a journal entry and create a replay session, or browse patterns in the dashboard.
             </p>
             <div className="flex justify-center gap-3">
               <button
                 onClick={() => setViewMode("dashboard")}
-                className="rounded-lg border border-cyan-500/50 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 transition-colors hover:bg-cyan-500/20"
+                className="rounded-lg border border-info/40 bg-info/10 px-4 py-2 text-sm font-medium text-info transition-colors hover:bg-info/20"
               >
                 📊 View Dashboard
               </button>
               <button
                 onClick={() => navigate("/journal-v2")}
-                className="rounded-lg border border-zinc-800 bg-zinc-900/80 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200"
+                className="rounded-lg border border-subtle bg-surface/80 px-4 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary"
               >
                 ← Back to Journal
               </button>
@@ -494,12 +494,12 @@ export default function ReplayPage() {
                 onViewEntry={handleViewEntry}
               />
             ) : (
-              <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-8 text-center">
+              <div className="rounded-xl border border-subtle bg-surface/70 p-8 text-center">
                 <div className="mb-4 text-6xl">📊</div>
-                <h2 className="mb-2 text-xl font-bold text-zinc-200">
+                <h2 className="mb-2 text-xl font-bold text-primary">
                   No Data Yet
                 </h2>
-                <p className="text-sm text-zinc-500">
+                <p className="text-sm text-secondary">
                   Close some trades in your journal to see pattern analysis.
                 </p>
               </div>
