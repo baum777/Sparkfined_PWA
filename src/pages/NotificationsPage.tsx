@@ -7,17 +7,15 @@ import RuleWizard from "../sections/notifications/RuleWizard";
 import type { ServerRule } from "../lib/serverRules";
 import PlaybookCard from "../sections/ideas/Playbook";
 import { usePushQueueStore } from "../store/pushQueueStore";
-
-type IdeaPacket = {
-  id: string;
-  title: string;
-  thesis: string;
-  timeframe: string;
-  confidence: string;
-  updatedAt: number;
-};
-
-const IDEA_STORAGE_KEY = "sparkfined_idea_packets";
+import {
+  createIdeaPacket,
+  getAllIdeaPackets,
+  migrateIdeaPacketsFromLocalStorage,
+  removeIdeaPacket,
+  replaceIdeaPackets,
+  updateIdeaPacket,
+} from "../lib/ideaPackets";
+import type { IdeaConfidence, IdeaPacket, IdeaTimeframe } from "@/types/ideas";
 
 export default function NotificationsPage() {
   const { rules, create, update, remove, triggers, clearTriggers, addManualTrigger } = useAlertRules();
@@ -33,8 +31,14 @@ export default function NotificationsPage() {
   // --- Server Rules Panel (minimal)
   const [srvRules, setSrvRules] = React.useState<ServerRule[]>([]);
   const [ideas, setIdeas] = React.useState<IdeaPacket[]>([]);
-  const [ideaForm, setIdeaForm] = React.useState({
-    editId: null as string | null,
+  const [ideaForm, setIdeaForm] = React.useState<{
+    editId: string | null;
+    title: string;
+    thesis: string;
+    timeframe: IdeaTimeframe;
+    confidence: IdeaConfidence;
+  }>({
+    editId: null,
     title: "",
     thesis: "",
     timeframe: "swing",
@@ -43,26 +47,24 @@ export default function NotificationsPage() {
   const [address] = React.useState(""); // default address für upload
 
   React.useEffect(() => {
-    try {
-      const stored = localStorage.getItem(IDEA_STORAGE_KEY);
-      if (stored) {
-        setIdeas(JSON.parse(stored));
+    let cancelled = false;
+
+    const hydrateIdeas = async () => {
+      await migrateIdeaPacketsFromLocalStorage();
+      const allIdeas = await getAllIdeaPackets();
+      if (!cancelled) {
+        setIdeas(allIdeas);
       }
-    } catch (error) {
-      console.warn("[ideas] failed to hydrate local ideas", error);
-    }
+    };
+
+    void hydrateIdeas();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const persistIdeas = React.useCallback((nextIdeas: IdeaPacket[]) => {
-    setIdeas(nextIdeas);
-    try {
-      localStorage.setItem(IDEA_STORAGE_KEY, JSON.stringify(nextIdeas));
-    } catch (error) {
-      console.warn("[ideas] failed to persist", error);
-    }
-  }, []);
-
-  const upsertIdea = React.useCallback(() => {
+  const upsertIdea = React.useCallback(async () => {
     const title = ideaForm.title.trim();
     const thesis = ideaForm.thesis.trim();
     if (!title || !thesis) {
@@ -72,26 +74,28 @@ export default function NotificationsPage() {
 
     const now = Date.now();
     if (ideaForm.editId) {
-      const updated = ideas.map((idea) =>
-        idea.id === ideaForm.editId
-          ? { ...idea, title, thesis, timeframe: ideaForm.timeframe, confidence: ideaForm.confidence, updatedAt: now }
-          : idea,
-      );
-      persistIdeas(updated);
-    } else {
-      const next: IdeaPacket = {
-        id: crypto.randomUUID(),
+      const updated = await updateIdeaPacket(ideaForm.editId, {
         title,
         thesis,
         timeframe: ideaForm.timeframe,
         confidence: ideaForm.confidence,
         updatedAt: now,
-      };
-      persistIdeas([next, ...ideas]);
+      });
+      if (updated) {
+        setIdeas((prev) => prev.map((idea) => (idea.id === updated.id ? updated : idea)));
+      }
+    } else {
+      const created = await createIdeaPacket({
+        title,
+        thesis,
+        timeframe: ideaForm.timeframe,
+        confidence: ideaForm.confidence,
+      });
+      setIdeas((prev) => [created, ...prev]);
     }
 
     setIdeaForm((prev) => ({ ...prev, editId: null, title: "", thesis: "" }));
-  }, [ideaForm.confidence, ideaForm.editId, ideaForm.thesis, ideaForm.timeframe, ideaForm.title, ideas, persistIdeas]);
+  }, [ideaForm.confidence, ideaForm.editId, ideaForm.thesis, ideaForm.timeframe, ideaForm.title]);
 
   const startEdit = React.useCallback((packet: IdeaPacket) => {
     setIdeaForm({
@@ -101,6 +105,10 @@ export default function NotificationsPage() {
       timeframe: packet.timeframe,
       confidence: packet.confidence,
     });
+  }, []);
+  const archiveIdea = React.useCallback(async (id: string) => {
+    await removeIdeaPacket(id);
+    setIdeas((prev) => prev.filter((idea) => idea.id !== id));
   }, []);
   const loadSrv = async ()=> {
     const r = await fetch("/api/rules").then((r): any=>r.json()).catch((): any=>null);
@@ -116,7 +124,8 @@ export default function NotificationsPage() {
         confidence: it.confidence ?? "medium",
         updatedAt: it.updatedAt ?? Date.now(),
       }));
-      persistIdeas(mapped);
+      const syncedIdeas = await replaceIdeaPackets(mapped);
+      setIdeas(syncedIdeas);
     }
   };
   const uploadAll = async ()=> {
@@ -287,7 +296,7 @@ export default function NotificationsPage() {
                 <select
                   className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-100"
                   value={ideaForm.timeframe}
-                  onChange={(e)=>setIdeaForm((prev)=>({ ...prev, timeframe: e.target.value }))}
+                  onChange={(e)=>setIdeaForm((prev)=>({ ...prev, timeframe: e.target.value as IdeaTimeframe }))}
                   data-testid="idea-timeframe-select"
                 >
                   <option value="scalp">Scalp</option>
@@ -300,7 +309,7 @@ export default function NotificationsPage() {
                 <select
                   className="mt-1 w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-100"
                   value={ideaForm.confidence}
-                  onChange={(e)=>setIdeaForm((prev)=>({ ...prev, confidence: e.target.value }))}
+                  onChange={(e)=>setIdeaForm((prev)=>({ ...prev, confidence: e.target.value as IdeaConfidence }))}
                   data-testid="idea-confidence-select"
                 >
                   <option value="low">Low</option>
@@ -331,10 +340,7 @@ export default function NotificationsPage() {
                 <div className="text-zinc-500">Confidence: {it.confidence} · Updated {new Date(it.updatedAt).toLocaleString()}</div>
                 <div className="mt-2 flex items-center gap-2">
                   <button className={btn} onClick={()=>startEdit(it)} data-testid="idea-edit-button">Bearbeiten</button>
-                  <button className={btn} onClick={()=>{
-                    const without = ideas.filter(x=>x.id!==it.id);
-                    persistIdeas(without);
-                  }}>Archivieren</button>
+                  <button className={btn} onClick={()=>{ void archiveIdea(it.id); }}>Archivieren</button>
                 </div>
                 <div className="mt-3">
                   <PlaybookCard
