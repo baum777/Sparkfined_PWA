@@ -23,6 +23,7 @@ import {
   BookmarkPlus,
   BookOpen,
   Zap,
+  Clock,
   type LucideIcon,
 } from '@/lib/icons';
 import { getItem, setItem } from '@/lib/safeStorage';
@@ -33,23 +34,49 @@ interface NavItem {
   Icon: LucideIcon;
 }
 
-const primaryNavItems: NavItem[] = [
-  { path: '/dashboard-v2', label: 'Board', Icon: Home },
-  { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
-  { path: '/chart-v2', label: 'Chart', Icon: TrendingUp },
-  { path: '/journal-v2', label: 'Journal', Icon: FileText },
-  { path: '/oracle', label: 'Oracle', Icon: Sparkles },
-  { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
-];
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
 
-const knowledgeNavItems: NavItem[] = [
-  { path: '/watchlist-v2', label: 'Watchlist', Icon: BookmarkPlus },
-  { path: '/lessons', label: 'Lessons', Icon: BookOpen },
-  { path: '/signals', label: 'Signals', Icon: Zap },
-];
-
-const systemNavItems: NavItem[] = [
-  { path: '/settings-v2', label: 'Settings', Icon: Settings },
+const navSections: NavSection[] = [
+  {
+    title: 'Home',
+    items: [{ path: '/dashboard-v2', label: 'Home', Icon: Home }],
+  },
+  {
+    title: 'Analytics',
+    items: [
+      { path: '/analysis-v2', label: 'Analytics', Icon: BarChart3 },
+      { path: '/signals', label: 'Signals', Icon: Zap },
+    ],
+  },
+  {
+    title: 'Assets',
+    items: [
+      { path: '/watchlist-v2', label: 'Watchlist', Icon: BookmarkPlus },
+      { path: '/chart-v2', label: 'Chart', Icon: TrendingUp },
+    ],
+  },
+  {
+    title: 'Tools',
+    items: [
+      { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
+      { path: '/replay', label: 'Replay', Icon: Clock },
+      { path: '/oracle', label: 'Oracle', Icon: Sparkles },
+    ],
+  },
+  {
+    title: 'Journal & Playbook',
+    items: [
+      { path: '/journal-v2', label: 'Journal', Icon: FileText },
+      { path: '/lessons', label: 'Playbook', Icon: BookOpen },
+    ],
+  },
+  {
+    title: 'Settings',
+    items: [{ path: '/settings-v2', label: 'Settings', Icon: Settings }],
+  },
 ];
 
 const STORAGE_KEY = 'sparkfined.sidebar.collapsed';
@@ -88,23 +115,23 @@ export default function Sidebar() {
       'group flex w-full rounded-2xl px-3 py-2 font-medium transition-all duration-200 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
       isCollapsed ? 'flex-col items-center justify-center gap-1 text-[11px]' : 'flex-row items-center gap-3 text-sm',
       isActive
-        ? 'bg-brand/10 text-brand border-glow-brand hover-glow' // Design System: border-glow, hover-glow
-        : 'text-text-secondary hover:text-text-primary hover:bg-interactive-hover hover-lift', // Design System: hover-lift
+        ? 'bg-brand/10 text-brand border-glow-brand hover-glow'
+        : 'text-text-secondary hover:text-text-primary hover:bg-interactive-hover hover-lift',
     ].join(' ');
 
-  // Get tour ID and data-testid for nav item
   const getNavIds = (label: string) => {
     const idMap: Record<string, { tour: string; testid: string }> = {
-      'Board': { tour: 'board-link', testid: 'nav-board' },
-      'Analyze': { tour: 'analyze-link', testid: 'nav-analyze' },
-      'Chart': { tour: 'chart-link', testid: 'nav-chart' },
-      'Journal': { tour: 'journal-link', testid: 'nav-journal' },
-      'Oracle': { tour: 'oracle-link', testid: 'nav-oracle' },
-      'Alerts': { tour: 'notifications-link', testid: 'nav-alerts' },
-      'Watchlist': { tour: '', testid: 'nav-watchlist' },
-      'Lessons': { tour: '', testid: 'nav-lessons' },
-      'Signals': { tour: '', testid: 'nav-signals' },
-      'Settings': { tour: 'settings-link', testid: 'nav-settings' },
+      Home: { tour: 'board-link', testid: 'nav-board' },
+      Analytics: { tour: 'analyze-link', testid: 'nav-analyze' },
+      Chart: { tour: 'chart-link', testid: 'nav-chart' },
+      Journal: { tour: 'journal-link', testid: 'nav-journal' },
+      Oracle: { tour: 'oracle-link', testid: 'nav-oracle' },
+      Alerts: { tour: 'notifications-link', testid: 'nav-alerts' },
+      Watchlist: { tour: '', testid: 'nav-watchlist' },
+      Playbook: { tour: '', testid: 'nav-lessons' },
+      Signals: { tour: '', testid: 'nav-signals' },
+      Replay: { tour: '', testid: 'nav-replay' },
+      Settings: { tour: 'settings-link', testid: 'nav-settings' },
     };
     return idMap[label] || { tour: '', testid: '' };
   };
@@ -160,39 +187,28 @@ export default function Sidebar() {
       aria-label="Primary navigation"
       data-collapsed={isCollapsed}
     >
-      {/* Trading Workflow Section */}
       <div className="flex-1 overflow-y-auto">
-        {!isCollapsed && renderSectionHeader('Trading Workflow')}
-        <nav className="space-y-2 px-2">
-          {primaryNavItems.map(renderNavItem)}
-        </nav>
-
-        {/* Knowledge Base Section */}
-        {!isCollapsed && renderSectionHeader('Knowledge Base')}
-        <nav className="space-y-2 px-2">
-          {knowledgeNavItems.map(renderNavItem)}
-        </nav>
+        {navSections.map((section) => (
+          <div key={section.title} className="space-y-2">
+            {!isCollapsed && renderSectionHeader(section.title)}
+            <nav className="space-y-2 px-2">{section.items.map(renderNavItem)}</nav>
+          </div>
+        ))}
       </div>
 
-      {/* System Section */}
-      {!isCollapsed && renderSectionHeader('System')}
-      <nav className="space-y-2 px-2">
-        {systemNavItems.map(renderNavItem)}
-      </nav>
-
-      {/* Gamification Footer */}
       <div className="mt-4 space-y-2 border-t border-border/50 px-3 pt-3">
         <div className="rounded-lg bg-brand/10 px-2 py-2 text-center text-[10px] font-semibold">
           <div className="text-brand">🎮 XP Points</div>
-          <div className={`text-[9px] text-text-secondary transition-opacity duration-200 motion-reduce:transition-none ${
-            isCollapsed ? 'opacity-0' : 'opacity-100'
-          }`}>
+          <div
+            className={`text-[9px] text-text-secondary transition-opacity duration-200 motion-reduce:transition-none ${
+              isCollapsed ? 'opacity-0' : 'opacity-100'
+            }`}
+          >
             Level up your journey
           </div>
         </div>
       </div>
 
-      {/* Collapse Button */}
       <button
         type="button"
         onClick={() => setIsCollapsed((prev) => !prev)}

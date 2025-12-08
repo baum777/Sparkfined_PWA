@@ -180,6 +180,14 @@ export default function ChartPageV2() {
     }
   }, [asset.address, asset.symbol, candles, timeframe])
 
+  const handleCreateAlertDraft = () => {
+    createAlertDraft({ ...creationContext, timeframe })
+  }
+
+  const handleSaveJournal = () => {
+    void createJournalDraft(creationContext)
+  }
+
   useEffect(() => {
     if (!signalTrackedRef.current && annotations.some((item) => item.kind === 'signal')) {
       track('chart.pulse_signal_viewed_in_chart', { address: asset.address, timeframe })
@@ -191,7 +199,13 @@ export default function ChartPageV2() {
     <DashboardShell
       title="Chart"
       description="Trade-ready chart workspace with indicators, replay, drawings and exports."
-      actions={<ChartHeaderActions />}
+      actions={
+        <ChartHeaderActions
+          onCreateAlert={handleCreateAlertDraft}
+          onSaveJournal={handleSaveJournal}
+          onOpenReplay={handleOpenReplay}
+        />
+      }
     >
       <Card variant="glass" className="space-y-6 rounded-3xl" data-testid="chart-page">
         {!hasSeenIntro && <ChartIntroBanner onDismiss={dismissIntro} />}
@@ -311,6 +325,32 @@ export default function ChartPageV2() {
                 {preset.label}
               </Button>
             ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3" data-testid="chart-next-actions">
+          <div className="card-glass rounded-2xl border border-border/60 p-4 lg:col-span-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Next best actions</p>
+                <p className="text-sm text-text-secondary">Stay close to the current view context.</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button size="sm" variant="primary" onClick={handleCreateAlertDraft} data-testid="chart-nba-alert">
+                  Create alert at level
+                </Button>
+                <Button size="sm" variant="secondary" onClick={handleSaveJournal} data-testid="chart-nba-journal">
+                  Save view to journal
+                </Button>
+                <Button size="sm" variant="ghost" onClick={handleOpenReplay} data-testid="chart-nba-replay">
+                  Open replay here
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="card-bordered rounded-2xl border border-border/60 bg-surface/70 p-4 text-sm text-text-secondary">
+            <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Focus hint</p>
+            <p className="mt-2 leading-relaxed">Keep one chart visible; toggle overlays only when needed.</p>
           </div>
         </div>
 

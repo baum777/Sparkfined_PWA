@@ -2,6 +2,7 @@ import React from "react"
 import { useParams, useNavigate, useSearchParams } from "react-router-dom"
 import ReplayPlayer from "@/components/ReplayPlayer"
 import PatternDashboard from "@/components/PatternDashboard"
+import DashboardShell from "@/components/dashboard/DashboardShell"
 import type { ReplaySession, JournalEntry, ReplayBookmark, SetupTag, EmotionTag } from "@/types/journal"
 import { getSession, addBookmark, deleteBookmark } from "@/lib/ReplayService"
 import { calculatePatternStats, queryEntries } from "@/lib/JournalService"
@@ -16,6 +17,8 @@ import { useChartUiStore } from "@/store/chartUiStore"
 import { mapAlertToAnnotation, mapJournalEntryToAnnotation, mergeAnnotations } from "@/lib/annotations"
 import { buildChartUrl } from "@/lib/chartLinks"
 import { useChartTelemetry } from "@/lib/chartTelemetry"
+import CalmState from "@/components/ui/CalmState"
+import Button from "@/components/ui/Button"
 
 type ViewMode = "player" | "dashboard"
 
@@ -313,49 +316,30 @@ function speedToMs(speed: number): number {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="mb-4 text-4xl">⏳</div>
-          <p className="text-sm text-secondary">Loading replay...</p>
-        </div>
-      </div>
+      <DashboardShell title="Replay" description="Focused playback workspace">
+        <CalmState type="loading" title="Loading replay" description="Preparing frames and stats" />
+      </DashboardShell>
     )
   }
 
   return (
-    <div className="min-h-screen bg-bg p-4" data-testid="replay-page">
-      <div className="mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-primary">
-              {viewMode === "player" ? "🎬 Replay Player" : "📊 Pattern Dashboard"}
-            </h1>
-            <p className="text-sm text-secondary">
-              {viewMode === "player"
-                ? "Playback and analyze your trades frame-by-frame"
-                : "Discover patterns and insights from your trading history"}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* View Toggle */}
-            <button
-              onClick={toggleViewMode}
-              className="rounded-lg border border-subtle bg-surface/80 px-4 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary"
-            >
-              {viewMode === "player" ? "📊 Dashboard" : "🎬 Player"}
-            </button>
-
-            {/* Back Button */}
-            <button
-              onClick={() => navigate("/journal-v2")}
-              className="rounded-lg border border-subtle bg-surface/80 px-4 py-2 text-sm font-medium text-secondary transition-colors hover:text-primary"
-            >
-              ← Journal
-            </button>
-          </div>
+    <DashboardShell
+      title="Replay"
+      description={
+        viewMode === "player"
+          ? "Playback trades calmly with timeline controls and nearby next steps."
+          : "See pattern stats before jumping back into the player."
+      }
+      actions={
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="primary" onClick={toggleViewMode} data-testid="replay-toggle-view">
+            {viewMode === "player" ? "View dashboard" : "View player"}
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => navigate("/journal-v2")}>Back to journal</Button>
         </div>
+      }
+    >
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4" data-testid="replay-page">
 
         {viewMode === "player" && (
           <div
@@ -403,6 +387,34 @@ function speedToMs(speed: number): number {
             {status === "no-data" && <span className="text-secondary">No candles yet</span>}
             {status === "error" && <span className="text-danger">{error}</span>}
             <span className="rounded-full border border-subtle px-2 py-0.5 text-xs uppercase text-tertiary">{mode}</span>
+          </div>
+        )}
+
+        {viewMode === "player" && (
+          <div className="card-glass mb-2 rounded-2xl border border-border/60 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Next best actions</p>
+                <p className="text-sm text-text-secondary">Keep journal, alerts, and live views within reach.</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="primary"
+                  onClick={() =>
+                    handleAddBookmark({ frame: currentFrame, note: "Saved from replay CTA", timestamp: Date.now() })
+                  }
+                >
+                  Save moment
+                </Button>
+                <Button size="sm" variant="secondary" onClick={handleOpenChart}>
+                  Open in chart
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setViewMode("dashboard")}>
+                  Find similar patterns
+                </Button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -540,6 +552,6 @@ function speedToMs(speed: number): number {
           </div>
         )}
       </div>
-    </div>
+    </DashboardShell>
   )
 }

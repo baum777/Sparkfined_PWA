@@ -6,9 +6,20 @@ interface WatchlistDetailPanelProps {
   trend?: WatchlistTrendSnapshot;
   onOpenChart?: (row?: WatchlistRow) => void;
   onOpenReplay?: (row?: WatchlistRow) => void;
+  onCreateAlert?: (row?: WatchlistRow) => void;
+  onAddJournal?: (row?: WatchlistRow) => void;
+  onOpenPlaybook?: (row?: WatchlistRow) => void;
 }
 
-export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenReplay }: WatchlistDetailPanelProps) {
+export default function WatchlistDetailPanel({
+  row,
+  trend,
+  onOpenChart,
+  onOpenReplay,
+  onCreateAlert,
+  onAddJournal,
+  onOpenPlaybook,
+}: WatchlistDetailPanelProps) {
   if (!row) {
     return (
       <div
@@ -53,25 +64,59 @@ export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenRe
       </div>
 
       <div className="space-y-4 border-t border-border-subtle pt-6">
-        <div className="card-bordered rounded-xl p-4 text-center">
-          <p className="text-xs text-text-secondary">Quick actions</p>
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => onOpenChart?.(row)}
-              className="btn btn-outline btn-sm hover-scale"
-              data-testid="button-open-chart"
-            >
-              Open chart
-            </button>
-            <button
-              type="button"
-              onClick={() => onOpenReplay?.(row)}
-              className="btn btn-outline btn-sm hover-scale"
-              data-testid="button-open-replay-from-watchlist"
-            >
-              Replay
-            </button>
+        <div className="card-bordered rounded-xl p-4">
+          <div className="flex flex-col gap-3 text-sm text-text-secondary">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Next actions</p>
+              <span className="text-[11px] text-text-secondary">Keep flow near the selected asset.</span>
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => onOpenChart?.(row)}
+                className="btn btn-primary btn-sm justify-between"
+                data-testid="button-open-chart"
+              >
+                Open chart
+                <span aria-hidden>↗</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onCreateAlert?.(row)}
+                className="btn btn-ghost btn-sm justify-between border border-border"
+                data-testid="button-create-alert"
+              >
+                Create alert
+                <span aria-hidden>•</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenReplay?.(row)}
+                className="btn btn-outline btn-sm justify-between"
+                data-testid="button-open-replay-from-watchlist"
+              >
+                Open replay
+                <span aria-hidden>⏯</span>
+              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => onAddJournal?.(row)}
+                  className="btn btn-ghost btn-sm"
+                  data-testid="button-add-to-journal"
+                >
+                  Add to journal
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onOpenPlaybook?.(row)}
+                  className="btn btn-ghost btn-sm"
+                  data-testid="button-open-playbook"
+                >
+                  Link playbook
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <SocialTrendCard trend={trend} />
