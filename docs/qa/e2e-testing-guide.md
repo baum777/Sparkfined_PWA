@@ -109,6 +109,26 @@ tests/
 
 **Test file**: `tests/e2e/routing.spec.ts`
 
+#### 5. Watchlist Resilience
+- ✅ Offline mode shows cached rows and resilience banner
+
+**Test file**: `tests/e2e/watchlist/watchlist.offline.spec.ts`
+
+#### 6. Onboarding Flow
+- ✅ First-run wizard advances through journal → watchlist → alerts
+- ✅ Skip action hides the wizard and persists the completion flag
+
+**Test file**: `tests/e2e/onboarding.flow.spec.ts`
+
+#### 7. Analysis Navigation
+- ✅ Switching tabs updates the query param and preserves overview metrics
+
+**Test file**: `tests/e2e/analyze/analysis.flow.spec.ts`
+
+### Recent Hardening (P3)
+- Telemetry drain loop now reuses a stable interval/listener set to avoid churn when buffers change.
+- Onboarding wizard emits `onboarding.advance/skip` events to mirror the new first-run flow coverage.
+
 ---
 
 ## 🛠️ **Writing Good E2E Tests**

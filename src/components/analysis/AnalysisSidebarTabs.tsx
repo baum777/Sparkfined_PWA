@@ -42,6 +42,7 @@ export default function AnalysisSidebarTabs({
                 ? 'border-glow-brand bg-brand/10 text-brand hover-glow'
                 : 'border-transparent text-text-secondary hover:border-border-moderate hover:bg-interactive-hover hover:text-text-primary hover-scale'
             }`}
+            data-testid={`analysis-tab-${tab.id}`}
           >
             {tab.label}
           </button>
