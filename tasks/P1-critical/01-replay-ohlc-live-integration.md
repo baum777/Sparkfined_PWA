@@ -41,7 +41,7 @@ Live OHLC-Daten von echten Providern abrufen:
 - Kategorie A – Bereits erfüllt
   - [ ] Keine Abdeckung: es gibt keine produktive OHLC-Quelle, weder Adapter noch Orchestrator noch Replay-Integration.
 - Kategorie B – Kleine, fokussierte Tasks
-  - [ ] Quick-Win-Pfad nicht identifiziert, da alle Schritte von funktionierender Provider-Kette abhängen.
+  - [x] Quick-Win: Deterministische OHLC-Replay-Engine für gespeicherte Kerzen implementiert (Start/Pause/Resume/Stop, Cleanup, Normalisierung) und in ReplayPage verdrahtet. Tests: `tests/lib/ohlcReplayEngine.test.ts`.
 - Kategorie C – Große / Epische Themen (offen)
   - [ ] Provider-Adapter (Moralis/DexScreener/CoinGecko) implementieren und via Fallback-Kette anbinden.
   - [ ] SWR-/IndexedDB-Cache für OHLC-Daten hinzufügen, damit Replay offline-fähig ist.
