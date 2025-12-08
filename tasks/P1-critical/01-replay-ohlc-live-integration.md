@@ -35,6 +35,18 @@ Live OHLC-Daten von echten Providern abrufen:
 - **Fallback 1**: DexScreener
 - **Fallback 2**: CoinGecko (Free Tier, limitiert)
 
+## Audit 2025-12-08 (Codex)
+
+- Status: Live-Datenpfad fehlt weiterhin; `getTokenSnapshot` wirft "Not implemented" und kein Orchestrator ist verdrahtet.
+- Kategorie A – Bereits erfüllt
+  - [ ] Keine Abdeckung: es gibt keine produktive OHLC-Quelle, weder Adapter noch Orchestrator noch Replay-Integration.
+- Kategorie B – Kleine, fokussierte Tasks
+  - [ ] Quick-Win-Pfad nicht identifiziert, da alle Schritte von funktionierender Provider-Kette abhängen.
+- Kategorie C – Große / Epische Themen (offen)
+  - [ ] Provider-Adapter (Moralis/DexScreener/CoinGecko) implementieren und via Fallback-Kette anbinden.
+  - [ ] SWR-/IndexedDB-Cache für OHLC-Daten hinzufügen, damit Replay offline-fähig ist.
+  - [ ] ReplayService/ReplayPage auf Live-Daten umstellen und `tests/e2e/replay.spec.ts` reaktivieren.
+
 ---
 
 ## Tasks
@@ -469,5 +481,5 @@ pnpm dev
 ---
 
 **Owner**: Backend + Data Team
-**Status**: 🟠 NICHT GESTARTET
+**Status**: 🔴 OFFEN – kein Live-Datenpfad; siehe Audit 2025-12-08
 **Deadline**: Woche 3 (Sprint 3)

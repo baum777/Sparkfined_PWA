@@ -37,6 +37,17 @@ Implementiere **vollständige Export/Import Pipeline**:
 - Import: JSON → Journal (restore backup)
 - Bulk Export: Alle Daten (Journal + Alerts + Settings)
 
+## Audit 2025-12-08 (Codex)
+
+- Status: `ExportService` enthält weiterhin nur Platzhalter und wirft "Not implemented"; keine UI-Hooks vorhanden.
+- Kategorie A – Bereits erfüllt
+  - [ ] Kein Teil der Pipeline ist derzeit produktiv; kein JSON/Markdown-Export implementiert.
+- Kategorie B – Kleine, fokussierte Tasks
+  - [ ] Minimaler JSON-Export (ohne ZIP/Share-Cards) aus `db.journalEntries` implementieren und download helper anbinden.
+- Kategorie C – Große / Epische Themen (offen)
+  - [ ] Vollständige Export/Import-Pipeline inkl. Markdown/ZIP/Share-Cards und Schema-Validierung.
+  - [ ] Settings/Alerts/Watchlist in Bulk-Export integrieren und UI-Schalter auf SettingsPageV2 anbinden.
+
 ---
 
 ## Tasks
@@ -546,5 +557,5 @@ Entry at $95, target $105. Strong volume confirmation.
 ---
 
 **Owner**: Frontend Team
-**Status**: 🟠 NICHT GESTARTET
+**Status**: 🔴 OFFEN – ExportService weiter placeholder; siehe Audit 2025-12-08
 **Deadline**: Woche 4 (Sprint 4)
