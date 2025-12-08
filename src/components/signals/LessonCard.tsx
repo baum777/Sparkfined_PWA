@@ -24,17 +24,17 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
   // Score styling
   const scoreColor =
     lesson.score >= 0.75
-      ? 'text-emerald-500'
+      ? 'text-sentiment-bull'
       : lesson.score >= 0.6
-      ? 'text-amber-500'
-      : 'text-zinc-500'
+        ? 'text-warn'
+        : 'text-text-tertiary'
 
-  const scoreBg =
+  const scoreSurface =
     lesson.score >= 0.75
-      ? 'bg-emerald-950/30 border-emerald-800/50'
+      ? 'border border-sentiment-bull-border bg-sentiment-bull-bg'
       : lesson.score >= 0.6
-      ? 'bg-amber-950/30 border-amber-800/50'
-      : 'bg-zinc-900 border-zinc-800'
+        ? 'border border-warn/40 bg-warn/10'
+        : 'border border-border bg-surface-subtle'
 
   // Pattern display
   const patternDisplay = lesson.pattern
@@ -48,7 +48,7 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
   if (compact) {
     return (
       <div
-        className={`border ${scoreBg} rounded-lg p-3 transition-all ${
+        className={`${scoreSurface} rounded-lg p-3 transition-all ${
           onClick ? 'cursor-pointer hover:bg-opacity-70 active:scale-[0.98]' : ''
         }`}
         style={{
@@ -63,11 +63,10 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
           <div className="flex items-center gap-2">
             <BookOpen size={16} className={scoreColor} />
             <div>
-              <p className="text-sm font-semibold text-zinc-100">{patternDisplay}</p>
+              <p className="text-sm font-semibold text-text-primary">{patternDisplay}</p>
               {lesson.stats && (
-                <p className="text-xs text-zinc-500">
-                  {(lesson.stats.win_rate * 100).toFixed(0)}% WR • {lesson.stats.trades_analyzed}{' '}
-                  trades
+                <p className="text-xs text-text-secondary">
+                  {(lesson.stats.win_rate * 100).toFixed(0)}% WR • {lesson.stats.trades_analyzed} trades
                 </p>
               )}
             </div>
@@ -81,19 +80,16 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
   }
 
   return (
-    <div
-      className={`border ${scoreBg} rounded-lg p-4 space-y-4`}
-      style={{ borderRadius: 'var(--radius-lg)' }}
-    >
+    <div className={`${scoreSurface} rounded-lg p-4 space-y-4`} style={{ borderRadius: 'var(--radius-lg)' }}>
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-zinc-900/50 p-2">
+          <div className="rounded-lg border border-border-subtle bg-surface-subtle p-2">
             <BookOpen size={20} className={scoreColor} />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-100">{patternDisplay}</h3>
-            <p className="text-xs text-zinc-500">Updated {timeAgo}</p>
+            <h3 className="text-lg font-semibold text-text-primary">{patternDisplay}</h3>
+            <p className="text-xs text-text-secondary">Updated {timeAgo}</p>
           </div>
         </div>
 
@@ -101,63 +97,57 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
           <p className={`text-xl font-semibold ${scoreColor}`}>
             {(lesson.score * 100).toFixed(0)}%
           </p>
-          <p className="text-xs text-zinc-500">Confidence</p>
+          <p className="text-xs text-text-tertiary">Confidence</p>
         </div>
       </div>
 
       {/* Stats */}
       {lesson.stats && (
         <div className="grid grid-cols-3 gap-2">
-          <div className="rounded bg-zinc-900/50 p-2 text-center">
-            <p className="text-xs text-zinc-500">Win Rate</p>
-            <p className="text-sm font-semibold text-emerald-500">
+          <div className="rounded-2xl border border-border-subtle bg-surface-subtle p-2 text-center">
+            <p className="text-xs text-text-tertiary">Win Rate</p>
+            <p className="text-sm font-semibold text-sentiment-bull">
               {(lesson.stats.win_rate * 100).toFixed(0)}%
             </p>
           </div>
-          <div className="rounded bg-zinc-900/50 p-2 text-center">
-            <p className="text-xs text-zinc-500">Avg R:R</p>
-            <p className="text-sm font-semibold text-zinc-300">
+          <div className="rounded-2xl border border-border-subtle bg-surface-subtle p-2 text-center">
+            <p className="text-xs text-text-tertiary">Avg R:R</p>
+            <p className="text-sm font-semibold text-text-secondary">
               {lesson.stats.avg_rr.toFixed(1)}:1
             </p>
           </div>
-          <div className="rounded bg-zinc-900/50 p-2 text-center">
-            <p className="text-xs text-zinc-500">Trades</p>
-            <p className="text-sm font-semibold text-zinc-300">{lesson.stats.trades_analyzed}</p>
+          <div className="rounded-2xl border border-border-subtle bg-surface-subtle p-2 text-center">
+            <p className="text-xs text-text-tertiary">Trades</p>
+            <p className="text-sm font-semibold text-text-secondary">{lesson.stats.trades_analyzed}</p>
           </div>
         </div>
       )}
 
       {/* When It Works */}
-      <div className="rounded-lg bg-emerald-950/20 border border-emerald-800/30 p-3">
-        <div className="flex items-center gap-2 mb-2">
-          <TrendingUp size={14} className="text-emerald-500" />
-          <p className="text-xs font-semibold text-emerald-500 uppercase tracking-wide">
-            When It Works
-          </p>
+      <div className="rounded-lg border border-sentiment-bull-border bg-sentiment-bull-bg p-3">
+        <div className="mb-2 flex items-center gap-2">
+          <TrendingUp size={14} className="text-sentiment-bull" />
+          <p className="text-xs font-semibold uppercase tracking-wide text-sentiment-bull">When It Works</p>
         </div>
-        <p className="text-sm leading-relaxed text-zinc-300">{lesson.when_it_works}</p>
+        <p className="text-sm leading-relaxed text-text-secondary">{lesson.when_it_works}</p>
       </div>
 
       {/* When It Fails */}
-      <div className="rounded-lg bg-rose-950/20 border border-rose-800/30 p-3">
-        <div className="flex items-center gap-2 mb-2">
-          <XCircle size={14} className="text-rose-500" />
-          <p className="text-xs font-semibold text-rose-500 uppercase tracking-wide">
-            When It Fails
-          </p>
+      <div className="rounded-lg border border-sentiment-bear-border bg-sentiment-bear-bg p-3">
+        <div className="mb-2 flex items-center gap-2">
+          <XCircle size={14} className="text-sentiment-bear" />
+          <p className="text-xs font-semibold uppercase tracking-wide text-sentiment-bear">When It Fails</p>
         </div>
-        <p className="text-sm leading-relaxed text-zinc-300">{lesson.when_it_fails}</p>
+        <p className="text-sm leading-relaxed text-text-secondary">{lesson.when_it_fails}</p>
       </div>
 
       {/* Checklist */}
       <div>
-        <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wide mb-2">
-          📋 Checklist
-        </p>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">📋 Checklist</p>
         <ul className="space-y-1">
           {lesson.checklist.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-sm text-zinc-300">
-              <span className="text-zinc-600">•</span>
+            <li key={idx} className="flex items-start gap-2 text-sm text-text-secondary">
+              <span className="text-text-tertiary">•</span>
               <span>{item}</span>
             </li>
           ))}
@@ -166,14 +156,14 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
 
       {/* DOs */}
       <div>
-        <div className="flex items-center gap-2 mb-2">
-          <CheckCircle2 size={14} className="text-emerald-500" />
-          <p className="text-xs font-semibold text-emerald-500 uppercase tracking-wide">DOs</p>
+        <div className="mb-2 flex items-center gap-2">
+          <CheckCircle2 size={14} className="text-sentiment-bull" />
+          <p className="text-xs font-semibold uppercase tracking-wide text-sentiment-bull">DOs</p>
         </div>
         <ul className="space-y-1">
           {lesson.dos.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-sm text-zinc-300">
-              <span className="text-emerald-600">✓</span>
+            <li key={idx} className="flex items-start gap-2 text-sm text-text-secondary">
+              <span className="text-sentiment-bull">✓</span>
               <span>{item}</span>
             </li>
           ))}
@@ -182,14 +172,14 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
 
       {/* DONTs */}
       <div>
-        <div className="flex items-center gap-2 mb-2">
-          <XCircle size={14} className="text-rose-500" />
-          <p className="text-xs font-semibold text-rose-500 uppercase tracking-wide">DON'Ts</p>
+        <div className="mb-2 flex items-center gap-2">
+          <XCircle size={14} className="text-sentiment-bear" />
+          <p className="text-xs font-semibold uppercase tracking-wide text-sentiment-bear">DON'Ts</p>
         </div>
         <ul className="space-y-1">
           {lesson.donts.map((item, idx) => (
-            <li key={idx} className="flex items-start gap-2 text-sm text-zinc-300">
-              <span className="text-rose-600">✗</span>
+            <li key={idx} className="flex items-start gap-2 text-sm text-text-secondary">
+              <span className="text-sentiment-bear">✗</span>
               <span>{item}</span>
             </li>
           ))}
@@ -197,14 +187,12 @@ export default function LessonCard({ lesson, onClick, compact = false }: LessonC
       </div>
 
       {/* Next Drill */}
-      <div className="rounded-lg bg-cyan-950/20 border border-cyan-800/30 p-3">
-        <div className="flex items-center gap-2 mb-2">
-          <Target size={14} className="text-cyan-500" />
-          <p className="text-xs font-semibold text-cyan-500 uppercase tracking-wide">
-            Next Drill
-          </p>
+      <div className="rounded-lg border border-info/40 bg-info/10 p-3">
+        <div className="mb-2 flex items-center gap-2">
+          <Target size={14} className="text-info" />
+          <p className="text-xs font-semibold uppercase tracking-wide text-info">Next Drill</p>
         </div>
-        <p className="text-sm leading-relaxed text-zinc-300">{lesson.next_drill}</p>
+        <p className="text-sm leading-relaxed text-text-secondary">{lesson.next_drill}</p>
       </div>
     </div>
   )

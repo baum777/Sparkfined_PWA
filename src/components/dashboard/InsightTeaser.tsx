@@ -12,7 +12,7 @@ interface InsightTeaserProps {
 const biasStyles: Record<InsightTeaserProps['bias'], string> = {
   long: 'border border-sentiment-bull-border bg-sentiment-bull-bg text-sentiment-bull',
   short: 'border border-sentiment-bear-border bg-sentiment-bear-bg text-sentiment-bear',
-  neutral: 'border border-sentiment-neutral-border bg-sentiment-neutral-bg text-amber-200',
+  neutral: 'border border-sentiment-neutral-border bg-sentiment-neutral-bg text-text-secondary',
 };
 
 export default function InsightTeaser({ title, bias, confidenceLabel, summary }: InsightTeaserProps) {

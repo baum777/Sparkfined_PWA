@@ -69,15 +69,7 @@ export default function OracleHistoryList({ reports }: OracleHistoryListProps) {
                   <span className="text-xs uppercase tracking-wider text-text-tertiary">
                     Score
                   </span>
-                  <span
-                    className={`rounded-full px-2 py-1 text-sm font-semibold ${
-                      report.score >= 6
-                        ? 'bg-brand/20 text-brand'
-                        : report.score >= 4
-                        ? 'bg-blue-500/20 text-blue-400'
-                        : 'bg-text-tertiary/20 text-text-tertiary'
-                    }`}
-                  >
+                  <span className={`rounded-full px-2 py-1 text-sm font-semibold ${scoreBadgeClass(report.score)}`}>
                     {report.score}/7
                   </span>
                 </div>
@@ -196,4 +188,14 @@ export default function OracleHistoryList({ reports }: OracleHistoryListProps) {
       )}
     </>
   );
+}
+
+function scoreBadgeClass(score: number): string {
+  if (score >= 6) {
+    return 'bg-sentiment-bull-bg text-sentiment-bull';
+  }
+  if (score >= 4) {
+    return 'bg-info/20 text-info';
+  }
+  return 'bg-text-tertiary/20 text-text-tertiary';
 }
