@@ -1,0 +1,35 @@
+# Sparkfined PWA - robots.txt
+# Generated: 2025-12-08
+
+User-agent: *
+Allow: /
+
+# Disallow development/testing routes (if accidentally deployed)
+Disallow: /styles
+Disallow: /ux
+Disallow: /icons
+
+# Disallow API routes (not meant for search engines)
+Disallow: /api/
+
+# Allow all main application routes
+Allow: /landing
+Allow: /dashboard-v2
+Allow: /journal-v2
+Allow: /analysis-v2
+Allow: /chart-v2
+Allow: /watchlist-v2
+Allow: /alerts-v2
+Allow: /replay
+Allow: /oracle
+Allow: /notifications
+Allow: /signals
+Allow: /lessons
+Allow: /settings-v2
+
+# Sitemap location
+# TODO: Replace "your-domain.vercel.app" with actual production domain
+Sitemap: https://your-domain.vercel.app/sitemap.xml
+
+# Crawl delay (optional, prevents aggressive crawling)
+# Crawl-delay: 1

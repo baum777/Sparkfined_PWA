@@ -60,6 +60,7 @@ docs/
   - Environment variables & data providers
   - Build & deploy guide
   - Push notifications setup
+  - SEO & sitemap configuration
   - Vercel deployment checklist
 
 ### Concepts & Roadmaps
