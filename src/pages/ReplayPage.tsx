@@ -5,6 +5,7 @@ import PatternDashboard from "@/components/PatternDashboard"
 import type { ReplaySession, JournalEntry, ReplayBookmark, SetupTag, EmotionTag } from "@/types/journal"
 import { getSession, addBookmark, deleteBookmark } from "@/lib/ReplayService"
 import { calculatePatternStats, queryEntries } from "@/lib/JournalService"
+import { OhlcReplayEngine } from "@/lib/replay/ohlcReplayEngine"
 import AdvancedChart from "@/components/chart/AdvancedChart"
 import { DEFAULT_TIMEFRAME, type ChartAnnotation, type ChartMode, type ChartTimeframe } from "@/domain/chart"
 import useOhlcData from "@/hooks/useOhlcData"
@@ -59,6 +60,7 @@ export default function ReplayPage() {
   const [loading, setLoading] = React.useState(false)
   const [timeframe, setTimeframe] = React.useState<ChartTimeframe>(resolveTimeframe(searchParams.get("timeframe")))
   const [mode, setMode] = React.useState<ChartMode>("replay")
+  const engineRef = React.useRef<OhlcReplayEngine | null>(null)
 
   const asset = React.useMemo(
     () => resolveAsset(searchParams.get("symbol"), searchParams.get("address"), searchParams.get("network")),
@@ -116,6 +118,33 @@ export default function ReplayPage() {
     }
   }, [candles.length, currentFrame, hasFrames])
 
+  React.useEffect(() => {
+    if (!candles.length) {
+      engineRef.current?.stop()
+      setIsPlaying(false)
+      setCurrentFrame(0)
+      return undefined
+    }
+
+    engineRef.current = new OhlcReplayEngine({
+      candles,
+      speedMs: speedToMs(speed),
+      fromIndex: Math.min(currentFrame, candles.length - 1),
+      onTick: ({ index }) => setCurrentFrame(index),
+      onComplete: () => setIsPlaying(false),
+    })
+
+    return () => {
+      engineRef.current?.stop()
+    }
+  }, [candles, speed, currentFrame])
+
+  React.useEffect(() => {
+    if (engineRef.current && engineRef.current.status === "playing") {
+      engineRef.current.setSpeed(speedToMs(speed))
+    }
+  }, [speed])
+
   // Load session if sessionId provided
   React.useEffect(() => {
     if (sessionId) {
@@ -134,19 +163,17 @@ export default function ReplayPage() {
   React.useEffect(() => {
     if (!isPlaying || candles.length === 0) return
 
-    const interval = setInterval(() => {
-      setCurrentFrame((prev) => {
-        const next = prev + 1
-        if (next >= candles.length) {
-          setIsPlaying(false)
-          return candles.length - 1
-        }
-        return next
-      })
-    }, 1000 / speed) // Adjust speed
+    engineRef.current?.seek(currentFrame)
+    const started = engineRef.current?.start()
+    if (!started) {
+      setIsPlaying(false)
+      return undefined
+    }
 
-    return () => clearInterval(interval)
-  }, [isPlaying, speed, candles])
+    return () => {
+      engineRef.current?.pause()
+    }
+  }, [isPlaying, currentFrame])
 
   // Load session
   const loadSession = async (id: string) => {
@@ -165,8 +192,13 @@ export default function ReplayPage() {
       console.error("Error loading session:", error)
     } finally {
       setLoading(false)
-    }
   }
+}
+
+function speedToMs(speed: number): number {
+  const safeSpeed = Math.max(speed, 0.25)
+  return 1000 / safeSpeed
+}
 
   // Load dashboard data
   const loadDashboardData = async () => {
@@ -197,6 +229,7 @@ export default function ReplayPage() {
   const handleSeek = (frame: number) => {
     if (!hasFrames) return
     setCurrentFrame(frame)
+    engineRef.current?.seek(frame)
     setIsPlaying(false)
   }
   const handleSpeedChange = (newSpeed: number) => setSpeed(newSpeed)

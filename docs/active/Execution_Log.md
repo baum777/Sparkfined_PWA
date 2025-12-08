@@ -831,3 +831,23 @@ Actions:
 
 Commands & Results:
 - pnpm vitest run --reporter=dot (pass; 80 files, 557 tests, 35 skipped)
+
+### 2025-12-08 – P1-critical Stream A – Replay OHLC Quick Wins
+
+Date: 2025-12-08
+Agent: Codex
+Section: P1-critical Stream A – Replay OHLC
+Branch: (current)
+
+Actions:
+- Konsolidierte eine deterministische OHLC-Replay-Engine mit Start/Pause/Resume/Stop-API und Timer-Cleanup, normalisiert Kerzenstrukturen.
+- Integrierte die Engine in ReplayPage, damit Playback-State und Seek-Operationen über die Engine laufen und Timer-Leaks vermieden werden.
+- Ergänzte Vitest-Coverage für Replay-Fälle (Durchlauf, Pause/Resume, Boundaries, Speed-Updates) und dokumentierte Quick-Win-Abdeckung im Task-Dokument.
+
+Commands & Results:
+- pnpm typecheck (pending)
+- pnpm lint (pending)
+- pnpm test -- --reporter=dot (pending)
+
+New open points:
+- Live-Provider-Kette und Dexie-Caching bleiben offen (Epic, siehe Task 01 Phase 1/2/5).
