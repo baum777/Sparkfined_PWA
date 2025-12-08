@@ -45,12 +45,7 @@ export default function JournalSnapshot({ entries }: JournalSnapshotProps) {
       </div>
 
       <div className="mt-5">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-blue-300 hover:text-blue-200"
-          onClick={handleNavigate}
-        >
+        <Button variant="ghost" size="sm" className="text-text-secondary hover:text-text-primary" onClick={handleNavigate}>
           Open journal
         </Button>
       </div>

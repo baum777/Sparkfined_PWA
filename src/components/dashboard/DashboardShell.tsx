@@ -9,6 +9,7 @@ interface DashboardTab {
 interface DashboardShellProps {
   title: string;
   description?: string;
+  meta?: string;
   actions?: React.ReactNode;
   tabs?: DashboardTab[];
   activeTabId?: string;
@@ -20,6 +21,7 @@ interface DashboardShellProps {
 export default function DashboardShell({
   title,
   description,
+  meta,
   actions,
   tabs,
   activeTabId,
@@ -34,6 +36,7 @@ export default function DashboardShell({
       <PageHeader
         title={title}
         subtitle={description}
+        meta={meta}
         actions={actions}
         tabs={
           hasTabs ? (

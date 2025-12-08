@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import DashboardKpiStrip from '@/components/dashboard/DashboardKpiStrip';
 import DashboardQuickActions from '@/components/dashboard/DashboardQuickActions';
@@ -7,6 +8,8 @@ import InsightTeaser from '@/components/dashboard/InsightTeaser';
 import JournalSnapshot from '@/components/dashboard/JournalSnapshot';
 import AlertsSnapshot from '@/components/dashboard/AlertsSnapshot';
 import ErrorBanner from '@/components/ui/ErrorBanner';
+import { Skeleton } from '@/components/ui/Skeleton';
+import StateView from '@/components/ui/StateView';
 import { useJournalStore } from '@/store/journalStore';
 import { useAlertsStore } from '@/store/alertsStore';
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from '@/lib/dashboard/calculateKPIs';
@@ -21,6 +24,7 @@ const dummyInsight = {
 export default function DashboardPageV2() {
   const journalEntries = useJournalStore((state) => state.entries);
   const alerts = useAlertsStore((state) => state.alerts);
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +67,7 @@ export default function DashboardPageV2() {
   const kpiStripContent = isLoading ? (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="h-20 animate-pulse rounded-2xl bg-surface-skeleton" />
+        <Skeleton key={index} variant="card" className="h-20 w-full" />
       ))}
     </div>
   ) : error ? null : (
@@ -73,13 +77,11 @@ export default function DashboardPageV2() {
   const renderMainContent = () => {
     if (isLoading) {
       return (
-        <div className="space-y-6">
-          <DashboardMainGrid
-            primary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
-            secondary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
-            tertiary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
-          />
-        </div>
+        <DashboardMainGrid
+          primary={<Skeleton variant="card" className="h-72 w-full" />}
+          secondary={<Skeleton variant="card" className="h-60 w-full" />}
+          tertiary={<Skeleton variant="card" className="h-60 w-full" />}
+        />
       );
     }
 
@@ -87,8 +89,14 @@ export default function DashboardPageV2() {
       return (
         <div className="space-y-6">
           <ErrorBanner message={error} onRetry={handleRetry} />
-          <div className="rounded-3xl border border-border-subtle bg-surface-elevated p-6 text-sm text-text-secondary">
-            Please try again. If the issue persists, check your connection or reload the dashboard.
+          <div className="card-glass rounded-3xl p-6">
+            <StateView
+              type="error"
+              title="Unable to load dashboard"
+              description="Please check your connection or reload. Your latest synced data remains safe."
+              actionLabel="Retry sync"
+              onAction={handleRetry}
+            />
           </div>
         </div>
       );
@@ -98,16 +106,22 @@ export default function DashboardPageV2() {
       return (
         <DashboardMainGrid
           primary={
-            <div className="space-y-3 text-sm text-text-secondary">
-              <p className="text-base font-semibold text-text-primary">No insights yet</p>
-              <p>Analyze your first market to see advanced insights here.</p>
-            </div>
+            <StateView
+              type="empty"
+              title="No insights yet"
+              description="Run your first analysis to unlock AI bias, flow and volatility context."
+              actionLabel="Go to analysis"
+              onAction={() => navigate('/analysis-v2')}
+            />
           }
           secondary={
-            <div className="space-y-3 text-sm text-text-secondary">
-              <p className="text-base font-semibold text-text-primary">No journal entries to show</p>
-              <p>Add a new journal entry to see recent trades and notes.</p>
-            </div>
+            <StateView
+              type="empty"
+              title="No journal entries"
+              description="Log a trade or mindset note to build your streaks."
+              actionLabel="Open journal"
+              onAction={() => navigate('/journal-v2')}
+            />
           }
           tertiary={<AlertsSnapshot />}
         />
@@ -124,12 +138,16 @@ export default function DashboardPageV2() {
   };
 
   return (
-    <DashboardShell
-      title="Dashboard"
-      actions={<DashboardQuickActions />}
-      kpiStrip={kpiStripContent}
-    >
-      {renderMainContent()}
-    </DashboardShell>
+    <div data-testid="dashboard-page">
+      <DashboardShell
+        title="Dashboard"
+        description="Command surface for your net risk, streaks, and live intelligence."
+        meta={`${journalEntries.length} journal entries · ${alerts.length} alerts`}
+        actions={<DashboardQuickActions />}
+        kpiStrip={kpiStripContent}
+      >
+        {renderMainContent()}
+      </DashboardShell>
+    </div>
   );
 }

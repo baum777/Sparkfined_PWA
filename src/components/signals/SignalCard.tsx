@@ -18,26 +18,23 @@ interface SignalCardProps {
 
 export default function SignalCard({ signal, onClick, compact = false }: SignalCardProps) {
   // Direction styling
-  const directionStyles = {
-    long: {
-      bg: 'bg-emerald-950/30',
-      border: 'border-emerald-800/50',
-      text: 'text-emerald-500',
-      icon: TrendingUp,
-    },
-    short: {
-      bg: 'bg-rose-950/30',
-      border: 'border-rose-800/50',
-      text: 'text-rose-500',
-      icon: TrendingDown,
-    },
-    neutral: {
-      bg: 'bg-zinc-900',
-      border: 'border-zinc-800',
-      text: 'text-zinc-400',
-      icon: AlertCircle,
-    },
-  }
+const directionStyles = {
+  long: {
+    surface: 'border border-sentiment-bull-border bg-sentiment-bull-bg',
+    accent: 'text-sentiment-bull',
+    icon: TrendingUp,
+  },
+  short: {
+    surface: 'border border-sentiment-bear-border bg-sentiment-bear-bg',
+    accent: 'text-sentiment-bear',
+    icon: TrendingDown,
+  },
+  neutral: {
+    surface: 'border border-border bg-surface-subtle',
+    accent: 'text-text-secondary',
+    icon: AlertCircle,
+  },
+}
 
   const style = directionStyles[signal.direction]
   const DirectionIcon = style.icon
@@ -45,10 +42,10 @@ export default function SignalCard({ signal, onClick, compact = false }: SignalC
   // Confidence color
   const confidenceColor =
     signal.confidence >= 0.75
-      ? 'text-emerald-500'
+      ? 'text-sentiment-bull'
       : signal.confidence >= 0.6
-      ? 'text-amber-500'
-      : 'text-zinc-500'
+      ? 'text-warn'
+      : 'text-text-tertiary'
 
   // Pattern display
   const patternDisplay = signal.pattern
@@ -61,7 +58,7 @@ export default function SignalCard({ signal, onClick, compact = false }: SignalC
 
   return (
     <div
-      className={`border ${style.border} ${style.bg} p-3 transition-all md:rounded-lg ${
+      className={`${style.surface} p-3 transition-all md:rounded-lg ${
         onClick ? 'cursor-pointer hover:bg-opacity-70 active:scale-[0.98]' : ''
       }`}
       style={{
@@ -76,12 +73,12 @@ export default function SignalCard({ signal, onClick, compact = false }: SignalC
       {/* Header: Symbol + Direction + Confidence */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2">
-          <DirectionIcon size={16} className={style.text} />
+          <DirectionIcon size={16} className={style.accent} />
           <div>
-            <p className="text-sm font-semibold text-zinc-100">
+            <p className="text-sm font-semibold text-text-primary">
               {signal.market.symbol}
             </p>
-            <p className="text-xs text-zinc-500">{signal.market.venue}</p>
+            <p className="text-xs text-text-secondary">{signal.market.venue}</p>
           </div>
         </div>
 
@@ -89,7 +86,7 @@ export default function SignalCard({ signal, onClick, compact = false }: SignalC
           <p className={`text-xs font-medium ${confidenceColor}`}>
             {(signal.confidence * 100).toFixed(0)}%
           </p>
-          <p className="text-xs text-zinc-500">{timeAgo}</p>
+          <p className="text-xs text-text-tertiary">{timeAgo}</p>
         </div>
       </div>
 
@@ -97,16 +94,16 @@ export default function SignalCard({ signal, onClick, compact = false }: SignalC
       {!compact && (
         <div className="mt-2 space-y-1">
           <div className="flex items-center gap-2">
-            <span className="rounded bg-zinc-800/50 px-2 py-0.5 text-xs font-medium text-zinc-300">
+            <span className="rounded bg-surface-subtle px-2 py-0.5 text-xs font-medium text-text-secondary">
               {patternDisplay}
             </span>
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-text-tertiary">
               {signal.regime.trend} / {signal.regime.vol} vol
             </span>
           </div>
 
           {/* Thesis (truncated) */}
-          <p className="text-xs leading-relaxed text-zinc-400 line-clamp-2">
+          <p className="text-xs leading-relaxed text-text-secondary line-clamp-2">
             {signal.thesis}
           </p>
         </div>
@@ -115,8 +112,8 @@ export default function SignalCard({ signal, onClick, compact = false }: SignalC
       {/* Risk Flags (if any) */}
       {signal.features.risk_flags.length > 0 && (
         <div className="mt-2 flex items-center gap-1">
-          <AlertCircle size={12} className="text-amber-500" />
-          <p className="text-xs text-amber-500">
+          <AlertCircle size={12} className="text-warn" />
+          <p className="text-xs text-warn">
             {signal.features.risk_flags.length} risk flag
             {signal.features.risk_flags.length > 1 ? 's' : ''}
           </p>

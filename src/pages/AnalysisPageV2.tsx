@@ -49,6 +49,9 @@ export default function AnalysisPageV2() {
   const trendSnapshots = useAdvancedInsightStore((state) => state.trendSnapshots);
   const sourcePayloadMeta = useAdvancedInsightStore((state) => state.sourcePayload?.meta);
   const hasLoadedMarketRef = React.useRef(false);
+  const headerMeta = marketSnapshot
+    ? `${marketSnapshot.symbol} · ${marketSnapshot.timeframeLabel} · ${formatChangePct(marketSnapshot.change24hPct)}`
+    : "Auto-refreshing snapshot";
   const trendInsight = React.useMemo(() => {
     const keys = Object.keys(trendSnapshots);
     const firstKey = keys[0];
@@ -231,17 +234,14 @@ export default function AnalysisPageV2() {
           </div>
 
           {trendInsight ? (
-            <div
-              className="space-y-2 rounded-2xl border border-emerald-400/30 bg-emerald-500/5 p-4"
-              data-testid="analysis-trend-block"
-            >
+            <div className="space-y-2 rounded-2xl border border-sentiment-bull-border bg-sentiment-bull-bg p-4" data-testid="analysis-trend-block">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.25em] text-emerald-200/80">Social trend</p>
+                  <p className="text-xs uppercase tracking-[0.25em] text-sentiment-bull">Social trend</p>
                   <p className="text-sm text-text-secondary">{trendInsight.tweet.snippet ?? trendInsight.tweet.fullText}</p>
                 </div>
                 {trendInsight.sentiment?.label ? (
-                  <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-200">
+                  <span className="inline-flex items-center rounded-full bg-sentiment-bull-bg px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-sentiment-bull">
                     {trendInsight.sentiment.label}
                   </span>
                 ) : null}
@@ -265,7 +265,7 @@ export default function AnalysisPageV2() {
                   href={trendInsight.source.tweetUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-200 underline decoration-emerald-500/70 decoration-dotted underline-offset-4"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-sentiment-bull underline decoration-border decoration-dotted underline-offset-4"
                 >
                   View tweet
                   <span aria-hidden="true">↗</span>
@@ -299,54 +299,58 @@ export default function AnalysisPageV2() {
   };
 
   return (
-    <DashboardShell
-      title="Analysis"
-      description="AI-backed market views, flows and playbooks."
-      actions={
-        <AnalysisHeaderActions
-          activeTab={activeTab}
-          isMarketLoading={isMarketLoading}
-          marketError={marketError}
-        />
-      }
-    >
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8">
-        <section className="space-y-3" data-testid="analysis-page-root">
-          <div className="space-y-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Pattern analysis</p>
-            <p className="text-base text-text-primary">Deep dives into setups, timing, and sentiment.</p>
-            <p className="text-sm text-text-secondary">
-              Use filters and tabs to isolate the conditions that matter for your playbook.
-            </p>
-          </div>
-          <div className="space-y-1 text-xs">
-            {isMarketLoading && <p className="text-text-tertiary">Syncing the latest market snapshot…</p>}
-            {!isMarketLoading && marketError && (
-              <p className="font-medium text-warn">{marketError}</p>
-            )}
-            {!isMarketLoading && !marketError && (
-              <p className="text-text-secondary">Insights refresh automatically as new context comes in.</p>
-            )}
-          </div>
-        </section>
-
-        <section>
-          <AnalysisLayout
-            tabs={tabs}
+    <div data-testid="analysis-page">
+      <DashboardShell
+        title="Analysis"
+        description="AI-backed market views, flows and playbooks."
+        meta={headerMeta}
+        actions={
+          <AnalysisHeaderActions
             activeTab={activeTab}
-            onTabChange={(id) => {
-              setActiveTab(id as AnalysisTabId);
-              const nextParams = new URLSearchParams(searchParams);
-              nextParams.set("tab", id);
-              setSearchParams(nextParams, { replace: true });
-            }}
-            showHeader={false}
-          >
-            {renderTabContent()}
-          </AnalysisLayout>
-        </section>
-      </div>
-    </DashboardShell>
+            isMarketLoading={isMarketLoading}
+            marketError={marketError}
+          />
+        }
+      >
+        <div className="space-y-6 text-text-primary">
+          <section className="grid gap-4 lg:grid-cols-12" data-testid="analysis-context">
+            <div className="card-glass rounded-3xl p-6 lg:col-span-8">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Pattern analysis</p>
+              <h2 className="mt-3 text-2xl font-semibold text-text-primary">Deep dives into setups, timing, and sentiment.</h2>
+              <p className="mt-2 text-sm text-text-secondary">
+                Use filters and tabs to isolate the conditions that matter for your playbook.
+              </p>
+            </div>
+            <div className="card rounded-3xl p-6 lg:col-span-4">
+              <p className="text-xs uppercase tracking-wide text-text-tertiary">Data status</p>
+              <div className="mt-3 space-y-2 text-sm text-text-secondary">
+                {isMarketLoading ? <p className="text-text-tertiary">Syncing the latest market snapshot…</p> : null}
+                {!isMarketLoading && marketError ? <p className="font-medium text-warn">{marketError}</p> : null}
+                {!isMarketLoading && !marketError ? (
+                  <p>Insights refresh automatically as new context comes in.</p>
+                ) : null}
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <AnalysisLayout
+              tabs={tabs}
+              activeTab={activeTab}
+              onTabChange={(id) => {
+                setActiveTab(id as AnalysisTabId);
+                const nextParams = new URLSearchParams(searchParams);
+                nextParams.set("tab", id);
+                setSearchParams(nextParams, { replace: true });
+              }}
+              showHeader={false}
+            >
+              {renderTabContent()}
+            </AnalysisLayout>
+          </section>
+        </div>
+      </DashboardShell>
+    </div>
   );
 }
 

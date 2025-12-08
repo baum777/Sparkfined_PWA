@@ -115,9 +115,9 @@ export default function AnalysisOverviewStats({
 function toneValueClass(tone: AnalysisOverviewStatTone = 'neutral'): string {
   switch (tone) {
     case 'positive':
-      return 'text-emerald-300';
+      return 'text-sentiment-bull';
     case 'negative':
-      return 'text-rose-300';
+      return 'text-sentiment-bear';
     default:
       return 'text-text-primary';
   }
@@ -126,9 +126,9 @@ function toneValueClass(tone: AnalysisOverviewStatTone = 'neutral'): string {
 function toneIconClass(tone: AnalysisOverviewStatTone = 'neutral'): string {
   switch (tone) {
     case 'positive':
-      return 'bg-emerald-500/10 text-emerald-300';
+      return 'bg-sentiment-bull-bg text-sentiment-bull';
     case 'negative':
-      return 'bg-rose-500/10 text-rose-300';
+      return 'bg-sentiment-bear-bg text-sentiment-bear';
     default:
       return 'bg-surface text-text-secondary';
   }
