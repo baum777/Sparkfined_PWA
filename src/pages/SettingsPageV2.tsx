@@ -10,9 +10,7 @@ export default function SettingsPageV2() {
       description="Manage preferences, data backups, AI usage and app controls."
       actions={<SettingsHeaderActions />}
     >
-      <div className="card rounded-3xl p-4 sm:p-6">
-        <SettingsPage showHeading={false} wrapperClassName="space-y-6" />
-      </div>
+      <SettingsPage showHeading={false} wrapperClassName="space-y-6" />
     </DashboardShell>
   );
 }
