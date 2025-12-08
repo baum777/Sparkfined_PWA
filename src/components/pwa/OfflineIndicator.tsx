@@ -24,20 +24,20 @@ export default function OfflineIndicator() {
   if (isOnline) return null;
 
   return (
-    <div
-      className="fixed top-0 left-0 right-0 z-50 bg-amber-500/90 backdrop-blur-sm border-b border-amber-600 px-4 py-2 lg:pl-24"
-      role="status"
-      aria-live="polite"
-      aria-label="Offline mode active"
-    >
-      <div className="max-w-7xl mx-auto flex items-center gap-3">
-        <WifiOff className="w-5 h-5 text-white flex-shrink-0" aria-hidden="true" />
+    <div className="pointer-events-none fixed top-4 left-0 right-0 z-toast px-4 sm:px-6">
+      <div
+        className="pointer-events-auto mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border border-border/70 bg-surface/90 px-4 py-3 text-text-primary shadow-card-subtle backdrop-blur-xl"
+        role="status"
+        aria-live="polite"
+        aria-label="Offline mode active"
+      >
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-warn/10 text-warn">
+          <WifiOff className="h-4 w-4" aria-hidden="true" />
+        </span>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white">
-            📡 Offline Mode
-          </p>
-          <p className="text-xs text-amber-100 hidden sm:block">
-            Showing cached data. Changes will sync when online.
+          <p className="text-sm font-semibold tracking-wide text-text-primary">Offline Mode</p>
+          <p className="text-xs text-text-secondary">
+            Showing cached data. Changes sync automatically once you reconnect.
           </p>
         </div>
       </div>

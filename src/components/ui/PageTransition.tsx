@@ -9,6 +9,8 @@ export function PageTransition({ children }: PageTransitionProps) {
   const location = useLocation();
   const [displayLocation, setDisplayLocation] = useState(location);
   const [transitionStage, setTransitionStage] = useState<'fade-in' | 'fade-out'>('fade-in');
+  const prefersReducedMotion =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   useEffect(() => {
     if (location !== displayLocation) {
@@ -18,10 +20,9 @@ export function PageTransition({ children }: PageTransitionProps) {
 
   return (
     <div
-      className={`
-        transition-opacity duration-300
-        ${transitionStage === 'fade-out' ? 'opacity-0' : 'opacity-100'}
-      `}
+      className={`transition-opacity ${prefersReducedMotion ? '' : 'duration-300'} ${
+        transitionStage === 'fade-out' && !prefersReducedMotion ? 'opacity-0' : 'opacity-100'
+      }`}
       onTransitionEnd={() => {
         if (transitionStage === 'fade-out') {
           setTransitionStage('fade-in');

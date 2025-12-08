@@ -49,10 +49,8 @@ const maxWidthClasses = {
 
 export function PageLayout({ children, className, maxWidth = '6xl' }: PageLayoutProps) {
   return (
-    <div className={cn('min-h-screen bg-app-gradient text-text-primary', className)}>
-      <div className={cn('mx-auto w-full px-4 sm:px-6 lg:px-8', maxWidthClasses[maxWidth])}>
-        {children}
-      </div>
+    <div className={cn('w-full text-text-primary', className)}>
+      <div className={cn('mx-auto w-full space-y-6', maxWidthClasses[maxWidth])}>{children}</div>
     </div>
   );
 }
@@ -70,7 +68,10 @@ export interface PageHeaderProps {
 export function PageHeader({ title, subtitle, meta, actions, tabs, className }: PageHeaderProps) {
   return (
     <header
-      className={cn('border-b border-border glass-subtle elevation-low py-8', className)}
+      className={cn(
+        'rounded-3xl border border-border/70 bg-surface/80 px-6 py-8 shadow-card-subtle backdrop-blur-xl sm:px-8 lg:px-10',
+        className
+      )}
       data-testid="page-header"
     >
       <div className="flex flex-col gap-6">
@@ -106,7 +107,7 @@ export function Toolbar({ left, right, search, className }: ToolbarProps) {
   return (
     <div
       className={cn(
-        'flex flex-col gap-4 border-b border-border bg-surface-subtle/30 px-4 py-4 sm:flex-row sm:items-center sm:justify-between',
+        'flex flex-col gap-4 rounded-3xl border border-border/70 bg-surface/60 px-4 py-4 backdrop-blur-lg sm:flex-row sm:items-center sm:justify-between',
         className
       )}
       data-testid="page-toolbar"
@@ -134,12 +135,17 @@ const spacingClasses = {
 
 export function PageContent({ children, className, spacing = 'lg' }: PageContentProps) {
   return (
-    <section className={cn(spacingClasses[spacing], className)} data-testid="page-content">
-      {children}
+    <section
+      className={cn(
+        'rounded-3xl border border-border/60 bg-surface/70 px-4 shadow-card-subtle backdrop-blur-md sm:px-6',
+        className
+      )}
+      data-testid="page-content"
+    >
+      <div className={cn('w-full', spacingClasses[spacing])}>{children}</div>
     </section>
   );
 }
-
 /** PageFooter - Optional pagination or meta info */
 export interface PageFooterProps {
   children: React.ReactNode;
@@ -149,7 +155,10 @@ export interface PageFooterProps {
 export function PageFooter({ children, className }: PageFooterProps) {
   return (
     <footer
-      className={cn('border-t border-border bg-surface-subtle/30 px-4 py-4', className)}
+      className={cn(
+        'rounded-3xl border border-border/60 bg-surface/70 px-4 py-4 text-text-secondary shadow-card-subtle sm:px-6',
+        className
+      )}
       data-testid="page-footer"
     >
       {children}

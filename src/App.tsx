@@ -3,11 +3,9 @@ import { SettingsProvider } from './state/settings'
 import { TelemetryProvider } from './state/telemetry'
 import { AIProviderState } from './state/ai'
 import RoutesRoot from './routes/RoutesRoot'
-import GlobalInstruments from './pages/_layout/GlobalInstruments'
-import Sidebar from './components/layout/Sidebar'
-import BottomNav from './components/layout/BottomNav'
 import MissingConfigBanner from './components/MissingConfigBanner'
 import OfflineIndicator from './components/pwa/OfflineIndicator'
+import UpdateBanner from './components/UpdateBanner'
 import './styles/App.css'
 import { ThemeProvider } from '@/lib/theme/theme-provider'
 import { checkAlerts, notifyAlertTriggered } from '@/lib/alerts/triggerEngine'
@@ -82,7 +80,8 @@ function App() {
               {/* Missing Config Banner */}
               <MissingConfigBanner />
 
-              {/* Offline Mode Indicator */}
+              {/* Update + Offline indicators (fixed overlays) */}
+              <UpdateBanner />
               <OfflineIndicator />
 
               {/* Skip to main content link (A11y) */}
@@ -93,21 +92,7 @@ function App() {
                 Skip to main content
               </a>
 
-              {/* Desktop Sidebar (>= lg) */}
-              <Sidebar />
-
-              {/* Main content with sidebar offset on desktop */}
-              <main
-                id="main-content"
-                tabIndex={-1}
-                className="transition-[padding] duration-300 ease-out motion-reduce:transition-none lg:pl-[var(--sidebar-width,5rem)]"
-              >
-                <RoutesRoot />
-                <GlobalInstruments />
-              </main>
-
-              {/* Mobile Bottom Nav (< lg) */}
-              <BottomNav />
+              <RoutesRoot />
               </ToastProvider>
             </AIProviderState>
           </SettingsProvider>
