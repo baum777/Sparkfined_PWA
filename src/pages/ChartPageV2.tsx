@@ -189,7 +189,7 @@ export default function ChartPageV2() {
   }, [annotations, asset.address, timeframe, track])
 
   const headerMeta = `${asset.symbol} · ${timeframe.toUpperCase()} · ${
-    source === 'live' ? 'Live feed' : 'Cached snapshot'
+    source === 'network' ? 'Live feed' : 'Cached snapshot'
   }`
   const showChartSkeleton = status === 'loading' && !hasData
 
