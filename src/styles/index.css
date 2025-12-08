@@ -537,7 +537,7 @@
   }
   
   .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--color-border-hover));
+    background: rgba(var(--color-border-contrast) / 0.18);
   }
 }
 
@@ -732,7 +732,7 @@
   }
   
   .input:hover {
-    border-color: rgb(var(--color-border-hover));
+    border-color: rgba(var(--color-border-contrast) / 0.15);
   }
   
   .input:focus {

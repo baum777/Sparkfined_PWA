@@ -8,30 +8,30 @@
    * Always consume them via rgb(var(--token) / alpha).
    */
   /* Brand & Accent */
-  --color-brand: 15 179 76;            /* emerald-500 */
-  --color-brand-hover: 5 150 105;      /* emerald-600 */
+  --color-brand: 15 179 76;            /* primary brand */
+  --color-brand-hover: 5 150 105;      /* brand hover */
   --color-accent: 0 255 102;           /* neon accent */
-  --color-cyan: 6 182 212;             /* cyan-500 */
+  --color-cyan: 6 182 212;             /* cyan accent */
 
   /* Background & Surface */
-  --color-bg: 10 10 10;                /* zinc-950 */
+  --color-bg: 10 10 10;                /* base background */
   --color-bg-elevated: 11 11 19;       /* overlay gradient stop */
   --color-bg-overlay: 5 5 5;           /* modal scrim */
 
-  --color-surface: 24 24 27;           /* zinc-900 */
-  --color-surface-subtle: 19 19 22;    /* zinc-950 with lift */
-  --color-surface-elevated: 28 28 30;  /* zinc-850 */
-  --color-surface-hover: 39 39 42;     /* zinc-800 */
+  --color-surface: 24 24 27;           /* base surface */
+  --color-surface-subtle: 19 19 22;    /* subtle surface */
+  --color-surface-elevated: 28 28 30;  /* elevated surface */
+  --color-surface-hover: 39 39 42;     /* hover surface */
   --color-surface-850: 28 28 30;       /* legacy compat */
   --color-surface-skeleton: 255 255 255; /* reused with 0.05 alpha */
 
   /* Text */
-  --color-text-primary: 244 244 245;   /* zinc-100 */
-  --color-text-secondary: 161 161 170; /* zinc-400 */
-  --color-text-tertiary: 113 113 122;  /* zinc-500 */
+  --color-text-primary: 244 244 245;   /* bright text */
+  --color-text-secondary: 161 161 170; /* muted text */
+  --color-text-tertiary: 113 113 122;  /* helper text */
 
   /* Borders */
-  --color-border: 39 39 42;            /* zinc-800 */
+  --color-border: 39 39 42;            /* default border */
   --color-border-contrast: 255 255 255;/* used with opacity */
   --color-border-accent: 15 179 76;    /* brand */
   --color-border-focus: 16 185 129;    /* emerald-500 */
@@ -119,8 +119,8 @@
 :root[data-theme="light"] {
   color-scheme: light;
 
-  --color-bg: 248 250 252;              /* slate-50 */
-  --color-bg-elevated: 241 245 249;     /* slate-100 */
+  --color-bg: 248 250 252;              /* light background */
+  --color-bg-elevated: 241 245 249;     /* light overlay */
   --color-bg-overlay: 226 232 240;      /* light scrim */
 
   --color-surface: 255 255 255;
@@ -130,11 +130,11 @@
   --color-surface-850: 232 234 239;
   --color-surface-skeleton: 15 23 42;   /* dark ink w/ low alpha */
 
-  --color-text-primary: 15 23 42;       /* slate-900 */
-  --color-text-secondary: 71 85 105;    /* slate-600 */
-  --color-text-tertiary: 100 116 139;   /* slate-500 */
+  --color-text-primary: 15 23 42;       /* dark mode text */
+  --color-text-secondary: 71 85 105;    /* muted dark text */
+  --color-text-tertiary: 100 116 139;   /* helper dark text */
 
-  --color-border: 203 213 225;          /* slate-300 */
+  --color-border: 203 213 225;          /* light border */
   --color-border-contrast: 15 23 42;
   --color-interactive-base: 15 23 42;
 }
