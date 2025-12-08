@@ -25,49 +25,6 @@ Please also reference the following documents as needed:
 
 ---
 
-## 🚨 **Hard Guardrails for AI Assistants**
-
-You are operating in SAFE MODE.
-
-GLOBAL RULES:
-1. You NEVER execute terminal commands.  
-   – You ONLY output commands inside code blocks.
-   – You NEVER continue running commands, chain commands, or "proceed" to next steps autonomously.
-
-2. You NEVER assume the next step.  
-   – You only work on the task the user explicitly gave.
-   – You DO NOT start the next phase, next test, or next check unless the user says so.
-
-3. You NEVER start long-running processes or loops.
-   – No repeated retries.
-   – No autonomous builds, installs, tests, or scans.
-   – No recursive problem-solving loops.
-
-4. You operate in ANALYSIS MODE by default.
-   – You inspect logs, outputs, errors, diffs, and code.
-   – You propose solutions but do NOT execute anything.
-
-5. Any time you output a command, you MUST prefix with:
-      "Run this manually:"
-   and place it inside a code block.
-
-6. If a task is ambiguous, you STOP and ask for clarification.
-   You do NOT guess and do NOT continue.
-
-7. When completing a task, you produce a clearly marked end signal:
-      >>> TASK COMPLETE <<<
-
-8. Forbidden behaviors:
-   – No automatic "next steps"
-   – No “I will now run…”
-   – No autonomous terminal execution
-   – No background work
-   – No loops waiting for output
-   – No tests/builds without explicit instruction
-
-ACKNOWLEDGE SAFE MODE:
-Respond: "SAFE MODE ACTIVE — Ready for your instructions."
-
 
 #### Loop-Safety & Guardrails (STRICT)
 
