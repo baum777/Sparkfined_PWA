@@ -13,6 +13,8 @@ import { DEFAULT_TIMEFRAME } from "@/domain/chart";
 import { buildChartUrl, buildReplayUrl } from "@/lib/chartLinks";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import StateView from "@/components/ui/StateView";
+import { useAlertsStore } from "@/store/alertsStore";
+import { useJournalStore } from "@/store/journalStore";
 
 type SessionFilter = "all" | "London" | "NY" | "Asia";
 type SortMode = "default" | "top-movers" | "alphabetical";
@@ -27,6 +29,8 @@ export default function WatchlistPageV2() {
     setError: state.setError,
   }));
   const trends = useWatchlistStore((state) => state.trends);
+  const createAlert = useAlertsStore((state) => state.createAlert);
+  const createJournalDraft = useJournalStore((state) => state.createDraftFromChart);
   const [sessionFilter, setSessionFilter] = React.useState<SessionFilter>("all");
   const [sortMode, setSortMode] = React.useState<SortMode>("default");
   const [activeSymbol, setActiveSymbol] = React.useState<string | undefined>(undefined);
@@ -117,6 +121,41 @@ export default function WatchlistPageV2() {
     },
     [navigate]
   );
+
+  const openAlertDraft = React.useCallback(
+    (row?: WatchlistRow) => {
+      if (!row) return;
+      const priceValue = parseNumeric(row.price);
+      createAlert({
+        symbol: row.symbol,
+        type: "price-above",
+        condition: `Watch ${row.symbol} around ${row.price}`,
+        threshold: Number.isFinite(priceValue) ? priceValue : 0,
+        timeframe: DEFAULT_TIMEFRAME,
+      });
+      setActiveSymbol(row.symbol);
+    },
+    [createAlert]
+  );
+
+  const addToJournal = React.useCallback(
+    (row?: WatchlistRow) => {
+      if (!row) return;
+      const priceValue = parseNumeric(row.price) ?? 0;
+      void createJournalDraft({
+        address: row.address ?? "",
+        symbol: row.symbol,
+        price: priceValue,
+        time: Date.now(),
+        timeframe: DEFAULT_TIMEFRAME,
+      });
+    },
+    [createJournalDraft]
+  );
+
+  const openPlaybook = React.useCallback(() => {
+    navigate("/analysis-v2?tab=playbook");
+  }, [navigate]);
 
   return (
     <div data-testid="watchlist-page">
@@ -209,7 +248,15 @@ export default function WatchlistPageV2() {
                 </div>
               </div>
               <div className="space-y-4">
-                <WatchlistDetailPanel row={activeRow} trend={activeTrend} onOpenChart={openChart} onOpenReplay={openReplay} />
+                <WatchlistDetailPanel
+                  row={activeRow}
+                  trend={activeTrend}
+                  onOpenChart={openChart}
+                  onOpenReplay={openReplay}
+                  onCreateAlert={openAlertDraft}
+                  onAddJournal={addToJournal}
+                  onOpenPlaybook={openPlaybook}
+                />
               </div>
             </div>
           </WatchlistLayout>
@@ -224,4 +271,10 @@ const SESSION_FILTERS: SessionFilter[] = ["all", "London", "NY", "Asia"];
 
 function getAbsChange(row: WatchlistRow) {
   return Math.abs(parseFloat(row.change24h));
+}
+
+function parseNumeric(input?: string) {
+  if (!input) return 0;
+  const numeric = Number.parseFloat(input.replace(/[^0-9.-]/g, ""));
+  return Number.isFinite(numeric) ? numeric : 0;
 }

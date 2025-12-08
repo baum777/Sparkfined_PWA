@@ -50,6 +50,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 | `UX-TEST-STATUS.md` | `docs/qa/` | QA |
 | `sparkfined-style-guide.html` | `docs/design/` | Design |
 
+### Calm/Focus Navigation (2025-12-09)
+- **`docs/design/CALM_FOCUS_IMPLEMENTATION.md`** - Umsetzung der Calm-/Focus-Shell inkl. Suite-Navigation (Option C) und Page-Fokus-Notizen
+- Ergänzt um Next-Best-Action Mapping je Seite (Butter-und-Belag-Logik)
+
 ---
 
 ## 📦 Documentation Governance (2025-12-04)

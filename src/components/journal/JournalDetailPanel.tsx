@@ -32,6 +32,7 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
       ? 'text-sentiment-bear'
       : 'text-sentiment-bull'
     : 'text-text-tertiary';
+  const hasLinkableContext = Boolean(entry?.sourceUrl);
 
   const directionLabel = entry ? entry.direction.toUpperCase() : '';
 
@@ -172,6 +173,38 @@ export default function JournalDetailPanel({ entry }: JournalDetailPanelProps) {
       <div className="mt-3 flex items-center justify-between text-sm">
         <span className="text-xs font-medium uppercase tracking-wide text-text-tertiary">PnL</span>
         <span className={['text-sm font-semibold', pnlColorClass].join(' ')}>{entry.pnl ?? 'N/A'}</span>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border-subtle bg-surface/70 p-3 text-sm text-text-secondary">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Next actions</p>
+          {!hasLinkableContext && (
+            <span className="text-[11px] text-text-tertiary">Add symbol or timestamp to enable jumps.</span>
+          )}
+        </div>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => hasLinkableContext && window.open(entry.sourceUrl, '_blank')}
+            className="btn btn-primary btn-xs"
+            disabled={!hasLinkableContext}
+            data-testid="journal-action-open-chart"
+          >
+            Open chart
+          </button>
+          <button
+            type="button"
+            onClick={() => hasLinkableContext && window.open(entry.sourceUrl, '_blank')}
+            className="btn btn-ghost btn-xs"
+            disabled={!hasLinkableContext}
+            data-testid="journal-action-open-replay"
+          >
+            Open replay
+          </button>
+          <button type="button" className="btn btn-ghost btn-xs" data-testid="journal-action-generate-rule">
+            Generate playbook rule
+          </button>
+        </div>
       </div>
 
       {/* Notes */}

@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { Home, BarChart3, FileText, Settings, TrendingUp, Menu, type LucideIcon } from '@/lib/icons'
+import { Home, BarChart3, FileText, Settings, Menu, BookmarkPlus, type LucideIcon } from '@/lib/icons'
 import { NavigationDrawer } from './NavigationDrawer'
 
 interface NavItem {
@@ -10,9 +10,9 @@ interface NavItem {
 }
 
 const primaryNavItems: NavItem[] = [
-  { path: '/dashboard-v2', label: 'Board', Icon: Home },
-  { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
-  { path: '/chart-v2', label: 'Chart', Icon: TrendingUp },
+  { path: '/dashboard-v2', label: 'Home', Icon: Home },
+  { path: '/analysis-v2', label: 'Analytics', Icon: BarChart3 },
+  { path: '/watchlist-v2', label: 'Watchlist', Icon: BookmarkPlus },
   { path: '/journal-v2', label: 'Journal', Icon: FileText },
   { path: '/settings-v2', label: 'Settings', Icon: Settings },
 ]
@@ -23,11 +23,12 @@ export default function BottomNav() {
   // Map labels to tour step IDs and data-testid
   const getNavIds = (label: string) => {
     const idMap: Record<string, { tour: string; testid: string }> = {
-      'Board': { tour: 'board-link', testid: 'nav-board' },
-      'Analyze': { tour: 'analyze-link', testid: 'nav-analyze' },
-      'Chart': { tour: 'chart-link', testid: 'nav-chart' },
-      'Journal': { tour: 'journal-link', testid: 'nav-journal' },
-      'Settings': { tour: 'settings-link', testid: 'nav-settings' },
+      Home: { tour: 'board-link', testid: 'nav-board' },
+      Analytics: { tour: 'analyze-link', testid: 'nav-analyze' },
+      Watchlist: { tour: 'nav-watchlist', testid: 'nav-watchlist' },
+      Chart: { tour: 'chart-link', testid: 'nav-chart' },
+      Journal: { tour: 'journal-link', testid: 'nav-journal' },
+      Settings: { tour: 'settings-link', testid: 'nav-settings' },
     };
     return idMap[label] || { tour: '', testid: '' };
   };

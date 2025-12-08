@@ -7,16 +7,24 @@ export default function DashboardQuickActions() {
 
   const actions = [
     {
-      label: 'Dashboard',
-      path: '/dashboard-v2',
+      label: 'Open Watchlist',
+      path: '/watchlist-v2',
+      variant: 'primary' as const,
     },
     {
-      label: 'Journal',
-      path: '/journal-v2',
+      label: 'Review Alerts',
+      path: '/alerts-v2',
+      variant: 'ghost' as const,
     },
     {
-      label: 'Analysis',
+      label: 'Start Replay',
+      path: '/replay',
+      variant: 'ghost' as const,
+    },
+    {
+      label: 'Open Analyze',
       path: '/analysis-v2',
+      variant: 'ghost' as const,
     },
   ];
 
@@ -25,7 +33,7 @@ export default function DashboardQuickActions() {
       {actions.map((action) => (
         <Button
           key={action.label}
-          variant="secondary"
+          variant={action.variant}
           size="sm"
           onClick={() => navigate(action.path)}
         >

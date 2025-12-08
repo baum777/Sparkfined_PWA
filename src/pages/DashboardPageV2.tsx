@@ -7,6 +7,7 @@ import InsightTeaser from '@/components/dashboard/InsightTeaser';
 import JournalSnapshot from '@/components/dashboard/JournalSnapshot';
 import AlertsSnapshot from '@/components/dashboard/AlertsSnapshot';
 import ErrorBanner from '@/components/ui/ErrorBanner';
+import CalmState from '@/components/ui/CalmState';
 import { useJournalStore } from '@/store/journalStore';
 import { useAlertsStore } from '@/store/alertsStore';
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from '@/lib/dashboard/calculateKPIs';
@@ -61,11 +62,13 @@ export default function DashboardPageV2() {
   }, [journalEntries]);
 
   const kpiStripContent = isLoading ? (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="h-20 animate-pulse rounded-2xl bg-surface-skeleton" />
-      ))}
-    </div>
+    <CalmState
+      type="loading"
+      title="Loading your snapshot"
+      description="Pulling KPIs and recent signals"
+      compact
+      className="bg-surface/50"
+    />
   ) : error ? null : (
     <DashboardKpiStrip items={kpiItems} />
   );
@@ -73,23 +76,25 @@ export default function DashboardPageV2() {
   const renderMainContent = () => {
     if (isLoading) {
       return (
-        <div className="space-y-6">
-          <DashboardMainGrid
-            primary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
-            secondary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
-            tertiary={<div className="h-64 animate-pulse rounded-2xl bg-surface-skeleton" />}
-          />
-        </div>
+        <CalmState
+          type="loading"
+          title="Preparing your calm view"
+          description="Fetching insights, journal streak, and alert health"
+        />
       );
     }
 
     if (error) {
       return (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <ErrorBanner message={error} onRetry={handleRetry} />
-          <div className="rounded-3xl border border-border-subtle bg-surface-elevated p-6 text-sm text-text-secondary">
-            Please try again. If the issue persists, check your connection or reload the dashboard.
-          </div>
+          <CalmState
+            type="error"
+            title="Dashboard unavailable"
+            description="Retry to refresh KPIs and signals."
+            actionLabel="Retry"
+            onAction={handleRetry}
+          />
         </div>
       );
     }
@@ -98,16 +103,22 @@ export default function DashboardPageV2() {
       return (
         <DashboardMainGrid
           primary={
-            <div className="space-y-3 text-sm text-text-secondary">
-              <p className="text-base font-semibold text-text-primary">No insights yet</p>
-              <p>Analyze your first market to see advanced insights here.</p>
-            </div>
+            <CalmState
+              type="empty"
+              title="No insights yet"
+              description="Analyze your first market to see AI-backed focus tiles."
+              actionLabel="Open Analyze"
+              onAction={() => setError(null)}
+            />
           }
           secondary={
-            <div className="space-y-3 text-sm text-text-secondary">
-              <p className="text-base font-semibold text-text-primary">No journal entries to show</p>
-              <p>Add a new journal entry to see recent trades and notes.</p>
-            </div>
+            <CalmState
+              type="empty"
+              title="No journal entries"
+              description="Capture a quick note to start your streak."
+              actionLabel="Open Journal"
+              onAction={() => setError(null)}
+            />
           }
           tertiary={<AlertsSnapshot />}
         />
