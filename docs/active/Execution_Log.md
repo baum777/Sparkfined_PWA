@@ -782,3 +782,19 @@ Commands & Results:
 - pnpm typecheck (pass)
 - pnpm test -- src/lib/grokPulse/__tests__/sources.test.ts (pass)
 - pnpm test -- src/lib/grokPulse/__tests__/engine-smoke.test.ts (pass)
+---
+Date: 2025-12-06
+Agent: Codex
+Branch: work
+Section: 8 – E2E Implementation & CI Gates
+
+Actions:
+- Migrated Idea Packets storage from localStorage to a Dexie-backed repository with migration coverage and state sync on the Notifications page.
+- Added repository unit tests plus Dexie setup/migration adjustments for Playwright idea specs and updated the Working Plan tracker.
+- Introduced IndexedDB reset in E2E idea specs to keep runs isolated and documented the Dexie migration in the plan.
+
+Commands & Results:
+- pnpm typecheck (pass)
+- pnpm lint (pass; existing warnings on unrelated files)
+- pnpm test -- --reporter=dot (pass)
+- pnpm test:e2e (fail – Playwright browsers not installed; install via `pnpm exec playwright install`)

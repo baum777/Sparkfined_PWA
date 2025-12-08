@@ -920,6 +920,7 @@ Checklist:
 - [ ] Add CI step to run E2E tests on each PR / main push.
 - [ ] Make E2E tests fast and deterministic (no flakiness).
 - [x] Add deterministic Analyze + Idea Packet specs (analysis-v2 snapshot, notifications idea form).
+- [x] Idea Packet storage auf Dexie gehoben (inkl. Migration von localStorage) – Tests: `tests/unit/ideaPackets.test.ts`, `tests/e2e/ideas/idea-packets.spec.ts` (IndexedDB Reset vor jedem Lauf).
 - [ ] Add basic reporting (which scenarios passed/failed).
 
 Handoff to Claude:
