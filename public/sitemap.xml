@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Homepage (Board) -->
+  <!-- Homepage (Dashboard V2) -->
   <url>
     <loc>https://your-domain.vercel.app/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-12-08</lastmod>
   </url>
   
   <!-- Landing Page -->
@@ -13,55 +13,79 @@
     <loc>https://your-domain.vercel.app/landing</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-12-08</lastmod>
   </url>
   
-  <!-- Board (Default Route) -->
+  <!-- Dashboard V2 (Board) -->
   <url>
-    <loc>https://your-domain.vercel.app/board</loc>
+    <loc>https://your-domain.vercel.app/dashboard-v2</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-12-08</lastmod>
   </url>
   
-  <!-- Chart -->
+  <!-- Journal V2 (Hero's Journey Trading Journal) -->
   <url>
-    <loc>https://your-domain.vercel.app/chart</loc>
+    <loc>https://your-domain.vercel.app/journal-v2</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2025-12-08</lastmod>
+  </url>
+  
+  <!-- Chart V2 (Multi-provider Chart System) -->
+  <url>
+    <loc>https://your-domain.vercel.app/chart-v2</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-12-08</lastmod>
   </url>
   
-  <!-- Analyze -->
+  <!-- Analysis V2 (Market Analysis) -->
   <url>
-    <loc>https://your-domain.vercel.app/analyze</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://your-domain.vercel.app/analysis-v2</loc>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-12-08</lastmod>
   </url>
   
-  <!-- Journal -->
+  <!-- Watchlist V2 -->
   <url>
-    <loc>https://your-domain.vercel.app/journal</loc>
+    <loc>https://your-domain.vercel.app/watchlist-v2</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-12-08</lastmod>
+  </url>
+  
+  <!-- Alerts V2 (Price Alerts & Triggers) -->
+  <url>
+    <loc>https://your-domain.vercel.app/alerts-v2</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2025-12-08</lastmod>
+  </url>
+  
+  <!-- Replay (Chart Replay Mode) -->
+  <url>
+    <loc>https://your-domain.vercel.app/replay</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+    <lastmod>2025-12-08</lastmod>
+  </url>
+  
+  <!-- Oracle (Daily AI Insights) -->
+  <url>
+    <loc>https://your-domain.vercel.app/oracle</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+    <lastmod>2025-12-08</lastmod>
   </url>
   
   <!-- Notifications -->
   <url>
     <loc>https://your-domain.vercel.app/notifications</loc>
     <changefreq>daily</changefreq>
-    <priority>0.6</priority>
-    <lastmod>2025-11-05</lastmod>
-  </url>
-  
-  <!-- Lessons (Teaser) -->
-  <url>
-    <loc>https://your-domain.vercel.app/lessons</loc>
-    <changefreq>monthly</changefreq>
     <priority>0.5</priority>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-12-08</lastmod>
   </url>
   
   <!-- Signals (Teaser) -->
@@ -69,41 +93,55 @@
     <loc>https://your-domain.vercel.app/signals</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-12-08</lastmod>
   </url>
   
-  <!-- Access (Teaser) -->
+  <!-- Lessons (Teaser) -->
   <url>
-    <loc>https://your-domain.vercel.app/access</loc>
+    <loc>https://your-domain.vercel.app/lessons</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-12-08</lastmod>
   </url>
   
-  <!-- Settings -->
+  <!-- Settings V2 -->
   <url>
-    <loc>https://your-domain.vercel.app/settings</loc>
+    <loc>https://your-domain.vercel.app/settings-v2</loc>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-12-08</lastmod>
   </url>
 </urlset>
 
 <!-- 
-  INSTRUCTIONS AFTER DEPLOYMENT:
-  1. Replace "https://your-domain.vercel.app" with your actual domain
-  2. Update <lastmod> dates when pages change significantly
+  Sparkfined PWA Sitemap
+  Last Updated: 2025-12-08
+  
+  DEPLOYMENT INSTRUCTIONS:
+  1. Replace "https://your-domain.vercel.app" with your actual production domain
+  2. Update <lastmod> dates when pages receive significant updates
   3. Submit to Google Search Console: https://search.google.com/search-console
-  4. Update robots.txt with correct Sitemap URL
+  4. Ensure robots.txt references this sitemap (Sitemap: https://your-domain.vercel.app/sitemap.xml)
   
-  Priority Guide:
-  - 1.0: Homepage, most important page
-  - 0.8-0.9: Key landing pages
-  - 0.6-0.7: Important features
-  - 0.4-0.5: Secondary pages, teasers
+  PRIORITY GUIDE:
+  - 1.0: Homepage, most critical entry points (Dashboard)
+  - 0.8-0.9: Core features (Journal, Analysis, Chart)
+  - 0.6-0.7: Important features (Alerts, Watchlist, Replay)
+  - 0.4-0.5: Secondary pages, settings, teasers
   
-  Changefreq Guide:
-  - daily: Content changes every day (Board, Notifications)
-  - weekly: Content changes weekly (Chart, Analyze)
-  - monthly: Rarely changes (Settings, Teasers)
+  CHANGEFREQ GUIDE:
+  - daily: Content changes daily (Dashboard, Journal, Alerts, Analysis, Notifications)
+  - weekly: Updated weekly (Chart, Replay)
+  - monthly: Rarely changes (Settings, Lessons, Signals teasers)
+  
+  ROUTE STRUCTURE (as of 2025-12-08):
+  - All main routes use -v2 suffix (e.g., /dashboard-v2, /journal-v2)
+  - Legacy routes (/dashboard, /board, /journal, etc.) redirect to -v2 versions
+  - Dev-only routes (/styles, /ux, /icons) excluded from sitemap
+  - Dynamic routes (e.g., /replay/:sessionId) represented by base path only
+  
+  NOTES:
+  - PWA with offline-first architecture
+  - React Router handles client-side routing
+  - All routes render through /index.html (see vercel.json rewrites)
 -->

@@ -14,5 +14,10 @@
    - `./scripts/smoke-vercel-check.sh https://<preview-url>` to validate `/api/health` and `/api/moralis/health`.
 5. **Review Logs**
    - Check Vercel Function logs for `api/moralis/*` for rate limiting or proxy errors.
-6. **Sign Off**
+6. **SEO & Sitemap**
+   - Update domain in `public/sitemap.xml` (replace `your-domain.vercel.app`)
+   - Update domain in `public/robots.txt` (replace `your-domain.vercel.app`)
+   - Verify sitemap is accessible at `/sitemap.xml` after deployment
+   - Submit sitemap to Google Search Console
+7. **Sign Off**
    - Document environment values in `env_inventory.md` and archive smoke test results in `verifications.md`.
