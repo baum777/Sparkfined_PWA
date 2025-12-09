@@ -1,9 +1,13 @@
+import React, { Suspense, lazy } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
 import Header from '@/components/Header';
 import GlobalInstruments from '@/pages/_layout/GlobalInstruments';
 import { PageTransition } from '@/components/ui/PageTransition';
+import { useOnboardingStore } from '@/store/onboardingStore';
+
+const OnboardingWizard = lazy(() => import('@/components/onboarding/OnboardingWizard'));
 
 /**
  * AppShell
@@ -16,6 +20,8 @@ import { PageTransition } from '@/components/ui/PageTransition';
  * - Global instruments rail pinned beneath page content
  */
 export default function AppShell() {
+  const hasCompletedOnboarding = useOnboardingStore((state) => state.hasCompletedOnboarding);
+
   return (
     <div className="relative min-h-screen bg-app-gradient text-text-primary">
       <Sidebar />
@@ -43,6 +49,12 @@ export default function AppShell() {
       </div>
 
       <BottomNav />
+
+      {!hasCompletedOnboarding && (
+        <Suspense fallback={null}>
+          <OnboardingWizard />
+        </Suspense>
+      )}
     </div>
   );
 }

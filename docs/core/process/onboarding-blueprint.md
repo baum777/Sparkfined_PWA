@@ -29,6 +29,7 @@ sources:
 - Zustand via `zustand` Store (`onboardingStore`) mit Persistenz in `localStorage`.
 - Hints & Aktionen nutzen string IDs (`hint:analyze-ai`, `chart-created`) für Wiederverwendung.
 - Komponenten unter `src/components/onboarding` kapseln Modal, Checklist, HintBanner, KeyboardShortcuts.
+- Der Onboarding-Wizard wird im `AppShell` als `OnboardingOverlay` gerendert (glass-heavy + Scrim, `data-testid="onboarding-overlay"`), sodass Dashboard-Interaktionen blockiert bleiben, bis Abschluss/Skip.
 - Quick Start Snippets zeigen Integration (HintBanner, First-Time Action Tracker, TooltipIcon, Feature Discovery).
 
 ## Rollout-Plan

@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '@/components/ui/Button'
 import { Bell, BookOpen, Star, X, type LucideIcon } from '@/lib/icons'
+import OnboardingOverlay from './OnboardingOverlay'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { useTelemetry } from '@/state/telemetry'
 
@@ -48,6 +49,7 @@ export default function OnboardingWizard() {
   const skipOnboarding = useOnboardingStore((state) => state.skipOnboarding)
   const [currentStepIndex, setCurrentStepIndex] = React.useState(0)
   const { enqueue } = useTelemetry()
+  const titleId = 'onboarding-title'
 
   if (hasCompletedOnboarding) {
     return null
@@ -93,13 +95,8 @@ export default function OnboardingWizard() {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-bg-overlay/80 px-4 py-8 backdrop-blur"
-      role="dialog"
-      aria-modal="true"
-      data-testid="onboarding-wizard"
-    >
-      <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-border-moderate bg-surface text-text-primary shadow-[0_24px_120px_rgba(0,0,0,0.55)]">
+    <OnboardingOverlay labelledBy={titleId}>
+      <div className="relative" data-testid="onboarding-wizard">
         <button
           type="button"
           onClick={handleClose}
@@ -110,47 +107,47 @@ export default function OnboardingWizard() {
           <X className="h-4 w-4" />
         </button>
 
-        <div className="grid gap-8 px-6 py-10 lg:grid-cols-[1.1fr_0.9fr] lg:px-10">
-          <div className="space-y-6">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-text-tertiary">First-run setup</p>
-              <h2 className="mt-2 text-3xl font-semibold leading-tight text-text-primary">
-                Configure Sparkfined in three moves
-              </h2>
-              <p className="mt-2 text-sm text-text-secondary">
-                Each step drops you into the exact workspace so you can finish onboarding without losing momentum.
-              </p>
-            </div>
+        <div className="space-y-6 p-6 sm:p-8">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-text-tertiary">First-run setup</p>
+            <h2 id={titleId} className="text-3xl font-semibold leading-tight text-text-primary">
+              Welcome to Sparkfined
+            </h2>
+            <p className="text-sm text-text-secondary">
+              Start with a focused trio of workspaces. We keep the dashboard blurred behind this overlay until you finish or skip.
+            </p>
+          </div>
 
-            <div className="flex items-center gap-2" aria-label="Onboarding progress">
-              {STEPS.map((step, index) => {
-                const isActive = index === currentStepIndex
-                const isComplete = index < currentStepIndex
-                return (
-                  <span
-                    key={step.id}
-                    className={[
-                      'h-1.5 flex-1 rounded-full transition-all',
-                      isComplete && 'bg-brand',
-                      !isComplete && isActive && 'bg-brand/70',
-                      !isComplete && !isActive && 'bg-border-moderate',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                  />
-                )
-              })}
-            </div>
+          <div className="flex items-center gap-2" aria-label="Onboarding progress">
+            {STEPS.map((step, index) => {
+              const isActive = index === currentStepIndex
+              const isComplete = index < currentStepIndex
+              return (
+                <span
+                  key={step.id}
+                  className={[
+                    'h-1.5 flex-1 rounded-full transition-all',
+                    isComplete && 'bg-brand',
+                    !isComplete && isActive && 'bg-brand/80',
+                    !isComplete && !isActive && 'bg-border-moderate',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                />
+              )
+            })}
+          </div>
 
-            <div className="rounded-2xl border border-border-subtle bg-surface-subtle p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary">
-                Step {safeIndex + 1} of {STEPS.length}
-              </p>
-              <div className="mt-4 flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface">
-                  <activeStep.icon className="h-8 w-8 text-brand" aria-hidden="true" />
-                </div>
-                <div>
+          <div className="space-y-5 rounded-2xl border border-border-subtle bg-surface/80 p-6 shadow-card-subtle">
+            <div className="flex items-start gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-strong">
+                <activeStep.icon className="h-7 w-7 text-brand" aria-hidden="true" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary">
+                  Step {safeIndex + 1} of {STEPS.length}
+                </p>
+                <div className="space-y-1">
                   <h3
                     className="text-xl font-semibold text-text-primary"
                     data-testid="onboarding-active-step-title"
@@ -158,65 +155,64 @@ export default function OnboardingWizard() {
                   >
                     {activeStep.title}
                   </h3>
-                  <p className="mt-1 text-sm text-text-secondary">{activeStep.description}</p>
+                  <p className="text-sm text-text-secondary">{activeStep.description}</p>
                 </div>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-text-secondary">
+                  <li>Jump straight to {activeStep.targetRoute} with guided context.</li>
+                  <li>Finish or skip once — the wizard stays hidden after that.</li>
+                </ul>
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button
-                variant='ghost'
-                className="w-full"
-                onClick={handleSkip}
-                data-testid="onboarding-skip"
-              >
-                Skip onboarding
-              </Button>
-              <Button
-                className="w-full"
-                size="lg"
-                onClick={handleNext}
-                data-testid="onboarding-action"
-              >
-                {activeStep.actionLabel}
-              </Button>
+            <div className="rounded-2xl border border-border-subtle bg-surface-subtle p-4">
+              <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Playbook</p>
+              <ul className="space-y-2">
+                {STEPS.map((step, index) => {
+                  const isComplete = index < currentStepIndex
+                  return (
+                    <li
+                      key={step.id}
+                      className={[
+                        'flex items-center justify-between rounded-xl px-3 py-2 text-sm transition-colors',
+                        isComplete ? 'bg-surface text-text-primary' : 'bg-surface/60 text-text-secondary',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      data-testid="onboarding-step-item"
+                      data-step-id={step.id}
+                      data-step-state={isComplete ? 'complete' : 'pending'}
+                    >
+                      <div className="flex items-center gap-3">
+                        <step.icon className="h-5 w-5 text-text-secondary" aria-hidden="true" />
+                        <span className="font-semibold text-text-primary">{step.title}</span>
+                      </div>
+                      <span className="text-xs text-text-tertiary">{step.targetRoute}</span>
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           </div>
 
-          <aside className="space-y-4 rounded-2xl border border-border-subtle bg-surface-subtle p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Playbook</p>
-            <p className="text-sm text-text-secondary">
-              Finish onboarding once and the wizard stays hidden via local storage (<code>sparkfined_onboarding_completed</code>).
-              You can relaunch it anytime under Settings.
-            </p>
-            <ul className="space-y-3">
-              {STEPS.map((step, index) => {
-                const isComplete = index < currentStepIndex
-                return (
-                  <li
-                    key={step.id}
-                    className={[
-                      'flex items-center gap-3 rounded-2xl border px-3 py-3 text-sm',
-                      isComplete ? 'border-brand/60 bg-surface' : 'border-border-moderate bg-surface',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                    data-testid="onboarding-step-item"
-                    data-step-id={step.id}
-                    data-step-state={isComplete ? 'complete' : 'pending'}
-                  >
-                    <step.icon className="h-5 w-5 text-text-secondary" aria-hidden="true" />
-                    <div>
-                      <p className="font-semibold text-text-primary">{step.title}</p>
-                      <p className="text-xs text-text-tertiary">{step.targetRoute}</p>
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
-          </aside>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={handleSkip}
+              data-testid="onboarding-skip"
+            >
+              Maybe later
+            </Button>
+            <Button className="w-full" size="lg" onClick={handleNext} data-testid="onboarding-action">
+              {activeStep.actionLabel}
+            </Button>
+          </div>
+
+          <p className="text-xs text-text-tertiary">
+            We dimmed and locked the dashboard while onboarding is active to keep your focus on setup.
+          </p>
         </div>
       </div>
-    </div>
+    </OnboardingOverlay>
   )
 }
