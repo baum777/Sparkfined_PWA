@@ -11,6 +11,10 @@ import { computeUserJourneySnapshotFromEntries } from '@/lib/journal/journey-sna
 import { createQuickJournalEntry, loadJournalEntries, useJournalStore } from '@/store/journalStore';
 import { JournalInsightsPanel } from '@/components/journal/JournalInsightsPanel';
 import { Search } from '@/lib/icons';
+import { Toolbar } from '@/components/layout';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 
 type DirectionFilter = 'all' | 'long' | 'short';
 
@@ -219,104 +223,109 @@ export default function JournalPageV2() {
         />
       }
     >
-      <div
-        className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6 text-text-primary md:px-6 lg:py-8"
-        data-testid="journal-page"
-      >
-        <section className="space-y-3">
-          <div className="space-y-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Daily practice</p>
-            <p className="text-base text-text-primary">Your trading log as a guided ritual to build discipline, not FOMO.</p>
-            <p className="text-sm text-text-secondary">
-              Select any entry to review, refine your notes, and track your growth over time.
-            </p>
+      <div className="space-y-6" data-testid="journal-page">
+        <Card variant="glass" className="p-5 shadow-card-subtle">
+          <CardHeader className="mb-0">
+            <CardTitle className="text-xl font-semibold">Guided reflection</CardTitle>
+            <CardDescription>
+              Your trading log as a calm ritual to build discipline, not FOMO. Select any entry to review, refine your notes,
+              and track your growth over time.
+            </CardDescription>
+          </CardHeader>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-2xl border border-border/60 bg-surface/60 px-4 py-3">
+              <p className="text-xs uppercase tracking-wide text-text-tertiary">Recent entries</p>
+              <p className="text-lg font-semibold text-text-primary">{entries.length}</p>
+              <p className="text-xs text-text-secondary">Synced across devices</p>
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-surface/60 px-4 py-3">
+              <p className="text-xs uppercase tracking-wide text-text-tertiary">Filter ready</p>
+              <p className="text-lg font-semibold text-text-primary">{filteredEntries.length}</p>
+              <p className="text-xs text-text-secondary">After current filters</p>
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-surface/60 px-4 py-3">
+              <p className="text-xs uppercase tracking-wide text-text-tertiary">Status</p>
+              {isLoading ? (
+                <p className="text-sm font-medium text-text-secondary">Loading your journal…</p>
+              ) : error ? (
+                <p className="text-sm font-medium text-warn">Could not load entries right now.</p>
+              ) : (
+                <p className="text-sm font-medium text-sentiment-bull">Ready to review</p>
+              )}
+              {!isLoading && cacheWarning ? (
+                <p className="text-xs text-text-secondary" data-testid="journal-cache-warning">
+                  {cacheWarning}
+                </p>
+              ) : null}
+            </div>
           </div>
-          <div className="space-y-1 text-xs">
-            {isLoading && <p className="text-text-tertiary">Loading your journal…</p>}
-            {!isLoading && error && (
-              <p className="font-medium text-warn">
-                Could not load entries right now. Please reload or try again later.
-              </p>
-            )}
-            {!isLoading && cacheWarning && (
-              <p className="text-text-secondary" data-testid="journal-cache-warning">
-                {cacheWarning}
-              </p>
-            )}
-          </div>
-        </section>
+        </Card>
 
-        {hasJourneyMeta && journeySnapshot && (
-          <section>
-            <JournalJourneyBanner snapshot={journeySnapshot} />
-          </section>
-        )}
-
-        <section>
-          <JournalInsightsPanel entries={entries} />
-        </section>
-
-        <section>
-          <JournalLayout
-            list={
-              <div className="flex h-full flex-col space-y-3">
-                <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-                  <div className="space-y-0.5">
-                    <p className="text-xs uppercase tracking-wider text-text-tertiary">Entries</p>
-                    <p className="text-xs text-text-secondary">
-                      Showing {filteredEntries.length} of {entries.length} saved logs
-                    </p>
-                  </div>
-                  <p className="text-xs text-text-tertiary">Filter by direction or search through notes.</p>
+        <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
+          <div className="space-y-4 xl:col-span-8">
+            <Toolbar
+              className="bg-surface/70"
+              left={
+                <div className="flex flex-wrap items-center gap-2">
+                  {directionFilters.map((filter) => {
+                    const isActive = directionFilter === filter.value;
+                    return (
+                      <Button
+                        key={filter.value}
+                        variant={isActive ? 'primary' : 'outline'}
+                        size="sm"
+                        onClick={() => setDirectionFilter(filter.value)}
+                        className="rounded-full"
+                        data-testid={`journal-filter-${filter.value}`}
+                      >
+                        {filter.label}
+                      </Button>
+                    );
+                  })}
                 </div>
-                <div className="flex h-full flex-col rounded-2xl border border-border bg-surface/80 backdrop-blur">
-                  <div className="flex flex-col gap-2 border-b border-border px-3 py-2 md:flex-row md:items-center md:justify-between">
-                    <div className="flex flex-wrap items-center gap-2">
-                      {directionFilters.map((filter) => {
-                        const isActive = directionFilter === filter.value;
-                        return (
-                          <button
-                            key={filter.value}
-                            type="button"
-                            onClick={() => setDirectionFilter(filter.value)}
-                            className={`rounded-full border px-3 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
-                              isActive
-                                ? 'border-brand bg-surface-hover text-text-primary'
-                                : 'border-border text-text-secondary hover:bg-surface-hover'
-                            }`}
-                            data-testid={`journal-filter-${filter.value}`}
-                          >
-                            {filter.label}
-                          </button>
-                        );
-                      })}
-                      {hasFiltersApplied ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDirectionFilter('all');
-                            setSearchQuery('');
-                          }}
-                          className="rounded-full border border-border-subtle px-3 py-1 text-xs font-medium text-text-secondary transition hover:border-border-hover hover:bg-interactive-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
-                          data-testid="journal-clear-filters"
-                        >
-                          Reset
-                        </button>
-                      ) : null}
+              }
+              search={
+                <Input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search by title or notes"
+                  data-testid="journal-search-input"
+                  leftIcon={<Search size={16} className="text-text-tertiary" aria-hidden />}
+                  className="bg-surface"
+                />
+              }
+              right={
+                hasFiltersApplied ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setDirectionFilter('all');
+                      setSearchQuery('');
+                    }}
+                    className="rounded-full"
+                    data-testid="journal-clear-filters"
+                  >
+                    Reset filters
+                  </Button>
+                ) : null
+              }
+            />
+
+            <JournalLayout
+              list={
+                <div className="flex h-full flex-col gap-3">
+                  <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+                    <div className="space-y-0.5">
+                      <p className="text-xs uppercase tracking-wider text-text-tertiary">Entries</p>
+                      <p className="text-xs text-text-secondary">
+                        Showing {filteredEntries.length} of {entries.length} saved logs
+                      </p>
                     </div>
-                    <label className="flex w-full items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 text-sm text-text-primary shadow-inner transition focus-within:border-border-hover focus-within:ring-2 focus-within:ring-border-focus md:w-auto md:min-w-[260px]">
-                      <Search size={16} className="text-text-tertiary" aria-hidden />
-                      <input
-                        type="search"
-                        value={searchQuery}
-                        onChange={(event) => setSearchQuery(event.target.value)}
-                        placeholder="Search by title or notes"
-                        className="w-full bg-transparent text-sm outline-none placeholder:text-text-secondary"
-                        data-testid="journal-search-input"
-                      />
-                    </label>
+                    <p className="text-xs text-text-secondary">Filter by direction or search through notes.</p>
                   </div>
-                  <div className="flex-1 overflow-y-auto p-2">
+                  <div className="flex-1 rounded-2xl border border-border bg-surface/70 p-2 backdrop-blur">
                     {isLoading ? (
                       <div className="space-y-2">
                         {Array.from({ length: 3 }).map((_, idx) => (
@@ -334,11 +343,15 @@ export default function JournalPageV2() {
                     )}
                   </div>
                 </div>
-              </div>
-            }
-            detail={<JournalDetailPanel entry={activeEntry} />}
-          />
-        </section>
+              }
+              detail={<JournalDetailPanel entry={activeEntry} />}
+            />
+          </div>
+          <div className="space-y-4 xl:col-span-4">
+            {hasJourneyMeta && journeySnapshot ? <JournalJourneyBanner snapshot={journeySnapshot} /> : null}
+            <JournalInsightsPanel entries={entries} />
+          </div>
+        </div>
       </div>
       <JournalNewEntryDialog
         isOpen={isNewDialogOpen}
