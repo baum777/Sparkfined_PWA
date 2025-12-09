@@ -408,10 +408,38 @@ describe('getJournalInsightsForEntries', () => {
       id: `entry-${i}`,
     }))
 
+    // Service takes last 10 entries: entry-20 through entry-29
+    // So evidence must reference one of those
+    const responseWithValidEvidence = {
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              insights: [
+                {
+                  category: 'BEHAVIOR_LOOP',
+                  severity: 'WARNING',
+                  title: 'FOMO-Breakout Pattern',
+                  summary: 'Du steigst häufig bei Breakouts ein, die bereits stark gelaufen sind.',
+                  recommendation: 'Warte auf Pullbacks oder nutze Limit-Orders.',
+                  evidenceEntries: ['entry-25'],
+                  confidence: 85,
+                },
+              ],
+            }),
+          },
+        },
+      ],
+      usage: {
+        prompt_tokens: 500,
+        completion_tokens: 200,
+      },
+    }
+
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => validAIResponse,
+      json: async () => responseWithValidEvidence,
     })
 
     await getJournalInsightsForEntries({
@@ -429,10 +457,38 @@ describe('getJournalInsightsForEntries', () => {
       id: `entry-${i}`,
     }))
 
+    // Service caps at 50 and takes last 50 entries: entry-70 through entry-119
+    // So evidence must reference one of those
+    const responseWithValidEvidence = {
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              insights: [
+                {
+                  category: 'BEHAVIOR_LOOP',
+                  severity: 'WARNING',
+                  title: 'FOMO-Breakout Pattern',
+                  summary: 'Du steigst häufig bei Breakouts ein, die bereits stark gelaufen sind.',
+                  recommendation: 'Warte auf Pullbacks oder nutze Limit-Orders.',
+                  evidenceEntries: ['entry-100'],
+                  confidence: 85,
+                },
+              ],
+            }),
+          },
+        },
+      ],
+      usage: {
+        prompt_tokens: 500,
+        completion_tokens: 200,
+      },
+    }
+
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => validAIResponse,
+      json: async () => responseWithValidEvidence,
     })
 
     const result = await getJournalInsightsForEntries({
