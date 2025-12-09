@@ -65,4 +65,10 @@ Das Design System ist in folgende Bereiche unterteilt:
 
 ---
 
+## 🧭 UI Audit Log
+
+- 2025-03-27: Settings `/settings-v2` refreshed with design-system cards, inputs and toggle pills for clearer hierarchy and token usage.
+
+---
+
 **Happy Styling! 🎨✨**
