@@ -40,11 +40,6 @@ const THRESHOLDS = {
   // Estimated: ~3KB gzipped
   'vendor-state': 5,
   
-  // Generic vendor (OpenAI SDK, workbox, etc.)
-  // Current: ~50KB gzipped (includes OpenAI SDK, workbox, web-push)
-  // Note: Stable and cacheable, rarely changes
-  'vendor': 52,
-  
   // Tesseract.js (OCR) - Heavy library, isolated for lazy loading
   // Used only in SettingsPageV2 (OCR scan feature)
   // Estimated: 25-30KB gzipped (lazy-loaded)
@@ -70,6 +65,16 @@ const THRESHOLDS = {
   // Current: ~6KB (chartTelemetry) + 0.3KB (chartLinks)
   'chartTelemetry': 15,
   'chartLinks': 5,
+
+  // AI-related code (OpenAI SDK, AI insights service, prompt builders)
+  // Lazy-loaded when AI features are used (Journal insights, Analysis AI features)
+  // Current: ~19KB gzipped (includes OpenAI SDK ~15KB + our AI wrappers)
+  'chunk-ai': 25,
+
+  // Journal components chunk (form inputs, panels, dialogs)
+  // Lazy-loaded with JournalPageV2
+  // Current: ~9KB gzipped
+  'chunk-journal-components': 12,
 };
 
 // Chunks that may not exist in all builds (don't fail if missing)
@@ -82,14 +87,15 @@ const OPTIONAL_CHUNKS = [
   'chunk-chart',        // App code split (may be bundled with page)
   'chunk-analyze',      // App code split (may be bundled with page)
   'chunk-signals',      // App code split (may be bundled with page)
-  'chunk-journal-components', // Journal components split
-  'chunk-ai',           // AI-related code split
 ];
 
-// Global JS budget (uncompressed) for initial + critical chunks.
-// Updated 2025-12-06: Adjusted after optimizations (~804KB current)
-// Note: Real win is 50% reduction in index chunk (28KB → 14KB gzipped)
-const TOTAL_BUDGET_KB = 850;
+// Global JS budget (uncompressed) for all JS chunks.
+// Updated 2025-12-09: Adjusted to reflect real feature set
+// - Added AI insights feature (OpenAI SDK in chunk-ai: ~19KB gzipped)
+// - Added journal components chunk (~9KB gzipped)
+// - Current total: ~866KB uncompressed
+// Budget increased by ~3% to accommodate these production features
+const TOTAL_BUDGET_KB = 880;
 
 // Critical-path bundles (initial load). Keep these lean even if deep-feature
 // chunks grow due to lazy loading (e.g., charts, OCR).
