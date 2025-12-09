@@ -1,4 +1,5 @@
 import React from 'react';
+import { Card } from '@/components/ui/Card';
 import type { WatchlistRow, WatchlistTrendSnapshot } from '@/store/watchlistStore';
 import { ResponsiveTable } from '@/components/layout/ResponsiveTable';
 
@@ -11,7 +12,7 @@ interface WatchlistTableProps {
 
 export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }: WatchlistTableProps) {
   return (
-    <div className="card-bordered rounded-2xl" data-testid="watchlist-table">
+    <Card variant="glass" className="rounded-3xl" data-testid="watchlist-table">
       <ResponsiveTable className="sm:px-4" innerClassName="sm:min-w-[720px]">
         <div className="hidden grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-text-tertiary sm:grid">
           <span>Symbol</span>
@@ -20,55 +21,55 @@ export default function WatchlistTable({ rows, activeSymbol, trends, onSelect }:
           <span>24h change</span>
           <span>Session</span>
         </div>
-        <div className="divide-y divide-border-subtle">
+        <div className="divide-y divide-border-subtle/70">
           {rows.map((row) => {
-          const isActive = activeSymbol === row.symbol;
-          const hasTrend = Boolean(trends?.[row.symbol]);
-          return (
-            <div
-              key={`${row.symbol}-${row.session}`}
-              onClick={() => onSelect?.(row.symbol)}
-              className={`flex flex-col gap-4 px-4 py-4 text-sm text-text-secondary transition sm:grid sm:grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] sm:items-center sm:gap-6 ${
-                isActive
-                  ? 'cursor-pointer border-l-4 border-glow-success bg-brand/5'
-                  : 'cursor-pointer hover:bg-interactive-hover hover-lift'
-              }`}
-              data-testid="watchlist-token-row"
-              data-symbol={row.symbol}
-              data-session={row.session}
-              data-active={String(isActive)}
-            >
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Symbol</p>
-                <div className="flex items-center gap-2">
-                  <p className="text-base font-semibold text-text-primary">{row.symbol}</p>
-                  {hasTrend ? <span className="h-2 w-2 rounded-full bg-sentiment-bull" aria-label="Trend present" /> : null}
+            const isActive = activeSymbol === row.symbol;
+            const hasTrend = Boolean(trends?.[row.symbol]);
+            return (
+              <div
+                key={`${row.symbol}-${row.session}`}
+                onClick={() => onSelect?.(row.symbol)}
+                className={`flex cursor-pointer flex-col gap-4 px-4 py-4 text-sm text-text-secondary transition sm:grid sm:grid-cols-[1.1fr_1.4fr_minmax(0,1fr)_minmax(0,1fr)_minmax(0,120px)] sm:items-center sm:gap-6 ${
+                  isActive
+                    ? 'rounded-2xl bg-brand/5 shadow-glow-brand ring-1 ring-brand/30'
+                    : 'hover:bg-interactive-hover/50 hover:shadow-card-subtle'
+                }`}
+                data-testid="watchlist-token-row"
+                data-symbol={row.symbol}
+                data-session={row.session}
+                data-active={String(isActive)}
+              >
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Symbol</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-base font-semibold text-text-primary">{row.symbol}</p>
+                    {hasTrend ? <span className="h-2 w-2 rounded-full bg-sentiment-bull" aria-label="Trend present" /> : null}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Name</p>
+                  <p className="font-medium text-text-primary">{row.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Price</p>
+                  <p className="text-lg font-semibold text-warn">{row.price}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">24h change</p>
+                  <p className={`font-semibold ${getChangeAccent(row.change24h)}`}>{row.change24h}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Session</p>
+                  <span className="inline-flex items-center rounded-full border border-border-moderate bg-surface-skeleton px-3 py-1 text-xs font-semibold uppercase tracking-wide text-text-primary">
+                    {row.session}
+                  </span>
                 </div>
               </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Name</p>
-                <p className="font-medium text-text-primary">{row.name}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Price</p>
-                <p className="text-lg font-semibold text-amber-200">{row.price}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">24h change</p>
-                <p className={`font-semibold ${getChangeAccent(row.change24h)}`}>{row.change24h}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary sm:hidden">Session</p>
-                <span className="inline-flex items-center rounded-full border border-border-moderate bg-surface-skeleton px-3 py-1 text-xs font-semibold uppercase tracking-wide text-text-primary">
-                  {row.session}
-                </span>
-              </div>
-              </div>
             );
-        })}
+          })}
         </div>
       </ResponsiveTable>
-    </div>
+    </Card>
   );
 }
 

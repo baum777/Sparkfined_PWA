@@ -1,4 +1,5 @@
 import React from 'react';
+import { Card } from '@/components/ui/Card';
 import type { WatchlistRow, WatchlistTrendSnapshot } from '@/store/watchlistStore';
 
 interface WatchlistDetailPanelProps {
@@ -11,20 +12,18 @@ interface WatchlistDetailPanelProps {
 export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenReplay }: WatchlistDetailPanelProps) {
   if (!row) {
     return (
-      <div
-        className="card-bordered flex min-h-[400px] flex-col items-center justify-center rounded-2xl border-dashed px-6 py-10 text-center"
+      <Card
+        variant="bordered"
+        className="flex min-h-[400px] flex-col items-center justify-center rounded-3xl border-dashed px-6 py-10 text-center"
         data-testid="watchlist-detail-empty"
       >
         <p className="text-sm text-text-secondary">Select an asset on the left to see more context here.</p>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div
-      className="card-glass space-y-6 rounded-2xl p-6 text-text-secondary"
-      data-testid="watchlist-detail-panel"
-    >
+    <Card variant="glass" className="space-y-6 rounded-3xl p-6 text-text-secondary" data-testid="watchlist-detail-panel">
       <div className="space-y-2">
         <h2 className="text-2xl font-semibold text-text-primary" data-testid="watchlist-detail-symbol">
           {row.symbol}
@@ -35,7 +34,7 @@ export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenRe
       <div className="grid grid-cols-2 gap-4 text-sm">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">Price</p>
-          <p className="mt-1 text-lg font-semibold text-amber-200">{row.price}</p>
+          <p className="mt-1 text-lg font-semibold text-warn">{row.price}</p>
         </div>
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-text-tertiary">24h change</p>
@@ -53,7 +52,7 @@ export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenRe
       </div>
 
       <div className="space-y-4 border-t border-border-subtle pt-6">
-        <div className="card-bordered rounded-xl p-4 text-center">
+        <div className="rounded-xl border border-border-moderate bg-surface-subtle/80 p-4 text-center">
           <p className="text-xs text-text-secondary">Quick actions</p>
           <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
             <button
@@ -76,7 +75,7 @@ export default function WatchlistDetailPanel({ row, trend, onOpenChart, onOpenRe
         </div>
         <SocialTrendCard trend={trend} />
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -84,14 +83,14 @@ function getChangeAccent(change: string) {
   const trimmed = change.trim();
 
   if (trimmed.startsWith('-')) {
-    return 'text-rose-300';
+    return 'text-danger';
   }
 
   if (trimmed.startsWith('+')) {
-    return 'text-emerald-300';
+    return 'text-success';
   }
 
-  return 'text-zinc-200';
+  return 'text-text-secondary';
 }
 
 function SocialTrendCard({ trend }: { trend?: WatchlistTrendSnapshot }) {
