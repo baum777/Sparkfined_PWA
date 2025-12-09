@@ -52,30 +52,32 @@ describe('getJournalInsightsForEntries', () => {
 
   const PROMPT_VERSION = 'journal-insights-v1.0'
 
-  const validAIResponse = {
-    choices: [
-      {
-        message: {
-          content: JSON.stringify({
-            insights: [
-              {
-                category: 'BEHAVIOR_LOOP',
-                severity: 'WARNING',
-                title: 'FOMO-Breakout Pattern',
-                summary: 'Du steigst häufig bei Breakouts ein, die bereits stark gelaufen sind.',
-                recommendation: 'Warte auf Pullbacks oder nutze Limit-Orders.',
-                evidenceEntries: ['entry-1'],
-                confidence: 85,
-              },
-            ],
-          }),
+  function createValidAIResponse(evidenceEntries: string[] = [mockEntry.id]) {
+    return {
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              insights: [
+                {
+                  category: 'BEHAVIOR_LOOP',
+                  severity: 'WARNING',
+                  title: 'FOMO-Breakout Pattern',
+                  summary: 'Du steigst häufig bei Breakouts ein, die bereits stark gelaufen sind.',
+                  recommendation: 'Warte auf Pullbacks oder nutze Limit-Orders.',
+                  evidenceEntries,
+                  confidence: 85,
+                },
+              ],
+            }),
+          },
         },
+      ],
+      usage: {
+        prompt_tokens: 500,
+        completion_tokens: 200,
       },
-    ],
-    usage: {
-      prompt_tokens: 500,
-      completion_tokens: 200,
-    },
+    }
   }
 
   beforeEach(() => {
@@ -92,7 +94,7 @@ describe('getJournalInsightsForEntries', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => validAIResponse,
+      json: async () => createValidAIResponse(),
     })
 
     const result = await getJournalInsightsForEntries({
@@ -118,7 +120,7 @@ describe('getJournalInsightsForEntries', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => validAIResponse,
+      json: async () => createValidAIResponse(),
     })
 
     const result = await getJournalInsightsForEntries({
@@ -325,7 +327,7 @@ describe('getJournalInsightsForEntries', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => validAIResponse,
+      json: async () => createValidAIResponse(),
     })
 
     const result1 = await getJournalInsightsForEntries({
@@ -337,7 +339,7 @@ describe('getJournalInsightsForEntries', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => validAIResponse,
+      json: async () => createValidAIResponse(),
     })
 
     const result2 = await getJournalInsightsForEntries({
@@ -408,10 +410,12 @@ describe('getJournalInsightsForEntries', () => {
       id: `entry-${i}`,
     }))
 
+    const evidenceId = manyEntries[manyEntries.length - 1]?.id ?? mockEntry.id
+
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => validAIResponse,
+      json: async () => createValidAIResponse([evidenceId]),
     })
 
     await getJournalInsightsForEntries({
@@ -429,10 +433,12 @@ describe('getJournalInsightsForEntries', () => {
       id: `entry-${i}`,
     }))
 
+    const latestEntryId = manyEntries[manyEntries.length - 1]?.id ?? mockEntry.id
+
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => validAIResponse,
+      json: async () => createValidAIResponse([latestEntryId]),
     })
 
     const result = await getJournalInsightsForEntries({
@@ -452,7 +458,7 @@ describe('getJournalInsightsForEntries', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => validAIResponse,
+      json: async () => createValidAIResponse(),
     })
 
     const result = await getJournalInsightsForEntries({
