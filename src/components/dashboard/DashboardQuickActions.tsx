@@ -15,6 +15,10 @@ export default function DashboardQuickActions() {
       path: '/journal-v2',
     },
     {
+      label: 'Journal 2.0',
+      path: '/journal/v2',
+    },
+    {
       label: 'Analysis',
       path: '/analysis-v2',
     },
