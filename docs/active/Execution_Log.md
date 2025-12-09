@@ -851,3 +851,24 @@ Commands & Results:
 
 New open points:
 - Live-Provider-Kette und Dexie-Caching bleiben offen (Epic, siehe Task 01 Phase 1/2/5).
+
+### 2025-12-09 – Reflect & Learn Surfaces Refresh
+
+Date: 2025-12-09
+Agent: Codex
+Section: Module 4 – Journal & Lessons surfaces
+Branch: work
+
+Actions:
+- Refactored JournalPageV2 layout with design-system toolbar, glass summary cards, and right-rail journey/insights stack.
+- Updated Journal header actions to design-system buttons and rounded chips for filters/search.
+- Wrapped Lessons hub in DashboardShell with stats cards, filter toolbar, and refreshed lesson library card layout.
+
+Commands & Results:
+- pnpm typecheck → ✅
+- pnpm lint → ⚠️ (upstream warnings about unused variables/hardcoded colors already present)
+- pnpm test → ✅
+- pnpm test:e2e → ❌ (Playwright browsers missing; see output recommending `pnpm exec playwright install`)
+
+New open points:
+- Re-run Playwright E2E after installing browsers; many suites blocked by missing chromium binaries.
