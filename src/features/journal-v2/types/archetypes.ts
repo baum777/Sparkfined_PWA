@@ -1,0 +1,10 @@
+export type JournalArchetype =
+  | 'The Overthinker'
+  | 'The Gambler'
+  | 'The Analyzer'
+  | 'The Intuitive'
+  | 'The Disciplined'
+  | 'The Adaptive'
+  | 'The Contrarian'
+  | 'The Momentum Rider'
+  | 'The Risk Manager'

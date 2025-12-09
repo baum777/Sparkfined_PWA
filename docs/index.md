@@ -52,6 +52,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-06)
+
+- **`docs/journal/journal-v2-migration.md`** – Leitfaden zur Migration der Legacy-Journal-Einträge in die neue Journal-2.0-Pipeline (Dexie, Pipeline-Aufruf, manueller Trigger).
+
 ## 📦 Documentation Governance (2025-12-04)
 
 ### Governance Audit & Rules
