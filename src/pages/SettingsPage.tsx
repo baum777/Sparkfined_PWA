@@ -80,22 +80,30 @@ export default function SettingsPage({
   };
 
   const Row = ({ label, children }:{label:string;children:React.ReactNode}) => (
-    <div className="flex items-center justify-between gap-3 border-b border-zinc-800 py-3">
-      <div className="text-sm text-zinc-300">{label}</div>
+    <div className="flex items-center justify-between gap-3 border-b border-border/60 py-3 last:border-b-0">
+      <div className="text-sm font-medium text-text-primary">{label}</div>
       <div>{children}</div>
     </div>
   );
   const Select = (p:React.SelectHTMLAttributes<HTMLSelectElement>) =>
-    <select {...p} className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm text-zinc-200" />;
+    <select
+      {...p}
+      className="rounded-xl border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary shadow-card-subtle transition focus:outline-none focus:ring-2 focus:ring-brand/40"
+    />;
   const Toggle = ({checked,onChange}:{checked:boolean;onChange:(v:boolean)=>void}) =>
-    <button onClick={()=>onChange(!checked)} className={`rounded px-2 py-1 text-sm border ${checked?"border-emerald-700 bg-emerald-900/30 text-emerald-100":"border-zinc-700 text-zinc-200 hover:bg-zinc-800"}`}>{checked?"ON":"OFF"}</button>;
+    <button
+      onClick={()=>onChange(!checked)}
+      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${checked ? 'border border-brand bg-brand/10 text-brand shadow-glow-accent' : 'border border-border text-text-primary hover:bg-interactive-hover'}`}
+    >
+      {checked?"ON":"OFF"}
+    </button>;
 
   return (
     <div className={wrapperClassName}>
       {showHeading ? (
-        <h1 className="mb-4 text-lg font-semibold text-zinc-100 md:text-xl">Einstellungen</h1>
+        <h1 className="mb-4 text-lg font-semibold text-text-primary md:text-xl">Einstellungen</h1>
       ) : null}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <div className="rounded-2xl border border-border bg-surface/80 p-4 shadow-card-subtle">
         <Row label="Theme">
           <Select value={theme} onChange={(e)=>setTheme(e.target.value as ThemeMode)}>
             <option value="system">System</option>
@@ -105,7 +113,7 @@ export default function SettingsPage({
         </Row>
       </div>
 
-      <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <div className="mt-4 rounded-2xl border border-border bg-surface/80 p-4 shadow-card-subtle">
         <Row label="Snap-to-OHLC (Default)">
           <Toggle checked={settings.snapDefault} onChange={(v)=>setSettings({snapDefault:v})}/>
         </Row>
@@ -124,7 +132,7 @@ export default function SettingsPage({
           <Toggle checked={settings.showMinimap} onChange={(v)=>setSettings({showMinimap:v})}/>
         </Row>
       </div>
-      <div className="mt-4 text-xs text-zinc-500">
+      <div className="mt-4 text-xs text-text-tertiary">
         Gespeichert unter <code>sparkfined.settings.v1</code>. Änderungen wirken sofort.
       </div>
       <div className="mt-4 flex justify-end">
@@ -138,15 +146,15 @@ export default function SettingsPage({
       </div>
 
       {/* BLOCK 2: Wallet Monitoring */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Wallet-Monitoring (Auto-Journal)</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">Wallet-Monitoring (Auto-Journal)</h2>
+      <div className="rounded-2xl border border-border bg-surface/80 p-4 shadow-card-subtle">
         <Row label="Wallet-Adresse">
           <input
             type="text"
             value={walletAddress}
             onChange={(e) => handleWalletChange(e.target.value)}
             placeholder="DezXAZ8z7Pnr..."
-            className="w-64 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-sm text-zinc-200"
+            className="w-64 rounded-xl border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary shadow-card-subtle focus:outline-none focus:ring-2 focus:ring-brand/40"
           />
         </Row>
         <Row label="Wallet-Monitoring aktiv">
@@ -164,9 +172,9 @@ export default function SettingsPage({
 
         {/* Status display */}
         {monitorStatus && monitorStatus.isRunning && (
-          <div className="mt-3 rounded border border-emerald-800/40 bg-emerald-950/20 p-3 text-xs text-emerald-200">
+          <div className="mt-3 rounded-xl border border-success/60 bg-success/10 p-3 text-xs text-success">
             <div className="mb-1 font-semibold">✅ Monitoring aktiv</div>
-            <div className="text-emerald-300/80">
+            <div className="text-text-secondary">
               <div>Wallet: {monitorStatus.walletAddress.slice(0, 8)}...{monitorStatus.walletAddress.slice(-6)}</div>
               <div>Letzter Check: {new Date(monitorStatus.lastChecked).toLocaleTimeString()}</div>
               <div>Transaktionen gesehen: {monitorStatus.seenTransactions}</div>
@@ -175,21 +183,21 @@ export default function SettingsPage({
         )}
 
         {walletAddress && !monitoringEnabled && (
-          <div className="mt-3 rounded border border-zinc-700 bg-zinc-900/60 p-3 text-xs text-zinc-400">
+          <div className="mt-3 rounded-xl border border-border bg-surface-subtle p-3 text-xs text-text-secondary">
             ⏸️ Monitoring pausiert. Aktiviere oben, um Auto-Journal zu starten.
           </div>
         )}
       </div>
-      <div className="mt-2 text-xs text-zinc-500">
+      <div className="mt-2 text-xs text-text-tertiary">
         <strong>Info:</strong> Wallet-Monitoring erkennt automatisch Buy-Transaktionen und erstellt
         temporäre Journal-Einträge. Du hast 7 Tage Zeit, um sie als "aktiv" zu markieren.
       </div>
 
       {/* Data Export / Import */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Daten — Export / Import</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
-        <div className="mb-2 text-xs text-zinc-400">Wähle Bereiche für Export:</div>
-        <div className="mb-3 grid grid-cols-2 gap-2 text-xs text-zinc-300 md:grid-cols-3">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">Daten — Export / Import</h2>
+      <div className="rounded-2xl border border-border bg-surface/80 p-4 shadow-card-subtle">
+        <div className="mb-2 text-xs text-text-tertiary">Wähle Bereiche für Export:</div>
+        <div className="mb-3 grid grid-cols-2 gap-2 text-xs text-text-primary md:grid-cols-3">
           {Object.keys(KEYS).map(k => {
             const key = k as NamespaceKey;
             return (
@@ -202,7 +210,7 @@ export default function SettingsPage({
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
-            className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800"
+            className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-primary transition hover:bg-interactive-hover"
             onClick={()=>{
               const selected = Object.entries(pick).filter(([,v])=>v).map(([k])=>k as NamespaceKey);
               const payload = exportAppData(selected);
@@ -219,28 +227,28 @@ export default function SettingsPage({
                    } catch(e:any){ setMsg(`Import-Fehler: ${e?.message||e}`); }
                    setBusy(null); e.currentTarget.value = "";
                  }} />
-          <button className="rounded-lg border border-zinc-700 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800"
+          <button className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-primary transition hover:bg-interactive-hover"
                   onClick={()=>fileRef.current?.click()}>Import JSON (Merge)</button>
         </div>
-        {busy && <div className="mt-2 text-[11px] text-zinc-400">{busy}</div>}
-        {msg &&  <div className="mt-2 text-[11px] text-emerald-300">{msg}</div>}
+        {busy && <div className="mt-2 text-[11px] text-text-secondary">{busy}</div>}
+        {msg &&  <div className="mt-2 text-[11px] text-success">{msg}</div>}
       </div>
 
       {/* Danger Zone */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Danger Zone</h2>
-      <div className="rounded-xl border border-rose-900 bg-rose-950/30 p-4">
-        <div className="text-xs text-rose-100">Gezieltes Löschen</div>
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">Danger Zone</h2>
+      <div className="rounded-2xl border border-danger/60 bg-danger/5 p-4 shadow-card-subtle">
+        <div className="text-xs text-danger">Gezieltes Löschen</div>
         <div className="mt-2 grid grid-cols-2 gap-2 text-xs md:grid-cols-3">
           {Object.entries(KEYS).map(([ns, _key])=>(
             <button key={ns}
-              className="rounded border border-rose-900 px-2 py-1 text-rose-100 hover:bg-rose-900/20"
+              className="rounded border border-danger/60 px-2 py-1 font-semibold text-danger transition hover:bg-danger/10"
               onClick={()=>{ if(confirm(`Lösche ${ns}?`)) { clearNs(ns as NamespaceKey); alert(`${ns} gelöscht.`);} }}>
               Clear {ns}
             </button>
           ))}
         </div>
         <div className="mt-3">
-          <button className="rounded border border-rose-900 px-3 py-2 text-sm text-rose-100 hover:bg-rose-900/20"
+          <button className="rounded border border-danger/60 px-3 py-2 text-sm font-semibold text-danger transition hover:bg-danger/10"
             onClick={()=>{
               if (!confirm("Factory Reset? Alle sparkfined.* Daten werden gelöscht!")) return;
               Object.keys(KEYS).forEach(ns => clearNs(ns as NamespaceKey));
@@ -252,12 +260,12 @@ export default function SettingsPage({
       </div>
 
       {/* AI */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">AI</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">AI</h2>
+      <div className="rounded-2xl border border-border bg-surface/80 p-4 text-xs text-text-primary shadow-card-subtle">
         <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
           <label className="inline-flex items-center gap-2">
             Provider
-            <select className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+            <select className="rounded-xl border border-border bg-surface-elevated px-2 py-1 text-xs text-text-primary shadow-card-subtle"
                     value={ai.provider} onChange={(e)=>setAI({ provider: e.target.value as any })}>
               <option value="anthropic">Anthropic</option>
               <option value="openai">OpenAI</option>
@@ -266,7 +274,7 @@ export default function SettingsPage({
           </label>
           <label className="inline-flex items-center gap-2">
             Model
-            <input className="w-48 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+            <input className="w-48 rounded-xl border border-border bg-surface-elevated px-2 py-1 text-xs text-text-primary shadow-card-subtle"
                    placeholder="(optional override)"
                    value={ai.model || ""} onChange={(e)=>setAI({ model: e.target.value || undefined })}/>
           </label>
@@ -275,45 +283,45 @@ export default function SettingsPage({
           <label className="inline-flex items-center gap-2">
             maxOutputTokens
             <input type="number" min={64} max={4000}
-                   className="w-28 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+                   className="w-28 rounded-xl border border-border bg-surface-elevated px-2 py-1 text-xs text-text-primary shadow-card-subtle"
                    value={ai.maxOutputTokens ?? 800}
                    onChange={(e)=>setAI({ maxOutputTokens: Number(e.target.value) })}/>
           </label>
           <label className="inline-flex items-center gap-2">
             maxCostUsd / Call
             <input type="number" min={0.01} step={0.01}
-                   className="w-28 rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs text-zinc-200"
+                   className="w-28 rounded-xl border border-border bg-surface-elevated px-2 py-1 text-xs text-text-primary shadow-card-subtle"
                    value={ai.maxCostUsd ?? 0.15}
                    onChange={(e)=>setAI({ maxCostUsd: Number(e.target.value) })}/>
           </label>
         </div>
-        <div className="mt-1 text-[11px] text-zinc-500">
+        <div className="mt-1 text-[11px] text-text-tertiary">
           Server setzt zusätzlich eine globale Obergrenze via <code>AI_MAX_COST_USD</code>.
         </div>
-        <div className="mt-2 text-[11px] text-zinc-500">Keys bleiben serverseitig (.env). Der Client sendet nur Provider/Model + Prompt.</div>
+        <div className="mt-2 text-[11px] text-text-tertiary">Keys bleiben serverseitig (.env). Der Client sendet nur Provider/Model + Prompt.</div>
       </div>
 
       {/* Token Budget */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">AI Token Budget</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">AI Token Budget</h2>
+      <div className="rounded-2xl border border-border bg-surface/80 p-4 text-xs text-text-primary shadow-card-subtle">
         <AIStats/>
       </div>
 
       {/* Risk & Playbook Defaults */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Risk & Playbook Defaults</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
-        <div className="mb-2 text-[12px] text-zinc-400">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">Risk & Playbook Defaults</h2>
+      <div className="rounded-2xl border border-border bg-surface/80 p-4 text-xs text-text-primary shadow-card-subtle">
+        <div className="mb-2 text-[12px] text-text-secondary">
           Setze Standard-Balance und Preset, die im Analyze/Ideas-Playbook vorgefüllt werden.
         </div>
         <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
           <label className="flex items-center gap-2">Default-Balance
-            <input className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs"
+            <input className="rounded-xl border border-border bg-surface-elevated px-2 py-1 text-xs text-text-primary shadow-card-subtle"
                    type="number" min={100} step={50}
                    value={settings.defaultBalance||1000}
                    onChange={e=>setSettings({ defaultBalance: Number(e.target.value||0) })}/>
           </label>
           <label className="flex items-center gap-2">Default-Preset
-            <select className="rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs"
+            <select className="rounded-xl border border-border bg-surface-elevated px-2 py-1 text-xs text-text-primary shadow-card-subtle"
                     value={settings.defaultPlaybookId||"bal-15"}
                     onChange={e=>setSettings({ defaultPlaybookId: e.target.value })}>
               <option value="cons-1">Conservative · 1% · ATR×1.5</option>
@@ -325,8 +333,8 @@ export default function SettingsPage({
       </div>
 
       {/* Monitoring & Tokens */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">Monitoring & Tokens</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">Monitoring & Tokens</h2>
+      <div className="rounded-2xl border border-border bg-surface/80 p-4 text-xs text-text-primary shadow-card-subtle">
         <div className="mb-2 grid grid-cols-2 gap-2 md:grid-cols-3">
           <label className="inline-flex items-center gap-2"><input type="checkbox" checked={flags.enabled} onChange={e=>setFlags({enabled: e.target.checked})}/> Enabled</label>
           <label className="inline-flex items-center gap-2"><input type="checkbox" checked={flags.includeNetwork} onChange={e=>setFlags({includeNetwork: e.target.checked})}/> API Timings</label>
@@ -336,20 +344,21 @@ export default function SettingsPage({
           <div className="inline-flex items-center gap-2">
             Sampling
             <input type="number" min={0} max={1} step={0.05} value={flags.sampling} onChange={e=>setFlags({sampling: Number(e.target.value)})}
-                   className="w-20 rounded border border-zinc-700 bg-zinc-900 px-1 py-0.5 text-xs text-zinc-200"/>
+                   className="w-20 rounded-lg border border-border bg-surface-elevated px-2 py-1 text-xs text-text-primary shadow-card-subtle"
+            />
           </div>
         </div>
         <div className="mt-2 flex items-center gap-2">
-          <button className="rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800" onClick={drain}>Jetzt senden ({buffer.length})</button>
-          <span className="text-zinc-500">Batch alle 15s & beim Tab-Wechsel</span>
+          <button className="rounded border border-border px-3 py-1.5 font-semibold text-text-primary transition hover:bg-interactive-hover" onClick={drain}>Jetzt senden ({buffer.length})</button>
+          <span className="text-text-tertiary">Batch alle 15s & beim Tab-Wechsel</span>
         </div>
       </div>
 
       {/* PWA Controls */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-zinc-200">PWA</h2>
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs text-zinc-300">
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">PWA</h2>
+      <div className="rounded-2xl border border-border bg-surface/80 p-4 text-xs text-text-primary shadow-card-subtle">
         <div className="flex flex-wrap items-center gap-2">
-          <button className="rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800"
+          <button className="rounded border border-border px-3 py-1.5 font-semibold text-text-primary transition hover:bg-interactive-hover"
             onClick={async ()=>{
               setBusy("Update-Check…");
               const res = await pokeServiceWorker();
@@ -360,7 +369,7 @@ export default function SettingsPage({
             }}>
             SW-Update anstoßen
           </button>
-          <button className="rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800"
+          <button className="rounded border border-border px-3 py-1.5 font-semibold text-text-primary transition hover:bg-interactive-hover"
             onClick={async ()=>{
               setBusy("Caches leeren…");
               const removed = await clearCaches();
@@ -370,11 +379,11 @@ export default function SettingsPage({
             Caches leeren
           </button>
         </div>
-        <div className="mt-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-[11px] text-zinc-500">
-          <div className="mb-1 text-xs font-medium text-zinc-400">App Info</div>
-          <div>Version: <span className="text-zinc-300">{import.meta.env.VITE_APP_VERSION ?? "dev"}</span></div>
-          <div>Build: <span className="text-zinc-300">{import.meta.env.MODE}</span></div>
-          <div>VAPID: <span className={import.meta.env.VITE_VAPID_PUBLIC_KEY ? "text-emerald-400" : "text-amber-400"}>{import.meta.env.VITE_VAPID_PUBLIC_KEY ? "configured" : "missing"}</span></div>
+        <div className="mt-3 rounded-lg border border-border bg-surface-subtle p-3 text-[11px] text-text-secondary">
+          <div className="mb-1 text-xs font-medium text-text-primary">App Info</div>
+          <div>Version: <span className="text-text-primary">{import.meta.env.VITE_APP_VERSION ?? "dev"}</span></div>
+          <div>Build: <span className="text-text-primary">{import.meta.env.MODE}</span></div>
+          <div>VAPID: <span className={import.meta.env.VITE_VAPID_PUBLIC_KEY ? "text-success" : "text-danger"}>{import.meta.env.VITE_VAPID_PUBLIC_KEY ? "configured" : "missing"}</span></div>
         </div>
       </div>
     </div>
@@ -384,27 +393,27 @@ export default function SettingsPage({
 function AIStats() {
   const ctx = useAIContext();
   const pct = (ctx.tokenUsed / ctx.tokenBudget) * 100;
-  const progressColor = pct > 90 ? "bg-rose-500" : pct > 70 ? "bg-amber-500" : "bg-emerald-500";
-  
+  const progressColor = pct > 90 ? "bg-danger" : pct > 70 ? "bg-brand" : "bg-success";
+
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
         <div>Used Tokens: {ctx.tokenUsed.toLocaleString()} / {ctx.tokenBudget.toLocaleString()}</div>
-        <div className="text-zinc-500">{pct.toFixed(1)}%</div>
+        <div className="text-text-tertiary">{pct.toFixed(1)}%</div>
       </div>
-      <div className="relative h-2 w-full overflow-hidden rounded-full bg-zinc-800">
-        <div 
+      <div className="relative h-2 w-full overflow-hidden rounded-full bg-surface-subtle">
+        <div
           className={`h-full transition-all duration-300 ${progressColor}`}
           style={{ width: `${Math.min(100, pct)}%` }}
         />
       </div>
       {ctx.activeIdeaId && (
-        <div className="mt-2 text-[11px] text-zinc-500">
+        <div className="mt-2 text-[11px] text-text-tertiary">
           Active Context: Idea {ctx.activeIdeaId.slice(0, 8)}...
         </div>
       )}
-      <button 
-        className="mt-2 rounded border border-zinc-700 px-2 py-1 hover:bg-zinc-800" 
+      <button
+        className="mt-2 rounded border border-border px-3 py-1.5 text-xs font-semibold text-text-primary transition hover:bg-interactive-hover"
         onClick={() => ctx.reset()}
       >
         Reset Counter

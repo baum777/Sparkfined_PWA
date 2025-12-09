@@ -9,6 +9,12 @@
 ## 2025-12-06
 
 ### Changed
+- **System & Meta surfaces alignment:**
+  - Updated landing, settings, and showcase pages to use design tokens and unified data-testid hooks for Playwright.
+  - Harmonized icon showcase visuals with Sparkfined glass cards and brand gradients.
+
+
+### Changed
 - **Bundle hardening & chart isolation:**
   - Split the charting stack (lightweight-charts + fancy-canvas) into `vendor-charts` to keep the default vendor chunk lean for the start route.
   - Routed `@remix-run/router` into `vendor-react` to avoid dragging chart code into the core shell preload path.

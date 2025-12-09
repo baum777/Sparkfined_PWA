@@ -26,7 +26,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg text-primary">
+    <div className="min-h-screen bg-bg text-primary" data-testid="landing-page">
       <nav className="fixed inset-x-0 top-0 z-40 border-b border-moderate bg-surface/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:px-8">
           <div className="flex items-center gap-2">
