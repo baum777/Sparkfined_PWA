@@ -23,7 +23,7 @@ export default function UXShowcasePage() {
   useKeyboardShortcut('cmd+k', () => toast.info('Command Palette würde sich hier öffnen'));
 
   return (
-    <div className="min-h-screen bg-bg p-6 space-y-12">
+    <div className="min-h-screen bg-bg p-6 space-y-12" data-testid="ux-showcase-page">
       {/* Header */}
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">

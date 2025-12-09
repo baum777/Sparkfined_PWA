@@ -4,7 +4,7 @@ import DashboardShell from '@/components/dashboard/DashboardShell';
 export default function StyleShowcasePage() {
   return (
     <DashboardShell title="Style Showcase" description="Neue Design-System Komponenten & Utilities">
-      <div className="mx-auto w-full max-w-6xl space-y-16 px-4 py-10">
+      <div className="mx-auto w-full max-w-6xl space-y-16 px-4 py-10" data-testid="style-showcase-page">
         
         {/* Glassmorphism Section */}
         <section className="space-y-6">

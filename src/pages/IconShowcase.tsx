@@ -23,15 +23,15 @@ export default function IconShowcase() {
   ]
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-bg text-text-primary p-8" data-testid="icon-showcase-page">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-3 text-gradient-brand">
             PWA Icon Showcase
           </h1>
-          <p className="text-zinc-400 text-lg">
-            All icons are <span className="text-emerald-400 font-semibold">maskable</span> and optimized for Android/iOS home screens
+          <p className="text-text-secondary text-lg">
+            All icons are <span className="text-brand font-semibold">maskable</span> and optimized for Android/iOS home screens
           </p>
         </div>
 
@@ -40,10 +40,10 @@ export default function IconShowcase() {
           {icons.map((icon) => (
             <div
               key={icon.size}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-emerald-500/50 transition-all duration-300 hover:shadow-emerald-glow"
+              className="rounded-xl border border-border bg-surface/80 p-6 shadow-card-subtle transition hover:border-brand/60 hover:shadow-glow-accent"
             >
               {/* Icon Preview */}
-              <div className="flex items-center justify-center mb-4 bg-zinc-950 rounded-lg p-6 aspect-square">
+              <div className="flex items-center justify-center mb-4 rounded-lg bg-surface-subtle p-6 aspect-square">
                 <img
                   src={`/icons/${icon.name}`}
                   alt={`${icon.size}x${icon.size} icon`}
@@ -58,44 +58,44 @@ export default function IconShowcase() {
 
               {/* Icon Info */}
               <div className="text-center">
-                <div className="text-xl font-bold text-emerald-400 mb-1">
+                <div className="text-xl font-bold text-brand mb-1">
                   {icon.size}x{icon.size}
                 </div>
-                <div className="text-sm text-zinc-500 font-mono">{icon.name}</div>
+                <div className="text-sm text-text-tertiary font-mono">{icon.name}</div>
               </div>
             </div>
           ))}
         </div>
 
         {/* Maskable Info */}
-        <div className="mt-16 bg-gradient-to-r from-emerald-950/50 to-cyan-950/50 border border-emerald-800/30 rounded-xl p-8">
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-3">
-            <span className="text-emerald-400">✓</span>
+        <div className="mt-4 rounded-xl border border-border bg-surface/70 p-8 shadow-card-subtle">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-3 text-text-primary">
+            <span className="text-brand">✓</span>
             Maskable Icons
           </h2>
-          <div className="text-zinc-300 space-y-3">
+          <div className="text-text-secondary space-y-3">
             <p>
-              All icons are marked as <code className="bg-zinc-800 px-2 py-1 rounded text-emerald-400">"purpose": "any maskable"</code> in the manifest.
+              All icons are marked as <code className="rounded bg-surface-subtle px-2 py-1 text-brand">"purpose": "any maskable"</code> in the manifest.
             </p>
             <p>
               This means they adapt to different device shapes (rounded squares, circles, squircles) automatically.
             </p>
-            <p className="text-zinc-400 text-sm">
+            <p className="text-text-tertiary text-sm">
               <strong>Safe zone:</strong> Keep important content within 80% of the icon area (center).
             </p>
           </div>
         </div>
 
         {/* Favicon Info */}
-        <div className="mt-8 bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-          <h3 className="text-xl font-bold mb-3 text-cyan-400">Additional Assets</h3>
+        <div className="rounded-xl border border-border bg-surface/80 p-6 shadow-card-subtle">
+          <h3 className="text-xl font-bold mb-3 text-text-primary">Additional Assets</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <img src="/favicon.ico" alt="Favicon" width={32} height={32} />
                 <div>
-                  <div className="font-semibold text-zinc-200">favicon.ico</div>
-                  <div className="text-sm text-zinc-500">256x256 multi-resolution</div>
+                  <div className="font-semibold text-text-primary">favicon.ico</div>
+                  <div className="text-sm text-text-tertiary">256x256 multi-resolution</div>
                 </div>
               </div>
             </div>
@@ -103,8 +103,8 @@ export default function IconShowcase() {
               <div className="flex items-center gap-3 mb-2">
                 <img src="/apple-touch-icon.png" alt="Apple Touch" width={32} height={32} className="rounded-lg" />
                 <div>
-                  <div className="font-semibold text-zinc-200">apple-touch-icon.png</div>
-                  <div className="text-sm text-zinc-500">180x180 iOS home screen</div>
+                  <div className="font-semibold text-text-primary">apple-touch-icon.png</div>
+                  <div className="text-sm text-text-tertiary">180x180 iOS home screen</div>
                 </div>
               </div>
             </div>
@@ -112,13 +112,13 @@ export default function IconShowcase() {
         </div>
 
         {/* Testing Info */}
-        <div className="mt-8 border border-zinc-800 rounded-xl p-6 bg-zinc-900/50">
-          <h3 className="text-lg font-semibold mb-3 text-zinc-200">Test Installation</h3>
-          <ol className="list-decimal list-inside space-y-2 text-zinc-400">
-            <li>Open Chrome DevTools → <span className="text-emerald-400">Application</span></li>
-            <li>Check <span className="text-emerald-400">Manifest</span> section</li>
+        <div className="rounded-xl border border-border bg-surface/70 p-6 shadow-card-subtle">
+          <h3 className="text-lg font-semibold mb-3 text-text-primary">Test Installation</h3>
+          <ol className="list-decimal list-inside space-y-2 text-text-secondary">
+            <li>Open Chrome DevTools → <span className="text-brand">Application</span></li>
+            <li>Check <span className="text-brand">Manifest</span> section</li>
             <li>Verify all icons are listed</li>
-            <li>Click <span className="text-emerald-400">Install</span> button in address bar</li>
+            <li>Click <span className="text-brand">Install</span> button in address bar</li>
             <li>Add to home screen on mobile devices</li>
           </ol>
         </div>
