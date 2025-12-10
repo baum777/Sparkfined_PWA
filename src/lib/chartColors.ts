@@ -25,10 +25,10 @@ const invalidValueWarnings = new Set<string>();
  * @param token - CSS variable name (e.g., '--color-brand')
  * @returns RGB string (e.g., 'rgb(15, 179, 76)')
  */
-function getTokenValue(token: string): string {
+function getTokenValue(token: string, fallback: string = FALLBACK_RGB): string {
   if (typeof window === 'undefined') {
     // SSR fallback (should not happen in chart context, but defensive)
-    return FALLBACK_RGB;
+    return fallback;
   }
 
   const root = document.documentElement;
@@ -39,7 +39,7 @@ function getTokenValue(token: string): string {
       console.warn(`[chartColors] Token "${token}" not found, using fallback`);
       missingTokenWarnings.add(token);
     }
-    return FALLBACK_RGB;
+    return fallback;
   }
 
   // Convert "15 179 76" to "rgb(15, 179, 76)"
@@ -51,7 +51,7 @@ function getTokenValue(token: string): string {
       console.warn(`[chartColors] Invalid RGB value for token "${token}": "${value}"`);
       invalidValueWarnings.add(token);
     }
-    return FALLBACK_RGB;
+    return fallback;
   }
 
   return `rgb(${r}, ${g}, ${b})`;
@@ -109,7 +109,7 @@ export type ChartColors = ReturnType<typeof getChartColors>;
  */
 export function getChartColor(token: string, fallback: string): string {
   try {
-    return getTokenValue(token);
+    return getTokenValue(token, fallback);
   } catch {
     return fallback;
   }
