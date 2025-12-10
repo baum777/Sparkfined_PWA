@@ -2,7 +2,15 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-11
+**Last Updated:** 2025-12-12
+
+---
+
+## 2025-12-12
+
+### Added
+- **Market data SWR cache & provider muxing:** Documented the new SWR cache layer with stale-while-revalidate semantics,
+  provider health tracking, and dynamic Moralis/DexPaprika/Dexscreener selection used by the market orchestrator.
 
 ---
 

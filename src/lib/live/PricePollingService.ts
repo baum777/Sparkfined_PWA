@@ -6,9 +6,10 @@
  * Integrates with marketOrchestrator for provider fallbacks.
  */
 
-import { getMarketSnapshot } from '@/lib/data/marketOrchestrator';
+import { getTokenSnapshot } from '@/lib/data/marketOrchestrator';
 import { getLiveDataConfig } from '@/lib/config/flags';
 import type { LivePriceSnapshot, PollingStatus, PollingError } from '@/types/live';
+import type { ChainId } from '@/types/market';
 
 /**
  * Symbol configuration for polling
@@ -228,15 +229,10 @@ export class PricePollingService {
     const { symbol, address, network } = config;
 
     try {
-      const result = await getMarketSnapshot(address, network as any);
-
-      if (!result.snapshot) {
-        throw new Error('No snapshot returned');
-      }
-
-      const price = result.snapshot.price.current;
-      const priceChange24h = result.snapshot.price.change24h;
-      const volume24h = result.snapshot.volume.volume24h;
+      const tokenSnapshot = await getTokenSnapshot({ address, chain: network as ChainId });
+      const price = tokenSnapshot.price;
+      const priceChange24h = tokenSnapshot.change24h ?? 0;
+      const volume24h = tokenSnapshot.volume24h ?? 0;
 
       // Create snapshot
       const snapshot: LivePriceSnapshot = {
@@ -245,7 +241,7 @@ export class PricePollingService {
         priceChange24h,
         volume24h,
         timestamp: Date.now(),
-        source: result.provider as any,
+        source: tokenSnapshot.provider as any,
       };
 
       // Store last price for direction detection

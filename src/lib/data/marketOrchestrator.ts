@@ -1,451 +1,220 @@
-/**
- * Market Data Orchestrator - Feature-Flag Routing & Fallbacks
- *
- * Orchestrates data fetching across multiple providers with:
- * - Feature-flag based primary selection (DexPaprika vs Moralis)
- * - Automatic fallback chain (Primary → Fallback1 → Fallback2 → ...)
- * - Timeout controls per provider
- * - Telemetry logging for provider switches
- * - Performance tracking
- *
- * Flow:
- * 1. Check ENV for DATA_PRIMARY (dexpaprika | moralis)
- * 2. Try primary with timeout
- * 3. On error/timeout → try fallbacks in order
- * 4. Log all provider switches for analytics
- *
- * @module lib/data/marketOrchestrator
- */
-
-import type { MarketSnapshot, AdapterResponse, ChainId, ProviderId } from '../../types/market'
+import { Telemetry } from '@/lib/TelemetryService'
+import { SWRCache } from '@/lib/cache/swrCache'
+import { ProviderHealthTracker } from '@/lib/markets/providerHealthTracker'
+import type { AdapterResponse, ChainId, MarketSnapshot, ProviderId } from '@/types/market'
 import { getDexPaprikaSnapshot } from '../adapters/dexpaprikaAdapter'
 import { getMoralisSnapshot } from '../adapters/moralisAdapter'
 import { getDexscreenerToken } from '../adapters/dexscreenerAdapter'
-import { getPumpfunData } from '../adapters/pumpfunAdapter'
 
-// ============================================================================
-// CONFIGURATION
-// ============================================================================
-
-interface OrchestratorConfig {
-  primary: ProviderId
-  fallbacks: ProviderId[]
-  timeout: number
-  maxRetries: number
-  enableTelemetry: boolean
+export type TokenSnapshotParams = {
+  address: string
+  chain?: ChainId
+  symbol?: string
 }
 
-/**
- * Load configuration from environment variables
- */
-function loadConfig(): OrchestratorConfig {
-  const primary = (import.meta.env.VITE_DATA_PRIMARY || 'dexpaprika') as ProviderId
-  const fallbacksStr = import.meta.env.VITE_DATA_FALLBACKS || 'dexscreener,pumpfun'
-  const fallbacks = fallbacksStr.split(',').map((f: string) => f.trim()) as ProviderId[]
-
-  return {
-    primary,
-    fallbacks,
-    timeout: 8000, // 8s global timeout
-    maxRetries: 2,
-    enableTelemetry: import.meta.env.VITE_ENABLE_METRICS !== 'false',
-  }
-}
-
-const CONFIG = loadConfig()
-
-// ============================================================================
-// TELEMETRY
-// ============================================================================
-
-interface TelemetryEvent {
-  type: 'provider_switch' | 'provider_failure' | 'provider_success'
+export interface TokenSnapshot {
+  symbol: string
+  address: string
+  chain: ChainId
+  price: number
+  change24h?: number
+  marketCap?: number
+  volume24h?: number
   provider: ProviderId
-  reason?: string
-  latency?: number
+  latencyMs?: number
   timestamp: number
+  cached?: boolean
 }
 
-const telemetryEvents: TelemetryEvent[] = []
-
-/**
- * Log telemetry event
- */
-function logTelemetry(event: Omit<TelemetryEvent, 'timestamp'>) {
-  if (!CONFIG.enableTelemetry) return
-
-  const fullEvent: TelemetryEvent = {
-    ...event,
-    timestamp: Date.now(),
-  }
-
-  telemetryEvents.push(fullEvent)
-
-  // Keep last 100 events only
-  if (telemetryEvents.length > 100) {
-    telemetryEvents.shift()
-  }
-
-  // Log to console in dev mode
-  if (import.meta.env.DEV) {
-    console.log('[MarketOrchestrator]', fullEvent)
+export class MarketDataUnavailableError extends Error {
+  constructor(message: string, public causes: unknown[]) {
+    super(message)
+    this.name = 'MarketDataUnavailableError'
   }
 }
 
-/**
- * Get telemetry events (for debugging/analytics)
- */
-export function getOrchestratorTelemetry(): TelemetryEvent[] {
-  return [...telemetryEvents]
-}
+const DEFAULT_PROVIDER_ORDER: ProviderId[] = ['moralis', 'dexpaprika', 'dexscreener']
+const CACHE_TTL_MS = 60_000
+const STALE_WHILE_REVALIDATE_MS = 60_000
 
-/**
- * Clear telemetry history
- */
-export function clearOrchestratorTelemetry(): void {
-  telemetryEvents.length = 0
-}
+export const providerHealthTracker = new ProviderHealthTracker(DEFAULT_PROVIDER_ORDER)
+const swrCache = new SWRCache<TokenSnapshot>({
+  ttlMs: CACHE_TTL_MS,
+  staleWhileRevalidateMs: STALE_WHILE_REVALIDATE_MS,
+})
 
-// ============================================================================
-// ADAPTER MAPPING
-// ============================================================================
-
-type AdapterFunction = (
-  address: string,
-  chain: ChainId,
-  forceRefresh?: boolean
-) => Promise<AdapterResponse<MarketSnapshot>>
-
-/**
- * Map provider ID to adapter function
- */
-function getAdapter(provider: ProviderId): AdapterFunction | null {
-  switch (provider) {
-    case 'dexpaprika':
-      return getDexPaprikaSnapshot
-    case 'moralis':
-      return getMoralisSnapshot
-    case 'dexscreener':
-      // Wrap existing dexscreener adapter to match signature
-      return async (address, _chain) => {
-        try {
-          const data = await getDexscreenerToken(address)
-          if (!data) throw new Error('Token not found')
-
-          // Convert to MarketSnapshot format
-          const snapshot: MarketSnapshot = {
-            token: {
-              address: data.address || address,
-              symbol: data.symbol || 'UNKNOWN',
-              name: data.name || 'Unknown Token',
-              chain: (data.chain as ChainId) || 'solana',
-            },
-            price: {
-              current: data.price || 0,
-              high24h: data.high24 || 0,
-              low24h: data.low24 || 0,
-              change24h: data.priceChange24h || 0,
-            },
-            volume: {
-              volume24h: data.vol24 || 0,
-            },
-            liquidity: {
-              total: data.liquidity || 0,
-            },
-            marketCap: data.marketCap,
-            metadata: {
-              provider: 'dexscreener',
-              timestamp: data.timestamp || Date.now(),
-              cached: false,
-              confidence: 0.8,
-            },
-          }
-
-          return {
-            success: true,
-            data: snapshot,
-            metadata: {
-              provider: 'dexscreener',
-              cached: false,
-              latency: 0,
-              retries: 0,
-            },
-          }
-        } catch (error) {
-          return {
-            success: false,
-            error: {
-              code: 'NETWORK_ERROR',
-              message: error instanceof Error ? error.message : 'Unknown error',
-              provider: 'dexscreener',
-              timestamp: Date.now(),
-            },
-            metadata: {
-              provider: 'dexscreener',
-              cached: false,
-              latency: 0,
-              retries: 0,
-            },
-          }
-        }
-      }
-    case 'pumpfun':
-      // Wrap pump.fun adapter
-      return async (address, _chain) => {
-        try {
-          const data = await getPumpfunData(address)
-          if (!data) throw new Error('Token not found')
-
-          const snapshot: MarketSnapshot = {
-            token: {
-              address,
-              symbol: data.symbol || 'UNKNOWN',
-              name: data.name || 'Unknown Token',
-              chain: 'solana',
-            },
-            price: {
-              current: 0,
-              high24h: 0,
-              low24h: 0,
-              change24h: 0,
-            },
-            volume: {
-              volume24h: 0,
-            },
-            liquidity: {
-              total: data.liquidity || 0,
-            },
-            social: {
-              website: data.socialLinks?.website,
-              twitter: data.socialLinks?.twitter,
-              telegram: data.socialLinks?.telegram,
-            },
-            metadata: {
-              provider: 'pumpfun',
-              timestamp: Date.now(),
-              cached: false,
-              confidence: 0.6,
-            },
-          }
-
-          return {
-            success: true,
-            data: snapshot,
-            metadata: {
-              provider: 'pumpfun',
-              cached: false,
-              latency: 0,
-              retries: 0,
-            },
-          }
-        } catch (error) {
-          return {
-            success: false,
-            error: {
-              code: 'NETWORK_ERROR',
-              message: error instanceof Error ? error.message : 'Unknown error',
-              provider: 'pumpfun',
-              timestamp: Date.now(),
-            },
-            metadata: {
-              provider: 'pumpfun',
-              cached: false,
-              latency: 0,
-              retries: 0,
-            },
-          }
-        }
-      }
-    default:
-      return null
-  }
-}
-
-// ============================================================================
-// ORCHESTRATION
-// ============================================================================
-
-interface FetchResult {
-  snapshot?: MarketSnapshot
-  provider: ProviderId
-  latency: number
-  error?: string
-}
-
-/**
- * Try fetching from a single provider with timeout
- */
-async function tryProvider(
+function snapshotFromMarketSnapshot(
+  snapshot: MarketSnapshot,
   provider: ProviderId,
-  address: string,
-  chain: ChainId,
-  timeout: number
-): Promise<FetchResult> {
-  const startTime = Date.now()
-
-  try {
-    const adapter = getAdapter(provider)
-    if (!adapter) {
-      throw new Error(`Unknown provider: ${provider}`)
-    }
-
-    // Race between adapter call and timeout
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Timeout')), timeout)
-    })
-
-    const response = await Promise.race([adapter(address, chain, false), timeoutPromise])
-
-    const latency = Date.now() - startTime
-
-    if (response.success && response.data) {
-      logTelemetry({
-        type: 'provider_success',
-        provider,
-        latency,
-      })
-
-      return {
-        snapshot: response.data,
-        provider,
-        latency,
-      }
-    } else {
-      const errorMsg = response.error?.message || 'Unknown error'
-      logTelemetry({
-        type: 'provider_failure',
-        provider,
-        reason: errorMsg,
-        latency,
-      })
-
-      return {
-        provider,
-        latency,
-        error: errorMsg,
-      }
-    }
-  } catch (error) {
-    const latency = Date.now() - startTime
-    const errorMsg = error instanceof Error ? error.message : 'Unknown error'
-
-    logTelemetry({
-      type: 'provider_failure',
-      provider,
-      reason: errorMsg,
-      latency,
-    })
-
-    return {
-      provider,
-      latency,
-      error: errorMsg,
-    }
-  }
-}
-
-/**
- * Get market snapshot with automatic fallback chain
- *
- * @param address - Token contract address
- * @param chain - Blockchain (default: 'solana')
- * @returns MarketSnapshot with metadata about provider used
- */
-export async function getMarketSnapshot(
-  address: string,
-  chain: ChainId = 'solana'
-): Promise<{
-  snapshot: MarketSnapshot | null
-  provider: ProviderId
-  fallbackUsed: boolean
-  attempts: number
-  totalLatency: number
-}> {
-  const startTime = Date.now()
-  const providers = [CONFIG.primary, ...CONFIG.fallbacks]
-  let attempts = 0
-
-  // Try each provider in order
-  for (const provider of providers) {
-    attempts++
-
-    const result = await tryProvider(provider, address, chain, CONFIG.timeout)
-
-    if (result.snapshot) {
-      // Success!
-      const fallbackUsed = attempts > 1
-
-      if (fallbackUsed) {
-        logTelemetry({
-          type: 'provider_switch',
-          provider,
-          reason: `Fallback after ${attempts - 1} failed attempt(s)`,
-        })
-      }
-
-      return {
-        snapshot: result.snapshot,
-        provider,
-        fallbackUsed,
-        attempts,
-        totalLatency: Date.now() - startTime,
-      }
-    }
-
-    // Log failure and try next provider
-    if (import.meta.env.DEV) {
-      console.warn(`[MarketOrchestrator] ${provider} failed: ${result.error}`)
-    }
-  }
-
-  // All providers failed
+  latencyMs: number
+): TokenSnapshot {
   return {
-    snapshot: null,
-    provider: CONFIG.primary,
-    fallbackUsed: false,
-    attempts,
-    totalLatency: Date.now() - startTime,
+    symbol: snapshot.token.symbol,
+    address: snapshot.token.address,
+    chain: snapshot.token.chain,
+    price: snapshot.price.current,
+    change24h: snapshot.price.change24h,
+    marketCap: snapshot.marketCap,
+    volume24h: snapshot.volume.volume24h,
+    provider,
+    latencyMs,
+    timestamp: snapshot.metadata.timestamp ?? Date.now(),
+    cached: snapshot.metadata.cached,
   }
 }
 
-/**
- * Get market snapshots for multiple tokens (batch)
- */
-export async function getMarketSnapshotBatch(
-  addresses: string[],
-  chain: ChainId = 'solana'
-): Promise<
-  Array<{
-    address: string
-    snapshot: MarketSnapshot | null
-    provider: ProviderId
-    fallbackUsed: boolean
-  }>
-> {
-  const results = await Promise.all(
-    addresses.map(async (address) => {
-      const result = await getMarketSnapshot(address, chain)
-      return {
-        address,
-        ...result,
-      }
-    })
-  )
+async function callAdapter(
+  provider: ProviderId,
+  adapterCall: () => Promise<AdapterResponse<MarketSnapshot>>
+): Promise<TokenSnapshot> {
+  const start = performance.now()
+  try {
+    const response = await adapterCall()
+    const latencyMs = performance.now() - start
 
-  return results
+    if (!response.success || !response.data) {
+      throw new Error(response.error?.message || 'Unknown provider error')
+    }
+
+    providerHealthTracker.recordSuccess(provider, latencyMs)
+    return snapshotFromMarketSnapshot(response.data, provider, latencyMs)
+  } catch (error) {
+    const latencyMs = performance.now() - start
+    providerHealthTracker.recordFailure(provider, error, latencyMs)
+    throw error
+  }
 }
 
-/**
- * Get current orchestrator configuration
- */
-export function getOrchestratorConfig(): OrchestratorConfig {
-  return { ...CONFIG }
+async function fetchFromMoralis(params: TokenSnapshotParams): Promise<TokenSnapshot> {
+  const chain = params.chain ?? 'solana'
+  return callAdapter('moralis', () => getMoralisSnapshot(params.address, chain, false))
 }
 
-/**
- * Reload configuration from environment (for hot-reload during dev)
- */
-export function reloadOrchestratorConfig(): void {
-  const newConfig = loadConfig()
-  Object.assign(CONFIG, newConfig)
+async function fetchFromDexPaprika(params: TokenSnapshotParams): Promise<TokenSnapshot> {
+  const chain = params.chain ?? 'solana'
+  return callAdapter('dexpaprika', () => getDexPaprikaSnapshot(params.address, chain, false))
+}
+
+async function fetchFromDexScreener(params: TokenSnapshotParams): Promise<TokenSnapshot> {
+  const start = performance.now()
+  try {
+    const response = await getDexscreenerToken(params.address)
+    const latencyMs = performance.now() - start
+
+    if (!response) {
+      throw new Error('Dexscreener returned empty response')
+    }
+
+    const snapshot: TokenSnapshot = {
+      symbol: response.symbol || params.symbol || 'UNKNOWN',
+      address: response.address ?? params.address,
+      chain: (response.chain as ChainId) || params.chain || 'solana',
+      price: response.price ?? 0,
+      change24h: response.priceChange24h,
+      marketCap: response.marketCap,
+      volume24h: response.vol24,
+      provider: 'dexscreener',
+      latencyMs,
+      timestamp: response.timestamp ?? Date.now(),
+      cached: false,
+    }
+
+    providerHealthTracker.recordSuccess('dexscreener', latencyMs)
+    return snapshot
+  } catch (error) {
+    const latencyMs = performance.now() - start
+    providerHealthTracker.recordFailure('dexscreener', error, latencyMs)
+    throw error
+  }
+}
+
+export function getProvidersSortedByHealthAndLatency(): ProviderId[] {
+  const healthSnapshots = providerHealthTracker
+    .getAllHealth()
+    .filter((snapshot) => DEFAULT_PROVIDER_ORDER.includes(snapshot.provider))
+
+  const ranked = healthSnapshots.sort((a, b) => {
+    if (a.healthScore !== b.healthScore) {
+      return b.healthScore - a.healthScore
+    }
+
+    const latencyA = a.averageLatencyMs ?? Number.POSITIVE_INFINITY
+    const latencyB = b.averageLatencyMs ?? Number.POSITIVE_INFINITY
+
+    if (latencyA !== latencyB) {
+      return latencyA - latencyB
+    }
+
+    return (
+      DEFAULT_PROVIDER_ORDER.indexOf(a.provider) - DEFAULT_PROVIDER_ORDER.indexOf(b.provider)
+    )
+  })
+
+  return ranked.map((snapshot) => snapshot.provider)
+}
+
+export async function fetchFromProviderChain(params: TokenSnapshotParams): Promise<TokenSnapshot> {
+  const errors: unknown[] = []
+  const providers = getProvidersSortedByHealthAndLatency()
+
+  for (const provider of providers) {
+    try {
+      const snapshot = await fetchFromProvider(provider, params)
+      return snapshot
+    } catch (error) {
+      errors.push({ provider, error })
+    }
+  }
+
+  throw new MarketDataUnavailableError('Unable to fetch market data from any provider', errors)
+}
+
+async function fetchFromProvider(provider: ProviderId, params: TokenSnapshotParams): Promise<TokenSnapshot> {
+  switch (provider) {
+    case 'moralis':
+      return fetchFromMoralis(params)
+    case 'dexpaprika':
+      return fetchFromDexPaprika(params)
+    case 'dexscreener':
+      return fetchFromDexScreener(params)
+    default:
+      throw new Error(`Unsupported provider ${provider}`)
+  }
+}
+
+export async function getTokenSnapshot(
+  params: TokenSnapshotParams,
+  options?: { forceRefresh?: boolean }
+): Promise<TokenSnapshot> {
+  const key = `tokenSnapshot:${params.address}:${params.chain ?? 'default'}`
+  const cacheState = swrCache.get(key).state
+  const cacheHit = cacheState !== 'miss' && !options?.forceRefresh
+
+  const start = performance.now()
+  const snapshot = await swrCache.fetch(key, () => fetchFromProviderChain(params), options)
+  const latencyMs = performance.now() - start
+
+  const resultSnapshot = cacheHit ? { ...snapshot, cached: true } : snapshot
+
+  Telemetry.log('market.provider.used', latencyMs, {
+    providerId: snapshot.provider,
+    cacheHit,
+    state: cacheState,
+    forceRefresh: options?.forceRefresh ?? false,
+  })
+
+  return resultSnapshot
+}
+
+export function resetMarketOrchestratorState(): void {
+  swrCache.clear()
+  providerHealthTracker.reset()
+}
+
+export function getMarketSnapshot(
+  address: string,
+  chain: ChainId = 'solana',
+  options?: { forceRefresh?: boolean }
+): Promise<TokenSnapshot> {
+  return getTokenSnapshot({ address, chain }, options)
 }
