@@ -28,11 +28,11 @@ export default function AlertsSnapshot() {
   const hasAlerts = totalAlerts > 0;
 
   const handleViewAll = React.useCallback(() => {
-    navigate('/alerts-v2');
+    navigate('/alerts');
   }, [navigate]);
 
   const handleCreateAlert = React.useCallback(() => {
-    navigate('/alerts-v2');
+    navigate('/alerts');
   }, [navigate]);
 
   return (

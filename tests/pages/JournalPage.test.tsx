@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, it, beforeEach, expect, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
-import JournalPageV2 from '@/pages/JournalPageV2'
+import JournalPage from '@/pages/JournalPage'
 import { useJournalStore } from '@/store/journalStore'
 import { queryEntries } from '@/lib/JournalService'
 
@@ -13,7 +13,7 @@ vi.mock('@/lib/JournalService', () => ({
   updateEntryNotes: vi.fn(),
 }))
 
-describe('JournalPageV2 cache warnings', () => {
+describe('JournalPage cache warnings', () => {
   beforeEach(() => {
     useJournalStore.setState({
       entries: [],
@@ -29,7 +29,7 @@ describe('JournalPageV2 cache warnings', () => {
 
     render(
       <MemoryRouter>
-        <JournalPageV2 />
+        <JournalPage />
       </MemoryRouter>
     )
 

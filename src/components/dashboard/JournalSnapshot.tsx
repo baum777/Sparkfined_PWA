@@ -21,7 +21,7 @@ const directionStyles: Record<JournalEntry['direction'], string> = {
 export default function JournalSnapshot({ entries }: JournalSnapshotProps) {
   const navigate = useNavigate();
 
-  const handleNavigate = React.useCallback(() => navigate('/journal-v2'), [navigate]);
+  const handleNavigate = React.useCallback(() => navigate('/journal'), [navigate]);
 
   return (
     <div className="card rounded-lg p-4">

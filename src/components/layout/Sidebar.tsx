@@ -17,6 +17,7 @@ import {
   FileText,
   Bell,
   TrendingUp,
+  Activity,
   Settings,
   ChevronRight,
   Sparkles,
@@ -37,17 +38,18 @@ const navSections: { title: string; items: NavItem[] }[] = [
   {
     title: 'Trading Workflow',
     items: [
-      { path: '/dashboard-v2', label: 'Board', Icon: Home },
-      { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
-      { path: '/chart-v2', label: 'Chart', Icon: TrendingUp },
-      { path: '/journal-v2', label: 'Journal', Icon: FileText },
-      { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
+      { path: '/dashboard', label: 'Board', Icon: Home },
+      { path: '/analysis', label: 'Analyze', Icon: BarChart3 },
+      { path: '/chart', label: 'Chart', Icon: TrendingUp },
+      { path: '/signals', label: 'Signals', Icon: Activity },
+      { path: '/journal', label: 'Journal', Icon: FileText },
+      { path: '/alerts', label: 'Alerts', Icon: Bell },
     ],
   },
   {
     title: 'Knowledge Base',
     items: [
-      { path: '/watchlist-v2', label: 'Watchlist', Icon: BookmarkPlus },
+      { path: '/watchlist', label: 'Watchlist', Icon: BookmarkPlus },
       { path: '/oracle', label: 'Oracle', Icon: Sparkles },
       { path: '/lessons', label: 'Learning', Icon: GraduationCap },
       { path: '/icons', label: 'Showcase', Icon: Star },
@@ -55,7 +57,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
   },
   {
     title: 'System',
-    items: [{ path: '/settings-v2', label: 'Settings', Icon: Settings }],
+    items: [{ path: '/settings', label: 'Settings', Icon: Settings }],
   },
 ];
 
@@ -105,6 +107,7 @@ export default function Sidebar() {
       'Board': { tour: 'board-link', testid: 'nav-board' },
       'Analyze': { tour: 'analyze-link', testid: 'nav-analyze' },
       'Chart': { tour: 'chart-link', testid: 'nav-chart' },
+      'Signals': { tour: 'signals-link', testid: 'nav-signals' },
       'Journal': { tour: 'journal-link', testid: 'nav-journal' },
       'Alerts': { tour: 'notifications-link', testid: 'nav-alerts' },
       'Watchlist': { tour: '', testid: 'nav-watchlist' },

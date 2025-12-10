@@ -33,7 +33,7 @@ const COMPACT_USD_FORMATTER = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 1,
 });
 
-export default function AnalysisPageV2() {
+export default function AnalysisPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tabFromUrl = searchParams.get("tab");
   const initialTab = tabs.some((tab) => tab.id === tabFromUrl)

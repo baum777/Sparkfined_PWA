@@ -17,6 +17,7 @@ import {
 } from "../lib/ideaPackets";
 import type { IdeaConfidence, IdeaPacket, IdeaTimeframe } from "@/types/ideas";
 
+// TODO(Product): Decide whether NotificationsPage should be kept, removed, or re-added to navigation
 export default function NotificationsPage() {
   const { rules, create, update, remove, triggers, clearTriggers, addManualTrigger } = useAlertRules();
   const { enqueue } = useTelemetry();

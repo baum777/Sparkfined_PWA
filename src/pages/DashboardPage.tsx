@@ -21,7 +21,7 @@ const dummyInsight = {
   summary: 'Market structure shows higher lows with strong momentum on intraday timeframes. Watching for pullbacks to re-enter long positions with tight risk management.',
 };
 
-export default function DashboardPageV2() {
+export default function DashboardPage() {
   const journalEntries = useJournalStore((state) => state.entries);
   const alerts = useAlertsStore((state) => state.alerts);
   const navigate = useNavigate();
@@ -111,7 +111,7 @@ export default function DashboardPageV2() {
               title="No insights yet"
               description="Run your first analysis to unlock AI bias, flow and volatility context."
               actionLabel="Go to analysis"
-              onAction={() => navigate('/analysis-v2')}
+          onAction={() => navigate('/analysis')}
             />
           }
           secondary={
@@ -120,7 +120,7 @@ export default function DashboardPageV2() {
               title="No journal entries"
               description="Log a trade or mindset note to build your streaks."
               actionLabel="Open journal"
-              onAction={() => navigate('/journal-v2')}
+          onAction={() => navigate('/journal')}
             />
           }
           tertiary={<AlertsSnapshot />}

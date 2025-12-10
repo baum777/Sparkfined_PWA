@@ -2,7 +2,7 @@
  * FilterPills - Reusable Filter Toggle Pills
  *
  * Provides consistent filter UI for all pages (Alerts, Journal, Watchlist, etc.)
- * Uses the same "segmented control" pattern as in AlertsPageV2
+ * Uses the same "segmented control" pattern as in AlertsPage
  *
  * Usage:
  * ```tsx

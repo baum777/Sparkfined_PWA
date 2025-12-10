@@ -11,15 +11,15 @@ const NotificationsPage = lazy(() => import("../pages/NotificationsPage"));
 const SignalsPage = lazy(() => import("../pages/SignalsPage"));
 const LessonsPage = lazy(() => import("../pages/LessonsPage"));
 const IconShowcase = lazy(() => import("../pages/IconShowcase"));
-const DashboardPageV2 = lazy(() => import("../pages/DashboardPageV2"));
-const AnalysisPageV2 = lazy(() => import("../pages/AnalysisPageV2"));
-const JournalPageV2 = lazy(() => import("../pages/JournalPageV2"));
+const DashboardPage = lazy(() => import("../pages/DashboardPage"));
+const AnalysisPage = lazy(() => import("../pages/AnalysisPage"));
+const JournalPage = lazy(() => import("../pages/JournalPage"));
 const JournalV2PipelinePage = lazy(() => import("../features/journal-v2/pages/JournalV2Page"));
 const OraclePage = lazy(() => import("../pages/OraclePage"));
-const WatchlistPageV2 = lazy(() => import("../pages/WatchlistPageV2"));
-const AlertsPageV2 = lazy(() => import("../pages/AlertsPageV2"));
-const ChartPageV2 = lazy(() => import("../pages/ChartPageV2"));
-const SettingsPageV2 = lazy(() => import("../pages/SettingsPageV2"));
+const WatchlistPage = lazy(() => import("../pages/WatchlistPage"));
+const AlertsPage = lazy(() => import("../pages/AlertsPage"));
+const ChartPage = lazy(() => import("../pages/ChartPage"));
+const SettingsPage = lazy(() => import("../pages/SettingsPage"));
 
 // Dev-only showcase pages (excluded from production bundle)
 const StyleShowcasePage = import.meta.env.DEV
@@ -56,30 +56,34 @@ export default function RoutesRoot() {
 
           {/* App Shell */}
           <Route element={<AppShell />}>
-            <Route path="/" element={<Navigate to="/dashboard-v2" replace />} />
-            <Route path="/dashboard" element={<Navigate to="/dashboard-v2" replace />} />
-            <Route path="/board" element={<Navigate to="/dashboard-v2" replace />} />
-            <Route path="/analyze" element={<Navigate to="/analysis-v2" replace />} />
-            <Route path="/analysis" element={<Navigate to="/analysis-v2" replace />} />
-            <Route path="/chart" element={<Navigate to="/chart-v2" replace />} />
-            <Route path="/journal" element={<Navigate to="/journal-v2" replace />} />
-            <Route path="/watchlist" element={<Navigate to="/watchlist-v2" replace />} />
-            <Route path="/alerts" element={<Navigate to="/alerts-v2" replace />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/board" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/analyze" element={<Navigate to="/analysis" replace />} />
+            <Route path="/analysis" element={<AnalysisPage />} />
+            <Route path="/chart" element={<ChartPage />} />
+            <Route path="/journal" element={<JournalPage />} />
+            <Route path="/watchlist" element={<WatchlistPage />} />
+            <Route path="/alerts" element={<AlertsPage />} />
             <Route path="/replay" element={<ReplayPage />} />
             <Route path="/replay/:sessionId" element={<ReplayPage />} />
+            {/* TODO(Product): Decide whether NotificationsPage should stay, be removed, or be re-added to navigation */}
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/signals" element={<SignalsPage />} />
             <Route path="/lessons" element={<LessonsPage />} />
-            <Route path="/dashboard-v2" element={<DashboardPageV2 />} />
-            <Route path="/watchlist-v2" element={<WatchlistPageV2 />} />
-            <Route path="/analysis-v2" element={<AnalysisPageV2 />} />
             <Route path="/journal/v2" element={<JournalV2PipelinePage />} />
-            <Route path="/journal-v2" element={<JournalPageV2 />} />
             <Route path="/oracle" element={<OraclePage />} />
-            <Route path="/alerts-v2" element={<AlertsPageV2 />} />
-            <Route path="/chart-v2" element={<ChartPageV2 />} />
-            <Route path="/settings-v2" element={<SettingsPageV2 />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/icons" element={<IconShowcase />} />
+
+            {/* Legacy V2 routes (redirect to canonical paths) */}
+            <Route path="/dashboard-v2" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/watchlist-v2" element={<Navigate to="/watchlist" replace />} />
+            <Route path="/analysis-v2" element={<Navigate to="/analysis" replace />} />
+            <Route path="/journal-v2" element={<Navigate to="/journal" replace />} />
+            <Route path="/alerts-v2" element={<Navigate to="/alerts" replace />} />
+            <Route path="/chart-v2" element={<Navigate to="/chart" replace />} />
+            <Route path="/settings-v2" element={<Navigate to="/settings" replace />} />
 
             {/* Dev-only showcase routes */}
             {import.meta.env.DEV && (

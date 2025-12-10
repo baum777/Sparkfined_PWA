@@ -309,7 +309,7 @@ function speedToMs(speed: number): number {
   }
 
   const handleViewEntry = (entryId: string) => {
-    navigate(`/journal-v2?entry=${entryId}`)
+    navigate(`/journal?entry=${entryId}`)
   }
 
   // Toggle view mode
@@ -329,7 +329,7 @@ function speedToMs(speed: number): number {
             <Button variant="ghost" size="sm" onClick={toggleViewMode}>
               {viewMode === "player" ? "View dashboard" : "View player"}
             </Button>
-            <Button variant="secondary" size="sm" onClick={() => navigate("/journal-v2")}>
+            <Button variant="secondary" size="sm" onClick={() => navigate('/journal')}>
               Journal
             </Button>
           </div>

@@ -15,6 +15,7 @@ import {
   Bell,
   BookmarkPlus,
   Sparkles,
+  Activity,
   RefreshCw,
   GraduationCap,
   Star,
@@ -34,8 +35,9 @@ interface NavigationDrawerProps {
 }
 
 const drawerItems: DrawerNavItem[] = [
-  { path: '/watchlist-v2', label: 'Watchlist', Icon: BookmarkPlus },
-  { path: '/alerts-v2', label: 'Alerts', Icon: Bell },
+  { path: '/watchlist', label: 'Watchlist', Icon: BookmarkPlus },
+  { path: '/alerts', label: 'Alerts', Icon: Bell },
+  { path: '/signals', label: 'Signals', Icon: Activity },
   { path: '/oracle', label: 'Oracle', Icon: Sparkles },
   { path: '/replay', label: 'Replay', Icon: RefreshCw },
   { path: '/lessons', label: 'Learning', Icon: GraduationCap },
@@ -45,6 +47,7 @@ const drawerItems: DrawerNavItem[] = [
 const getTestId = (label: string) => {
   const testIdMap: Record<string, string> = {
     Alerts: 'nav-alerts',
+    Signals: 'nav-signals',
     Watchlist: 'nav-watchlist',
     Oracle: 'nav-oracle',
     Replay: 'nav-replay',

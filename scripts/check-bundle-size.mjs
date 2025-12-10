@@ -41,7 +41,7 @@ const THRESHOLDS = {
   'vendor-state': 5,
   
   // Tesseract.js (OCR) - Heavy library, isolated for lazy loading
-  // Used only in SettingsPageV2 (OCR scan feature)
+  // Used only in SettingsPage (OCR scan feature)
   // Estimated: 25-30KB gzipped (lazy-loaded)
   'vendor-ocr': 35,
   
@@ -58,8 +58,8 @@ const THRESHOLDS = {
   
   // Analysis Page (token research + AI affordances)
   // Current: ~8KB gzipped
-  // FIXED: Pattern was 'analyze', actual chunk is 'AnalysisPageV2'
-  'AnalysisPageV2': 15,
+  // FIXED: Pattern was 'analyze', actual chunk is 'AnalysisPage'
+  'AnalysisPage': 15,
   
   // Chart-related app code (not the library itself!)
   // Current: ~6KB (chartTelemetry) + 0.3KB (chartLinks)
@@ -72,7 +72,7 @@ const THRESHOLDS = {
   'chunk-ai': 25,
 
   // Journal components chunk (form inputs, panels, dialogs)
-  // Lazy-loaded with JournalPageV2
+  // Lazy-loaded with JournalPage
   // Current: ~9KB gzipped
   'chunk-journal-components': 12,
 };

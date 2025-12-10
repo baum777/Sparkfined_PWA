@@ -18,7 +18,7 @@ const biasStyles: Record<InsightTeaserProps['bias'], string> = {
 export default function InsightTeaser({ title, bias, confidenceLabel, summary }: InsightTeaserProps) {
   const navigate = useNavigate();
 
-  const handleNavigate = React.useCallback(() => navigate('/analysis-v2'), [navigate]);
+  const handleNavigate = React.useCallback(() => navigate('/analysis'), [navigate]);
 
   return (
     <div className="card-glass rounded-lg p-4 hover-lift">

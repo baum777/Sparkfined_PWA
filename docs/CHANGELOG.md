@@ -2,9 +2,17 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-06
+**Last Updated:** 2025-12-07
 
 ---
+
+## 2025-12-07
+
+### Changed
+- **Navigation + V2 cleanup:** Consolidated remaining *PageV2 routes to their canonical counterparts, updated navigation surfaces (sidebar, bottom nav, drawer) to include Signals, and documented the pending product decision for Notifications.
+
+### Fixed
+- **Bottom navigation tests:** Aligned matchers with the Vitest/Chai setup (attribute assertions without jest-dom) to keep unit tests green.
 
 ## 2025-12-06
 

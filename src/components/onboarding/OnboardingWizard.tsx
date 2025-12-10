@@ -19,26 +19,26 @@ const STEPS: StepDefinition[] = [
   {
     id: 'journal',
     title: 'Journal your ritual',
-    description: 'Capture thesis, risk and emotions in /journal-v2 so every session starts with clarity.',
+    description: 'Capture thesis, risk and emotions in /journal so every session starts with clarity.',
     actionLabel: 'Open journal workspace',
     icon: BookOpen,
-    targetRoute: '/journal-v2',
+    targetRoute: '/journal',
   },
   {
     id: 'watchlist',
     title: 'Curate your watchlist',
-    description: 'Pin catalysts and conviction scores inside /watchlist-v2 to stay focused on high-quality setups.',
+    description: 'Pin catalysts and conviction scores inside /watchlist to stay focused on high-quality setups.',
     actionLabel: 'Review watchlist',
     icon: Star,
-    targetRoute: '/watchlist-v2',
+    targetRoute: '/watchlist',
   },
   {
     id: 'alerts',
     title: 'Stay ahead with alerts',
-    description: 'Route price, volume and flow triggers into /alerts-v2 before the next volatility spike.',
+    description: 'Route price, volume and flow triggers into /alerts before the next volatility spike.',
     actionLabel: 'Enable alerts',
     icon: Bell,
-    targetRoute: '/alerts-v2',
+    targetRoute: '/alerts',
   },
 ]
 

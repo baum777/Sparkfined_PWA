@@ -175,7 +175,7 @@ export default defineConfig(({ mode }) => ({
           }
 
           // 3. Tesseract.js (OCR) - Heavy library, isolate for lazy loading
-          // Used only in SettingsPageV2 (OCR scan feature)
+          // Used only in SettingsPage (OCR scan feature)
           // Estimated: ~30KB gzip
           if (id.includes('tesseract')) {
             return 'vendor-ocr';
