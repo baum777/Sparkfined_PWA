@@ -10,7 +10,7 @@ import { useSearchParams } from 'react-router-dom';
 type StatusFilter = 'all' | 'armed' | 'triggered' | 'paused';
 type TypeFilter = 'all' | 'price-above' | 'price-below';
 
-export default function AlertsPageV2() {
+export default function AlertsPage() {
   const alerts = useAlertsStore((state) => state.alerts);
   const [searchParams, setSearchParams] = useSearchParams();
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');

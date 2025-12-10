@@ -47,7 +47,7 @@ export default function LandingPage() {
             </a>
             <button
               type="button"
-              onClick={() => navigate('/dashboard-v2')}
+              onClick={() => navigate('/dashboard')}
               className="btn btn-primary btn-sm shadow-token-md"
             >
               Launch App
@@ -55,7 +55,7 @@ export default function LandingPage() {
           </div>
           <button
             type="button"
-            onClick={() => navigate('/dashboard-v2')}
+            onClick={() => navigate('/dashboard')}
             className="btn btn-primary md:hidden"
           >
             Open
@@ -88,12 +88,12 @@ export default function LandingPage() {
               <button
                 type="button"
                 className="btn btn-primary btn-lg"
-                onClick={() => navigate('/dashboard-v2')}
+                onClick={() => navigate('/dashboard')}
               >
                 Enter Command Center
                 <ArrowRight size={18} />
               </button>
-              <button type="button" className="btn btn-outline btn-lg" onClick={() => navigate('/dashboard-v2')}>
+              <button type="button" className="btn btn-outline btn-lg" onClick={() => navigate('/dashboard')}>
                 Watch 30s Demo
               </button>
             </div>
@@ -185,7 +185,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-5xl">
             <SectionHeader eyebrow="Access System" title="Pick your clearance" description="Lock in what you need. No subscriptions, no gatekeeping, just utility." />
             <div className="grid gap-6 md:grid-cols-2">
-              <PricingCard title="Free Tier" badge="Included" description="All glass primitives + offline sync" items={freeTierFeatures} cta="Start Free" onClick={() => navigate('/dashboard-v2')} />
+              <PricingCard title="Free Tier" badge="Included" description="All glass primitives + offline sync" items={freeTierFeatures} cta="Start Free" onClick={() => navigate('/dashboard')} />
               <PricingCard
                 featured
                 title="OG Tier"
@@ -234,7 +234,7 @@ export default function LandingPage() {
             <p className="text-sm uppercase tracking-[0.3em] text-secondary">Final Call</p>
             <h2 className="mt-4 text-4xl font-semibold text-primary md:text-5xl">Ready to trade smarter?</h2>
             <p className="mt-4 text-lg text-secondary">Launch the glass console. No signup, no credit card. Just focus.</p>
-            <button type="button" className="btn btn-primary btn-lg mt-8" onClick={() => navigate('/dashboard-v2')}>
+            <button type="button" className="btn btn-primary btn-lg mt-8" onClick={() => navigate('/dashboard')}>
               Launch Sparkfined →
             </button>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs uppercase tracking-widest text-tertiary">

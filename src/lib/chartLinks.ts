@@ -8,7 +8,7 @@ export function buildChartUrl(address: string, timeframe?: ChartTimeframe, opts:
   if (timeframe) params.set('timeframe', timeframe)
   if (opts.from) params.set('from', String(opts.from))
   if (opts.to) params.set('to', String(opts.to))
-  return `/chart-v2?${params.toString()}`
+  return `/chart?${params.toString()}`
 }
 
 export function buildReplayUrl(

@@ -8,11 +8,11 @@ export default function DashboardQuickActions() {
   const actions = [
     {
       label: 'Dashboard',
-      path: '/dashboard-v2',
+      path: '/dashboard',
     },
     {
       label: 'Journal',
-      path: '/journal-v2',
+      path: '/journal',
     },
     {
       label: 'Journal 2.0',
@@ -20,7 +20,7 @@ export default function DashboardQuickActions() {
     },
     {
       label: 'Analysis',
-      path: '/analysis-v2',
+      path: '/analysis',
     },
   ];
 

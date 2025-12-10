@@ -60,7 +60,7 @@ function resolveAsset(symbol?: string | null, address?: string | null, network?:
   return DEFAULT_ASSET
 }
 
-export default function ChartPageV2() {
+export default function ChartPage() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [timeframe, setTimeframe] = useState<ChartTimeframe>(resolveTimeframe(searchParams.get('timeframe')))
@@ -219,7 +219,7 @@ export default function ChartPageV2() {
         {isDefaultAsset && (
           <div className="rounded-3xl border border-info/40 bg-info/10 px-4 py-3 text-sm text-info">
             <strong>No symbol provided.</strong> Showing default chart (SOL/USDT). Select a token from the{' '}
-            <button onClick={() => navigate('/watchlist-v2')} className="underline hover:text-info/80">
+            <button onClick={() => navigate('/watchlist')} className="underline hover:text-info/80">
               Watchlist
             </button>{' '}
             to view other charts.

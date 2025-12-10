@@ -113,7 +113,7 @@ export default function LessonsPage() {
                 <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-surface">📈</span>
                 <span>Track the win rate impact of each lesson and refine filters as you progress.</span>
               </div>
-              <a className="btn btn-primary btn-sm rounded-full" href="/chart-v2">
+              <a className="btn btn-primary btn-sm rounded-full" href="/chart">
                 Analyze Your Next Chart
               </a>
             </CardContent>
@@ -203,7 +203,7 @@ export default function LessonsPage() {
                 <p className="text-sm text-text-secondary">
                   Start detecting signals and tracking trades to build your lesson library.
                 </p>
-                <a className="btn btn-primary rounded-full" href="/chart-v2">
+                <a className="btn btn-primary rounded-full" href="/chart">
                   Analyze Your First Chart
                 </a>
               </div>

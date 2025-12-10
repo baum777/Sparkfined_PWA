@@ -18,7 +18,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/Ca
 
 type DirectionFilter = 'all' | 'long' | 'short';
 
-export default function JournalPageV2() {
+export default function JournalPage() {
   const entries = useJournalStore((state) => state.entries);
   const isLoading = useJournalStore((state) => state.isLoading);
   const error = useJournalStore((state) => state.error);

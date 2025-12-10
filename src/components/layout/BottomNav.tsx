@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { Home, BarChart3, FileText, Settings, TrendingUp, Menu, type LucideIcon } from '@/lib/icons'
+import { Home, BarChart3, FileText, Settings, TrendingUp, Menu, Activity, type LucideIcon } from '@/lib/icons'
 import { NavigationDrawer } from './NavigationDrawer'
 
 interface NavItem {
@@ -10,11 +10,12 @@ interface NavItem {
 }
 
 const primaryNavItems: NavItem[] = [
-  { path: '/dashboard-v2', label: 'Board', Icon: Home },
-  { path: '/analysis-v2', label: 'Analyze', Icon: BarChart3 },
-  { path: '/chart-v2', label: 'Chart', Icon: TrendingUp },
-  { path: '/journal-v2', label: 'Journal', Icon: FileText },
-  { path: '/settings-v2', label: 'Settings', Icon: Settings },
+  { path: '/dashboard', label: 'Board', Icon: Home },
+  { path: '/analysis', label: 'Analyze', Icon: BarChart3 },
+  { path: '/chart', label: 'Chart', Icon: TrendingUp },
+  { path: '/signals', label: 'Signals', Icon: Activity },
+  { path: '/journal', label: 'Journal', Icon: FileText },
+  { path: '/settings', label: 'Settings', Icon: Settings },
 ]
 
 export default function BottomNav() {
@@ -26,6 +27,7 @@ export default function BottomNav() {
       'Board': { tour: 'board-link', testid: 'nav-board' },
       'Analyze': { tour: 'analyze-link', testid: 'nav-analyze' },
       'Chart': { tour: 'chart-link', testid: 'nav-chart' },
+      'Signals': { tour: 'signals-link', testid: 'nav-signals' },
       'Journal': { tour: 'journal-link', testid: 'nav-journal' },
       'Settings': { tour: 'settings-link', testid: 'nav-settings' },
     };
@@ -41,8 +43,8 @@ export default function BottomNav() {
         aria-label="Main navigation"
       >
         <div className="mx-auto max-w-7xl px-3 py-2">
-          <div className="grid grid-cols-6 gap-1.5">
-            {/* Primary Nav Items (5 tabs) */}
+          <div className="grid grid-cols-7 gap-1.5">
+            {/* Primary Nav Items (6 tabs) */}
             {primaryNavItems.map(({ path, label, Icon }) => {
               const { tour, testid } = getNavIds(label)
               return (

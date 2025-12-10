@@ -18,7 +18,7 @@ import { SkeletonCard, SkeletonTable } from '@/components/ui/Skeleton';
 type SessionFilter = "all" | "London" | "NY" | "Asia";
 type SortMode = "default" | "top-movers" | "alphabetical";
 
-export default function WatchlistPageV2() {
+export default function WatchlistPage() {
   const { rows, isLoading, error, hydrateFromQuotes, setLoading, setError } = useWatchlistStore((state) => ({
     rows: state.rows,
     isLoading: state.isLoading,
