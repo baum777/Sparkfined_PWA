@@ -69,7 +69,8 @@ describe('BottomNav', () => {
 
     const nav = screen.getByRole('navigation', { name: 'Main navigation' })
     const signalsLink = within(nav).getByRole('link', { name: /signals/i })
-    expect(signalsLink).toHaveAttribute('aria-current', 'page')
+    expect(signalsLink).toBeTruthy()
+    expect(signalsLink.getAttribute('aria-current')).toBe('page')
   })
 
   it('shows Signals in the navigation drawer', () => {
@@ -83,6 +84,8 @@ describe('BottomNav', () => {
     fireEvent.click(drawerTrigger)
 
     const drawer = screen.getByRole('dialog', { name: 'Secondary navigation' })
-    expect(within(drawer).getByRole('link', { name: /signals/i })).toBeInTheDocument()
+    const signalsLinkInDrawer = within(drawer).getByRole('link', { name: /signals/i })
+
+    expect(signalsLinkInDrawer).toBeTruthy()
   })
 })
