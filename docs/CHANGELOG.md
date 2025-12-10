@@ -2,7 +2,22 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-07
+**Last Updated:** 2025-12-10
+
+---
+
+## 2025-12-10
+
+### Fixed
+- **Chart color fallbacks:** Restored respect for caller-provided fallbacks while keeping missing/malformed token warnings
+  deduplicated for noisy themes.
+
+---
+
+## 2025-12-08
+
+### Fixed
+- **Chart color diagnostics:** Documented deduplicated warnings for missing or malformed chart color tokens to keep test output and developer consoles concise.
 
 ---
 

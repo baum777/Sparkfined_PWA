@@ -16,32 +16,42 @@
  * ```
  */
 
+const FALLBACK_RGB = 'rgb(0, 0, 0)';
+const missingTokenWarnings = new Set<string>();
+const invalidValueWarnings = new Set<string>();
+
 /**
  * Get computed RGB value from a CSS variable
  * @param token - CSS variable name (e.g., '--color-brand')
  * @returns RGB string (e.g., 'rgb(15, 179, 76)')
  */
-function getTokenValue(token: string): string {
+function getTokenValue(token: string, fallback: string = FALLBACK_RGB): string {
   if (typeof window === 'undefined') {
     // SSR fallback (should not happen in chart context, but defensive)
-    return 'rgb(0, 0, 0)';
+    return fallback;
   }
 
   const root = document.documentElement;
   const value = getComputedStyle(root).getPropertyValue(token).trim();
 
   if (!value) {
-    console.warn(`[chartColors] Token "${token}" not found, using fallback`);
-    return 'rgb(0, 0, 0)';
+    if (!missingTokenWarnings.has(token)) {
+      console.warn(`[chartColors] Token "${token}" not found, using fallback`);
+      missingTokenWarnings.add(token);
+    }
+    return fallback;
   }
 
   // Convert "15 179 76" to "rgb(15, 179, 76)"
   const parts = value.split(' ').map(Number);
   const [r = 0, g = 0, b = 0] = parts;
-  
+
   if (isNaN(r) || isNaN(g) || isNaN(b) || parts.length !== 3) {
-    console.warn(`[chartColors] Invalid RGB value for token "${token}": "${value}"`);
-    return 'rgb(0, 0, 0)';
+    if (!invalidValueWarnings.has(token)) {
+      console.warn(`[chartColors] Invalid RGB value for token "${token}": "${value}"`);
+      invalidValueWarnings.add(token);
+    }
+    return fallback;
   }
 
   return `rgb(${r}, ${g}, ${b})`;
@@ -99,7 +109,7 @@ export type ChartColors = ReturnType<typeof getChartColors>;
  */
 export function getChartColor(token: string, fallback: string): string {
   try {
-    return getTokenValue(token);
+    return getTokenValue(token, fallback);
   } catch {
     return fallback;
   }
