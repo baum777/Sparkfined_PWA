@@ -2,7 +2,15 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-10
+**Last Updated:** 2025-12-11
+
+---
+
+## 2025-12-11
+
+### Added
+- **Replay Lab OHLC adapters:** Documented Moralis and Dexscreener provider contracts, timeframe normalization utility,
+  and error-handling rules for the new replay data pipeline.
 
 ---
 
