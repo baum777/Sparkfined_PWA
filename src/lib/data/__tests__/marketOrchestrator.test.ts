@@ -1,30 +1,14 @@
-/**
- * Market Orchestrator Unit Tests
- *
- * Tests:
- * - Feature-flag routing (primary selection)
- * - Fallback chain execution
- * - Timeout handling
- * - Telemetry logging
- * - Provider switch detection
- *
- * @module lib/data/__tests__/marketOrchestrator.test
- */
-
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
+  fetchFromProviderChain,
   getMarketSnapshot,
-  getOrchestratorConfig,
-  getOrchestratorTelemetry,
-  clearOrchestratorTelemetry,
+  getTokenSnapshot,
+  providerHealthTracker,
+  resetMarketOrchestratorState,
 } from '../marketOrchestrator'
-import type { MarketSnapshot } from '../../../types/market'
+import type { MarketSnapshot } from '@/types/market'
+import { Telemetry } from '@/lib/TelemetryService'
 
-// ============================================================================
-// MOCKS
-// ============================================================================
-
-// Mock all adapters
 vi.mock('../../adapters/dexpaprikaAdapter', () => ({
   getDexPaprikaSnapshot: vi.fn(),
 }))
@@ -37,18 +21,9 @@ vi.mock('../../adapters/dexscreenerAdapter', () => ({
   getDexscreenerToken: vi.fn(),
 }))
 
-vi.mock('../../adapters/pumpfunAdapter', () => ({
-  getPumpfunData: vi.fn(),
-}))
-
 import { getDexPaprikaSnapshot } from '../../adapters/dexpaprikaAdapter'
 import { getMoralisSnapshot } from '../../adapters/moralisAdapter'
 import { getDexscreenerToken } from '../../adapters/dexscreenerAdapter'
-import { getPumpfunData } from '../../adapters/pumpfunAdapter'
-
-// ============================================================================
-// FIXTURES
-// ============================================================================
 
 const MOCK_SNAPSHOT: MarketSnapshot = {
   token: {
@@ -77,323 +52,131 @@ const MOCK_SNAPSHOT: MarketSnapshot = {
   },
 }
 
-// ============================================================================
-// TESTS
-// ============================================================================
-
-describe('Market Orchestrator', () => {
+describe('marketOrchestrator', () => {
   beforeEach(() => {
-    clearOrchestratorTelemetry()
+    resetMarketOrchestratorState()
+    Telemetry.clear()
     vi.clearAllMocks()
   })
 
-  describe('Configuration', () => {
-    it('should load config from environment', () => {
-      const config = getOrchestratorConfig()
-
-      expect(config.primary).toBeDefined()
-      expect(config.fallbacks).toBeInstanceOf(Array)
-      expect(config.timeout).toBeGreaterThan(0)
+  it('fetches from provider chain on cache miss', async () => {
+    vi.mocked(getMoralisSnapshot).mockResolvedValue({
+      success: true,
+      data: MOCK_SNAPSHOT,
+      metadata: { provider: 'moralis', cached: false, latency: 100, retries: 0 },
     })
+
+    const snapshot = await fetchFromProviderChain({ address: 'test123', chain: 'solana' })
+
+    expect(snapshot.provider).toBe('moralis')
+    expect(getMoralisSnapshot).toHaveBeenCalledTimes(1)
   })
 
-  describe('Primary Provider Success', () => {
-    it('should use primary provider (DexPaprika) when successful', async () => {
-      // Mock successful DexPaprika response
-      vi.mocked(getDexPaprikaSnapshot).mockResolvedValue({
+  it('returns cached value when fresh and avoids extra provider calls', async () => {
+    vi.mocked(getMoralisSnapshot).mockResolvedValue({
+      success: true,
+      data: MOCK_SNAPSHOT,
+      metadata: { provider: 'moralis', cached: false, latency: 50, retries: 0 },
+    })
+
+    const first = await getTokenSnapshot({ address: 'test123', chain: 'solana' })
+    const second = await getTokenSnapshot({ address: 'test123', chain: 'solana' })
+
+    expect(first.provider).toBe('moralis')
+    expect(second.cached).toBe(true)
+    expect(getMoralisSnapshot).toHaveBeenCalledTimes(1)
+  })
+
+  it('forces refresh when requested', async () => {
+    vi.mocked(getMoralisSnapshot)
+      .mockResolvedValueOnce({
         success: true,
-        data: MOCK_SNAPSHOT,
-        metadata: {
-          provider: 'dexpaprika',
-          cached: false,
-          latency: 100,
-          retries: 0,
-        },
+        data: { ...MOCK_SNAPSHOT, price: { ...MOCK_SNAPSHOT.price, current: 1 } },
+        metadata: { provider: 'moralis', cached: false, latency: 20, retries: 0 },
       })
-
-      const result = await getMarketSnapshot('test123', 'solana')
-
-      expect(result.snapshot).toBeDefined()
-      expect(result.provider).toBe('dexpaprika')
-      expect(result.fallbackUsed).toBe(false)
-      expect(result.attempts).toBe(1)
-      expect(getDexPaprikaSnapshot).toHaveBeenCalledTimes(1)
-    })
-
-    it('should not call fallback providers when primary succeeds', async () => {
-      vi.mocked(getDexPaprikaSnapshot).mockResolvedValue({
+      .mockResolvedValueOnce({
         success: true,
-        data: MOCK_SNAPSHOT,
-        metadata: {
-          provider: 'dexpaprika',
-          cached: false,
-          latency: 100,
-          retries: 0,
-        },
+        data: { ...MOCK_SNAPSHOT, price: { ...MOCK_SNAPSHOT.price, current: 2 } },
+        metadata: { provider: 'moralis', cached: false, latency: 30, retries: 0 },
       })
 
-      await getMarketSnapshot('test123', 'solana')
-
-      expect(getMoralisSnapshot).not.toHaveBeenCalled()
-      expect(getDexscreenerToken).not.toHaveBeenCalled()
-      expect(getPumpfunData).not.toHaveBeenCalled()
+    const first = await getTokenSnapshot({ address: 'test123', chain: 'solana' })
+    const refreshed = await getTokenSnapshot({ address: 'test123', chain: 'solana' }, {
+      forceRefresh: true,
     })
+
+    expect(first.price).toBe(1)
+    expect(refreshed.price).toBe(2)
+    expect(getMoralisSnapshot).toHaveBeenCalledTimes(2)
   })
 
-  describe('Fallback Chain', () => {
-    it('should fall back to next provider when primary fails', async () => {
-      // Primary fails
-      vi.mocked(getDexPaprikaSnapshot).mockResolvedValue({
-        success: false,
-        error: {
-          code: 'TIMEOUT',
-          message: 'Request timeout',
-          provider: 'dexpaprika',
-          timestamp: Date.now(),
-        },
-        metadata: {
-          provider: 'dexpaprika',
-          cached: false,
-          latency: 5000,
-          retries: 0,
-        },
-      })
-
-      // Fallback succeeds (Dexscreener)
-      vi.mocked(getDexscreenerToken).mockResolvedValue({
-        address: 'test123',
-        symbol: 'TEST',
-        name: 'Test Token',
-        chain: 'solana',
-        price: 1.0,
-        high24: 1.1,
-        low24: 0.9,
-        vol24: 100000,
-        liquidity: 500000,
-        marketCap: 1000000,
-        priceChange24h: 5.0,
-        timestamp: Date.now(),
-      })
-
-      const result = await getMarketSnapshot('test123', 'solana')
-
-      expect(result.snapshot).toBeDefined()
-      expect(result.provider).toBe('dexscreener')
-      expect(result.fallbackUsed).toBe(true)
-      expect(result.attempts).toBeGreaterThan(1)
+  it('falls back to next provider when primary fails', async () => {
+    vi.mocked(getMoralisSnapshot).mockRejectedValue(new Error('moralis down'))
+    vi.mocked(getDexPaprikaSnapshot).mockResolvedValue({
+      success: true,
+      data: { ...MOCK_SNAPSHOT, metadata: { ...MOCK_SNAPSHOT.metadata, provider: 'dexpaprika' } },
+      metadata: { provider: 'dexpaprika', cached: false, latency: 40, retries: 0 },
     })
 
-    it('should try all providers in fallback chain', async () => {
-      // All providers fail except last
-      vi.mocked(getDexPaprikaSnapshot).mockResolvedValue({
-        success: false,
-        error: {
-          code: 'NETWORK_ERROR',
-          message: 'Network error',
-          provider: 'dexpaprika',
-          timestamp: Date.now(),
-        },
-        metadata: {
-          provider: 'dexpaprika',
-          cached: false,
-          latency: 1000,
-          retries: 0,
-        },
-      })
-
-      vi.mocked(getDexscreenerToken).mockRejectedValue(new Error('Failed'))
-
-      // Pump.fun succeeds
-      vi.mocked(getPumpfunData).mockResolvedValue({
-        name: 'Test Token',
-        symbol: 'TEST',
-        liquidity: 500000,
-        launchDate: new Date().toISOString(),
-        bondingCurve: 0.5,
-        creatorAddress: 'creator123',
-        socialLinks: {
-          website: 'https://test.com',
-          twitter: 'https://twitter.com/test',
-        },
-      })
-
-      const result = await getMarketSnapshot('test123', 'solana')
-
-      expect(result.snapshot).toBeDefined()
-      expect(result.provider).toBe('pumpfun')
-      expect(result.fallbackUsed).toBe(true)
+    const snapshot = await getTokenSnapshot({ address: 'test123', chain: 'solana' }, {
+      forceRefresh: true,
     })
 
-    it('should return null when all providers fail', async () => {
-      // All providers fail
-      vi.mocked(getDexPaprikaSnapshot).mockResolvedValue({
-        success: false,
-        error: {
-          code: 'NETWORK_ERROR',
-          message: 'Network error',
-          provider: 'dexpaprika',
-          timestamp: Date.now(),
-        },
-        metadata: {
-          provider: 'dexpaprika',
-          cached: false,
-          latency: 1000,
-          retries: 0,
-        },
-      })
-
-      vi.mocked(getDexscreenerToken).mockRejectedValue(new Error('Failed'))
-      vi.mocked(getPumpfunData).mockRejectedValue(new Error('Failed'))
-
-      const result = await getMarketSnapshot('test123', 'solana')
-
-      expect(result.snapshot).toBeNull()
-      expect(result.attempts).toBeGreaterThan(1)
-    })
+    expect(snapshot.provider).toBe('dexpaprika')
+    expect(providerHealthTracker.getHealth('moralis').failureCount).toBe(1)
   })
 
-  describe('Telemetry', () => {
-    it('should log provider success events', async () => {
-      vi.mocked(getDexPaprikaSnapshot).mockResolvedValue({
-        success: true,
-        data: MOCK_SNAPSHOT,
-        metadata: {
-          provider: 'dexpaprika',
-          cached: false,
-          latency: 100,
-          retries: 0,
-        },
-      })
+  it('prioritizes providers with better health and latency', async () => {
+    providerHealthTracker.recordSuccess('dexscreener', 80)
+    providerHealthTracker.recordFailure('moralis', new Error('bad'))
+    providerHealthTracker.recordFailure('dexpaprika', new Error('bad'))
 
-      await getMarketSnapshot('test123', 'solana')
-
-      const events = getOrchestratorTelemetry()
-      const successEvents = events.filter((e) => e.type === 'provider_success')
-
-      expect(successEvents.length).toBeGreaterThan(0)
-      expect(successEvents[0]?.provider).toBe('dexpaprika')
+    vi.mocked(getDexscreenerToken).mockResolvedValue({
+      address: 'test123',
+      symbol: 'TEST',
+      chain: 'solana',
+      price: 2,
+      high24: 0,
+      low24: 0,
+      vol24: 500,
+      liquidity: 1000,
+      marketCap: 2000,
+      priceChange24h: 3,
+      timestamp: Date.now(),
     })
 
-    it('should log provider failure events', async () => {
-      vi.mocked(getDexPaprikaSnapshot).mockResolvedValue({
-        success: false,
-        error: {
-          code: 'TIMEOUT',
-          message: 'Timeout',
-          provider: 'dexpaprika',
-          timestamp: Date.now(),
-        },
-        metadata: {
-          provider: 'dexpaprika',
-          cached: false,
-          latency: 5000,
-          retries: 0,
-        },
-      })
+    const snapshot = await fetchFromProviderChain({ address: 'test123', chain: 'solana' })
 
-      vi.mocked(getDexscreenerToken).mockResolvedValue({
-        address: 'test123',
-        symbol: 'TEST',
-        name: 'Test Token',
-        chain: 'solana',
-        price: 1.0,
-        high24: 1.1,
-        low24: 0.9,
-        vol24: 100000,
-        liquidity: 500000,
-        marketCap: 1000000,
-        priceChange24h: 5.0,
-        timestamp: Date.now(),
-      })
-
-      await getMarketSnapshot('test123', 'solana')
-
-      const events = getOrchestratorTelemetry()
-      const failureEvents = events.filter((e) => e.type === 'provider_failure')
-
-      expect(failureEvents.length).toBeGreaterThan(0)
-      expect(failureEvents[0]?.provider).toBe('dexpaprika')
-    })
-
-    it('should log provider switch events when fallback is used', async () => {
-      vi.mocked(getDexPaprikaSnapshot).mockResolvedValue({
-        success: false,
-        error: {
-          code: 'NETWORK_ERROR',
-          message: 'Failed',
-          provider: 'dexpaprika',
-          timestamp: Date.now(),
-        },
-        metadata: {
-          provider: 'dexpaprika',
-          cached: false,
-          latency: 1000,
-          retries: 0,
-        },
-      })
-
-      vi.mocked(getDexscreenerToken).mockResolvedValue({
-        address: 'test123',
-        symbol: 'TEST',
-        name: 'Test Token',
-        chain: 'solana',
-        price: 1.0,
-        high24: 1.1,
-        low24: 0.9,
-        vol24: 100000,
-        liquidity: 500000,
-        marketCap: 1000000,
-        priceChange24h: 5.0,
-        timestamp: Date.now(),
-      })
-
-      await getMarketSnapshot('test123', 'solana')
-
-      const events = getOrchestratorTelemetry()
-      const switchEvents = events.filter((e) => e.type === 'provider_switch')
-
-      expect(switchEvents.length).toBeGreaterThan(0)
-      expect(switchEvents[0]?.provider).toBe('dexscreener')
-    })
+    expect(snapshot.provider).toBe('dexscreener')
+    expect(getMoralisSnapshot).not.toHaveBeenCalled()
   })
 
-  describe('Performance', () => {
-    it('should track total latency across all attempts', async () => {
-      vi.useFakeTimers()
-      vi.setSystemTime(new Date('2025-01-01T00:00:00.000Z'))
-
-      try {
-        vi.mocked(getDexPaprikaSnapshot).mockImplementation(
-          () =>
-            new Promise((resolve) =>
-              setTimeout(
-                () =>
-                  resolve({
-                    success: true,
-                    data: MOCK_SNAPSHOT,
-                    metadata: {
-                      provider: 'dexpaprika',
-                      cached: false,
-                      latency: 100,
-                      retries: 0,
-                    },
-                  }),
-                100
-              )
-            )
-        )
-
-        const resultPromise = getMarketSnapshot('test123', 'solana')
-
-        await vi.advanceTimersByTimeAsync(100)
-        const result = await resultPromise
-
-        expect(result.totalLatency).toBeGreaterThan(0)
-        expect(result.totalLatency).toBe(100)
-      } finally {
-        vi.clearAllTimers()
-        vi.useRealTimers()
-      }
+  it('logs telemetry for provider usage', async () => {
+    vi.mocked(getMoralisSnapshot).mockResolvedValue({
+      success: true,
+      data: MOCK_SNAPSHOT,
+      metadata: { provider: 'moralis', cached: false, latency: 20, retries: 0 },
     })
+
+    await getTokenSnapshot({ address: 'test123', chain: 'solana' })
+    const events = Telemetry.dump().events.filter((event) => event.name === 'market.provider.used')
+
+    expect(events.length).toBeGreaterThan(0)
+    expect(events[0]?.metadata?.providerId).toBe('moralis')
+    expect(events[0]?.metadata?.state).toBe('miss')
+  })
+
+  it('returns cached snapshot when calling getMarketSnapshot alias', async () => {
+    vi.mocked(getMoralisSnapshot).mockResolvedValue({
+      success: true,
+      data: MOCK_SNAPSHOT,
+      metadata: { provider: 'moralis', cached: false, latency: 10, retries: 0 },
+    })
+
+    await getMarketSnapshot('test123', 'solana')
+    const cached = await getMarketSnapshot('test123', 'solana')
+
+    expect(cached.cached).toBe(true)
+    expect(getMoralisSnapshot).toHaveBeenCalledTimes(1)
   })
 })
