@@ -2,7 +2,14 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-07
+**Last Updated:** 2025-12-08
+
+---
+
+## 2025-12-08
+
+### Fixed
+- **Chart color diagnostics:** Documented deduplicated warnings for missing or malformed chart color tokens to keep test output and developer consoles concise.
 
 ---
 
