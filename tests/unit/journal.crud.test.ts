@@ -23,6 +23,8 @@ import {
   closeEntry,
   exportEntries,
   importJournalEntries,
+  addScreenshotToEntry,
+  createJournalEntryFromChart,
 } from '@/lib/JournalService';
 import { initDB, resetDbInstance } from '@/lib/db';
 import type { JournalEntry, JournalImportPayload, TradeOutcome } from '@/types/journal';
@@ -92,6 +94,8 @@ describe('Journal CRUD Operations', () => {
   afterEach(async () => {
     // Cleanup: reset IndexedDB between tests
     vi.clearAllMocks();
+    vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   describe('Create Entry', () => {
@@ -771,6 +775,68 @@ describe('Journal CRUD Operations', () => {
       expect(minimal.outcome).toBeUndefined();
       expect(minimal.grokContext).toBeUndefined();
       expect(minimal.chartSnapshot).toBeUndefined();
+    });
+  });
+
+  describe('Screenshots', () => {
+    it('adds screenshot metadata to an existing entry', async () => {
+      const capturedAtIso = '2025-01-02T03:04:05.000Z';
+
+      const entry = await createEntry({
+        ticker: 'SHOT',
+        address: 'shot-address',
+        setup: 'custom',
+        emotion: 'custom',
+        status: 'active',
+        timestamp: Date.now(),
+      });
+
+      await addScreenshotToEntry(entry.id, 'data:image/png;base64,abc123', capturedAtIso);
+
+      const updated = await getEntry(entry.id);
+      expect(updated?.screenshot).toBe('data:image/png;base64,abc123');
+      expect(updated?.screenshotCapturedAt).toBe(capturedAtIso);
+    });
+
+    it('creates a chart entry with screenshot context', async () => {
+      const capturedAt = new Date('2025-01-05T00:00:00.000Z').getTime();
+      vi.spyOn(Date, 'now').mockReturnValue(capturedAt);
+
+      const created = await createJournalEntryFromChart({
+        title: 'Chart save',
+        note: 'Captured after breakout',
+        screenshotDataURL: 'data:image/jpeg;base64,chart',
+        symbol: 'eth',
+        timeframe: '1h',
+      });
+
+      expect(created.ticker).toBe('ETH');
+      expect(created.status).toBe('active');
+      expect(created.screenshot).toBe('data:image/jpeg;base64,chart');
+      expect(created.screenshotCapturedAt).toBe('2025-01-05T00:00:00.000Z');
+      expect(created.customTags).toEqual(['timeframe:1h']);
+      expect(created.thesis).toContain('Chart save');
+
+      const persisted = await getEntry(created.id);
+      expect(persisted?.screenshot).toBe('data:image/jpeg;base64,chart');
+      expect(persisted?.screenshotCapturedAt).toBe('2025-01-05T00:00:00.000Z');
+    });
+
+    it('persists screenshot fields through Dexie v6 schema', async () => {
+      const created = await createEntry({
+        ticker: 'DEXIE',
+        address: 'dexie-address',
+        setup: 'custom',
+        emotion: 'custom',
+        status: 'active',
+        timestamp: Date.now(),
+        screenshot: 'data:image/png;base64,dexie',
+        screenshotCapturedAt: '2025-02-01T10:00:00.000Z',
+      });
+
+      const fetched = await getEntry(created.id);
+      expect(fetched?.screenshot).toBe('data:image/png;base64,dexie');
+      expect(fetched?.screenshotCapturedAt).toBe('2025-02-01T10:00:00.000Z');
     });
   });
 

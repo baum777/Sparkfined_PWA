@@ -2,7 +2,7 @@
 // Handles trades, events, metrics, feedback, journal, and replay storage with offline-first approach
 
 const DB_NAME = 'sparkfined-ta-pwa'
-const DB_VERSION = 5 // Bumped for journal schema migration (v5)
+const DB_VERSION = 6 // Bumped for journal screenshot fields (v6)
 
 export interface TradeEntry {
   id?: number
@@ -74,10 +74,25 @@ function normalizeJournalEntryV5(entry: any): JournalEntry {
     outcome: entry.outcome,
     customTags: entry.customTags || entry.tags,
     journeyMeta: entry.journeyMeta,
+    screenshot: entry.screenshot,
+    screenshotCapturedAt: entry.screenshotCapturedAt,
   }
 }
 
 function migrateJournalEntriesToV5(transaction: IDBTransaction): void {
+  const store = transaction.objectStore('journal_entries')
+  const getAllRequest = store.getAll()
+
+  getAllRequest.onsuccess = () => {
+    const entries = (getAllRequest.result || []) as JournalEntry[]
+    entries.forEach((entry) => {
+      const normalized = normalizeJournalEntryV5(entry)
+      store.put(normalized)
+    })
+  }
+}
+
+function migrateJournalEntriesToV6(transaction: IDBTransaction): void {
   const store = transaction.objectStore('journal_entries')
   const getAllRequest = store.getAll()
 
@@ -186,6 +201,9 @@ export async function initDB(): Promise<IDBDatabase> {
 
       if (event.oldVersion < 5 && request.transaction?.objectStoreNames.contains('journal_entries')) {
         migrateJournalEntriesToV5(request.transaction)
+      }
+      if (event.oldVersion < 6 && request.transaction?.objectStoreNames.contains('journal_entries')) {
+        migrateJournalEntriesToV6(request.transaction)
       }
     }
   })
