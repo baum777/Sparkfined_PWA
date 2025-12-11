@@ -193,6 +193,48 @@ export async function updateEntryNotes(
   return updated
 }
 
+export async function addScreenshotToEntry(
+  entryId: string,
+  screenshotDataURL: string,
+  capturedAt: string = new Date().toISOString(),
+): Promise<void> {
+  const existing = await getEntry(entryId)
+  if (!existing) {
+    throw new Error(`Journal entry ${entryId} not found`)
+  }
+
+  await updateEntry(entryId, {
+    screenshot: screenshotDataURL,
+    screenshotCapturedAt: capturedAt,
+  })
+}
+
+export async function createJournalEntryFromChart(params: {
+  title?: string
+  note?: string
+  screenshotDataURL: string
+  symbol?: string
+  timeframe?: string
+}): Promise<JournalEntry> {
+  const now = Date.now()
+  const capturedAt = new Date(now).toISOString()
+  const thesisSections = [params.title?.trim(), params.note?.trim()].filter(Boolean)
+  const ticker = params.symbol?.trim()?.toUpperCase() || 'MANUAL'
+
+  return createEntry({
+    ticker,
+    address: 'manual-entry',
+    setup: 'custom',
+    emotion: 'custom',
+    status: 'active',
+    timestamp: now,
+    thesis: thesisSections.length ? thesisSections.join('\n\n') : undefined,
+    customTags: params.timeframe ? [`timeframe:${params.timeframe}`] : undefined,
+    screenshot: params.screenshotDataURL,
+    screenshotCapturedAt: capturedAt,
+  })
+}
+
 /**
  * Get a single journal entry by ID
  * @param id - Entry ID
@@ -679,6 +721,8 @@ function ensureCurrentSchema(entry: JournalEntry | LegacyJournalEntryV4): Journa
       timestamp,
       createdAt: entry.createdAt ?? timestamp,
       updatedAt: entry.updatedAt ?? timestamp,
+      screenshot: entry.screenshot,
+      screenshotCapturedAt: entry.screenshotCapturedAt,
     }
   }
 
