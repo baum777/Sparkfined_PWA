@@ -10,7 +10,7 @@ export interface ThemeContextValue {
   setTheme: (next: ThemeMode) => void
 }
 
-const THEME_STORAGE_KEY = 'sparkfined.theme.v1'
+export const THEME_STORAGE_KEY = 'sparkfined.theme.v1'
 
 export const ThemeContext = React.createContext<ThemeContextValue | null>(null)
 

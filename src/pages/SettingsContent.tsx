@@ -1,10 +1,11 @@
 import React from "react";
 import { useSettings } from "../state/settings";
-import { KEYS, exportAppData, downloadJson, importAppData, clearNs, clearCaches, pokeServiceWorker, type NamespaceKey } from "../lib/datastore";
+import { KEYS, clearNs, clearCaches, pokeServiceWorker, type NamespaceKey } from "../lib/datastore";
 import { useTelemetry } from "../state/telemetry";
 import { useAISettings } from "../state/ai";
 import { useAIContext } from "../state/aiContext";
 import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from "../lib/walletMonitor";
+import JournalDataControls from "@/components/settings/JournalDataControls";
 import Button from "@/components/ui/Button";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useTheme, type ThemeMode } from "@/lib/theme/useTheme";
@@ -25,14 +26,6 @@ export default function SettingsContent({
   const resetOnboarding = useOnboardingStore((state) => state.resetOnboarding);
   const [busy, setBusy] = React.useState<string | null>(null);
   const [msg, setMsg] = React.useState<string | null>(null);
-  const [pick, setPick] = React.useState<Record<NamespaceKey, boolean>>(() => {
-    const base: Record<NamespaceKey, boolean> = {
-      settings: true, watchlist: true, alerts: true, alertTriggers: true,
-      sessions: true, bookmarks: true, events: true, journal: true
-    };
-    return base;
-  });
-  const fileRef = React.useRef<HTMLInputElement | null>(null);
 
   // BLOCK 2: Wallet monitoring state
   const [walletAddress, setWalletAddress] = React.useState(() => {
@@ -194,45 +187,8 @@ export default function SettingsContent({
       </div>
 
       {/* Data Export / Import */}
-      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">Daten — Export / Import</h2>
-      <div className="rounded-2xl border border-border bg-surface/80 p-4 shadow-card-subtle">
-        <div className="mb-2 text-xs text-text-tertiary">Wähle Bereiche für Export:</div>
-        <div className="mb-3 grid grid-cols-2 gap-2 text-xs text-text-primary md:grid-cols-3">
-          {Object.keys(KEYS).map(k => {
-            const key = k as NamespaceKey;
-            return (
-              <label key={k} className="inline-flex items-center gap-2">
-                <input type="checkbox" checked={!!pick[key]} onChange={()=>setPick(p=>({ ...p, [key]: !p[key] }))}/>
-                <span>{k}</span>
-              </label>
-            );
-          })}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-primary transition hover:bg-interactive-hover"
-            onClick={()=>{
-              const selected = Object.entries(pick).filter(([,v])=>v).map(([k])=>k as NamespaceKey);
-              const payload = exportAppData(selected);
-              downloadJson(`sparkfined-backup-${new Date().toISOString().slice(0,10)}.json`, payload);
-            }}
-          >Export JSON</button>
-          <input ref={fileRef} type="file" accept="application/json" className="hidden"
-                 onChange={async (e)=>{
-                   const f = e.currentTarget.files?.[0]; if (!f) return;
-                   setBusy("Import…"); setMsg(null);
-                   try {
-                     const res = await importAppData(f, "merge");
-                     setMsg(`Import erfolgreich: ${res.imported.join(", ")}`);
-                   } catch(e:any){ setMsg(`Import-Fehler: ${e?.message||e}`); }
-                   setBusy(null); e.currentTarget.value = "";
-                 }} />
-          <button className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-primary transition hover:bg-interactive-hover"
-                  onClick={()=>fileRef.current?.click()}>Import JSON (Merge)</button>
-        </div>
-        {busy && <div className="mt-2 text-[11px] text-text-secondary">{busy}</div>}
-        {msg &&  <div className="mt-2 text-[11px] text-success">{msg}</div>}
-      </div>
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">Data Export &amp; Backup</h2>
+      <JournalDataControls />
 
       {/* Danger Zone */}
       <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">Danger Zone</h2>
@@ -385,6 +341,8 @@ export default function SettingsContent({
           <div>Build: <span className="text-text-primary">{import.meta.env.MODE}</span></div>
           <div>VAPID: <span className={import.meta.env.VITE_VAPID_PUBLIC_KEY ? "text-success" : "text-danger"}>{import.meta.env.VITE_VAPID_PUBLIC_KEY ? "configured" : "missing"}</span></div>
         </div>
+        {busy && <div className="mt-2 text-[11px] text-text-secondary">{busy}</div>}
+        {msg && <div className="mt-1 text-[11px] text-success">{msg}</div>}
       </div>
     </div>
   );
