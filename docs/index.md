@@ -56,6 +56,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 - **`docs/journal/journal-v2-migration.md`** – Leitfaden zur Migration der Legacy-Journal-Einträge in die neue Journal-2.0-Pipeline (Dexie, Pipeline-Aufruf, manueller Trigger).
 
+## 📦 Neue Ergänzungen (2025-12-12)
+
+ - **`docs/architecture/ai-cache-layer.md`** – Basis-Abstraktion, Key-Schema, TTL-Defaults und Orchestrator-Integration (AC1-AC3).
+
 ## 📦 Documentation Governance (2025-12-04)
 
 ### Governance Audit & Rules

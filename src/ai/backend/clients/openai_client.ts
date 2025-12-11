@@ -34,9 +34,17 @@ export class OpenAIClient {
     this.fetchImpl = config.fetchImpl ?? fetch;
   }
 
-  async analyzeMarket(payload: MarketPayload): Promise<BulletAnalysis> {
+  getModel(): string {
+    return this.model;
+  }
+
+  getTemperature(): number {
+    return this.temperature;
+  }
+
+  async renderMarketPrompt(payload: MarketPayload): Promise<string> {
     const atrValue = payload.indicators?.atr;
-    const prompt = await renderPrompt("task_prompt_openai.md", {
+    return renderPrompt("task_prompt_openai.md", {
       ticker: payload.ticker,
       timeframe: payload.timeframe,
       price: payload.price.toFixed(2),
@@ -45,6 +53,10 @@ export class OpenAIClient {
       onchain: payload.onchain ?? {},
       meta: payload.meta,
     });
+  }
+
+  async analyzeMarket(payload: MarketPayload, options: { prompt?: string } = {}): Promise<BulletAnalysis> {
+    const prompt = options.prompt ?? (await this.renderMarketPrompt(payload));
 
     const body = {
       model: this.model,
