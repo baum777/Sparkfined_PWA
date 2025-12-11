@@ -4,6 +4,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AIOrchestrator, SANITY_WARNING, mergeJournalFields, validateBulletResponse } from "@/ai/backend/orchestrator.js";
 import { withExponentialBackoff } from "@/ai/backend/retry.js";
 import type { MarketPayload, SocialAnalysis } from "@/types/ai";
+import { getCachedAIResponse, setAICacheStore } from "@/lib/ai/cache/aiCache";
+import { buildAICacheKey } from "@/lib/ai/cache/aiCacheKey";
+import { createInMemoryAICacheStore } from "@/lib/ai/cache/aiCacheStore";
 
 vi.mock("@/lib/ai/heuristics", () => ({
   sanityCheck: vi.fn((bullets: string[]) => bullets),
@@ -17,6 +20,7 @@ const sanityCheckMock = vi.mocked(sanityCheck);
 beforeEach(() => {
   sanityCheckMock.mockReset();
   sanityCheckMock.mockImplementation((bullets: string[]) => bullets);
+  setAICacheStore(createInMemoryAICacheStore());
 });
 
 const fixturePath = path.resolve(process.cwd(), "tests", "unit", "ai", "backend", "fixtures", "btc_payload.json");
@@ -78,6 +82,9 @@ describe("AIOrchestrator", () => {
           ],
           source_trace: { price_source: "dexpaprika" },
         })),
+        renderMarketPrompt: vi.fn(async () => "market prompt"),
+        getModel: () => "test-mini",
+        getTemperature: () => 0.2,
       } as unknown as any,
       grokClient: {
         analyzeSocial: vi.fn(async () => ({
@@ -103,6 +110,9 @@ describe("AIOrchestrator", () => {
           source_trace: { social_provider: "xapi" },
           social_review_required: false,
         } satisfies SocialAnalysis)),
+        renderSocialPrompt: vi.fn(async () => "social prompt"),
+        getModel: () => "grok-4-mini",
+        getTemperature: () => 0.2,
       } as unknown as any,
       random: () => 0,
     });
@@ -139,6 +149,9 @@ describe("AIOrchestrator", () => {
           ],
           source_trace: { price_source: "dexpaprika" },
         })),
+        renderMarketPrompt: vi.fn(async () => "market prompt"),
+        getModel: () => "test-mini",
+        getTemperature: () => 0.2,
       } as unknown as any,
       grokClient: {
         analyzeSocial: vi.fn(async () => ({
@@ -154,6 +167,9 @@ describe("AIOrchestrator", () => {
           source_trace: { social_provider: "xapi" },
           social_review_required: true,
         } satisfies Partial<SocialAnalysis> as SocialAnalysis)),
+        renderSocialPrompt: vi.fn(async () => "social prompt"),
+        getModel: () => "grok-4-mini",
+        getTemperature: () => 0.2,
       } as unknown as any,
       random: () => 0,
     });
@@ -190,9 +206,15 @@ describe("AIOrchestrator", () => {
           ],
           source_trace: { price_source: "dexpaprika" },
         })),
+        renderMarketPrompt: vi.fn(async () => "market prompt"),
+        getModel: () => "test-mini",
+        getTemperature: () => 0.2,
       } as unknown as any,
       grokClient: {
         analyzeSocial: vi.fn(),
+        renderSocialPrompt: vi.fn(async () => "social prompt"),
+        getModel: () => "grok-4-mini",
+        getTemperature: () => 0.2,
       } as unknown as any,
       random: () => 0.99,
       socialSampleRate: 0.1,
@@ -212,9 +234,15 @@ describe("AIOrchestrator", () => {
           bullets: undefined as unknown as string[],
           source_trace: { price_source: "dexpaprika" },
         })),
+        renderMarketPrompt: vi.fn(async () => "market prompt"),
+        getModel: () => "test-mini",
+        getTemperature: () => 0.2,
       } as unknown as any,
       grokClient: {
         analyzeSocial: vi.fn(),
+        renderSocialPrompt: vi.fn(async () => "social prompt"),
+        getModel: () => "grok-4-mini",
+        getTemperature: () => 0.2,
       } as unknown as any,
       random: () => 1,
       socialSampleRate: 0,
@@ -249,9 +277,15 @@ describe("AIOrchestrator", () => {
           ],
           source_trace: { price_source: "dexpaprika" },
         })),
+        renderMarketPrompt: vi.fn(async () => "market prompt"),
+        getModel: () => "test-mini",
+        getTemperature: () => 0.2,
       } as unknown as any,
       grokClient: {
         analyzeSocial: vi.fn(),
+        renderSocialPrompt: vi.fn(async () => "social prompt"),
+        getModel: () => "grok-4-mini",
+        getTemperature: () => 0.2,
       } as unknown as any,
       random: () => 1,
       socialSampleRate: 0,
@@ -260,5 +294,169 @@ describe("AIOrchestrator", () => {
     const result = await orchestrator.generateAnalysis(payload, { posts: [] });
     expect(result.marketAnalysis.bullets).toEqual(adjustedBullets);
     expect(result.meta.warnings).toContain(SANITY_WARNING);
+  });
+
+  it("uses cached market analysis on repeated requests", async () => {
+    const payload = await loadPayload();
+    const analyzeMarket = vi.fn(async () => ({
+      provider: "openai",
+      model: "test-mini",
+      bullets: ["a", "b", "c", "d"],
+      source_trace: { price_source: "dexpaprika" },
+    }));
+
+    const renderMarketPrompt = vi.fn(async () => "cached-market-prompt");
+
+    const orchestrator = new AIOrchestrator({
+      openaiClient: {
+        analyzeMarket,
+        renderMarketPrompt,
+        getModel: () => "test-mini",
+        getTemperature: () => 0.2,
+      } as unknown as any,
+      grokClient: {
+        analyzeSocial: vi.fn(),
+        renderSocialPrompt: vi.fn(async () => "social prompt"),
+        getModel: () => "grok-4-mini",
+        getTemperature: () => 0.2,
+      } as unknown as any,
+      random: () => 1,
+      socialSampleRate: 0,
+      now: () => 1_700_000_000_000,
+    });
+
+    const cacheKey = buildAICacheKey({
+      provider: "openai",
+      model: "test-mini",
+      systemPrompt: "task_prompt_openai.md",
+      userPrompt: "cached-market-prompt",
+      temperature: 0.2,
+    });
+
+    await orchestrator.generateAnalysis(payload, { posts: [] });
+
+    const cached = await getCachedAIResponse(cacheKey);
+
+    await orchestrator.generateAnalysis(payload, { posts: [] });
+
+    expect(cached.hit).toBe(true);
+    expect(analyzeMarket).toHaveBeenCalledTimes(1);
+    expect(renderMarketPrompt).toHaveBeenCalledTimes(2);
+  });
+
+  it("caches social analysis when inputs are identical", async () => {
+    const payload = await loadPayload();
+    const analyzeSocial = vi.fn(async () => ({
+      provider: "grok",
+      model: "grok-4-mini",
+      mode: "newest",
+      thesis: "Buzz",
+      bullets: ["Social buzz"],
+      sentiment: 0.5,
+      confidence: 0.7,
+      aggregates: { positive: 5, neutral: 3, negative: 2 },
+      posts: [],
+      narrative_lore: "",
+      source_trace: { social_provider: "xapi" },
+      social_review_required: false,
+    } satisfies SocialAnalysis));
+
+    const renderMarketPrompt = vi.fn(async () => "market prompt");
+    const renderSocialPrompt = vi.fn(async () => "social prompt");
+
+    const orchestrator = new AIOrchestrator({
+      openaiClient: {
+        analyzeMarket: vi.fn(async () => ({
+          provider: "openai",
+          model: "test-mini",
+          bullets: ["a", "b", "c", "d"],
+          source_trace: { price_source: "dexpaprika" },
+        })),
+        renderMarketPrompt,
+        getModel: () => "test-mini",
+        getTemperature: () => 0.2,
+      } as unknown as any,
+      grokClient: {
+        analyzeSocial,
+        renderSocialPrompt,
+        getModel: () => "grok-4-mini",
+        getTemperature: () => 0.2,
+      } as unknown as any,
+      random: () => 0,
+      socialSampleRate: 1,
+      now: () => 1_700_000_000_000,
+    });
+
+    const posts = [
+      {
+        id: "p1",
+        text: "Signal",
+        created_at: "2025-11-11T10:00:00Z",
+        source: "x",
+        author: { id: "user123", followers: 120, created_at: "2020-01-01T00:00:00Z" },
+      },
+    ];
+
+    const cacheKey = buildAICacheKey({
+      provider: "grok",
+      model: "grok-4-mini",
+      systemPrompt: "task_prompt_grok.md",
+      userPrompt: "social prompt",
+      temperature: 0.2,
+    });
+
+    await orchestrator.generateAnalysis(payload, { posts });
+
+    const cached = await getCachedAIResponse(cacheKey);
+
+    await orchestrator.generateAnalysis(payload, { posts });
+
+    expect(cached.hit).toBe(true);
+    expect(analyzeSocial).toHaveBeenCalledTimes(1);
+    expect(renderSocialPrompt).toHaveBeenCalledTimes(2);
+  });
+
+  it("continues when cache store fails", async () => {
+    const payload = await loadPayload();
+
+    setAICacheStore({
+      get: vi.fn(async () => {
+        throw new Error("boom");
+      }),
+      set: vi.fn(async () => {
+        throw new Error("write failed");
+      }),
+      del: vi.fn(async () => {}),
+    });
+
+    const analyzeMarket = vi.fn(async () => ({
+      provider: "openai",
+      model: "test-mini",
+      bullets: ["a", "b", "c", "d"],
+      source_trace: { price_source: "dexpaprika" },
+    }));
+
+    const orchestrator = new AIOrchestrator({
+      openaiClient: {
+        analyzeMarket,
+        renderMarketPrompt: vi.fn(async () => "market prompt"),
+        getModel: () => "test-mini",
+        getTemperature: () => 0.2,
+      } as unknown as any,
+      grokClient: {
+        analyzeSocial: vi.fn(),
+        renderSocialPrompt: vi.fn(async () => "social prompt"),
+        getModel: () => "grok-4-mini",
+        getTemperature: () => 0.2,
+      } as unknown as any,
+      random: () => 1,
+      socialSampleRate: 0,
+      now: () => 1_700_000_000_000,
+    });
+
+    const result = await orchestrator.generateAnalysis(payload, { posts: [] });
+
+    expect(result.marketAnalysis.bullets).toEqual(["a", "b", "c", "d"]);
+    expect(analyzeMarket).toHaveBeenCalledTimes(1);
   });
 });

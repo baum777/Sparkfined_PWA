@@ -3,6 +3,7 @@ import path from "path";
 import { OpenAIClient } from "./clients/openai_client.js";
 import { GrokClient } from "./clients/grok_client.js";
 import type {
+  BulletAnalysis,
   MarketPayload,
   OrchestratorResult,
   Provider,
@@ -11,6 +12,8 @@ import type {
   TelemetryEvent,
 } from "@/types/ai";
 import { sanityCheck } from "@/lib/ai/heuristics";
+import { getCachedAIResponse, setCachedAIResponse } from "@/lib/ai/cache/aiCache";
+import { buildAICacheKey, getDefaultAICacheTTL, getModelId } from "@/lib/ai/cache/aiCacheKey";
 
 export const SANITY_WARNING = "sanity_check adjusted AI bullets";
 
@@ -64,7 +67,7 @@ export class AIOrchestrator {
     const telemetryEvents: TelemetryEvent[] = [];
 
     const startOpenAi = this.now();
-    const marketAnalysis = await this.openai.analyzeMarket(normalized);
+    const marketAnalysis = await this.getMarketAnalysis(normalized);
     const initialBullets = Array.isArray(marketAnalysis.bullets) ? marketAnalysis.bullets : [];
     marketAnalysis.bullets = initialBullets;
     if (marketAnalysis.bullets.length > 0) {
@@ -100,7 +103,7 @@ export class AIOrchestrator {
         warnings.push("includeSocial requested but no posts supplied");
       } else {
         const startGrok = this.now();
-        socialAnalysis = await this.grok.analyzeSocial(normalized, posts);
+        socialAnalysis = await this.getSocialAnalysis(normalized, posts);
         usedProviders.push("grok");
         telemetryEvents.push({
           timestamp: new Date().toISOString(),
@@ -133,6 +136,65 @@ export class AIOrchestrator {
       socialAnalysis,
       meta,
     };
+  }
+
+  private async getMarketAnalysis(payload: MarketPayload): Promise<BulletAnalysis> {
+    const prompt = await this.openai.renderMarketPrompt(payload);
+    const cacheKey = buildAICacheKey({
+      provider: "openai",
+      model: this.openai.getModel(),
+      systemPrompt: "task_prompt_openai.md",
+      userPrompt: prompt,
+      temperature: this.openai.getTemperature(),
+    });
+
+    const modelId = getModelId("openai", this.openai.getModel());
+
+    return this.withAICache(cacheKey, modelId, () =>
+      this.openai.analyzeMarket(payload, { prompt }),
+    );
+  }
+
+  private async getSocialAnalysis(
+    payload: MarketPayload,
+    posts: SocialPost[],
+  ): Promise<SocialAnalysis> {
+    const prompt = await this.grok.renderSocialPrompt(payload, posts);
+    const cacheKey = buildAICacheKey({
+      provider: "grok",
+      model: this.grok.getModel(),
+      systemPrompt: "task_prompt_grok.md",
+      userPrompt: prompt,
+      temperature: this.grok.getTemperature(),
+    });
+
+    const modelId = getModelId("grok", this.grok.getModel());
+
+    return this.withAICache(cacheKey, modelId, () =>
+      this.grok.analyzeSocial(payload, posts, { prompt }),
+    );
+  }
+
+  private async withAICache<T>(
+    cacheKey: string,
+    modelId: string,
+    resolver: () => Promise<T>,
+  ): Promise<T> {
+    const cached = await getCachedAIResponse(cacheKey);
+    if (cached.hit && cached.entry) {
+      return cached.entry.response as T;
+    }
+
+    const response = await resolver();
+
+    await setCachedAIResponse(cacheKey, {
+      response,
+      createdAt: Date.now(),
+      ttlMs: getDefaultAICacheTTL(),
+      modelId,
+    });
+
+    return response;
   }
 
   shouldRunSocial(payload: MarketPayload): boolean {

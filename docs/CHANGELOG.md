@@ -19,6 +19,9 @@
 ### Added
 - **Market data SWR cache & provider muxing:** Documented the new SWR cache layer with stale-while-revalidate semantics,
   provider health tracking, and dynamic Moralis/DexPaprika/Dexscreener selection used by the market orchestrator.
+- **AI Cache Layer (AC1):** Recorded the new cache abstraction, store interface, and in-memory default for orchestrated AI responses.
+- **AI Cache Layer (AC2):** Captured the deterministic cache key schema, model ID helper, and TTL defaults sourced from env vars.
+- **AI Cache Layer (AC3):** Logged orchestrator integration with prompt-based cache keys for OpenAI/Grok calls and resilient cache fallbacks.
 
 ---
 
