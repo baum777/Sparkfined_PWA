@@ -38,3 +38,9 @@ void runMigration()
 - Route: `/journal/v2` (siehe `RoutesRoot.tsx`)
 - Hook: `useJournalV2` kapselt Pipeline + Persistenz
 - Components: `JournalInputForm`, `JournalResultView`
+
+## Backup & Export (Journal 1.x)
+- **Versionierte Bundles:** `src/lib/export/exportTypes.ts` definiert `JournalExportBundle` (Version `1.0.0`).
+- **Export:** `exportJournalToJSON` und `exportJournalToMarkdown` erzeugen JSON- bzw. Markdown-Dumps (inkl. Download-Helper).
+- **Import:** `importJournalFromJSON`/`handleJournalImport` verstehen Merge- und Replace-Strategien; inkompatible Versionen werfen `JournalImportVersionError`.
+- **UI-Einstieg:** Die Settings-Seite bindet `JournalDataControls` (Buttons für JSON/Markdown-Export, All-App-Backup sowie File-Upload mit Moduswahl).

@@ -11,8 +11,8 @@ export type Settings = {
   defaultPlaybookId?: string
 }
 
-const KEY = 'sparkfined.settings.v1'
-const DEFAULTS: Settings = {
+export const SETTINGS_STORAGE_KEY = 'sparkfined.settings.v1'
+export const DEFAULT_SETTINGS: Settings = {
   snapDefault: true,
   replaySpeed: 2,
   showHud: true,
@@ -26,11 +26,14 @@ type StoredSettings = Settings & { theme?: string }
 
 function read(): Settings {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { theme: _legacyTheme, ...settings } = getJSON<StoredSettings>(KEY, DEFAULTS)
+  const { theme: _legacyTheme, ...settings } = getJSON<StoredSettings>(
+    SETTINGS_STORAGE_KEY,
+    DEFAULT_SETTINGS,
+  )
   return settings
 }
 function write(s: Settings) {
-  setJSON(KEY, s)
+  setJSON(SETTINGS_STORAGE_KEY, s)
 }
 
 type Ctx = { settings: Settings; setSettings: (next: Partial<Settings>) => void }
