@@ -9,8 +9,15 @@
 ## 2025-12-13
 
 ### Added
-- **Chart capture utilities:** Documented the new Canvas → Blob → DataURL helpers that power chart snapshots for journal flows.
-- **Journal screenshot support:** Recorded the new V1 screenshot fields, Dexie schema bump, and service helpers to attach chart captures to entries.
+- **Signal Strategien & Orchestrator:** Dokumentiert Breakout/Volume-Spike-Detection sowie den neuen `scanForSignals`-Flow, der OHLC-Serien pro Rule lädt und Treffer im Dexie-Signal-Store ablegt.
+
+---
+
+## 2025-12-12
+
+### Added
+- **Signal DB Kernel:** Dokumentation zum Dexie-basierten Rule/Signal-Speicher (`src/lib/signalDb.ts`) mit CRUD-APIs und Legacy-
+  Trennung wurde ergänzt.
 
 ---
 

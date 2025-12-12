@@ -28,6 +28,16 @@ sources:
 | `lessons` | Verdichtete Learnings mit Bezug zu Signals/Plans. |
 | `edges` | Beziehungen (CAUSES, FOLLOWS, INVALIDATES). |
 
+### Dexie Kernel (M20)
+- **Neue Stores:** `signals`, `rules` mit Indexen auf `symbol`, `ruleId`, `enabled` für schnelle Filter.
+- **CRUD-APIs:** `createSignal`, `getSignalsForSymbol(limit?)`, `markSignalTriggered`, `createRule`, `getActiveRules`, `disableRule`.
+- **Scope-Trennung:** Legacy-Graph-Funktionen liegen in `src/lib/legacySignalDb.ts`, während `src/lib/signalDb.ts` die schlanke Rule/Signal-DB kapselt.
+
+### Strategien & Orchestrator (M21)
+- **Breakout:** `detectBreakout(series, rule)` prüft die letzten *N* Candles und erzeugt ein bullishes/bearishes Signal, wenn der Close über dem Lookback-High bzw. unter dem Lookback-Low (optional mit Multiplikator) liegt. Siehe `src/lib/signals/strategies/breakout.ts`.
+- **Volume Spike:** `detectVolumeSpike(series, rule)` vergleicht das aktuelle Volumen mit dem Durchschnitt der letzten *N* Kerzen und markiert Spikes (`spikeMultiplier` > ØVolumen). Siehe `src/lib/signals/strategies/volumeSpike.ts`.
+- **scanForSignals:** Der Orchestrator (`src/lib/signalOrchestrator.ts`) lädt je Rule OHLC-Daten (`fetchOHLC` Callback), wählt anhand von `rule.strategy` die passende Detection, schreibt Treffer via `createSignal` in den Dexie-Store und liefert die neuen Signals zurück. Fehler pro Rule werden geloggt, blockieren den Rest aber nicht.
+
 ## Integrationspfad
 1. **Analyse** – Chart/Analyze liefert `MarketSnapshot` + `HeuristicAnalysis`.
 2. **Signal Pipeline** – Call `processMarketData` (siehe `signalOrchestrator.ts` Blueprint) → persistiert Signal + Action Nodes.
