@@ -29,6 +29,10 @@ export type JournalEntry = {
   
   // Chart Context (Hybrid: Screenshot + State)
   chartSnapshot?: ChartSnapshot;
+
+  // Screenshot capture (V1)
+  screenshot?: string;              // data:image/...;base64,...
+  screenshotCapturedAt?: string;    // ISO string when capture occurred
   
   // Outcome & Performance (PRIO 3: PnL-Analyse)
   outcome?: TradeOutcome;

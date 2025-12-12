@@ -42,20 +42,33 @@ export class GrokClient {
     this.fetchImpl = config.fetchImpl ?? fetch;
   }
 
-  async analyzeSocial(
-    payload: MarketPayload,
-    posts: SocialPost[],
-  ): Promise<SocialAnalysis> {
+  getModel(): string {
+    return this.model;
+  }
+
+  getTemperature(): number {
+    return this.temperature;
+  }
+
+  async renderSocialPrompt(payload: MarketPayload, posts: SocialPost[]): Promise<string> {
     if (!posts.length) {
       throw new Error("Grok social analysis requires at least one post");
     }
 
-    const prompt = await renderPrompt("task_prompt_grok.md", {
+    return renderPrompt("task_prompt_grok.md", {
       ticker: payload.ticker,
       mode: payload.socialMode ?? "newest",
       sources: (payload.socialSources ?? []).join(",") || "n/a",
       posts,
     });
+  }
+
+  async analyzeSocial(
+    payload: MarketPayload,
+    posts: SocialPost[],
+    options: { prompt?: string } = {},
+  ): Promise<SocialAnalysis> {
+    const prompt = options.prompt ?? (await this.renderSocialPrompt(payload, posts));
 
     const body = {
       model: this.model,

@@ -56,6 +56,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 - **`docs/journal/journal-v2-migration.md`** – Leitfaden zur Migration der Legacy-Journal-Einträge in die neue Journal-2.0-Pipeline (Dexie, Pipeline-Aufruf, manueller Trigger).
 
+## 📦 Neue Ergänzungen (2025-12-12)
+
+ - **`docs/architecture/ai-cache-layer.md`** – Basis-Abstraktion, Key-Schema, TTL-Defaults und Orchestrator-Integration (AC1-AC3).
+
 ## 📦 Documentation Governance (2025-12-04)
 
 ### Governance Audit & Rules
@@ -97,3 +101,32 @@ The Design System establishes the "Alchemical Trading Interface" aesthetic:
 - ⚠️ **Gap Identified**: Current implementation uses emerald/zinc palette, design spec requires Spark/Void
 - 📋 **Module Spec Ready**: Complete architecture and token structure defined
 - 🎯 **For Codex**: DESIGN_MODULE_SPEC.md contains full implementation checklist with 60+ tasks
+
+---
+
+## 📋 Launch-Ready Product Documentation (2025-12-11)
+
+### Product & Technical Documentation
+- **`docs/product/launch-ready-documentation.md`** (50K+) - Comprehensive product specification for controlled feature rollout
+
+### Contents
+The launch-ready documentation provides:
+1. **Informationsarchitektur** - Complete mapping of all 12 pages/tabs with feature matrices (MVP, Release 1, Release 2)
+2. **Funktionskatalog** - Detailed feature list per page with user actions, use cases, AI dependencies, and release targets
+3. **Core User Journeys** - 6 step-by-step user flows (quick trade logging, alerts, chart analysis, performance review, watchlist monitoring, market sentiment)
+4. **AI & Provider Integrations** - Complete provider chain (Moralis → DexPaprika → DexScreener), OpenAI integration, GrokPulse sentiment engine
+5. **Data Flows & Dependencies** - Architecture diagrams for journal creation, alerts, chart rendering, watchlist updates, and GrokPulse analysis
+6. **UI/UX Flows & Interaction Patterns** - Layout specifications, interaction patterns, modal designs, and visual journey flows
+7. **Release Roadmap** - Feature matrix by release with timeline estimates and go-to-market strategy
+
+### Target Audience
+- 👨‍💼 **Product Managers**: Feature prioritization, release planning, success metrics
+- 👨‍💻 **Engineers**: Dependencies, data flows, integration requirements, test coverage needs
+- 🎨 **Designers**: UI/UX flows, interaction patterns, responsive layouts
+- 👥 **Stakeholders**: MVP scope, release timeline, business value per release
+
+### Key Highlights
+- ✅ **MVP Scope**: Core journaling, charting, alerts, watchlist (6–8 weeks)
+- 🚀 **Release 1**: AI insights, gamification, GrokPulse, signals (4–6 weeks)
+- 📊 **Release 2**: Wallet integration, lessons, advanced replay (4–6 weeks)
+- 📈 **Success Metrics**: 60% DAU retention, 5+ journal entries/user/week, 80% alert accuracy
