@@ -23,7 +23,7 @@ import {
   getLessonById,
   getPatternStats,
   getAllTradeOutcomes,
-} from '@/lib/signalDb'
+} from '@/lib/legacySignalDb'
 
 // ============================================================================
 // SIGNALS

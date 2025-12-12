@@ -2,7 +2,22 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-12
+**Last Updated:** 2025-12-13
+
+---
+
+## 2025-12-13
+
+### Added
+- **Signal Strategien & Orchestrator:** Dokumentiert Breakout/Volume-Spike-Detection sowie den neuen `scanForSignals`-Flow, der OHLC-Serien pro Rule lädt und Treffer im Dexie-Signal-Store ablegt.
+
+---
+
+## 2025-12-12
+
+### Added
+- **Signal DB Kernel:** Dokumentation zum Dexie-basierten Rule/Signal-Speicher (`src/lib/signalDb.ts`) mit CRUD-APIs und Legacy-
+  Trennung wurde ergänzt.
 
 ---
 

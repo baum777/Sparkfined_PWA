@@ -13,7 +13,7 @@ import {
   saveLesson,
   saveTradeOutcome,
   saveEdge,
-} from '@/lib/signalDb'
+} from '@/lib/legacySignalDb'
 
 // ============================================================================
 // SEED FUNCTIONS

@@ -24,6 +24,16 @@ import type {
 } from '@/types/signal'
 import type { MarketSnapshot } from '@/types/market'
 import type { HeuristicAnalysis } from '@/types/analysis'
+import type { OHLCSeries } from '@/lib/types/ohlc'
+import {
+  createSignal,
+  signalDb,
+  type Signal as SignalRecord,
+  type SignalDatabase,
+  type SignalRule,
+} from './signalDb'
+import { detectBreakout } from './signals/strategies/breakout'
+import { detectVolumeSpike } from './signals/strategies/volumeSpike'
 
 // ============================================================================
 // SIGNAL DETECTION
@@ -488,4 +498,44 @@ export function buildOrchestratorOutput(
     explanation,
     warnings: warnings.length > 0 ? warnings : undefined,
   }
+}
+
+// ============================================================================
+// SIGNAL SCAN (M21)
+// ============================================================================
+
+type StrategyDetector = (series: OHLCSeries, rule: SignalRule) => SignalRecord | null
+
+const strategyDetectors: Record<string, StrategyDetector> = {
+  breakout: detectBreakout,
+  volumeSpike: detectVolumeSpike,
+}
+
+export async function scanForSignals(
+  rules: SignalRule[],
+  fetchOHLC: (rule: SignalRule) => Promise<OHLCSeries>,
+  db: SignalDatabase = signalDb
+): Promise<SignalRecord[]> {
+  const detectedSignals: SignalRecord[] = []
+
+  for (const rule of rules) {
+    const detect = strategyDetectors[rule.strategy]
+    if (!detect) {
+      continue
+    }
+
+    try {
+      const series = await fetchOHLC(rule)
+      const match = detect(series, rule)
+
+      if (match) {
+        const stored = await createSignal(match, db)
+        detectedSignals.push(stored)
+      }
+    } catch (error) {
+      console.error('scanForSignals: failed to evaluate rule', { ruleId: rule.id, error })
+    }
+  }
+
+  return detectedSignals
 }
