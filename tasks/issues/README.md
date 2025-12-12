@@ -10,9 +10,9 @@
 Dieses Verzeichnis enthält **alle strukturierten Tasks** für die Sparkfined PWA, organisiert nach **Priorität und Dringlichkeit**.
 
 **Gesamtstatus**:
-- ✅ **Vollständig**: 40%
-- 🟡 **In Arbeit**: 30%
-- 🔴 **Nicht gestartet**: 30%
+- ✅ **Vollständig**: 70% (P0/P1/Push/AI-Cost-Guards/Journals durch Tests abgedeckt)
+- 🟡 **In Arbeit**: 20% (Live-Provider-E2E, Monitoring-Dashboards)
+- 🔴 **Nicht gestartet**: 10% (Docs-Ergänzungen/Sentry-Rollout)
 
 ---
 
@@ -66,11 +66,11 @@ tasks/
 
 | Task | Aufwand | Status | Owner |
 |------|---------|--------|-------|
-| [Journal CRUD Tests](./P0-blocker/01-journal-crud-tests.md) | 1-2 Tage | 🔴 TODO | Dev Team |
-| [API Contract Tests](./P0-blocker/02-api-contract-tests.md) | 2-3 Tage | 🔴 TODO | Backend |
-| [AI Cost Guards Testing](./P0-blocker/03-ai-cost-guards-testing.md) | 1 Tag | 🔴 TODO | Backend |
-| [Push Notifications Testing](./P0-blocker/04-push-notifications-testing.md) | 1 Tag | 🔴 TODO | Frontend+Backend |
-| [E2E Test Stabilization](./P0-blocker/05-e2e-test-stabilization.md) | 2 Tage | 🔴 TODO | QA |
+| [Journal CRUD Tests](./P0-blocker/01-journal-crud-tests.md) | 1-2 Tage | 🟢 DONE (Vitest Suite aktiv) | Dev Team |
+| [API Contract Tests](./P0-blocker/02-api-contract-tests.md) | 2-3 Tage | 🟢 DONE (Journal/Rules/Ideas Contracts) | Backend |
+| [AI Cost Guards Testing](./P0-blocker/03-ai-cost-guards-testing.md) | 1 Tag | 🟢 DONE (Budget Guards getestet) | Backend |
+| [Push Notifications Testing](./P0-blocker/04-push-notifications-testing.md) | 1 Tag | 🟡 PARTIAL (Send-Endpoint E2E offen) | Frontend+Backend |
+| [E2E Test Stabilization](./P0-blocker/05-e2e-test-stabilization.md) | 2 Tage | 🟢 DONE (Flows stabilisiert, Live-Daten-E2E offen) | QA |
 
 **Gesamt**: ~8-10 Tage (parallelisierbar)
 

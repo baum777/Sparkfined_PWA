@@ -14,6 +14,22 @@ Kritische Backend-Endpoints haben **KEINE Contract-Tests**:
 - `/api/rules` - Alert Rule Management
 - `/api/ideas` - Idea Packet Creation
 
+## Checkliste (Repo-Abgleich – Stand: 2025-12-12)
+
+- [x] Journal-API-Verträge abgedeckt – `tests/api/journal.api.test.ts` und `journal.contract.test.ts` prüfen CRUD, PnL-Normalisierung, Query-Filter und Migration.
+- [x] Rules-API getestet – `tests/api/rules.api.test.ts`, `rules.contract.test.ts` und `rules.eval.test.ts` validieren Payload-Validation, Trigger-Evaluierung und Fehlerpfade.
+- [x] Ideas-API vollständig – `tests/api/ideas.api.test.ts`, `ideas.contract.test.ts` und `ideas.one-click-packet.test.ts` decken Create/Update mit Journal- und Rule-Linking ab.
+- [x] Push- und Cost-Guards mit abgedeckt – Suite nutzt `tests/api/setup.ts` für env/bootstrap, sodass API-Routen im CI lauffähig sind.
+
+## Zusätzliche Beobachtungen aus dem Code
+
+- API-Routen liegen unter `api/` (z. B. `api/journal/index.ts`, `api/rules/index.ts`), nutzen gemeinsam `lib/withApiHandler` und sind in Tests mit Mocks für externe Provider verdrahtet.
+
+## Nächste Schritte aus Repo-Sicht
+
+- Bei neuen Feldern in Journal/Ideas/Rules die Contract-Snapshots erweitern.
+- Smoke-E2E für zentrale Flows (`tests/e2e/journal/journal-crud.spec.ts`, `tests/e2e/alerts/alerts-crud.spec.ts`) als Regressionsschutz in den Task aufnehmen.
+
 **Risiken**:
 - Breaking Changes unbemerkt deployed
 - Payload Validation fehlt

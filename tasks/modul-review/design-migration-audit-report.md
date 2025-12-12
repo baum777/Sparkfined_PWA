@@ -3,7 +3,9 @@
 **Audit Date**: 2025-12-09
 **Auditor**: Claude (AI Code Review Assistant)
 **Audit Scope**: Full codebase review gegen Design Migration Checklist
-**Status**: 🟡 In Progress
+**Status**: 🟡 In Progress (Audit-Ergebnisse stammen aus Vorab-Scan, kein aktueller vollständiger Lauf)
+
+> Repo-Abgleich – 2025-12-12: Der Bericht wurde nicht mit dem aktuellen Code revalidiert. Die Codebasis nutzt weiterhin gemischte Tailwind-Paletten; ein erneuter Audit mit installiertem `node_modules` steht aus.
 
 ---
 

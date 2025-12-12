@@ -32,6 +32,19 @@ Push Notifications funktionieren nur **manuell getestet**. Es gibt:
 - ✅ PushManager Mock + E2E Alert→Push Flow: Vitest in `tests/unit/push.service.test.ts`, Playwright in `tests/e2e/alerts/alerts.push.spec.ts`
 - ✅ Permission-Denied + VAPID-Fallbacks abgedeckt (unit mocks + UI-Fallback im Push-Client)
 
+## Checkliste (Repo-Abgleich – Stand: 2025-12-12)
+
+- [x] Backend-Subscribe/Unsubscribe getestet (API-Contract Suite)
+- [x] Frontend-Push-Service mit Mocks abgedeckt
+- [x] VAPID-Doku vorhanden
+- [ ] Push-Send-Endpunkt (`api/push/send.ts`) wird nicht in der aktuellen Suite ausgeführt; nur Subscribe/Unsubscribe sind abgedeckt.
+- [ ] Mobile-Permissions (iOS/Android) weiterhin nur dokumentiert, nicht automatisiert getestet.
+
+## Nächste Schritte aus Repo-Sicht
+
+- E2E erweitern, um `api/push/send.ts` mit einem Fake-Service-Worker zu validieren.
+- Optional: Plattform-spezifische Permission-UX verlinken oder mocken, falls Mobile-Support Priorität hat.
+
 ---
 
 ## Push Notification Flow (Aktuell)

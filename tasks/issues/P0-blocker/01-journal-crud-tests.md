@@ -11,6 +11,23 @@
 
 Die komplette Journal CRUD Test-Suite ist geskippt (`tests/unit/journal.crud.test.ts`). Es gibt **keine automatisierte Garantie**, dass die IndexedDB-Persistence über Create/Update/Delete-Operationen hinweg verlustfrei funktioniert.
 
+## Checkliste (Repo-Abgleich – Stand: 2025-12-12)
+
+- [x] Unit-Suite aktiv und nicht mehr geskippt – `tests/unit/journal.crud.test.ts` deckt Create/Read/Update/Delete, Query-Filter, Statuswechsel sowie Screenshot-Anhänge und Chart-basiertes Erstellen ab.
+- [x] Dexie-Reset im Test-Setup – `initDB`/`resetDbInstance` werden vor jedem Test verwendet, um einen frischen IndexedDB-State sicherzustellen.
+- [x] Edge-Cases abgedeckt – Tests prüfen Duplicate-IDs, Update-Fehlerfälle, Large Notes und Migration von Schema v4→v5.
+- [x] Export/Import Roundtrip – Import-Merge/Replace-Pfade und CSV/JSON-Export werden in der Suite validiert.
+- [x] Store-Hilfsfunktionen – `createQuickJournalEntry` wird mit Titel-Validierung getestet, Status-Transitions (`markAsActive`, `closeEntry`) sind abgedeckt.
+
+## Zusätzliche Beobachtungen aus dem Code
+
+- JournalService ist produktiv im Einsatz (`src/lib/JournalService.ts`), und die Tests verifizieren auch den Chart-Screenshot-Anhang (`addScreenshotToEntry`) sowie das Erstellen aus dem Chart-Kontext (`createJournalEntryFromChart`).
+
+## Nächste Schritte aus Repo-Sicht
+
+- Regression-Watch: Neue Felder in `JournalEntry` (z. B. AI Insights) müssen in Tests ergänzt werden.
+- Coverage im Blick behalten, falls weitere Migrationspfade hinzukommen.
+
 **Betroffene Dateien**:
 - `tests/unit/journal.crud.test.ts` (komplett geskippt)
 - `src/lib/JournalService.ts` (ungetestet)
