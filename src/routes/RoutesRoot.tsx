@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { SwipeNavGate } from "../components/navigation/SwipeNavGate";
-import AppShell from "@/layout/AppShell";
+import AppShell from "@/components/layout/AppShell";
 
 // Route-level code splitting (reduziert initial bundle)
 const LandingPage = lazy(() => import("../pages/LandingPage"));

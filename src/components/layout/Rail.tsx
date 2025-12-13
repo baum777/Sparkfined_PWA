@@ -4,9 +4,10 @@ import { cn } from "@/lib/ui/cn"
 
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: "▦" },
-  { to: "/scanner", label: "Scanner", icon: "⌁" },
-  { to: "/chart", label: "Chart", icon: "⟐" },
-  { to: "/trades", label: "Trades", icon: "⇄" },
+  { to: "/analysis", label: "Analysis", icon: "⟐" },
+  { to: "/chart", label: "Chart", icon: "⌁" },
+  { to: "/watchlist", label: "Watchlist", icon: "★" },
+  { to: "/alerts", label: "Alerts", icon: "⚡" },
   { to: "/journal", label: "Journal", icon: "✎" },
 ]
 

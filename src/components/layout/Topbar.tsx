@@ -5,7 +5,7 @@ export default function Topbar() {
   return (
     <div className="sf-topbar-inner">
       <div className="sf-topbar-left">
-        <div className="sf-brand">
+        <div className="sf-brand" aria-label="Sparkfined brand">
           <span className="sf-brand-dot" />
           <span className="sf-brand-text">Sparkfined</span>
         </div>
@@ -16,7 +16,7 @@ export default function Topbar() {
         </button>
       </div>
 
-      <div className="sf-topbar-center">
+      <div className="sf-topbar-center" aria-label="Selected pair">
         <div className="sf-pair">
           <span className="sf-pair-symbol">SOL/USDC</span>
           <span className="sf-pair-meta">• 1m</span>

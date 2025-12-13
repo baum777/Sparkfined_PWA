@@ -24,7 +24,7 @@ export default function ActionPanel() {
             </div>
             <Input placeholder="0.00" inputMode="decimal" className="sf-mono" aria-label="Order size" />
             <div className="sf-chips" aria-label="Size presets">
-              {['25%', '50%', '75%', '100%'].map((x) => (
+              {["25%", "50%", "75%", "100%"].map((x) => (
                 <button key={x} type="button" className="sf-chip">{x}</button>
               ))}
             </div>
