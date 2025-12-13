@@ -750,4 +750,239 @@
     outline: 2px solid rgb(var(--color-brand));
     outline-offset: 2px;
   }
+
+  .sf-shell {
+    @apply h-dvh w-full grid;
+    grid-template-columns: 72px 1fr 420px;
+    grid-template-rows: 60px 1fr;
+    grid-template-areas:
+      "topbar topbar topbar"
+      "rail   canvas action";
+  }
+
+  .sf-topbar {
+    grid-area: topbar;
+    @apply sticky top-0 z-50 border-b;
+  }
+  .sf-rail {
+    grid-area: rail;
+    @apply border-r;
+  }
+  .sf-canvas {
+    grid-area: canvas;
+    @apply min-w-0 overflow-auto;
+  }
+  .sf-action {
+    grid-area: action;
+    @apply border-l;
+  }
+
+  /* Topbar look: calm terminal */
+  .sf-topbar {
+    @apply bg-surface/70 backdrop-blur-md;
+    border-color: rgb(var(--color-border) / 0.7);
+  }
+  .sf-topbar-inner {
+    @apply h-[60px] px-3 flex items-center justify-between gap-3;
+  }
+  .sf-topbar-left {
+    @apply flex items-center min-w-[420px];
+  }
+  .sf-topbar-center {
+    @apply flex-1 flex justify-center;
+  }
+  .sf-topbar-right {
+    @apply flex items-center gap-2;
+  }
+
+  .sf-brand {
+    @apply flex items-center gap-2;
+  }
+  .sf-brand-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    background: rgb(var(--color-brand) / 1);
+    box-shadow: 0 0 0 6px rgb(var(--color-brand) / 0.08);
+  }
+  .sf-brand-text {
+    @apply text-sm font-semibold tracking-wide text-text-primary;
+  }
+
+  .sf-search {
+    @apply ml-3 flex items-center justify-between gap-3 rounded-xl px-3 h-10 min-w-[320px] border;
+    background: rgb(var(--color-surface) / 0.45);
+    border-color: rgb(var(--color-border) / 0.7);
+  }
+  .sf-search:hover {
+    border-color: rgb(var(--color-border-strong) / 0.8);
+  }
+  .sf-search:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--color-brand) / 0.26);
+    border-color: rgb(var(--color-brand) / 0.55);
+  }
+  .sf-search-placeholder {
+    @apply text-sm text-text-secondary;
+  }
+  .sf-kbd {
+    @apply text-xs rounded-lg px-2 py-1 border text-text-tertiary;
+    border-color: rgb(var(--color-border) / 0.7);
+  }
+
+  .sf-pair {
+    @apply flex items-center gap-2;
+  }
+  .sf-pair-symbol {
+    @apply text-sm font-semibold text-text-primary;
+  }
+  .sf-pair-meta {
+    @apply text-xs text-text-tertiary;
+  }
+
+  /* Rail */
+  .sf-rail {
+    @apply bg-surface/40;
+    border-color: rgb(var(--color-border) / 0.7);
+  }
+  .sf-rail-inner {
+    @apply h-[calc(100dvh-60px)] pt-2 px-2 flex flex-col gap-1;
+  }
+  .sf-rail-item {
+    @apply h-10 rounded-xl px-2 flex items-center gap-2 border;
+    border-color: transparent;
+  }
+  .sf-rail-item:hover {
+    @apply bg-surface/50;
+    border-color: rgb(var(--color-border) / 0.6);
+  }
+  .sf-rail-item-active {
+    @apply bg-surface/70;
+    border-color: rgb(var(--color-brand) / 0.22);
+    box-shadow: inset 0 0 0 1px rgb(var(--color-brand) / 0.12);
+  }
+  .sf-rail-icon {
+    @apply w-8 flex justify-center text-text-secondary;
+  }
+  .sf-rail-label {
+    @apply text-sm text-text-primary;
+  }
+
+  /* Action panel */
+  .sf-action {
+    @apply bg-surface/40;
+    border-color: rgb(var(--color-border) / 0.7);
+  }
+  .sf-action-inner {
+    @apply h-[calc(100dvh-60px)] w-full p-3 overflow-auto;
+  }
+
+  .sf-panel {
+    @apply rounded-2xl border overflow-hidden bg-surface/70;
+    border-color: rgb(var(--color-border) / 0.7);
+  }
+  .sf-panel-header {
+    @apply px-3 pt-3 pb-2 relative;
+  }
+  .sf-panel-title {
+    @apply text-xs uppercase tracking-widest text-text-tertiary;
+  }
+  .sf-panel-dna {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      rgb(var(--color-brand) / 0.55),
+      rgb(var(--color-accent) / 0.35),
+      transparent
+    );
+    opacity: 0.55;
+  }
+  .sf-panel-body {
+    @apply p-3;
+  }
+
+  .sf-subpanel {
+    @apply rounded-2xl border p-3;
+    background: rgb(var(--color-surface) / 0.28);
+    border-color: rgb(var(--color-border) / 0.6);
+  }
+  .sf-subpanel-title {
+    @apply text-xs font-semibold mb-2 text-text-secondary;
+  }
+  .sf-subpanel-grid {
+    @apply grid grid-cols-2 gap-3;
+  }
+  .sf-mini-label {
+    @apply text-xs text-text-tertiary;
+  }
+  .sf-kpi {
+    @apply text-sm font-semibold text-text-primary;
+  }
+  .sf-mono {
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font-mono, ui-monospace);
+  }
+  .sf-divider {
+    @apply my-3;
+    height: 1px;
+    background: rgb(var(--color-border) / 0.6);
+  }
+  .sf-mini-row {
+    @apply flex items-center justify-between;
+  }
+
+  /* Segmented */
+  .sf-seg {
+    @apply grid grid-cols-2 rounded-2xl border overflow-hidden;
+    border-color: rgb(var(--color-border) / 0.7);
+  }
+  .sf-seg-item {
+    @apply h-10 text-sm text-text-secondary;
+    background: rgb(var(--color-surface) / 0.22);
+  }
+  .sf-seg-item:hover {
+    background: rgb(var(--color-surface) / 0.3);
+  }
+  .sf-seg-active {
+    @apply text-text-primary;
+    background: rgb(var(--color-surface) / 0.42);
+    box-shadow: inset 0 0 0 1px rgb(var(--color-brand) / 0.14);
+  }
+
+  /* Chips */
+  .sf-chips {
+    @apply flex gap-2 flex-wrap;
+  }
+  .sf-chip {
+    @apply h-8 px-3 rounded-xl border text-xs text-text-secondary;
+    background: rgb(var(--color-surface) / 0.18);
+    border-color: rgb(var(--color-border) / 0.6);
+  }
+  .sf-chip:hover {
+    border-color: rgb(var(--color-border-strong) / 0.7);
+  }
+
+  /* Toggle placeholder */
+  .sf-toggle {
+    width: 40px;
+    height: 22px;
+    border-radius: 9999px;
+    background: rgb(var(--color-surface) / 0.45);
+    border: 1px solid rgb(var(--color-border) / 0.7);
+    position: relative;
+  }
+
+  .sf-field-row {
+    @apply flex items-center justify-between;
+  }
+  .sf-field-label {
+    @apply text-xs font-semibold text-text-secondary;
+  }
+  .sf-field-meta {
+    @apply text-xs text-text-tertiary;
+  }
 }
