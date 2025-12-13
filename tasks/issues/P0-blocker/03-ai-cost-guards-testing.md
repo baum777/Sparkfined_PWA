@@ -11,6 +11,14 @@
 
 AI-Features (Journal Insights, Bullet Analysis, Vision OCR) haben **Cost Guards im Code**, aber diese sind **NICHT GETESTET**.
 
+## Checkliste (Repo-Abgleich – Stand: 2025-12-12)
+
+- [x] Budget-Enforcement getestet – `tests/api/ai-cost-guards.test.ts` deckt Cap-Überschreitungen, Provider-Fallbacks und Cooldown-Pfade ab.
+- [x] Cache-Path validiert – Suite prüft Cache-Hits/-Misses inkl. Persistierung und Response-Reuse.
+- [x] Secret-Handling abgedeckt – fehlende/ungültige API-Keys lösen 401/503 in Tests aus.
+- [x] Kosten-Tracker implementiert – `src/lib/ai/costGuard.ts` verwaltet Limits und wird in AI-Routen genutzt.
+- [ ] Per-User-Budgets – kein dedizierter Quoten-Mechanismus implementiert; falls benötigt, Follow-up nötig.
+
 **Risiken**:
 - 💸 API Cost Overrun (OpenAI/Grok ohne Limit)
 - 💸 Budget Cap wird nicht enforced

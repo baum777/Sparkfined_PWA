@@ -17,6 +17,19 @@ Replay Lab verwendet **gemockte OHLC-Daten**. Die gesamte Feature ist aktuell ni
 - `src/pages/ReplayPage.tsx` - UI zeigt Mock-Daten
 - `tests/e2e/replay.spec.ts` - Komplett geskippt
 
+## Checkliste (Repo-Abgleich – Stand: 2025-12-12)
+
+- [x] Live-Provider-Adapter vorhanden – `src/lib/priceAdapter.ts` nutzt DexPaprika mit Moralis-Fallback inkl. Retry/Cooldown.
+- [x] Hook/Cache umgesetzt – `src/hooks/useOhlcData.ts` lädt aus IndexedDB-Snapshots, aktualisiert via Network-Fetch und speichert mit `putChartSnapshot`.
+- [x] E2E-Flow aktiv – `tests/e2e/replay.spec.ts` läuft mit deterministischen Candle-Fixtures statt Skip.
+- [x] Unit-Tests für Replay-Logik – `tests/unit/replay.math.test.ts` und `useOhlcData.test.ts` prüfen Playback/Mapping.
+- [ ] Live-Replay ohne Mocks – ReplayPage nutzt weiterhin Mock-Daten in E2E; echter Provider-Pfad noch nicht in Playwright abgedeckt.
+
+## Nächste Schritte aus Repo-Sicht
+
+- Optional: Separaten E2E-Run mit echtem Provider-Flag ergänzen, um Live-Daten-Pipeline zu verifizieren.
+- Dokumentation im Task anpassen, falls `getTokenSnapshot.ts` nicht mehr zentral genutzt wird (aktueller Fetch über `priceAdapter`).
+
 **Aktueller Code**:
 ```typescript
 // src/lib/data/getTokenSnapshot.ts

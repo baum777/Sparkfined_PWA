@@ -36,6 +36,19 @@ E2E Test-Suite hat kritische Lücken:
 - ✅ Journal Flows stabilisiert (Scroll/DB-Cleanup in `tests/e2e/journal/journal.flows.spec.ts`)
 - ⚠️ Analyze Page/Idea-Packet E2E weiterhin fehlend
 
+## Checkliste (Repo-Abgleich – Stand: 2025-12-12)
+
+- [x] Replay-Lab-E2E aktiv mit deterministischen OHLC-Fixtures
+- [x] Journal CRUD/Flows stabilisiert (Scroll/Wartezeiten/DB-Cleanup in Tests)
+- [x] Analyze-Page E2E vorhanden (`tests/e2e/analyze/analyze.page.spec.ts`)
+- [x] Idea-Packet E2E vorhanden (`tests/e2e/ideas/idea-packets.spec.ts`)
+- [ ] Live-Provider-E2E fehlt – Replay nutzt weiterhin Mock-Candles; echtes Provider-Muxing nicht abgedeckt.
+
+## Nächste Schritte aus Repo-Sicht
+
+- Falls Live-Daten-Provider priorisiert werden, eigenen E2E-Run mit realen Endpoints ergänzen (Feature-Flag/Mock-Toggle berücksichtigen).
+- Prüfen, ob weitere Flaky-Tests im CI auftauchen und in diese Checkliste übernehmen.
+
 ---
 
 ## Test Status Overview

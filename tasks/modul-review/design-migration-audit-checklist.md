@@ -18,6 +18,12 @@ Your job:
    - Du erzeugst **keine Commits, keine Patches, keine Auto-Fixes**.
    - Deine Aufgabe ist ausschließlich **Analyse & Dokumentation**.
 
+## Status-Notiz (Repo-Abgleich – Stand: 2025-12-12)
+
+- Diese Checkliste wurde im Code noch nicht systematisch durchlaufen. Die UI nutzt weiterhin gemischte Tailwind-Paletten (`slate`, `zinc`, `sky`, etc.).
+- Design-Migration befindet sich nicht im aktiven Refactor; Fokus der Codebasis liegt aktuell auf Funktionalität/Tests (Journal, Alerts, Replay).
+- Falls ein zukünftiger Audit erfolgt, Referenzpunkte: App-Shell (`src/routes/RoutesRoot.tsx` + `src/layouts/AppShell.tsx`), Tokens in `tailwind.config.ts`, Styles in `src/components`.
+
 Empfohlenes Format für deine Dokumentation:
 
 - Pro Checklist-Punkt, bei dem du ein Problem findest:
