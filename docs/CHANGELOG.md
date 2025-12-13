@@ -2,7 +2,15 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-13
+**Last Updated:** 2025-12-14
+
+---
+
+## 2025-12-14
+
+### Changed
+- **AppShell Layout:** Dokumentiert die neue terminalartige Shell (Topbar, Rail, Canvas, 420px Action Panel) mit `sf-*` Namensraum,
+  Skip-Link-Anchor (`#main-content`) und immer sichtbarem Action Panel ab `xl`.
 
 ---
 
