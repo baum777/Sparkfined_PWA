@@ -54,6 +54,14 @@ Das Design System ist in folgende Bereiche unterteilt:
 </div>
 ```
 
+### 🛠️ Neue Layout-Hülle (sf-shell)
+
+- **Grid-Shell**: `sf-shell` spannt ein 3-spaltiges Grid (Rail → Canvas → Action Panel) mit fixem Topbar über die volle Höhe.
+- **Navigation Rail**: `sf-rail` + `sf-rail-item` liefern die kompakten Primärlinks inkl. aktivem State.
+- **Topbar**: `sf-topbar` beherbergt Branding, Such-Shortcut und aktuelle Paar-Info.
+- **Action Panel**: `sf-action` hält das Trading-Modul (`sf-panel`, `sf-subpanel`, Chips/Segmented Controls) auf XL+ sichtbar.
+- **Tokens**: Nutzt neue Alias-Tokens (`--surface-*`, `--text-*`, `--brand`) für konsistente Farb-/Flächenzuordnung.
+
 ---
 
 ## 📖 Weitere Ressourcen
