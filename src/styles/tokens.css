@@ -1,4 +1,4 @@
-/* Design Tokens — Sparkfined PWA Board */
+/* Design Tokens – Sparkfined PWA Board */
 
 :root {
   color-scheme: dark;
@@ -55,26 +55,32 @@
   --color-status-snoozed: 125 211 252;
 
   /* --- Layout primitives --- */
-  /* Deprecated spacing tokens – Tailwind spacing utilities replace these. */
-  --space-1: 0.25rem;   /* 4px @deprecated */
-  --space-2: 0.5rem;    /* 8px @deprecated */
-  --space-3: 0.75rem;   /* 12px @deprecated */
-  --space-4: 1rem;      /* 16px @deprecated */
-  --space-6: 1.5rem;    /* 24px @deprecated */
-  --space-8: 2rem;      /* 32px @deprecated */
-  --space-12: 3rem;     /* 48px @deprecated */
+  
+  /* ✅ SPACING: Use Tailwind utilities (p-4, gap-6, space-y-8, etc.)
+   * No custom spacing tokens needed – Tailwind's 8px grid handles all cases
+   * 
+   * Migration guide:
+   * - var(--space-1) → class="p-1" (4px)
+   * - var(--space-2) → class="p-2" (8px)
+   * - var(--space-4) → class="p-4" (16px)
+   * - var(--space-6) → class="p-6" (24px)
+   * - var(--space-8) → class="p-8" (32px)
+   */
 
+  /* Border Radius */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-full: 9999px;
 
+  /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
   --shadow-md: 0 4px 8px rgba(0,0,0,0.16), 0 2px 4px rgba(0,0,0,0.08);
   --shadow-lg: 0 10px 20px rgba(0,0,0,0.20), 0 4px 8px rgba(0,0,0,0.12);
   --shadow-xl: 0 20px 25px rgba(0,0,0,0.25);
 
+  /* Glows */
   --glow-accent: 0 0 12px rgba(0, 255, 102, 0.22);
   --glow-brand: 0 0 12px rgba(15, 179, 76, 0.24);
   --glow-cyan: 0 0 10px rgba(6, 182, 212, 0.2);
@@ -83,6 +89,7 @@
   --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
+  /* Font Sizes (use Tailwind text-* classes in components) */
   --text-xs: 0.75rem;   /* 12px */
   --text-sm: 0.875rem;  /* 14px */
   --text-base: 1rem;    /* 16px */
@@ -90,13 +97,15 @@
   --text-xl: 1.25rem;   /* 20px */
   --text-2xl: 1.5rem;   /* 24px */
 
-  --leading-xs: 1.33;   /* 16px at 12px */
-  --leading-sm: 1.43;   /* 20px at 14px */
-  --leading-base: 1.5;  /* 24px at 16px */
-  --leading-lg: 1.56;   /* 28px at 18px */
-  --leading-xl: 1.4;    /* 28px at 20px */
-  --leading-2xl: 1.33;  /* 32px at 24px */
+  /* Line Heights (Tailwind leading-* classes preferred) */
+  --leading-xs: 1.5;    /* ✅ Improved from 1.33 */
+  --leading-sm: 1.5;    /* ✅ Improved from 1.43 */
+  --leading-base: 1.6;  /* ✅ Improved from 1.5 */
+  --leading-lg: 1.6;    /* ✅ Improved from 1.56 */
+  --leading-xl: 1.5;    /* ✅ Improved from 1.4 */
+  --leading-2xl: 1.4;   /* ✅ Improved from 1.33 */
 
+  /* Font Weights */
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
