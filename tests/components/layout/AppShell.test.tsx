@@ -20,11 +20,24 @@ function renderShell(pathname = "/dashboard") {
 }
 
 describe("AppShell", () => {
-  it("renders the core chrome elements", () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+  })
+
+  it("renders the core chrome elements", async () => {
+    const user = userEvent.setup()
     renderShell()
 
     expect(screen.getByText("Sparkfined")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Global search" })).toBeInTheDocument()
+
+    const toggle = screen.getByRole("button", { name: "Toggle panel" })
+    expect(toggle).toHaveAttribute("aria-expanded", "false")
+    expect(screen.queryByText("Inspector")).not.toBeInTheDocument()
+
+    await user.click(toggle)
+
+    expect(toggle).toHaveAttribute("aria-expanded", "true")
     expect(screen.getByText("Inspector")).toBeInTheDocument()
     expect(screen.getByText("Shortcuts")).toBeInTheDocument()
     expect(screen.getByRole("main")).toHaveAttribute("id", "main-content")
@@ -54,18 +67,27 @@ describe("AppShell", () => {
     expect(journalLink.getAttribute("aria-current")).toBe("page")
   })
 
-  it("shows journal-specific inspector helpers", () => {
+  it("shows journal-specific inspector helpers", async () => {
+    const user = userEvent.setup()
     renderShell("/journal")
 
-    expect(screen.getByText("Journal tools")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Toggle panel" })).toHaveAttribute("aria-expanded", "true")
+    const toggle = screen.getByRole("button", { name: "Toggle panel" })
+    await user.click(toggle)
+
+    expect(await screen.findByText("Journal tools")).toBeInTheDocument()
+    expect(toggle).toHaveAttribute("aria-expanded", "true")
   })
 
   it("allows collapsing the action panel", async () => {
+    const user = userEvent.setup()
     renderShell()
 
     const toggle = screen.getByRole("button", { name: "Toggle panel" })
-    await userEvent.click(toggle)
+
+    await user.click(toggle)
+    expect(toggle).toHaveAttribute("aria-expanded", "true")
+
+    await user.click(toggle)
 
     expect(toggle).toHaveAttribute("aria-expanded", "false")
     expect(screen.queryByText("Inspector")).not.toBeInTheDocument()

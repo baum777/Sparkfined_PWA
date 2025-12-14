@@ -1,5 +1,5 @@
 import React from "react"
-import { useLocation } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import Button from "@/components/ui/Button"
 
 interface ActionPanelProps {
@@ -16,14 +16,18 @@ function DashboardInspector() {
         ))}
       </div>
       <div className="sf-divider" />
-      <div className="space-y-2">
-        <div className="sf-field-row">
-          <div className="sf-field-label">Snapshot</div>
-          <div className="sf-field-meta">Pulse / KPI deck</div>
+      <div className="space-y-2 text-sm text-[rgb(var(--text-1)/0.9)]">
+        <div className="sf-mini-row">
+          <span className="sf-mini-label">Status</span>
+          <span className="sf-field-meta">Live widgets · OK</span>
         </div>
         <div className="sf-mini-row">
-          <span className="sf-mini-label">Refresh data</span>
-          <Button variant="ghost" size="sm">Sync</Button>
+          <span className="sf-mini-label">Filters</span>
+          <Button variant="ghost" size="sm">Scope</Button>
+        </div>
+        <div className="sf-mini-row">
+          <span className="sf-mini-label">Telemetry</span>
+          <span className="sf-field-meta">No incidents</span>
         </div>
       </div>
     </div>
@@ -37,16 +41,20 @@ function JournalInspector() {
       <div className="flex flex-wrap gap-2">
         <Button variant="secondary" size="sm">New entry</Button>
         <Button variant="ghost" size="sm">Templates</Button>
-        <Button variant="ghost" size="sm">Insights</Button>
+        <Button variant="ghost" size="sm">Tag library</Button>
       </div>
       <div className="sf-divider" />
-      <div className="space-y-2">
-        <div className="sf-field-row">
-          <div className="sf-field-label">Focus</div>
-          <div className="sf-field-meta">Setups / Tags</div>
+      <div className="space-y-2 text-sm text-[rgb(var(--text-1)/0.9)]">
+        <div className="sf-mini-row">
+          <span className="sf-mini-label">Drafts</span>
+          <span className="sf-field-meta">2 pending</span>
         </div>
-        <div className="sf-chips" aria-label="Journal filters">
-          {["A+ setups", "Review queue", "Needs tags"].map((chip) => (
+        <div className="sf-field-row">
+          <div className="sf-field-label">Quick tags</div>
+          <div className="sf-field-meta">Add to next entry</div>
+        </div>
+        <div className="sf-chips" aria-label="Journal quick tags">
+          {["A+ setup", "Review", "Mindset"].map((chip) => (
             <button key={chip} type="button" className="sf-chip">{chip}</button>
           ))}
         </div>
@@ -58,10 +66,10 @@ function JournalInspector() {
 function DefaultInspector() {
   return (
     <div className="sf-subpanel" aria-label="Inspector overview">
-      <div className="sf-subpanel-title">Context</div>
+      <div className="sf-subpanel-title">Empty state</div>
       <p className="text-sm leading-relaxed text-[rgb(var(--text-2)/0.9)]">
-        The inspector mirrors the screen you are on with quick filters, notes, and tools. Use it to keep momentum without
-        losing the main canvas.
+        Open the panel to jump between dashboards, analysis, or your journal. Shortcuts and quick links keep navigation tight
+        while leaving the main canvas unobstructed.
       </p>
     </div>
   )
@@ -102,6 +110,19 @@ function RecentSection() {
   )
 }
 
+function QuickLinksSection() {
+  return (
+    <div className="sf-subpanel" aria-label="Quick navigation">
+      <div className="sf-subpanel-title">Quick links</div>
+      <div className="sf-chips" aria-label="Primary quick links">
+        <Link to="/dashboard" className="sf-chip">Dashboard</Link>
+        <Link to="/journal" className="sf-chip">Journal</Link>
+        <Link to="/analysis" className="sf-chip">Analysis</Link>
+      </div>
+    </div>
+  )
+}
+
 export default function ActionPanel({ onClose }: ActionPanelProps) {
   const location = useLocation()
   const pathname = location.pathname
@@ -131,6 +152,7 @@ export default function ActionPanel({ onClose }: ActionPanelProps) {
 
         <div className="sf-panel-body space-y-4">
           {context}
+          <QuickLinksSection />
           <ShortcutSection />
           <RecentSection />
         </div>

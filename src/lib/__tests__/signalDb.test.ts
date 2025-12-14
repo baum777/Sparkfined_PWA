@@ -55,9 +55,19 @@ describe('signalDb', () => {
   })
 
   it('creates signals and returns them for a symbol with optional limit', async () => {
-    const first = await createSignal(baseSignal, db)
-    const second = await createSignal({ ...baseSignal, meta: { close: 50500 } }, db)
-    const third = await createSignal({ ...baseSignal, meta: { close: 51000 } }, db)
+    const baseTime = Date.now()
+    const first = await createSignal(
+      { ...baseSignal, triggeredAt: new Date(baseTime).toISOString() },
+      db,
+    )
+    const second = await createSignal(
+      { ...baseSignal, meta: { close: 50500 }, triggeredAt: new Date(baseTime + 1000).toISOString() },
+      db,
+    )
+    const third = await createSignal(
+      { ...baseSignal, meta: { close: 51000 }, triggeredAt: new Date(baseTime + 2000).toISOString() },
+      db,
+    )
 
     const allSignals = await getSignalsForSymbol(baseSignal.symbol, undefined, db)
     expect(allSignals).toHaveLength(3)

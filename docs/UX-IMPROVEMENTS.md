@@ -1,4 +1,4 @@
-# 🎯 10 UX-Verbesserungen für Sparkfined
+# 🎯 13 UX-Verbesserungen für Sparkfined
 
 Umfassende UX-Optimierungen für bessere Nutzererfahrung, Accessibility und Interaktionen.
 
@@ -18,6 +18,9 @@ Umfassende UX-Optimierungen für bessere Nutzererfahrung, Accessibility und Inte
 | 8 | **Progressive Disclosure** | ✅ Fertig | `Collapsible.tsx` |
 | 9 | **Focus Management** | ✅ Fertig | `useFocusManagement.ts` |
 | 10 | **Page Transitions** | ✅ Fertig | `PageTransition.tsx` |
+| 11 | **Action Panel Persistenz** | ✅ Fertig | `AppShell.tsx`, `Topbar.tsx` |
+| 12 | **Icon-first Navigation Rail** | ✅ Fertig | `AppShell.tsx`, `Rail.tsx`, `styles/index.css` |
+| 13 | **Route-aware Inspector Panel** | ✅ Fertig | `ActionPanel.tsx` |
 
 ---
 
@@ -470,6 +473,43 @@ import { PageTransition, SlideTransition, ScaleTransition } from '@/components/u
 
 ---
 
+## 11. 📌 Action Panel Persistenz
+
+**Problem:** Der Inspector startet offen und verliert seinen Zustand zwischen Sessions, wodurch der Main-Canvas unnötig Platz
+verliert.
+
+**Lösung:**
+- Das Panel ist standardmäßig geschlossen (`isActionPanelOpen = false`).
+- Der Zustand wird unter `sf.actionPanel.open` in `localStorage` persistiert und beim Laden gelesen.
+- Globaler Toggle in der Topbar mit ARIA-Attributen (`aria-expanded`, `aria-controls="sf-action-panel"`).
+- Beim Schließen wird der Fokus zurück auf den Toggle gesetzt, um Keyboard-Usern den Kontext zu erhalten.
+
+---
+
+## 12. 🧭 Icon-first Navigation Rail
+
+**Problem:** Labels waren dauerhaft sichtbar und machten den Rail breiter als nötig, obwohl die IA primär über Icons vermittelt
+wird.
+
+**Lösung:**
+- Rail startet icon-first mit 78px Breite und zeigt Labels nur im Expanded-State.
+- Manual Toggle (ARIA-pressed) im Rail; Grid passt sich über `sf-shell-rail-expanded` an (Expanded: clamp auf 200–240px).
+- Labels sind getruncatet (ellipsis) und nutzen bestehende `title`-Tooltips im collapsed Mode für schnelle Orientierung.
+
+---
+
+## 13. 🔎 Route-aware Inspector Panel
+
+**Problem:** Das Panel war leer, wenn kein Trading-Context aktiv war, und bot wenig Mehrwert für Dashboard oder Journal.
+
+**Lösung:**
+- Route-Awareness: Dashboard zeigt schnelle Filter/Status-Blöcke, Journal fokussiert auf neue Einträge, Templates und Tag-Quick-
+Adds.
+- Quick Links block für Dashboard/Journal/Analysis und Shortcut-Section (⌘K, Jump-to, Panel-Toggle) halten die Navigation straff.
+- Default Empty State erklärt Nutzen und bleibt frei von Trading-UI.
+
+---
+
 ## 🎨 Design Patterns
 
 ### Pattern 1: Loading → Empty → Content → Error
@@ -567,4 +607,4 @@ Alle Komponenten sind optimiert für Performance:
 
 ---
 
-**Alle 10 UX-Verbesserungen sind implementiert und ready to use! 🎉**
+**Alle 13 UX-Verbesserungen sind implementiert und ready to use! 🎉**
