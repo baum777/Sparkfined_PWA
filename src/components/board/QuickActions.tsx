@@ -7,16 +7,15 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { Search, BarChart3, FileText, Upload, Share2 } from '@/lib/icons';
+import { BarChart3, FileText, Upload, Share2 } from '@/lib/icons';
 import QuickActionCard from './QuickActionCard';
 
 export default function QuickActions() {
   const navigate = useNavigate();
   
   const actions = [
-  { id: 'analyze', label: 'New Analysis', icon: Search, target: '/analysis' },
-  { id: 'chart', label: 'Open Chart', icon: BarChart3, target: '/chart' },
-  { id: 'journal', label: 'Add Journal', icon: FileText, target: '/journal' },
+    { id: 'chart', label: 'Open Chart', icon: BarChart3, target: '/chart' },
+    { id: 'journal', label: 'Add Journal', icon: FileText, target: '/journal' },
     { id: 'import', label: 'Import Data', icon: Upload, target: '#import' },
     { id: 'share', label: 'Share Session', icon: Share2, target: '#share' },
   ];

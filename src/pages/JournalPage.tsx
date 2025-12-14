@@ -1,370 +1,94 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
-import JournalLayout from '@/components/journal/JournalLayout';
-import JournalList from '@/components/journal/JournalList';
-import JournalDetailPanel from '@/components/journal/JournalDetailPanel';
-import JournalNewEntryDialog from '@/components/journal/JournalNewEntryDialog';
-import DashboardShell from '@/components/dashboard/DashboardShell';
-import { JournalJourneyBanner } from '@/components/journal/JournalJourneyBanner';
-import { JournalHeaderActions } from '@/components/journal/JournalHeaderActions';
-import { computeUserJourneySnapshotFromEntries } from '@/lib/journal/journey-snapshot';
-import { createQuickJournalEntry, loadJournalEntries, useJournalStore } from '@/store/journalStore';
-import { JournalInsightsPanel } from '@/components/journal/JournalInsightsPanel';
-import { Search } from '@/lib/icons';
-import { Toolbar } from '@/components/layout';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import React, { useCallback } from "react";
+import DashboardShell from "@/components/dashboard/DashboardShell";
+import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState, ErrorBanner } from "@/components/ui";
+import { JournalInputForm } from "@/features/journal-v2/components/JournalInputForm";
+import { JournalResultView } from "@/features/journal-v2/components/JournalResultView";
+import { useJournalV2 } from "@/features/journal-v2/hooks/useJournalV2";
 
-type DirectionFilter = 'all' | 'long' | 'short';
+function formatTimestamp(timestamp: number): string {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(timestamp);
+}
 
 export default function JournalPage() {
-  const entries = useJournalStore((state) => state.entries);
-  const isLoading = useJournalStore((state) => state.isLoading);
-  const error = useJournalStore((state) => state.error);
-  const activeId = useJournalStore((state) => state.activeId);
-  const setEntries = useJournalStore((state) => state.setEntries);
-  const setActiveId = useJournalStore((state) => state.setActiveId);
-  const setLoading = useJournalStore((state) => state.setLoading);
-  const setError = useJournalStore((state) => state.setError);
-  const addEntry = useJournalStore((state) => state.addEntry);
-  const location = useLocation();
-  const [, setSearchParams] = useSearchParams();
-  const [directionFilter, setDirectionFilter] = useState<DirectionFilter>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isNewDialogOpen, setIsNewDialogOpen] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
-  const [createErrorMessage, setCreateErrorMessage] = useState<string | null>(null);
-  const [cacheWarning, setCacheWarning] = useState<string | null>(null);
-  const entryFromUrl = useMemo(() => {
-    if (!location.search) {
-      return null;
-    }
-    const params = new URLSearchParams(location.search);
-    return params.get('entry');
-  }, [location.search]);
+  const { submit, latestResult, history, isSaving, isLoading, error } = useJournalV2();
 
-  useEffect(() => {
-    let isCurrent = true;
-
-    const runLoad = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const loaded = await loadJournalEntries();
-        if (!isCurrent) {
-          return;
-        }
-        setEntries(loaded);
-        setCacheWarning(null);
-      } catch (err) {
-        console.warn('[Journal V2] Failed to load entries from persistence', err);
-        if (isCurrent) {
-          setError('Unable to load journal entries; showing empty state.');
-          setCacheWarning('Local journal cache is currently unavailable. Live data may be limited.');
-        }
-      } finally {
-        if (isCurrent) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void runLoad();
-
-    return () => {
-      isCurrent = false;
-    };
-    // loadJournalEntries is a stable import, setters are stable from zustand
-  }, []);
-
-  // Keep URL state in sync with the active entry while preventing re-render loops.
-  useEffect(() => {
-    if (!entries.length) {
-      return;
-    }
-
-    if (entryFromUrl && entries.some((entry) => entry.id === entryFromUrl)) {
-      if (entryFromUrl !== activeId) {
-        setActiveId(entryFromUrl);
-      }
-      return;
-    }
-
-    const fallbackEntry = entries[0];
-    if (fallbackEntry && (!activeId || !entries.some((entry) => entry.id === activeId))) {
-      if (fallbackEntry.id !== activeId) {
-        setActiveId(fallbackEntry.id);
-      }
-    }
-  }, [entries, entryFromUrl, activeId, setActiveId]);
-
-  const directionFilteredEntries = useMemo(() => {
-    if (directionFilter === 'all') {
-      return entries;
-    }
-    return entries.filter((entry) => entry.direction === directionFilter);
-  }, [directionFilter, entries]);
-
-  const normalizedQuery = searchQuery.trim().toLowerCase();
-
-  const filteredEntries = useMemo(() => {
-    if (!normalizedQuery) {
-      return directionFilteredEntries;
-    }
-    return directionFilteredEntries.filter((entry) => {
-      const haystacks = [entry.title, entry.notes ?? ''];
-      return haystacks.some((value) => value.toLowerCase().includes(normalizedQuery));
-    });
-  }, [directionFilteredEntries, normalizedQuery]);
-
-  const directionCounts = useMemo(() => {
-    return {
-      all: entries.length,
-      long: entries.filter((entry) => entry.direction === 'long').length,
-      short: entries.filter((entry) => entry.direction === 'short').length,
-    };
-  }, [entries]);
-
-  const journeySources = useMemo(
-    () =>
-      entries.map((entry) => ({
-        journeyMeta: entry.journeyMeta,
-      })),
-    [entries],
-  );
-
-  const hasJourneyMeta = useMemo(
-    () => journeySources.some((source) => Boolean(source.journeyMeta)),
-    [journeySources],
-  );
-
-  const journeySnapshot = useMemo(
-    () => computeUserJourneySnapshotFromEntries(journeySources),
-    [journeySources],
-  );
-
-  const handleSelectEntry = useCallback(
-    (id: string) => {
-      setActiveId(id);
-      setSearchParams((prev) => {
-        const nextParams = new URLSearchParams(prev);
-        nextParams.set('entry', id);
-        return nextParams;
-      }, { replace: true });
+  const handleSubmit = useCallback(
+    async (input: Parameters<typeof submit>[0]) => {
+      await submit(input);
     },
-    [setActiveId, setSearchParams],
+    [submit],
   );
-
-  const activeEntry = useMemo(() => entries.find((entry) => entry.id === activeId), [entries, activeId]);
-
-  const directionFilters: Array<{ label: string; value: DirectionFilter }> = useMemo(
-    () => [
-      { label: `All (${directionCounts.all})`, value: 'all' },
-      { label: directionCounts.long ? `Long · ${directionCounts.long}` : 'Long', value: 'long' },
-      { label: directionCounts.short ? `Short · ${directionCounts.short}` : 'Short', value: 'short' },
-    ],
-    [directionCounts.all, directionCounts.long, directionCounts.short],
-  );
-
-  const listEmptyState = useMemo(
-    () =>
-      filteredEntries.length === 0 && entries.length
-        ? {
-            title: 'No entries match your filters',
-            description: 'Adjust the direction filter or clear your search to see your saved trades again.',
-            actionLabel: 'Clear filters',
-            onAction: () => {
-              setDirectionFilter('all');
-              setSearchQuery('');
-            },
-          }
-        : undefined,
-    [entries.length, filteredEntries.length, setDirectionFilter, setSearchQuery],
-  );
-
-  const hasFiltersApplied = directionFilter !== 'all' || Boolean(normalizedQuery);
-
-  const handleCreateEntry = useCallback(
-    async ({ title, notes }: { title: string; notes: string }) => {
-      setIsCreating(true);
-      setCreateErrorMessage(null);
-      try {
-        const newEntry = await createQuickJournalEntry({ title, notes });
-        addEntry(newEntry);
-        setActiveId(newEntry.id);
-        setSearchParams((prev) => {
-          const nextParams = new URLSearchParams(prev);
-          nextParams.set('entry', newEntry.id);
-          return nextParams;
-        }, { replace: true });
-        setIsNewDialogOpen(false);
-      } catch (createError) {
-        console.warn('[Journal V2] Failed to create entry', createError);
-        setCreateErrorMessage('Unable to create entry. Please try again.');
-      } finally {
-        setIsCreating(false);
-      }
-    },
-    [addEntry, setActiveId, setSearchParams],
-  );
-
-  const headerDescription = `${entries.length} recent entries · Quick filters and inline edits to stay in flow`;
 
   return (
     <DashboardShell
       title="Journal"
-      description={headerDescription}
-      actions={
-        <JournalHeaderActions
-          isLoading={isLoading}
-          isCreating={isCreating}
-          onNewEntry={() => setIsNewDialogOpen(true)}
-        />
-      }
+      description="Behavioral pipeline with offline persistence and immediate archetype insights."
     >
-      <div className="space-y-6" data-testid="journal-page">
-        <Card variant="glass" className="p-5 shadow-card-subtle">
-          <CardHeader className="mb-0">
-            <CardTitle className="text-xl font-semibold">Guided reflection</CardTitle>
-            <CardDescription>
-              Your trading log as a calm ritual to build discipline, not FOMO. Select any entry to review, refine your notes,
-              and track your growth over time.
-            </CardDescription>
-          </CardHeader>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-2xl border border-border/60 bg-surface/60 px-4 py-3">
-              <p className="text-xs uppercase tracking-wide text-text-tertiary">Recent entries</p>
-              <p className="text-lg font-semibold text-text-primary">{entries.length}</p>
-              <p className="text-xs text-text-secondary">Synced across devices</p>
-            </div>
-            <div className="rounded-2xl border border-border/60 bg-surface/60 px-4 py-3">
-              <p className="text-xs uppercase tracking-wide text-text-tertiary">Filter ready</p>
-              <p className="text-lg font-semibold text-text-primary">{filteredEntries.length}</p>
-              <p className="text-xs text-text-secondary">After current filters</p>
-            </div>
-            <div className="rounded-2xl border border-border/60 bg-surface/60 px-4 py-3">
-              <p className="text-xs uppercase tracking-wide text-text-tertiary">Status</p>
-              {isLoading ? (
-                <p className="text-sm font-medium text-text-secondary">Loading your journal…</p>
-              ) : error ? (
-                <p className="text-sm font-medium text-warn">Could not load entries right now.</p>
-              ) : (
-                <p className="text-sm font-medium text-sentiment-bull">Ready to review</p>
-              )}
-              {!isLoading && cacheWarning ? (
-                <p className="text-xs text-text-secondary" data-testid="journal-cache-warning">
-                  {cacheWarning}
-                </p>
-              ) : null}
-            </div>
+      <div className="space-y-4" data-testid="journal-page">
+        {error ? <ErrorBanner message={error} /> : null}
+
+        <div className="grid gap-6 xl:grid-cols-3 xl:items-start">
+          <div className="xl:col-span-2">
+            <JournalInputForm onSubmit={handleSubmit} isSubmitting={isSaving} />
           </div>
-        </Card>
 
-        <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
-          <div className="space-y-4 xl:col-span-8">
-            <Toolbar
-              className="bg-surface/70"
-              left={
-                <div className="flex flex-wrap items-center gap-2">
-                  {directionFilters.map((filter) => {
-                    const isActive = directionFilter === filter.value;
-                    return (
-                      <Button
-                        key={filter.value}
-                        variant={isActive ? 'primary' : 'outline'}
-                        size="sm"
-                        onClick={() => setDirectionFilter(filter.value)}
-                        className="rounded-full"
-                        data-testid={`journal-filter-${filter.value}`}
-                      >
-                        {filter.label}
-                      </Button>
-                    );
-                  })}
-                </div>
-              }
-              search={
-                <Input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search by title or notes"
-                  data-testid="journal-search-input"
-                  leftIcon={<Search size={16} className="text-text-tertiary" aria-hidden />}
-                  className="bg-surface"
-                />
-              }
-              right={
-                hasFiltersApplied ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setDirectionFilter('all');
-                      setSearchQuery('');
-                    }}
-                    className="rounded-full"
-                    data-testid="journal-clear-filters"
-                  >
-                    Reset filters
-                  </Button>
-                ) : null
-              }
-            />
+          <div className="space-y-4">
+            {latestResult ? (
+              <JournalResultView result={latestResult} />
+            ) : (
+              <EmptyState
+                title="Run your first journal entry"
+                description="You will see archetype, score, and insights immediately after submitting the form."
+              />
+            )}
 
-            <JournalLayout
-              list={
-                <div className="flex h-full flex-col gap-3">
-                  <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
-                    <div className="space-y-0.5">
-                      <p className="text-xs uppercase tracking-wider text-text-tertiary">Entries</p>
-                      <p className="text-xs text-text-secondary">
-                        Showing {filteredEntries.length} of {entries.length} saved logs
-                      </p>
-                    </div>
-                    <p className="text-xs text-text-secondary">Filter by direction or search through notes.</p>
+            <Card variant="glass" data-testid="journal-v2-history">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Recent entries</CardTitle>
+                <p className="text-sm text-text-secondary">Stored locally with Dexie for offline review.</p>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {isLoading ? (
+                  <div className="space-y-2">
+                    {Array.from({ length: 3 }).map((_, index) => (
+                      <div key={index} className="h-14 animate-pulse rounded-xl bg-surface/70" />
+                    ))}
                   </div>
-                  <div className="flex-1 rounded-2xl border border-border bg-surface/70 p-2 backdrop-blur">
-                    {isLoading ? (
-                      <div className="space-y-2">
-                        {Array.from({ length: 3 }).map((_, idx) => (
-                          <div key={idx} className="h-16 animate-pulse rounded-2xl bg-surface" />
-                        ))}
+                ) : latestResult && history.length === 0 ? (
+                  <p className="text-sm text-text-secondary">Submit more entries to see your recent history.</p>
+                ) : history.length === 0 ? (
+                  <EmptyState
+                    title="No entries yet"
+                    description="Run the journal pipeline to see history and insights."
+                  />
+                ) : (
+                  <div className="space-y-3">
+                    {history.map((item) => (
+                      <div key={item.id} className="rounded-2xl border border-border/80 bg-surface/70 p-3">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
+                              <span className="text-text-tertiary">#{String(item.id).padStart(3, "0")}</span>
+                              <Badge variant="brand">Archetype v{item.version}</Badge>
+                            </div>
+                            <p className="text-xs text-text-secondary">{formatTimestamp(item.createdAt)}</p>
+                          </div>
+                          <div className="text-sm text-text-primary">Score: {item.output.score}/100</div>
+                        </div>
                       </div>
-                    ) : (
-                      <JournalList
-                        entries={filteredEntries}
-                        activeId={activeId}
-                        onSelect={handleSelectEntry}
-                        onNewEntry={() => setIsNewDialogOpen(true)}
-                        emptyState={listEmptyState}
-                      />
-                    )}
+                    ))}
                   </div>
-                </div>
-              }
-              detail={<JournalDetailPanel entry={activeEntry} />}
-            />
-          </div>
-          <div className="space-y-4 xl:col-span-4">
-            {hasJourneyMeta && journeySnapshot ? <JournalJourneyBanner snapshot={journeySnapshot} /> : null}
-            <JournalInsightsPanel entries={entries} />
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
-      <JournalNewEntryDialog
-        isOpen={isNewDialogOpen}
-        onClose={() => {
-          if (!isCreating) {
-            setIsNewDialogOpen(false);
-            setCreateErrorMessage(null);
-          }
-        }}
-        onCreate={handleCreateEntry}
-        isSubmitting={isCreating}
-        errorMessage={createErrorMessage}
-      />
     </DashboardShell>
   );
 }

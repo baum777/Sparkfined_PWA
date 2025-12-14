@@ -9,11 +9,9 @@ interface RailProps {
 
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: "▦" },
-  { to: "/analysis", label: "Analysis", icon: "⟐" },
+  { to: "/journal", label: "Journal", icon: "✎" },
   { to: "/chart", label: "Chart", icon: "⌁" },
   { to: "/watchlist", label: "Watchlist", icon: "★" },
-  { to: "/alerts", label: "Alerts", icon: "⚡" },
-  { to: "/journal", label: "Journal", icon: "✎" },
 ]
 
 export default function Rail({ isExpanded, onToggleExpand }: RailProps) {

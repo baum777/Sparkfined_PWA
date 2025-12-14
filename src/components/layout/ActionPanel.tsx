@@ -68,8 +68,8 @@ function DefaultInspector() {
     <div className="sf-subpanel" aria-label="Inspector overview">
       <div className="sf-subpanel-title">Empty state</div>
       <p className="text-sm leading-relaxed text-[rgb(var(--text-2)/0.9)]">
-        Open the panel to jump between dashboards, analysis, or your journal. Shortcuts and quick links keep navigation tight
-        while leaving the main canvas unobstructed.
+        Open the panel to jump between dashboards, charting, or your journal. Shortcuts and quick links keep navigation tight while
+        leaving the main canvas unobstructed.
       </p>
     </div>
   )
@@ -117,7 +117,7 @@ function QuickLinksSection() {
       <div className="sf-chips" aria-label="Primary quick links">
         <Link to="/dashboard" className="sf-chip">Dashboard</Link>
         <Link to="/journal" className="sf-chip">Journal</Link>
-        <Link to="/analysis" className="sf-chip">Analysis</Link>
+        <Link to="/chart" className="sf-chip">Chart</Link>
       </div>
     </div>
   )

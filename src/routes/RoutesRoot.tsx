@@ -12,9 +12,7 @@ const SignalsPage = lazy(() => import("../pages/SignalsPage"));
 const LessonsPage = lazy(() => import("../pages/LessonsPage"));
 const IconShowcase = lazy(() => import("../pages/IconShowcase"));
 const DashboardPage = lazy(() => import("../pages/DashboardPage"));
-const AnalysisPage = lazy(() => import("../pages/AnalysisPage"));
 const JournalPage = lazy(() => import("../pages/JournalPage"));
-const JournalV2PipelinePage = lazy(() => import("../features/journal-v2/pages/JournalV2Page"));
 const OraclePage = lazy(() => import("../pages/OraclePage"));
 const WatchlistPage = lazy(() => import("../pages/WatchlistPage"));
 const AlertsPage = lazy(() => import("../pages/AlertsPage"));
@@ -59,8 +57,8 @@ export default function RoutesRoot() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/board" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/analyze" element={<Navigate to="/analysis" replace />} />
-            <Route path="/analysis" element={<AnalysisPage />} />
+            <Route path="/analyze" element={<Navigate to="/chart" replace />} />
+            <Route path="/analysis" element={<Navigate to="/chart" replace />} />
             <Route path="/chart" element={<ChartPage />} />
             <Route path="/journal" element={<JournalPage />} />
             <Route path="/watchlist" element={<WatchlistPage />} />
@@ -71,7 +69,7 @@ export default function RoutesRoot() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/signals" element={<SignalsPage />} />
             <Route path="/lessons" element={<LessonsPage />} />
-            <Route path="/journal/v2" element={<JournalV2PipelinePage />} />
+            <Route path="/journal/v2" element={<Navigate to="/journal" replace />} />
             <Route path="/oracle" element={<OraclePage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/icons" element={<IconShowcase />} />
@@ -79,7 +77,7 @@ export default function RoutesRoot() {
             {/* Legacy V2 routes (redirect to canonical paths) */}
             <Route path="/dashboard-v2" element={<Navigate to="/dashboard" replace />} />
             <Route path="/watchlist-v2" element={<Navigate to="/watchlist" replace />} />
-            <Route path="/analysis-v2" element={<Navigate to="/analysis" replace />} />
+            <Route path="/analysis-v2" element={<Navigate to="/chart" replace />} />
             <Route path="/journal-v2" element={<Navigate to="/journal" replace />} />
             <Route path="/alerts-v2" element={<Navigate to="/alerts" replace />} />
             <Route path="/chart-v2" element={<Navigate to="/chart" replace />} />
