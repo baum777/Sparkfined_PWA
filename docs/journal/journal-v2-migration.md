@@ -1,8 +1,9 @@
 # Journal 2.0 – Migration Guide
 
 ## Kontext
-Journal 2.0 läuft als neue Pipeline unter `/journal/v2` mit Dexie-Storage (`sparkfined-journal-v2`).
-Einträge bestehen aus dem Rohinput (`JournalRawInput`) und dem berechneten Output (`JournalOutput`).
+Journal 2.0 läuft als neue Pipeline unter `/journal` (alte `/journal/v2`/`/journal-v2` leiten um) mit Dexie-Storage
+(`sparkfined-journal-v2`). Einträge bestehen aus dem Rohinput (`JournalRawInput`) und dem berechneten Output
+(`JournalOutput`).
 
 ## Schema
 - DB: `JournalV2DB` (`src/features/journal-v2/db/journal-v2-schema.ts`)
