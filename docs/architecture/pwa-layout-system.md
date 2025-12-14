@@ -24,30 +24,35 @@ Die App-Shell bleibt über alle Seiten hinweg konsistent:
 
 ### Komponenten
 
-- **Sidebar** (`src/components/layout/Sidebar.tsx`)
-  - Desktop (>= lg): Fixed left, collapsible
-  - Primäre Navigation: Dashboard, Analysis, Chart, Journal, Oracle, Alerts
-  - Sekundäre Navigation: Settings
-  - CSS-Variable: `--sidebar-width` (5rem collapsed, 16rem expanded)
+- **Topbar** (`src/components/layout/Topbar.tsx`)
+  - Linke Seite: Brand, Suche (stub), Panel-Toggle
+  - Rechte Seite: genau zwei Icons (Alerts → `/alerts`, Settings → `/settings`), beide mit `aria-label`
 
-- **BottomNav** (`src/components/layout/BottomNav.tsx`)
-  - Mobile (< lg): Fixed bottom navigation
-  - Gleiche Navigation wie Sidebar
+- **Rail** (`src/components/layout/Rail.tsx`)
+  - Icon-first Navigation mit vier Items: Dashboard (`/dashboard`), Journal (`/journal`), Chart (`/chart`), Watchlist (`/watchlist`)
+  - Klare Active-State-Hervorhebung über `NavLink`
+  - Keine Analysis/Journal 2.0 Links sichtbar
 
-- **Main Content Area** (`src/App.tsx`)
-  - Automatischer Sidebar-Offset auf Desktop: `lg:pl-[var(--sidebar-width)]`
-  - Transition bei Sidebar-Toggle
+- **ActionPanel** (`src/components/layout/ActionPanel.tsx`)
+  - Optionaler rechter Drawer, per Topbar-Button steuerbar
+
+- **Main Content Area** (`src/routes/RoutesRoot.tsx`)
+  - Lädt page-level Routes via `Outlet`
+  - `/analysis`, `/analysis-v2`, `/analyze` → Redirect nach `/chart`
+  - `/journal/v2` → Redirect nach `/journal`
 
 ### Struktur
 
 ```tsx
-<App>
-  <Sidebar /> {/* Desktop only */}
-  <main id="main-content" className="lg:pl-[var(--sidebar-width)]">
-    <RoutesRoot />
+<AppShell>
+  <Topbar />
+  <Rail />
+  <main id="main-content">
+    <Outlet />
   </main>
-  <BottomNav /> {/* Mobile only */}
-</App>
+  {/* Optional */}
+  <ActionPanel />
+</AppShell>
 ```
 
 ---
