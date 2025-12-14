@@ -97,11 +97,23 @@
     height: 100dvh;
     width: 100%;
     display: grid;
-    grid-template-columns: 72px 1fr 420px;
+    grid-template-columns:
+      clamp(72px, 16vw, 220px)
+      minmax(0, 1fr)
+      minmax(340px, 420px);
     grid-template-rows: 60px 1fr;
     grid-template-areas:
       "topbar topbar topbar"
       "rail   canvas action";
+  }
+
+  .sf-shell-action-closed {
+    grid-template-columns:
+      clamp(72px, 16vw, 220px)
+      minmax(0, 1fr);
+    grid-template-areas:
+      "topbar topbar"
+      "rail   canvas";
   }
 
   .sf-topbar {
@@ -201,6 +213,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    min-width: 0;
     border: 1px solid transparent;
     color: rgb(var(--text-1) / 0.9);
   }
@@ -212,11 +225,55 @@
     color: rgb(var(--text-0) / 0.95);
   }
   .sf-rail-icon { width: 2rem; display: flex; justify-content: center; opacity: 0.9; }
-  .sf-rail-label { font-size: 0.875rem; }
+  .sf-rail-label {
+    font-size: 0.875rem;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 1280px) {
+    .sf-shell {
+      grid-template-columns: 68px minmax(0, 1fr) minmax(320px, 400px);
+    }
+
+    .sf-rail-label {
+      display: none;
+    }
+
+    .sf-rail-item {
+      justify-content: center;
+    }
+
+    .sf-shell-action-closed {
+      grid-template-columns: 68px minmax(0, 1fr);
+      grid-template-areas:
+        "topbar topbar"
+        "rail   canvas";
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .sf-shell {
+      grid-template-columns: 64px minmax(0, 1fr) minmax(300px, 360px);
+    }
+
+    .sf-shell-action-closed {
+      grid-template-columns: 64px minmax(0, 1fr);
+    }
+  }
 
   /* ============ Action Panel ============ */
-  .sf-action { height: calc(100dvh - 60px); background: rgb(var(--surface-0) / 0.96); }
+  .sf-action {
+    height: calc(100dvh - 60px);
+    background: rgb(var(--surface-0) / 0.96);
+    min-width: 0;
+  }
   .sf-action-inner { height: 100%; width: 100%; padding: 0.75rem; overflow: auto; }
+
+  .sf-shell-action-closed .sf-action { display: none; }
 
   .sf-panel {
     border-radius: 1rem;
@@ -231,12 +288,28 @@
     padding-top: 0.75rem;
     padding-bottom: 0.5rem;
   }
+  .sf-panel-header-with-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
   .sf-panel-title {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: rgb(var(--text-2) / 0.9);
   }
+  .sf-panel-actions { display: flex; align-items: center; gap: 0.25rem; }
+  .sf-panel-close {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(var(--border-0) / 0.7);
+    background: rgb(var(--surface-2) / 0.35);
+    color: rgb(var(--text-1) / 0.9);
+  }
+  .sf-panel-close:hover { border-color: rgb(var(--border-1) / 0.8); background: rgb(var(--surface-1) / 0.55); }
   .sf-panel-dna {
     position: absolute; left: 12px; right: 12px; bottom: 0;
     height: 2px;

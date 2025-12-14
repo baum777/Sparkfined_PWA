@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import "@testing-library/jest-dom/vitest"
 import { render, screen, within } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import AppShell from "@/components/layout/AppShell"
 
@@ -24,7 +25,8 @@ describe("AppShell", () => {
 
     expect(screen.getByText("Sparkfined")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: "Global search" })).toBeInTheDocument()
-    expect(screen.getByText("Trade")).toBeInTheDocument()
+    expect(screen.getByText("Inspector")).toBeInTheDocument()
+    expect(screen.getByText("Shortcuts")).toBeInTheDocument()
     expect(screen.getByRole("main")).toHaveAttribute("id", "main-content")
     expect(screen.getByText("Dashboard Content")).toBeInTheDocument()
   })
@@ -50,5 +52,22 @@ describe("AppShell", () => {
     const journalLink = within(nav).getByRole("link", { name: "Journal" })
 
     expect(journalLink.getAttribute("aria-current")).toBe("page")
+  })
+
+  it("shows journal-specific inspector helpers", () => {
+    renderShell("/journal")
+
+    expect(screen.getByText("Journal tools")).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Toggle panel" })).toHaveAttribute("aria-expanded", "true")
+  })
+
+  it("allows collapsing the action panel", async () => {
+    renderShell()
+
+    const toggle = screen.getByRole("button", { name: "Toggle panel" })
+    await userEvent.click(toggle)
+
+    expect(toggle).toHaveAttribute("aria-expanded", "false")
+    expect(screen.queryByText("Inspector")).not.toBeInTheDocument()
   })
 })

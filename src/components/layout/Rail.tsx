@@ -18,6 +18,8 @@ export default function Rail() {
         <NavLink
           key={it.to}
           to={it.to}
+          aria-label={it.label}
+          title={it.label}
           className={({ isActive }) =>
             cn("sf-rail-item", isActive && "sf-rail-item-active")
           }
