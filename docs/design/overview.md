@@ -56,10 +56,10 @@ Das Design System ist in folgende Bereiche unterteilt:
 
 ### 🛠️ Neue Layout-Hülle (sf-shell)
 
-- **Grid-Shell**: `sf-shell` spannt ein 3-spaltiges Grid (Rail → Canvas → Action Panel) mit fixem Topbar über die volle Höhe.
-- **Navigation Rail**: `sf-rail` + `sf-rail-item` liefern die kompakten Primärlinks inkl. aktivem State.
-- **Topbar**: `sf-topbar` beherbergt Branding, Such-Shortcut und aktuelle Paar-Info.
-- **Action Panel**: `sf-action` hält das Trading-Modul (`sf-panel`, `sf-subpanel`, Chips/Segmented Controls) auf XL+ sichtbar.
+- **Grid-Shell**: `sf-shell` spannt ein 3-spaltiges Grid (Rail → Canvas → Action Panel) mit fixem Topbar über die volle Höhe; die Rail nutzt `clamp()` und das Canvas `minmax(0, 1fr)`, damit Labels nicht das Hauptpaneel überlaufen.
+- **Navigation Rail**: `sf-rail` + `sf-rail-item` liefern die kompakten Primärlinks inkl. aktivem State. Labels werden bei langen Texten gekürzt und unter 1280px automatisch in einen Icon-Only-Modus versetzt.
+- **Topbar**: `sf-topbar` beherbergt Branding, Such-Shortcut und aktuelle Paar-Info, plus ein neuer Toggle für das rechte Panel (`aria-expanded`, `aria-controls`).
+- **Action Panel / Inspector**: `sf-action` ist als Inspector einklappbar (0px-Spalte bei geschlossenem Zustand) und liefert kontextsensitive Blöcke: Dashboard-Filter/Sync, Journal-Tools (Entries, Templates, Insights) sowie globale Shortcuts und eine kleine Recent-Sektion.
 - **Tokens**: Nutzt neue Alias-Tokens (`--surface-*`, `--text-*`, `--brand`) für konsistente Farb-/Flächenzuordnung.
 - **Implementation**: Live unter `src/components/layout/*` mit `main#main-content` als Skip-Link-Ziel, im Router verdrahtet über `src/routes/RoutesRoot.tsx` (Legacy-Ordner `src/layout/` entfernt).
 - **Navigation**: Rail-Links verweisen auf bestehende Routen (Dashboard, Analysis, Chart, Watchlist, Alerts, Journal), damit keine 404s entstehen.

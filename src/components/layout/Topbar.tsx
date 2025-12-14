@@ -1,7 +1,17 @@
 import React from "react"
 import Button from "@/components/ui/Button"
 
-export default function Topbar() {
+interface TopbarProps {
+  onToggleActionPanel: () => void
+  isActionPanelOpen: boolean
+  actionPanelToggleRef: React.RefObject<HTMLButtonElement>
+}
+
+export default function Topbar({
+  onToggleActionPanel,
+  isActionPanelOpen,
+  actionPanelToggleRef,
+}: TopbarProps) {
   return (
     <div className="sf-topbar-inner">
       <div className="sf-topbar-left">
@@ -24,6 +34,17 @@ export default function Topbar() {
       </div>
 
       <div className="sf-topbar-right">
+        <button
+          ref={actionPanelToggleRef}
+          type="button"
+          className="btn btn-ghost btn-sm"
+          aria-label="Toggle panel"
+          aria-expanded={isActionPanelOpen}
+          aria-controls="sf-action-panel"
+          onClick={onToggleActionPanel}
+        >
+          Panel
+        </button>
         <Button variant="ghost" size="sm">Wallet</Button>
         <Button variant="ghost" size="sm" aria-label="Notifications">🔔</Button>
         <Button variant="ghost" size="sm" aria-label="Settings">⚙︎</Button>
