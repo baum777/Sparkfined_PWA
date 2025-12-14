@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { Home, BarChart3, FileText, Settings, TrendingUp, Menu, Activity, type LucideIcon } from '@/lib/icons'
+import { Home, FileText, Settings, TrendingUp, Menu, Activity, type LucideIcon } from '@/lib/icons'
 import { NavigationDrawer } from './NavigationDrawer'
 
 interface NavItem {
@@ -11,7 +11,6 @@ interface NavItem {
 
 const primaryNavItems: NavItem[] = [
   { path: '/dashboard', label: 'Board', Icon: Home },
-  { path: '/analysis', label: 'Analyze', Icon: BarChart3 },
   { path: '/chart', label: 'Chart', Icon: TrendingUp },
   { path: '/signals', label: 'Signals', Icon: Activity },
   { path: '/journal', label: 'Journal', Icon: FileText },
@@ -25,7 +24,6 @@ export default function BottomNav() {
   const getNavIds = (label: string) => {
     const idMap: Record<string, { tour: string; testid: string }> = {
       'Board': { tour: 'board-link', testid: 'nav-board' },
-      'Analyze': { tour: 'analyze-link', testid: 'nav-analyze' },
       'Chart': { tour: 'chart-link', testid: 'nav-chart' },
       'Signals': { tour: 'signals-link', testid: 'nav-signals' },
       'Journal': { tour: 'journal-link', testid: 'nav-journal' },
@@ -43,8 +41,8 @@ export default function BottomNav() {
         aria-label="Main navigation"
       >
         <div className="mx-auto max-w-7xl px-3 py-2">
-          <div className="grid grid-cols-7 gap-1.5">
-            {/* Primary Nav Items (6 tabs) */}
+          <div className="grid grid-cols-6 gap-1.5">
+            {/* Primary Nav Items (5 tabs) */}
             {primaryNavItems.map(({ path, label, Icon }) => {
               const { tour, testid } = getNavIds(label)
               return (

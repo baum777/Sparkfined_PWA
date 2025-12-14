@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import DashboardKpiStrip from '@/components/dashboard/DashboardKpiStrip';
-import DashboardQuickActions from '@/components/dashboard/DashboardQuickActions';
 import DashboardMainGrid from '@/components/dashboard/DashboardMainGrid';
 import InsightTeaser from '@/components/dashboard/InsightTeaser';
 import JournalSnapshot from '@/components/dashboard/JournalSnapshot';
@@ -109,9 +108,9 @@ export default function DashboardPage() {
             <StateView
               type="empty"
               title="No insights yet"
-              description="Run your first analysis to unlock AI bias, flow and volatility context."
-              actionLabel="Go to analysis"
-          onAction={() => navigate('/analysis')}
+              description="Run your first chart session to unlock AI bias, flow and volatility context."
+              actionLabel="Open chart"
+              onAction={() => navigate('/chart')}
             />
           }
           secondary={
@@ -143,7 +142,6 @@ export default function DashboardPage() {
         title="Dashboard"
         description="Command surface for your net risk, streaks, and live intelligence."
         meta={`${journalEntries.length} journal entries · ${alerts.length} alerts`}
-        actions={<DashboardQuickActions />}
         kpiStrip={kpiStripContent}
       >
         {renderMainContent()}

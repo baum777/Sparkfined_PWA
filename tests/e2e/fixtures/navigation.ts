@@ -17,7 +17,7 @@ async function visit(page: Page, path: string, testId: string) {
 }
 
 export async function visitJournal(page: Page) {
-  await visit(page, '/journal-v2', 'journal-page');
+  await visit(page, '/journal', 'journal-page');
 }
 
 export async function visitAlerts(page: Page) {

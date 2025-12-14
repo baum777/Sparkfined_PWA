@@ -15,7 +15,6 @@ describe('BottomNav', () => {
     const navArea = within(nav)
 
     expect(navArea.getByText('Board')).toBeTruthy()
-    expect(navArea.getByText('Analyze')).toBeTruthy()
     expect(navArea.getByText('Chart')).toBeTruthy()
     expect(navArea.getByText('Signals')).toBeTruthy()
     expect(navArea.getByText('Journal')).toBeTruthy()
@@ -46,14 +45,12 @@ describe('BottomNav', () => {
     const navArea = within(nav)
 
     const boardLink = navArea.getByRole('link', { name: /board/i })
-    const analyzeLink = navArea.getByRole('link', { name: /analyze/i })
     const chartLink = navArea.getByRole('link', { name: /chart/i })
     const signalsLink = navArea.getByRole('link', { name: /signals/i })
     const journalLink = navArea.getByRole('link', { name: /journal/i })
     const settingsLink = navArea.getByRole('link', { name: /settings/i })
 
     expect(boardLink.getAttribute('href')).toBe('/dashboard')
-    expect(analyzeLink.getAttribute('href')).toBe('/analysis')
     expect(chartLink.getAttribute('href')).toBe('/chart')
     expect(signalsLink.getAttribute('href')).toBe('/signals')
     expect(journalLink.getAttribute('href')).toBe('/journal')

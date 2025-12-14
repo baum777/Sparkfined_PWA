@@ -11,8 +11,9 @@ function renderShell(pathname = "/dashboard") {
       <Routes>
         <Route element={<AppShell />}>
           <Route path="/dashboard" element={<div>Dashboard Content</div>} />
-          <Route path="/analysis" element={<div>Analysis Page</div>} />
+          <Route path="/chart" element={<div>Chart Page</div>} />
           <Route path="/journal" element={<div>Journal Page</div>} />
+          <Route path="/watchlist" element={<div>Watchlist Page</div>} />
         </Route>
       </Routes>
     </MemoryRouter>
@@ -51,10 +52,8 @@ describe("AppShell", () => {
     const navArea = within(nav)
 
     expect(navArea.getByText("Dashboard")).toBeInTheDocument()
-    expect(navArea.getByText("Analysis")).toBeInTheDocument()
     expect(navArea.getByText("Chart")).toBeInTheDocument()
     expect(navArea.getByText("Watchlist")).toBeInTheDocument()
-    expect(navArea.getByText("Alerts")).toBeInTheDocument()
     expect(navArea.getByText("Journal")).toBeInTheDocument()
   })
 

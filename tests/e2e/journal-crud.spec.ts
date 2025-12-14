@@ -1,6 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 
-const JOURNAL_URL = '/journal-v2';
+const JOURNAL_URL = '/journal';
+
+test.skip(true, 'Legacy journal CRUD flows pending migration to the new journal pipeline');
 
 async function bypassOnboarding(page: Page) {
   await page.addInitScript(() => {

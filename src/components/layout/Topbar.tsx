@@ -1,5 +1,5 @@
 import React from "react"
-import Button from "@/components/ui/Button"
+import { Link } from "react-router-dom"
 
 interface TopbarProps {
   onToggleActionPanel: () => void
@@ -24,16 +24,7 @@ export default function Topbar({
           <span className="sf-search-placeholder">Search…</span>
           <span className="sf-kbd">⌘K</span>
         </button>
-      </div>
 
-      <div className="sf-topbar-center" aria-label="Selected pair">
-        <div className="sf-pair">
-          <span className="sf-pair-symbol">SOL/USDC</span>
-          <span className="sf-pair-meta">• 1m</span>
-        </div>
-      </div>
-
-      <div className="sf-topbar-right">
         <button
           ref={actionPanelToggleRef}
           type="button"
@@ -45,9 +36,22 @@ export default function Topbar({
         >
           Panel
         </button>
-        <Button variant="ghost" size="sm">Wallet</Button>
-        <Button variant="ghost" size="sm" aria-label="Notifications">🔔</Button>
-        <Button variant="ghost" size="sm" aria-label="Settings">⚙︎</Button>
+      </div>
+
+      <div className="sf-topbar-center" aria-label="Selected pair">
+        <div className="sf-pair">
+          <span className="sf-pair-symbol">SOL/USDC</span>
+          <span className="sf-pair-meta">• 1m</span>
+        </div>
+      </div>
+
+      <div className="sf-topbar-right">
+        <Link className="btn btn-ghost btn-sm" aria-label="Alerts" to="/alerts">
+          🔔
+        </Link>
+        <Link className="btn btn-ghost btn-sm" aria-label="Settings" to="/settings">
+          ⚙︎
+        </Link>
       </div>
     </div>
   )

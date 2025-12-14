@@ -13,7 +13,6 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Home,
-  BarChart3,
   FileText,
   Bell,
   TrendingUp,
@@ -39,7 +38,6 @@ const navSections: { title: string; items: NavItem[] }[] = [
     title: 'Trading Workflow',
     items: [
       { path: '/dashboard', label: 'Board', Icon: Home },
-      { path: '/analysis', label: 'Analyze', Icon: BarChart3 },
       { path: '/chart', label: 'Chart', Icon: TrendingUp },
       { path: '/signals', label: 'Signals', Icon: Activity },
       { path: '/journal', label: 'Journal', Icon: FileText },
@@ -105,7 +103,6 @@ export default function Sidebar() {
   const getNavIds = (label: string) => {
     const idMap: Record<string, { tour: string; testid: string }> = {
       'Board': { tour: 'board-link', testid: 'nav-board' },
-      'Analyze': { tour: 'analyze-link', testid: 'nav-analyze' },
       'Chart': { tour: 'chart-link', testid: 'nav-chart' },
       'Signals': { tour: 'signals-link', testid: 'nav-signals' },
       'Journal': { tour: 'journal-link', testid: 'nav-journal' },

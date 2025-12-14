@@ -1,39 +1,49 @@
 import { render, screen } from '@testing-library/react'
-import { describe, it, beforeEach, expect, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
-
 import JournalPage from '@/pages/JournalPage'
-import { useJournalStore } from '@/store/journalStore'
-import { queryEntries } from '@/lib/JournalService'
+import { runJournalPipeline } from '@/features/journal-v2/engine'
+import type { JournalRawInput, JournalOutput } from '@/features/journal-v2/types'
 
-vi.mock('@/lib/JournalService', () => ({
-  createEntry: vi.fn(),
-  queryEntries: vi.fn(),
-  updateEntry: vi.fn(),
-  updateEntryNotes: vi.fn(),
+const mockSubmit = vi.fn()
+
+const sampleInput: JournalRawInput = {
+  emotionalState: 'calm',
+  emotionIntensity: 4,
+  conviction: 6,
+  patternQuality: 6,
+  marketContext: 'mean-reversion',
+  reasoning: 'Fade extended move into liquidity pocket.',
+  expectation: 'Snap back to VWAP',
+  selfReflection: 'Respect stop placement',
+  createdAt: 1_700_000_200_000,
+}
+
+const mockResult: JournalOutput = runJournalPipeline(sampleInput)
+
+vi.mock('@/features/journal-v2/hooks/useJournalV2', () => ({
+  useJournalV2: () => ({
+    submit: mockSubmit,
+    latestResult: mockResult,
+    history: [
+      { id: 1, raw: sampleInput, output: mockResult, createdAt: sampleInput.createdAt, version: 2 },
+    ],
+    isSaving: false,
+    isLoading: false,
+    error: null,
+  }),
 }))
 
-describe('JournalPage cache warnings', () => {
-  beforeEach(() => {
-    useJournalStore.setState({
-      entries: [],
-      isLoading: false,
-      error: null,
-      activeId: undefined,
-    })
-    vi.mocked(queryEntries).mockReset()
-  })
-
-  it('shows a gentle cache warning if IndexedDB load fails', async () => {
-    vi.mocked(queryEntries).mockRejectedValue(new Error('idb blocked'))
-
+describe('JournalPage', () => {
+  it('renders form, result, and history', () => {
     render(
       <MemoryRouter>
         <JournalPage />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
 
-    const warning = await screen.findByTestId('journal-cache-warning')
-    expect(warning.textContent).toContain('Local journal cache is currently unavailable')
+    expect(screen.getByTestId('journal-v2-form')).toBeTruthy()
+    expect(screen.getByTestId('journal-v2-result')).toBeTruthy()
+    expect(screen.getByTestId('journal-v2-history')).toBeTruthy()
   })
 })

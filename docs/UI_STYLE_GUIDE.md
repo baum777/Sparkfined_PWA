@@ -897,8 +897,6 @@ All app pages use the `DashboardShell` wrapper:
 ```
 ┌─────────────────────────────────────────────┐
 │ Header: "Dashboard"                         │
-│ Actions: [Quick Actions Dropdown]           │
-├─────────────────────────────────────────────┤
 │ KPI Strip: [Net P&L] [Win Rate] [Alerts] […]│
 ├─────────────────────────────────────────────┤
 │ Main Content:                                │
@@ -913,7 +911,6 @@ All app pages use the `DashboardShell` wrapper:
 - `DashboardKpiStrip`: 4 KPI tiles
 - `InsightTeaser`: AI bias card (bias, confidence, summary)
 - `JournalSnapshot`: 3 recent entries with direction badges
-- `DashboardQuickActions`: Floating action button dropdown
 
 ### **9.4 Journal Page**
 
