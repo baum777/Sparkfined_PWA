@@ -68,7 +68,7 @@ export function JournalInputForm({ onSubmit, isSubmitting }: JournalInputFormPro
     <Card variant="glass" className="border-border/70 shadow-card-subtle" data-testid="journal-v2-form">
       <CardHeader className="flex flex-col gap-2 pb-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <Badge variant="brand" className="mb-2 uppercase tracking-wide text-xs">Journal 2.0</Badge>
+          <Badge variant="brand" className="mb-2 uppercase tracking-wide text-xs">Journal</Badge>
           <CardTitle className="text-xl">Capture your trading state</CardTitle>
           <p className="text-sm text-text-secondary">
             Map emotions, conviction, and context before you enter. Insights are generated locally and saved for offline review.
@@ -192,7 +192,7 @@ export function JournalInputForm({ onSubmit, isSubmitting }: JournalInputFormPro
                 Entries are stored locally with timestamps to track your emotional trend.
               </p>
               <Button type="submit" variant="primary" loading={isSubmitting} disabled={isSubmitting} data-testid="journal-v2-submit">
-                {isSubmitting ? 'Analyzing…' : 'Run Journal 2.0'}
+                {isSubmitting ? 'Analyzing…' : 'Run Journal'}
               </Button>
             </div>
           </div>
