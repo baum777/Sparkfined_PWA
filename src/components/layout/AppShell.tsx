@@ -5,17 +5,23 @@ import Topbar from "./Topbar"
 import Rail from "./Rail"
 import ActionPanel from "./ActionPanel"
 
+const ACTION_PANEL_STORAGE_KEY = "sf.actionPanel.open"
+
 export default function AppShell() {
   const [isActionPanelOpen, setIsActionPanelOpen] = React.useState(() => {
-    if (typeof window === "undefined") return true
-    const stored = window.localStorage.getItem("sf.actionPanel.open")
-    return stored ? stored === "true" : true
+    if (typeof window === "undefined") return false
+    const stored = window.localStorage.getItem(ACTION_PANEL_STORAGE_KEY)
+    return stored ? stored === "true" : false
   })
+  const [isRailExpanded, setIsRailExpanded] = React.useState(false)
   const toggleButtonRef = React.useRef<HTMLButtonElement>(null)
 
   React.useEffect(() => {
     if (typeof window === "undefined") return
-    window.localStorage.setItem("sf.actionPanel.open", isActionPanelOpen ? "true" : "false")
+    window.localStorage.setItem(
+      ACTION_PANEL_STORAGE_KEY,
+      isActionPanelOpen ? "true" : "false",
+    )
   }, [isActionPanelOpen])
 
   const handleCloseActionPanel = React.useCallback(() => {
@@ -27,10 +33,19 @@ export default function AppShell() {
     setIsActionPanelOpen((prev) => !prev)
   }, [])
 
+  const handleToggleRail = React.useCallback(() => {
+    setIsRailExpanded((prev) => !prev)
+  }, [])
+
   return (
     <div
-      className={cn("sf-shell", !isActionPanelOpen && "sf-shell-action-closed")}
+      className={cn(
+        "sf-shell",
+        !isActionPanelOpen && "sf-shell-action-closed",
+        isRailExpanded && "sf-shell-rail-expanded",
+      )}
       data-action-panel-open={isActionPanelOpen}
+      data-rail-expanded={isRailExpanded}
     >
       <header className="sf-topbar">
         <Topbar
@@ -40,8 +55,8 @@ export default function AppShell() {
         />
       </header>
 
-      <aside className="sf-rail">
-        <Rail />
+      <aside className="sf-rail" data-expanded={isRailExpanded}>
+        <Rail isExpanded={isRailExpanded} onToggleExpand={handleToggleRail} />
       </aside>
 
       <main id="main-content" tabIndex={-1} className="sf-canvas">
