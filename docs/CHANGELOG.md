@@ -2,7 +2,14 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-14
+**Last Updated:** 2025-12-15
+
+---
+
+## 2025-12-15
+
+### Added
+- **Solana Trade Events Store:** Dokumentiert den neuen Dexie-Store `trade_events` inkl. Unique-Index (`txHash`), deduplizierendem `saveTradeEvents`-Helper sowie Queries für unbelegte BUY-Events (`listUnconsumedBuyEvents`, `countUnconsumedBuyEvents`, `markEventConsumed`).
 
 ---
 

@@ -30,6 +30,12 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-15)
+
+- **On-chain Trade Events (Solana):** `trade_events` Dexie-Store mit dedupliziertem `saveTradeEvents`-Helper und Queries für unbelegte BUY-Swaps. Dokumentiert in [docs/events/index.md](events/index.md).
+
+---
+
 ## 📦 Neue Ergänzungen (2025-12-03)
 
 ### Rulesync & AI Agent Setup
