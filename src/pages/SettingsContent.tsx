@@ -7,6 +7,7 @@ import { useAIContext } from "../state/aiContext";
 import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from "../lib/walletMonitor";
 import JournalDataControls from "@/components/settings/JournalDataControls";
 import { QuoteCurrencySelect } from "@/components/settings/QuoteCurrencySelect";
+import ConnectedWalletsPanel from "@/components/settings/ConnectedWalletsPanel";
 import Button from "@/components/ui/Button";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useTheme, type ThemeMode } from "@/lib/theme/useTheme";
@@ -142,6 +143,9 @@ export default function SettingsContent({
           Reset Onboarding
         </Button>
       </div>
+
+      <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">Connected Wallets</h2>
+      <ConnectedWalletsPanel />
 
       {/* BLOCK 2: Wallet Monitoring */}
       <h2 className="mt-6 mb-2 text-sm font-semibold text-text-primary">Wallet-Monitoring (Auto-Journal)</h2>
