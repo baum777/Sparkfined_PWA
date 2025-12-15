@@ -7,6 +7,7 @@
 ---
 
 ## 2025-12-15
+- Added Moralis Solana Gateway wallet swaps provider documentation entry (normalized trade event mapping) to the events inventory and docs index.
 
 ### Added
 - **Solana Trade Events Store:** Dokumentiert den neuen Dexie-Store `trade_events` inkl. Unique-Index (`txHash`), deduplizierendem `saveTradeEvents`-Helper sowie Queries für unbelegte BUY-Events (`listUnconsumedBuyEvents`, `countUnconsumedBuyEvents`, `markEventConsumed`).
