@@ -18,6 +18,8 @@ telemetry/ai/*.jsonl
 .DS_Store
 Thumbs.db
 *.tsbuildinfo
+core
+core.*
 
 # Lighthouse CI Reports
 .lhci-report/
