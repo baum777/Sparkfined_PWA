@@ -21,6 +21,7 @@ Umfassende UX-Optimierungen für bessere Nutzererfahrung, Accessibility und Inte
 | 11 | **Action Panel Persistenz** | ✅ Fertig | `AppShell.tsx`, `Topbar.tsx` |
 | 12 | **Icon-first Navigation Rail** | ✅ Fertig | `AppShell.tsx`, `Rail.tsx`, `styles/index.css` |
 | 13 | **Route-aware Inspector Panel** | ✅ Fertig | `ActionPanel.tsx` |
+| 14 | **Chart Indicator Persistenz** | ✅ Neu | `indicatorSettings.ts`, `ChartPage.tsx` |
 
 ---
 

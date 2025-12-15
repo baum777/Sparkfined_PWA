@@ -20,6 +20,7 @@ import type {
 } from '@/domain/chart'
 import type { ChartDataSource } from '@/hooks/useOhlcData'
 import { getChartColors } from '@/lib/chartColors'
+import { IndicatorSeriesManager } from '@/lib/chart/indicatorSeriesManager'
 
 export type AdvancedChartProps = {
   candles: OhlcCandle[]
@@ -108,7 +109,7 @@ export default function AdvancedChart({
   const chartRef = useRef<IChartApi | null>(null)
   const candleSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null)
   const volumeSeriesRef = useRef<ISeriesApi<'Histogram'> | null>(null)
-  const indicatorSeriesRef = useRef<Record<string, ISeriesApi<'Line'>[]>>({})
+  const indicatorManagerRef = useRef<IndicatorSeriesManager | null>(null)
 
   const { candleData, volumeData } = useMemo(() => toSeriesData(candles), [candles])
   const lastCandle = useMemo(() => candles[candles.length - 1], [candles])
@@ -166,6 +167,7 @@ export default function AdvancedChart({
         candleSeriesRef.current = candleSeries
         volumeSeriesRef.current = volumeSeries
         chartRef.current = chart
+        indicatorManagerRef.current = new IndicatorSeriesManager(chart)
 
         const handleResize = () => {
           if (containerRef.current && chart) {
@@ -208,6 +210,8 @@ export default function AdvancedChart({
       chartRef.current = null
       candleSeriesRef.current = null
       volumeSeriesRef.current = null
+      indicatorManagerRef.current?.removeAll()
+      indicatorManagerRef.current = null
     }
   }, [])
 
@@ -224,36 +228,8 @@ export default function AdvancedChart({
   }, [viewState, onViewStateChange])
 
   useEffect(() => {
-    const chart = chartRef.current
-    if (!chart) return
-
-    // Get chart colors from design tokens
-    const colors = getChartColors()
-
-    Object.values(indicatorSeriesRef.current).forEach((seriesList) => {
-      seriesList.forEach((series) => {
-        // removeSeries is available at runtime; guard for mock compatibility with optional chaining
-        chart.removeSeries?.(series)
-      })
-    })
-    indicatorSeriesRef.current = {}
-
-    indicators?.forEach((indicator) => {
-      if (indicator.type === 'bb') {
-        const basis = chart.addLineSeries({ color: indicator.color ?? colors.warn, lineWidth: 2 })
-        const upper = chart.addLineSeries({ color: colors.warn, lineWidth: 1 })
-        const lower = chart.addLineSeries({ color: colors.warn, lineWidth: 1 })
-        basis.setData(indicator.basis)
-        upper.setData(indicator.upper)
-        lower.setData(indicator.lower)
-        indicatorSeriesRef.current[indicator.id] = [basis, upper, lower]
-        return
-      }
-
-      const line = chart.addLineSeries({ color: indicator.color ?? colors.info, lineWidth: 2 })
-      line.setData(indicator.points)
-      indicatorSeriesRef.current[indicator.id] = [line]
-    })
+    if (!indicators) return
+    indicatorManagerRef.current?.apply(indicators)
   }, [indicators])
 
   useEffect(() => {
