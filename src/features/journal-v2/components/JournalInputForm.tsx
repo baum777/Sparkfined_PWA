@@ -1,10 +1,13 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Select, Textarea } from '@/components/ui'
-import type { JournalRawInput, EmotionLabel, MarketContext } from '../types'
+import type { JournalRawInput, EmotionLabel, MarketContext, TradeContext } from '../types'
+import { cn } from '@/lib/ui/cn'
 
 interface JournalInputFormProps {
   onSubmit: (input: JournalRawInput) => Promise<void> | void
   isSubmitting?: boolean
+  tradeContext?: TradeContext
+  onClearTradeContext?: () => void
 }
 
 const emotionOptions: Array<{ value: EmotionLabel; label: string }> = [
@@ -29,7 +32,7 @@ const contextOptions: Array<{ value: MarketContext; label: string }> = [
 const sliderClasses =
   'w-full accent-brand transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus'
 
-export function JournalInputForm({ onSubmit, isSubmitting }: JournalInputFormProps) {
+export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClearTradeContext }: JournalInputFormProps) {
   const [emotionalState, setEmotionalState] = useState<EmotionLabel>('calm')
   const [emotionIntensity, setEmotionIntensity] = useState(5)
   const [conviction, setConviction] = useState(5)
@@ -38,6 +41,26 @@ export function JournalInputForm({ onSubmit, isSubmitting }: JournalInputFormPro
   const [reasoning, setReasoning] = useState('')
   const [expectation, setExpectation] = useState('')
   const [selfReflection, setSelfReflection] = useState('')
+
+  useEffect(() => {
+    if (!tradeContext) return
+
+    setReasoning((previous) =>
+      previous.trim().length
+        ? previous
+        : `Auto-captured ${tradeContext.side} ${tradeContext.baseSymbol ?? 'trade'} via ${tradeContext.walletId ?? 'wallet'} (tx ${tradeContext.txHash}).`,
+    )
+    setExpectation((previous) =>
+      previous.trim().length
+        ? previous
+        : `Journaling on-chain ${tradeContext.side} from ${new Date(tradeContext.timestamp).toUTCString()}.`,
+    )
+    setSelfReflection((previous) => (previous.trim().length ? previous : 'Note any emotion at entry or sizing decision.'))
+
+    if (tradeContext.side === 'BUY') {
+      setConviction((value) => Math.max(value, 6))
+    }
+  }, [tradeContext])
 
   const intensityLabels = useMemo(
     () => ({
@@ -51,6 +74,8 @@ export function JournalInputForm({ onSubmit, isSubmitting }: JournalInputFormPro
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    const createdAt = tradeContext?.timestamp ?? Date.now()
+
     onSubmit({
       emotionalState,
       emotionIntensity,
@@ -60,7 +85,8 @@ export function JournalInputForm({ onSubmit, isSubmitting }: JournalInputFormPro
       reasoning,
       expectation,
       selfReflection,
-      createdAt: Date.now(),
+      createdAt,
+      tradeContext,
     })
   }
 
@@ -81,6 +107,43 @@ export function JournalInputForm({ onSubmit, isSubmitting }: JournalInputFormPro
       </CardHeader>
 
       <CardContent>
+        {tradeContext ? (
+          <div
+            className="mb-6 rounded-2xl border border-border/70 bg-surface/60 p-4 shadow-card-subtle"
+            data-testid="journal-trade-context"
+          >
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-text-tertiary">Prefilled from on-chain trade</p>
+                <p className="text-sm font-semibold text-text-primary">
+                  {tradeContext.baseSymbol ?? 'Asset'} {tradeContext.side}
+                </p>
+                <p className="text-xs text-text-secondary">
+                  {new Intl.DateTimeFormat('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    timeZone: 'UTC',
+                  }).format(tradeContext.timestamp)}{' '}
+                  · {tradeContext.txHash.slice(0, 8)}…
+                </p>
+              </div>
+              {onClearTradeContext ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClearTradeContext}
+                  className={cn('self-start text-text-secondary hover:text-text-primary')}
+                >
+                  Clear trade context
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+
         <form className="grid gap-6 lg:grid-cols-2" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="space-y-2">

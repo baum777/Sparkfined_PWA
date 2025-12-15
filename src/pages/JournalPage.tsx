@@ -4,6 +4,7 @@ import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState, ErrorBanne
 import { JournalInputForm } from "@/features/journal-v2/components/JournalInputForm";
 import { JournalResultView } from "@/features/journal-v2/components/JournalResultView";
 import { useJournalV2 } from "@/features/journal-v2/hooks/useJournalV2";
+import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
 
 function formatTimestamp(timestamp: number): string {
   return new Intl.DateTimeFormat("en-US", {
@@ -16,12 +17,16 @@ function formatTimestamp(timestamp: number): string {
 
 export default function JournalPage() {
   const { submit, latestResult, history, isSaving, isLoading, error } = useJournalV2();
+  const { tradeContext, clearTradeContext } = useTradeEventJournalBridge();
 
   const handleSubmit = useCallback(
     async (input: Parameters<typeof submit>[0]) => {
       await submit(input);
+      if (tradeContext) {
+        clearTradeContext();
+      }
     },
-    [submit],
+    [submit, tradeContext, clearTradeContext],
   );
 
   return (
@@ -34,7 +39,12 @@ export default function JournalPage() {
 
         <div className="grid gap-6 xl:grid-cols-3 xl:items-start">
           <div className="xl:col-span-2">
-            <JournalInputForm onSubmit={handleSubmit} isSubmitting={isSaving} />
+            <JournalInputForm
+              onSubmit={handleSubmit}
+              isSubmitting={isSaving}
+              tradeContext={tradeContext}
+              onClearTradeContext={clearTradeContext}
+            />
           </div>
 
           <div className="space-y-4">

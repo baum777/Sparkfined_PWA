@@ -4,6 +4,7 @@ import type { JournalOutput, JournalRawInput } from '../types'
 import type { PersistedJournalEntry } from '../db'
 import { getJournalEntries, saveJournalEntry } from '../db'
 import { createShadowTradeLogFromPipeline } from '../services/shadowTradeLog'
+import { confirmTradeFromContext } from '../services/confirmTradeFromContext'
 import { useSettings } from '@/state/settings'
 
 interface UseJournalV2Result {
@@ -79,6 +80,17 @@ export function useJournalV2(): UseJournalV2Result {
         })
       } catch (shadowErr) {
         console.warn('[journal-v2] failed to create shadow trade log', shadowErr)
+      }
+
+      if (normalizedInput.tradeContext) {
+        try {
+          await confirmTradeFromContext({
+            context: normalizedInput.tradeContext,
+            journalEntryId: id,
+          })
+        } catch (confirmErr) {
+          console.warn('[journal-v2] failed to confirm trade event', confirmErr)
+        }
       }
 
       setHistory((previous) => [{ ...persistedEntry, id }, ...previous])

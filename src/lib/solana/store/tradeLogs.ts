@@ -29,6 +29,10 @@ export class TradeLogsDB extends Dexie {
     this.version(1).stores({
       trade_logs: '++id, journalEntryId, origin, status, generatedAt',
     })
+
+    this.version(2).stores({
+      trade_logs: '++id, journalEntryId, origin, status, generatedAt, txHash',
+    })
   }
 }
 
