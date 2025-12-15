@@ -34,4 +34,11 @@ describe('Settings quote currency', () => {
 
     expect(result.current.settings.quoteCurrency).toBe(DEFAULT_SETTINGS.quoteCurrency)
   })
+
+  it('ignores invalid stored values and falls back to USD', () => {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ ...DEFAULT_SETTINGS, quoteCurrency: 'JPY' }))
+    const { result } = renderHook(() => useSettings(), { wrapper })
+
+    expect(result.current.settings.quoteCurrency).toBe(DEFAULT_SETTINGS.quoteCurrency)
+  })
 })

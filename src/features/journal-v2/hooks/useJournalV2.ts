@@ -3,6 +3,8 @@ import { runJournalPipeline } from '../engine'
 import type { JournalOutput, JournalRawInput } from '../types'
 import type { PersistedJournalEntry } from '../db'
 import { getJournalEntries, saveJournalEntry } from '../db'
+import { createShadowTradeLogFromPipeline } from '../services/shadowTradeLog'
+import { useSettings } from '@/state/settings'
 
 interface UseJournalV2Result {
   submit: (input: JournalRawInput) => Promise<JournalOutput>
@@ -19,6 +21,7 @@ export function useJournalV2(): UseJournalV2Result {
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { settings } = useSettings()
 
   useEffect(() => {
     let isActive = true
@@ -66,6 +69,18 @@ export function useJournalV2(): UseJournalV2Result {
 
       const id = await saveJournalEntry(persistedEntry)
 
+      try {
+        await createShadowTradeLogFromPipeline({
+          journalEntryId: id,
+          action: output.action,
+          quoteCurrency: settings.quoteCurrency,
+          generatedAt: normalizedInput.createdAt,
+          signalPrice: null,
+        })
+      } catch (shadowErr) {
+        console.warn('[journal-v2] failed to create shadow trade log', shadowErr)
+      }
+
       setHistory((previous) => [{ ...persistedEntry, id }, ...previous])
       setLatestResult(output)
 
@@ -77,7 +92,7 @@ export function useJournalV2(): UseJournalV2Result {
     } finally {
       setIsSaving(false)
     }
-  }, [])
+  }, [settings.quoteCurrency])
 
   const memoizedLatest = useMemo(() => latestResult, [latestResult])
 

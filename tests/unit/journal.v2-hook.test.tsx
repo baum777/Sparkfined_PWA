@@ -4,6 +4,7 @@ import { useJournalV2 } from '@/features/journal-v2/hooks/useJournalV2'
 import { runJournalPipeline } from '@/features/journal-v2/engine'
 import type { JournalRawInput, JournalOutput } from '@/features/journal-v2/types'
 import { getJournalEntries, saveJournalEntry } from '@/features/journal-v2/db'
+import { createShadowTradeLogFromPipeline } from '@/features/journal-v2/services/shadowTradeLog'
 
 vi.mock('@/features/journal-v2/db', () => ({
   getJournalEntries: vi.fn(),
@@ -11,6 +12,18 @@ vi.mock('@/features/journal-v2/db', () => ({
   saveJournalEntries: vi.fn(),
   journalV2DB: {},
 }))
+
+vi.mock('@/features/journal-v2/services/shadowTradeLog', () => ({
+  createShadowTradeLogFromPipeline: vi.fn(),
+}))
+
+vi.mock('@/state/settings', async () => {
+  const actual = await vi.importActual<typeof import('@/state/settings')>('@/state/settings')
+  return {
+    ...actual,
+    useSettings: () => ({ settings: actual.DEFAULT_SETTINGS, setSettings: vi.fn() }),
+  }
+})
 
 const sampleInput: JournalRawInput = {
   emotionalState: 'excitement',
@@ -27,6 +40,7 @@ const sampleInput: JournalRawInput = {
 describe('useJournalV2', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(createShadowTradeLogFromPipeline).mockResolvedValue({} as any)
   })
 
   it('loads existing history on mount', async () => {
@@ -54,6 +68,13 @@ describe('useJournalV2', () => {
     })
 
     expect(saveJournalEntry).toHaveBeenCalled()
+    expect(createShadowTradeLogFromPipeline).toHaveBeenCalledWith(
+      expect.objectContaining({
+        journalEntryId: 10,
+        action: expect.any(String),
+        quoteCurrency: 'USD',
+      }),
+    )
     expect(result.current.latestResult?.score).toBeGreaterThan(0)
     expect(result.current.history[0]?.id).toBe(10)
   })

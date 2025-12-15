@@ -1,7 +1,5 @@
-import type { QuoteCurrency } from '@/types/currency'
+import { QUOTE_CURRENCIES, type QuoteCurrency } from '@/types/currency'
 import { useSettings } from '@/state/settings'
-
-const QUOTE_OPTIONS: QuoteCurrency[] = ['USD', 'EUR']
 
 export function QuoteCurrencySelect() {
   const { settings, setSettings } = useSettings()
@@ -21,7 +19,7 @@ export function QuoteCurrencySelect() {
         onChange={handleChange}
         className="rounded-xl border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary shadow-card-subtle transition focus:outline-none focus:ring-2 focus:ring-brand/40"
       >
-        {QUOTE_OPTIONS.map((option) => (
+        {QUOTE_CURRENCIES.map((option) => (
           <option key={option} value={option}>
             {option}
           </option>

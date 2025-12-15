@@ -1,6 +1,6 @@
 import React from 'react'
 import { getJSON, setJSON } from '@/lib/safeStorage'
-import type { QuoteCurrency } from '@/types/currency'
+import { isQuoteCurrency, type QuoteCurrency } from '@/types/currency'
 
 export type Settings = {
   snapDefault: boolean
@@ -36,7 +36,9 @@ function read(): Settings {
   return {
     ...DEFAULT_SETTINGS,
     ...settings,
-    quoteCurrency: settings.quoteCurrency ?? DEFAULT_SETTINGS.quoteCurrency,
+    quoteCurrency: isQuoteCurrency(settings.quoteCurrency)
+      ? settings.quoteCurrency
+      : DEFAULT_SETTINGS.quoteCurrency,
   }
 }
 function write(s: Settings) {
