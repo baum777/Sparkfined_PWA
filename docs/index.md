@@ -34,6 +34,7 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 - **On-chain Trade Events (Solana):** `trade_events` Dexie-Store mit dedupliziertem `saveTradeEvents`-Helper und Queries für unbelegte BUY-Swaps. Dokumentiert in [docs/events/index.md](events/index.md).
 - **Moralis Wallet Swaps Provider:** Solana-Gateway-Client (`fetchWalletSwaps`) inklusive Normalisierung auf `NormalizedTradeEvent` (BUY/SELL, null-safe Amount/Price/Symbol/Mints) für das Trade-Events-Pipeline-Setup. Dokumentiert in [docs/events/index.md](events/index.md).
+- **Trade Event Watcher (T1-C):** Moralis-basiertes Polling über alle verbundenen Wallets mit Backoff (429/Netzfehler), BUY-Filter und deduplizierter Persistenz über `tradeEventWatcher.ts`. Dokumentiert in [docs/events/index.md](events/index.md).
 
 ---
 

@@ -14,4 +14,5 @@
 - **Query-Helper** – `listUnconsumedBuyEvents(limit)` liefert die neuesten unbelegten BUY-Events (timestamp-desc, capped), `countUnconsumedBuyEvents()` treibt den Dashboard-Badge, `markEventConsumed(id)` toggelt nach Journal-Confirm auf `consumed=true`.
 - **Dedup-Insert** – `saveTradeEvents(...)` ignoriert `txHash`-Duplikate über den Dexie-Constraint-Error, damit Watcher-Polls keine redundanten Items hinterlassen.
 - **Moralis Wallet Swaps Provider** – `fetchWalletSwaps(walletAddress, opts)` ruft `/account/mainnet/{WALLET}/swaps` am Moralis Solana-Gateway ab, mappt BUY/SELL-Sides mit null-sicheren Amount/Price/Symbol/Mint-Feldern und liefert normalisierte `NormalizedTradeEvent`-Objekte (Source=`moralis`).
+- **Polling Watcher (T1-C)** – `tradeEventWatcher.ts` pollt alle `connected_wallets` (nur mit `VITE_MORALIS_API_KEY`) im ~25s-Intervall, filtert BUY-Swaps, persistiert sie idempotent via `saveTradeEvents` und fährt bei 429/Netzfehlern in ein exponentielles Backoff (bis 5min) ohne Duplikate.
 
