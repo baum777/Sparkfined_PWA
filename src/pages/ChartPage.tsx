@@ -6,11 +6,20 @@ import DashboardShell from '@/components/dashboard/DashboardShell'
 import Button from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardFooter, CardHeader } from '@/components/ui/Card'
+import Input from '@/components/ui/Input'
 import StateView from '@/components/ui/StateView'
 import { SkeletonChartCard } from '@/components/ui/Skeleton'
-import { DEFAULT_TIMEFRAME, TIMEFRAME_ORDER, type ChartTimeframe, type IndicatorPresetId } from '@/domain/chart'
+import {
+  DEFAULT_TIMEFRAME,
+  TIMEFRAME_ORDER,
+  type ChartIndicatorOverlay,
+  type ChartTimeframe,
+  type IndicatorId,
+  type IndicatorPresetId,
+} from '@/domain/chart'
 import useOhlcData from '@/hooks/useOhlcData'
 import { useIndicators } from '@/hooks/useIndicators'
+import { useIndicatorSettings } from '@/hooks/useIndicatorSettings'
 import { useOnlineStatus } from '@/hooks/useOnlineStatus'
 import { useAlertsStore } from '@/store/alertsStore'
 import { useJournalStore } from '@/store/journalStore'
@@ -85,13 +94,17 @@ export default function ChartPage() {
   })
   const isOnline = useOnlineStatus()
 
-  const indicatorConfig = useChartUiStore((state) => state.getConfigFor(asset.address))
+  const {
+    settings: indicatorSettings,
+    overlays,
+    toggleIndicator,
+    applyPreset,
+    isLoading: indicatorSettingsLoading,
+    updateParamsFor,
+  } = useIndicatorSettings(asset.symbol, timeframe)
+  const indicators = useIndicators(candles, overlays)
   const hasSeenIntro = useChartUiStore((state) => state.hasSeenIntro)
   const dismissIntro = useChartUiStore((state) => state.dismissIntro)
-  const toggleOverlay = useChartUiStore((state) => state.toggleOverlay)
-  const applyPreset = useChartUiStore((state) => state.applyPreset)
-  const overlays = indicatorConfig.overlays
-  const indicators = useIndicators(candles, overlays)
   const alerts = useAlertsStore((state) => state.alerts)
   const createAlertDraft = useAlertsStore((state) => state.createDraftFromChart)
   const journalEntries = useJournalStore((state) => state.entries)
@@ -147,27 +160,30 @@ export default function ChartPage() {
     navigate(url)
   }
 
-  const timeframeButtons = useMemo(
-    () =>
-      TIMEFRAME_ORDER.filter((tf) => SUPPORTED_TIMEFRAMES.includes(tf)).map((tf) => ({
-        value: tf,
-        label: tf,
-      })),
-    []
-  )
-
-  const indicatorButtons: Array<{ key: string; label: string; overlay: Parameters<typeof toggleOverlay>[1] }> = useMemo(
+  const indicatorButtons: Array<{ key: IndicatorId; label: string }> = useMemo(
     () => [
-      { key: 'sma-20', label: 'SMA 20', overlay: { type: 'sma', period: 20 } as const },
-      { key: 'ema-50', label: 'EMA 50', overlay: { type: 'ema', period: 50 } as const },
-      { key: 'bb-20', label: 'BB 20/2', overlay: { type: 'bb', period: 20, deviation: 2 } as const },
+      { key: 'sma', label: 'SMA 20' },
+      { key: 'ema', label: 'EMA 50' },
+      { key: 'bb', label: 'BB 20/2' },
     ],
     []
   )
 
   const handlePreset = (preset: IndicatorPresetId) => {
-    applyPreset(asset.address, preset)
+    void applyPreset(preset)
     track('chart.indicator_preset_selected', { presetId: preset, address: asset.address, timeframe })
+  }
+
+  const handleParamChange = (indicatorId: IndicatorId, key: string, value: number) => {
+    if (!Number.isFinite(value) || value <= 0) return
+    void updateParamsFor(indicatorId, { [key]: value })
+    track('chart.indicator_param_changed', {
+      indicator: indicatorId,
+      key,
+      value,
+      address: asset.address,
+      timeframe,
+    })
   }
 
   const creationContext = useMemo(() => {
@@ -233,17 +249,30 @@ export default function ChartPage() {
           <div className="flex flex-wrap items-center gap-3 text-xs text-text-secondary">
             <span className="uppercase tracking-[0.3em] text-text-tertiary">Indicators</span>
             {indicatorButtons.map((button) => {
-              const isActive = overlays.some((item) => JSON.stringify(item) === JSON.stringify(button.overlay))
+              const isActive = indicatorSettings.enabled?.[button.key] ?? false
+              let indicatorPayload: ChartIndicatorOverlay
+              if (button.key === 'sma') {
+                indicatorPayload = { type: 'sma', period: indicatorSettings.params.sma?.period ?? 20 }
+              } else if (button.key === 'ema') {
+                indicatorPayload = { type: 'ema', period: indicatorSettings.params.ema?.period ?? 50 }
+              } else {
+                indicatorPayload = {
+                  type: 'bb',
+                  period: indicatorSettings.params.bb?.period ?? 20,
+                  deviation: indicatorSettings.params.bb?.deviation ?? 2,
+                }
+              }
               return (
                 <Button
                   key={button.key}
                   size="sm"
                   variant={isActive ? 'secondary' : 'ghost'}
                   className="rounded-full px-4 text-xs"
+                  disabled={indicatorSettingsLoading}
                   onClick={() => {
-                    toggleOverlay(asset.address, button.overlay)
+                    void toggleIndicator(button.key)
                     track('chart.indicator_toggled', {
-                      indicator: button.overlay,
+                      indicator: indicatorPayload,
                       active: !isActive,
                       address: asset.address,
                       timeframe,
@@ -251,7 +280,7 @@ export default function ChartPage() {
                   }}
                   data-testid={`indicator-toggle-${button.key}`}
                   title={
-                    button.overlay.type === 'bb'
+                    button.key === 'bb'
                       ? 'BB 20/2 – volatility bands for squeezes and breakouts'
                       : `${button.label} – smoothing to contextualize moves`
                   }
@@ -273,7 +302,7 @@ export default function ChartPage() {
               <Button
                 key={preset.id}
                 size="sm"
-                variant={indicatorConfig.preset === preset.id ? 'secondary' : 'ghost'}
+                variant={indicatorSettings.preset === preset.id ? 'secondary' : 'ghost'}
                 className="rounded-full px-3 text-[11px]"
                 onClick={() => handlePreset(preset.id)}
                 data-testid={`indicator-preset-${preset.id}`}
@@ -282,6 +311,55 @@ export default function ChartPage() {
                 {preset.label}
               </Button>
             ))}
+          </div>
+
+          <div className="space-y-2 text-xs text-text-secondary">
+            <span className="uppercase tracking-wide text-text-tertiary">Parameters</span>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <label className="space-y-1">
+                <span className="flex items-center justify-between text-[11px] text-text-tertiary">SMA Length</span>
+                <Input
+                  type="number"
+                  min={1}
+                  value={indicatorSettings.params.sma?.period ?? 20}
+                  onChange={(event) => handleParamChange('sma', 'period', Number(event.target.value))}
+                  disabled={indicatorSettingsLoading}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="flex items-center justify-between text-[11px] text-text-tertiary">EMA Length</span>
+                <Input
+                  type="number"
+                  min={1}
+                  value={indicatorSettings.params.ema?.period ?? 50}
+                  onChange={(event) => handleParamChange('ema', 'period', Number(event.target.value))}
+                  disabled={indicatorSettingsLoading}
+                />
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="space-y-1">
+                  <span className="flex items-center justify-between text-[11px] text-text-tertiary">BB Length</span>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={indicatorSettings.params.bb?.period ?? 20}
+                    onChange={(event) => handleParamChange('bb', 'period', Number(event.target.value))}
+                    disabled={indicatorSettingsLoading}
+                  />
+                </label>
+                <label className="space-y-1">
+                  <span className="flex items-center justify-between text-[11px] text-text-tertiary">BB StdDev</span>
+                  <Input
+                    type="number"
+                    min={0.1}
+                    step={0.1}
+                    value={indicatorSettings.params.bb?.deviation ?? 2}
+                    onChange={(event) => handleParamChange('bb', 'deviation', Number(event.target.value))}
+                    disabled={indicatorSettingsLoading}
+                  />
+                </label>
+              </div>
+            </div>
           </div>
         </section>
 

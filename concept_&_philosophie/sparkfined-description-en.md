@@ -31,33 +31,39 @@ Many traders lose money – not because they have bad charts, but because they:
 ### 📊 **1. Dashboard – Your Command Center**
 
 **What you see:**
-- **KPI Strip:** Net P&L, Win Rate, Armed Alerts, Journal Streak at a glance
+- **KPI Strip:** Net P&L (30 days), Win Rate, Armed Alerts, Journal Streak at a glance
 - **Live Insight Teaser:** Current Market Bias (Bullish/Bearish) with Confidence Level
 - **Journal Snapshot:** Your last 3 trading notes, directly clickable
-- **Alerts Snapshot:** Status of your active price alerts
-- **Holdings & Trades:** Your current positions and last 5 trades
+- **Alerts Snapshot:** Status of your active price alerts with quick actions
+- **Holdings & Trades:** Your current positions (SOL, JUP, USDC) and last 5 trades
+- **Log Entry Button:** Quick access to Trade Event Inbox with badge for unconsumed events
 
 **Your benefits:**
 - Central command surface for net risk, streaks, and live intelligence
 - Quick overview without scrolling through 10 tabs
-- Direct access to Journal, Watchlist, Analysis, and Alerts
+- Direct access to Journal, Watchlist, Chart, and Alerts
+- Take trade events from inbox directly into journal (seamless workflow)
+- StateView pattern: Clear empty/error/loading states for better UX
 
 ---
 
-### 📝 **2. Journal V2 – Behavioral Pipeline with Archetype System**
+### 📝 **2. Journal – Behavioral Pipeline with Offline-First Persistence**
 
 **What you can do:**
-- Log trades in a structured form (Ticker, Sentiment, Notes, Outcome)
+- Log trades in structured form (Symbol, Notes, Outcome)
 - **Archetype Score** (0-100): Your trading personality analyzed
 - **Immediate Insights:** Behavioral patterns recognized right after submission
-- Offline persistence with Dexie – works without internet
+- **Trade Event Integration:** Take trades from Log Entry Inbox directly into Journal
+- Offline persistence with IndexedDB (Dexie) – works without internet
 - Browse history and track archetype evolution over time
+- Export to Markdown/CSV for your own analysis
 
 **Your benefits:**
 - Systematic behavior tracking with instant feedback
-- Score-based system shows your development objectively
+- Score-based system shows your development objectively (version tracking)
 - No waiting for AI analysis – insights come immediately
 - Emotional honesty: Archetype system forces self-reflection
+- Seamless integration between Dashboard → Trade Events → Journal Entry
 
 ---
 
@@ -83,17 +89,19 @@ Many traders lose money – not because they have bad charts, but because they:
 ### 🔔 **4. Manage Alerts (24/7 Ready)**
 
 **What you can do:**
-- **Status Filter:** All, Armed, Triggered, Paused – quickly find relevant alerts
-- **Type Filter:** Price-above, Price-below for targeted setups
-- View alert details in panel with Symbol, Condition, Threshold
+- **Status Filter:** All, Armed, Triggered, Paused – quickly find relevant alerts (pills design)
+- **Type Filter:** All, Price-above, Price-below for targeted setups
+- Alert details in right detail panel with Symbol, Condition, Threshold
 - Direct actions: Snooze, Edit, Delete with URL state sync
-- Share alerts via URL (?alert=id)
+- **Share alerts via URL:** `?alert=id` for direct linking
+- **2-column layout:** List on left, details on right (responsive: stacked on mobile)
 
 **Your benefits:**
-- Structured alert management without chaos
-- URL-based routing enables direct linking
+- Structured alert management without chaos (filters + detail panel)
+- URL-based routing enables direct linking and sharing
 - You don't have to constantly stare at charts
 - Never miss important level breaks again
+- Clear overview through visual status feedback (glow effects)
 
 ---
 
@@ -132,21 +140,28 @@ Many traders lose money – not because they have bad charts, but because they:
 
 ---
 
-### 🎯 **7. Navigation & UI – Icon-First Design**
+### 🎯 **7. Navigation & UI – AppShell with Rail & ActionPanel**
 
 **What you experience:**
-- **AppShell:** Central navigation with Rail (sidebar) and ActionPanel (inspector)
-- **Rail (Icon-First):** Dashboard, Journal, Chart, Watchlist – expandable for labels
-- **ActionPanel (Route-Aware):** Context-dependent tools for Dashboard/Journal
-- **Shortcuts Section:** ⌘K (Search), J (Jump to Journal), P (Toggle Panel)
-- **Quick Links:** Fast access to all main areas
-- **Persistent State:** Panel status saved in localStorage
+- **AppShell Architecture:** Modern 3-column structure (Topbar, Rail, Canvas, ActionPanel)
+- **Rail (Icon-First):** Minimal sidebar with 4 main areas – expandable for labels
+  - 📊 Dashboard
+  - ✎ Journal
+  - ⌁ Chart
+  - ★ Watchlist
+- **ActionPanel (Route-Aware):** Context-dependent inspector tools on the right side
+  - Opens/closes via Topbar toggle
+  - Persists status in localStorage
+  - Shows context-dependent tools based on active page
+- **Responsive Design:** Rail collapses on mobile, ActionPanel only on desktop (xl+)
+- **Topbar:** Header with page title and ActionPanel toggle
 
 **Your benefits:**
-- Minimal distraction through icon-first design
-- Contextual tools exactly where you need them
-- Keyboard shortcuts for power users
+- Minimal distraction through icon-first Rail design
+- More space for content (Rail only 60px collapsed, 240px expanded)
+- Contextual tools exactly where you need them (ActionPanel)
 - Consistent navigation between desktop and mobile
+- Persistent UI states (panel status is preserved)
 
 ---
 
@@ -172,15 +187,15 @@ Many traders lose money – not because they have bad charts, but because they:
 
 | Feature | What It Does | Your Benefits | Status |
 |---------|-------------|---------------|---------|
-| **📊 Dashboard** | KPI Strip, Insight Teaser, Journal/Alerts Snapshot | Central command surface for all metrics | ✅ Live |
-| **📝 Journal V2** | Behavioral pipeline with Archetype System (Score 0-100) | Instant feedback on your trading patterns | ✅ Live |
-| **📊 Charts** | Canvas-based charts with indicator presets | Professional analysis without TradingView subscription | ✅ Live |
-| **🔔 Alerts** | Status filter, type filter, URL state sync | Structured alert management with direct linking | ✅ Live |
+| **📊 Dashboard** | KPI Strip, Insight Teaser, Journal/Alerts Snapshot, Log Entry Inbox | Central command surface for all metrics | ✅ Live |
+| **📝 Journal** | Behavioral pipeline with Archetype System (Score 0-100), Trade Event Bridge | Instant feedback on your trading patterns | ✅ Live |
+| **📊 Charts** | Canvas-based charts with indicator presets, multi-timeframe | Professional analysis without TradingView subscription | ✅ Live |
+| **🔔 Alerts** | Status filter, type filter, URL state sync, detail panel | Structured alert management with direct linking | ✅ Live |
 | **📋 Watchlist** | Session filter, sort modes, detail panel | Session-aware multi-asset tracking | ✅ Live |
 | **🎮 Replay Mode** | Replay historical charts without hindsight bias | Risk-free practice, understand errors, Go Live | ✅ Live |
-| **🎯 Navigation** | Icon-first Rail, route-aware ActionPanel | Minimal distraction, contextual tools | ✅ Live |
-| **🔐 Offline-First** | PWA with IndexedDB, works without internet | No API dependency, your data stays local | ✅ Live |
-| **📱 Mobile-Optimized** | Responsive design, touch targets ≥ 44px | Trade analysis on smartphone/tablet | ✅ Live |
+| **🎯 Navigation** | AppShell with icon-first Rail, route-aware ActionPanel, Topbar | Minimal distraction, contextual tools | ✅ Live |
+| **🔐 Offline-First** | PWA with IndexedDB (Dexie), works without internet | No API dependency, your data stays local | ✅ Live |
+| **📱 Mobile-Optimized** | Responsive design, touch targets ≥ 44px, collapsible Rail | Trade analysis on smartphone/tablet | ✅ Live |
 | **📤 Export** | Journal → Markdown, CSV (your data belongs to you) | No vendor lock-ins, full control | ✅ Live |
 | **🎨 StateView Pattern** | Unified Loading/Error/Empty/Offline states | Consistent UX across all features | ✅ Live |
 | **☁️ Cloud Sync** | Supabase integration for cross-device sync | One journal on all devices | 🚧 Q2 2025 |
@@ -198,8 +213,9 @@ Many traders lose money – not because they have bad charts, but because they:
 - **Why it works:** Score-based system (0-100) shows your development in real-time.
 
 ### **2. Problem: Too many tools, no connection**
-**Solution:** Sparkfined unites Charts + Alerts + Journal + Analysis in one app with icon-first navigation.
+**Solution:** Sparkfined unites Charts + Alerts + Journal + Analysis in one app with AppShell architecture (Rail + ActionPanel).
 - **Why it works:** Your context is preserved (no tab-switching, no data fragmentation).
+- **Navigation:** Icon-first Rail with 4 main areas (Dashboard, Journal, Chart, Watchlist) + context-dependent ActionPanel.
 
 ### **3. Problem: Offline dependency with other tools**
 **Solution:** PWA architecture with IndexedDB – works without internet. StateView pattern for offline states.
@@ -221,10 +237,12 @@ Many traders lose money – not because they have bad charts, but because they:
 - **What it means:** App installable from browser (no App Store needed)
 - **Your advantage:** Works on flights, with poor internet, without API dependency
 - **StateView Pattern:** Unified UX for Loading/Error/Empty/Offline states
+- **Service Worker:** Vite PWA plugin with Workbox for intelligent caching
 
 ### **Local-First Storage (IndexedDB via Dexie)**
-- **What it means:** Your data resides primarily on your device
+- **What it means:** Your data resides primarily on your device (IndexedDB via Dexie.js)
 - **Your advantage:** Full control, no vendor lock-in, privacy by design
+- **Sync:** Optional cloud sync planned (Supabase Q2 2025), but local data remains primary source
 
 ### **Multi-Provider Fallback (CoinGecko → CoinCap → Moralis)**
 - **What it means:** If one data provider fails, the next one automatically takes over
@@ -238,9 +256,11 @@ Many traders lose money – not because they have bad charts, but because they:
 - **What it means:** All critical user flows are automatically tested
 - **Your advantage:** Features don't break, updates are stable
 
-### **Route-Aware UI**
-- **What it means:** ActionPanel shows context-dependent tools (Dashboard vs. Journal)
+### **Route-Aware UI (AppShell Architecture)**
+- **What it means:** ActionPanel shows context-dependent tools based on active route (Dashboard vs. Journal vs. Chart)
 - **Your advantage:** Relevant features exactly where you need them
+- **Structure:** Topbar (Header) + Rail (Sidebar) + Canvas (Main Content) + ActionPanel (Inspector)
+- **Responsive:** Rail collapses on mobile, ActionPanel only on desktop (xl+)
 
 ---
 

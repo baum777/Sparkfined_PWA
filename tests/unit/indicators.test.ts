@@ -20,7 +20,7 @@ describe('indicator calculations', () => {
   it('computes EMA smoothing correctly', () => {
     const points = computeEma(candles, 2)
     const rounded = points.map((p) => Number(p.value.toFixed(2)))
-    expect(rounded).toEqual([1.67, 2.56, 3.52])
+    expect(rounded).toEqual([1.5, 2.5, 3.5])
   })
 
   it('computes bollinger bands with deviation applied', () => {

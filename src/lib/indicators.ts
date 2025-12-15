@@ -31,9 +31,12 @@ export function computeEma(candles: OhlcCandle[], period: number): IndicatorSeri
 
   candles.forEach((candle, index) => {
     const close = candle.c
-    if (index === 0) {
-      prevEma = close
-    } else if (prevEma !== undefined) {
+
+    if (index + 1 === period) {
+      const seedSlice = candles.slice(0, period)
+      const seedSum = seedSlice.reduce((sum, item) => sum + item.c, 0)
+      prevEma = seedSum / period
+    } else if (index + 1 > period && prevEma !== undefined) {
       prevEma = (close - prevEma) * multiplier + prevEma
     }
 
@@ -89,6 +92,7 @@ export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicato
       return [
         {
           id: `sma-${overlay.period}-${index}`,
+          indicatorId: 'sma',
           type: 'line',
           config: overlay,
           points: computeSma(candles, overlay.period),
@@ -101,6 +105,7 @@ export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicato
       return [
         {
           id: `ema-${overlay.period}-${index}`,
+          indicatorId: 'ema',
           type: 'line',
           config: overlay,
           points: computeEma(candles, overlay.period),
@@ -114,6 +119,7 @@ export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicato
       return [
         {
           id: `bb-${overlay.period}-${overlay.deviation}-${index}`,
+          indicatorId: 'bb',
           type: 'bb',
           config: overlay,
           basis: bands.basis,

@@ -1,9 +1,10 @@
-import type { ChartIndicatorOverlay, ChartTimeframe, IndicatorPresetId } from './chart'
+import type { ChartIndicatorOverlay, ChartTimeframe, IndicatorId, IndicatorPresetId } from './chart'
 
 export type ChartTelemetryEventName =
   | 'chart.view_opened'
   | 'chart.indicator_preset_selected'
   | 'chart.indicator_toggled'
+  | 'chart.indicator_param_changed'
   | 'chart.replay_started'
   | 'chart.replay_stopped'
   | 'chart.replay_go_live'
@@ -18,6 +19,13 @@ export type ChartTelemetryPayloads = {
   'chart.indicator_toggled': {
     indicator: ChartIndicatorOverlay
     active: boolean
+    address?: string
+    timeframe: ChartTimeframe
+  }
+  'chart.indicator_param_changed': {
+    indicator: IndicatorId
+    key: string
+    value: number
     address?: string
     timeframe: ChartTimeframe
   }
