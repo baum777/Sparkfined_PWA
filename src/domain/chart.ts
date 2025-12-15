@@ -103,6 +103,28 @@ export type ChartIndicatorOverlay =
   | { type: 'bb'; period: number; deviation: number }
   | { type: 'rsi'; period: number; overbought?: number; oversold?: number }
 
+export type IndicatorId = 'sma' | 'ema' | 'bb' | 'rsi'
+
+export type IndicatorEnabled = Partial<Record<IndicatorId, boolean>>
+
+export interface IndicatorParams {
+  sma?: { period: number; color?: string }
+  ema?: { period: number; color?: string }
+  bb?: { period: number; deviation: number; color?: string }
+  rsi?: { period: number; overbought?: number; oversold?: number; color?: string }
+}
+
+export interface IndicatorSettingsRecord {
+  id?: number
+  symbol: string
+  timeframe: ChartTimeframe
+  enabled: IndicatorEnabled
+  params: IndicatorParams
+  preset?: IndicatorPresetId
+  createdAt: number
+  updatedAt: number
+}
+
 export interface ChartAnnotation {
   id: string;
   candleTime: number;
@@ -135,6 +157,7 @@ export type IndicatorSeriesPoint = {
 export type ComputedIndicator =
   | {
       id: string;
+      indicatorId: IndicatorId;
       type: 'line';
       config: Exclude<ChartIndicatorOverlay, { type: 'bb' }>;
       points: IndicatorSeriesPoint[];
@@ -142,6 +165,7 @@ export type ComputedIndicator =
     }
   | {
       id: string;
+      indicatorId: IndicatorId;
       type: 'bb';
       config: Extract<ChartIndicatorOverlay, { type: 'bb' }>;
       basis: IndicatorSeriesPoint[];
@@ -149,6 +173,8 @@ export type ComputedIndicator =
       lower: IndicatorSeriesPoint[];
       color?: string;
     };
+
+export type IndicatorOutput = ComputedIndicator;
 
 // ===== OHLC Fetch Status =====
 export type OhlcFetchStatus =

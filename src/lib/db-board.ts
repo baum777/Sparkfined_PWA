@@ -12,7 +12,7 @@
  */
 
 import Dexie, { type Table } from 'dexie';
-import type { BoardChartSnapshot, ChartTimeframe, ChartViewState } from '@/domain/chart';
+import type { BoardChartSnapshot, ChartTimeframe, ChartViewState, IndicatorSettingsRecord } from '@/domain/chart';
 
 // ===== Interfaces =====
 
@@ -111,6 +111,7 @@ export class BoardDatabase extends Dexie {
   rules!: Table<AlertRule, number>;
   feedCache!: Table<FeedEventCache, string>;
   kpiCache!: Table<KPICache, string>;
+  indicatorSettings!: Table<IndicatorSettingsRecord, number>;
 
   constructor() {
     super('sparkfined-board');
@@ -142,6 +143,25 @@ export class BoardDatabase extends Dexie {
             fetchedFrom: chart.metadata?.fetchedFrom ?? 'cache',
             candleCount: chart.metadata?.candleCount ?? chart.ohlc.length ?? 0,
           };
+        });
+      });
+
+    this.version(3)
+      .stores({
+        charts: '++id, symbol, address, timeframe, [address+timeframe], metadata.lastFetchedAt',
+        rules: '++id, symbol, status, createdAt',
+        feedCache: 'id, type, timestamp, cachedAt',
+        kpiCache: 'id, cachedAt',
+        indicatorSettings: '++id, symbol, timeframe, [symbol+timeframe]',
+      })
+      .upgrade(async (tx) => {
+        const indicatorSettings = tx.table('indicatorSettings') as Table<IndicatorSettingsRecord>;
+
+        await indicatorSettings.toCollection().modify((record) => {
+          record.createdAt = record.createdAt ?? Date.now();
+          record.updatedAt = record.updatedAt ?? record.createdAt;
+          record.enabled = record.enabled ?? {};
+          record.params = record.params ?? {};
         });
       });
   }

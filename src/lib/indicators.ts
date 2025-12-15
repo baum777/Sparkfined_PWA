@@ -89,6 +89,7 @@ export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicato
       return [
         {
           id: `sma-${overlay.period}-${index}`,
+          indicatorId: 'sma',
           type: 'line',
           config: overlay,
           points: computeSma(candles, overlay.period),
@@ -101,6 +102,7 @@ export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicato
       return [
         {
           id: `ema-${overlay.period}-${index}`,
+          indicatorId: 'ema',
           type: 'line',
           config: overlay,
           points: computeEma(candles, overlay.period),
@@ -114,6 +116,7 @@ export function computeIndicators(candles: OhlcCandle[], overlays: ChartIndicato
       return [
         {
           id: `bb-${overlay.period}-${overlay.deviation}-${index}`,
+          indicatorId: 'bb',
           type: 'bb',
           config: overlay,
           basis: bands.basis,
