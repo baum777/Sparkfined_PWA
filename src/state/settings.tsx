@@ -1,5 +1,6 @@
 import React from 'react'
 import { getJSON, setJSON } from '@/lib/safeStorage'
+import type { QuoteCurrency } from '@/types/currency'
 
 export type Settings = {
   snapDefault: boolean
@@ -9,6 +10,7 @@ export type Settings = {
   showMinimap: boolean
   defaultBalance?: number
   defaultPlaybookId?: string
+  quoteCurrency: QuoteCurrency
 }
 
 export const SETTINGS_STORAGE_KEY = 'sparkfined.settings.v1'
@@ -20,6 +22,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showMinimap: true,
   defaultBalance: 1000,
   defaultPlaybookId: 'bal-15',
+  quoteCurrency: 'USD',
 }
 
 type StoredSettings = Settings & { theme?: string }
@@ -30,7 +33,11 @@ function read(): Settings {
     SETTINGS_STORAGE_KEY,
     DEFAULT_SETTINGS,
   )
-  return settings
+  return {
+    ...DEFAULT_SETTINGS,
+    ...settings,
+    quoteCurrency: settings.quoteCurrency ?? DEFAULT_SETTINGS.quoteCurrency,
+  }
 }
 function write(s: Settings) {
   setJSON(SETTINGS_STORAGE_KEY, s)

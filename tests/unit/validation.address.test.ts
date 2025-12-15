@@ -9,6 +9,8 @@ import {
   sanitizeAddress,
   assertSolanaAddress,
   WELL_KNOWN_ADDRESSES,
+  normalizeSolanaAddress,
+  validateSolanaAddress,
 } from '@/lib/validation/address';
 
 describe('Address Validation', () => {
@@ -18,12 +20,25 @@ describe('Address Validation', () => {
     expect(isSolanaAddress(WELL_KNOWN_ADDRESSES.USDT)).toBe(true);
   });
 
+  it('accepts valid addresses with surrounding whitespace after normalization', () => {
+    const address = WELL_KNOWN_ADDRESSES.SOL;
+    expect(isSolanaAddress(`  ${address}  `)).toBe(true);
+    expect(validateSolanaAddress(`\n${address}\t`)).toBe(true);
+  });
+
   it('rejects invalid addresses', () => {
     expect(isSolanaAddress('0xdeadbeef')).toBe(false); // Ethereum style
     expect(isSolanaAddress('invalid')).toBe(false); // Too short
     expect(isSolanaAddress('')).toBe(false); // Empty
     expect(isSolanaAddress('So1111111111111111111111111111111111111111O')).toBe(false); // Contains 'O'
     expect(isSolanaAddress('So1111111111111111111111111111111111111111I')).toBe(false); // Contains 'I'
+  });
+
+  it('rejects addresses that are too short or too long', () => {
+    expect(validateSolanaAddress('So11111111111111111111111111111')).toBe(false);
+    expect(
+      validateSolanaAddress(`${WELL_KNOWN_ADDRESSES.SOL}extra-padding`)
+    ).toBe(false);
   });
 
   it('rejects addresses with invalid Base58 characters', () => {
@@ -37,6 +52,11 @@ describe('Address Validation', () => {
     const address = WELL_KNOWN_ADDRESSES.SOL;
     expect(sanitizeAddress(`  ${address}  `)).toBe(address);
     expect(sanitizeAddress(`\n${address}\t`)).toBe(address);
+  });
+
+  it('normalizes whitespace without altering valid characters', () => {
+    expect(normalizeSolanaAddress('  foo\tbar  ')).toBe('foo bar');
+    expect(normalizeSolanaAddress(' foo')).toBe('foo');
   });
 
   it('returns null for invalid input during sanitization', () => {

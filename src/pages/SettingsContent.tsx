@@ -6,6 +6,7 @@ import { useAISettings } from "../state/ai";
 import { useAIContext } from "../state/aiContext";
 import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from "../lib/walletMonitor";
 import JournalDataControls from "@/components/settings/JournalDataControls";
+import { QuoteCurrencySelect } from "@/components/settings/QuoteCurrencySelect";
 import ConnectedWalletsPanel from "@/components/settings/ConnectedWalletsPanel";
 import Button from "@/components/ui/Button";
 import { useOnboardingStore } from "@/store/onboardingStore";
@@ -105,6 +106,10 @@ export default function SettingsContent({
             <option value="light">Light</option>
           </Select>
         </Row>
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-border bg-surface/80 p-4 shadow-card-subtle">
+        <QuoteCurrencySelect />
       </div>
 
       <div className="mt-4 rounded-2xl border border-border bg-surface/80 p-4 shadow-card-subtle">
