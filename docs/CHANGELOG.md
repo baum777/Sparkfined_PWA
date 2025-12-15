@@ -11,6 +11,7 @@
 
 ### Added
 - **Solana Trade Events Store:** Dokumentiert den neuen Dexie-Store `trade_events` inkl. Unique-Index (`txHash`), deduplizierendem `saveTradeEvents`-Helper sowie Queries für unbelegte BUY-Events (`listUnconsumedBuyEvents`, `countUnconsumedBuyEvents`, `markEventConsumed`).
+- **Moralis Polling Watcher (T1-C):** Ergänzt die Event-Inventarseite um den neuen `tradeEventWatcher.ts`, der verbundene Wallets mit Moralis-Swaps pollt, BUY-Events dedupliziert persistiert und bei 429/Netzfehlern exponentiell zurückfällt.
 
 ---
 
