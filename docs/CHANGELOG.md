@@ -2,7 +2,15 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-13
+**Last Updated:** 2025-12-14
+
+---
+
+## 2025-12-14
+
+### Added
+- **Solana Connected Wallets (Settings):** Neue Sektion für lokale Trading-Wallets (Base58-Validierung, Dexie-Store
+  `connected_wallets`, Mehrfach-Wallet-Support, Entfernen) dokumentiert und UI-Verortung in `/settings` ergänzt.
 
 ---
 
