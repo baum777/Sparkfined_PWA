@@ -23,5 +23,8 @@ describe('journal-v2 pipeline', () => {
     expect(result.score).toBeLessThanOrEqual(100)
     expect(result.insights.length).toBeGreaterThan(0)
     expect(result.metrics.emotionalVolatility).toBeGreaterThanOrEqual(0)
+    expect(['BUY', 'SELL', 'HOLD']).toContain(result.action)
+    expect(result.confidence).toBeGreaterThanOrEqual(0)
+    expect(result.confidence).toBeLessThanOrEqual(100)
   })
 })

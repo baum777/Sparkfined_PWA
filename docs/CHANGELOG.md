@@ -11,6 +11,8 @@
 ### Updated
 - Wallet-Einstellungen: Solana-Adressvalidierung gegen EVM-Präfixe/invalides Base58 gehärtet und Normalisierung/Dedupe-Regeln dokumentiert.
 - Quote Currency Setting: Neues USD/EUR-Setting mit UI-Select dokumentiert; Holdings/TradeLog nutzen Currency-Formatter.
+- Quote Currency Setting: Persistenz härtet ungültige Werte jetzt auf den USD-Default zurück, um inkonsistente Lokalstorage-States zu vermeiden.
+- Journal v2 Pipeline: Output enthält nun Action+Confidence und legt nach jedem Submit einen Shadow-Trade-Log (origin=pipeline, status=shadow) an.
 
 ---
 

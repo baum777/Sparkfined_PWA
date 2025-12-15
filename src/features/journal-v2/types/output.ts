@@ -1,6 +1,7 @@
 import type { JournalArchetype } from './archetypes'
 import type { JournalDerived } from './derived'
 import type { JournalNormalized } from './normalized'
+import type { TradeAction } from '@/types/trade'
 
 export interface JournalOutput {
   archetype: JournalArchetype
@@ -10,4 +11,6 @@ export interface JournalOutput {
   recommendations: string[]
   emotionalTrend?: 'rising' | 'falling' | 'stable'
   score: number
+  action: TradeAction
+  confidence: number
 }
