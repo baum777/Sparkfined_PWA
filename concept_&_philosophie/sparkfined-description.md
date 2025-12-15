@@ -31,16 +31,19 @@ Viele Trader verlieren Geld – nicht weil sie schlechte Charts haben, sondern w
 ### 📊 **1. Charts analysieren (Offline-fähig)**
 
 **Was du tun kannst:**
-- Charts für BTC, ETH, SOL und 100+ Coins abrufen
+- Charts für BTC, ETH, SOL und 100+ Coins abrufen (CoinGecko → CoinCap → Moralis Fallback)
 - 30+ technische Indikatoren nutzen (RSI, MACD, Bollinger Bands, Volume Profile)
 - Trendlinien, Fibonacci-Retracements und Rechtecke zeichnen
 - Multi-Timeframe-Analyse (1 Minute bis 1 Woche)
 - **Replay-Mode:** Historische Perioden "nachspielen" (ohne Hindsight-Bias)
+- **Offline-Banner:** Zeigt cached Chart-Daten wenn keine Internet-Verbindung
+- **Default-Asset-Fallback:** Intelligente Fehlerbehandlung bei fehlenden Parametern
 
 **Dein Nutzen:**
 - Keine Abhängigkeit von TradingView-Abos
-- Funktioniert offline (PWA-Architektur)
+- Funktioniert offline (PWA-Architektur mit IndexedDB)
 - Mobile-optimiert: Trade-Analyse unterwegs oder um 3 Uhr nachts
+- Multi-Provider-Fallback: Höhere Verfügbarkeit, keine "Daten nicht verfügbar"-Fehler
 
 ---
 
