@@ -28,73 +28,93 @@ Many traders lose money – not because they have bad charts, but because they:
 
 ## ✨ What Can You Do With Sparkfined?
 
-### 📊 **1. Analyze Charts (Offline-Capable)**
+### 📊 **1. Dashboard – Your Command Center**
 
-**What you can do:**
-- Access charts for BTC, ETH, SOL and 100+ coins
-- Use 30+ technical indicators (RSI, MACD, Bollinger Bands, Volume Profile)
-- Draw trendlines, Fibonacci retracements, and rectangles
-- Multi-timeframe analysis (1 minute to 1 week)
-- **Replay Mode:** "Replay" historical periods (without hindsight bias)
+**What you see:**
+- **KPI Strip:** Net P&L, Win Rate, Armed Alerts, Journal Streak at a glance
+- **Live Insight Teaser:** Current Market Bias (Bullish/Bearish) with Confidence Level
+- **Journal Snapshot:** Your last 3 trading notes, directly clickable
+- **Alerts Snapshot:** Status of your active price alerts
+- **Holdings & Trades:** Your current positions and last 5 trades
 
 **Your benefits:**
-- No dependency on TradingView subscriptions
-- Works offline (PWA architecture)
+- Central command surface for net risk, streaks, and live intelligence
+- Quick overview without scrolling through 10 tabs
+- Direct access to Journal, Watchlist, Analysis, and Alerts
+
+---
+
+### 📝 **2. Journal V2 – Behavioral Pipeline with Archetype System**
+
+**What you can do:**
+- Log trades in a structured form (Ticker, Sentiment, Notes, Outcome)
+- **Archetype Score** (0-100): Your trading personality analyzed
+- **Immediate Insights:** Behavioral patterns recognized right after submission
+- Offline persistence with Dexie – works without internet
+- Browse history and track archetype evolution over time
+
+**Your benefits:**
+- Systematic behavior tracking with instant feedback
+- Score-based system shows your development objectively
+- No waiting for AI analysis – insights come immediately
+- Emotional honesty: Archetype system forces self-reflection
+
+---
+
+### 📊 **3. Analyze Charts (Offline-Capable)**
+
+**What you can do:**
+- Access charts for SOL, BTC, ETH and more tokens
+- **Indicator Presets:** Scalper, Swing, Position – pre-configured setups
+- Toggle individual indicators (SMA 20, EMA 50, Bollinger Bands)
+- **Annotations System:** Your journal entries, alerts, and pulse signals directly in chart
+- Multi-timeframe analysis (15m, 1h, 4h, 1d)
+- **Replay Mode:** "Replay" historical periods and jump back to live
+- Create journal notes and alerts directly from the chart
+
+**Your benefits:**
+- Trade-ready workspace without TradingView subscription
+- Works offline (PWA architecture with cached snapshots)
+- Contextual integration: See your trading history directly in chart
 - Mobile-optimized: Trade analysis on the go or at 3 AM
 
 ---
 
-### 🔔 **2. Set Alerts (24/7 Active)**
+### 🔔 **4. Manage Alerts (24/7 Ready)**
 
 **What you can do:**
-- Create price alerts with multi-conditions (price + volume + indicator combinations)
-- Backtest alerts before activation (view historical triggers)
-- Receive push notifications (desktop + mobile)
-- Manage alert groups (spam prevention)
+- **Status Filter:** All, Armed, Triggered, Paused – quickly find relevant alerts
+- **Type Filter:** Price-above, Price-below for targeted setups
+- View alert details in panel with Symbol, Condition, Threshold
+- Direct actions: Snooze, Edit, Delete with URL state sync
+- Share alerts via URL (?alert=id)
 
 **Your benefits:**
+- Structured alert management without chaos
+- URL-based routing enables direct linking
 - You don't have to constantly stare at charts
-- Server-side evaluation runs 24/7 (even when app is closed)
-- Never miss breakouts again
+- Never miss important level breaks again
 
 ---
 
-### 📝 **3. Keep a Trading Journal (With AI Support)**
+### 📋 **5. Watchlist – Session-Based Tracking**
 
 **What you can do:**
-- Log trades in 10 seconds (one-click entry creation)
-- Tag emotions (FOMO, Fear, Greed, Revenge)
-- Upload screenshots → OCR extracts text automatically
-- Generate AI summaries for long notes
-- Export entries (Markdown format – your data belongs to you)
+- **Session Filter:** All, London, NY, Asia – focus on relevant market times
+- **Sort Modes:** Default, Top Movers, Alphabetical
+- Detail panel with token info, sentiment teaser, and trend data
+- Direct links: "Open Chart" → `/chart?symbol=...` or "Open Replay"
+- **Offline Banner:** Shows cached prices when no connection available
 
 **Your benefits:**
-- Systematic tracking of all trades (not just the winners)
-- Emotional honesty: You have to acknowledge your mistakes
-- Pattern recognition: Recognize when you keep making the same mistake
+- Session-aware trading (no NY setups during Asian session)
+- Quick access to charts without tab-switching
+- Works offline with last-known values
+- Structured multi-asset tracking
 
 ---
 
-### 🧠 **4. Behavioral Analysis by AI (After 10-20 Trades)**
-
-**What you can do:**
-- Select your last 20-50 journal entries
-- Generate AI insights (~30 seconds)
-- Analyze 5 categories:
-  - **Behavior Loops** (e.g., "You FOMO into breakouts that have already run +30%")
-  - **Timing Patterns** (e.g., "Your worst trades happen after 8 PM – fatigue")
-  - **Risk Management** (e.g., "You triple position size on revenge trades")
-  - **Setup Discipline** (e.g., "On weekends you trade 2x more, but with 15% lower win rate")
-  - **Emotional Patterns** (e.g., "After 2 losses in a row, you double position size")
-
-**Your benefits:**
-- **Objective truth instead of self-deception:** AI shows you patterns you don't see yourself
-- Concrete action recommendations (not just "trade better")
-- Evidence-based: Every insight is linked to concrete trades
-
----
-
-### 🎮 **5. Trade Replay – Learn From the Past**
+### 🎮 **6. Trade Replay – Learn From the Past**
 
 **What you can do:**
 - "Replay" historical chart periods (time-travel mode)
@@ -102,15 +122,35 @@ Many traders lose money – not because they have bad charts, but because they:
 - Save studies (bookmark key moments)
 - Compare setups ("What would have happened if...")
 - Pattern training (practice on 1000+ historical candles)
+- **"Go Live"** button: Jump back to current chart instantly
 
 **Your benefits:**
 - **Risk-free practice:** No real losses, real learning
 - Identify error sources ("Why did I exit too early?")
 - Build muscle memory for better entry timing
+- Seamless integration with live charts
 
 ---
 
-### 🎯 **6. Gamification – Journey System (Degen → Sage)**
+### 🎯 **7. Navigation & UI – Icon-First Design**
+
+**What you experience:**
+- **AppShell:** Central navigation with Rail (sidebar) and ActionPanel (inspector)
+- **Rail (Icon-First):** Dashboard, Journal, Chart, Watchlist – expandable for labels
+- **ActionPanel (Route-Aware):** Context-dependent tools for Dashboard/Journal
+- **Shortcuts Section:** ⌘K (Search), J (Jump to Journal), P (Toggle Panel)
+- **Quick Links:** Fast access to all main areas
+- **Persistent State:** Panel status saved in localStorage
+
+**Your benefits:**
+- Minimal distraction through icon-first design
+- Contextual tools exactly where you need them
+- Keyboard shortcuts for power users
+- Consistent navigation between desktop and mobile
+
+---
+
+### 🎯 **8. Gamification – Journey System (Degen → Sage)**
 
 **What you can do:**
 - Earn XP for journaling, discipline, daily streaks
@@ -132,15 +172,17 @@ Many traders lose money – not because they have bad charts, but because they:
 
 | Feature | What It Does | Your Benefits | Status |
 |---------|-------------|---------------|---------|
-| **📊 Charts** | Canvas-based 60fps charts with 30+ indicators | Professional analysis without TradingView subscription | ✅ Live |
-| **🔔 Alerts** | Server-side 24/7 evaluation with multi-conditions | Never miss breakouts, sleep soundly | ✅ Live |
-| **📝 Journal** | One-click logging, OCR for screenshots, export | Systematic error analysis, pattern recognition | ✅ Live |
-| **🧠 AI Insights** | Behavioral analysis over 20-50 trades (5 categories) | Objective truth about your mistakes | ✅ Live |
-| **🎮 Replay Mode** | Replay historical charts without hindsight bias | Risk-free practice, understand errors | ✅ Live |
-| **🎯 Journey System** | XP, phases, streaks, discipline tracking | Motivation through gamification | ✅ Live |
+| **📊 Dashboard** | KPI Strip, Insight Teaser, Journal/Alerts Snapshot | Central command surface for all metrics | ✅ Live |
+| **📝 Journal V2** | Behavioral pipeline with Archetype System (Score 0-100) | Instant feedback on your trading patterns | ✅ Live |
+| **📊 Charts** | Canvas-based charts with indicator presets | Professional analysis without TradingView subscription | ✅ Live |
+| **🔔 Alerts** | Status filter, type filter, URL state sync | Structured alert management with direct linking | ✅ Live |
+| **📋 Watchlist** | Session filter, sort modes, detail panel | Session-aware multi-asset tracking | ✅ Live |
+| **🎮 Replay Mode** | Replay historical charts without hindsight bias | Risk-free practice, understand errors, Go Live | ✅ Live |
+| **🎯 Navigation** | Icon-first Rail, route-aware ActionPanel | Minimal distraction, contextual tools | ✅ Live |
 | **🔐 Offline-First** | PWA with IndexedDB, works without internet | No API dependency, your data stays local | ✅ Live |
 | **📱 Mobile-Optimized** | Responsive design, touch targets ≥ 44px | Trade analysis on smartphone/tablet | ✅ Live |
 | **📤 Export** | Journal → Markdown, CSV (your data belongs to you) | No vendor lock-ins, full control | ✅ Live |
+| **🎨 StateView Pattern** | Unified Loading/Error/Empty/Offline states | Consistent UX across all features | ✅ Live |
 | **☁️ Cloud Sync** | Supabase integration for cross-device sync | One journal on all devices | 🚧 Q2 2025 |
 | **🌐 Community Heatmaps** | Anonymized behavioral patterns from community | Learn from other traders' mistakes | 🚧 Q3 2025 |
 | **🔓 Open Source** | MIT license, full code available | Transparency, self-hosting possible | 🚧 Q3 2025 |
@@ -152,23 +194,23 @@ Many traders lose money – not because they have bad charts, but because they:
 ## 🎯 Why Does Sparkfined Fulfill This Purpose?
 
 ### **1. Problem: Traders repeat mistakes unconsciously**
-**Solution:** Sparkfined forces you to log every trade. AI analyzes your patterns objectively.
-- **Why it works:** You can't deny what's documented in black and white.
+**Solution:** Sparkfined Journal V2 with Archetype System gives you immediate feedback. AI analyzes your patterns objectively.
+- **Why it works:** Score-based system (0-100) shows your development in real-time.
 
 ### **2. Problem: Too many tools, no connection**
-**Solution:** Sparkfined unites Charts + Alerts + Journal + AI in one app.
+**Solution:** Sparkfined unites Charts + Alerts + Journal + Analysis in one app with icon-first navigation.
 - **Why it works:** Your context is preserved (no tab-switching, no data fragmentation).
 
 ### **3. Problem: Offline dependency with other tools**
-**Solution:** PWA architecture with IndexedDB – works without internet.
+**Solution:** PWA architecture with IndexedDB – works without internet. StateView pattern for offline states.
 - **Why it works:** Your data is stored locally first, sync is optional.
 
 ### **4. Problem: Lack of self-reflection**
-**Solution:** AI insights show you patterns you don't see yourself.
-- **Why it works:** Objective data analysis beats subjective memory.
+**Solution:** Archetype system shows you patterns immediately after each trade log.
+- **Why it works:** Immediate feedback beats delayed analysis.
 
 ### **5. Problem: Lack of motivation (documenting only losses feels bad)**
-**Solution:** Gamification system rewards discipline, not just profits.
+**Solution:** Gamification system rewards discipline, not just profits. Journey phases (Degen → Sage).
 - **Why it works:** Process focus instead of outcome focus reduces tilt.
 
 ---
@@ -178,6 +220,7 @@ Many traders lose money – not because they have bad charts, but because they:
 ### **Offline-First (PWA)**
 - **What it means:** App installable from browser (no App Store needed)
 - **Your advantage:** Works on flights, with poor internet, without API dependency
+- **StateView Pattern:** Unified UX for Loading/Error/Empty/Offline states
 
 ### **Local-First Storage (IndexedDB via Dexie)**
 - **What it means:** Your data resides primarily on your device
@@ -188,12 +231,16 @@ Many traders lose money – not because they have bad charts, but because they:
 - **Your advantage:** Higher availability, no "data unavailable" errors
 
 ### **TypeScript + React 18**
-- **What it means:** Modern, type-safe codebase
-- **Your advantage:** Fewer bugs, faster performance, better developer experience (if you want to develop yourself)
+- **What it means:** Modern, type-safe codebase with features-folder structure
+- **Your advantage:** Fewer bugs, faster performance, modular architecture
 
 ### **Playwright E2E Tests**
 - **What it means:** All critical user flows are automatically tested
 - **Your advantage:** Features don't break, updates are stable
+
+### **Route-Aware UI**
+- **What it means:** ActionPanel shows context-dependent tools (Dashboard vs. Journal)
+- **Your advantage:** Relevant features exactly where you need them
 
 ---
 
@@ -201,9 +248,11 @@ Many traders lose money – not because they have bad charts, but because they:
 
 1. **Open app:** [sparkfined.vercel.app](https://sparkfined.vercel.app) (no signup required)
 2. **Install as PWA** (optional): Click "Install" in browser menu
-3. **Log first trade:** After trade close → Document ticker, thesis, emotions, outcome
-4. **After 10-20 trades:** Click "Generate Insights" → Let AI analyze your patterns
-5. **Fix one pattern:** Pick the most severe insight and work on it systematically
+3. **Check Dashboard:** See KPI Strip, Insight Teaser, Journal Snapshot
+4. **Log first trade:** Journal → Behavioral Pipeline → Receive Archetype Score
+5. **Open Chart:** Watchlist → Select asset → "Open Chart" → Toggle indicators
+6. **Set Alert:** Chart → "Create Alert" → Status: Armed → Never miss breakouts
+7. **Practice Replay:** Chart → "Open Replay" → Analyze historical setups → "Go Live"
 
 **3 seconds to start. 0 barriers. Core features free.**
 
@@ -236,7 +285,7 @@ Many traders lose money – not because they have bad charts, but because they:
 **We DO promise:**
 - ✅ **Honest tools** that respect your intelligence
 - ✅ **A journal** that forces you to acknowledge your mistakes
-- ✅ **AI insights** that reveal your blind spots
+- ✅ **Archetype system** that reveals your blind spots (instantly!)
 - ✅ **Offline-first**, your data belongs to you
 - ✅ **No BS** – transparent development, no gimmicks
 
