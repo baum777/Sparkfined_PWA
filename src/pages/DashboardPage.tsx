@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardShell from '@/components/dashboard/DashboardShell';
+import { LogEntryOverlayPanel } from '@/components/dashboard/LogEntryOverlayPanel';
 import DashboardKpiStrip from '@/components/dashboard/DashboardKpiStrip';
 import DashboardMainGrid from '@/components/dashboard/DashboardMainGrid';
 import InsightTeaser from '@/components/dashboard/InsightTeaser';
@@ -10,12 +11,15 @@ import { HoldingsList, type HoldingPosition } from '@/components/dashboard/Holdi
 import { TradeLogList } from '@/components/dashboard/TradeLogList';
 import ErrorBanner from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
+import Button from '@/components/ui/Button';
 import StateView from '@/components/ui/StateView';
 import { useJournalStore } from '@/store/journalStore';
 import { useAlertsStore } from '@/store/alertsStore';
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from '@/lib/dashboard/calculateKPIs';
 import { getAllTrades, type TradeEntry } from '@/lib/db';
+import { useTradeEventInbox, type TradeEventInboxItem } from '@/hooks/useTradeEventInbox';
 import { useSettings } from '@/state/settings';
+import { useTradeEventJournalBridge } from '@/store/tradeEventJournalBridge';
 
 const dummyInsight = {
   title: 'SOL Daily Bias',
@@ -28,11 +32,15 @@ export default function DashboardPage() {
   const journalEntries = useJournalStore((state) => state.entries);
   const alerts = useAlertsStore((state) => state.alerts);
   const { settings } = useSettings();
+  const { setTradeContext } = useTradeEventJournalBridge();
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tradeEntries, setTradeEntries] = useState<TradeEntry[]>([]);
+  const [isLogOverlayOpen, setIsLogOverlayOpen] = useState(false);
+
+  const { events: inboxEvents, unconsumedCount, isLoading: isInboxLoading, refresh } = useTradeEventInbox();
 
   const hasData = journalEntries.length > 0;
 
@@ -108,6 +116,23 @@ export default function DashboardPage() {
       <TradeLogList trades={recentTrades} quoteCurrency={settings.quoteCurrency} />
     </div>
   );
+
+  const handleJournalTrade = (event: TradeEventInboxItem) => {
+    setTradeContext({
+      eventId: event.id,
+      txHash: event.txHash,
+      walletId: event.walletId,
+      timestamp: event.timestamp,
+      side: event.side,
+      amount: event.amount,
+      price: event.price,
+      baseSymbol: event.baseSymbol,
+      quoteSymbol: event.quoteSymbol,
+      quoteCurrency: settings.quoteCurrency,
+    });
+    setIsLogOverlayOpen(false);
+    navigate('/journal');
+  };
 
   const renderMainContent = () => {
     if (isLoading) {
@@ -185,9 +210,33 @@ export default function DashboardPage() {
         description="Command surface for your net risk, streaks, and live intelligence."
         meta={`${journalEntries.length} journal entries · ${alerts.length} alerts`}
         kpiStrip={kpiStripContent}
+        actions={
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              void refresh();
+              setIsLogOverlayOpen(true);
+            }}
+            disabled={unconsumedCount === 0}
+            data-testid="dashboard-log-entry"
+          >
+            Log entry
+            {unconsumedCount > 0 ? (
+              <span className="ml-2 rounded-full bg-surface px-2 py-0.5 text-xs">{unconsumedCount}</span>
+            ) : null}
+          </Button>
+        }
       >
         {renderMainContent()}
       </DashboardShell>
+      <LogEntryOverlayPanel
+        isOpen={isLogOverlayOpen}
+        onClose={() => setIsLogOverlayOpen(false)}
+        events={inboxEvents}
+        isLoading={isInboxLoading}
+        onSelect={handleJournalTrade}
+      />
     </div>
   );
 }

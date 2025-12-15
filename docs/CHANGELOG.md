@@ -6,6 +6,15 @@
 
 ---
 
+## 2025-12-16
+
+### Added
+- Dashboard Log Entry Drawer (T1-D): New `LogEntryOverlayPanel` surfaces unconsumed BUY `trade_events` directly from the Dashboard header with badge counts and journal CTA.
+- Journal v2 Trade Context (T2): Journal form now accepts on-chain `tradeContext` payloads, prefills drafts, and confirms events via `confirmTradeFromContext` (txHash-first, fallback window, create-on-miss) while marking `trade_events` consumed.
+- Trade Logs Indexing: `trade_logs` Dexie schema bumped to include `txHash` index to support confirmation lookups.
+
+---
+
 ## 2025-12-15
 - Added Moralis Solana Gateway wallet swaps provider documentation entry (normalized trade event mapping) to the events inventory and docs index.
 

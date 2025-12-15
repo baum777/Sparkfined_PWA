@@ -30,6 +30,13 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-16)
+
+- **Dashboard Log Entry Drawer:** `src/pages/DashboardPage.tsx` bindet den neuen `LogEntryOverlayPanel` ein, zeigt Badge-Counts für unbelegte BUY-Events (`trade_events`) und öffnet die Journal-V2-Bridge mit CTA.
+- **Journal Trade Context & Confirmation:** `JournalInputForm` akzeptiert `tradeContext`-Payloads (txHash, walletId, timestamp, amounts/pair) zur Prefill-Logik und `confirmTradeFromContext` markiert Events als consumed und hebt `trade_logs` von shadow→confirmed an (txHash-first, Zeitfenster-Fallback, create-on-miss) plus `txHash`-Index in `trade_logs`.
+
+---
+
 ## 📦 Neue Ergänzungen (2025-12-15)
 
 - **On-chain Trade Events (Solana):** `trade_events` Dexie-Store mit dedupliziertem `saveTradeEvents`-Helper und Queries für unbelegte BUY-Swaps. Dokumentiert in [docs/events/index.md](events/index.md).
