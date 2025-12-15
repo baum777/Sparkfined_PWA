@@ -6,6 +6,7 @@ import DashboardShell from '@/components/dashboard/DashboardShell'
 import Button from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card, CardFooter, CardHeader } from '@/components/ui/Card'
+import Input from '@/components/ui/Input'
 import StateView from '@/components/ui/StateView'
 import { SkeletonChartCard } from '@/components/ui/Skeleton'
 import {
@@ -93,8 +94,14 @@ export default function ChartPage() {
   })
   const isOnline = useOnlineStatus()
 
-  const { settings: indicatorSettings, overlays, toggleIndicator, applyPreset, isLoading: indicatorSettingsLoading } =
-    useIndicatorSettings(asset.symbol, timeframe)
+  const {
+    settings: indicatorSettings,
+    overlays,
+    toggleIndicator,
+    applyPreset,
+    isLoading: indicatorSettingsLoading,
+    updateParamsFor,
+  } = useIndicatorSettings(asset.symbol, timeframe)
   const indicators = useIndicators(candles, overlays)
   const hasSeenIntro = useChartUiStore((state) => state.hasSeenIntro)
   const dismissIntro = useChartUiStore((state) => state.dismissIntro)
@@ -165,6 +172,18 @@ export default function ChartPage() {
   const handlePreset = (preset: IndicatorPresetId) => {
     void applyPreset(preset)
     track('chart.indicator_preset_selected', { presetId: preset, address: asset.address, timeframe })
+  }
+
+  const handleParamChange = (indicatorId: IndicatorId, key: string, value: number) => {
+    if (!Number.isFinite(value) || value <= 0) return
+    void updateParamsFor(indicatorId, { [key]: value })
+    track('chart.indicator_param_changed', {
+      indicator: indicatorId,
+      key,
+      value,
+      address: asset.address,
+      timeframe,
+    })
   }
 
   const creationContext = useMemo(() => {
@@ -292,6 +311,55 @@ export default function ChartPage() {
                 {preset.label}
               </Button>
             ))}
+          </div>
+
+          <div className="space-y-2 text-xs text-text-secondary">
+            <span className="uppercase tracking-wide text-text-tertiary">Parameters</span>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <label className="space-y-1">
+                <span className="flex items-center justify-between text-[11px] text-text-tertiary">SMA Length</span>
+                <Input
+                  type="number"
+                  min={1}
+                  value={indicatorSettings.params.sma?.period ?? 20}
+                  onChange={(event) => handleParamChange('sma', 'period', Number(event.target.value))}
+                  disabled={indicatorSettingsLoading}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="flex items-center justify-between text-[11px] text-text-tertiary">EMA Length</span>
+                <Input
+                  type="number"
+                  min={1}
+                  value={indicatorSettings.params.ema?.period ?? 50}
+                  onChange={(event) => handleParamChange('ema', 'period', Number(event.target.value))}
+                  disabled={indicatorSettingsLoading}
+                />
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="space-y-1">
+                  <span className="flex items-center justify-between text-[11px] text-text-tertiary">BB Length</span>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={indicatorSettings.params.bb?.period ?? 20}
+                    onChange={(event) => handleParamChange('bb', 'period', Number(event.target.value))}
+                    disabled={indicatorSettingsLoading}
+                  />
+                </label>
+                <label className="space-y-1">
+                  <span className="flex items-center justify-between text-[11px] text-text-tertiary">BB StdDev</span>
+                  <Input
+                    type="number"
+                    min={0.1}
+                    step={0.1}
+                    value={indicatorSettings.params.bb?.deviation ?? 2}
+                    onChange={(event) => handleParamChange('bb', 'deviation', Number(event.target.value))}
+                    disabled={indicatorSettingsLoading}
+                  />
+                </label>
+              </div>
+            </div>
           </div>
         </section>
 

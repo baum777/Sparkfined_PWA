@@ -31,9 +31,12 @@ export function computeEma(candles: OhlcCandle[], period: number): IndicatorSeri
 
   candles.forEach((candle, index) => {
     const close = candle.c
-    if (index === 0) {
-      prevEma = close
-    } else if (prevEma !== undefined) {
+
+    if (index + 1 === period) {
+      const seedSlice = candles.slice(0, period)
+      const seedSum = seedSlice.reduce((sum, item) => sum + item.c, 0)
+      prevEma = seedSum / period
+    } else if (index + 1 > period && prevEma !== undefined) {
       prevEma = (close - prevEma) * multiplier + prevEma
     }
 

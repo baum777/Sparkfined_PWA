@@ -30,6 +30,12 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-17)
+
+- **Chart Indicators:** SMA/EMA/Bollinger computations hardened (seeded EMA, short-series safe) with toolbar parameter controls for length/stddev. Relevant code in `src/lib/indicators.ts` and `src/pages/ChartPage.tsx`.
+
+---
+
 ## 📦 Neue Ergänzungen (2025-12-16)
 
 - **Dashboard Log Entry Drawer:** `src/pages/DashboardPage.tsx` bindet den neuen `LogEntryOverlayPanel` ein, zeigt Badge-Counts für unbelegte BUY-Events (`trade_events`) und öffnet die Journal-V2-Bridge mit CTA.

@@ -2,7 +2,14 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-15
+**Last Updated:** 2025-12-17
+
+---
+
+## 2025-12-17
+
+### Updated
+- Chart indicators: EMA now seeds with SMA for stability, Bollinger bands/MA computations covered by fixtures, and toolbar parameter controls capture SMA/EMA/BB lengths plus deviation.
 
 ---
 
