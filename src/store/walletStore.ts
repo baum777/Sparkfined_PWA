@@ -6,6 +6,7 @@ import type {
   WalletRole,
   WalletSettings,
 } from '@/types/wallet-tracking';
+import { normalizeSolanaAddress, validateSolanaAddress } from '@/lib/validation/address';
 
 interface WalletState {
   // Wallet Management
@@ -30,7 +31,7 @@ interface WalletState {
   isWalletConnected: (address: string) => boolean;
 }
 
-const DEFAULT_SETTINGS: WalletSettings = {
+export const DEFAULT_SETTINGS: WalletSettings = {
   wallets: [],
   autoJournalEnabled: true,
   minTradeSize: 10,              // Minimum $10 USD to auto-journal
@@ -46,11 +47,19 @@ export const useWalletStore = create<WalletState>()(
 
       connectWallet: (address, provider, role, label) => {
         set((state) => {
+          const normalizedAddress = normalizeSolanaAddress(address);
+
+          if (!validateSolanaAddress(normalizedAddress)) {
+            throw new Error('Invalid Solana address');
+          }
+
           // Check if wallet already exists
-          const existingIndex = state.wallets.findIndex((w) => w.address === address);
+          const existingIndex = state.wallets.findIndex(
+            (w) => normalizeSolanaAddress(w.address) === normalizedAddress
+          );
 
           const newWallet: ConnectedWallet = {
-            address,
+            address: normalizedAddress,
             provider,
             role,
             label: label || `${provider} (${role})`,
@@ -59,13 +68,7 @@ export const useWalletStore = create<WalletState>()(
           };
 
           if (existingIndex >= 0) {
-            // Update existing wallet
-            const updatedWallets = [...state.wallets];
-            updatedWallets[existingIndex] = {
-              ...updatedWallets[existingIndex],
-              ...newWallet,
-            };
-            return { wallets: updatedWallets };
+            throw new Error('Wallet already connected');
           }
 
           // Check wallet limit by role
@@ -92,31 +95,43 @@ export const useWalletStore = create<WalletState>()(
       },
 
       disconnectWallet: (address) => {
+        const normalizedAddress = normalizeSolanaAddress(address);
         set((state) => ({
-          wallets: state.wallets.filter((w) => w.address !== address),
+          wallets: state.wallets.filter(
+            (w) => normalizeSolanaAddress(w.address) !== normalizedAddress
+          ),
         }));
       },
 
       updateWalletLabel: (address, label) => {
+        const normalizedAddress = normalizeSolanaAddress(address);
         set((state) => ({
           wallets: state.wallets.map((w) =>
-            w.address === address ? { ...w, label } : w
+            normalizeSolanaAddress(w.address) === normalizedAddress
+              ? { ...w, label }
+              : w
           ),
         }));
       },
 
       toggleWalletActive: (address) => {
+        const normalizedAddress = normalizeSolanaAddress(address);
         set((state) => ({
           wallets: state.wallets.map((w) =>
-            w.address === address ? { ...w, isActive: !w.isActive } : w
+            normalizeSolanaAddress(w.address) === normalizedAddress
+              ? { ...w, isActive: !w.isActive }
+              : w
           ),
         }));
       },
 
       updateWalletSyncTime: (address) => {
+        const normalizedAddress = normalizeSolanaAddress(address);
         set((state) => ({
           wallets: state.wallets.map((w) =>
-            w.address === address ? { ...w, lastSyncedAt: Date.now() } : w
+            normalizeSolanaAddress(w.address) === normalizedAddress
+              ? { ...w, lastSyncedAt: Date.now() }
+              : w
           ),
         }));
       },
@@ -159,7 +174,10 @@ export const useWalletStore = create<WalletState>()(
       },
 
       isWalletConnected: (address) => {
-        return get().wallets.some((w) => w.address === address);
+        const normalizedAddress = normalizeSolanaAddress(address);
+        return get().wallets.some(
+          (w) => normalizeSolanaAddress(w.address) === normalizedAddress
+        );
       },
     }),
     {

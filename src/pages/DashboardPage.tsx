@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardShell from '@/components/dashboard/DashboardShell';
 import DashboardKpiStrip from '@/components/dashboard/DashboardKpiStrip';
@@ -6,12 +6,16 @@ import DashboardMainGrid from '@/components/dashboard/DashboardMainGrid';
 import InsightTeaser from '@/components/dashboard/InsightTeaser';
 import JournalSnapshot from '@/components/dashboard/JournalSnapshot';
 import AlertsSnapshot from '@/components/dashboard/AlertsSnapshot';
+import { HoldingsList, type HoldingPosition } from '@/components/dashboard/HoldingsList';
+import { TradeLogList } from '@/components/dashboard/TradeLogList';
 import ErrorBanner from '@/components/ui/ErrorBanner';
 import { Skeleton } from '@/components/ui/Skeleton';
 import StateView from '@/components/ui/StateView';
 import { useJournalStore } from '@/store/journalStore';
 import { useAlertsStore } from '@/store/alertsStore';
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from '@/lib/dashboard/calculateKPIs';
+import { getAllTrades, type TradeEntry } from '@/lib/db';
+import { useSettings } from '@/state/settings';
 
 const dummyInsight = {
   title: 'SOL Daily Bias',
@@ -23,10 +27,12 @@ const dummyInsight = {
 export default function DashboardPage() {
   const journalEntries = useJournalStore((state) => state.entries);
   const alerts = useAlertsStore((state) => state.alerts);
+  const { settings } = useSettings();
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tradeEntries, setTradeEntries] = useState<TradeEntry[]>([]);
 
   const hasData = journalEntries.length > 0;
 
@@ -52,6 +58,29 @@ export default function DashboardPage() {
     ];
   }, [alerts, journalEntries]);
 
+  const holdings: HoldingPosition[] = useMemo(
+    () => [
+      { token: 'SOL', amount: 120.5, value: 9500 },
+      { token: 'JUP', amount: 3400, value: 2750 },
+      { token: 'USDC', amount: 820, value: 820 },
+    ],
+    [],
+  );
+
+  useEffect(() => {
+    void getAllTrades()
+      .then((entries) => setTradeEntries(entries))
+      .catch(() => setTradeEntries([]));
+  }, []);
+
+  const recentTrades = useMemo(
+    () =>
+      [...tradeEntries]
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+        .slice(0, 5),
+    [tradeEntries],
+  );
+
   const recentJournalEntries = useMemo(() => {
     if (!journalEntries.length) {
       return [];
@@ -71,6 +100,13 @@ export default function DashboardPage() {
     </div>
   ) : error ? null : (
     <DashboardKpiStrip items={kpiItems} />
+  );
+
+  const renderHoldingsAndTrades = () => (
+    <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <HoldingsList holdings={holdings} quoteCurrency={settings.quoteCurrency} />
+      <TradeLogList trades={recentTrades} quoteCurrency={settings.quoteCurrency} />
+    </div>
   );
 
   const renderMainContent = () => {
@@ -103,36 +139,42 @@ export default function DashboardPage() {
 
     if (!hasData) {
       return (
-        <DashboardMainGrid
-          primary={
-            <StateView
-              type="empty"
-              title="No insights yet"
-              description="Run your first chart session to unlock AI bias, flow and volatility context."
-              actionLabel="Open chart"
-              onAction={() => navigate('/chart')}
-            />
-          }
-          secondary={
-            <StateView
-              type="empty"
-              title="No journal entries"
-              description="Log a trade or mindset note to build your streaks."
-              actionLabel="Open journal"
-          onAction={() => navigate('/journal')}
-            />
-          }
-          tertiary={<AlertsSnapshot />}
-        />
+        <>
+          <DashboardMainGrid
+            primary={
+              <StateView
+                type="empty"
+                title="No insights yet"
+                description="Run your first chart session to unlock AI bias, flow and volatility context."
+                actionLabel="Open chart"
+                onAction={() => navigate('/chart')}
+              />
+            }
+            secondary={
+              <StateView
+                type="empty"
+                title="No journal entries"
+                description="Log a trade or mindset note to build your streaks."
+                actionLabel="Open journal"
+                onAction={() => navigate('/journal')}
+              />
+            }
+            tertiary={<AlertsSnapshot />}
+          />
+          {renderHoldingsAndTrades()}
+        </>
       );
     }
 
     return (
-      <DashboardMainGrid
-        primary={<InsightTeaser {...dummyInsight} />}
-        secondary={<JournalSnapshot entries={recentJournalEntries} />}
-        tertiary={<AlertsSnapshot />}
-      />
+      <>
+        <DashboardMainGrid
+          primary={<InsightTeaser {...dummyInsight} />}
+          secondary={<JournalSnapshot entries={recentJournalEntries} />}
+          tertiary={<AlertsSnapshot />}
+        />
+        {renderHoldingsAndTrades()}
+      </>
     );
   };
 

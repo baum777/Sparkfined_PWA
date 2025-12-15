@@ -6,9 +6,42 @@
 /**
  * Solana address validation regex
  * Base58 charset: [1-9A-HJ-NP-Za-km-z] (excludes 0, O, I, l)
- * Length: 32-44 characters (typically 43-44)
  */
-const SOLANA_ADDRESS_REGEX = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+const SOLANA_BASE58_REGEX = /^[1-9A-HJ-NP-Za-km-z]+$/;
+
+const MIN_SOLANA_ADDRESS_LENGTH = 32;
+const MAX_SOLANA_ADDRESS_LENGTH = 44;
+
+function isNormalizedSolanaAddress(address: string): boolean {
+  if (!address) {
+    return false;
+  }
+
+  if (address.startsWith('0x')) {
+    return false;
+  }
+
+  if (
+    address.length < MIN_SOLANA_ADDRESS_LENGTH ||
+    address.length > MAX_SOLANA_ADDRESS_LENGTH
+  ) {
+    return false;
+  }
+
+  return SOLANA_BASE58_REGEX.test(address);
+}
+
+/**
+ * Normalize Solana address input by collapsing whitespace and trimming
+ */
+export function normalizeSolanaAddress(input: string): string {
+  if (typeof input !== 'string') {
+    return '';
+  }
+
+  const collapsedWhitespace = input.replace(/\s+/g, ' ');
+  return collapsedWhitespace.trim();
+}
 
 /**
  * Validate Solana address format
@@ -16,11 +49,20 @@ const SOLANA_ADDRESS_REGEX = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
  * @returns true if valid Base58 Solana address
  */
 export function isSolanaAddress(address: string): boolean {
+  return validateSolanaAddress(address);
+}
+
+export function validateSolanaAddress(address: string): boolean {
   if (!address || typeof address !== 'string') {
     return false;
   }
 
-  return SOLANA_ADDRESS_REGEX.test(address);
+  const normalized = normalizeSolanaAddress(address);
+  if (!normalized) {
+    return false;
+  }
+
+  return isNormalizedSolanaAddress(normalized);
 }
 
 /**
@@ -32,13 +74,13 @@ export function isSolanaAddress(address: string): boolean {
 export function sanitizeAddress(input: string): string | null {
   if (!input) return null;
 
-  const trimmed = input.trim();
+  const normalized = normalizeSolanaAddress(input);
 
-  if (!isSolanaAddress(trimmed)) {
+  if (!isNormalizedSolanaAddress(normalized)) {
     return null;
   }
 
-  return trimmed;
+  return normalized;
 }
 
 /**
@@ -47,7 +89,7 @@ export function sanitizeAddress(input: string): string | null {
  * @throws Error if invalid
  */
 export function assertSolanaAddress(address: string): asserts address is string {
-  if (!isSolanaAddress(address)) {
+  if (!validateSolanaAddress(address)) {
     throw new Error(`Invalid Solana address: ${address}`);
   }
 }

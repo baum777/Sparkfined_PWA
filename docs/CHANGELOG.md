@@ -2,7 +2,15 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-13
+**Last Updated:** 2025-12-14
+
+---
+
+## 2025-12-14
+
+### Updated
+- Wallet-Einstellungen: Solana-Adressvalidierung gegen EVM-Präfixe/invalides Base58 gehärtet und Normalisierung/Dedupe-Regeln dokumentiert.
+- Quote Currency Setting: Neues USD/EUR-Setting mit UI-Select dokumentiert; Holdings/TradeLog nutzen Currency-Formatter.
 
 ---
 
