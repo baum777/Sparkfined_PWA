@@ -30,6 +30,12 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-18)
+
+- **Drawing Overlay Core (CH-TA-1):** Added Dexie `chart_drawings` table with helpers (`listDrawings`, `saveDrawing`, `deleteDrawing`, `clearDrawings`) and mounted `DrawingOverlay` canvas above `AdvancedChart` to render stored HLINE/LINE/BOX/FIB stubs. Documented in [docs/architecture/Chart_System.md](architecture/Chart_System.md).
+
+---
+
 ## 📦 Neue Ergänzungen (2025-12-17)
 
 - **Chart Indicators:** SMA/EMA/Bollinger computations hardened (seeded EMA, short-series safe) with toolbar parameter controls for length/stddev. Relevant code in `src/lib/indicators.ts` and `src/pages/ChartPage.tsx`.

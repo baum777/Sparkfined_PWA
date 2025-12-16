@@ -33,6 +33,7 @@ import {
 import { buildReplayUrl } from '@/lib/chartLinks'
 import { useChartTelemetry } from '@/lib/chartTelemetry'
 import type { PulseDeltaEvent } from '@/lib/grokPulse/types'
+import { useChartDrawings } from '@/hooks/useChartDrawings'
 
 const DEFAULT_ASSET = {
   symbol: 'SOLUSDT',
@@ -92,6 +93,7 @@ export default function ChartPage() {
     timeframe,
     network: asset.network,
   })
+  const { drawings } = useChartDrawings(asset.symbol, timeframe)
   const isOnline = useOnlineStatus()
 
   const {
@@ -378,6 +380,7 @@ export default function ChartPage() {
               lastUpdatedAt={lastUpdatedAt}
               indicators={indicators}
               annotations={annotations}
+              drawings={drawings}
               testId="chart-workspace"
               onCreateJournalAtPoint={() => {
                 void createJournalDraft(creationContext)

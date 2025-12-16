@@ -176,6 +176,35 @@ export type ComputedIndicator =
 
 export type IndicatorOutput = ComputedIndicator;
 
+// ===== Drawings (persisted + overlay rendering) =====
+export type ChartDrawingType = 'HLINE' | 'LINE' | 'BOX' | 'FIB'
+
+export interface ChartDrawingPoint {
+  /** Unix timestamp in milliseconds */
+  t: number
+  /** Price at the point */
+  p: number
+}
+
+export interface ChartDrawingStyle {
+  color?: string
+  lineWidth?: number
+  dash?: number[]
+  label?: string
+}
+
+export interface ChartDrawingRecord {
+  id?: string
+  symbol: string
+  timeframe: ChartTimeframe
+  type: ChartDrawingType
+  points: ChartDrawingPoint[]
+  style?: ChartDrawingStyle
+  origin?: 'manual' | 'ai'
+  createdAt?: number
+  updatedAt?: number
+}
+
 // ===== OHLC Fetch Status =====
 export type OhlcFetchStatus =
   | { status: 'idle' }
