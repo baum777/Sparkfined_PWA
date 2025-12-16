@@ -1,7 +1,7 @@
 # PWA Layout System – Strukturierung & UI-Kit
 
 **Status**: ✅ Implemented  
-**Last Updated**: 2024-12-05  
+**Last Updated**: 2025-12-16  
 **Owner**: Architecture Team
 
 ---
@@ -160,6 +160,14 @@ export default function AlertsPage() {
   );
 }
 ```
+
+### Hinweis: Dashboard Layout Scaffolding (2025-12)
+
+Das Dashboard wurde im Zuge der Layout-Migration auf das UI-Kit Scaffolding umgestellt:
+
+- **Container + PageHeader (UI-Kit)**: `src/components/ui/Container.tsx`, `src/components/ui/PageHeader.tsx`
+- **Implementierung**: `src/pages/DashboardPage.tsx`
+- **Layout**: responsives 2-Spalten-Grid (Desktop) → gestapelt (Mobile), ohne inhaltliche/Logik-Änderungen.
 
 ---
 

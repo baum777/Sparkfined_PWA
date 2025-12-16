@@ -60,8 +60,9 @@ export function Modal({
 }: ModalProps) {
   const titleId = React.useId();
   const contentRef = React.useRef<HTMLDivElement>(null);
+  const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
-  useFocusTrap(contentRef, isOpen);
+  useFocusTrap(contentRef, isOpen, { initialFocus: closeButtonRef });
 
   // Handle Escape key
   React.useEffect(() => {
@@ -132,6 +133,7 @@ export function Modal({
             </div>
             {showCloseButton && (
               <button
+                ref={closeButtonRef}
                 type="button"
                 onClick={onClose}
                 className="ml-4 rounded-full p-2 text-text-secondary transition-all hover:bg-interactive-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
