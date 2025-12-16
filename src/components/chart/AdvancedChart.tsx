@@ -39,6 +39,8 @@ export type AdvancedChartProps = {
   onCreateJournalAtPoint?: (payload: { price: number; time: number }) => void
   onCreateAlertAtPoint?: (payload: { price: number; time: number }) => void
   drawings?: ChartDrawingRecord[]
+  drawingsInteractive?: boolean
+  onSelectDrawing?: (drawing: ChartDrawingRecord | null) => void
   testId?: string
 }
 
@@ -107,6 +109,8 @@ export default function AdvancedChart({
   onCreateJournalAtPoint,
   onCreateAlertAtPoint,
   drawings,
+  drawingsInteractive,
+  onSelectDrawing,
   testId,
 }: AdvancedChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -296,6 +300,8 @@ export default function AdvancedChart({
               chartApi={chartRef.current}
               mainSeries={candleSeriesRef.current}
               drawings={drawings}
+              interactive={drawingsInteractive}
+              onSelectDrawing={onSelectDrawing}
               renderTrigger={lastCandle?.t}
             />
           </div>

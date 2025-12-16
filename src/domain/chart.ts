@@ -201,6 +201,7 @@ export interface ChartDrawingRecord {
   points: ChartDrawingPoint[]
   style?: ChartDrawingStyle
   origin?: 'manual' | 'ai'
+  isSelected?: boolean
   createdAt?: number
   updatedAt?: number
 }

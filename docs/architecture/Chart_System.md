@@ -6,8 +6,8 @@
 3. `useIndicators` builds SMA/EMA/BB overlays from returned candles.
 4. Annotation mappers convert Journal/Alert/Pulse events to `ChartAnnotation` markers.
 5. `AdvancedChart` renders candles, volume, indicators, markers, and creation affordances.
-6. `DrawingOverlay` sits above the chart container (devicePixelRatio aware) to render saved drawings from Dexie without user interaction.
-7. Pages (`ChartPageV2`, `ReplayPage`) wire URL params, indicator config, deep links, and creation callbacks.
+6. `DrawingOverlay` sits above the chart container (devicePixelRatio aware) to render saved drawings from Dexie; it supports an interactive selection mode (hit-testing with DPR tolerance, single-select highlight) while remaining read-only by default.
+7. Pages (`ChartPageV2`, `ReplayPage`) wire URL params, indicator config, deep links, creation callbacks, and drawing interaction mode (view/select toggle).
 
 ## Persistence (Dexie)
 - `boardDB.chart_drawings` — string `id` primary key, compound `[symbol+timeframe]` index; stores `{ symbol, timeframe, type, points, style?, origin, createdAt, updatedAt }`.
