@@ -18,11 +18,13 @@ import type {
   ChartViewState,
   OhlcCandle,
   ChartDrawingRecord,
+  ChartTimeframe,
 } from '@/domain/chart'
 import type { ChartDataSource } from '@/hooks/useOhlcData'
 import { getChartColors } from '@/lib/chartColors'
 import { IndicatorSeriesManager } from '@/lib/chart/indicatorSeriesManager'
 import DrawingOverlay from '@/components/chart/DrawingOverlay'
+import type { ChartInteractionMode } from '@/hooks/useChartInteractionMode'
 
 export type AdvancedChartProps = {
   candles: OhlcCandle[]
@@ -40,6 +42,13 @@ export type AdvancedChartProps = {
   onCreateAlertAtPoint?: (payload: { price: number; time: number }) => void
   drawings?: ChartDrawingRecord[]
   drawingsInteractive?: boolean
+  drawingMode?: ChartInteractionMode
+  selectedDrawingId?: string | null
+  onCreateDrawing?: (drawing: ChartDrawingRecord) => void
+  onUpdateDrawing?: (drawing: ChartDrawingRecord) => void
+  onCancelDrawingDraft?: () => void
+  symbol: string
+  timeframe: ChartTimeframe
   onSelectDrawing?: (drawing: ChartDrawingRecord | null) => void
   testId?: string
 }
@@ -110,6 +119,13 @@ export default function AdvancedChart({
   onCreateAlertAtPoint,
   drawings,
   drawingsInteractive,
+  drawingMode,
+  selectedDrawingId,
+  onCreateDrawing,
+  onUpdateDrawing,
+  onCancelDrawingDraft,
+  symbol,
+  timeframe,
   onSelectDrawing,
   testId,
 }: AdvancedChartProps) {
@@ -301,6 +317,13 @@ export default function AdvancedChart({
               mainSeries={candleSeriesRef.current}
               drawings={drawings}
               interactive={drawingsInteractive}
+              interactionMode={drawingMode}
+              selectedId={selectedDrawingId}
+              onCreateDrawing={onCreateDrawing}
+              onUpdateDrawing={onUpdateDrawing}
+              onCancelDraft={onCancelDrawingDraft}
+              symbol={symbol}
+              timeframe={timeframe}
               onSelectDrawing={onSelectDrawing}
               renderTrigger={lastCandle?.t}
             />
