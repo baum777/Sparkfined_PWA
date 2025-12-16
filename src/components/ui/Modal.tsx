@@ -21,8 +21,10 @@
  */
 
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X } from '@/lib/icons';
 import { cn } from '@/lib/ui/cn';
+import { useFocusTrap } from '@/lib/ui/useFocusTrap';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -57,6 +59,9 @@ export function Modal({
   className,
 }: ModalProps) {
   const titleId = React.useId();
+  const contentRef = React.useRef<HTMLDivElement>(null);
+
+  useFocusTrap(contentRef, isOpen);
 
   // Handle Escape key
   React.useEffect(() => {
@@ -92,7 +97,9 @@ export function Modal({
     }
   };
 
-  return (
+  const portalTarget = document.getElementById('overlay-root') ?? document.body;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-modal flex items-center justify-center bg-bg-overlay/80 px-4 py-8 backdrop-blur-sm"
       role="dialog"
@@ -102,12 +109,14 @@ export function Modal({
       data-testid="modal-overlay"
     >
       <div
+        ref={contentRef}
         className={cn(
           'w-full rounded-2xl border border-border-moderate bg-surface-elevated p-6 shadow-2xl',
           'animate-scale-in',
           sizeClasses[size],
           className
         )}
+        tabIndex={-1}
         data-testid="modal-content"
       >
         {/* Header */}
@@ -138,7 +147,8 @@ export function Modal({
         {/* Body */}
         <div className="text-text-primary">{children}</div>
       </div>
-    </div>
+    </div>,
+    portalTarget
   );
 }
 
