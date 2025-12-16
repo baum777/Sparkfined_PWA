@@ -1,70 +1,91 @@
 import React from 'react'
-import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
+import { Badge, Card, CardContent, CardHeader } from '@/components/ui'
+import { MetricCard } from '@/components/ui/MetricCard'
 import type { JournalOutput } from '../types'
 
 interface JournalResultViewProps {
   result: JournalOutput
 }
 
-function MetricTile({ label, value, hint }: { label: string; value: string; hint?: string }) {
+export function JournalResultView({ result }: JournalResultViewProps) {
+  const scoreColor = result.score >= 70 ? 'text-emerald-400' : result.score >= 40 ? 'text-amber-400' : 'text-rose-400'
+
   return (
-    <div className="rounded-2xl border border-border bg-surface/60 p-3">
-      <p className="text-xs uppercase tracking-wide text-text-tertiary">{label}</p>
-      <p className="text-lg font-semibold text-text-primary">{value}</p>
-      {hint ? <p className="text-xs text-text-secondary">{hint}</p> : null}
-    </div>
+    <Card variant="glass" data-testid="journal-v2-result">
+      {/* Summary strip header */}
+      <CardHeader className="pb-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-2">
+            <Badge variant="brand" className="uppercase tracking-wide text-[10px]">
+              Archetype
+            </Badge>
+            <h2 className="text-2xl font-bold text-text-primary">{result.archetype}</h2>
+            {result.emotionalTrend && (
+              <p className="text-sm text-text-secondary">
+                Emotional trend: <span className="font-medium capitalize text-text-primary">{result.emotionalTrend}</span>
+              </p>
+            )}
+          </div>
+          <div className="text-right">
+            <p className="text-xs uppercase tracking-wide text-text-tertiary">Score</p>
+            <p className={`text-4xl font-bold ${scoreColor}`}>{result.score.toFixed(0)}</p>
+            <p className="text-xs text-text-tertiary">out of 100</p>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        {/* 2x2 Metric Grid */}
+        <div className="grid grid-cols-2 gap-3" data-testid="journal-metrics-grid">
+          <MetricCard
+            label="Decision Quality"
+            value={`${(result.metrics.decisionQuality * 100).toFixed(0)}%`}
+            helper="Based on conviction and pattern clarity"
+            trendTone={result.metrics.decisionQuality >= 0.7 ? 'positive' : result.metrics.decisionQuality >= 0.4 ? 'neutral' : 'negative'}
+          />
+          <MetricCard
+            label="Emotional Volatility"
+            value={`${(result.metrics.emotionalVolatility * 100).toFixed(0)}%`}
+            helper="Lower is calmer"
+            trendTone={result.metrics.emotionalVolatility <= 0.3 ? 'positive' : result.metrics.emotionalVolatility <= 0.6 ? 'neutral' : 'negative'}
+          />
+          <MetricCard
+            label="Risk Alignment"
+            value={`${(result.metrics.riskAlignment * 100).toFixed(0)}%`}
+            helper="Conviction × clarity"
+            trendTone={result.metrics.riskAlignment >= 0.7 ? 'positive' : result.metrics.riskAlignment >= 0.4 ? 'neutral' : 'negative'}
+          />
+          <MetricCard
+            label="Pattern Strength"
+            value={`${(result.normalized.patternStrength * 100).toFixed(0)}%`}
+            helper="Technical setup quality"
+            trendTone={result.normalized.patternStrength >= 0.7 ? 'positive' : result.normalized.patternStrength >= 0.4 ? 'neutral' : 'negative'}
+          />
+        </div>
+
+        {/* Insights as cards */}
+        {result.insights.length > 0 && (
+          <div className="space-y-3" data-testid="journal-insights-section">
+            <h3 className="text-sm font-semibold text-text-primary">What next?</h3>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {result.insights.slice(0, 4).map((insight, index) => (
+                <InsightCard key={index} insight={insight} />
+              ))}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }
 
-export function JournalResultView({ result }: JournalResultViewProps) {
+function InsightCard({ insight }: { insight: string }) {
   return (
-    <Card variant="glass" data-testid="journal-v2-result">
-      <CardHeader className="pb-3">
-        <Badge variant="outline" className="w-fit uppercase tracking-wide text-xs">Archetype</Badge>
-        <CardTitle className="text-2xl font-semibold text-text-primary">{result.archetype}</CardTitle>
-        <p className="text-sm text-text-secondary">Score combines conviction, pattern quality, and emotional stability.</p>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-wrap items-center gap-3" aria-label="Journal score">
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-text-primary">
-            <span className="inline-flex h-2 w-2 rounded-full bg-brand" aria-hidden />
-            Score
-          </div>
-          <span className="text-3xl font-bold text-text-primary">{result.score.toFixed(0)}</span>
-          {result.emotionalTrend ? (
-            <Badge variant="brand" className="text-xs capitalize">
-              Emotional trend: {result.emotionalTrend}
-            </Badge>
-          ) : null}
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <MetricTile label="Decision quality" value={(result.metrics.decisionQuality * 100).toFixed(0) + '%'} />
-          <MetricTile
-            label="Emotional volatility"
-            value={(result.metrics.emotionalVolatility * 100).toFixed(0) + '%'}
-            hint="Lower is calmer"
-          />
-          <MetricTile
-            label="Risk alignment"
-            value={(result.metrics.riskAlignment * 100).toFixed(0) + '%'}
-            hint="Conviction × clarity"
-          />
-          <MetricTile label="Pattern strength" value={(result.normalized.patternStrength * 100).toFixed(0) + '%'} />
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-sm font-semibold text-text-primary">Insights</p>
-          <ul className="space-y-1 text-sm text-text-secondary" data-testid="journal-v2-insights">
-            {result.insights.map((insight) => (
-              <li key={insight} className="flex gap-2">
-                <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-brand" aria-hidden />
-                <span>{insight}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="rounded-xl border border-border/70 bg-surface/60 p-3 transition hover:bg-surface-hover/50">
+      <div className="flex gap-2">
+        <span className="mt-0.5 inline-flex h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand" aria-hidden />
+        <p className="text-sm text-text-secondary leading-relaxed">{insight}</p>
+      </div>
+    </div>
   )
 }

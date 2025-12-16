@@ -1,5 +1,6 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Select, Textarea } from '@/components/ui'
+import { Collapsible } from '@/components/ui/Collapsible'
 import type { JournalRawInput, EmotionLabel, MarketContext, TradeContext } from '../types'
 import { cn } from '@/lib/ui/cn'
 
@@ -41,6 +42,8 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
   const [reasoning, setReasoning] = useState('')
   const [expectation, setExpectation] = useState('')
   const [selfReflection, setSelfReflection] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
+  const isSubmittingRef = useRef(false)
 
   useEffect(() => {
     if (!tradeContext) return
@@ -71,42 +74,64 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
     [conviction, emotionIntensity, patternQuality]
   )
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    // Prevent double-submit
+    if (isSubmittingRef.current || isSubmitting) return
+    isSubmittingRef.current = true
 
     const createdAt = tradeContext?.timestamp ?? Date.now()
 
-    onSubmit({
-      emotionalState,
-      emotionIntensity,
-      conviction,
-      patternQuality,
-      marketContext,
-      reasoning,
-      expectation,
-      selfReflection,
-      createdAt,
-      tradeContext,
-    })
+    try {
+      await onSubmit({
+        emotionalState,
+        emotionIntensity,
+        conviction,
+        patternQuality,
+        marketContext,
+        reasoning,
+        expectation,
+        selfReflection,
+        createdAt,
+        tradeContext,
+      })
+    } finally {
+      isSubmittingRef.current = false
+    }
   }
 
+  const handleReset = () => {
+    setEmotionalState('calm')
+    setEmotionIntensity(5)
+    setConviction(5)
+    setPatternQuality(5)
+    setMarketContext('chop')
+    setReasoning('')
+    setExpectation('')
+    setSelfReflection('')
+    onClearTradeContext?.()
+  }
+
+  const canSubmit = !isSubmitting && reasoning.trim().length > 0
+
   return (
-    <Card variant="glass" className="border-border/70 shadow-card-subtle" data-testid="journal-v2-form">
+    <Card variant="glass" className="relative border-border/70 shadow-card-subtle" data-testid="journal-v2-form">
       <CardHeader className="flex flex-col gap-2 pb-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <Badge variant="brand" className="mb-2 uppercase tracking-wide text-xs">Journal</Badge>
           <CardTitle className="text-xl">Capture your trading state</CardTitle>
           <p className="text-sm text-text-secondary">
-            Map emotions, conviction, and context before you enter. Insights are generated locally and saved for offline review.
+            Map emotions, conviction, and context before you enter.
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-text-tertiary">
           <span className="inline-flex h-2 w-2 rounded-full bg-brand" aria-hidden />
-          Offline-first · Dexie persisted
+          Offline-first
         </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="pb-20">
         {tradeContext ? (
           <div
             className="mb-6 rounded-2xl border border-border/70 bg-surface/60 p-4 shadow-card-subtle"
@@ -137,130 +162,190 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
                   onClick={onClearTradeContext}
                   className={cn('self-start text-text-secondary hover:text-text-primary')}
                 >
-                  Clear trade context
+                  Clear
                 </Button>
               ) : null}
             </div>
           </div>
         ) : null}
 
-        <form className="grid gap-6 lg:grid-cols-2" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-text-primary">Emotional state</label>
-              <Select
-                value={emotionalState}
-                onChange={(value) => setEmotionalState(value as EmotionLabel)}
-                options={emotionOptions}
-                placeholder="Select your current state"
-                triggerProps={{ 'data-testid': 'journal-v2-emotion' }}
-              />
-              <p className="text-xs text-text-tertiary">Identify the dominant emotion guiding your decision.</p>
+        <form ref={formRef} className="space-y-6" onSubmit={handleSubmit}>
+          {/* Section 1: State (Required, always visible) */}
+          <section className="space-y-4" data-testid="journal-section-state">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-text-primary">1. Emotional State</h3>
+              <Badge variant="warning" className="text-[10px]">Required</Badge>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-sm font-medium text-text-primary">
-                <span>Emotion intensity</span>
-                <span className="text-text-secondary">{intensityLabels.emotion}</span>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-text-primary">Current emotion</label>
+                <Select
+                  value={emotionalState}
+                  onChange={(value) => setEmotionalState(value as EmotionLabel)}
+                  options={emotionOptions}
+                  placeholder="Select your current state"
+                  triggerProps={{ 'data-testid': 'journal-v2-emotion' }}
+                />
               </div>
-              <input
-                type="range"
-                min={0}
-                max={10}
-                value={emotionIntensity}
-                onChange={(event) => setEmotionIntensity(Number(event.target.value))}
-                className={sliderClasses}
-                data-testid="journal-v2-emotion-intensity"
-              />
-            </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-sm font-medium text-text-primary">
-                <span>Conviction</span>
-                <span className="text-text-secondary">{intensityLabels.conviction}</span>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm font-medium text-text-primary">
+                  <span>Intensity</span>
+                  <span className="text-text-secondary">{intensityLabels.emotion}</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={10}
+                  value={emotionIntensity}
+                  onChange={(event) => setEmotionIntensity(Number(event.target.value))}
+                  className={sliderClasses}
+                  data-testid="journal-v2-emotion-intensity"
+                />
               </div>
-              <input
-                type="range"
-                min={0}
-                max={10}
-                value={conviction}
-                onChange={(event) => setConviction(Number(event.target.value))}
-                className={sliderClasses}
-                data-testid="journal-v2-conviction"
-              />
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-sm font-medium text-text-primary">
-                <span>Pattern quality</span>
-                <span className="text-text-secondary">{intensityLabels.pattern}</span>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm font-medium text-text-primary">
+                  <span>Conviction</span>
+                  <span className="text-text-secondary">{intensityLabels.conviction}</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={10}
+                  value={conviction}
+                  onChange={(event) => setConviction(Number(event.target.value))}
+                  className={sliderClasses}
+                  data-testid="journal-v2-conviction"
+                />
               </div>
-              <input
-                type="range"
-                min={0}
-                max={10}
-                value={patternQuality}
-                onChange={(event) => setPatternQuality(Number(event.target.value))}
-                className={sliderClasses}
-                data-testid="journal-v2-pattern-quality"
-              />
-            </div>
-          </div>
 
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-text-primary">Market context</label>
-              <Select
-                value={marketContext}
-                onChange={(value) => setMarketContext(value as MarketContext)}
-                options={contextOptions}
-                placeholder="Where is the market right now?"
-                triggerProps={{ 'data-testid': 'journal-v2-market-context' }}
-              />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm font-medium text-text-primary">
+                  <span>Pattern quality</span>
+                  <span className="text-text-secondary">{intensityLabels.pattern}</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={10}
+                  value={patternQuality}
+                  onChange={(event) => setPatternQuality(Number(event.target.value))}
+                  className={sliderClasses}
+                  data-testid="journal-v2-pattern-quality"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Section 2: Context (Optional, collapsible) */}
+          <Collapsible
+            title={
+              <div className="flex items-center gap-2">
+                <span>2. Market Context</span>
+                <Badge variant="outline" className="text-[10px]">Optional</Badge>
+              </div>
+            }
+            defaultOpen={false}
+            variant="card"
+            className="border-border/50"
+          >
+            <div className="space-y-4" data-testid="journal-section-context">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-text-primary">Current market regime</label>
+                <Select
+                  value={marketContext}
+                  onChange={(value) => setMarketContext(value as MarketContext)}
+                  options={contextOptions}
+                  placeholder="Where is the market right now?"
+                  triggerProps={{ 'data-testid': 'journal-v2-market-context' }}
+                />
+                <p className="text-xs text-text-tertiary">
+                  Helps identify patterns in your performance across different conditions.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-text-primary">Self reflection</label>
+                <Textarea
+                  value={selfReflection}
+                  onChange={(event) => setSelfReflection(event.target.value)}
+                  placeholder="What bias or habit should you watch?"
+                  data-testid="journal-v2-reflection"
+                  rows={2}
+                />
+              </div>
+            </div>
+          </Collapsible>
+
+          {/* Section 3: Thesis (Required) */}
+          <section className="space-y-4" data-testid="journal-section-thesis">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-semibold text-text-primary">3. Trade Thesis</h3>
+              <Badge variant="warning" className="text-[10px]">Required</Badge>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-text-primary">Reasoning</label>
-              <Textarea
-                value={reasoning}
-                onChange={(event) => setReasoning(event.target.value)}
-                placeholder="Setup, catalysts, and risk context"
-                data-testid="journal-v2-reasoning"
-              />
-              <p className="text-xs text-text-tertiary">Keep it concise: what is your thesis and invalidation?</p>
-            </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-text-primary">Reasoning</label>
+                <Textarea
+                  value={reasoning}
+                  onChange={(event) => setReasoning(event.target.value)}
+                  placeholder="Setup, catalysts, and risk context. What is your thesis and invalidation?"
+                  data-testid="journal-v2-reasoning"
+                  rows={3}
+                  required
+                />
+              </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-text-primary">Expectation</label>
-              <Input
-                value={expectation}
-                onChange={(event) => setExpectation(event.target.value)}
-                placeholder="What outcome are you anticipating?"
-                data-testid="journal-v2-expectation"
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-text-primary">Expectation</label>
+                <Input
+                  value={expectation}
+                  onChange={(event) => setExpectation(event.target.value)}
+                  placeholder="What outcome are you anticipating?"
+                  data-testid="journal-v2-expectation"
+                />
+              </div>
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-text-primary">Self reflection</label>
-              <Textarea
-                value={selfReflection}
-                onChange={(event) => setSelfReflection(event.target.value)}
-                placeholder="What bias or habit should you watch?"
-                data-testid="journal-v2-reflection"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-text-tertiary">
-                Entries are stored locally with timestamps to track your emotional trend.
-              </p>
-              <Button type="submit" variant="primary" loading={isSubmitting} disabled={isSubmitting} data-testid="journal-v2-submit">
-                {isSubmitting ? 'Analyzing…' : 'Run Journal'}
-              </Button>
-            </div>
-          </div>
+          </section>
         </form>
       </CardContent>
+
+      {/* Sticky action bar */}
+      <div
+        className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-3 rounded-b-2xl border-t border-border/70 bg-surface-elevated/95 px-6 py-4 backdrop-blur"
+        data-testid="journal-action-bar"
+      >
+        <p className="hidden text-xs text-text-tertiary sm:block">
+          Entries are stored locally with timestamps.
+        </p>
+        <div className="flex flex-1 items-center justify-end gap-2 sm:flex-none">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleReset}
+            disabled={isSubmitting}
+            data-testid="journal-v2-reset"
+          >
+            Reset
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            loading={isSubmitting}
+            disabled={!canSubmit}
+            onClick={() => formRef.current?.requestSubmit()}
+            data-testid="journal-v2-submit"
+          >
+            {isSubmitting ? 'Analyzing…' : 'Run Journal'}
+          </Button>
+        </div>
+      </div>
     </Card>
   )
 }

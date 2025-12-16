@@ -98,10 +98,20 @@ export default function DashboardPage() {
       .map(({ entry }) => entry);
   }, [journalEntries]);
 
+  const handleMarkEntry = React.useCallback(() => {
+    void refresh();
+    setIsLogOverlayOpen(true);
+  }, [refresh]);
+
   const renderHoldingsAndTrades = () => (
     <div className="grid gap-6 xl:grid-cols-2">
       <HoldingsList holdings={holdings} quoteCurrency={settings.quoteCurrency} />
-      <TradeLogList trades={recentTrades} quoteCurrency={settings.quoteCurrency} />
+      <TradeLogList
+        trades={recentTrades}
+        quoteCurrency={settings.quoteCurrency}
+        onMarkEntry={handleMarkEntry}
+        isMarkEntryDisabled={unconsumedCount === 0}
+      />
     </div>
   );
 

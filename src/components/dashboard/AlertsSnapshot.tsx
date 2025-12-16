@@ -2,30 +2,39 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import StateView from '@/components/ui/StateView';
+import { Badge } from '@/components/ui/Badge';
+import { EmptyState } from '@/components/ui/EmptyState';
+import type { Alert } from '@/store/alertsStore';
 import { useAlertsStore } from '@/store/alertsStore';
+
+const MAX_ITEMS_PER_CATEGORY = 3;
 
 export default function AlertsSnapshot() {
   const alerts = useAlertsStore((state) => state.alerts);
   const navigate = useNavigate();
 
-  const { armedCount, triggeredCount } = React.useMemo(() => {
-    return alerts.reduce(
-      (acc, alert) => {
-        if (alert.status === 'armed') {
-          acc.armedCount += 1;
-        }
-        if (alert.status === 'triggered') {
-          acc.triggeredCount += 1;
-        }
-        return acc;
-      },
-      { armedCount: 0, triggeredCount: 0 },
-    );
+  const { armedAlerts, triggeredAlerts, armedCount, triggeredCount } = React.useMemo(() => {
+    const armed: Alert[] = [];
+    const triggered: Alert[] = [];
+    
+    for (const alert of alerts) {
+      if (alert.status === 'armed' && armed.length < MAX_ITEMS_PER_CATEGORY) {
+        armed.push(alert);
+      }
+      if (alert.status === 'triggered' && triggered.length < MAX_ITEMS_PER_CATEGORY) {
+        triggered.push(alert);
+      }
+    }
+    
+    return {
+      armedAlerts: armed,
+      triggeredAlerts: triggered,
+      armedCount: alerts.filter((a) => a.status === 'armed').length,
+      triggeredCount: alerts.filter((a) => a.status === 'triggered').length,
+    };
   }, [alerts]);
 
-  const totalAlerts = alerts.length;
-  const hasAlerts = totalAlerts > 0;
+  const hasAlerts = alerts.length > 0;
 
   const handleViewAll = React.useCallback(() => {
     navigate('/alerts');
@@ -35,6 +44,13 @@ export default function AlertsSnapshot() {
     navigate('/alerts');
   }, [navigate]);
 
+  const handleAlertClick = React.useCallback(
+    (alertId: string) => {
+      navigate(`/alerts?alert=${alertId}`);
+    },
+    [navigate],
+  );
+
   return (
     <Card
       data-testid="dashboard-alerts-snapshot"
@@ -42,49 +58,89 @@ export default function AlertsSnapshot() {
       className="bg-surface-subtle"
     >
       <CardHeader className="mb-2">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-text-tertiary">Signals</p>
-        <CardTitle className="text-base">Alerts snapshot</CardTitle>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-text-tertiary">Signals</p>
+            <CardTitle className="text-base">Alerts snapshot</CardTitle>
+          </div>
+          {hasAlerts && (
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1 text-xs text-text-secondary">
+                <span data-testid="dashboard-alerts-armed-count">{armedCount}</span>
+                <span>armed</span>
+              </span>
+              <span className="text-text-tertiary">/</span>
+              <span className="flex items-center gap-1 text-xs text-text-secondary">
+                <span data-testid="dashboard-alerts-triggered-count">{triggeredCount}</span>
+                <span>triggered</span>
+              </span>
+            </div>
+          )}
+        </div>
       </CardHeader>
 
       {hasAlerts ? (
-        <CardContent className="gap-5">
-          <div className="grid grid-cols-2 gap-4">
-            <StatBlock
-              label="Armed"
-              value={armedCount}
-              testId="dashboard-alerts-armed-count"
-              badgeClass="border-glow-success bg-sentiment-bull-bg"
-            />
-            <StatBlock
-              label="Triggered"
-              value={triggeredCount}
-              testId="dashboard-alerts-triggered-count"
-              badgeClass="border-glow-danger bg-sentiment-bear-bg"
-            />
-          </div>
+        <CardContent className="gap-4">
+          {/* Triggered Alerts Section */}
+          {triggeredAlerts.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-rose-300">
+                Triggered
+              </p>
+              <div className="space-y-2">
+                {triggeredAlerts.map((alert) => (
+                  <AlertRow
+                    key={alert.id}
+                    alert={alert}
+                    onClick={() => handleAlertClick(alert.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Armed Alerts Section */}
+          {armedAlerts.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">
+                Armed
+              </p>
+              <div className="space-y-2">
+                {armedAlerts.map((alert) => (
+                  <AlertRow
+                    key={alert.id}
+                    alert={alert}
+                    onClick={() => handleAlertClick(alert.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Summary when there are more alerts */}
+          {(armedCount > MAX_ITEMS_PER_CATEGORY || triggeredCount > MAX_ITEMS_PER_CATEGORY) && (
+            <p className="text-xs text-text-tertiary">
+              Showing top {MAX_ITEMS_PER_CATEGORY} per category. View all for complete list.
+            </p>
+          )}
         </CardContent>
       ) : (
-        <StateView
-          type="empty"
-          title="No alerts configured"
-          description="Create an alert to monitor key price levels."
-          actionLabel="Create alert"
-          onAction={handleCreateAlert}
-          compact
-          className="w-full rounded-2xl border border-dashed border-border-moderate bg-surface p-4"
-          data-testid="dashboard-alerts-empty-state"
-        />
+        <CardContent>
+          <EmptyState
+            illustration="alerts"
+            title="No alerts configured"
+            description="Create price alerts to monitor key levels and stay ahead of market moves."
+            action={{
+              label: 'Create alert',
+              onClick: handleCreateAlert,
+            }}
+            compact
+            data-testid="dashboard-alerts-empty-state"
+          />
+        </CardContent>
       )}
 
-      <CardFooter className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        {hasAlerts ? (
-          <p className="text-xs uppercase tracking-wide text-text-tertiary">
-            Total alerts: <span className="text-text-primary">{totalAlerts}</span>
-          </p>
-        ) : (
-          <p className="text-xs text-text-tertiary">Stay ahead of volatility.</p>
-        )}
-
+      <CardFooter className="mt-4 flex flex-wrap items-center justify-end gap-2">
         <Button
           variant="ghost"
           size="sm"
@@ -93,30 +149,42 @@ export default function AlertsSnapshot() {
         >
           View all
         </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleCreateAlert}
+          data-testid="dashboard-alerts-new"
+        >
+          New alert
+        </Button>
       </CardFooter>
     </Card>
   );
 }
 
-interface StatBlockProps {
-  label: string;
-  value: number;
-  testId: string;
-  badgeClass: string;
+interface AlertRowProps {
+  alert: Alert;
+  onClick: () => void;
 }
 
-function StatBlock({ label, value, testId, badgeClass }: StatBlockProps) {
+function AlertRow({ alert, onClick }: AlertRowProps) {
   return (
-    <div className="card-bordered rounded-2xl p-4 hover-scale">
-      <p className="text-xs uppercase tracking-wide text-text-tertiary">{label}</p>
-      <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-gradient-success text-3xl font-semibold" data-testid={testId}>
-          {value}
-        </span>
-        <span className={`rounded-full px-2 py-1 text-[11px] font-medium ${badgeClass}`}>
-          {value > 0 ? 'Active' : 'Idle'}
-        </span>
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full rounded-xl border border-border/70 bg-surface/60 px-3 py-2 text-left transition hover:border-border-focus hover:bg-surface-hover/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus"
+      data-testid="dashboard-alert-row"
+      data-alert-id={alert.id}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium text-text-primary">{alert.symbol}</p>
+          <p className="truncate text-xs text-text-secondary">{alert.condition}</p>
+        </div>
+        <Badge variant={alert.status === 'triggered' ? 'triggered' : 'armed'} className="flex-shrink-0">
+          {alert.timeframe}
+        </Badge>
       </div>
-    </div>
+    </button>
   );
 }

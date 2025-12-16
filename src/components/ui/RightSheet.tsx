@@ -23,6 +23,7 @@ export interface RightSheetProps {
   closeOnOverlayClick?: boolean
   closeOnEscape?: boolean
   className?: string
+  'data-testid'?: string
 }
 
 const getOverlayRoot = () => document.getElementById("overlay-root") ?? document.body
@@ -38,6 +39,7 @@ export function RightSheet({
   closeOnOverlayClick = true,
   closeOnEscape = true,
   className,
+  'data-testid': testId,
 }: RightSheetProps) {
   const sheetRef = React.useRef<HTMLDivElement>(null)
   const closeButtonRef = React.useRef<HTMLButtonElement>(null)
@@ -92,7 +94,7 @@ export function RightSheet({
           className
         )}
         tabIndex={-1}
-        data-testid="right-sheet-content"
+        data-testid={testId ?? "right-sheet-content"}
       >
         {(title || subtitle) && (
           <header className="flex flex-shrink-0 items-start justify-between border-b border-border px-6 py-5">

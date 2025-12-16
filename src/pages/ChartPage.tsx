@@ -185,14 +185,18 @@ export default function ChartPage() {
     navigate(url)
   }
 
-  const indicatorButtons: Array<{ key: IndicatorId; label: string }> = useMemo(
-    () => [
-      { key: 'sma', label: 'SMA 20' },
-      { key: 'ema', label: 'EMA 50' },
-      { key: 'bb', label: 'BB 20/2' },
-    ],
-    []
-  )
+  const indicatorButtons = useMemo(() => {
+    const smaParam = indicatorSettings.params.sma?.period ?? 20
+    const emaParam = indicatorSettings.params.ema?.period ?? 50
+    const bbPeriod = indicatorSettings.params.bb?.period ?? 20
+    const bbDev = indicatorSettings.params.bb?.deviation ?? 2
+
+    return [
+      { key: 'sma' as IndicatorId, label: `SMA ${smaParam}` },
+      { key: 'ema' as IndicatorId, label: `EMA ${emaParam}` },
+      { key: 'bb' as IndicatorId, label: `BB ${bbPeriod}/${bbDev}` },
+    ]
+  }, [indicatorSettings.params.sma?.period, indicatorSettings.params.ema?.period, indicatorSettings.params.bb?.period, indicatorSettings.params.bb?.deviation])
 
   const handlePreset = (preset: IndicatorPresetId) => {
     void applyPreset(preset)
@@ -331,229 +335,226 @@ export default function ChartPage() {
         )}
 
         <section
-          className="space-y-4 rounded-3xl border border-border/70 bg-surface/90 p-4 shadow-card-subtle backdrop-blur-lg sm:p-6"
+          className="rounded-3xl border border-border/70 bg-surface/90 p-3 shadow-card-subtle backdrop-blur-lg sm:p-4"
           data-testid="indicator-toolbar"
         >
-          <div className="flex flex-wrap items-center gap-3 text-xs text-text-secondary">
-            <span className="uppercase tracking-[0.3em] text-text-tertiary">Indicators</span>
-            {indicatorButtons.map((button) => {
-              const isActive = indicatorSettings.enabled?.[button.key] ?? false
-              let indicatorPayload: ChartIndicatorOverlay
-              if (button.key === 'sma') {
-                indicatorPayload = { type: 'sma', period: indicatorSettings.params.sma?.period ?? 20 }
-              } else if (button.key === 'ema') {
-                indicatorPayload = { type: 'ema', period: indicatorSettings.params.ema?.period ?? 50 }
-              } else {
-                indicatorPayload = {
-                  type: 'bb',
-                  period: indicatorSettings.params.bb?.period ?? 20,
-                  deviation: indicatorSettings.params.bb?.deviation ?? 2,
-                }
-              }
-              return (
-                <Button
-                  key={button.key}
-                  size="sm"
-                  variant={isActive ? 'secondary' : 'ghost'}
-                  className="rounded-full px-4 text-xs"
-                  disabled={indicatorSettingsLoading}
-                  onClick={() => {
-                    void toggleIndicator(button.key)
-                    track('chart.indicator_toggled', {
-                      indicator: indicatorPayload,
-                      active: !isActive,
-                      address: asset.address,
-                      timeframe,
-                    })
-                  }}
-                  data-testid={`indicator-toggle-${button.key}`}
-                  title={
-                    button.key === 'bb'
-                      ? 'BB 20/2 – volatility bands for squeezes and breakouts'
-                      : `${button.label} – smoothing to contextualize moves`
+          {/* Primary toolbar row - always visible */}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+            {/* Indicators */}
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Indicators</span>
+              {indicatorButtons.map((button) => {
+                const isActive = indicatorSettings.enabled?.[button.key] ?? false
+                let indicatorPayload: ChartIndicatorOverlay
+                if (button.key === 'sma') {
+                  indicatorPayload = { type: 'sma', period: indicatorSettings.params.sma?.period ?? 20 }
+                } else if (button.key === 'ema') {
+                  indicatorPayload = { type: 'ema', period: indicatorSettings.params.ema?.period ?? 50 }
+                } else {
+                  indicatorPayload = {
+                    type: 'bb',
+                    period: indicatorSettings.params.bb?.period ?? 20,
+                    deviation: indicatorSettings.params.bb?.deviation ?? 2,
                   }
+                }
+                return (
+                  <Button
+                    key={button.key}
+                    size="sm"
+                    variant={isActive ? 'secondary' : 'ghost'}
+                    className="rounded-full px-3 text-[11px] focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+                    disabled={indicatorSettingsLoading}
+                    onClick={() => {
+                      void toggleIndicator(button.key)
+                      track('chart.indicator_toggled', {
+                        indicator: indicatorPayload,
+                        active: !isActive,
+                        address: asset.address,
+                        timeframe,
+                      })
+                    }}
+                    data-testid={`indicator-toggle-${button.key}`}
+                    title={`${button.label} – smoothing to contextualize moves`}
+                  >
+                    {button.label}
+                  </Button>
+                )
+              })}
+            </div>
+
+            {/* Presets */}
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Preset</span>
+              {(
+                [
+                  { id: 'scalper', label: 'Scalper' },
+                  { id: 'swing', label: 'Swing' },
+                  { id: 'position', label: 'Position' },
+                ] satisfies Array<{ id: IndicatorPresetId; label: string }>
+              ).map((preset) => (
+                <Button
+                  key={preset.id}
+                  size="sm"
+                  variant={indicatorSettings.preset === preset.id ? 'secondary' : 'ghost'}
+                  className="rounded-full px-3 text-[11px] focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-1"
+                  onClick={() => handlePreset(preset.id)}
+                  data-testid={`indicator-preset-${preset.id}`}
+                  title={`Apply ${preset.label} indicator mix`}
                 >
-                  {button.label}
+                  {preset.label}
                 </Button>
-              )
-            })}
-          </div>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
-            <span className="uppercase tracking-wide text-text-tertiary">Preset</span>
-            {(
-              [
-                { id: 'scalper', label: 'Scalper' },
-                { id: 'swing', label: 'Swing' },
-                { id: 'position', label: 'Position' },
-              ] satisfies Array<{ id: IndicatorPresetId; label: string }>
-            ).map((preset) => (
-              <Button
-                key={preset.id}
-                size="sm"
-                variant={indicatorSettings.preset === preset.id ? 'secondary' : 'ghost'}
-                className="rounded-full px-3 text-[11px]"
-                onClick={() => handlePreset(preset.id)}
-                data-testid={`indicator-preset-${preset.id}`}
-                title={`Apply ${preset.label} indicator mix`}
-              >
-                {preset.label}
-              </Button>
-            ))}
+              ))}
+            </div>
+
+            {/* Drawings - Logical grouping */}
+            <div className="flex flex-wrap items-center gap-2 text-xs" data-testid="drawing-mode-toggle">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-text-tertiary">Drawings</span>
+              
+              {/* Mode buttons */}
+              <div className="flex items-center gap-1 rounded-full border border-border/50 bg-surface-subtle/50 p-0.5">
+                <Button
+                  size="sm"
+                  variant={interactionMode === 'view' ? 'secondary' : 'ghost'}
+                  className="rounded-full px-2.5 text-[11px] focus-visible:ring-2 focus-visible:ring-brand"
+                  onClick={() => {
+                    disableSelection()
+                    selectDrawing(null)
+                  }}
+                >
+                  View
+                </Button>
+                <Button
+                  size="sm"
+                  variant={interactionMode === 'select' ? 'secondary' : 'ghost'}
+                  className="rounded-full px-2.5 text-[11px] focus-visible:ring-2 focus-visible:ring-brand"
+                  onClick={enableSelection}
+                >
+                  Select
+                </Button>
+              </div>
+
+              {/* Drawing tools */}
+              <div className="flex items-center gap-1">
+                {[
+                  { mode: 'create-line' as const, label: 'Line', action: setCreateLine },
+                  { mode: 'create-box' as const, label: 'Box', action: setCreateBox },
+                  { mode: 'create-fib' as const, label: 'Fib', action: setCreateFib },
+                  { mode: 'create-channel' as const, label: 'Channel', action: setCreateChannel },
+                ].map((tool) => (
+                  <Button
+                    key={tool.mode}
+                    size="sm"
+                    variant={interactionMode === tool.mode ? 'secondary' : 'ghost'}
+                    className="rounded-full px-2.5 text-[11px] focus-visible:ring-2 focus-visible:ring-brand"
+                    onClick={() => {
+                      selectDrawing(null)
+                      tool.action()
+                    }}
+                    disabled={drawingsLoading}
+                    data-testid={`drawing-${tool.mode}`}
+                  >
+                    {tool.label}
+                  </Button>
+                ))}
+              </div>
+
+              {/* History & Delete */}
+              <div className="flex items-center gap-1 border-l border-border/50 pl-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-full px-2.5 text-[11px] focus-visible:ring-2 focus-visible:ring-brand"
+                  onClick={handleUndo}
+                  disabled={!canUndo}
+                  data-testid="drawing-undo"
+                  title="Undo (Ctrl+Z)"
+                >
+                  Undo
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-full px-2.5 text-[11px] focus-visible:ring-2 focus-visible:ring-brand"
+                  onClick={handleRedo}
+                  disabled={!canRedo}
+                  data-testid="drawing-redo"
+                  title="Redo (Ctrl+Shift+Z)"
+                >
+                  Redo
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  className="rounded-full px-2.5 text-[11px] focus-visible:ring-2 focus-visible:ring-rose-400"
+                  onClick={() => void deleteSelected()}
+                  disabled={!selectedDrawingId}
+                  data-testid="drawing-delete"
+                  title="Delete selected (Del)"
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2 text-xs text-text-secondary">
-            <span className="uppercase tracking-wide text-text-tertiary">Parameters</span>
-            <div className="grid gap-3 sm:grid-cols-3">
+          {/* Collapsible parameters section */}
+          <details className="mt-3 group">
+            <summary className="cursor-pointer select-none text-[10px] font-semibold uppercase tracking-[0.25em] text-text-tertiary hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded">
+              <span className="inline-flex items-center gap-1">
+                Parameters
+                <svg className="h-3 w-3 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </summary>
+            <div className="mt-2 grid gap-3 sm:grid-cols-4">
               <label className="space-y-1">
-                <span className="flex items-center justify-between text-[11px] text-text-tertiary">SMA Length</span>
+                <span className="text-[11px] text-text-tertiary">SMA Length</span>
                 <Input
                   type="number"
                   min={1}
                   value={indicatorSettings.params.sma?.period ?? 20}
                   onChange={(event) => handleParamChange('sma', 'period', Number(event.target.value))}
                   disabled={indicatorSettingsLoading}
+                  className="h-8 text-sm"
                 />
               </label>
               <label className="space-y-1">
-                <span className="flex items-center justify-between text-[11px] text-text-tertiary">EMA Length</span>
+                <span className="text-[11px] text-text-tertiary">EMA Length</span>
                 <Input
                   type="number"
                   min={1}
                   value={indicatorSettings.params.ema?.period ?? 50}
                   onChange={(event) => handleParamChange('ema', 'period', Number(event.target.value))}
                   disabled={indicatorSettingsLoading}
+                  className="h-8 text-sm"
                 />
               </label>
-              <div className="grid grid-cols-2 gap-2">
-                <label className="space-y-1">
-                  <span className="flex items-center justify-between text-[11px] text-text-tertiary">BB Length</span>
-                  <Input
-                    type="number"
-                    min={1}
-                    value={indicatorSettings.params.bb?.period ?? 20}
-                    onChange={(event) => handleParamChange('bb', 'period', Number(event.target.value))}
-                    disabled={indicatorSettingsLoading}
-                  />
-                </label>
-                <label className="space-y-1">
-                  <span className="flex items-center justify-between text-[11px] text-text-tertiary">BB StdDev</span>
-                  <Input
-                    type="number"
-                    min={0.1}
-                    step={0.1}
-                    value={indicatorSettings.params.bb?.deviation ?? 2}
-                    onChange={(event) => handleParamChange('bb', 'deviation', Number(event.target.value))}
-                    disabled={indicatorSettingsLoading}
-                  />
-                </label>
-              </div>
+              <label className="space-y-1">
+                <span className="text-[11px] text-text-tertiary">BB Length</span>
+                <Input
+                  type="number"
+                  min={1}
+                  value={indicatorSettings.params.bb?.period ?? 20}
+                  onChange={(event) => handleParamChange('bb', 'period', Number(event.target.value))}
+                  disabled={indicatorSettingsLoading}
+                  className="h-8 text-sm"
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-[11px] text-text-tertiary">BB StdDev</span>
+                <Input
+                  type="number"
+                  min={0.1}
+                  step={0.1}
+                  value={indicatorSettings.params.bb?.deviation ?? 2}
+                  onChange={(event) => handleParamChange('bb', 'deviation', Number(event.target.value))}
+                  disabled={indicatorSettingsLoading}
+                  className="h-8 text-sm"
+                />
+              </label>
             </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary" data-testid="drawing-mode-toggle">
-            <span className="uppercase tracking-[0.3em] text-text-tertiary">Drawings</span>
-            <Button
-              size="sm"
-              variant={interactionMode === 'view' ? 'secondary' : 'ghost'}
-              className="rounded-full px-3 text-[11px]"
-              onClick={() => {
-                disableSelection()
-                selectDrawing(null)
-              }}
-            >
-              View
-            </Button>
-            <Button
-              size="sm"
-              variant={interactionMode === 'select' ? 'secondary' : 'ghost'}
-              className="rounded-full px-3 text-[11px]"
-              onClick={enableSelection}
-            >
-              Select
-            </Button>
-            <Button
-              size="sm"
-              variant={interactionMode === 'create-line' ? 'secondary' : 'ghost'}
-              className="rounded-full px-3 text-[11px]"
-              onClick={() => {
-                selectDrawing(null)
-                setCreateLine()
-              }}
-              disabled={drawingsLoading}
-              data-testid="drawing-create-line"
-            >
-              Line
-            </Button>
-            <Button
-              size="sm"
-              variant={interactionMode === 'create-box' ? 'secondary' : 'ghost'}
-              className="rounded-full px-3 text-[11px]"
-              onClick={() => {
-                selectDrawing(null)
-                setCreateBox()
-              }}
-              disabled={drawingsLoading}
-              data-testid="drawing-create-box"
-            >
-              Box
-            </Button>
-            <Button
-              size="sm"
-              variant={interactionMode === 'create-fib' ? 'secondary' : 'ghost'}
-              className="rounded-full px-3 text-[11px]"
-              onClick={() => {
-                selectDrawing(null)
-                setCreateFib()
-              }}
-              disabled={drawingsLoading}
-              data-testid="drawing-create-fib"
-            >
-              Fib
-            </Button>
-            <Button
-              size="sm"
-              variant={interactionMode === 'create-channel' ? 'secondary' : 'ghost'}
-              className="rounded-full px-3 text-[11px]"
-              onClick={() => {
-                selectDrawing(null)
-                setCreateChannel()
-              }}
-              disabled={drawingsLoading}
-              data-testid="drawing-create-channel"
-            >
-              Channel
-            </Button>
-            <Button
-              size="sm"
-              variant="destructive"
-              className="rounded-full px-3 text-[11px]"
-              onClick={() => void deleteSelected()}
-              disabled={!selectedDrawingId}
-              data-testid="drawing-delete"
-            >
-              Delete
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="rounded-full px-3 text-[11px]"
-              onClick={handleUndo}
-              disabled={!canUndo}
-              data-testid="drawing-undo"
-            >
-              Undo
-            </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="rounded-full px-3 text-[11px]"
-              onClick={handleRedo}
-              disabled={!canRedo}
-              data-testid="drawing-redo"
-            >
-              Redo
-            </Button>
-          </div>
+          </details>
         </section>
 
         {showChartSkeleton ? (
@@ -607,9 +608,7 @@ export default function ChartPage() {
         )}
 
         {status === 'error' && !hasData && (
-          <div className="rounded-2xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
-            {error || 'Failed to load chart data.'}
-          </div>
+          <ChartErrorBanner error={error} onRetry={refresh} onOpenSettings={() => navigate('/settings')} />
         )}
 
         {status === 'stale' && (
@@ -681,6 +680,85 @@ function ChartLegend() {
       <Badge variant="outline" className="bg-surface-subtle px-3 py-1">
         Replay + Go Live in toolbar
       </Badge>
+    </div>
+  )
+}
+
+interface ChartErrorBannerProps {
+  error?: string
+  onRetry: () => void
+  onOpenSettings: () => void
+}
+
+function ChartErrorBanner({ error, onRetry, onOpenSettings }: ChartErrorBannerProps) {
+  const [showDetails, setShowDetails] = React.useState(false)
+
+  // Detect if error looks like HTML or non-JSON response
+  const isHtmlError = error?.includes('<!DOCTYPE') || error?.includes('<html') || error?.includes('Unexpected token')
+  const isParssingError = error?.includes('JSON') || error?.includes('parse') || error?.includes('SyntaxError')
+  const isNetworkError = error?.includes('fetch') || error?.includes('network') || error?.includes('timeout')
+
+  const friendlyTitle = isHtmlError || isParssingError
+    ? 'Data feed unavailable'
+    : isNetworkError
+      ? 'Connection issue'
+      : 'Unable to load chart'
+
+  const friendlyDescription = isHtmlError || isParssingError
+    ? 'The data provider returned an unexpected response. This is usually temporary.'
+    : isNetworkError
+      ? 'Check your internet connection and try again.'
+      : 'There was a problem loading chart data. Please try again.'
+
+  return (
+    <div
+      className="rounded-2xl border border-rose-400/40 bg-rose-500/10 p-4 shadow-card-subtle"
+      role="alert"
+      data-testid="chart-error-banner"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-rose-100">{friendlyTitle}</p>
+          <p className="text-xs text-rose-200/80">{friendlyDescription}</p>
+        </div>
+        <div className="flex flex-shrink-0 items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRetry}
+            className="text-rose-100 hover:bg-rose-500/20"
+            data-testid="chart-error-retry"
+          >
+            Retry
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onOpenSettings}
+            className="text-rose-100 hover:bg-rose-500/20"
+            data-testid="chart-error-settings"
+          >
+            Settings
+          </Button>
+        </div>
+      </div>
+
+      {error && (
+        <div className="mt-3">
+          <button
+            type="button"
+            onClick={() => setShowDetails(!showDetails)}
+            className="text-xs text-rose-200/60 underline hover:text-rose-200"
+          >
+            {showDetails ? 'Hide details' : 'Show details'}
+          </button>
+          {showDetails && (
+            <pre className="mt-2 max-h-32 overflow-auto rounded-lg bg-black/30 p-2 text-xs text-rose-200/80">
+              {error.length > 500 ? `${error.slice(0, 500)}...` : error}
+            </pre>
+          )}
+        </div>
+      )}
     </div>
   )
 }

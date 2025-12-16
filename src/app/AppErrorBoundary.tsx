@@ -53,15 +53,15 @@ export class AppErrorBoundary extends React.Component<
         <main role="main" aria-label="Error" className="min-h-screen bg-bg text-primary flex items-center justify-center p-6">
           <div className="max-w-2xl w-full text-center">
             <div className="text-6xl mb-4">⚠️</div>
-            <h1 className="text-2xl font-bold text-brand mb-4">Es gab einen Fehler beim Laden</h1>
-            <p className="text-secondary mb-6">Versuchen Sie, die Seite neu zu laden. Diagnosen werden in der Preview gesammelt.</p>
+            <h1 className="text-2xl font-bold text-brand mb-4">Something went wrong</h1>
+            <p className="text-secondary mb-6">Try reloading the page. Diagnostics are collected in preview mode.</p>
             
             <div className="flex gap-4 justify-center mb-6">
               <button 
                 onClick={() => window.location.reload()}
                 className="px-6 py-3 bg-brand hover:bg-brand-hover text-bg rounded-lg font-medium transition-colors"
               >
-                Neu laden
+                Reload
               </button>
               <button 
                 onClick={this.hardReset}
@@ -74,7 +74,7 @@ export class AppErrorBoundary extends React.Component<
             {(this.state.error || this.state.errorInfo) && (
               <details className="mt-6 text-left bg-surface rounded-lg p-4">
                 <summary className="cursor-pointer text-sm text-secondary hover:text-primary mb-2">
-                  Fehlerdetails anzeigen
+                  Show error details
                 </summary>
                 <div className="mt-2 space-y-4">
                   {this.state.error && (
