@@ -47,6 +47,8 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ## 📦 Neue Ergänzungen (2025-12-16)
 
+- **UI Redesign Taskboard:** Neues Verzeichnis [`tasks/ui-redesign/`](../tasks/ui-redesign/00-PLAN.md) mit neun Phasen-Dateien (00–08) für Foundation, App Shell, Dashboard, Chart, Journal, Alerts, Settings und A11y-Polish, inklusive Route-Inventur und Akzeptanzkriterien für den Sparkfined-Terminal-Refresh.
+- **UI Redesign Foundation:** [`docs/process/ui-redesign-foundation.md`](process/ui-redesign-foundation.md) dokumentiert die Routeninventur (Phase 00) und die neuen Foundation-Primitives (Container, PageHeader, SectionNav, ListRow, KpiTile, MetricCard, InlineBanner, FormRow, RightSheet/Modal-Fokusfallen, Badge-Varianten).
 - **Dashboard Log Entry Drawer:** `src/pages/DashboardPage.tsx` bindet den neuen `LogEntryOverlayPanel` ein, zeigt Badge-Counts für unbelegte BUY-Events (`trade_events`) und öffnet die Journal-V2-Bridge mit CTA.
 - **Journal Trade Context & Confirmation:** `JournalInputForm` akzeptiert `tradeContext`-Payloads (txHash, walletId, timestamp, amounts/pair) zur Prefill-Logik und `confirmTradeFromContext` markiert Events als consumed und hebt `trade_logs` von shadow→confirmed an (txHash-first, Zeitfenster-Fallback, create-on-miss) plus `txHash`-Index in `trade_logs`.
 

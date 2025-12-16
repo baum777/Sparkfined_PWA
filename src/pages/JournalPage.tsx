@@ -1,6 +1,7 @@
 import React, { useCallback } from "react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState, ErrorBanner } from "@/components/ui";
+import { ListRow } from "@/components/ui/ListRow";
 import { JournalInputForm } from "@/features/journal-v2/components/JournalInputForm";
 import { JournalResultView } from "@/features/journal-v2/components/JournalResultView";
 import { useJournalV2 } from "@/features/journal-v2/hooks/useJournalV2";
@@ -13,6 +14,12 @@ function formatTimestamp(timestamp: number): string {
     hour: "2-digit",
     minute: "2-digit",
   }).format(timestamp);
+}
+
+function getScoreBadgeVariant(score: number): 'success' | 'warning' | 'danger' {
+  if (score >= 70) return 'success';
+  if (score >= 40) return 'warning';
+  return 'danger';
 }
 
 export default function JournalPage() {
@@ -52,46 +59,63 @@ export default function JournalPage() {
               <JournalResultView result={latestResult} />
             ) : (
               <EmptyState
+                illustration="journal"
                 title="Run your first journal entry"
-                description="You will see archetype, score, and insights immediately after submitting the form."
+                description="Capture your trading state to receive archetype analysis, behavioral insights, and pattern recognition."
+                compact
               />
             )}
 
             <Card variant="glass" data-testid="journal-v2-history">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Recent entries</CardTitle>
-                <p className="text-sm text-text-secondary">Stored locally with Dexie for offline review.</p>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Recent entries</CardTitle>
+                  {history.length > 0 && (
+                    <Badge variant="info" className="text-[10px]">
+                      {history.length} saved
+                    </Badge>
+                  )}
+                </div>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent>
                 {isLoading ? (
                   <div className="space-y-2">
                     {Array.from({ length: 3 }).map((_, index) => (
                       <div key={index} className="h-14 animate-pulse rounded-xl bg-surface/70" />
                     ))}
                   </div>
-                ) : latestResult && history.length === 0 ? (
-                  <p className="text-sm text-text-secondary">Submit more entries to see your recent history.</p>
                 ) : history.length === 0 ? (
                   <EmptyState
                     title="No entries yet"
-                    description="Run the journal pipeline to see history and insights."
+                    description="Run the journal to build your trading history."
+                    compact
+                    className="min-h-[160px]"
                   />
                 ) : (
-                  <div className="space-y-3">
-                    {history.map((item) => (
-                      <div key={item.id} className="rounded-2xl border border-border/80 bg-surface/70 p-3">
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
-                              <span className="text-text-tertiary">#{String(item.id).padStart(3, "0")}</span>
-                              <Badge variant="brand">Archetype v{item.version}</Badge>
-                            </div>
-                            <p className="text-xs text-text-secondary">{formatTimestamp(item.createdAt)}</p>
-                          </div>
-                          <div className="text-sm text-text-primary">Score: {item.output.score}/100</div>
-                        </div>
-                      </div>
+                  <div className="space-y-2">
+                    {history.slice(0, 5).map((item) => (
+                      <ListRow
+                        key={item.id}
+                        title={
+                          <span className="flex items-center gap-2">
+                            <span className="text-text-tertiary">#{String(item.id).padStart(3, "0")}</span>
+                            <span>{item.output.archetype}</span>
+                          </span>
+                        }
+                        subtitle={formatTimestamp(item.createdAt)}
+                        meta={
+                          <Badge variant={getScoreBadgeVariant(item.output.score)} className="text-[10px]">
+                            {item.output.score}/100
+                          </Badge>
+                        }
+                        data-testid="journal-history-row"
+                      />
                     ))}
+                    {history.length > 5 && (
+                      <p className="pt-1 text-center text-xs text-text-tertiary">
+                        +{history.length - 5} more entries
+                      </p>
+                    )}
                   </div>
                 )}
               </CardContent>

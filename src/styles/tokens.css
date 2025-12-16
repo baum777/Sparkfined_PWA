@@ -72,6 +72,30 @@
   --color-status-triggered: 110 231 183;
   --color-status-snoozed: 125 211 252;
 
+  /* Spacing Scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Layering */
+  --layer-bg-0: var(--surface-0);
+  --layer-bg-1: var(--surface-1);
+  --layer-bg-2: var(--surface-2);
+
+  /* Text Levels */
+  --layer-text-0: var(--text-0);
+  --layer-text-1: var(--text-1);
+  --layer-text-2: var(--text-2);
+
+  /* Semantic aliases */
+  --semantic-accent: var(--color-accent);
+  --semantic-danger: var(--color-danger);
+  --semantic-warning: var(--color-warn);
+  --semantic-success: var(--color-success);
+
   /* --- Layout primitives --- */
   
   /* ✅ SPACING: Use Tailwind utilities (p-4, gap-6, space-y-8, etc.)

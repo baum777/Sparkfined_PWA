@@ -94,6 +94,16 @@ if (typeof window !== 'undefined') {
   })
 }
 
+const ensureOverlayRoot = () => {
+  let overlayRoot = document.getElementById('overlay-root')
+  if (!overlayRoot) {
+    overlayRoot = document.createElement('div')
+    overlayRoot.id = 'overlay-root'
+    document.body.appendChild(overlayRoot)
+  }
+  return overlayRoot
+}
+
 // Ensure root element exists before rendering
 const rootElement = document.getElementById('root')
 if (!rootElement) {
@@ -102,6 +112,7 @@ if (!rootElement) {
   const newRoot = document.createElement('div')
   newRoot.id = 'root'
   document.body.appendChild(newRoot)
+  ensureOverlayRoot()
   const root = ReactDOM.createRoot(newRoot, {
     onRecoverableError(error, info) {
       if ((import.meta as any).env?.VERCEL_ENV === 'preview') {
@@ -129,6 +140,7 @@ if (!rootElement) {
     </React.StrictMode>
   )
 } else {
+  ensureOverlayRoot()
   const root = ReactDOM.createRoot(rootElement, {
     onRecoverableError(error, info) {
       if ((import.meta as any).env?.VERCEL_ENV === 'preview') {

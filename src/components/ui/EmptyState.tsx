@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '@/lib/ui/cn';
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -13,6 +14,8 @@ interface EmptyStateProps {
     onClick: () => void;
   };
   illustration?: 'journal' | 'watchlist' | 'alerts' | 'chart' | 'generic';
+  className?: string;
+  compact?: boolean;
 }
 
 const illustrations = {
@@ -49,22 +52,30 @@ export function EmptyState({
   description, 
   action, 
   secondaryAction,
-  illustration = 'generic'
+  illustration = 'generic',
+  className,
+  compact = false,
 }: EmptyStateProps) {
   return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle/30 px-6 py-12 text-center">
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-moderate bg-surface-subtle/30 px-6 text-center",
+        compact ? "min-h-[220px] py-8" : "min-h-[400px] py-12",
+        className
+      )}
+    >
       {/* Icon/Illustration */}
-      <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-surface-elevated/50">
+      <div className={cn("mb-6 flex items-center justify-center rounded-full bg-surface-elevated/50", compact ? "h-16 w-16" : "h-24 w-24")}>
         {icon || illustrations[illustration]}
       </div>
 
       {/* Title */}
-      <h3 className="text-xl font-semibold text-text-primary mb-3">
+      <h3 className={cn("font-semibold text-text-primary mb-3", compact ? "text-lg" : "text-xl")}>
         {title}
       </h3>
 
       {/* Description */}
-      <p className="max-w-md text-sm text-text-secondary leading-relaxed mb-8">
+      <p className={cn("max-w-md text-sm text-text-secondary leading-relaxed", compact ? "mb-6" : "mb-8")}>
         {description}
       </p>
 

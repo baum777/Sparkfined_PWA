@@ -2,7 +2,18 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-17
+**Last Updated:** 2025-12-18
+
+---
+
+## 2025-12-18
+
+### Updated
+- UI Redesign foundation notes (`docs/process/ui-redesign-foundation.md`) now include the new `FormRow` primitive alongside the overlay focus-trap coverage.
+- Docs index references the expanded foundation primitives list (including `FormRow`).
+
+### Context
+- Phase 01 foundation refinements for the Sparkfined terminal UI refresh.
 
 ---
 
@@ -16,6 +27,8 @@
 ## 2025-12-16
 
 ### Added
+- UI Redesign Phase 00/01 documentation captured in `docs/process/ui-redesign-foundation.md` (route inventory and new primitives/overlay system).
+- UI Redesign Taskboard documented in `docs/index.md` with links to the new `tasks/ui-redesign/00-PLAN.md`–`08-A11Y-POLISH.md` files outlining foundation, shell, dashboard, chart, journal, alerts, settings, and accessibility polish phases.
 - Dashboard Log Entry Drawer (T1-D): New `LogEntryOverlayPanel` surfaces unconsumed BUY `trade_events` directly from the Dashboard header with badge counts and journal CTA.
 - Journal v2 Trade Context (T2): Journal form now accepts on-chain `tradeContext` payloads, prefills drafts, and confirms events via `confirmTradeFromContext` (txHash-first, fallback window, create-on-miss) while marking `trade_events` consumed.
 - Trade Logs Indexing: `trade_logs` Dexie schema bumped to include `txHash` index to support confirmation lookups.

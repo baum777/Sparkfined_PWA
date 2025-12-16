@@ -119,7 +119,7 @@ describe('buildJournalInsightsPrompt', () => {
       entries: [],
     })
 
-    expect(result.user).toContain('Keine Einträge')
+    expect(result.user).toContain('No entries available')
   })
 
   it('should include focusCategories in user prompt', () => {

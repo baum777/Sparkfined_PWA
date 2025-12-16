@@ -27,6 +27,26 @@ import { useSettings } from "@/state/settings";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
 import { useWalletHoldings } from "@/hooks/useWalletHoldings";
 import { getMonitoredWallet } from "@/lib/wallet/monitoredWallet";
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { LogEntryOverlayPanel } from '@/components/dashboard/LogEntryOverlayPanel';
+import InsightTeaser from '@/components/dashboard/InsightTeaser';
+import JournalSnapshot from '@/components/dashboard/JournalSnapshot';
+import AlertsSnapshot from '@/components/dashboard/AlertsSnapshot';
+import { HoldingsList, type HoldingPosition } from '@/components/dashboard/HoldingsList';
+import { TradeLogList } from '@/components/dashboard/TradeLogList';
+import { Container, KpiTile, PageHeader } from '@/components/ui';
+import ErrorBanner from '@/components/ui/ErrorBanner';
+import Button from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
+import StateView from '@/components/ui/StateView';
+import { useJournalStore } from '@/store/journalStore';
+import { useAlertsStore } from '@/store/alertsStore';
+import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from '@/lib/dashboard/calculateKPIs';
+import { getAllTrades, type TradeEntry } from '@/lib/db';
+import { useTradeEventInbox, type TradeEventInboxItem } from '@/hooks/useTradeEventInbox';
+import { useSettings } from '@/state/settings';
+import { useTradeEventJournalBridge } from '@/store/tradeEventJournalBridge';
 
 const dummyInsight = {
   title: "SOL Daily Bias",
@@ -124,15 +144,10 @@ export default function DashboardPage() {
       .map(({ entry }) => entry);
   }, [journalEntries]);
 
-  const kpiStripContent = isLoading ? (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <Skeleton key={index} variant="card" className="h-20 w-full" />
-      ))}
-    </div>
-  ) : error ? null : (
-    <DashboardKpiStrip items={kpiItems} />
-  );
+  const handleMarkEntry = React.useCallback(() => {
+    void refresh();
+    setIsLogOverlayOpen(true);
+  }, [refresh]);
 
   const renderHoldingsAndTrades = () => (
     <div className="mt-6 grid gap-6 lg:grid-cols-2">
@@ -145,6 +160,14 @@ export default function DashboardPage() {
         onRetry={refetchHoldings}
       />
       <TradeLogList trades={recentTrades} quoteCurrency={settings.quoteCurrency} />
+    <div className="grid gap-6 xl:grid-cols-2">
+      <HoldingsList holdings={holdings} quoteCurrency={settings.quoteCurrency} />
+      <TradeLogList
+        trades={recentTrades}
+        quoteCurrency={settings.quoteCurrency}
+        onMarkEntry={handleMarkEntry}
+        isMarkEntryDisabled={unconsumedCount === 0}
+      />
     </div>
   );
 
@@ -168,11 +191,16 @@ export default function DashboardPage() {
   const renderMainContent = () => {
     if (isLoading) {
       return (
-        <DashboardMainGrid
-          primary={<Skeleton variant="card" className="h-72 w-full" />}
-          secondary={<Skeleton variant="card" className="h-60 w-full" />}
-          tertiary={<Skeleton variant="card" className="h-60 w-full" />}
-        />
+        <div className="grid gap-6 lg:grid-cols-12">
+          <div className="space-y-6 lg:col-span-7 xl:col-span-8">
+            <Skeleton variant="card" className="h-72 w-full" />
+            {renderHoldingsAndTrades()}
+          </div>
+          <div className="space-y-6 lg:col-span-5 xl:col-span-4">
+            <Skeleton variant="card" className="h-60 w-full" />
+            <Skeleton variant="card" className="h-60 w-full" />
+          </div>
+        </div>
       );
     }
 
@@ -195,9 +223,9 @@ export default function DashboardPage() {
 
     if (!hasData) {
       return (
-        <>
-          <DashboardMainGrid
-            primary={
+        <div className="grid gap-6 lg:grid-cols-12">
+          <div className="space-y-6 lg:col-span-7 xl:col-span-8">
+            <div className="card-elevated rounded-3xl p-6">
               <StateView
                 type="empty"
                 title="No insights yet"
@@ -205,32 +233,38 @@ export default function DashboardPage() {
                 actionLabel="Open chart"
                 onAction={() => navigate("/chart")}
               />
-            }
-            secondary={
+            </div>
+            {renderHoldingsAndTrades()}
+          </div>
+          <div className="space-y-6 lg:col-span-5 xl:col-span-4">
+            <div className="card-glass rounded-3xl p-6">
               <StateView
                 type="empty"
                 title="No journal entries"
                 description="Log a trade or mindset note to build your streaks."
                 actionLabel="Open journal"
                 onAction={() => navigate("/journal")}
+                onAction={() => navigate('/journal')}
+                compact
               />
-            }
-            tertiary={<AlertsSnapshot />}
-          />
-          {renderHoldingsAndTrades()}
-        </>
+            </div>
+            <AlertsSnapshot />
+          </div>
+        </div>
       );
     }
 
     return (
-      <>
-        <DashboardMainGrid
-          primary={<InsightTeaser {...dummyInsight} />}
-          secondary={<JournalSnapshot entries={recentJournalEntries} />}
-          tertiary={<AlertsSnapshot />}
-        />
-        {renderHoldingsAndTrades()}
-      </>
+      <div className="grid gap-6 lg:grid-cols-12">
+        <div className="space-y-6 lg:col-span-7 xl:col-span-8">
+          <InsightTeaser {...dummyInsight} />
+          {renderHoldingsAndTrades()}
+        </div>
+        <div className="space-y-6 lg:col-span-5 xl:col-span-4">
+          <JournalSnapshot entries={recentJournalEntries} />
+          <AlertsSnapshot />
+        </div>
+      </div>
     );
   };
 
@@ -263,6 +297,62 @@ export default function DashboardPage() {
       >
         {renderMainContent()}
       </DashboardShell>
+      <Container maxWidth="2xl" className="py-6">
+        <PageHeader
+          title="Dashboard"
+          subtitle="Command surface for your net risk, streaks, and live intelligence."
+          actions={
+            <>
+              <Button variant="primary" size="sm" onClick={() => navigate('/chart')} data-testid="dashboard-open-chart">
+                Open chart
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => navigate('/alerts')} data-testid="dashboard-new-alert">
+                New alert
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => navigate('/journal')} data-testid="dashboard-run-journal">
+                Run journal
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  void refresh();
+                  setIsLogOverlayOpen(true);
+                }}
+                disabled={unconsumedCount === 0}
+                data-testid="dashboard-log-entry"
+              >
+                Log entry
+                {unconsumedCount > 0 ? (
+                  <span className="ml-2 rounded-full bg-surface px-2 py-0.5 text-xs">{unconsumedCount}</span>
+                ) : null}
+              </Button>
+            </>
+          }
+        />
+
+        <div className="mt-6 space-y-6">
+          {isLoading ? (
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Key performance indicators loading">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={index} variant="card" className="h-24 w-full" />
+              ))}
+            </div>
+          ) : error ? null : (
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Key performance indicators">
+              {kpiItems.map((item) => (
+                <KpiTile
+                  key={item.label}
+                  label={item.label}
+                  value={item.value === 'N/A' ? <span className="text-text-tertiary">—</span> : item.value}
+                />
+              ))}
+            </div>
+          )}
+
+          {renderMainContent()}
+        </div>
+      </Container>
       <LogEntryOverlayPanel
         isOpen={isLogOverlayOpen}
         onClose={() => setIsLogOverlayOpen(false)}

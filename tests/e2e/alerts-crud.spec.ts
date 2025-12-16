@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-const ALERTS_URL = '/alerts-v2';
+const ALERTS_URL = '/alerts';
 
 async function bypassOnboarding(page: Page) {
   await page.addInitScript(() => {

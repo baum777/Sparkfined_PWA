@@ -50,10 +50,10 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="text-center mb-6">
               <div className="text-6xl mb-4">⚠️</div>
               <h1 className="text-2xl font-bold text-brand mb-4">
-                Etwas ist schiefgelaufen
+                Something went wrong
               </h1>
               <p className="text-text-secondary mb-6">
-                Die App ist auf einen Fehler gestoßen. Bitte laden Sie die Seite neu.
+                The app encountered an error. Please reload the page.
               </p>
             </div>
             
@@ -62,7 +62,7 @@ class ErrorBoundary extends Component<Props, State> {
                 onClick={() => window.location.reload()}
                 className="rounded-lg bg-brand px-6 py-3 font-medium text-bg transition-colors hover:bg-brand/90"
               >
-                Seite neu laden
+                Reload page
               </button>
               <button
                 onClick={() => {
@@ -82,7 +82,7 @@ class ErrorBoundary extends Component<Props, State> {
                 }}
                 className="rounded-lg bg-warn px-6 py-3 font-medium text-bg transition-colors hover:bg-warn/90"
               >
-                Cache löschen & Neuladen
+                Clear cache & Reload
               </button>
               <a
                 href="/debug-blackscreen.html"
@@ -95,7 +95,7 @@ class ErrorBoundary extends Component<Props, State> {
             {(this.state.error || this.state.errorInfo) && (
               <details className="mt-6 rounded-lg bg-surface-subtle p-4 text-left">
                 <summary className="mb-2 cursor-pointer text-sm text-text-secondary hover:text-text-primary">
-                  Fehlerdetails anzeigen {import.meta.env.DEV ? '(Dev Mode)' : ''}
+                  Show error details {import.meta.env.DEV ? '(Dev Mode)' : ''}
                 </summary>
                 <div className="mt-2 space-y-4">
                   {this.state.error && (
