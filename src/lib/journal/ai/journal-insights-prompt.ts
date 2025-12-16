@@ -88,7 +88,7 @@ function buildSystemPrompt(): string {
 
 function buildUserPrompt(entries: JournalEntry[], focusCategories?: string[]): string {
   if (entries.length === 0) {
-    return 'Keine Einträge vorhanden. Bitte füge Journal-Einträge hinzu.'
+    return 'No entries available. Please add journal entries to generate insights.'
   }
 
   // Serialize entries in compact, machine-readable format
