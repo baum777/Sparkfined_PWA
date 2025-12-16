@@ -1,31 +1,39 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import DashboardShell from '@/components/dashboard/DashboardShell';
-import { LogEntryOverlayPanel } from '@/components/dashboard/LogEntryOverlayPanel';
-import DashboardKpiStrip from '@/components/dashboard/DashboardKpiStrip';
-import DashboardMainGrid from '@/components/dashboard/DashboardMainGrid';
-import InsightTeaser from '@/components/dashboard/InsightTeaser';
-import JournalSnapshot from '@/components/dashboard/JournalSnapshot';
-import AlertsSnapshot from '@/components/dashboard/AlertsSnapshot';
-import { HoldingsList, type HoldingPosition } from '@/components/dashboard/HoldingsList';
-import { TradeLogList } from '@/components/dashboard/TradeLogList';
-import ErrorBanner from '@/components/ui/ErrorBanner';
-import { Skeleton } from '@/components/ui/Skeleton';
-import Button from '@/components/ui/Button';
-import StateView from '@/components/ui/StateView';
-import { useJournalStore } from '@/store/journalStore';
-import { useAlertsStore } from '@/store/alertsStore';
-import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from '@/lib/dashboard/calculateKPIs';
-import { getAllTrades, type TradeEntry } from '@/lib/db';
-import { useTradeEventInbox, type TradeEventInboxItem } from '@/hooks/useTradeEventInbox';
-import { useSettings } from '@/state/settings';
-import { useTradeEventJournalBridge } from '@/store/tradeEventJournalBridge';
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import DashboardShell from "@/components/dashboard/DashboardShell";
+import { LogEntryOverlayPanel } from "@/components/dashboard/LogEntryOverlayPanel";
+import DashboardKpiStrip from "@/components/dashboard/DashboardKpiStrip";
+import DashboardMainGrid from "@/components/dashboard/DashboardMainGrid";
+import InsightTeaser from "@/components/dashboard/InsightTeaser";
+import JournalSnapshot from "@/components/dashboard/JournalSnapshot";
+import AlertsSnapshot from "@/components/dashboard/AlertsSnapshot";
+import { HoldingsList } from "@/components/dashboard/HoldingsList";
+import { TradeLogList } from "@/components/dashboard/TradeLogList";
+import ErrorBanner from "@/components/ui/ErrorBanner";
+import { Skeleton } from "@/components/ui/Skeleton";
+import Button from "@/components/ui/Button";
+import StateView from "@/components/ui/StateView";
+import { useJournalStore } from "@/store/journalStore";
+import { useAlertsStore } from "@/store/alertsStore";
+import {
+  calculateJournalStreak,
+  calculateNetPnL,
+  calculateWinRate,
+  getEntryDate,
+} from "@/lib/dashboard/calculateKPIs";
+import { getAllTrades, type TradeEntry } from "@/lib/db";
+import { useTradeEventInbox, type TradeEventInboxItem } from "@/hooks/useTradeEventInbox";
+import { useSettings } from "@/state/settings";
+import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
+import { useWalletHoldings } from "@/hooks/useWalletHoldings";
+import { getMonitoredWallet } from "@/lib/wallet/monitoredWallet";
 
 const dummyInsight = {
-  title: 'SOL Daily Bias',
-  bias: 'long' as const,
-  confidenceLabel: 'High',
-  summary: 'Market structure shows higher lows with strong momentum on intraday timeframes. Watching for pullbacks to re-enter long positions with tight risk management.',
+  title: "SOL Daily Bias",
+  bias: "long" as const,
+  confidenceLabel: "High",
+  summary:
+    "Market structure shows higher lows with strong momentum on intraday timeframes. Watching for pullbacks to re-enter long positions with tight risk management.",
 };
 
 export default function DashboardPage() {
@@ -39,8 +47,32 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [tradeEntries, setTradeEntries] = useState<TradeEntry[]>([]);
   const [isLogOverlayOpen, setIsLogOverlayOpen] = useState(false);
+  const [monitoredWallet, setMonitoredWallet] = useState<string | null>(() => getMonitoredWallet());
 
-  const { events: inboxEvents, unconsumedCount, isLoading: isInboxLoading, refresh } = useTradeEventInbox();
+  const {
+    events: inboxEvents,
+    unconsumedCount,
+    isLoading: isInboxLoading,
+    refresh,
+  } = useTradeEventInbox();
+  const {
+    data: holdingsData,
+    status: holdingsStatus,
+    error: holdingsError,
+    refetch: refetchHoldings,
+  } = useWalletHoldings(monitoredWallet);
+
+  useEffect(() => {
+    const handleWalletChange = () => setMonitoredWallet(getMonitoredWallet());
+
+    window.addEventListener("storage", handleWalletChange);
+    window.addEventListener("sparkfined:monitored-wallet-changed", handleWalletChange);
+
+    return () => {
+      window.removeEventListener("storage", handleWalletChange);
+      window.removeEventListener("sparkfined:monitored-wallet-changed", handleWalletChange);
+    };
+  }, []);
 
   const hasData = journalEntries.length > 0;
 
@@ -50,30 +82,25 @@ export default function DashboardPage() {
   };
 
   const kpiItems = useMemo(() => {
-    const armedAlertsCount = alerts.filter((alert) => alert.status === 'armed').length;
+    const armedAlertsCount = alerts.filter((alert) => alert.status === "armed").length;
     const netPnLValue = calculateNetPnL(journalEntries);
     const winRateValue = calculateWinRate(journalEntries, 30);
     const streakValue = calculateJournalStreak(journalEntries);
 
-    const netTrend: 'up' | 'down' | 'flat' =
-      netPnLValue === 'N/A' || netPnLValue === '0%' ? 'flat' : netPnLValue.startsWith('-') ? 'down' : 'up';
+    const netTrend: "up" | "down" | "flat" =
+      netPnLValue === "N/A" || netPnLValue === "0%"
+        ? "flat"
+        : netPnLValue.startsWith("-")
+          ? "down"
+          : "up";
 
     return [
-      { label: 'Net P&L', value: netPnLValue, trend: netTrend },
-      { label: 'Win Rate', value: winRateValue, trend: 'flat' as const },
-      { label: 'Alerts Armed', value: String(armedAlertsCount), trend: 'up' as const },
-      { label: 'Journal Streak', value: streakValue, trend: 'up' as const },
+      { label: "Net P&L", value: netPnLValue, trend: netTrend },
+      { label: "Win Rate", value: winRateValue, trend: "flat" as const },
+      { label: "Alerts Armed", value: String(armedAlertsCount), trend: "up" as const },
+      { label: "Journal Streak", value: streakValue, trend: "up" as const },
     ];
   }, [alerts, journalEntries]);
-
-  const holdings: HoldingPosition[] = useMemo(
-    () => [
-      { token: 'SOL', amount: 120.5, value: 9500 },
-      { token: 'JUP', amount: 3400, value: 2750 },
-      { token: 'USDC', amount: 820, value: 820 },
-    ],
-    [],
-  );
 
   useEffect(() => {
     void getAllTrades()
@@ -82,11 +109,8 @@ export default function DashboardPage() {
   }, []);
 
   const recentTrades = useMemo(
-    () =>
-      [...tradeEntries]
-        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
-        .slice(0, 5),
-    [tradeEntries],
+    () => [...tradeEntries].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)).slice(0, 5),
+    [tradeEntries]
   );
 
   const recentJournalEntries = useMemo(() => {
@@ -112,7 +136,14 @@ export default function DashboardPage() {
 
   const renderHoldingsAndTrades = () => (
     <div className="mt-6 grid gap-6 lg:grid-cols-2">
-      <HoldingsList holdings={holdings} quoteCurrency={settings.quoteCurrency} />
+      <HoldingsList
+        holdings={holdingsData?.tokens ?? []}
+        nativeBalanceLamports={holdingsData?.nativeBalanceLamports ?? null}
+        status={holdingsStatus}
+        walletAddress={monitoredWallet}
+        error={holdingsError}
+        onRetry={refetchHoldings}
+      />
       <TradeLogList trades={recentTrades} quoteCurrency={settings.quoteCurrency} />
     </div>
   );
@@ -131,7 +162,7 @@ export default function DashboardPage() {
       quoteCurrency: settings.quoteCurrency,
     });
     setIsLogOverlayOpen(false);
-    navigate('/journal');
+    navigate("/journal");
   };
 
   const renderMainContent = () => {
@@ -172,7 +203,7 @@ export default function DashboardPage() {
                 title="No insights yet"
                 description="Run your first chart session to unlock AI bias, flow and volatility context."
                 actionLabel="Open chart"
-                onAction={() => navigate('/chart')}
+                onAction={() => navigate("/chart")}
               />
             }
             secondary={
@@ -181,7 +212,7 @@ export default function DashboardPage() {
                 title="No journal entries"
                 description="Log a trade or mindset note to build your streaks."
                 actionLabel="Open journal"
-                onAction={() => navigate('/journal')}
+                onAction={() => navigate("/journal")}
               />
             }
             tertiary={<AlertsSnapshot />}
@@ -223,7 +254,9 @@ export default function DashboardPage() {
           >
             Log entry
             {unconsumedCount > 0 ? (
-              <span className="ml-2 rounded-full bg-surface px-2 py-0.5 text-xs">{unconsumedCount}</span>
+              <span className="ml-2 rounded-full bg-surface px-2 py-0.5 text-xs">
+                {unconsumedCount}
+              </span>
             ) : null}
           </Button>
         }

@@ -20,6 +20,12 @@
 - Journal v2 Trade Context (T2): Journal form now accepts on-chain `tradeContext` payloads, prefills drafts, and confirms events via `confirmTradeFromContext` (txHash-first, fallback window, create-on-miss) while marking `trade_events` consumed.
 - Trade Logs Indexing: `trade_logs` Dexie schema bumped to include `txHash` index to support confirmation lookups.
 
+### Changed
+- Updated `docs/core/setup/environment-and-providers.md` with server-only `HELIUS_API_KEY` for the Helius `getAssetsByOwner` holdings endpoint exposed at `/api/wallet/assets`.
+
+### Context
+- Documented the Solana DAS dependency to support dashboard holdings fed by the monitored wallet from Settings.
+
 ---
 
 ## 2025-12-15
