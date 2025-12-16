@@ -50,6 +50,9 @@ describe('AdvancedChart status overlays', () => {
         source="network"
         viewState={baseViewState}
         lastUpdatedAt={Date.now()}
+        symbol="SOL"
+        timeframe="1h"
+        drawingsInteractive={false}
       />
     )
 
@@ -63,6 +66,9 @@ describe('AdvancedChart status overlays', () => {
         status="no-data"
         source="network"
         viewState={baseViewState}
+        symbol="SOL"
+        timeframe="1h"
+        drawingsInteractive={false}
       />
     )
 
@@ -76,6 +82,9 @@ describe('AdvancedChart status overlays', () => {
         status="stale"
         source="cache"
         viewState={baseViewState}
+        symbol="SOL"
+        timeframe="1h"
+        drawingsInteractive={false}
       />
     )
 
@@ -92,6 +101,9 @@ describe('AdvancedChart status overlays', () => {
         viewState={baseViewState}
         annotations={[{ id: 'a1', candleTime: 1_700_000_000_000, label: 'Alert', kind: 'alert' }]}
         onAnnotationClick={onAnnotationClick}
+        symbol="SOL"
+        timeframe="1h"
+        drawingsInteractive={false}
       />
     )
 

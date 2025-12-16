@@ -400,6 +400,10 @@ function speedToMs(speed: number): number {
                       lastUpdatedAt={lastUpdatedAt}
                       indicators={indicators}
                       annotations={annotations}
+                      symbol={asset.symbol}
+                      timeframe={timeframe}
+                      drawingMode="view"
+                      drawingsInteractive={false}
                       onCreateJournalAtPoint={() => {
                         void createJournalDraft({
                           address: asset.address,

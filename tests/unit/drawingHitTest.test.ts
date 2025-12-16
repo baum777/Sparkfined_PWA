@@ -53,4 +53,43 @@ describe('drawing hit testing', () => {
     const hit = findHitShape(shapes, { x: 10, y: 51 }, 1)
     expect(hit?.drawing.id).toBe('second')
   })
+
+  it('hits fib retracement level lines using mapped metadata', () => {
+    const shapes: DrawingShape[] = [
+      {
+        drawing: { ...baseDrawing, id: 'fib', type: 'FIB', levels: [0, 1] },
+        points: [
+          { x: 0, y: 0 },
+          { x: 10, y: 10 },
+        ],
+        meta: {
+          fibLevels: [
+            { xStart: 0, xEnd: 10, y: 0 },
+            { xStart: 0, xEnd: 10, y: 10 },
+          ],
+        },
+      },
+    ]
+
+    const hit = findHitShape(shapes, { x: 5, y: 0 }, 1)
+    expect(hit?.drawing.id).toBe('fib')
+  })
+
+  it('hits channel area and boundary lines', () => {
+    const shapes: DrawingShape[] = [
+      {
+        drawing: { ...baseDrawing, id: 'channel', type: 'CHANNEL' },
+        points: [
+          { x: 0, y: 0 },
+          { x: 10, y: 0 },
+          { x: 0, y: 10 },
+        ],
+      },
+    ]
+
+    const edgeHit = findHitShape(shapes, { x: 5, y: 0 }, 1)
+    const areaHit = findHitShape(shapes, { x: 5, y: 5 }, 1)
+    expect(edgeHit?.drawing.id).toBe('channel')
+    expect(areaHit?.drawing.id).toBe('channel')
+  })
 })

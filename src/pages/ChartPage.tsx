@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import AdvancedChart from '@/components/chart/AdvancedChart'
 import ChartHeaderActions from '@/components/chart/ChartHeaderActions'
@@ -13,6 +13,7 @@ import {
   DEFAULT_TIMEFRAME,
   TIMEFRAME_ORDER,
   type ChartIndicatorOverlay,
+  type ChartDrawingRecord,
   type ChartTimeframe,
   type IndicatorId,
   type IndicatorPresetId,
@@ -94,8 +95,28 @@ export default function ChartPage() {
     timeframe,
     network: asset.network,
   })
-  const { drawings } = useChartDrawings(asset.symbol, timeframe)
-  const { mode: interactionMode, setSelect: enableSelection, setView: disableSelection } = useChartInteractionMode()
+  const {
+    drawings,
+    isLoading: drawingsLoading,
+    selectedId: selectedDrawingId,
+    selectDrawing,
+    createDrawing,
+    updateDrawing,
+    deleteSelected,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  } = useChartDrawings(asset.symbol, timeframe)
+  const {
+    mode: interactionMode,
+    setSelect: enableSelection,
+    setView: disableSelection,
+    setCreateLine,
+    setCreateBox,
+    setCreateFib,
+    setCreateChannel,
+  } = useChartInteractionMode()
   const isOnline = useOnlineStatus()
 
   const {
@@ -201,12 +222,75 @@ export default function ChartPage() {
     }
   }, [asset.address, asset.symbol, candles, timeframe])
 
+  const handleCreateDrawing = useCallback(
+    async (draft: ChartDrawingRecord) => {
+      await createDrawing({ ...draft, symbol: asset.symbol, timeframe })
+      enableSelection()
+    },
+    [asset.symbol, createDrawing, enableSelection, timeframe]
+  )
+
+  const handleUpdateDrawing = useCallback(
+    async (drawing: ChartDrawingRecord) => {
+      await updateDrawing({ ...drawing, symbol: asset.symbol, timeframe })
+    },
+    [asset.symbol, timeframe, updateDrawing]
+  )
+
+  const handleCancelDraft = useCallback(() => {
+    disableSelection()
+    selectDrawing(null)
+  }, [disableSelection, selectDrawing])
+
+  const handleUndo = useCallback(() => {
+    void undo()
+  }, [undo])
+
+  const handleRedo = useCallback(() => {
+    void redo()
+  }, [redo])
+
   useEffect(() => {
     if (!signalTrackedRef.current && annotations.some((item) => item.kind === 'signal')) {
       track('chart.pulse_signal_viewed_in_chart', { address: asset.address, timeframe })
       signalTrackedRef.current = true
     }
   }, [annotations, asset.address, timeframe, track])
+
+  useEffect(() => {
+    if (interactionMode === 'view') {
+      selectDrawing(null)
+    }
+  }, [interactionMode, selectDrawing])
+
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      const isMeta = event.metaKey || event.ctrlKey
+      const key = event.key.toLowerCase()
+
+      if (key === 'delete' && selectedDrawingId) {
+        event.preventDefault()
+        void deleteSelected()
+      }
+
+      if (key === 'z' && isMeta) {
+        event.preventDefault()
+        if (event.shiftKey) {
+          handleRedo()
+        } else {
+          handleUndo()
+        }
+      }
+
+      if (key === 'escape') {
+        disableSelection()
+        selectDrawing(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeydown)
+    return () => window.removeEventListener('keydown', handleKeydown)
+  }, [deleteSelected, disableSelection, handleRedo, handleUndo, selectedDrawingId, selectDrawing])
 
   const headerMeta = `${asset.symbol} · ${timeframe.toUpperCase()} · ${
     source === 'network' ? 'Live feed' : 'Cached snapshot'
@@ -372,7 +456,10 @@ export default function ChartPage() {
               size="sm"
               variant={interactionMode === 'view' ? 'secondary' : 'ghost'}
               className="rounded-full px-3 text-[11px]"
-              onClick={disableSelection}
+              onClick={() => {
+                disableSelection()
+                selectDrawing(null)
+              }}
             >
               View
             </Button>
@@ -383,6 +470,88 @@ export default function ChartPage() {
               onClick={enableSelection}
             >
               Select
+            </Button>
+            <Button
+              size="sm"
+              variant={interactionMode === 'create-line' ? 'secondary' : 'ghost'}
+              className="rounded-full px-3 text-[11px]"
+              onClick={() => {
+                selectDrawing(null)
+                setCreateLine()
+              }}
+              disabled={drawingsLoading}
+              data-testid="drawing-create-line"
+            >
+              Line
+            </Button>
+            <Button
+              size="sm"
+              variant={interactionMode === 'create-box' ? 'secondary' : 'ghost'}
+              className="rounded-full px-3 text-[11px]"
+              onClick={() => {
+                selectDrawing(null)
+                setCreateBox()
+              }}
+              disabled={drawingsLoading}
+              data-testid="drawing-create-box"
+            >
+              Box
+            </Button>
+            <Button
+              size="sm"
+              variant={interactionMode === 'create-fib' ? 'secondary' : 'ghost'}
+              className="rounded-full px-3 text-[11px]"
+              onClick={() => {
+                selectDrawing(null)
+                setCreateFib()
+              }}
+              disabled={drawingsLoading}
+              data-testid="drawing-create-fib"
+            >
+              Fib
+            </Button>
+            <Button
+              size="sm"
+              variant={interactionMode === 'create-channel' ? 'secondary' : 'ghost'}
+              className="rounded-full px-3 text-[11px]"
+              onClick={() => {
+                selectDrawing(null)
+                setCreateChannel()
+              }}
+              disabled={drawingsLoading}
+              data-testid="drawing-create-channel"
+            >
+              Channel
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              className="rounded-full px-3 text-[11px]"
+              onClick={() => void deleteSelected()}
+              disabled={!selectedDrawingId}
+              data-testid="drawing-delete"
+            >
+              Delete
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="rounded-full px-3 text-[11px]"
+              onClick={handleUndo}
+              disabled={!canUndo}
+              data-testid="drawing-undo"
+            >
+              Undo
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="rounded-full px-3 text-[11px]"
+              onClick={handleRedo}
+              disabled={!canRedo}
+              data-testid="drawing-redo"
+            >
+              Redo
             </Button>
           </div>
         </section>
@@ -403,7 +572,15 @@ export default function ChartPage() {
               indicators={indicators}
               annotations={annotations}
               drawings={drawings}
-              drawingsInteractive={interactionMode === 'select'}
+              drawingsInteractive={interactionMode !== 'view'}
+              drawingMode={interactionMode}
+              selectedDrawingId={selectedDrawingId}
+              onCreateDrawing={handleCreateDrawing}
+              onUpdateDrawing={handleUpdateDrawing}
+              onCancelDrawingDraft={handleCancelDraft}
+              onSelectDrawing={selectDrawing}
+              symbol={asset.symbol}
+              timeframe={timeframe}
               testId="chart-workspace"
               onCreateJournalAtPoint={() => {
                 void createJournalDraft(creationContext)

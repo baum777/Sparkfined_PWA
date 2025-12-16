@@ -177,7 +177,7 @@ export type ComputedIndicator =
 export type IndicatorOutput = ComputedIndicator;
 
 // ===== Drawings (persisted + overlay rendering) =====
-export type ChartDrawingType = 'HLINE' | 'LINE' | 'BOX' | 'FIB'
+export type ChartDrawingType = 'HLINE' | 'LINE' | 'BOX' | 'FIB' | 'CHANNEL'
 
 export interface ChartDrawingPoint {
   /** Unix timestamp in milliseconds */
@@ -191,6 +191,8 @@ export interface ChartDrawingStyle {
   lineWidth?: number
   dash?: number[]
   label?: string
+  fillOpacity?: number
+  showLabels?: boolean
 }
 
 export interface ChartDrawingRecord {
@@ -199,6 +201,7 @@ export interface ChartDrawingRecord {
   timeframe: ChartTimeframe
   type: ChartDrawingType
   points: ChartDrawingPoint[]
+  levels?: number[]
   style?: ChartDrawingStyle
   origin?: 'manual' | 'ai'
   isSelected?: boolean

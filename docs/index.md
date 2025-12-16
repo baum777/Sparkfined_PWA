@@ -34,6 +34,8 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 - **Drawing Overlay Core (CH-TA-1):** Added Dexie `chart_drawings` table with helpers (`listDrawings`, `saveDrawing`, `deleteDrawing`, `clearDrawings`) and mounted `DrawingOverlay` canvas above `AdvancedChart` to render stored HLINE/LINE/BOX/FIB stubs. Documented in [docs/architecture/Chart_System.md](architecture/Chart_System.md).
 - **Drawing Overlay Interaction (CH-TA-2):** Introduced hit-testing with DPR-aware tolerance, single-select highlighting, and a view/select mode toggle to keep the overlay read-only by default while enabling selection when needed. Documented in [docs/architecture/Chart_System.md](architecture/Chart_System.md).
+- **Drawing Lifecycle (CH-TA-3):** Added create/edit/delete/undo flows with draft previews, handle-based resize/move, keyboard shortcuts (ESC cancel, Delete, Ctrl/Cmd+Z/Shift+Z), and Dexie-backed persistence for Line/Box drawings. Documented in [docs/architecture/Chart_System.md](architecture/Chart_System.md).
+- **Fib + Channel Drawings (CH-TA-4):** Added creation/editing for Fib retracements (default levels) and parallel channels (three-point flow with fill), extended hit-testing/handles/history, and stabilized Playwright webServer startup. Documented in [docs/architecture/Chart_System.md](architecture/Chart_System.md).
 
 ---
 
