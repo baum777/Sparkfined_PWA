@@ -12,7 +12,13 @@
  */
 
 import Dexie, { type Table } from 'dexie';
-import type { BoardChartSnapshot, ChartTimeframe, ChartViewState, IndicatorSettingsRecord } from '@/domain/chart';
+import type {
+  BoardChartSnapshot,
+  ChartDrawingRecord,
+  ChartTimeframe,
+  ChartViewState,
+  IndicatorSettingsRecord,
+} from '@/domain/chart';
 
 // ===== Interfaces =====
 
@@ -112,6 +118,7 @@ export class BoardDatabase extends Dexie {
   feedCache!: Table<FeedEventCache, string>;
   kpiCache!: Table<KPICache, string>;
   indicatorSettings!: Table<IndicatorSettingsRecord, number>;
+  chart_drawings!: Table<ChartDrawingRecord, string>;
 
   constructor() {
     super('sparkfined-board');
@@ -164,6 +171,15 @@ export class BoardDatabase extends Dexie {
           record.params = record.params ?? {};
         });
       });
+
+    this.version(4).stores({
+      charts: '++id, symbol, address, timeframe, [address+timeframe], metadata.lastFetchedAt',
+      rules: '++id, symbol, status, createdAt',
+      feedCache: 'id, type, timestamp, cachedAt',
+      kpiCache: 'id, cachedAt',
+      indicatorSettings: '++id, symbol, timeframe, [symbol+timeframe]',
+      chart_drawings: 'id, symbol, timeframe, [symbol+timeframe]',
+    });
   }
 }
 

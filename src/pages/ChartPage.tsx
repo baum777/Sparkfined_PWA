@@ -33,6 +33,8 @@ import {
 import { buildReplayUrl } from '@/lib/chartLinks'
 import { useChartTelemetry } from '@/lib/chartTelemetry'
 import type { PulseDeltaEvent } from '@/lib/grokPulse/types'
+import { useChartInteractionMode } from '@/hooks/useChartInteractionMode'
+import { useChartDrawings } from '@/hooks/useChartDrawings'
 
 const DEFAULT_ASSET = {
   symbol: 'SOLUSDT',
@@ -92,6 +94,8 @@ export default function ChartPage() {
     timeframe,
     network: asset.network,
   })
+  const { drawings } = useChartDrawings(asset.symbol, timeframe)
+  const { mode: interactionMode, setSelect: enableSelection, setView: disableSelection } = useChartInteractionMode()
   const isOnline = useOnlineStatus()
 
   const {
@@ -361,6 +365,26 @@ export default function ChartPage() {
               </div>
             </div>
           </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary" data-testid="drawing-mode-toggle">
+            <span className="uppercase tracking-[0.3em] text-text-tertiary">Drawings</span>
+            <Button
+              size="sm"
+              variant={interactionMode === 'view' ? 'secondary' : 'ghost'}
+              className="rounded-full px-3 text-[11px]"
+              onClick={disableSelection}
+            >
+              View
+            </Button>
+            <Button
+              size="sm"
+              variant={interactionMode === 'select' ? 'secondary' : 'ghost'}
+              className="rounded-full px-3 text-[11px]"
+              onClick={enableSelection}
+            >
+              Select
+            </Button>
+          </div>
         </section>
 
         {showChartSkeleton ? (
@@ -378,6 +402,8 @@ export default function ChartPage() {
               lastUpdatedAt={lastUpdatedAt}
               indicators={indicators}
               annotations={annotations}
+              drawings={drawings}
+              drawingsInteractive={interactionMode === 'select'}
               testId="chart-workspace"
               onCreateJournalAtPoint={() => {
                 void createJournalDraft(creationContext)

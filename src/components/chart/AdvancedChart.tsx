@@ -17,10 +17,12 @@ import type {
   ComputedIndicator,
   ChartViewState,
   OhlcCandle,
+  ChartDrawingRecord,
 } from '@/domain/chart'
 import type { ChartDataSource } from '@/hooks/useOhlcData'
 import { getChartColors } from '@/lib/chartColors'
 import { IndicatorSeriesManager } from '@/lib/chart/indicatorSeriesManager'
+import DrawingOverlay from '@/components/chart/DrawingOverlay'
 
 export type AdvancedChartProps = {
   candles: OhlcCandle[]
@@ -36,6 +38,9 @@ export type AdvancedChartProps = {
   onAnnotationClick?: (annotation: ChartAnnotation) => void
   onCreateJournalAtPoint?: (payload: { price: number; time: number }) => void
   onCreateAlertAtPoint?: (payload: { price: number; time: number }) => void
+  drawings?: ChartDrawingRecord[]
+  drawingsInteractive?: boolean
+  onSelectDrawing?: (drawing: ChartDrawingRecord | null) => void
   testId?: string
 }
 
@@ -103,6 +108,9 @@ export default function AdvancedChart({
   onAnnotationClick,
   onCreateJournalAtPoint,
   onCreateAlertAtPoint,
+  drawings,
+  drawingsInteractive,
+  onSelectDrawing,
   testId,
 }: AdvancedChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -281,11 +289,22 @@ export default function AdvancedChart({
 
       <div className="relative rounded-2xl border border-slate-800 bg-slate-950/70 p-2">
         {status !== 'error' && (
-          <div
-            ref={containerRef}
-            className="h-[320px] w-full min-h-[260px] rounded-xl bg-slate-950 md:h-[420px]"
-            aria-label="advanced-chart"
-          />
+          <div className="relative">
+            <div
+              ref={containerRef}
+              className="h-[320px] w-full min-h-[260px] rounded-xl bg-slate-950 md:h-[420px]"
+              aria-label="advanced-chart"
+            />
+            <DrawingOverlay
+              containerRef={containerRef}
+              chartApi={chartRef.current}
+              mainSeries={candleSeriesRef.current}
+              drawings={drawings}
+              interactive={drawingsInteractive}
+              onSelectDrawing={onSelectDrawing}
+              renderTrigger={lastCandle?.t}
+            />
+          </div>
         )}
 
         {(onCreateJournalAtPoint || onCreateAlertAtPoint) && lastCandle && (
