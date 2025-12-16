@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '@/components/ui/Button';
+import { Badge, Button, Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui';
 
 interface InsightTeaserProps {
   title: string;
@@ -9,37 +9,61 @@ interface InsightTeaserProps {
   summary: string;
 }
 
-const biasStyles: Record<InsightTeaserProps['bias'], string> = {
-  long: 'border border-sentiment-bull-border bg-sentiment-bull-bg text-sentiment-bull',
-  short: 'border border-sentiment-bear-border bg-sentiment-bear-bg text-sentiment-bear',
-  neutral: 'border border-sentiment-neutral-border bg-sentiment-neutral-bg text-text-secondary',
-};
+function buildBulletSummary(summary: string): string[] {
+  const normalized = summary.replace(/\s+/g, ' ').trim();
+  if (!normalized) return [];
+
+  const sentenceMatches = normalized.match(/[^.!?]+[.!?]+/g);
+  const sentences = sentenceMatches ? sentenceMatches.map((chunk) => chunk.trim()) : [normalized];
+  return sentences.filter(Boolean).slice(0, 3);
+}
 
 export default function InsightTeaser({ title, bias, confidenceLabel, summary }: InsightTeaserProps) {
   const navigate = useNavigate();
 
-  const handleNavigate = React.useCallback(() => navigate('/chart'), [navigate]);
+  const bullets = React.useMemo(() => buildBulletSummary(summary), [summary]);
+
+  const handleViewFullAnalysis = React.useCallback(() => navigate('/analysis'), [navigate]);
+  const handleOpenChart = React.useCallback(() => navigate('/chart'), [navigate]);
 
   return (
-    <div className="card-glass rounded-lg p-4 hover-lift">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-base font-semibold text-text-primary">{title}</h3>
-        <span className={`rounded-full px-3 py-1 text-xs font-medium ${biasStyles[bias]}`}>
-          {bias === 'long' && 'Long'}
-          {bias === 'short' && 'Short'}
-          {bias === 'neutral' && 'Neutral'}
-        </span>
-      </div>
+    <Card variant="elevated" className="rounded-3xl p-6" data-testid="dashboard-bias-hero">
+      <CardHeader className="mb-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1">
+            <CardTitle className="text-xl">{title}</CardTitle>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant={bias === 'long' ? 'long' : bias === 'short' ? 'short' : 'info'}>
+                {bias === 'long' ? 'Long' : bias === 'short' ? 'Short' : 'Neutral'}
+              </Badge>
+              <Badge variant="info">{confidenceLabel}</Badge>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
 
-      <p className="mt-3 text-xs uppercase tracking-wide text-text-tertiary">Confidence: {confidenceLabel}</p>
+      <CardContent className="text-sm">
+        {bullets.length > 0 ? (
+          <ul className="list-disc space-y-1 pl-5 text-text-secondary">
+            {bullets.map((bullet, index) => (
+              <li key={index}>{bullet}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-text-secondary">{summary}</p>
+        )}
+      </CardContent>
 
-      <p className="mt-2 text-sm text-text-secondary line-clamp-3 leading-relaxed">{summary}</p>
-
-      <div className="mt-4">
-        <Button size="sm" onClick={handleNavigate}>
-          View full analysis
-        </Button>
-      </div>
-    </div>
+      <CardFooter className="mt-6 justify-end">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button size="sm" variant="secondary" onClick={handleViewFullAnalysis}>
+            View full analysis
+          </Button>
+          <Button size="sm" onClick={handleOpenChart}>
+            Open chart
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
   );
 }
