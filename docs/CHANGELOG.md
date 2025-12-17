@@ -6,6 +6,17 @@
 
 ---
 
+## 2025-12-20
+
+### Updated
+- UI & UX Polish working paper relocated to its canonical path at `tasks/WP-polish/UI_&_UX_polish.md` with a root stub for existing bookmarks and a tracked `WP-Polish/` artifacts folder.
+- Mobile bottom navigation now lives in `src/features/shell/BottomNavBar.tsx` with dedicated shell styles, keeping the AppShell mobile-only render path while preserving the existing layout export surface.
+
+### Context
+- WP-001 shell alignment and working paper hygiene.
+
+---
+
 ## 2025-12-19
 
 ### Updated
