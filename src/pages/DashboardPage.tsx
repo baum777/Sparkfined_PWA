@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import { LogEntryOverlayPanel } from "@/components/dashboard/LogEntryOverlayPanel";
 import DashboardKpiStrip from "@/components/dashboard/DashboardKpiStrip";
-import DashboardMainGrid from "@/components/dashboard/DashboardMainGrid";
+import { LogEntryOverlayPanel } from "@/components/dashboard/LogEntryOverlayPanel";
 import InsightTeaser from "@/components/dashboard/InsightTeaser";
 import JournalSnapshot from "@/components/dashboard/JournalSnapshot";
 import AlertsSnapshot from "@/components/dashboard/AlertsSnapshot";
@@ -15,38 +14,13 @@ import Button from "@/components/ui/Button";
 import StateView from "@/components/ui/StateView";
 import { useJournalStore } from "@/store/journalStore";
 import { useAlertsStore } from "@/store/alertsStore";
-import {
-  calculateJournalStreak,
-  calculateNetPnL,
-  calculateWinRate,
-  getEntryDate,
-} from "@/lib/dashboard/calculateKPIs";
+import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from "@/lib/dashboard/calculateKPIs";
 import { getAllTrades, type TradeEntry } from "@/lib/db";
 import { useTradeEventInbox, type TradeEventInboxItem } from "@/hooks/useTradeEventInbox";
 import { useSettings } from "@/state/settings";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
 import { useWalletHoldings } from "@/hooks/useWalletHoldings";
-import { getMonitoredWallet } from "@/lib/wallet/monitoredWallet";
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { LogEntryOverlayPanel } from '@/components/dashboard/LogEntryOverlayPanel';
-import InsightTeaser from '@/components/dashboard/InsightTeaser';
-import JournalSnapshot from '@/components/dashboard/JournalSnapshot';
-import AlertsSnapshot from '@/components/dashboard/AlertsSnapshot';
-import { HoldingsList, type HoldingPosition } from '@/components/dashboard/HoldingsList';
-import { TradeLogList } from '@/components/dashboard/TradeLogList';
-import { Container, KpiTile, PageHeader } from '@/components/ui';
-import ErrorBanner from '@/components/ui/ErrorBanner';
-import Button from '@/components/ui/Button';
-import { Skeleton } from '@/components/ui/Skeleton';
-import StateView from '@/components/ui/StateView';
-import { useJournalStore } from '@/store/journalStore';
-import { useAlertsStore } from '@/store/alertsStore';
-import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from '@/lib/dashboard/calculateKPIs';
-import { getAllTrades, type TradeEntry } from '@/lib/db';
-import { useTradeEventInbox, type TradeEventInboxItem } from '@/hooks/useTradeEventInbox';
-import { useSettings } from '@/state/settings';
-import { useTradeEventJournalBridge } from '@/store/tradeEventJournalBridge';
+import { getMonitoredWallet, WALLET_CHANGED_EVENT } from "@/lib/wallet/monitoredWallet";
 
 const dummyInsight = {
   title: "SOL Daily Bias",
@@ -63,7 +37,7 @@ export default function DashboardPage() {
   const { setTradeContext } = useTradeEventJournalBridge();
   const navigate = useNavigate();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tradeEntries, setTradeEntries] = useState<TradeEntry[]>([]);
   const [isLogOverlayOpen, setIsLogOverlayOpen] = useState(false);
@@ -86,11 +60,11 @@ export default function DashboardPage() {
     const handleWalletChange = () => setMonitoredWallet(getMonitoredWallet());
 
     window.addEventListener("storage", handleWalletChange);
-    window.addEventListener("sparkfined:monitored-wallet-changed", handleWalletChange);
+    window.addEventListener(WALLET_CHANGED_EVENT, handleWalletChange);
 
     return () => {
       window.removeEventListener("storage", handleWalletChange);
-      window.removeEventListener("sparkfined:monitored-wallet-changed", handleWalletChange);
+      window.removeEventListener(WALLET_CHANGED_EVENT, handleWalletChange);
     };
   }, []);
 
@@ -123,9 +97,23 @@ export default function DashboardPage() {
   }, [alerts, journalEntries]);
 
   useEffect(() => {
-    void getAllTrades()
-      .then((entries) => setTradeEntries(entries))
-      .catch(() => setTradeEntries([]));
+    let mounted = true;
+    setIsLoading(true);
+
+    void (async () => {
+      try {
+        const entries = await getAllTrades();
+        if (mounted) setTradeEntries(entries);
+      } catch {
+        if (mounted) setTradeEntries([]);
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const recentTrades = useMemo(
@@ -144,7 +132,7 @@ export default function DashboardPage() {
       .map(({ entry }) => entry);
   }, [journalEntries]);
 
-  const handleMarkEntry = React.useCallback(() => {
+  const handleMarkEntry = useCallback(() => {
     void refresh();
     setIsLogOverlayOpen(true);
   }, [refresh]);
@@ -159,9 +147,6 @@ export default function DashboardPage() {
         error={holdingsError}
         onRetry={refetchHoldings}
       />
-      <TradeLogList trades={recentTrades} quoteCurrency={settings.quoteCurrency} />
-    <div className="grid gap-6 xl:grid-cols-2">
-      <HoldingsList holdings={holdings} quoteCurrency={settings.quoteCurrency} />
       <TradeLogList
         trades={recentTrades}
         quoteCurrency={settings.quoteCurrency}
@@ -244,7 +229,6 @@ export default function DashboardPage() {
                 description="Log a trade or mindset note to build your streaks."
                 actionLabel="Open journal"
                 onAction={() => navigate("/journal")}
-                onAction={() => navigate('/journal')}
                 compact
               />
             </div>
@@ -270,11 +254,12 @@ export default function DashboardPage() {
 
   return (
     <div data-testid="dashboard-page">
+      {/* Note: DashboardShell is the single layout source-of-truth (no legacy Container/PageHeader duplication). */}
       <DashboardShell
         title="Dashboard"
         description="Command surface for your net risk, streaks, and live intelligence."
         meta={`${journalEntries.length} journal entries · ${alerts.length} alerts`}
-        kpiStrip={kpiStripContent}
+        kpiStrip={<DashboardKpiStrip items={kpiItems} />}
         actions={
           <Button
             variant="secondary"
@@ -297,62 +282,6 @@ export default function DashboardPage() {
       >
         {renderMainContent()}
       </DashboardShell>
-      <Container maxWidth="2xl" className="py-6">
-        <PageHeader
-          title="Dashboard"
-          subtitle="Command surface for your net risk, streaks, and live intelligence."
-          actions={
-            <>
-              <Button variant="primary" size="sm" onClick={() => navigate('/chart')} data-testid="dashboard-open-chart">
-                Open chart
-              </Button>
-              <Button variant="secondary" size="sm" onClick={() => navigate('/alerts')} data-testid="dashboard-new-alert">
-                New alert
-              </Button>
-              <Button variant="secondary" size="sm" onClick={() => navigate('/journal')} data-testid="dashboard-run-journal">
-                Run journal
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  void refresh();
-                  setIsLogOverlayOpen(true);
-                }}
-                disabled={unconsumedCount === 0}
-                data-testid="dashboard-log-entry"
-              >
-                Log entry
-                {unconsumedCount > 0 ? (
-                  <span className="ml-2 rounded-full bg-surface px-2 py-0.5 text-xs">{unconsumedCount}</span>
-                ) : null}
-              </Button>
-            </>
-          }
-        />
-
-        <div className="mt-6 space-y-6">
-          {isLoading ? (
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Key performance indicators loading">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <Skeleton key={index} variant="card" className="h-24 w-full" />
-              ))}
-            </div>
-          ) : error ? null : (
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="Key performance indicators">
-              {kpiItems.map((item) => (
-                <KpiTile
-                  key={item.label}
-                  label={item.label}
-                  value={item.value === 'N/A' ? <span className="text-text-tertiary">—</span> : item.value}
-                />
-              ))}
-            </div>
-          )}
-
-          {renderMainContent()}
-        </div>
-      </Container>
       <LogEntryOverlayPanel
         isOpen={isLogOverlayOpen}
         onClose={() => setIsLogOverlayOpen(false)}

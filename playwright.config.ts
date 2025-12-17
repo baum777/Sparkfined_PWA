@@ -12,9 +12,10 @@ export default defineConfig({
     navigationTimeout: 15000, // Navigation timeout
   },
   webServer: {
-    command: 'pnpm dev -- --host --port 4173',
+    // Use production preview so service worker + offline flows work in E2E.
+    command: 'pnpm build && pnpm preview --host --port 4173',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: process.env.CI ? false : true,
-    timeout: 120000,
+    timeout: 180000,
   },
 });

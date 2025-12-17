@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { SwipeNavGate } from "../components/navigation/SwipeNavGate";
 import AppShell from "@/components/layout/AppShell";
@@ -42,6 +42,11 @@ function Fallback() {
   );
 }
 
+function LegacyRedirect({ to }: { to: string }) {
+  const location = useLocation();
+  return <Navigate to={`${to}${location.search}${location.hash}`} replace />;
+}
+
 export default function RoutesRoot() {
   return (
     <ErrorBoundary>
@@ -75,13 +80,14 @@ export default function RoutesRoot() {
             <Route path="/icons" element={<IconShowcase />} />
 
             {/* Legacy V2 routes (redirect to canonical paths) */}
-            <Route path="/dashboard-v2" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/watchlist-v2" element={<Navigate to="/watchlist" replace />} />
-            <Route path="/analysis-v2" element={<Navigate to="/chart" replace />} />
-            <Route path="/journal-v2" element={<Navigate to="/journal" replace />} />
-            <Route path="/alerts-v2" element={<Navigate to="/alerts" replace />} />
-            <Route path="/chart-v2" element={<Navigate to="/chart" replace />} />
-            <Route path="/settings-v2" element={<Navigate to="/settings" replace />} />
+            <Route path="/dashboard-v2" element={<LegacyRedirect to="/dashboard" />} />
+            <Route path="/watchlist-v2" element={<LegacyRedirect to="/watchlist" />} />
+            <Route path="/analysis-v2" element={<LegacyRedirect to="/chart" />} />
+            <Route path="/journal-v2" element={<LegacyRedirect to="/journal" />} />
+            <Route path="/alerts-v2" element={<LegacyRedirect to="/alerts" />} />
+            {/* Keep /chart-v2 as a first-class route (E2E + deep links rely on it). */}
+            <Route path="/chart-v2" element={<ChartPage />} />
+            <Route path="/settings-v2" element={<LegacyRedirect to="/settings" />} />
 
             {/* Dev-only showcase routes */}
             {import.meta.env.DEV && (
