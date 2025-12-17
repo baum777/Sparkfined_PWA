@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import { BrowserRouter, MemoryRouter } from 'react-router-dom'
-import BottomNav from '../BottomNav'
+import BottomNav from '@/features/shell/BottomNavBar'
 
 describe('BottomNav', () => {
   it('renders all navigation items', () => {

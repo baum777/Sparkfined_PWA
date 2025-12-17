@@ -4,7 +4,7 @@ import { cn } from "@/lib/ui/cn"
 import Topbar from "./Topbar"
 import Rail from "./Rail"
 import ActionPanel from "./ActionPanel"
-import BottomNav from "./BottomNav"
+import BottomNavBar from "@/features/shell/BottomNavBar"
 
 const ACTION_PANEL_STORAGE_KEY = "sf.actionPanel.open"
 
@@ -70,7 +70,7 @@ export default function AppShell() {
         </aside>
       ) : null}
 
-      <BottomNav />
+      <BottomNavBar />
     </div>
   )
 }
