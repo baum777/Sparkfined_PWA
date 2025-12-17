@@ -20,6 +20,7 @@ sources:
 | `DEXPAPRIKA_API_KEY` | Alternativer Datenprovider. | Kontakt DexPaprika. |
 | `DEXPAPRIKA_BASE` | Basis-URL DexPaprika. | `https://api.dexpaprika.com` |
 | `VITE_DATA_PRIMARY` / `VITE_DATA_SECONDARY` | Provider-Priorität (Frontend). | `dexpaprika` / `moralis`. |
+| `HELIUS_API_KEY` | Solana DAS `getAssetsByOwner` (Server: `/api/wallet/assets`). | [helius.dev](https://www.helius.dev/) |
 
 > Mindestens ein Datenprovider (Moralis oder DexPaprika) muss aktiv sein.
 
@@ -48,6 +49,9 @@ AI_CACHE_TTL_SEC=3600
 # Optional
 VITE_ENABLE_AI_TEASER=false
 VITE_ENABLE_ANALYTICS=false
+
+# Solana Wallet Holdings (Server-only)
+HELIUS_API_KEY=...
 ```
 
 ## Provider-spezifische Schritte
@@ -58,7 +62,11 @@ VITE_ENABLE_ANALYTICS=false
    - Key anfordern, im Backend & Frontend eintragen.
    - Health-Check Endpoint: `/api/data/health` (liefert Provider-Status).
    - Verwaltet OHLC, Token-Metadata, Heatmap-Kacheln.
-3. **Fallback-Logik**
+3. **Helius (Solana Assets)**
+   - Server-Only Key: `HELIUS_API_KEY`
+   - Endpoint: `https://mainnet.helius-rpc.com/?api-key=...` mit RPC-Methode `getAssetsByOwner`
+   - Intern genutzt von `/api/wallet/assets?owner=<pubkey>` für Dashboard-Holdings (SOL + SPL fungibles).
+4. **Fallback-Logik**
    - `ENV_USAGE_OVERVIEW` beschreibt, welche Module welche Variablen benötigen (Chart, Analyze, Journal, Serverless APIs).
    - Empfohlen: Monitoring über Telemetrie, wenn Provider-Switch ausgelöst wird.
 
@@ -67,4 +75,3 @@ VITE_ENABLE_ANALYTICS=false
 - [ ] Secrets nie als `VITE_` setzen, wenn sie nicht im Browser benötigt werden.
 - [ ] Test-Call `/api/data/ohlc?address=...` + `/api/journal` lokal.
 - [ ] Fallback-Pfade (`VITE_DATA_FALLBACKS`) gepflegt.
-

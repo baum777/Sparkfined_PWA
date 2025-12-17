@@ -12,22 +12,20 @@ import { DEFAULT_TIMEFRAME } from '@/domain/chart';
 import { buildChartUrl, buildReplayUrl } from '@/lib/chartLinks';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import StateView from '@/components/ui/StateView';
-import { FilterPills } from '@/components/layout/FilterPills';
 import { SkeletonCard, SkeletonTable } from '@/components/ui/Skeleton';
 
 type SessionFilter = "all" | "London" | "NY" | "Asia";
 type SortMode = "default" | "top-movers" | "alphabetical";
 
 export default function WatchlistPage() {
-  const { rows, isLoading, error, hydrateFromQuotes, setLoading, setError } = useWatchlistStore((state) => ({
-    rows: state.rows,
-    isLoading: state.isLoading,
-    error: state.error,
-    hydrateFromQuotes: state.hydrateFromQuotes,
-    setLoading: state.setLoading,
-    setError: state.setError,
-  }));
+  // IMPORTANT: select primitives/functions individually to avoid React 18 useSyncExternalStore loops.
+  const rows = useWatchlistStore((state) => state.rows);
+  const isLoading = useWatchlistStore((state) => state.isLoading);
+  const error = useWatchlistStore((state) => state.error);
   const trends = useWatchlistStore((state) => state.trends);
+  const hydrateFromQuotes = useWatchlistStore((state) => state.hydrateFromQuotes);
+  const setLoading = useWatchlistStore((state) => state.setLoading);
+  const setError = useWatchlistStore((state) => state.setError);
   const [sessionFilter, setSessionFilter] = React.useState<SessionFilter>("all");
   const [sortMode, setSortMode] = React.useState<SortMode>("default");
   const [activeSymbol, setActiveSymbol] = React.useState<string | undefined>(undefined);
@@ -140,7 +138,28 @@ export default function WatchlistPage() {
         <div className="space-y-6 text-text-primary">
           <section className="rounded-3xl border border-border/70 bg-surface/80 px-4 py-4 shadow-card-subtle backdrop-blur-lg sm:px-6 sm:py-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <FilterPills options={SESSION_FILTERS} active={sessionFilter} onChange={setSessionFilter} className="w-full lg:w-auto" />
+              <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Session filter">
+                {SESSION_FILTERS.map((option) => {
+                  const isActive = sessionFilter === option;
+                  const label = option === 'all' ? 'All' : option;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setSessionFilter(option)}
+                      className={`rounded-full border px-3 py-1 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand sm:text-sm ${
+                        isActive
+                          ? 'border-brand/40 bg-brand/10 text-brand hover-glow'
+                          : 'border-border text-text-secondary hover:bg-interactive-hover hover:text-text-primary hover-scale'
+                      }`}
+                      aria-pressed={isActive}
+                      data-testid={`watchlist-session-filter-${label}`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
               <div className="flex flex-wrap items-center gap-3">
                 <LiveStatusBadge showLabel />
                 <button

@@ -21,11 +21,10 @@ export function LiveStatusBadge({
   showLabel = true,
   className = '',
 }: LiveStatusBadgeProps) {
-  const { isEnabled, pollingStatus, errorCount } = useLiveDataStore((state) => ({
-    isEnabled: state.isEnabled,
-    pollingStatus: state.pollingStatus,
-    errorCount: state.errorCount,
-  }));
+  // IMPORTANT: select primitives to avoid React 18 useSyncExternalStore loops.
+  const isEnabled = useLiveDataStore((state) => state.isEnabled);
+  const pollingStatus = useLiveDataStore((state) => state.pollingStatus);
+  const errorCount = useLiveDataStore((state) => state.errorCount);
 
   // Determine status and variant
   let statusText = 'OFF';
