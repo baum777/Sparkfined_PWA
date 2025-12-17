@@ -1,1234 +1,1176 @@
-# Working Papers: Full PWA Refactor
-
+# UI & UX Polish — Working Paper (Sparkfined)
 **Status:** Planning  
 **Last Updated:** 2025-12-17  
-**Owner:** Codex
+**Owner:** Codex  
+
+> This document is the canonical “execution spec” for UI/UX polish + PWA refactor work.
+> It is written to be *Codex-executable*: minimal ambiguity, strict file targets, binary acceptance criteria.
 
 ---
 
-## 🎯 INDEX – Full Architecture Overview
+## Codex Execution Contract (Applies to every WP)
 
-### Pages & Modules
+### Scope & PR hygiene
+- **One WP per PR** (exceptions only if explicitly marked *“Atomic Pair”* in the WP).
+- **No drive-by refactors.** If unrelated issues are discovered, add a note to the *Backlog* section at the bottom.
+- **Prefer extension over replacement.** Reuse existing components/patterns unless the WP explicitly says “replace”.
 
-```
-GLOBAL LAYER (Core Infrastructure)
-├─ WP-001: Bottom Navigation Bar (PWA Mobile)
-├─ WP-002: Theme System (Dark/Light Toggle)
-├─ WP-003: Desktop Navigation (Sidebar, Icons, Settings)
-└─ WP-004: Header Bar (Alerts + Settings Integration)
+### Dependency gate
+- **Do not implement a WP if any `Depends On` is incomplete.**
+- If blocked, output a short “Blocked by …” report and stop.
 
-DASHBOARD (Analytics & Overview)
-├─ WP-010: Typography, Spacing & Global Styles (Dashboard-Context)
-├─ WP-011: Hero KPI Bar (Sticky Top, 4–5 Cards)
-├─ WP-012: Daily Bias / Market Intel Card
-├─ WP-013: Holdings / Wallet Snapshot
-├─ WP-014: Trade Log / Recent Entries
-├─ WP-015: Recent Journal Entries & Alerts Overview
-└─ WP-016: Quick Actions (FAB, Mobile Layout)
+### Design tokens (hard rule)
+- **From WP-002 onward:** UI components must not use hard-coded colors.
+- All colors must come from **CSS variables** defined in `src/styles/theme.css`.
+- Spacing and radii should use the shared utilities in `src/styles/ui.css` (introduced in WP-002).
 
-JOURNAL (Trade Tracking & Psychology)
-├─ WP-030: Foundation (Typography, Spacing, Contrast)
-├─ WP-031: Emotional State (Emojis, Sliders, Gradients)
-├─ WP-032: Market Context (Accordion, Regime Selector)
-├─ WP-033: Trade Thesis (Tags, Screenshot, AI Notes)
-├─ WP-034: Mobile Journal (Cards, Touch, Bottom-Sheet)
-└─ WP-035: Workflow (Templates, Auto-Save, Forms)
+### Single source of truth
+- Navigation must be defined once in `src/config/navigation.ts` and reused by:
+  - `BottomNavBar` (mobile)
+  - `Sidebar` (desktop)
+  - any header quick-links (if applicable)
 
+### Typed APIs + mock fallback
+- Any WP that references `src/api/*` must:
+  - define a **typed interface** (DTOs)
+  - provide a **mock fallback** so the UI renders without backend availability
+  - keep UI resilient (loading / empty / error states)
 
+### Accessibility & interaction
+- Keyboard navigable (Tab order sane).
+- Focus styles visible (`:focus-visible`).
+- Touch targets **≥ 44×44px** on mobile.
+- Modal/sheet: focus trap + ESC close + scroll lock (reuse existing overlay primitives if present).
 
-### Execution Order (Recommended)
-1. **WP-001 to WP-004** (Global Infrastructure – all pages depend)
-2. **WP-010 to WP-016** (Dashboard – uses Global)
-3. **WP-030 to WP-035** (Journal – uses Global + WP-010 styles)
-4. **WP-050 to WP-056** (Chart – uses Global, can parallel to Journal)
-5. **WP-070 to WP-076** (Alerts – uses Global)
-6. **WP-090 to WP-097** (Settings – uses Global, lower priority)
-
-**Total Estimated Time:** 60–90h  
-**Critical Path:** Global → (Dashboard + Journal) → Chart → Alerts → Settings
-
----
+### Verification (minimum)
+- Run: `pnpm typecheck`
+- Run: `pnpm lint` (don’t introduce new warnings)
+- Run: `pnpm test` / `pnpm vitest run` where applicable
+- If e2e is configured but browsers are missing: document it; don’t block PR
 
 ---
 
-## GLOBAL LAYER – Core Infrastructure
+## Canonical Routes & Navigation
+
+### Routes
+- `/dashboard`
+- `/journal`
+- `/chart`
+- `/watchlist`
+- `/alerts`
+- `/settings`
+
+### Navigation ordering (Desktop)
+- Items (top → down): Dashboard → Journal → Chart → Watchlist → Alerts  
+- **Settings icon is separate at the very bottom** of the rail (not part of the list).
+
+### Navigation ordering (Mobile)
+- Bottom tabs: Dashboard · Journal · Chart · Watchlist · Alerts  
+- Settings is accessible via:
+  - Header gear icon on mobile, **and**
+  - `/settings` route (deep link)
 
 ---
 
-## WP-001: Bottom Navigation Bar (Mobile PWA)
+## Design System Tokens (WP-002 defines these; listed here for reference)
 
-**Status:** 🔵 Planned | **Depends On:** —
+### Color tokens
+Components use variables only:
+- `--sf-bg-0` (app background)
+- `--sf-bg-1` (raised surface)
+- `--sf-bg-2` (card surface)
+- `--sf-border-1` (hairline border)
+- `--sf-text-1` (primary text)
+- `--sf-text-2` (secondary text)
+- `--sf-text-3` (muted text)
+- `--sf-primary` (brand / primary)
+- `--sf-danger` (error / destructive)
+- `--sf-warning`
+- `--sf-success`
+- `--sf-shadow` (rgba shadow token)
 
-### Kontext
-- Mobile-PWA braucht intuitive Bottom-Navigation
-- 5 Tabs: Dashboard, Journal, Chart, Watchlist, Alerts
-- Fixed, immer sichtbar auf Mobile (<768px)
-- Active-State mit Farbe + Icon-Highlight
+### Radius tokens
+- `--sf-radius-sm` (8px)
+- `--sf-radius-md` (12px)
+- `--sf-radius-lg` (16px)
 
-### Datei-Targets
-```
-
-src/components/MobileNav/BottomNavBar.tsx
-src/components/MobileNav/BottomNavBar.css
-src/layouts/MainLayout.tsx                  (integrieren)
-src/types/navigation.ts                     (Navigation-Types)
-
-```
-
-### Schritt-für-Schritt Plan
-
-1. **BottomNavBar-Komponente:**
-   - Position: `fixed bottom-0 left-0 right-0`, z-index 40
-   - Layout: Flexbox, 5 gleich breite Items, zentriert
-   - Height: 64–72px Mobile, Safe-Area Padding unten
-   - Background: #0F0F0F mit Border-Top #2A2A2A
-
-2. **Icons & Labels:**
-   - Nutze Lucide React: Home, BookOpen, TrendingUp, Eye, Bell
-   - Icon-Größe: 24px
-   - Label unter Icon: 10–12px, grau
-   - Active: Primary-Farbe (#22C55E), Bold
-
-3. **Interaktivität:**
-   - onClick → React Router navigate zu Route
-   - Active-Detection: `useLocation()` oder Props
-   - Touch-Target: 48×48px mind. pro Item
-
-4. **Desktop Behavior:**
-   - Hidden via `hidden md:block` oder `@media (min-width: 768px) { display: none }`
-
-### Checkliste
-- [ ] BottomNavBar.tsx mit 5 Items erstellt
-- [ ] Icons aus Lucide React
-- [ ] Active-State Styling (Farbe, Bold)
-- [ ] React Router Integration
-- [ ] Safe-Area Padding (iPhone)
-- [ ] Mobile-only Display
-- [ ] Touch-Target ≥44×44px
-
-### Akzeptanzkriterien
-✅ Nav-Bar fixed unten, 5 Items sichtbar  
-✅ Active Tab visuell unterscheidbar (Farbe)  
-✅ Klick navigiert zu korrekter Page  
-✅ Auf Desktop hidden  
-
-### Codex Instructions
-```
-
-1. Erstelle src/components/MobileNav/BottomNavBar.tsx mit 5 Lucide-Icons.
-2. Position: fixed bottom-0, bg #0F0F0F, border-top #2A2A2A.
-3. Flex-Layout: 5 gleich breite Items, 48–56px Touch-Target.
-4. Active-State: Primary-Farbe (#22C55E) für Icon + Bold Label.
-5. onClick navigiert via useNavigate() zu /dashboard, /journal, /chart, /watchlist, /alerts.
-6. Hidden auf Desktop (@media min-width: 768px).
-7. Safe-Area Padding: padding-bottom: max(16px, env(safe-area-inset-bottom)).
-
-```
+### Spacing utilities
+Use `ui.css` utility classes (WP-002):
+- `.sf-gap-2` (8px) `.sf-gap-3` (12px) `.sf-gap-4` (16px) `.sf-gap-6` (24px) `.sf-gap-8` (32px)
+- `.sf-pad-4` (16px) `.sf-pad-6` (24px)
+- `.sf-card` (standard surface + border + radius + shadow)
 
 ---
 
-## WP-002: Theme System (Dark/Light Toggle)
+## File/module conventions (recommended)
+- **Global UI shell:** `src/features/shell/*`
+- **Theme system:** `src/features/theme/*`, `src/styles/theme.css`, `src/styles/ui.css`
+- **Dashboard:** `src/features/dashboard/*`
+- **Journal:** `src/features/journal/*`
+- **Chart:** `src/features/chart/*`
+- **Alerts:** `src/features/alerts/*`
+- **Settings:** `src/features/settings/*`
+- **Shared components:** `src/shared/components/*`
+- **API clients:** `src/api/*`
+- **Navigation config:** `src/config/navigation.ts`
 
-**Status:** 🔵 Planned | **Depends On:** —
-
-### Kontext
-- Global Dark Default, aber Light-Mode Option
-- Toggle in Settings + Header-Icon (optional)
-- LocalStorage Persistence
-- Alle Components nutzen Theme-Kontext
-
-### Datei-Targets
-```
-
-src/context/ThemeContext.tsx               (neu)
-src/hooks/useTheme.ts                      (neu)
-src/styles/theme.css                       (neu)
-src/store/userSettings.ts                  (erweitern – theme field)
-src/App.tsx                                (integrieren)
-
-```
-
-### Schritt-für-Schritt Plan
-
-1. **ThemeContext & Hook:**
-   - Context: `{ theme: 'dark' | 'light', toggleTheme: () => void }`
-   - Hook: `useTheme()` → `{ theme, toggleTheme }`
-   - Provider: wrap App.tsx
-
-2. **CSS Variablen:**
-   - `:root[data-theme="dark"]` → Farben (z. B. `--bg-primary: #0F0F0F`)
-   - `:root[data-theme="light"]` → Helle Varianten
-   - Alle Components nutzen CSS-Var statt Hard-coded Farben
-
-3. **Persistence:**
-   - Speichere in LocalStorage: `userSettings.theme`
-   - On App-Start: Lade Preference oder System-Default
-
-4. **Components:**
-   - Settings Page: Theme Dropdown (Dark/Light/System)
-   - Optional: Toggle-Button im Header-Icon-Bar
-
-### Checkliste
-- [ ] ThemeContext + useTheme Hook erstellt
-- [ ] CSS-Variablen definiert (Dark + Light)
-- [ ] HTML data-theme Attribute set
-- [ ] Settings-Dropdown integriert
-- [ ] LocalStorage Persistence
-- [ ] App startet mit gespeicherter Preference
-- [ ] Mobile + Desktop Themeing konsistent
-
-### Akzeptanzkriterien
-✅ Dark ist Default  
-✅ Light-Mode schaltbar in Settings  
-✅ Preference bleibt über Refresh erhalten  
-✅ CSS-Variablen konsistent in allen Components  
-
-### Codex Instructions
-```
-
-1. Erstelle src/context/ThemeContext.tsx mit useState (dark/light).
-2. Exportiere useTheme Hook: { theme, toggleTheme }.
-3. Erstelle src/styles/theme.css mit :root[data-theme="dark/light"] CSS-Variablen.
-4. In App.tsx: <ThemeProvider> wrapper, set document.documentElement.setAttribute('data-theme', theme).
-5. Lade Theme aus userSettings (localStorage) oder System-Preference.
-6. Erstelle Toggle in Settings: Dropdown (Dark/Light/System) → toggleTheme().
-7. Alle Hard-coded Farben in Components → CSS-Variablen umwandeln.
-
-```
+> Note: If your repo already has a different structure, keep existing conventions,
+> but still apply the “single source of truth” rules.
 
 ---
 
-## WP-003: Desktop Navigation (Sidebar, Icons, Settings)
+# GLOBAL LAYER — Core Infrastructure
 
-**Status:** 🔵 Planned | **Depends On:** WP-002 (Theme)
+## WP-001 — Bottom Navigation Bar (Mobile PWA)
+**Status:** Planned  
+**Depends On:** —  
+**Priority:** P0  
 
-### Kontext
-- Desktop Sidebar (>768px): Links fixed, collapsible
-- Icons für: Dashboard, Journal, Chart, Watchlist, Alerts
-- Settings-Icon ganz unten (separat)
-- Active-State Highlight
-- Mobile: Hidden (BottomNavBar stattdessen)
+### Goal
+Mobile users get a fixed, safe-area aware bottom tab bar with 5 primary destinations.
 
-### Datei-Targets
+### In Scope
+- Bottom navigation with icons + labels
+- Active state
+- Safe-area padding
+- Mobile-only rendering
+
+### Out of Scope
+- Settings tab (mobile settings is via header + route)
+
+### File targets
+```txt
+CREATE  src/features/shell/BottomNavBar.tsx
+CREATE  src/features/shell/bottom-nav.css
+MODIFY  src/layouts/MainLayout.tsx
+CREATE  src/config/navigation.ts
 ```
 
-src/components/DesktopNav/Sidebar.tsx
-src/components/DesktopNav/Sidebar.css
-src/layouts/MainLayout.tsx                 (Layout mit Sidebar)
+### Implementation steps
+1. Create `src/config/navigation.ts` exporting a `NAV_ITEMS` array (route, label, icon).
+2. Implement `BottomNavBar.tsx`:
+   - `position: fixed; bottom: 0; left:0; right:0; z-index: 40`
+   - height 64–72px with `padding-bottom: max(12px, env(safe-area-inset-bottom))`
+   - 5 equal-width items, touch target ≥44×44
+3. Wire into `MainLayout.tsx` for **mobile only** (`<768px`).
+4. Active tab:
+   - use `useLocation()` to compare route prefixes.
+5. Ensure keyboard focus and aria-labels.
 
+### Acceptance criteria
+- [ ] Visible on <768px, hidden on ≥768px
+- [ ] 5 tabs: Dashboard / Journal / Chart / Watchlist / Alerts
+- [ ] Active tab visually distinct
+- [ ] Safe-area padding works (no overlap with iOS home bar)
+- [ ] Navigates correctly via React Router
+
+### Verification
+- [ ] `pnpm typecheck`
+- [ ] Visual check on narrow viewport
+
+### Codex notes
+WP-001 may use simple CSS with hard-coded colors **only if WP-002 is not merged yet**. Once WP-002 is merged, migrate BottomNav to tokens.
+
+---
+
+## WP-002 — Theme System (Dark/Light + Tokens)
+**Status:** Planned  
+**Depends On:** —  
+**Priority:** P0  
+
+### Goal
+Introduce a single theme system with CSS variables, dark default, light optional, persisted selection, and shared UI utilities.
+
+### In Scope
+- Theme provider + hook
+- `data-theme` + `color-scheme`
+- `theme.css` + `ui.css`
+- Persistence: localStorage
+- “System” mode (optional but recommended)
+
+### File targets
+```txt
+CREATE  src/features/theme/ThemeContext.tsx
+CREATE  src/features/theme/useTheme.ts
+CREATE  src/styles/theme.css
+CREATE  src/styles/ui.css
+MODIFY  src/App.tsx
+MODIFY  src/store/userSettings.ts   (or equivalent settings store)
 ```
 
-### Schritt-für-Schritt Plan
+### Implementation steps
+1. Define theme modes: `dark | light | system`.
+2. Implement `ThemeProvider`:
+   - reads saved preference from settings store/localStorage
+   - applies `document.documentElement.dataset.theme = resolvedTheme`
+   - applies `document.documentElement.style.colorScheme = resolvedTheme`
+3. Create `theme.css`:
+   - `:root[data-theme="dark"] { ...tokens... }`
+   - `:root[data-theme="light"] { ...tokens... }`
+4. Create `ui.css` utilities:
+   - `.sf-card`, `.sf-btn`, spacing helpers, focus ring helper
+5. Update app entry to import `theme.css` and `ui.css`.
 
-1. **Sidebar Layout:**
-   - Position: `fixed left-0 top-0`, width 64–80px, full-height
-   - Background: #0F0F0F, border-right #2A2A2A
-   - Flex-Column: Items oben, Settings-Icon unten
-   - Collapsible (optional): Hamburger-Toggle → expand zu 220px
+### Token definitions (recommended defaults)
+Dark (example values; components must never inline these):
+- `--sf-bg-0: #0F0F0F`
+- `--sf-bg-1: #121212`
+- `--sf-bg-2: #1E1E1E`
+- `--sf-border-1: #2A2A2A`
+- `--sf-text-1: #FFFFFF`
+- `--sf-text-2: rgba(255,255,255,0.85)`
+- `--sf-text-3: rgba(255,255,255,0.65)`
+- `--sf-primary: #22C55E`
+- `--sf-danger: #EF4444`
+- `--sf-warning: #F59E0B`
+- `--sf-success: #22C55E`
+- `--sf-shadow: rgba(0,0,0,0.25)`
 
-2. **Nav Items (5):**
+Light: choose accessible equivalents (no pure-white glare; still high contrast).
+
+### Acceptance criteria
+- [ ] Dark is default
+- [ ] Theme selection persists across reload
+- [ ] Components can style using tokens (no hard-coded colors in WPs ≥ 002)
+- [ ] `data-theme` updates on change
+- [ ] System mode (if implemented) follows OS changes (optional; document if skipped)
+
+### Verification
+- [ ] `pnpm typecheck`
+- [ ] Manual: toggle theme and reload
+
+---
+
+## WP-003 — Desktop Navigation Sidebar (Rail)
+**Status:** Planned  
+**Depends On:** WP-002  
+**Priority:** P0  
+
+### Goal
+Desktop users get a fixed left rail with nav icons, active highlight, and a separate settings icon pinned to the bottom.
+
+### In Scope
+- Left rail (≥768px)
+- Icons, active state, tooltips
+- Settings icon separate bottom
+- Uses `NAV_ITEMS`
+
+### File targets
+```txt
+CREATE  src/features/shell/Sidebar.tsx
+CREATE  src/features/shell/sidebar.css
+MODIFY  src/layouts/MainLayout.tsx
+MODIFY  src/config/navigation.ts
+```
+
+### Implementation steps
+1. In `navigation.ts` ensure desktop ordering:
    - Dashboard, Journal, Chart, Watchlist, Alerts
-   - Icon: 24–28px, grau, auf Hover heller
-   - Active: Primary-Farbe + Highlight (linker Border oder Glow)
-   - Tooltip: Hover-Popup (z. B. "Dashboard")
+2. Implement `Sidebar.tsx`:
+   - fixed left, full height, width 64–80px
+   - items in a column
+   - settings icon block at bottom (`margin-top: auto`)
+3. Active state:
+   - left border or glow using `--sf-primary`
+4. Tooltip on hover/focus for collapsed rail.
+5. Hidden on mobile.
 
-3. **Settings Icon:**
-   - Ganz unten (vor Footer oder nach Items)
-   - Separate visuell (anders styled oder Spacing)
-   - Klick → navigiert zu /settings oder öffnet Drawer
+### Acceptance criteria
+- [ ] Visible on ≥768px, hidden on <768px
+- [ ] Correct ordering + routing
+- [ ] Settings icon is separate at bottom
+- [ ] Active item visible
+- [ ] No hard-coded colors (tokens only)
 
-4. **Responsive:**
-   - Desktop (>768px): Sichtbar
-   - Mobile: Hidden
-
-### Checkliste
-- [ ] Sidebar.tsx erstellt mit 5 Nav-Items + Settings-Icon
-- [ ] Active-State Styling (Farbe, Border/Glow)
-- [ ] Icons aus Lucide React
-- [ ] Tooltips on Hover
-- [ ] Collapsible Toggle (optional)
-- [ ] Settings-Icon separat unten platziert
-- [ ] Mobile-Hidden via Media Query
-- [ ] Routing Integration
-
-### Akzeptanzkriterien
-✅ Sidebar fixed links, 64–80px breit  
-✅ 5 Nav-Items + Settings-Icon  
-✅ Active-Item visuell unterscheidbar  
-✅ Klick navigiert korrekt  
-✅ Auf Mobile hidden  
-
-### Codex Instructions
-```
-
-1. Erstelle src/components/DesktopNav/Sidebar.tsx, fixed left-0, bg #0F0F0F.
-2. Layout: Flex-column mit 5 Nav-Items oben, Settings-Icon unten (margin-top: auto).
-3. Nutze Lucide Icons (24px), Active-State: Primary-Farbe + border-left oder Glow.
-4. Tooltip on Hover (z. B. "Dashboard", "Journal", etc.).
-5. onClick navigiert via useNavigate() zu Routes.
-6. Hidden auf Mobile (@media max-width: 767px).
-7. Collapsible (optional): Toggle-Button → expand zu 220px mit Labels.
-
-```
+### Verification
+- [ ] `pnpm typecheck`
+- [ ] Manual: resize + navigate
 
 ---
 
-## WP-004: Header Bar (Alerts + Settings Integration)
+## WP-004 — Header Bar (TopBar)
+**Status:** Planned  
+**Depends On:** WP-002  
+**Priority:** P0  
 
-**Status:** 🔵 Planned | **Depends On:** WP-002 (Theme)
+### Goal
+A sticky top bar that provides context + quick actions:
+- Desktop: Alerts + Settings icons on the right, plus theme toggle.
+- Mobile: Title + Settings + theme toggle (keep it minimal).
 
-### Kontext
-- Top-Bar (Desktop + Mobile): Alerts Icon, Settings Icon, Dark-Mode Toggle
-- Sticky, hohe z-index (z-50)
-- Alerts Icon: Badge mit Anzahl (z. B. "2")
-- Settings: Shortcut zur Settings-Page
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/shell/TopBar.tsx
+CREATE  src/features/shell/top-bar.css
+MODIFY  src/layouts/MainLayout.tsx
 ```
 
-src/components/Header/TopBar.tsx
-src/components/Header/TopBar.css
-src/layouts/MainLayout.tsx                 (integrieren)
+### Implementation steps
+1. Sticky top bar: height 56–64px, z-index 50.
+2. Left: page title (or brand).
+3. Right:
+   - Desktop: Alerts (with badge), Settings, Theme toggle
+   - Mobile: Settings, Theme toggle (alerts already in bottom tabs)
+4. Badge count is from alerts store (mock fallback if not available).
+5. All icons have aria-labels + focus.
 
-```
-
-### Schritt-für-Schritt Plan
-
-1. **TopBar Layout:**
-   - Position: `sticky top-0`, z-index 50
-   - Height: 56–64px
-   - Flexbox: Logo/Title links, Icons rechts
-   - Background: #0F0F0F, border-bottom #2A2A2A
-
-2. **Right Icons:**
-   - Alerts Icon (Bell) + Badge (roter Kreis mit Zahl)
-   - Settings Icon (Gear)
-   - Dark-Mode Toggle (Sun/Moon Icon, optional)
-   - Spacing: 16–24px zwischen Icons
-
-3. **Alerts Badge:**
-   - Nur auf Desktop sichtbar (Mobile: Bottom Nav genügt)
-   - Badge: roter Kreis, Zahl darin (z. B. "2" = 2 triggered)
-   - Klick → navigiere zu /alerts oder zeige Alert-Panel
-
-4. **Interaktivität:**
-   - Alerts Icon Klick → /alerts
-   - Settings Icon Klick → /settings oder Settings-Drawer
-   - Dark-Mode Toggle → `useTheme().toggleTheme()`
-
-### Checkliste
-- [ ] TopBar.tsx mit Icons erstellt
-- [ ] Alerts Badge mit Zahl
-- [ ] Icons aus Lucide React
-- [ ] Spacing & Layout
-- [ ] Click-Handler für Navigation
-- [ ] Desktop + Mobile Responsive
-- [ ] Dark-Mode Toggle (optional)
-
-### Akzeptanzkriterien
-✅ TopBar sticky, Icons rechts  
-✅ Alerts Badge zeigt Zahl  
-✅ Klick navigiert korrekt  
-✅ Theme-Toggle funktioniert  
-
-### Codex Instructions
-```
-
-1. Erstelle src/components/Header/TopBar.tsx, sticky top-0, bg #0F0F0F.
-2. Layout: Flex mit Title links, Icons rechts (Alerts, Settings, Theme-Toggle).
-3. Alerts Icon: Lucide Bell + rotes Badge mit Zahl (z. B. "2").
-4. Settings Icon: Lucide Gear → onClick navigiert zu /settings.
-5. Dark-Mode Toggle (optional): Lucide Sun/Moon → useTheme().toggleTheme().
-6. Spacing: 16px Gap zwischen Icons, 24px Padding L/R.
-7. Mobile: Alerts + Settings Icons hidden (Bottom Nav zeigt sie).
-
-```
+### Acceptance criteria
+- [ ] Top bar sticky
+- [ ] Desktop shows alerts+settings+theme toggle
+- [ ] Mobile shows settings+theme toggle
+- [ ] Badge renders when count > 0
+- [ ] Tokens only
 
 ---
 
----
+# DASHBOARD — Analytics & Overview
 
-## DASHBOARD – Analytics & Overview
+## WP-010 — Dashboard Foundation (Typography, Spacing, Card System)
+**Status:** Planned  
+**Depends On:** WP-001..WP-004  
+**Priority:** P1  
 
----
+### Goal
+Introduce dashboard layout primitives: spacing, grid, card base styling, hover states—using theme tokens/utilities.
 
-## WP-010: Dashboard Foundation (Typography, Spacing, Global Styles)
-
-**Status:** 🔵 Planned | **Depends On:** WP-001 to WP-004
-
-### Kontext
-- Dashboard nutzt einheitliche Spacing (24–32px zwischen Sections)
-- Alle Text: links-aligned, Headers 20–24px bold, Body 14–16px
-- Cards: bg #1E1E1E, rounded-xl, padding 24px
-- Interaktivität: Hover-Effekte (scale ~1.05), Tooltips für KPIs
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/dashboard/dashboard.css
+MODIFY  src/features/dashboard/DashboardPage.tsx   (or existing page)
+CREATE  src/features/dashboard/DashboardLayout.tsx (if needed)
 ```
 
-src/styles/dashboard.css                   (neu)
-src/components/Dashboard/DashboardPage.tsx
-src/components/Dashboard/DashboardLayout.tsx
+### Implementation steps
+1. Define dashboard layout classes in `dashboard.css`:
+   - section gap 24–32px
+   - card padding 24px
+2. Use `.sf-card` for surfaces + borders.
+3. Typography conventions:
+   - title 28–32
+   - section header 20–24
+   - body 14–16
+4. Hover: subtle scale (1.01–1.02) + shadow increase.
+5. Responsive:
+   - desktop grid (2 cols where needed)
+   - mobile stacked + horizontal scroll for KPI bar.
 
-```
-
-### Schritt-für-Schritt Plan
-
-1. **Spacing-System:**
-   - Section Gap: 32px vertikal
-   - Card Padding: 24px
-   - KPI-Cards: 24px Gap horizontal
-   - Mobile: Etwas weniger (16–24px)
-
-2. **Typography:**
-   - Page Title: 28–32px bold
-   - Section Header: 20–24px bold
-   - Body: 14–16px, line-height 1.5
-   - Label: 12–14px, grau
-   - Alle: links-aligned
-
-3. **Card Design:**
-   - Background: #1E1E1E
-   - Border: #2A2A2A (subtle)
-   - Border-Radius: 12–16px
-   - Padding: 24px
-   - Box-Shadow: 0 2px 8px rgba(0,0,0,0.2)
-
-4. **Hover-Effekte:**
-   - Cards: scale 1.02–1.05 + Shadow erhöhen
-   - Icons: Opacity/Color-Change
-   - Transition: 200ms ease
-
-5. **Responsive:**
-   - Desktop: Grid 2 cols (Holdings/Wallet), full-width (KPIs, Daily Bias)
-   - Mobile: Full-width stacked, KPIs horizontal scroll
-
-### Checkliste
-- [ ] Dashboard CSS-Klassen definiert
-- [ ] Spacing-Utilities (gap-section, gap-card, etc.)
-- [ ] Typography-Klassen (title, header, body, label)
-- [ ] Card-Base Styling
-- [ ] Hover-Transitions
-- [ ] Responsive Grid/Layout
-- [ ] Mobile Breakpoints
-
-### Akzeptanzkriterien
-✅ Spacing konsistent 24–32px  
-✅ Alle Text left-aligned  
-✅ Cards hover-responsiv  
-✅ Mobile vollständig responsive  
-
-### Codex Instructions
-```
-
-1. Erstelle src/styles/dashboard.css mit Spacing-Klassen
-   (gap-section: 32px, card-padding: 24px, etc.).
-2. Definiere Typography-Klassen: title, section-header, body, label.
-3. Card-Base: bg #1E1E1E, border #2A2A2A, padding 24px, radius 12px.
-4. Hover: scale 1.05, Shadow erhöhen, Transition 200ms.
-5. Responsive Grid: Desktop 2-col (Grid), Mobile full-width stacked.
-6. KPI-Horizontal-Scroll: overflow-x auto, gap 24px.
-
-```
+### Acceptance criteria
+- [ ] Consistent spacing between sections
+- [ ] Cards use token-based surfaces
+- [ ] No hard-coded colors
+- [ ] Mobile layout readable without overflow issues
 
 ---
 
-## WP-011: Hero KPI Bar (Sticky Top, 4–5 Cards)
+## WP-011 — Hero KPI Bar (Sticky, 4–5 KPIs)
+**Status:** Planned  
+**Depends On:** WP-010  
+**Priority:** P1  
 
-**Status:** 🔵 Planned | **Depends On:** WP-010
+### Goal
+Sticky KPI strip under the header showing key stats; scrollable on mobile, sticky on desktop.
 
-### Kontext
-- Top der Dashboard: Sticky, horizontale KPI-Cards
-- 4–5 Cards: Net P&L, Win Rate, Journal Streak, Alerts Armed, Avg R:R
-- Größe: 240×100px Desktop, responsive Mobile
-- Hover: Scale ~1.05 + Tooltip
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/dashboard/KPIBar.tsx
+CREATE  src/features/dashboard/KPICard.tsx
+CREATE  src/features/dashboard/kpi.css
 ```
 
-src/components/Dashboard/KPIBar.tsx
-src/components/Dashboard/KPICard.tsx
-src/components/Dashboard/KPITooltip.tsx    (optional)
+### Implementation steps
+1. KPI bar is sticky under `TopBar` (use CSS var / constant for offset).
+2. KPI cards:
+   - icon + label
+   - primary value
+   - delta indicator (arrow or +/-)
+3. Data binding via props; use placeholder values until real stats exist.
+4. Mobile: horizontal scroll with snap.
+5. Tooltip optional.
 
-```
-
-### Schritt-für-Schritt Plan
-
-1. **KPI Bar Container:**
-   - Position: `sticky top-[64px]` (unter Header)
-   - Height: 120px Desktop, 100px Mobile
-   - Padding: 32px L/R, 24px T/B
-   - Background: #0F0F0F mit Border-Bottom
-   - Flexbox: horizontal, wrap, gap 24px
-
-2. **KPI Card Design:**
-   - Size: 240×100px (Desktop), responsive smaller Mobile
-   - bg #1E1E1E, border #2A2A2A, radius 12px
-   - Padding: 16px
-   - Content Layout:
-     - Icon (20–24px) + Label (12px grau) oben links
-     - Große Zahl (28–32px bold) mittig/unten
-     - Sparkline oder Pfeil-Icon (grün/rot) rechts
-   - Hover: scale 1.05, Shadow erhöhen
-
-3. **Data Binding:**
-   - Props: `{ icon, label, value, change, sparklineData, tooltip }`
-   - Tooltip: Hover-text z. B. "Last 30 Days"
-
-4. **KPI Set (4–5):**
-   - Net P&L (USD, grün/rot je Vorzeichen)
-   - Win Rate (%, 0–100)
-   - Journal Streak (days, Nummer)
-   - Alerts Armed (count)
-   - Avg R:R (ratio, z. B. 1.5:1)
-
-### Checkliste
-- [ ] KPIBar.tsx mit Container-Layout
-- [ ] KPICard.tsx mit Icon, Label, Value, Sparkline
-- [ ] 4–5 KPI-Instanzen definiert
-- [ ] Hover-Scale + Tooltip
-- [ ] Responsive: Desktop & Mobile Sizes
-- [ ] Sticky Positioning unter Header
-- [ ] Data-Props korrekt strukturiert
-
-### Akzeptanzkriterien
-✅ 4–5 KPI-Cards horizontal sichtbar  
-✅ Hover: scale + Tooltip  
-✅ Sticky, bleibt beim Scrollen sichtbar  
-✅ Mobile responsive  
-
-### Codex Instructions
-```
-
-1. Erstelle src/components/Dashboard/KPIBar.tsx, sticky top-[64px],
-   flex horizontal, gap 24px, bg #0F0F0F.
-2. Erstelle src/components/Dashboard/KPICard.tsx (240×100px):
-   - Layout: Icon+Label oben, große Zahl mittig, Sparkline/Pfeil rechts.
-   - Hover: scale 1.05, Shadow +=1px.
-   - Props: icon, label, value, change%, sparklineData, tooltip.
-3. 4–5 Instanzen: Net P&L, Win Rate, Journal Streak, Alerts Armed, Avg R:R.
-4. Tooltip on Hover: "Last 30 Days" (optional, z. B. mit Recharts Mini-Sparkline).
-5. Mobile: Smaller Card-Size, ggfs. 2-row wrap auf sehr kleinen Screens.
-
-```
+### Acceptance criteria
+- [ ] 4–5 KPI cards render
+- [ ] Sticky behavior works (desktop)
+- [ ] Mobile horizontal scroll works
+- [ ] Tokens only
 
 ---
 
-## WP-012: Daily Bias / Market Intel Card
+## WP-012 — Daily Bias / Market Intel Card
+**Status:** Planned  
+**Depends On:** WP-010  
+**Priority:** P1  
 
-**Status:** 🔵 Planned | **Depends On:** WP-010
+### Goal
+Full-width card summarizing daily bias + insights with refresh action and stable states.
 
-### Kontext
-- Full-Width Card unter KPI-Bar
-- Zeigt aggregierte Bias aus Onchain + Crypto-Twitter Sentiment
-- Content: Header, Bias-Tag, 3–5 Bullet Points, Footer-Buttons + optional Chart-Snapshot
-- Update-Button: Refresh Sentiment
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/dashboard/DailyBiasCard.tsx
+CREATE  src/features/dashboard/BiasTag.tsx
+CREATE  src/api/marketIntelligence.ts
 ```
 
-src/components/Dashboard/DailyBiasCard.tsx
-src/components/Dashboard/BiasTag.tsx       (badge component)
-src/api/marketIntelligence.ts              (data fetching)
+### Implementation steps
+1. API client exports:
+   - `getDailyBias(): Promise<DailyBiasDTO>`
+   - mock fallback data
+2. UI card:
+   - header with refresh button
+   - bias tag (Bullish/Bearish/Neutral)
+   - bullet insights + timestamp
+   - footer actions (view analysis / refresh)
+3. Add loading and error states.
 
-```
-
-### Schritt-für-Schritt Plan
-
-1. **Card Layout:**
-   - Padding: 24px, rounded-xl, bg #1E1E1E
-   - Header: "Daily Bias / Market Intel" + Update-Button (Lucide RotateCw)
-   - Content: Bias-Tag + 3–5 Bullets + optional Mini-Chart
-   - Footer: 2 Buttons (View Full Analysis, Update Sentiment)
-
-2. **Bias-Tag:**
-   - Pills: "Bullish", "Bearish", "Neutral"
-   - Farbe je Bias: Grün, Rot, Grau
-   - Icon optional
-
-3. **Content (Bullets):**
-   - Kurze Insights (z. B. "SOL above $210 support", "BTC funding rates cooling")
-   - Timestamp: Wann zuletzt geupdatet
-
-4. **Optional: Chart Snapshot:**
-   - Mini-1D-Chart-Preview (z. B. TradingView Lightweight Chart)
-   - Oder Screenshot/Image von aktuellem State
-
-5. **Buttons:**
-   - "View Full Analysis": Navigiert zu Detail-Seite oder Modal
-   - "Update Sentiment": Trigged Refresh API-Call
-
-### Checkliste
-- [ ] DailyBiasCard.tsx erstellt
-- [ ] Bias-Tag Component mit Farben
-- [ ] 3–5 Bullet-Content
-- [ ] Update-Button mit Loading-State
-- [ ] Footer-Buttons integriert
-- [ ] Optional: Mini-Chart/Snapshot
-- [ ] Responsive Design
-
-### Akzeptanzkriterien
-✅ Card Full-Width unter KPI-Bar  
-✅ Bias-Tag visuell unterscheidbar  
-✅ Buttons funktionieren  
-✅ Update-Refresh zeigt Loading-State  
-
-### Codex Instructions
-```
-
-1. Erstelle src/components/Dashboard/DailyBiasCard.tsx, full-width, padding 24px.
-2. Header: Titel + Lucide RotateCw-Button (Update).
-3. Bias-Tag: Pills (Bullish/Bearish/Neutral) mit Farben (Grün/Rot/Grau).
-4. Content: 3–5 Bullet-Insights + Timestamp "Updated at HH:MM".
-5. Optional: Mini-Chart oder Image-Placeholder.
-6. Footer: 2 Buttons (View Analysis, Update) mit Click-Handler.
-7. Update-Button: Loading-State, dann Refresh Data (API-Call).
-
-```
+### Acceptance criteria
+- [ ] Bias tag visible and styled
+- [ ] Refresh shows loading state and updates timestamp
+- [ ] Works without backend (mock)
+- [ ] Tokens only
 
 ---
 
-## WP-013: Holdings / Wallet Snapshot
+## WP-013 — Holdings / Wallet Snapshot Card
+**Status:** Planned  
+**Depends On:** WP-010  
+**Priority:** P1  
 
-**Status:** 🔵 Planned | **Depends On:** WP-010
+### Goal
+Wallet holdings table with connected/not-connected states, hover rows, and responsive layout.
 
-### Kontext
-- Grid: 2 cols Desktop, 1 col Mobile
-- Wallet Connected: Tabelle mit Symbol, Amount, Value, Change%
-- Wallet Not Connected: Placeholder + CTA
-- Row Hover: Highlight
-- Farben: Grün (positive), Rot (negative Change)
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/dashboard/HoldingsCard.tsx
+CREATE  src/api/wallet.ts
 ```
 
-src/components/Dashboard/HoldingsCard.tsx
-src/components/Dashboard/WalletSnapshot.tsx
-src/api/wallet.ts                          (fetch holdings)
+### Implementation steps
+1. API client exports typed DTO:
+   - `getHoldings(walletAddress?: string): Promise<HoldingDTO[]>`
+   - mock fallback
+2. Connected state shows a small table/list:
+   - Symbol / Amount / Value / Change
+3. Not connected:
+   - CTA “Connect wallet” linking to Settings → Wallet Monitoring
+4. Row hover + click to open Watchlist detail (or placeholder handler).
 
-```
-
-### Schritt-für-Schritt Plan
-
-1. **Card Layout:**
-   - Padding: 24px, rounded-xl, bg #1E1E1E
-   - Header: "Holdings / Wallet Snapshot" + Connect-Button (falls nicht connected)
-   - Body: Tabelle oder Scrollable List
-
-2. **Wallet Connected – Tabelle:**
-   - Columns: Symbol | Amount | Value ($) | Change (%) | Action
-   - Row Height: 20px Spacing, Hover: bg #2A2A2A
-   - Farben: Green (+), Red (−)
-   - Klick Row → Watchlist oder Detail-View
-
-3. **Wallet Not Connected:**
-   - Placeholder Image/Icon
-   - Text: "Connect wallet to see your holdings"
-   - Button: "Connect Wallet" → navigiert zu Settings oder WalletModal
-
-4. **Responsive:**
-   - Desktop: 2-col Grid (oder Full-Width, je Layout)
-   - Mobile: 1-col, stacked
-
-### Checkliste
-- [ ] HoldingsCard.tsx mit Tabelle erstellt
-- [ ] Wallet-Status Check (connected/not connected)
-- [ ] Tabelle: Symbol, Amount, Value, Change%
-- [ ] Row Hover-Effect
-- [ ] Farben: Green/Red basierend auf Change
-- [ ] Connect-CTA für Not Connected
-- [ ] Responsive Grid Layout
-
-### Akzeptanzkriterien
-✅ Tabelle zeigt Holdings wenn Connected  
-✅ Placeholder + CTA wenn Not Connected  
-✅ Row Hover sichtbar  
-✅ Responsive Layout  
-
-### Codex Instructions
-```
-
-1. Erstelle src/components/Dashboard/HoldingsCard.tsx, bg #1E1E1E, padding 24px.
-2. Tabelle (falls Connected): Symbol | Amount | Value | Change% | Action.
-3. Row-Hover: bg #2A2A2A, Cursor pointer.
-4. Farben: Green (#22C55E) für +Change, Red (#EF4444) für −Change.
-5. Klick Row: Kann detail view öffnen oder Watchlist navigieren.
-6. Not Connected: Placeholder + Button "Connect Wallet" → WalletModal/Settings.
-7. Responsive: Desktop 2-col, Mobile 1-col.
-
-```
+### Acceptance criteria
+- [ ] Shows placeholder when no wallet
+- [ ] Shows rows when wallet exists
+- [ ] Change values color-coded via tokens (danger/success)
+- [ ] Tokens only
 
 ---
 
-## WP-014: Trade Log / Recent Entries
+## WP-014 — Recent Trades (Trade Log Card)
+**Status:** Planned  
+**Depends On:** WP-010  
+**Priority:** P1  
 
-**Status:** 🔵 Planned | **Depends On:** WP-010
+### Goal
+Show recent trades and provide a “Log entry” action. The action is disabled until a BUY signal exists (per Journal V2 pipeline requirement).
 
-### Kontext
-- Card: Recent Trades (letzte 10–20 Einträge)
-- Mini-Cards mit Symbol, Entry/Exit, P&L, Status
-- Left Border: grün (profit) oder rot (loss)
-- Click → Journal Detail-View
-- Pagination/Load More: >10 Einträge
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/dashboard/TradeLogCard.tsx
+CREATE  src/features/dashboard/TradeLogEntry.tsx
+MODIFY  src/api/journalEntries.ts              (or create if missing)
+MODIFY  src/features/journal/*                 (only for signal availability wiring, minimal)
 ```
 
-src/components/Dashboard/TradeLogCard.tsx
-src/components/Dashboard/TradeLogEntry.tsx
-src/api/journalEntries.ts                  (fetch recent trades)
+### Implementation steps
+1. Recent trades list (10 items) with “Load more”.
+2. Entry styling:
+   - left accent (success/danger) based on P&L sign
+   - click navigates to `/journal/:id`
+3. “Log entry” button behavior:
+   - default **disabled** (tooltip: “Enabled when a BUY signal is detected”)
+   - becomes enabled when there is at least one pending BUY signal in state
+   - on click: opens the existing Entry panel/overlay (not a full page nav)
+4. Provide mock data for trade list + mock BUY signal flag if pipeline is not available.
 
-```
-
-### Schritt-für-Schritt Plan
-
-1. **Card Layout:**
-   - Padding: 24px, rounded-xl, bg #1E1E1E
-   - Header: "Recent Trades" + Button "Log Entry"
-   - Body: Liste von Mini-Cards, scrollbar bei Overflow
-
-2. **Mini-Card Design:**
-   - Left Border: 4px (grün = profit, rot = loss)
-   - Content: Symbol/Pair | Entry Price | Exit/Current | P&L $$$
-   - Secondary: Date, Status (Open/Closed)
-   - Hover: scale 1.02, Cursor pointer
-   - Klick → /journal/:id
-
-3. **Empty State:**
-   - Icon + Text: "No trades logged yet"
-   - Button: "Mark Entry" → Öffnet Journal New Trade Modal
-
-4. **Pagination:**
-   - Show first 10, dann "Load More" Button
-   - Oder Infinite Scroll
-
-### Checkliste
-- [ ] TradeLogCard.tsx mit Header + Body
-- [ ] TradeLogEntry.tsx Mini-Card
-- [ ] Left-Border Styling (grün/rot)
-- [ ] Hover-Effect + Click Handler
-- [ ] Empty State
-- [ ] Pagination / Load More
-- [ ] Date + Status Display
-
-### Akzeptanzkriterien
-✅ Recent Trades angezeigt  
-✅ Left Border grün/rot  
-✅ Klick navigiert zu Journal Detail  
-✅ Empty State informativ  
-
-### Codex Instructions
-```
-
-1. Erstelle src/components/Dashboard/TradeLogCard.tsx mit Header + Body.
-2. Erstelle src/components/Dashboard/TradeLogEntry.tsx (Mini-Card):
-   - Left Border 4px: grün (#22C55E) für profit, rot (#EF4444) für loss.
-   - Content: Symbol | Entry | Exit | P&L | Date | Status.
-3. Hover: scale 1.02, cursor pointer, onClick navigiert zu /journal/:id.
-4. Empty State: Icon + "No trades yet" + Button "Mark Entry".
-5. Pagination: Show 10, dann "Load More" Button.
-6. Fetch data via journalEntries API.
-
-```
+### Acceptance criteria
+- [ ] Recent trades render with empty + loading states
+- [ ] Load more works
+- [ ] Log entry button disabled by default
+- [ ] Log entry enables when BUY signal is present
+- [ ] Tokens only
 
 ---
 
-## WP-015: Recent Journal Entries & Alerts Overview
+## WP-015 — Recent Journal Entries + Alerts Overview
+**Status:** Planned  
+**Depends On:** WP-010  
+**Priority:** P2  
 
-**Status:** 🔵 Planned | **Depends On:** WP-010
+### Goal
+Bottom dashboard section combining recent journal entries and alerts stats.
 
-### Kontext
-- Bottom Dashboard Section
-- 2 Bereiche: Recent Journal Entries (3–5 Cards) + Alerts Overview
-- Journal Entries: Horizontal Scroll auf Mobile, Grid auf Desktop
-- Alerts: Stats + Link zu /alerts
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/dashboard/RecentEntriesSection.tsx
+CREATE  src/features/dashboard/AlertsOverviewWidget.tsx
+MODIFY  src/api/journalEntries.ts
+MODIFY  src/api/alerts.ts     (create if missing)
 ```
 
-src/components/Dashboard/RecentEntriesSection.tsx
-src/components/Dashboard/AlertsOverviewWidget.tsx
+### Implementation steps
+1. Recent journal entries (3–5):
+   - desktop grid
+   - mobile horizontal scroll
+2. Alerts widget:
+   - “Armed / Triggered / Paused”
+   - links to `/alerts`
+3. Mock fallback for both.
 
-```
-
-### Schritt-für-Schritt Plan
-
-1. **Recent Journal Entries:**
-   - Layout: Grid 3–4 cols Desktop, horizontal scroll Mobile
-   - Cards: Thumbnail, Title, Date, Quick Preview (first 50 chars)
-   - Klick → /journal/:id
-   - "View All" Button → /journal
-
-2. **Alerts Overview:**
-   - Stats: "6 Armed · 2 Triggered · 1 Paused"
-   - Icons: Farbig je Status
-   - Button: "View All Alerts" → /alerts
-
-3. **Responsive:**
-   - Desktop: Nebeneinander oder Untereinander (je Space)
-   - Mobile: Stacked, Journal Scroll horizontal
-
-### Checkliste
-- [ ] RecentEntriesSection.tsx
-- [ ] AlertsOverviewWidget.tsx
-- [ ] Grid Layout (Desktop) + Scroll (Mobile)
-- [ ] Journal Entry Cards mit Klick
-- [ ] Alerts Stats Display
-- [ ] "View All" Buttons
-
-### Akzeptanzkriterien
-✅ 3–5 Recent Journal Entries sichtbar  
-✅ Mobile: Horizontal Scroll  
-✅ Alerts Stats angezeigt  
-✅ "View All" navigiert korrekt  
-
-### Codex Instructions
-```
-
-1. Erstelle src/components/Dashboard/RecentEntriesSection.tsx.
-2. Journal Entries: Grid 3–4 cols Desktop, scroll Mobile, onClick → /journal/:id.
-3. Erstelle src/components/Dashboard/AlertsOverviewWidget.tsx.
-4. Alerts Stats: Badge/Stat "6 Armed · 2 Triggered · 1 Paused" mit Icons.
-5. Button "View All Alerts" → /alerts.
-6. Responsive: Mobile stacked, Desktop side-by-side oder untereinander.
-
-```
+### Acceptance criteria
+- [ ] Responsive layout (grid vs scroll)
+- [ ] Links work
+- [ ] Tokens only
 
 ---
 
-## WP-016: Quick Actions (FAB, Mobile Layout)
+## WP-016 — Quick Actions (FAB)
+**Status:** Planned  
+**Depends On:** WP-010..WP-015  
+**Priority:** P2  
 
-**Status:** 🔵 Planned | **Depends On:** WP-010 to WP-015
+### Goal
+Mobile floating action button with quick actions (Log entry, Create alert).
 
-### Kontext
-- Floating Action Button (FAB): Unten rechts
-- Aktionen: + Log Entry (Journal), + Alert
-- Mobile: Mini-FAB-Menu mit 2 Items
-- Desktop: Optional (oder Static Buttons)
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/dashboard/FAB.tsx
+CREATE  src/features/dashboard/FABMenu.tsx
 ```
 
-src/components/Dashboard/FAB.tsx
-src/components/Dashboard/FABMenu.tsx
+### Implementation steps
+1. FAB fixed above bottom nav safe area.
+2. Toggle menu with outside-click and ESC.
+3. Actions:
+   - Log entry → open Entry overlay/panel
+   - Create alert → open New Alert modal/sheet
 
-```
-
-### Schritt-für-Schritt Plan
-
-1. **FAB Container:**
-   - Position: `fixed bottom-20 right-6` (oder Bottom-Safe-Area)
-   - Size: 56×56px (standard)
-   - Background: Primary (#22C55E)
-   - Icon: + (Plus)
-   - Hover: Scale 1.1, Shadow erhöhen
-   - Click → Toggle Menu
-
-2. **FAB Menu (on Click):**
-   - 2 Items: "Log Entry" (Journal), "Create Alert"
-   - Layout: Vertical stack above FAB
-   - Icons: BookOpen, Bell
-   - Labels: Hover-Tooltip oder always show
-   - Each Click: Execute Action (open Modal) + close Menu
-
-3. **Actions:**
-   - Log Entry: Opens NewTradeModal (from Journal)
-   - Create Alert: Opens NewAlertModal (from Alerts)
-
-### Checkliste
-- [ ] FAB.tsx mit Plus-Icon
-- [ ] FAB Menu mit 2 Items
-- [ ] Toggle on FAB Click
-- [ ] Actions (navigate/open Modals)
-- [ ] Mobile: Visible & Accessible
-- [ ] Desktop: Optional oder Hidden
-
-### Akzeptanzkriterien
-✅ FAB unten rechts sichtbar  
-✅ Click öffnet Menu  
-✅ Menu Items navigieren korrekt  
-✅ Mobile-friendly  
-
-### Codex Instructions
-```
-
-1. Erstelle src/components/Dashboard/FAB.tsx, fixed bottom-20 right-6.
-2. Plus-Icon, bg Primary (#22C55E), size 56×56px.
-3. onClick toggle FABMenu visibility.
-4. Erstelle src/components/Dashboard/FABMenu.tsx:
-   - 2 Items: "Log Entry" (BookOpen), "Create Alert" (Bell).
-   - Vertical layout above FAB, mit Labels/Tooltips.
-5. "Log Entry" opens NewTradeModal.
-6. "Create Alert" opens NewAlertModal.
-7. Menu closes nach Action oder outside-click.
-
-```
+### Acceptance criteria
+- [ ] FAB visible on mobile
+- [ ] Menu opens/closes reliably
+- [ ] Actions wired
+- [ ] Tokens only
 
 ---
 
----
+# JOURNAL — Trade Tracking & Psychology
 
-## JOURNAL – Trade Tracking & Psychology
+## WP-030 — Journal Foundation (Typography, Spacing, Contrast)
+**Status:** Planned  
+**Depends On:** WP-010  
+**Priority:** P1  
 
-*(Note: WP-030 bis WP-035 – referenziert auf die ursprüngliche Taskliste)*
+### Goal
+Journal pages match dashboard typography + spacing while ensuring WCAG AA contrast.
 
----
-
-## WP-030: Foundation – Typography, Spacing & Contrast
-
-**Status:** 🔵 Planned | **Depends On:** WP-010
-
-### Kontext
-- Konsistente Typography mit Dashboard (aber Journal-spezifisch)
-- Spacing: mind. 16–24px zwischen Cards/Sections
-- Kontrast: WCAG-AA (#FFFFFF auf #121212)
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/journal/journal.css
+MODIFY  src/features/journal/JournalForm.tsx
+MODIFY  src/features/journal/JournalCard.tsx
 ```
 
-src/styles/journal.css
-src/components/Journal/JournalCard.tsx
-src/components/Journal/JournalForm.tsx
-
-```
-
-### Schritt-für-Schritt Plan
-*(identisch zu ursprünglichem WP-001)*
-
-1. Typography: Body 14–16px, Headers 18–20px, Sans-serif
-2. Spacing: 16–24px Gap, 24px Padding in Cards
-3. Kontrast: WCAG-AA verifizieren
-4. Alle Texte links-aligned
-
-### Checkliste
-- [ ] Typography definiert
-- [ ] Spacing-Klassen
-- [ ] Kontrast-Check
-- [ ] Components aktualisiert
-
-### Akzeptanzkriterien
-✅ Spacing einheitlich  
-✅ Alle Text links-aligned  
-✅ WCAG-AA Kontrast  
-
-### Codex Instructions
-```
-
-1. Erstelle src/styles/journal.css mit Body 14–16px, Headers 18–20px.
-2. Spacing-Klassen: gap-base (16px), gap-lg (24px), padding-card (24px).
-3. Alle Texte text-align: left.
-4. WCAG-AA Kontrast testen.
-
-```
+### Acceptance criteria
+- [ ] Contrast meets WCAG AA (manual spot-check)
+- [ ] Consistent spacing + left-aligned text
+- [ ] Tokens only
 
 ---
 
-## WP-031: Emotional State – Emojis, Sliders & Gradients
+## WP-031 — Emotional State (Emojis + Gradient Sliders)
+**Status:** Planned  
+**Depends On:** WP-030  
+**Priority:** P2  
 
-**Status:** 🔵 Planned | **Depends On:** WP-030
+### Goal
+Emoji selector + confidence slider with gradient track, touch-friendly thumb.
 
-### Kontext
-- Dropdown → 3–5 klickbare Emojis (customizable)
-- Confidence Slider 0–100% mit Gradient (Rot → Gelb → Grün)
-- Optional: Conviction/Pattern-Quality Slider (hidden by default, toggle)
-- All sliders: einheitlicher Style
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/journal/EmojiSelector.tsx
+CREATE  src/shared/components/GradientSlider.tsx
+CREATE  src/features/journal/EmotionalStateCard.tsx
 ```
 
-src/components/Journal/EmojiSelector.tsx
-src/components/common/GradientSlider.tsx
-src/components/Journal/EmotionalStateCard.tsx
+### Implementation steps
+- Emoji selector: 3–5 options, keyboard/touch accessible
+- Gradient slider:
+  - track gradient uses CSS (allowed as it’s not a “color value in component”; define gradient in `journal.css`)
+  - thumb ≥ 32px on mobile
 
-```
-
-### Schritt-für-Schritt Plan
-*(identisch zu ursprünglichem WP-003)*
-
-1. EmojiSelector: 3–5 Buttons, custom via Settings
-2. GradientSlider: linear-gradient(90deg, #FF4444, #FFFF00, #00FF00)
-3. Confidence: immer sichtbar
-4. Conviction/Pattern: Optional toggle
-
-### Checkliste
-- [ ] EmojiSelector.tsx
-- [ ] GradientSlider.tsx
-- [ ] Confidence immer sichtbar
-- [ ] Optional Sliders togglebar
-- [ ] User-Emojis gespeichert
-
-### Akzeptanzkriterien
-✅ Emojis anklickbar  
-✅ Slider mit Gradient  
-✅ Optional Sliders funktionieren  
-
-### Codex Instructions
-```
-
-1. Erstelle EmojiSelector mit 3–5 Buttons (customizable).
-2. Erstelle GradientSlider mit Rot→Gelb→Grün Gradient.
-3. Confidence Slider immer sichtbar.
-4. Toggle Button für Conviction/Pattern Quality (default hidden).
-5. User-Emojis aus Settings laden.
-
-```
+### Acceptance criteria
+- [ ] Emojis selectable
+- [ ] Slider has gradient + large thumb
+- [ ] Optional additional sliders behind toggle
 
 ---
 
-## WP-032: Market Context – Accordion Refactor
+## WP-032 — Market Context Accordion (Regime Selector)
+**Status:** Planned  
+**Depends On:** WP-030  
+**Priority:** P2  
 
-**Status:** 🔵 Planned | **Depends On:** WP-030
+### Goal
+Accordion refactor with desktop dropdown and mobile horizontal regime buttons.
 
-### Kontext
-- Accordion mit flexibler Höhe
-- Desktop: Dropdown für Current Market Regime
-- Mobile: Horizontale Toggle-Buttons für Regimes
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/journal/MarketContextAccordion.tsx
+CREATE  src/features/journal/MarketRegimeSelector.tsx
 ```
 
-src/components/Journal/MarketContextAccordion.tsx
-src/components/Journal/MarketRegimeSelector.tsx
-
-```
-
-### Schritt-für-Schritt Plan
-*(identisch zu ursprünglichem WP-004)*
-
-1. Accordion: Header schmal, Body flex, variable Höhe
-2. Desktop: Dropdown
-3. Mobile: Horizontal Buttons
-
-### Checkliste
-- [ ] Accordion refactored
-- [ ] Desktop Dropdown
-- [ ] Mobile Buttons
-- [ ] Responsive Toggle
-
-### Akzeptanzkriterien
-✅ Accordion öffnet/schließt  
-✅ Desktop Dropdown  
-✅ Mobile Buttons  
-
-### Codex Instructions
-```
-
-1. Refaktoriere Accordion: Header schmal, Body flex, variable height.
-2. Desktop: Dropdown für Market Regime.
-3. Mobile: Horizontal toggle buttons für Regimes.
-4. Media Query: @media max-width: 768px.
-
-```
+### Acceptance criteria
+- [ ] Accordion opens/closes
+- [ ] Desktop dropdown works
+- [ ] Mobile toggle buttons work
 
 ---
 
-## WP-033: Trade Thesis – Tags & AI Features
+## WP-033 — Trade Thesis (Tags + Screenshot + AI Notes)
+**Status:** Planned  
+**Depends On:** WP-030  
+**Priority:** P2  
 
-**Status:** 🔵 Planned | **Depends On:** WP-030
+### Goal
+Trade thesis card supports tags, chart screenshot capture, and AI note generation.
 
-### Kontext
-- Tags für Psychologie/Journaling (Autocomplete)
-- "Chart Screenshot" Button
-- "Generate Notes" Button (AI)
+### Important rename
+- **Fix typo:** `TradeTthesisCard.tsx` → `TradeThesisCard.tsx` (update imports).
 
-### Datei-Targets
+### File targets
+```txt
+RENAME  src/features/journal/TradeTthesisCard.tsx -> src/features/journal/TradeThesisCard.tsx
+CREATE  src/features/journal/TagInput.tsx
+CREATE  src/features/journal/AINotesGenerator.tsx
 ```
 
-src/components/Journal/TradeTthesisCard.tsx
-src/components/Journal/TagInput.tsx
-src/components/Journal/AINotesGenerator.tsx
-
-```
-
-### Schritt-für-Schritt Plan
-*(identisch zu ursprünglichem WP-005)*
-
-1. TagInput mit Autocomplete + Chips
-2. Screenshot Button mit Loading
-3. AI Generator mit Modal/Output
-
-### Checkliste
-- [ ] TagInput.tsx
-- [ ] Screenshot Button
-- [ ] AI Generator
-- [ ] Error Handling
-
-### Akzeptanzkriterien
-✅ Tags eingeben/entfernen  
-✅ Screenshot Loading  
-✅ AI Notes anzeigen  
-
-### Codex Instructions
-```
-
-1. Erstelle TagInput mit Autocomplete + Chips.
-2. Screenshot Button mit Loading/Error States.
-3. AI Generator: Button → Modal/Output.
-4. Tags im Schema speichern.
-
-```
+### Acceptance criteria
+- [ ] Tags add/remove with autocomplete
+- [ ] Screenshot action shows loading state and stores reference
+- [ ] AI notes generate with clear output + error state
 
 ---
 
-## WP-034: Mobile Journal – Cards, Touch, Bottom-Sheet
+## WP-034 — Mobile Journal (Bottom Sheet + Touch)
+**Status:** Planned  
+**Depends On:** WP-030, WP-031  
+**Priority:** P2  
 
-**Status:** 🔵 Planned | **Depends On:** WP-030, WP-031
+### Goal
+Journal UX on mobile: card stacking, large controls, templates in a bottom sheet.
 
-### Kontext
-- Full-Width Cards, Spacing 16px
-- Large Slider Thumbs (≥32px)
-- Bottom-Sheet für Templates
-- Auto-Apply Templates
-
-### Datei-Targets
+### File targets
+```txt
+MODIFY  src/features/journal/JournalCard.tsx
+CREATE  src/features/journal/TemplateBottomSheet.tsx
+CREATE  src/shared/components/BottomSheet.tsx
 ```
 
-src/components/Journal/JournalCard.tsx
-src/components/Journal/TemplateBottomSheet.tsx
-src/components/common/BottomSheet.tsx
-
-```
-
-### Schritt-für-Schritt Plan
-*(identisch zu ursprünglichem WP-006)*
-
-1. Full-Width Cards: 100% − 16px
-2. Slider: Thumb ≥32px, Height ≥24px
-3. Bottom-Sheet: Drag-Handle, smooth animation
-4. Auto-Apply: Kein extra Button
-
-### Checkliste
-- [ ] Full-Width Cards
-- [ ] Large Sliders
-- [ ] BottomSheet.tsx
-- [ ] Auto-Apply
-- [ ] Smooth Scroll
-
-### Akzeptanzkriterien
-✅ Cards Full-Width  
-✅ Slider Touch-friendly  
-✅ Bottom-Sheet smooth  
-✅ Auto-Apply funktioniert  
-
-### Codex Instructions
-```
-
-1. Refaktoriere Cards: width 100% − 16px, gap 16px.
-2. Sliders: Thumb ≥32px, Height ≥24px.
-3. Erstelle BottomSheet.tsx mit Drag-Handle.
-4. TemplateBottomSheet: List + Auto-Apply on Select.
-
-```
+### Acceptance criteria
+- [ ] Bottom sheet opens/closes with drag handle
+- [ ] Large touch controls
+- [ ] Template selection auto-applies
 
 ---
 
-## WP-035: Journal Workflow – Templates, Auto-Save, Forms
+## WP-035 — Journal Workflow (Templates + Auto-Save + Validation)
+**Status:** Planned  
+**Depends On:** WP-030..WP-034  
+**Priority:** P1  
 
-**Status:** 🔵 Planned | **Depends On:** WP-030, WP-031, WP-033, WP-034
+### Goal
+Reliable journaling workflow: autosave, required field validation, template prefill, autocomplete inputs.
 
-### Kontext
-- Auto-Save alle 30s mit UI-Feedback
-- Required Fields: Sternchen + rote Border
-- New Trade Modal mit Template-Selection
-- Textfield Autocomplete (Psychologie + Charts)
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/journal/useAutoSave.ts
+CREATE  src/features/journal/NewTradeModal.tsx
+CREATE  src/features/journal/TextfieldWithAutocomplete.tsx
+MODIFY  src/features/journal/JournalForm.tsx
 ```
 
-src/hooks/useAutoSave.ts
-src/components/Journal/NewTradeModal.tsx
-src/components/Journal/TextfieldWithAutocomplete.tsx
-src/components/Journal/JournalForm.tsx
-
-```
-
-### Schritt-für-Schritt Plan
-*(identisch zu ursprünglichem WP-007)*
-
-1. useAutoSave: 30s Interval, "Saved at" UI
-2. Form Validation: Required, Errors
-3. NewTradeModal: Template Selection + Pre-Fill
-4. Autocomplete: @ Trigger oder Character-based
-
-### Checkliste
-- [ ] useAutoSave Hook
-- [ ] Form Validation
-- [ ] NewTradeModal
-- [ ] Autocomplete
-- [ ] Draft Persistence
-
-### Akzeptanzkriterien
-✅ Auto-Save alle 30s  
-✅ Required Fields validiert  
-✅ Modal + Template Pre-Fill  
-✅ Autocomplete zeigt Vorschläge  
-
-### Codex Instructions
-```
-
-1. Erstelle useAutoSave Hook: 30s Interval, "Saved at" UI.
-2. Form Validation: Required (*), rote Borders, Error-Messages.
-3. NewTradeModal: Template Selector + Pre-Fill.
-4. TextfieldWithAutocomplete: @ Trigger oder character-based.
-5. Drafts in State/Storage speichern.
-
-```
+### Acceptance criteria
+- [ ] Auto-save every 30s with “Saved at …” feedback
+- [ ] Required fields show inline errors
+- [ ] Template prefill works
+- [ ] Draft persists on refresh (localStorage)
 
 ---
 
----
+# CHART — Advanced Visualization & Replay
 
-## CHART – Advanced Visualization & Replay
+## WP-050 — Chart Foundation (Layout, Sidebar, TopBar, Toolbar, Bottom Panel)
+**Status:** Planned  
+**Depends On:** WP-002, WP-003  
+**Priority:** P1  
 
----
+### Goal
+A stable chart page shell: left sidebar, main chart, right toolbar, bottom panel + sticky top controls.
 
-## WP-050: Chart Foundation – Layout, Sidebar, Top-Bar
-
-**Status:** 🔵 Planned | **Depends On:** WP-002, WP-003
-
-### Kontext
-- Layout: Sidebar (left), Main (center), Toolbar (right), Bottom Panel
-- Top-Bar sticky: Timeframe Toggle, Refresh, Replay, Export
-- Full-height Chart Area
-- Responsive: Mobile collapsible Sidebar/Toolbar
-
-### Datei-Targets
+### File targets
+```txt
+CREATE  src/features/chart/ChartLayout.tsx
+CREATE  src/features/chart/ChartSidebar.tsx
+CREATE  src/features/chart/ChartTopBar.tsx
+CREATE  src/features/chart/ChartToolbar.tsx
+CREATE  src/features/chart/ChartBottomPanel.tsx
+CREATE  src/features/chart/chart.css
 ```
 
-src/components/Chart/ChartLayout.tsx
-src/components/Chart/ChartSidebar.tsx
-src/components/Chart/ChartTopBar.tsx
-src/components/Chart/ChartToolbar.tsx
-src/components/Chart/ChartBottomPanel.tsx
+### Implementation steps
+1. Layout:
+   - desktop: sidebar (240) + main (flex) + toolbar (200)
+   - bottom panel collapsible (120–200)
+2. Mobile:
+   - sidebar and toolbar become sheets/drawers
+   - main chart full width
+3. TopBar:
+   - timeframe toggle
+   - title “SOL/USDC · 1h”
+   - actions: refresh, replay, export (wired later)
+4. Bottom panel:
+   - tabs/accordion for “Grok Pulse” and “Journal Notes” placeholders
 
+### Acceptance criteria
+- [ ] Chart page renders full-height without overflow bugs
+- [ ] Desktop layout shows 3 columns
+- [ ] Mobile collapses side areas into sheets
+- [ ] Tokens only
+
+---
+
+## WP-051 — Main Chart Area (Crosshair, Zoom, Markers)
+**Status:** Planned  
+**Depends On:** WP-050  
+**Priority:** P1  
+
+### Goal
+Core chart interactions: crosshair, zoom/pan, and journal markers overlay.
+
+### File targets
+```txt
+CREATE  src/features/chart/ChartCanvas.tsx
+CREATE  src/features/chart/markers.ts
+MODIFY  src/api/journalEntries.ts
 ```
 
-### Schritt-für-Schritt Plan
+### Acceptance criteria
+- [ ] Crosshair visible
+- [ ] Zoom/pan works (mouse + touch where possible)
+- [ ] Journal markers render from mocked entries
 
-1. **ChartLayout:**
-   - Flex: Sidebar (left, width 240px) + Main (flex 1) + Toolbar (right, width 200px)
-   - Top-Bar: sticky, full-width, height 56px
-   - Bottom-Panel: sticky bottom, collapsible, height 120–200px
-   - Mobile: Sidebar/Toolbar hidden, use Hamburger/Bottom-Sheet
+---
 
-2. **Top-Bar:**
-   - Left: Timeframe Toggle (1H, 4H, 1D, etc.)
-   - Center: Title "SOL/USDC · 1h – Live"
-   - Right: Refresh, Replay, Export buttons
+## WP-052 — Right Toolbar (Indicators, Drawings, Alerts)
+**Status:** Planned  
+**Depends On:** WP-050  
+**Priority:** P2  
 
-3. **Sidebar (left):**
-   - Symbol Search/Selection
-   - Favorites / Watchlist
-   - Indicators List (expandable)
-   - Collapsible on Mobile
+### Goal
+Right toolbar groups chart tools with expandable sections.
 
-4. **Toolbar (right):**
-   - Indicators Section (add, edit, delete)
-   - Drawings Tools
-   - Alerts Manager
-   - Auto-collapse Toggle (Mobile)
+### File targets
+```txt
+MODIFY  src/features/chart/ChartToolbar.tsx
+CREATE  src/features/chart/toolbar-sections.tsx
+CREATE  src/api/alerts.ts
+```
 
-5. **Bottom-Panel:**
-   - 2 Cards: Grok Pulse + Journal Notes
-   - Collapsible Accordion
-   - Sticky Bottom
+### Acceptance criteria
+- [ ] Indicators section UI present
+- [ ] Drawings section UI present
+- [ ] Alerts manager entry point exists
+- [ ] Works with mock data
 
+---
+
+## WP-053 — Bottom Panel (Grok Pulse + Journal Notes)
+**Status:** Planned  
+**Depends On:** WP-050  
+**Priority:** P2  
+
+### Goal
+Bottom panel shows quick AI pulse + inline notes.
+
+### File targets
+```txt
+MODIFY  src/features/chart/ChartBottomPanel.tsx
+CREATE  src/features/chart/GrokPulseCard.tsx
+CREATE  src/features/chart/InlineJournalNotes.tsx
+```
+
+### Acceptance criteria
+- [ ] Collapsible bottom panel
+- [ ] Notes editable + persists draft
+- [ ] Tokens only
+
+---
+
+## WP-054 — Replay & Controls (Speed, Export)
+**Status:** Planned  
+**Depends On:** WP-051, WP-050  
+**Priority:** P2  
+
+### Goal
+Replay mode controls and export action in top bar.
+
+### File targets
+```txt
+MODIFY  src/features/chart/ChartTopBar.tsx
+CREATE  src/features/chart/replay.ts
+```
+
+### Acceptance criteria
+- [ ] Replay toggle + speed controls
+- [ ] Export action produces a file or stub output (document behavior)
+
+---
+
+## WP-055 — Default Chart & Fallback (SOL/USDC)
+**Status:** Planned  
+**Depends On:** WP-050  
+**Priority:** P2  
+
+### Goal
+Chart opens with a sensible default market and survives missing market data.
+
+### File targets
+```txt
+MODIFY  src/features/chart/* (minimal)
+CREATE  src/api/marketData.ts
+```
+
+### Acceptance criteria
+- [ ] Defaults to SOL/USDC if no symbol chosen
+- [ ] Clear empty/error states if data missing
+
+---
+
+## WP-056 — Mobile Chart UX (Bottom Sheet + Floating Buttons)
+**Status:** Planned  
+**Depends On:** WP-050  
+**Priority:** P2  
+
+### Goal
+Mobile chart navigation and tool access without clutter.
+
+### File targets
+```txt
+MODIFY  src/features/chart/ChartLayout.tsx
+CREATE  src/features/chart/MobileChartControls.tsx
+```
+
+### Acceptance criteria
+- [ ] Mobile tool access via sheet + floating controls
+- [ ] No overlap with bottom nav safe area
+
+---
+
+# ALERTS — Notification & Trigger Management
+
+## WP-070 — Alerts Desktop Layout (Top-Bar, Filters, List)
+**Status:** Planned  
+**Depends On:** WP-002, WP-003, WP-004  
+**Priority:** P2  
+
+### File targets
+```txt
+CREATE  src/features/alerts/AlertsPage.tsx
+CREATE  src/features/alerts/alerts.css
+CREATE  src/features/alerts/FiltersBar.tsx
+```
+
+### Acceptance criteria
+- [ ] Desktop layout: filters + list
+- [ ] Tokens only
+
+---
+
+## WP-071 — Alert Card Design & Actions
+**Status:** Planned  
+**Depends On:** WP-070  
+**Priority:** P2  
+
+### File targets
+```txt
+CREATE  src/features/alerts/AlertCard.tsx
+MODIFY  src/api/alerts.ts
+```
+
+### Acceptance criteria
+- [ ] Card shows symbol, condition, status, actions (pause/delete)
+- [ ] Optimistic UI with rollback on failure (mock ok)
+
+---
+
+## WP-072 — New Alert Modal/Sheet (Autocomplete + Conditions)
+**Status:** Planned  
+**Depends On:** WP-070  
+**Priority:** P2  
+
+### File targets
+```txt
+CREATE  src/features/alerts/NewAlertSheet.tsx
+CREATE  src/features/alerts/SymbolAutocomplete.tsx
+```
+
+### Acceptance criteria
+- [ ] Opens from FAB/menu and Alerts page
+- [ ] Validates required fields
+- [ ] Saves via mock API
+
+---
+
+## WP-073 — Filter System (Status, Type, Symbol, Search)
+**Status:** Planned  
+**Depends On:** WP-070  
+**Priority:** P3  
+
+### File targets
+```txt
+MODIFY  src/features/alerts/FiltersBar.tsx
+CREATE  src/features/alerts/filtering.ts
+```
+
+### Acceptance criteria
+- [ ] Filters update list
+- [ ] Search works (debounced)
+
+---
+
+## WP-074 — Preset Templates & Import
+**Status:** Planned  
+**Depends On:** WP-072  
+**Priority:** P3  
+
+### File targets
+```txt
+CREATE  src/features/alerts/AlertTemplates.tsx
+```
+
+### Acceptance criteria
+- [ ] Apply a template to prefill new alert
+
+---
+
+## WP-075 — Mobile Alerts (Scrollable, Swipe Actions)
+**Status:** Planned  
+**Depends On:** WP-070, WP-071  
+**Priority:** P3  
+
+### File targets
+```txt
+MODIFY  src/features/alerts/AlertsPage.tsx
+CREATE  src/features/alerts/MobileAlertRow.tsx
+```
+
+### Acceptance criteria
+- [ ] Mobile list scrolls smoothly
+- [ ] Swipe actions (optional; document if skipped)
+
+---
+
+## WP-076 — Integrations (Chart → Alert, Browser Notifications)
+**Status:** Planned  
+**Depends On:** WP-072  
+**Priority:** P3  
+
+### File targets
+```txt
+MODIFY  src/features/chart/* (entry point to create alert)
+CREATE  src/api/push.ts
+```
+
+### Acceptance criteria
+- [ ] “Create alert from chart” path exists
+- [ ] Browser notification permission flow documented/implemented
+
+---
+
+# SETTINGS — Configuration & Admin
+
+## WP-090 — Settings Foundation (Layout + Cards)
+**Status:** Planned  
+**Depends On:** WP-002, WP-003, WP-004  
+**Priority:** P2  
+
+### Goal
+Build the new settings structure (desktop + mobile) with clean cards and top actions.
+
+### Required UI structure
+- Header: **Settings**
+- Subtitle: “Manage preferences, data backups, wallet monitoring and app controls.”
+- Right buttons: **Export All**, **Reset Defaults**
+- Cards (vertical, gap-6, padding 24px, bg surface, rounded-xl)
+- **Danger Zone is an accordion** (keeps screen clean)
+
+### File targets
+```txt
+CREATE  src/features/settings/SettingsPage.tsx
+CREATE  src/features/settings/settings.css
+CREATE  src/features/settings/SettingsCard.tsx
+```
+
+### Acceptance criteria
+- [ ] Layout matches structure above
+- [ ] Mobile responsive
+- [ ] Tokens only
+
+---
+
+## WP-091 — Appearance & General (Theme, Font Size, Cache)
+**Status:** Planned  
+**Depends On:** WP-090  
+**Priority:** P3  
+
+### File targets
+```txt
+CREATE/MODIFY  src/features/settings/AppearanceCard.tsx
+MODIFY         src/features/theme/* (wire theme selection UI)
+```
+
+### Acceptance criteria
+- [ ] Theme selection works (dark/light/system)
+- [ ] Basic general toggles exist (stubs ok)
+
+---
+
+## WP-092 — Token Usage (Only) + Daily Reset at 00:00
+**Status:** Planned  
+**Depends On:** WP-090  
+**Priority:** P2  
+
+### Goal
+Replace “AI Provider & Usage” complexity with a single **Token Usage** card:
+- tokens consumed today
+- API calls today
+- resets daily at **00:00 Europe/Berlin**
+
+### File targets
+```txt
+CREATE  src/features/settings/TokenUsageCard.tsx
+CREATE  src/features/settings/token-usage.ts
+MODIFY  src/store/telemetry.ts (or equivalent usage store)
+```
+
+### Implementation notes
+- Remove/hide: provider selection, model override, max tokens/cost controls.
+- Keep data local (no telemetry/onboarding).
+
+### Acceptance criteria
+- [ ] Token usage section shows “Tokens today” + “API calls today”
+- [ ] Resets at 00:00 local time (Europe/Berlin)
+- [ ] No other AI provider settings shown
+
+---
+
+## WP-093 — Wallet Monitoring
+**Status:** Planned  
+**Depends On:** WP-090  
+**Priority:** P2  
+
+### Required UI
+- Monitored Wallet Address (with copy button)
+- Enable Monitoring (toggle)
+
+### File targets
+```txt
+CREATE  src/features/settings/WalletMonitoringCard.tsx
+MODIFY  src/api/wallet.ts
+MODIFY  src/store/userSettings.ts
+```
+
+### Acceptance criteria
+- [ ] Address can be copied
+- [ ] Toggle persists in settings
+- [ ] UI indicates enabled/disabled state clearly
+
+---
+
+## WP-094 — Data Export & Import (JSON/Markdown/Backup)
+**Status:** Planned  
+**Depends On:** WP-090  
+**Priority:** P3  
+
+### File targets
+```txt
+CREATE  src/features/settings/DataExportCard.tsx
+CREATE  src/features/settings/DataImportCard.tsx
+```
+
+### Acceptance criteria
+- [ ] Export all produces a downloadable file (or stub with documented output)
+- [ ] Import validates and shows errors
+
+---
+
+## WP-095 — Chart & App Preferences
+**Status:** Planned  
+**Depends On:** WP-090  
+**Priority:** P3  
+
+### File targets
+```txt
+CREATE  src/features/settings/PreferencesCard.tsx
+```
+
+### Acceptance criteria
+- [ ] Basic preferences toggle/radio UI exists and persists
+
+---
+
+## WP-096 — Danger Zone (Accordion)
+**Status:** Planned  
+**Depends On:** WP-090  
+**Priority:** P3  
+
+### Goal
+Destructive actions are grouped under a collapsible accordion to keep settings clean.
+
+### File targets
+```txt
+CREATE  src/features/settings/DangerZoneAccordion.tsx
+```
+
+### Acceptance criteria
+- [ ] Collapsed by default
+- [ ] Expands to show destructive actions
+- [ ] Requires confirmation step for destructive actions
+
+---
+
+## WP-097 — Mobile Settings (Accordion + Responsive)
+**Status:** Planned  
+**Depends On:** WP-090..WP-096  
+**Priority:** P3  
+
+### File targets
+```txt
+MODIFY  src/features/settings/SettingsPage.tsx
+MODIFY  src/features/settings/settings.css
+```
+
+### Acceptance criteria
+- [ ] Cards stack and are readable on mobile
+- [ ] Accordions usable with touch targets ≥44×44px
+
+---
+
+# Cross-cutting removals (must happen during relevant WPs)
+
+## Remove onboarding & telemetry (global requirement)
+- Any onboarding screens/flows must be removed or fully hidden from navigation.
+- Any telemetry collection beyond local token usage must be removed/disabled.
+
+> Implementation should be done opportunistically as affected files are touched.
+> If you find these systems, add a short note and the exact file paths in the PR summary.
+
+---
+
+# Backlog / Notes
+- Add any discovered issues here (with file paths + short description) instead of doing drive-by refactors.
