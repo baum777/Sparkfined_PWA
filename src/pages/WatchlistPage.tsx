@@ -16,20 +16,29 @@ import { SkeletonCard, SkeletonTable } from '@/components/ui/Skeleton';
 
 type SessionFilter = "all" | "London" | "NY" | "Asia";
 type SortMode = "default" | "top-movers" | "alphabetical";
+type WatchlistState = ReturnType<typeof useWatchlistStore.getState>;
+
+const selectRows = (state: WatchlistState) => state.rows;
+const selectIsLoading = (state: WatchlistState) => state.isLoading;
+const selectError = (state: WatchlistState) => state.error;
+const selectTrends = (state: WatchlistState) => state.trends;
+const selectHydrateFromQuotes = (state: WatchlistState) => state.hydrateFromQuotes;
+const selectSetLoading = (state: WatchlistState) => state.setLoading;
+const selectSetError = (state: WatchlistState) => state.setError;
 
 export default function WatchlistPage() {
   // IMPORTANT: select primitives/functions individually to avoid React 18 useSyncExternalStore loops.
-  const rows = useWatchlistStore((state) => state.rows);
-  const isLoading = useWatchlistStore((state) => state.isLoading);
-  const error = useWatchlistStore((state) => state.error);
-  const trends = useWatchlistStore((state) => state.trends);
-  const hydrateFromQuotes = useWatchlistStore((state) => state.hydrateFromQuotes);
-  const setLoading = useWatchlistStore((state) => state.setLoading);
-  const setError = useWatchlistStore((state) => state.setError);
+  const rows = useWatchlistStore(selectRows);
+  const isLoading = useWatchlistStore(selectIsLoading);
+  const error = useWatchlistStore(selectError);
+  const trends = useWatchlistStore(selectTrends);
+  const hydrateFromQuotes = useWatchlistStore(selectHydrateFromQuotes);
+  const setLoading = useWatchlistStore(selectSetLoading);
+  const setError = useWatchlistStore(selectSetError);
   const [sessionFilter, setSessionFilter] = React.useState<SessionFilter>("all");
   const [sortMode, setSortMode] = React.useState<SortMode>("default");
   const [activeSymbol, setActiveSymbol] = React.useState<string | undefined>(undefined);
-  const hasHydratedRef = React.useRef(false);
+  const hydratedSymbolsKeyRef = React.useRef<string | null>(null);
   const navigate = useNavigate();
   const isOnline = useOnlineStatus();
   const loadQuotes = React.useCallback(
@@ -55,12 +64,17 @@ export default function WatchlistPage() {
   );
 
   React.useEffect(() => {
-    if (!rows.length || hasHydratedRef.current) {
+    if (!rows.length) {
       return;
     }
 
-    hasHydratedRef.current = true;
     const symbols = rows.map((row) => row.symbol);
+    const symbolsKey = symbols.join('|');
+    if (hydratedSymbolsKeyRef.current === symbolsKey) {
+      return;
+    }
+
+    hydratedSymbolsKeyRef.current = symbolsKey;
 
     // Defensive: catch any unhandled errors in loadQuotes to prevent page crash
     loadQuotes(symbols).catch((error) => {
