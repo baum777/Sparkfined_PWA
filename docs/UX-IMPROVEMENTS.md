@@ -22,6 +22,7 @@ Umfassende UX-Optimierungen für bessere Nutzererfahrung, Accessibility und Inte
 | 12 | **Icon-first Navigation Rail** | ✅ Fertig | `AppShell.tsx`, `Rail.tsx`, `styles/index.css` |
 | 13 | **Route-aware Inspector Panel** | ✅ Fertig | `ActionPanel.tsx` |
 | 14 | **Chart Indicator Persistenz** | ✅ Neu | `indicatorSettings.ts`, `ChartPage.tsx` |
+| 15 | **Mobile Bottom Navigation** | ✅ Neu | `src/components/layout/BottomNav.tsx`, `src/config/navigation.ts`, `src/components/layout/AppShell.tsx` |
 
 ---
 

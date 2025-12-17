@@ -1,5 +1,6 @@
 import React from "react"
 import { Link } from "react-router-dom"
+import { NAV_ITEMS, SETTINGS_NAV_ITEM } from "@/config/navigation"
 
 interface TopbarProps {
   onToggleActionPanel: () => void
@@ -12,6 +13,11 @@ export default function Topbar({
   isActionPanelOpen,
   actionPanelToggleRef,
 }: TopbarProps) {
+  const alertsNavItem = React.useMemo(
+    () => NAV_ITEMS.find((item) => item.label === "Alerts"),
+    [],
+  )
+
   return (
     <div className="sf-topbar-inner">
       <div className="sf-topbar-left">
@@ -46,10 +52,18 @@ export default function Topbar({
       </div>
 
       <div className="sf-topbar-right">
-        <Link className="btn btn-ghost btn-sm" aria-label="Alerts" to="/alerts">
+        <Link
+          className="btn btn-ghost btn-sm"
+          aria-label={alertsNavItem?.label ?? "Alerts"}
+          to={alertsNavItem?.path ?? "/alerts"}
+        >
           🔔
         </Link>
-        <Link className="btn btn-ghost btn-sm" aria-label="Settings" to="/settings">
+        <Link
+          className="btn btn-ghost btn-sm"
+          aria-label={SETTINGS_NAV_ITEM.label}
+          to={SETTINGS_NAV_ITEM.path}
+        >
           ⚙︎
         </Link>
       </div>

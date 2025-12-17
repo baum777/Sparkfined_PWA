@@ -10,55 +10,26 @@
  */
 
 import React from 'react'
-import { NavLink } from 'react-router-dom'
-import {
-  Bell,
-  BookmarkPlus,
-  Sparkles,
-  Activity,
-  RefreshCw,
-  GraduationCap,
-  Star,
-  X,
-  type LucideIcon,
-} from '@/lib/icons'
-
-interface DrawerNavItem {
-  path: string
-  label: string
-  Icon: LucideIcon
-}
+import { NavLink, useLocation } from 'react-router-dom'
+import { X } from '@/lib/icons'
+import { NAV_ITEMS, SECONDARY_NAV_ITEMS, isNavItemActive } from '@/config/navigation'
 
 interface NavigationDrawerProps {
   isOpen: boolean
   onClose: () => void
 }
 
-const drawerItems: DrawerNavItem[] = [
-  { path: '/watchlist', label: 'Watchlist', Icon: BookmarkPlus },
-  { path: '/alerts', label: 'Alerts', Icon: Bell },
-  { path: '/signals', label: 'Signals', Icon: Activity },
-  { path: '/oracle', label: 'Oracle', Icon: Sparkles },
-  { path: '/replay', label: 'Replay', Icon: RefreshCw },
-  { path: '/lessons', label: 'Learning', Icon: GraduationCap },
-  { path: '/icons', label: 'Showcase', Icon: Star },
-]
-
-const getTestId = (label: string) => {
-  const testIdMap: Record<string, string> = {
-    Alerts: 'nav-alerts',
-    Signals: 'nav-signals',
-    Watchlist: 'nav-watchlist',
-    Oracle: 'nav-oracle',
-    Replay: 'nav-replay',
-    Learning: 'nav-lessons',
-    Showcase: 'nav-showcase',
-  }
-  return testIdMap[label] || ''
-}
-
 export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
   const drawerRef = React.useRef<HTMLDivElement>(null)
+  const { pathname } = useLocation()
+
+  const drawerItems = React.useMemo(
+    () => [
+      ...NAV_ITEMS.filter((item) => ['Watchlist', 'Alerts'].includes(item.label)),
+      ...SECONDARY_NAV_ITEMS,
+    ],
+    [],
+  )
 
   // Handle escape key
   React.useEffect(() => {
@@ -122,33 +93,35 @@ export function NavigationDrawer({ isOpen, onClose }: NavigationDrawerProps) {
         {/* Drawer Items */}
         <nav className="flex-1 overflow-y-auto px-2 py-4">
           <div className="space-y-1.5">
-            {drawerItems.map(({ path, label, Icon }) => (
-              <NavLink
-                key={path}
-                to={path}
-                onClick={onClose}
-                data-testid={getTestId(label)}
-                className={({ isActive }) =>
-                  [
-                    'flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold transition-all duration-150 ease-out motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
-                    isActive
-                      ? 'border-border bg-brand/10 text-brand shadow-glow-brand'
-                      : 'border-transparent text-text-secondary hover:border-border/60 hover:bg-interactive-hover hover:text-text-primary',
-                  ].join(' ')
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <Icon
-                      size={20}
-                      strokeWidth={isActive ? 2.4 : 2}
-                      className="text-current transition-transform duration-150"
-                    />
-                    <span>{label}</span>
-                  </>
-                )}
-              </NavLink>
-            ))}
+            {drawerItems.map((item) => {
+              const { path, label, Icon, testId } = item
+              const isActive = isNavItemActive(pathname, item)
+
+              return (
+                <NavLink
+                  key={path}
+                  to={path}
+                  onClick={onClose}
+                  data-testid={testId}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={() =>
+                    [
+                      'flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold transition-all duration-150 ease-out motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus',
+                      isActive
+                        ? 'border-border bg-brand/10 text-brand shadow-glow-brand'
+                        : 'border-transparent text-text-secondary hover:border-border/60 hover:bg-interactive-hover hover:text-text-primary',
+                    ].join(' ')
+                  }
+                >
+                  <Icon
+                    size={20}
+                    strokeWidth={isActive ? 2.4 : 2}
+                    className="text-current transition-transform duration-150"
+                  />
+                  <span>{label}</span>
+                </NavLink>
+              )
+            })}
           </div>
         </nav>
 

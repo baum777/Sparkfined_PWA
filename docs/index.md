@@ -30,6 +30,12 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-19)
+
+- **Mobile Bottom Navigation (WP-001):** Einheitliche Navigationskonfiguration (`src/config/navigation.ts`) speist jetzt BottomNav, Rail und Topbar. Die mobile Leiste zeigt fünf Tabs (Dashboard, Journal, Chart, Watchlist, Alerts) mit Safe-Area-Polsterung und wird ab `md` ausgeblendet (`src/components/layout/BottomNav.tsx`, `src/components/layout/Rail.tsx`, `src/components/layout/Topbar.tsx`, `src/styles/index.css`).
+
+---
+
 ## 📦 Neue Ergänzungen (2025-12-18)
 
 - **Drawing Overlay Core (CH-TA-1):** Added Dexie `chart_drawings` table with helpers (`listDrawings`, `saveDrawing`, `deleteDrawing`, `clearDrawings`) and mounted `DrawingOverlay` canvas above `AdvancedChart` to render stored HLINE/LINE/BOX/FIB stubs. Documented in [docs/architecture/Chart_System.md](architecture/Chart_System.md).
