@@ -1,12 +1,13 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Select, Textarea } from '@/components/ui'
 import { Collapsible } from '@/components/ui/Collapsible'
-import { EmotionalSlider, getEmotionalZone } from '@/components/journal/EmotionalSlider'
-import { JournalTemplatePicker } from '@/components/journal/templates/JournalTemplatePicker'
-import { applyTemplateToDraft } from '@/components/journal/templates/template-utils'
-import { useJournalTemplates } from '@/components/journal/templates/useJournalTemplates'
 import type { JournalRawInput, EmotionLabel, MarketContext, TradeContext } from '../types'
 import { cn } from '@/lib/ui/cn'
+
+const JournalTemplatesSection = React.lazy(() => import('./JournalTemplatesSection'))
+const EmotionalSlider = React.lazy(() =>
+  import('@/components/journal/EmotionalSlider').then((mod) => ({ default: mod.EmotionalSlider })),
+)
 
 interface JournalInputFormProps {
   onSubmit: (input: JournalRawInput) => Promise<void> | void
@@ -37,6 +38,15 @@ const contextOptions: Array<{ value: MarketContext; label: string }> = [
 const sliderClasses =
   'w-full accent-brand transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus'
 
+function getEmotionalZoneLabel(score: number): string {
+  const clamped = Math.max(0, Math.min(100, Math.round(score)))
+  if (clamped <= 20) return 'Sehr unsicher'
+  if (clamped <= 40) return 'Unsicher'
+  if (clamped <= 60) return 'Neutral'
+  if (clamped <= 80) return 'Optimistisch'
+  return 'Sehr optimistisch'
+}
+
 export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClearTradeContext }: JournalInputFormProps) {
   const [emotionalState, setEmotionalState] = useState<EmotionLabel>('calm')
   const [emotionalScore, setEmotionalScore] = useState(50)
@@ -46,10 +56,8 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
   const [reasoning, setReasoning] = useState('')
   const [expectation, setExpectation] = useState('')
   const [selfReflection, setSelfReflection] = useState('')
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('builtin-neutral')
   const formRef = useRef<HTMLFormElement>(null)
   const isSubmittingRef = useRef(false)
-  const templateState = useJournalTemplates()
 
   useEffect(() => {
     if (!tradeContext) return
@@ -83,26 +91,7 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
     return 'Strong'
   }, [patternQuality])
 
-  const emotionalZoneLabel = useMemo(() => getEmotionalZone(emotionalScore).label, [emotionalScore])
-
-  const selectedTemplate = useMemo(
-    () => templateState.templates.find((t) => t.id === selectedTemplateId) ?? templateState.templates[0],
-    [selectedTemplateId, templateState.templates],
-  )
-
-  const handleApplyTemplate = (mode: 'fill-empty' | 'overwrite-all') => {
-    if (!selectedTemplate) return
-    const next = applyTemplateToDraft(
-      { reasoning, expectation, selfReflection, marketContext, emotionalScore },
-      selectedTemplate.fields,
-      mode,
-    )
-    setReasoning(next.reasoning)
-    setExpectation(next.expectation)
-    setSelfReflection(next.selfReflection)
-    setMarketContext(next.marketContext)
-    setEmotionalScore(next.emotionalScore)
-  }
+  const emotionalZoneLabel = useMemo(() => getEmotionalZoneLabel(emotionalScore), [emotionalScore])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -200,18 +189,20 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
         ) : null}
 
         <form ref={formRef} className="space-y-6" onSubmit={handleSubmit}>
-          <JournalTemplatePicker
-            templates={templateState.templates}
-            selectedId={selectedTemplate?.id}
-            onSelect={setSelectedTemplateId}
-            onApply={handleApplyTemplate}
-            onCreate={templateState.createCustomTemplate}
-            onUpdate={templateState.updateCustomTemplate}
-            onDuplicate={templateState.duplicateAsCustom}
-            onDelete={templateState.deleteCustom}
-            isLoading={templateState.isLoading}
-            error={templateState.error}
-          />
+          <React.Suspense fallback={null}>
+            <JournalTemplatesSection
+              reasoning={reasoning}
+              setReasoning={setReasoning}
+              expectation={expectation}
+              setExpectation={setExpectation}
+              selfReflection={selfReflection}
+              setSelfReflection={setSelfReflection}
+              marketContext={marketContext}
+              setMarketContext={setMarketContext}
+              emotionalScore={emotionalScore}
+              setEmotionalScore={setEmotionalScore}
+            />
+          </React.Suspense>
 
           {/* Section 1: State (Required, always visible) */}
           <section className="space-y-4" data-testid="journal-section-state">
@@ -237,13 +228,29 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
                   <span>Emotional position</span>
                   <span className="text-text-secondary">{emotionalZoneLabel}</span>
                 </div>
-                <EmotionalSlider
-                  value={emotionalScore}
-                  onChange={setEmotionalScore}
-                  ariaLabel="Emotional position (Unsicher bis Optimistisch)"
-                  showNeutralMarker
-                  data-testid="journal-v2-emotional-score"
-                />
+                <React.Suspense
+                  fallback={
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={emotionalScore}
+                      onChange={(event) => setEmotionalScore(Number(event.target.value))}
+                      className={sliderClasses}
+                      aria-label="Emotional position (Unsicher bis Optimistisch)"
+                      data-testid="journal-v2-emotional-score"
+                    />
+                  }
+                >
+                  <EmotionalSlider
+                    value={emotionalScore}
+                    onChange={setEmotionalScore}
+                    ariaLabel="Emotional position (Unsicher bis Optimistisch)"
+                    showNeutralMarker
+                    data-testid="journal-v2-emotional-score"
+                  />
+                </React.Suspense>
               </div>
             </div>
 
