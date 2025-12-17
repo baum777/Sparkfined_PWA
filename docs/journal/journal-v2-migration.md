@@ -40,6 +40,10 @@ void runMigration()
 - Hook: `useJournalV2` kapselt Pipeline + Persistenz
 - Components: `JournalInputForm`, `JournalResultView`
 
+## Journal Templates (Client-only)
+- Built-ins + Custom Templates werden **lokal** gespeichert (IndexedDB/Dexie).
+- Einstieg: **Templates**-Row oben in `JournalInputForm` (Apply ist immer manuell; Standard: nur leere Felder füllen).
+
 ## Backup & Export (Journal 1.x)
 - **Versionierte Bundles:** `src/lib/export/exportTypes.ts` definiert `JournalExportBundle` (Version `1.0.0`).
 - **Export:** `exportJournalToJSON` und `exportJournalToMarkdown` erzeugen JSON- bzw. Markdown-Dumps (inkl. Download-Helper).

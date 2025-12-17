@@ -33,6 +33,7 @@ export { FormRow } from './FormRow';
 
 // Overlays
 export { Modal, type ModalProps } from './Modal';
+export { ModalConfirm, type ModalConfirmProps } from './ModalConfirm';
 export {
   Drawer,
   DrawerSection,

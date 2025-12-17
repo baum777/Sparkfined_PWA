@@ -2,6 +2,9 @@ import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Select, Textarea } from '@/components/ui'
 import { Collapsible } from '@/components/ui/Collapsible'
 import { EmotionalSlider, getEmotionalZone } from '@/components/journal/EmotionalSlider'
+import { JournalTemplatePicker } from '@/components/journal/templates/JournalTemplatePicker'
+import { applyTemplateToDraft } from '@/components/journal/templates/template-utils'
+import { useJournalTemplates } from '@/components/journal/templates/useJournalTemplates'
 import type { JournalRawInput, EmotionLabel, MarketContext, TradeContext } from '../types'
 import { cn } from '@/lib/ui/cn'
 
@@ -43,8 +46,10 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
   const [reasoning, setReasoning] = useState('')
   const [expectation, setExpectation] = useState('')
   const [selfReflection, setSelfReflection] = useState('')
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('builtin-neutral')
   const formRef = useRef<HTMLFormElement>(null)
   const isSubmittingRef = useRef(false)
+  const templateState = useJournalTemplates()
 
   useEffect(() => {
     if (!tradeContext) return
@@ -79,6 +84,25 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
   }, [patternQuality])
 
   const emotionalZoneLabel = useMemo(() => getEmotionalZone(emotionalScore).label, [emotionalScore])
+
+  const selectedTemplate = useMemo(
+    () => templateState.templates.find((t) => t.id === selectedTemplateId) ?? templateState.templates[0],
+    [selectedTemplateId, templateState.templates],
+  )
+
+  const handleApplyTemplate = (mode: 'fill-empty' | 'overwrite-all') => {
+    if (!selectedTemplate) return
+    const next = applyTemplateToDraft(
+      { reasoning, expectation, selfReflection, marketContext, emotionalScore },
+      selectedTemplate.fields,
+      mode,
+    )
+    setReasoning(next.reasoning)
+    setExpectation(next.expectation)
+    setSelfReflection(next.selfReflection)
+    setMarketContext(next.marketContext)
+    setEmotionalScore(next.emotionalScore)
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -176,6 +200,19 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
         ) : null}
 
         <form ref={formRef} className="space-y-6" onSubmit={handleSubmit}>
+          <JournalTemplatePicker
+            templates={templateState.templates}
+            selectedId={selectedTemplate?.id}
+            onSelect={setSelectedTemplateId}
+            onApply={handleApplyTemplate}
+            onCreate={templateState.createCustomTemplate}
+            onUpdate={templateState.updateCustomTemplate}
+            onDuplicate={templateState.duplicateAsCustom}
+            onDelete={templateState.deleteCustom}
+            isLoading={templateState.isLoading}
+            error={templateState.error}
+          />
+
           {/* Section 1: State (Required, always visible) */}
           <section className="space-y-4" data-testid="journal-section-state">
             <div className="flex items-center gap-2">
