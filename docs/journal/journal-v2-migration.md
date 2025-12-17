@@ -17,7 +17,7 @@ Die Migration ist vorbereitet, wird aber nicht automatisch ausgeführt.
 
 **Ablauf:**
 1. Lade Legacy-Einträge via `queryEntries({ status: 'all', sortBy: 'timestamp', sortOrder: 'desc' })`.
-2. Mappe jeden Eintrag auf `JournalRawInput` (Emotion/Setup → Label + Skalen 0–10).
+2. Mappe jeden Eintrag auf `JournalRawInput` (Emotion/Setup → Label; emotionale Position als `emotionalScore` 0–100).
 3. `runJournalPipeline(raw)` erzeugt den Output.
 4. Speichere `{ raw, output, createdAt, version: 2 }` per `saveJournalEntries` in Dexie.
 

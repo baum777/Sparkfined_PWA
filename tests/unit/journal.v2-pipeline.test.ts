@@ -4,7 +4,7 @@ import type { JournalRawInput } from '@/features/journal-v2/types'
 
 const baseInput: JournalRawInput = {
   emotionalState: 'calm',
-  emotionIntensity: 6,
+  emotionalScore: 60,
   conviction: 7,
   patternQuality: 8,
   marketContext: 'breakout',

@@ -33,7 +33,11 @@ export interface TradeContext {
 
 export interface JournalRawInput {
   emotionalState: EmotionLabel
-  emotionIntensity: number // 0–10
+  /**
+   * Continuous emotional position (0–100).
+   * UI shows semantic zones (Unsicher → Neutral → Optimistisch), no numeric scale.
+   */
+  emotionalScore: number // 0–100
   conviction: number // 0–10
   patternQuality: number // 0–10
   marketContext: MarketContext

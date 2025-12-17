@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Select, Textarea } from '@/components/ui'
 import { Collapsible } from '@/components/ui/Collapsible'
+import { EmotionalSlider, getEmotionalZone } from '@/components/journal/EmotionalSlider'
 import type { JournalRawInput, EmotionLabel, MarketContext, TradeContext } from '../types'
 import { cn } from '@/lib/ui/cn'
 
@@ -35,7 +36,7 @@ const sliderClasses =
 
 export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClearTradeContext }: JournalInputFormProps) {
   const [emotionalState, setEmotionalState] = useState<EmotionLabel>('calm')
-  const [emotionIntensity, setEmotionIntensity] = useState(5)
+  const [emotionalScore, setEmotionalScore] = useState(50)
   const [conviction, setConviction] = useState(5)
   const [patternQuality, setPatternQuality] = useState(5)
   const [marketContext, setMarketContext] = useState<MarketContext>('chop')
@@ -65,14 +66,19 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
     }
   }, [tradeContext])
 
-  const intensityLabels = useMemo(
-    () => ({
-      emotion: `${emotionIntensity}/10`,
-      conviction: `${conviction}/10`,
-      pattern: `${patternQuality}/10`,
-    }),
-    [conviction, emotionIntensity, patternQuality]
-  )
+  const convictionLabel = useMemo(() => {
+    if (conviction <= 3) return 'Low'
+    if (conviction <= 6) return 'Medium'
+    return 'High'
+  }, [conviction])
+
+  const patternQualityLabel = useMemo(() => {
+    if (patternQuality <= 3) return 'Weak'
+    if (patternQuality <= 6) return 'OK'
+    return 'Strong'
+  }, [patternQuality])
+
+  const emotionalZoneLabel = useMemo(() => getEmotionalZone(emotionalScore).label, [emotionalScore])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -86,7 +92,7 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
     try {
       await onSubmit({
         emotionalState,
-        emotionIntensity,
+        emotionalScore,
         conviction,
         patternQuality,
         marketContext,
@@ -103,7 +109,7 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
 
   const handleReset = () => {
     setEmotionalState('calm')
-    setEmotionIntensity(5)
+    setEmotionalScore(50)
     setConviction(5)
     setPatternQuality(5)
     setMarketContext('chop')
@@ -191,17 +197,15 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm font-medium text-text-primary">
-                  <span>Intensity</span>
-                  <span className="text-text-secondary">{intensityLabels.emotion}</span>
+                  <span>Emotional position</span>
+                  <span className="text-text-secondary">{emotionalZoneLabel}</span>
                 </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  value={emotionIntensity}
-                  onChange={(event) => setEmotionIntensity(Number(event.target.value))}
-                  className={sliderClasses}
-                  data-testid="journal-v2-emotion-intensity"
+                <EmotionalSlider
+                  value={emotionalScore}
+                  onChange={setEmotionalScore}
+                  ariaLabel="Emotional position (Unsicher bis Optimistisch)"
+                  showNeutralMarker
+                  data-testid="journal-v2-emotional-score"
                 />
               </div>
             </div>
@@ -210,7 +214,7 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm font-medium text-text-primary">
                   <span>Conviction</span>
-                  <span className="text-text-secondary">{intensityLabels.conviction}</span>
+                  <span className="text-text-secondary">{convictionLabel}</span>
                 </div>
                 <input
                   type="range"
@@ -226,7 +230,7 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm font-medium text-text-primary">
                   <span>Pattern quality</span>
-                  <span className="text-text-secondary">{intensityLabels.pattern}</span>
+                  <span className="text-text-secondary">{patternQualityLabel}</span>
                 </div>
                 <input
                   type="range"

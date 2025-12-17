@@ -8,7 +8,10 @@ export function detectBias(
 ): CognitiveBias[] {
   const biases: CognitiveBias[] = []
 
-  if (input.emotionIntensity > 7 && normalized.conviction < 0.4) {
+  // Keep legacy semantics (~0–10) while storing a continuous 0–100 score.
+  const intensity = Math.round(Math.max(0, Math.min(100, input.emotionalScore)) / 10)
+
+  if (intensity > 7 && normalized.conviction < 0.4) {
     biases.push('overconfidence')
   }
 
