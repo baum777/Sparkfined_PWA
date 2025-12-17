@@ -4,6 +4,7 @@ import { cn } from "@/lib/ui/cn"
 import Topbar from "./Topbar"
 import Rail from "./Rail"
 import ActionPanel from "./ActionPanel"
+import BottomNav from "./BottomNav"
 
 const ACTION_PANEL_STORAGE_KEY = "sf.actionPanel.open"
 
@@ -59,7 +60,7 @@ export default function AppShell() {
         <Rail isExpanded={isRailExpanded} onToggleExpand={handleToggleRail} />
       </aside>
 
-      <main id="main-content" tabIndex={-1} className="sf-canvas">
+      <main id="main-content" tabIndex={-1} className={cn("sf-canvas", "pb-24 md:pb-0")}>
         <Outlet />
       </main>
 
@@ -68,6 +69,8 @@ export default function AppShell() {
           <ActionPanel onClose={handleCloseActionPanel} />
         </aside>
       ) : null}
+
+      <BottomNav />
     </div>
   )
 }

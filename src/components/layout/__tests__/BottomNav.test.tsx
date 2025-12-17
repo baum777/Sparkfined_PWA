@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen, fireEvent, within } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { BrowserRouter, MemoryRouter } from 'react-router-dom'
 import BottomNav from '../BottomNav'
 
@@ -14,12 +14,11 @@ describe('BottomNav', () => {
     const nav = screen.getByRole('navigation', { name: 'Main navigation' })
     const navArea = within(nav)
 
-    expect(navArea.getByText('Board')).toBeTruthy()
-    expect(navArea.getByText('Chart')).toBeTruthy()
-    expect(navArea.getByText('Signals')).toBeTruthy()
+    expect(navArea.getByText('Dashboard')).toBeTruthy()
     expect(navArea.getByText('Journal')).toBeTruthy()
-    expect(navArea.getByText('Settings')).toBeTruthy()
-    expect(navArea.getByText('More')).toBeTruthy()
+    expect(navArea.getByText('Chart')).toBeTruthy()
+    expect(navArea.getByText('Watchlist')).toBeTruthy()
+    expect(navArea.getByText('Alerts')).toBeTruthy()
   })
 
   it('has correct accessibility attributes', () => {
@@ -44,45 +43,29 @@ describe('BottomNav', () => {
     const nav = screen.getByRole('navigation', { name: 'Main navigation' })
     const navArea = within(nav)
 
-    const boardLink = navArea.getByRole('link', { name: /board/i })
-    const chartLink = navArea.getByRole('link', { name: /chart/i })
-    const signalsLink = navArea.getByRole('link', { name: /signals/i })
+    const dashboardLink = navArea.getByRole('link', { name: /dashboard/i })
     const journalLink = navArea.getByRole('link', { name: /journal/i })
-    const settingsLink = navArea.getByRole('link', { name: /settings/i })
+    const chartLink = navArea.getByRole('link', { name: /chart/i })
+    const watchlistLink = navArea.getByRole('link', { name: /watchlist/i })
+    const alertsLink = navArea.getByRole('link', { name: /alerts/i })
 
-    expect(boardLink.getAttribute('href')).toBe('/dashboard')
-    expect(chartLink.getAttribute('href')).toBe('/chart')
-    expect(signalsLink.getAttribute('href')).toBe('/signals')
+    expect(dashboardLink.getAttribute('href')).toBe('/dashboard')
     expect(journalLink.getAttribute('href')).toBe('/journal')
-    expect(settingsLink.getAttribute('href')).toBe('/settings')
+    expect(chartLink.getAttribute('href')).toBe('/chart')
+    expect(watchlistLink.getAttribute('href')).toBe('/watchlist')
+    expect(alertsLink.getAttribute('href')).toBe('/alerts')
   })
 
-  it('marks Signals as active when on /signals', () => {
+  it('marks Alerts as active for nested alert paths', () => {
     render(
-      <MemoryRouter initialEntries={[{ pathname: '/signals' }]}>
+      <MemoryRouter initialEntries={[{ pathname: '/alerts/123' }]}>
         <BottomNav />
       </MemoryRouter>
     )
 
     const nav = screen.getByRole('navigation', { name: 'Main navigation' })
-    const signalsLink = within(nav).getByRole('link', { name: /signals/i })
-    expect(signalsLink).toBeTruthy()
-    expect(signalsLink.getAttribute('aria-current')).toBe('page')
-  })
-
-  it('shows Signals in the navigation drawer', () => {
-    render(
-      <BrowserRouter>
-        <BottomNav />
-      </BrowserRouter>
-    )
-
-    const drawerTrigger = screen.getByTestId('nav-drawer-trigger')
-    fireEvent.click(drawerTrigger)
-
-    const drawer = screen.getByRole('dialog', { name: 'Secondary navigation' })
-    const signalsLinkInDrawer = within(drawer).getByRole('link', { name: /signals/i })
-
-    expect(signalsLinkInDrawer).toBeTruthy()
+    const alertsLink = within(nav).getByRole('link', { name: /alerts/i })
+    expect(alertsLink).toBeTruthy()
+    expect(alertsLink.getAttribute('aria-current')).toBe('page')
   })
 })

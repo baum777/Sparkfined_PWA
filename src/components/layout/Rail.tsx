@@ -1,20 +1,16 @@
 import React from "react"
-import { NavLink } from "react-router-dom"
+import { NavLink, useLocation } from "react-router-dom"
 import { cn } from "@/lib/ui/cn"
+import { NAV_ITEMS, isNavItemActive } from "@/config/navigation"
 
 interface RailProps {
   isExpanded: boolean
   onToggleExpand: () => void
 }
 
-const items = [
-  { to: "/dashboard", label: "Dashboard", icon: "▦" },
-  { to: "/journal", label: "Journal", icon: "✎" },
-  { to: "/chart", label: "Chart", icon: "⌁" },
-  { to: "/watchlist", label: "Watchlist", icon: "★" },
-]
-
 export default function Rail({ isExpanded, onToggleExpand }: RailProps) {
+  const { pathname } = useLocation()
+
   return (
     <nav className="sf-rail-inner" aria-label="Primary navigation" data-expanded={isExpanded}>
       <button
@@ -29,18 +25,23 @@ export default function Rail({ isExpanded, onToggleExpand }: RailProps) {
       </button>
 
       <div className="sf-rail-items">
-        {items.map((it) => (
+        {NAV_ITEMS.map((item) => (
           <NavLink
-            key={it.to}
-            to={it.to}
-            aria-label={it.label}
-            title={it.label}
-            className={({ isActive }) =>
-              cn("sf-rail-item", isActive && "sf-rail-item-active")
-            }
+            key={item.path}
+            to={item.path}
+            aria-label={item.label}
+            title={item.label}
+            data-testid={item.testId}
+            aria-current={isNavItemActive(pathname, item) ? "page" : undefined}
+            className={({ isActive }) => {
+              const active = isActive || isNavItemActive(pathname, item)
+              return cn("sf-rail-item", active && "sf-rail-item-active")
+            }}
           >
-            <span className="sf-rail-icon" aria-hidden="true">{it.icon}</span>
-            <span className="sf-rail-label">{it.label}</span>
+            <span className="sf-rail-icon" aria-hidden="true">
+              <item.Icon size={18} />
+            </span>
+            <span className="sf-rail-label">{item.label}</span>
           </NavLink>
         ))}
       </div>

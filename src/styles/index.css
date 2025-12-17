@@ -312,6 +312,21 @@
     }
   }
 
+  @media (max-width: 768px) {
+    .sf-shell {
+      grid-template-columns: 1fr;
+      grid-template-rows: 60px 1fr;
+      grid-template-areas:
+        "topbar"
+        "canvas";
+    }
+
+    .sf-rail,
+    .sf-action {
+      display: none;
+    }
+  }
+
   /* ============ Action Panel ============ */
   .sf-action {
     height: calc(100dvh - 60px);

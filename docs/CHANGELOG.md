@@ -6,6 +6,17 @@
 
 ---
 
+## 2025-12-19
+
+### Updated
+- Mobile bottom navigation now renders the canonical 5 tabs (Dashboard, Journal, Chart, Watchlist, Alerts) with safe-area padding and unified active handling for aliased routes.
+- Navigation paths and IDs are centralized in `src/config/navigation.ts` and reused by the bottom bar, rail/sidebar, and header links to keep the shell consistent.
+
+### Context
+- WP-001 shell polish for the mobile PWA layout.
+
+---
+
 ## 2025-12-18
 
 ### Updated

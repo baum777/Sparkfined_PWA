@@ -10,58 +10,15 @@
  */
 
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import {
-  Home,
-  FileText,
-  Bell,
-  TrendingUp,
-  Activity,
-  Settings,
-  ChevronRight,
-  Sparkles,
-  BookmarkPlus,
-  GraduationCap,
-  Star,
-  type LucideIcon,
-} from '@/lib/icons';
+import { NavLink, useLocation } from 'react-router-dom';
+import { ChevronRight } from '@/lib/icons';
 import { getItem, setItem } from '@/lib/safeStorage';
-
-interface NavItem {
-  path: string;
-  label: string;
-  Icon: LucideIcon;
-}
-
-const navSections: { title: string; items: NavItem[] }[] = [
-  {
-    title: 'Trading Workflow',
-    items: [
-      { path: '/dashboard', label: 'Board', Icon: Home },
-      { path: '/chart', label: 'Chart', Icon: TrendingUp },
-      { path: '/signals', label: 'Signals', Icon: Activity },
-      { path: '/journal', label: 'Journal', Icon: FileText },
-      { path: '/alerts', label: 'Alerts', Icon: Bell },
-    ],
-  },
-  {
-    title: 'Knowledge Base',
-    items: [
-      { path: '/watchlist', label: 'Watchlist', Icon: BookmarkPlus },
-      { path: '/oracle', label: 'Oracle', Icon: Sparkles },
-      { path: '/lessons', label: 'Learning', Icon: GraduationCap },
-      { path: '/icons', label: 'Showcase', Icon: Star },
-    ],
-  },
-  {
-    title: 'System',
-    items: [{ path: '/settings', label: 'Settings', Icon: Settings }],
-  },
-];
+import { NAV_ITEMS, SECONDARY_NAV_ITEMS, SETTINGS_NAV_ITEM, isNavItemActive } from '@/config/navigation';
 
 const STORAGE_KEY = 'sparkfined.sidebar.collapsed';
 
 export default function Sidebar() {
+  const { pathname } = useLocation();
   const [isCollapsed, setIsCollapsed] = React.useState<boolean>(() => {
     const stored = getItem(STORAGE_KEY);
     if (stored === 'false') return false;
@@ -100,49 +57,58 @@ export default function Sidebar() {
     ].join(' ');
 
   // Get tour ID and data-testid for nav item
-  const getNavIds = (label: string) => {
-    const idMap: Record<string, { tour: string; testid: string }> = {
-      'Board': { tour: 'board-link', testid: 'nav-board' },
-      'Chart': { tour: 'chart-link', testid: 'nav-chart' },
-      'Signals': { tour: 'signals-link', testid: 'nav-signals' },
-      'Journal': { tour: 'journal-link', testid: 'nav-journal' },
-      'Alerts': { tour: 'notifications-link', testid: 'nav-alerts' },
-      'Watchlist': { tour: '', testid: 'nav-watchlist' },
-      'Oracle': { tour: 'oracle-link', testid: 'nav-oracle' },
-      'Learning': { tour: '', testid: 'nav-lessons' },
-      'Showcase': { tour: '', testid: 'nav-showcase' },
-      'Settings': { tour: 'settings-link', testid: 'nav-settings' },
-    };
-    return idMap[label] || { tour: '', testid: '' };
-  };
+  const navSections = React.useMemo(
+    () => [
+      {
+        title: 'Trading Workflow',
+        items: NAV_ITEMS,
+      },
+      {
+        title: 'Knowledge Base',
+        items: SECONDARY_NAV_ITEMS,
+      },
+      {
+        title: 'System',
+        items: [SETTINGS_NAV_ITEM],
+      },
+    ],
+    [],
+  );
 
-  const renderNavItem = ({ path, label, Icon }: NavItem) => {
-    const { tour, testid } = getNavIds(label);
+  const renderNavItem = (item: typeof NAV_ITEMS[number]) => {
+    const { path, label, Icon, tourId, testId } = item;
     return (
       <NavLink
         key={path}
         to={path}
-        id={tour || undefined}
-        data-testid={testid}
-        className={({ isActive }) => getNavClasses(isActive)}
+        id={tourId || undefined}
+        data-testid={testId}
+        className={({ isActive }) => {
+          const active = isActive || isNavItemActive(pathname, item);
+          return getNavClasses(active);
+        }}
         aria-label={label}
+        aria-current={isNavItemActive(pathname, item) ? 'page' : undefined}
       >
-        {({ isActive }) => (
-          <>
-            <Icon
-              size={isCollapsed ? 22 : 20}
-              strokeWidth={isActive ? 2.4 : 2}
-              className="transition-transform duration-200 motion-reduce:transition-none"
-            />
-            <span
-              className={`text-current transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
-                isCollapsed ? 'text-[11px]' : 'text-sm'
-              }`}
-            >
-              {label}
-            </span>
-          </>
-        )}
+        {({ isActive }) => {
+          const active = isActive || isNavItemActive(pathname, item);
+          return (
+            <>
+              <Icon
+                size={isCollapsed ? 22 : 20}
+                strokeWidth={active ? 2.4 : 2}
+                className="transition-transform duration-200 motion-reduce:transition-none"
+              />
+              <span
+                className={`text-current transition-[opacity,transform] duration-200 motion-reduce:transition-none ${
+                  isCollapsed ? 'text-[11px]' : 'text-sm'
+                }`}
+              >
+                {label}
+              </span>
+            </>
+          );
+        }}
       </NavLink>
     );
   };
