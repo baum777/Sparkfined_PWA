@@ -151,6 +151,9 @@ export default defineConfig(({ mode }) => ({
           // Only process node_modules
           if (!id.includes('node_modules')) {
             // App code splitting - more aggressive splitting for better caching
+            // NOTE: keep journal base chunk lean; split heavier/optional sub-features out.
+            if (id.includes('/components/journal/templates/')) return 'chunk-journal-templates';
+            if (id.includes('/components/journal/EmotionalSlider')) return 'chunk-journal-emotional-slider';
             if (id.includes('/components/journal/')) return 'chunk-journal-components';
             if (id.includes('/sections/chart/')) return 'chunk-chart';
             if (id.includes('/sections/analyze/')) return 'chunk-analyze';
@@ -161,6 +164,12 @@ export default defineConfig(({ mode }) => ({
 
           // === VENDOR SPLITTING ===
           
+          // 0. Lucide Icons - Split separately for better caching
+          // Must run before the react check (lucide-react includes "react" in its path).
+          if (id.includes('lucide-react')) {
+            return 'vendor-icons';
+          }
+
           // 1. React Ecosystem (React + ReactDOM + Scheduler + React-Router)
           // Note: React-Router is bundled with React (always used together)
           // Current: ~55KB gzip
@@ -187,12 +196,6 @@ export default defineConfig(({ mode }) => ({
           // Estimated: ~20KB gzip
           if (id.includes('driver.js')) {
             return 'vendor-onboarding';
-          }
-
-          // 5. Lucide Icons - Split separately for better caching
-          // Icons are used across all pages but rarely change
-          if (id.includes('lucide-react')) {
-            return 'vendor-icons';
           }
 
           // 6. Charting (lightweight-charts + fancy-canvas) - Heavy visual library

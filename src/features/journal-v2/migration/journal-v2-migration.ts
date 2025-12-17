@@ -31,7 +31,7 @@ function mapLegacyToRaw(entry: JournalEntry): JournalRawInput {
 
   return {
     emotionalState: mapEmotion(entry.emotion),
-    emotionIntensity: intensity,
+    emotionalScore: intensity * 10,
     conviction,
     patternQuality,
     marketContext: mapMarketContext(entry.setup),

@@ -17,7 +17,7 @@ Die Migration ist vorbereitet, wird aber nicht automatisch ausgeführt.
 
 **Ablauf:**
 1. Lade Legacy-Einträge via `queryEntries({ status: 'all', sortBy: 'timestamp', sortOrder: 'desc' })`.
-2. Mappe jeden Eintrag auf `JournalRawInput` (Emotion/Setup → Label + Skalen 0–10).
+2. Mappe jeden Eintrag auf `JournalRawInput` (Emotion/Setup → Label; emotionale Position als `emotionalScore` 0–100).
 3. `runJournalPipeline(raw)` erzeugt den Output.
 4. Speichere `{ raw, output, createdAt, version: 2 }` per `saveJournalEntries` in Dexie.
 
@@ -39,6 +39,10 @@ void runMigration()
 - Route: `/journal/v2` (siehe `RoutesRoot.tsx`)
 - Hook: `useJournalV2` kapselt Pipeline + Persistenz
 - Components: `JournalInputForm`, `JournalResultView`
+
+## Journal Templates (Client-only)
+- Built-ins + Custom Templates werden **lokal** gespeichert (IndexedDB/Dexie).
+- Einstieg: **Templates**-Row oben in `JournalInputForm` (Apply ist immer manuell; Standard: nur leere Felder füllen).
 
 ## Backup & Export (Journal 1.x)
 - **Versionierte Bundles:** `src/lib/export/exportTypes.ts` definiert `JournalExportBundle` (Version `1.0.0`).

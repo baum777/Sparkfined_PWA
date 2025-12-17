@@ -27,7 +27,7 @@ vi.mock('@/state/settings', async () => {
 
 const sampleInput: JournalRawInput = {
   emotionalState: 'excitement',
-  emotionIntensity: 7,
+  emotionalScore: 70,
   conviction: 6,
   patternQuality: 5,
   marketContext: 'trend-up',

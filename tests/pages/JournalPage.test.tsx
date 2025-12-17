@@ -9,7 +9,7 @@ const mockSubmit = vi.fn()
 
 const sampleInput: JournalRawInput = {
   emotionalState: 'calm',
-  emotionIntensity: 4,
+  emotionalScore: 40,
   conviction: 6,
   patternQuality: 6,
   marketContext: 'mean-reversion',
