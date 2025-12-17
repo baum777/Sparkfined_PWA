@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/ui/cn';
 
-interface EmptyStateProps {
+interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   icon?: React.ReactNode;
   title: string;
   description: string;
@@ -55,6 +55,7 @@ export function EmptyState({
   illustration = 'generic',
   className,
   compact = false,
+  ...rest
 }: EmptyStateProps) {
   return (
     <div
@@ -63,6 +64,7 @@ export function EmptyState({
         compact ? "min-h-[220px] py-8" : "min-h-[400px] py-12",
         className
       )}
+      {...rest}
     >
       {/* Icon/Illustration */}
       <div className={cn("mb-6 flex items-center justify-center rounded-full bg-surface-elevated/50", compact ? "h-16 w-16" : "h-24 w-24")}>

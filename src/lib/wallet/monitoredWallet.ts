@@ -3,6 +3,7 @@ import { isValidSolanaAddress } from "./address";
 
 export const MONITORED_WALLET_STORAGE_KEY = "sparkfined.wallet.monitored";
 const MONITORING_FLAG_STORAGE_KEY = "sparkfined.wallet.monitoring";
+export const WALLET_CHANGED_EVENT = "sf:wallet-changed";
 
 export function getMonitoredWallet(): string | null {
   const stored = getItem(MONITORED_WALLET_STORAGE_KEY);
@@ -18,7 +19,7 @@ export function setMonitoredWallet(address: string): void {
 
   if (typeof window !== "undefined") {
     window.dispatchEvent(
-      new CustomEvent("sparkfined:monitored-wallet-changed", { detail: { walletAddress: next } })
+      new CustomEvent(WALLET_CHANGED_EVENT, { detail: { walletAddress: next } })
     );
   }
 }

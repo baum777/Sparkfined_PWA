@@ -4,10 +4,6 @@ import { normalizeWalletAssetsResponse } from "../../src/lib/wallet/normalizeWal
 
 export const config = { runtime: "nodejs" };
 
-const HELIUS_ENDPOINT = process.env.HELIUS_API_KEY
-  ? `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`
-  : "";
-
 function getOwnerParam(req: VercelRequest): string | null {
   const ownerParam = Array.isArray(req.query.owner) ? req.query.owner[0] : req.query.owner;
   if (!ownerParam || typeof ownerParam !== "string") return null;
@@ -29,12 +25,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: "Invalid owner address" });
   }
 
-  if (!HELIUS_ENDPOINT) {
+  const heliusApiKey = process.env.HELIUS_API_KEY;
+  if (!heliusApiKey) {
     return res.status(500).json({ error: "HELIUS_API_KEY not configured" });
   }
 
+  const heliusEndpoint = `https://mainnet.helius-rpc.com/?api-key=${heliusApiKey}`;
+
   try {
-    const heliusResponse = await fetch(HELIUS_ENDPOINT, {
+    const heliusResponse = await fetch(heliusEndpoint, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({

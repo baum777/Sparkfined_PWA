@@ -7,9 +7,9 @@ import { useFocusTrap } from "@/lib/ui/useFocusTrap"
 type SheetWidth = "sm" | "md" | "lg"
 
 const widthClasses: Record<SheetWidth, string> = {
-  sm: "sm:max-w-[360px]",
-  md: "sm:max-w-[420px]",
-  lg: "sm:max-w-[480px]",
+  sm: "w-full sm:w-[360px]",
+  md: "w-full sm:w-[420px]",
+  lg: "w-full sm:w-[480px]",
 }
 
 export interface RightSheetProps {
@@ -78,7 +78,7 @@ export function RightSheet({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-drawer flex items-stretch justify-end bg-bg-overlay/60 backdrop-blur-sm"
+      className="fixed inset-0 z-modal flex items-stretch justify-end bg-bg-overlay/60 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? titleId : undefined}
@@ -88,8 +88,8 @@ export function RightSheet({
       <div
         ref={sheetRef}
         className={cn(
-          "relative flex h-full w-full flex-col border-l border-border bg-surface-elevated shadow-2xl",
-          "animate-slide-in-right sm:w-auto sm:min-w-[360px]",
+          "relative flex h-full flex-col border-l border-border bg-surface-elevated shadow-2xl",
+          "animate-slide-in-right",
           widthClasses[width],
           className
         )}
@@ -119,13 +119,22 @@ export function RightSheet({
           </header>
         )}
 
-        <div className="flex-1 overflow-y-auto px-6 py-5 text-text-primary">{children}</div>
-
-        {footer ? (
-          <div className="sticky bottom-0 border-t border-border bg-surface-elevated/95 px-6 py-4 backdrop-blur">
-            {footer}
-          </div>
-        ) : null}
+        {/* 
+          Important: `min-h-0` is required so the scroll area can shrink inside the
+          flex column. Without it, tall content can push the footer out of the
+          viewport (Playwright then reports footer buttons as "outside of the viewport").
+          
+          We render the footer *inside* the scroll container so it can always be
+          scrolled into view, even on smaller viewports.
+        */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5 text-text-primary">
+          {children}
+          {footer ? (
+            <div className="mt-6 border-t border-border bg-surface-elevated/95 py-4 backdrop-blur">
+              {footer}
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>,
     getOverlayRoot()

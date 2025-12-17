@@ -6,9 +6,11 @@ import AlertsDetailPanel from '@/components/alerts/AlertsDetailPanel';
 import { AlertsHeaderActions } from '@/components/alerts/AlertsHeaderActions';
 import AlertCreateDialog from '@/components/alerts/AlertCreateDialog';
 import { useAlertsStore } from '@/store/alertsStore';
+import type { AlertType } from '@/store/alertsStore';
 import { useSearchParams } from 'react-router-dom';
 
 type StatusFilter = 'all' | 'armed' | 'triggered' | 'paused';
+type TypeFilter = 'all' | AlertType;
 
 const STATUS_TABS: Array<{ value: StatusFilter; label: string }> = [
   { value: 'all', label: 'All' },
@@ -17,17 +19,34 @@ const STATUS_TABS: Array<{ value: StatusFilter; label: string }> = [
   { value: 'paused', label: 'Paused' },
 ];
 
+const TYPE_TABS: Array<{ value: TypeFilter; label: string }> = [
+  { value: 'all', label: 'All types' },
+  { value: 'price-above', label: '↑ Above' },
+  { value: 'price-below', label: '↓ Below' },
+];
+
 export default function AlertsPage() {
   const alerts = useAlertsStore((state) => state.alerts);
   const [searchParams, setSearchParams] = useSearchParams();
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>('all');
+  const [typeFilter, setTypeFilter] = React.useState<TypeFilter>('all');
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   
   const alertFromUrl = searchParams.get('alert');
-  const isValidAlertId = alerts.some((alert) => alert.id === alertFromUrl);
-  const [activeAlertId, setActiveAlertId] = React.useState<string | undefined>(
-    isValidAlertId ? (alertFromUrl as string) : undefined,
-  );
+  const [activeAlertId, setActiveAlertId] = React.useState<string | undefined>(undefined);
+
+  // Sync active alert with URL + store data (handles async store hydration).
+  React.useEffect(() => {
+    if (alertFromUrl && alerts.some((alert) => alert.id === alertFromUrl)) {
+      setActiveAlertId((current) => (current === alertFromUrl ? current : alertFromUrl));
+      return;
+    }
+
+    setActiveAlertId((current) => {
+      if (!current) return current;
+      return alerts.some((alert) => alert.id === current) ? current : undefined;
+    });
+  }, [alertFromUrl, alerts]);
 
   const handleAlertDeleted = React.useCallback(
     (deletedId: string) => {
@@ -49,9 +68,11 @@ export default function AlertsPage() {
 
   const filteredAlerts = React.useMemo(() => {
     return alerts.filter((alert) => {
-      return statusFilter === 'all' || alert.status === statusFilter;
+      const statusMatches = statusFilter === 'all' || alert.status === statusFilter;
+      const typeMatches = typeFilter === 'all' || alert.type === typeFilter;
+      return statusMatches && typeMatches;
     });
-  }, [alerts, statusFilter]);
+  }, [alerts, statusFilter, typeFilter]);
 
   const activeAlert = React.useMemo(() => {
     return alerts.find((alert) => alert.id === activeAlertId);
@@ -67,11 +88,14 @@ export default function AlertsPage() {
       return;
     }
     if (!activeAlertId && current) {
+      // If the URL points to a real alert, keep it long enough for the state-sync effect to pick it up.
+      const isValid = alerts.some((alert) => alert.id === current);
+      if (isValid) return;
       const next = new URLSearchParams(searchParams);
       next.delete('alert');
       setSearchParams(next, { replace: true });
     }
-  }, [activeAlertId, searchParams, setSearchParams]);
+  }, [activeAlertId, alerts, searchParams, setSearchParams]);
 
   return (
     <DashboardShell
@@ -112,6 +136,28 @@ export default function AlertsPage() {
                     }`}>
                       {count}
                     </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Type filters */}
+            <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Alert type filters">
+              {TYPE_TABS.map((tab) => {
+                const isActive = typeFilter === tab.value;
+                return (
+                  <button
+                    key={tab.value}
+                    type="button"
+                    onClick={() => setTypeFilter(tab.value)}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+                      isActive
+                        ? 'border-brand/40 bg-brand/10 text-brand'
+                        : 'border-border text-text-secondary hover:bg-interactive-hover hover:text-text-primary'
+                    }`}
+                    data-testid={`alerts-type-filter-${tab.value}`}
+                  >
+                    {tab.label}
                   </button>
                 );
               })}
