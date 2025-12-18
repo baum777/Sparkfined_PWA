@@ -4,21 +4,15 @@ import { NAV_ITEMS, isNavItemActive } from "@/config/navigation";
 import { cn } from "@/lib/ui/cn";
 import "./bottom-nav.css";
 
-const navSafeAreaStyle: React.CSSProperties = {
-  paddingBottom: "max(12px, env(safe-area-inset-bottom))",
-  minHeight: "72px",
-};
-
 export default function BottomNavBar() {
   const { pathname } = useLocation();
 
   return (
     <nav
       id="main-navigation"
-      className="sf-bottom-nav z-drawer border-t border-border/60 bg-surface/90 backdrop-blur-2xl md:hidden"
+      className="sf-bottom-nav z-drawer border-t border-border/60 bg-surface/90 backdrop-blur-2xl"
       role="navigation"
       aria-label="Main navigation"
-      style={navSafeAreaStyle}
     >
       <div className="mx-auto max-w-7xl px-3 py-1.5">
         <div className="grid grid-cols-5 gap-1.5">

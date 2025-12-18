@@ -60,7 +60,7 @@ export default function AppShell() {
         <Rail isExpanded={isRailExpanded} onToggleExpand={handleToggleRail} />
       </aside>
 
-      <main id="main-content" tabIndex={-1} className={cn("sf-canvas", "pb-24 md:pb-0")}>
+      <main id="main-content" tabIndex={-1} className={cn("sf-canvas")}>
         <Outlet />
       </main>
 
