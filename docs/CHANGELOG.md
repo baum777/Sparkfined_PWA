@@ -6,6 +6,15 @@
 
 ---
 
+## 2025-12-22
+
+### Added
+- Recorded the desktop sidebar rail delivery (WP-003) in the docs index, noting the AppShell wiring and tokenized styling surface.
+
+### Updated
+- Linked the new shell sidebar sources (`src/features/shell/Sidebar.tsx`, `src/features/shell/sidebar.css`, `src/components/layout/AppShell.tsx`) in `docs/index.md` for navigation traceability.
+
+
 ## 2025-12-21
 
 ### Updated
