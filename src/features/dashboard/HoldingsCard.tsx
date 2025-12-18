@@ -3,8 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useWalletStore } from '@/store/walletStore';
 import { getHoldings, HoldingDTO } from '@/api/wallet';
 import { RefreshCw, Wallet, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
+import { cn } from '@/lib/ui/cn';
 
-export const HoldingsCard = () => {
+interface HoldingsCardProps {
+  className?: string;
+}
+
+export const HoldingsCard = ({ className }: HoldingsCardProps) => {
   const activeWallets = useWalletStore((state) => state.wallets.filter(w => w.isActive));
   const hasConnectedWallet = activeWallets.length > 0;
   
@@ -26,7 +31,7 @@ export const HoldingsCard = () => {
         const primaryWallet = activeWallets[0]?.address;
         const data = await getHoldings(primaryWallet);
         setHoldings(data);
-      } catch (err) {
+      } catch {
         setError('Failed to load holdings');
       } finally {
         setLoading(false);
@@ -61,7 +66,7 @@ export const HoldingsCard = () => {
   // Not Connected State
   if (!hasConnectedWallet) {
     return (
-      <div className="sf-card p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[320px]">
+      <div className={cn("sf-card p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[320px]", className)}>
         <div className="p-3 bg-surface-raised rounded-full text-text-secondary">
           <Wallet size={32} />
         </div>
@@ -84,7 +89,7 @@ export const HoldingsCard = () => {
   // Error State
   if (error) {
     return (
-      <div className="sf-card p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[320px]">
+      <div className={cn("sf-card p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[320px]", className)}>
         <div className="p-3 bg-danger/10 text-danger rounded-full">
           <AlertCircle size={32} />
         </div>
@@ -105,7 +110,7 @@ export const HoldingsCard = () => {
   // Loading State
   if (loading) {
     return (
-      <div className="sf-card p-6 h-full min-h-[320px] flex flex-col">
+      <div className={cn("sf-card p-6 h-full min-h-[320px] flex flex-col", className)}>
         <div className="flex items-center justify-between mb-6">
           <div className="h-6 w-32 bg-surface-raised animate-pulse rounded" />
           <div className="h-8 w-8 bg-surface-raised animate-pulse rounded-full" />
@@ -134,7 +139,7 @@ export const HoldingsCard = () => {
   // Empty State
   if (holdings.length === 0) {
     return (
-      <div className="sf-card p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[320px]">
+      <div className={cn("sf-card p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[320px]", className)}>
         <div className="p-3 bg-surface-raised rounded-full text-text-secondary">
           <Wallet size={32} />
         </div>
@@ -150,7 +155,7 @@ export const HoldingsCard = () => {
 
   // Render List
   return (
-    <div className="sf-card p-6 h-full min-h-[320px] flex flex-col">
+    <div className={cn("sf-card p-6 h-full min-h-[320px] flex flex-col", className)}>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-medium text-text-primary">Holdings</h3>
         <button 

@@ -5,7 +5,7 @@ import { LogEntryOverlayPanel } from "@/components/dashboard/LogEntryOverlayPane
 import InsightTeaser from "@/components/dashboard/InsightTeaser";
 import JournalSnapshot from "@/components/dashboard/JournalSnapshot";
 import AlertsSnapshot from "@/components/dashboard/AlertsSnapshot";
-import { HoldingsList } from "@/components/dashboard/HoldingsList";
+import { HoldingsCard } from "@/features/dashboard/HoldingsCard";
 import { TradeLogList } from "@/components/dashboard/TradeLogList";
 import ErrorBanner from "@/components/ui/ErrorBanner";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -20,7 +20,6 @@ import { getAllTrades, type TradeEntry } from "@/lib/db";
 import { useTradeEventInbox, type TradeEventInboxItem } from "@/hooks/useTradeEventInbox";
 import { useSettings } from "@/state/settings";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
-import { useWalletHoldings } from "@/hooks/useWalletHoldings";
 import { getMonitoredWallet, WALLET_CHANGED_EVENT } from "@/lib/wallet/monitoredWallet";
 import { Activity, Bell, FileText, Target, TrendingUp } from "@/lib/icons";
 import "@/features/dashboard/dashboard.css";
@@ -44,6 +43,7 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [tradeEntries, setTradeEntries] = useState<TradeEntry[]>([]);
   const [isLogOverlayOpen, setIsLogOverlayOpen] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [monitoredWallet, setMonitoredWallet] = useState<string | null>(() => getMonitoredWallet());
 
   const {
@@ -52,12 +52,6 @@ export default function DashboardPage() {
     isLoading: isInboxLoading,
     refresh,
   } = useTradeEventInbox();
-  const {
-    data: holdingsData,
-    status: holdingsStatus,
-    error: holdingsError,
-    refetch: refetchHoldings,
-  } = useWalletHoldings(monitoredWallet);
 
   useEffect(() => {
     const handleWalletChange = () => setMonitoredWallet(getMonitoredWallet());
@@ -202,15 +196,7 @@ export default function DashboardPage() {
 
   const renderHoldingsAndTrades = () => (
     <div className="dashboard-split">
-      <HoldingsList
-        holdings={holdingsData?.tokens ?? []}
-        nativeBalanceLamports={holdingsData?.nativeBalanceLamports ?? null}
-        status={holdingsStatus}
-        walletAddress={monitoredWallet}
-        error={holdingsError}
-        onRetry={refetchHoldings}
-        className="dashboard-card sf-card"
-      />
+      <HoldingsCard className="dashboard-card" />
       <TradeLogList
         trades={recentTrades}
         quoteCurrency={settings.quoteCurrency}
