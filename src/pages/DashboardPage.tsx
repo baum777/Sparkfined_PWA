@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import Button from "@/components/ui/Button";
 import StateView from "@/components/ui/StateView";
 import KPIBar, { type KPIDeltaDirection, type KPIItem } from "@/features/dashboard/KPIBar";
+import DailyBiasCard from "@/features/dashboard/DailyBiasCard";
 import { useJournalStore } from "@/store/journalStore";
 import { useAlertsStore } from "@/store/alertsStore";
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from "@/lib/dashboard/calculateKPIs";
@@ -238,28 +239,33 @@ export default function DashboardPage() {
   };
 
   const renderMainContent = () => {
+    const biasCard = <DailyBiasCard className="dashboard-card sf-card" />;
+
     if (isLoading) {
       return (
-        <div className="dashboard-grid dashboard-grid--two">
-          <div className="dashboard-primary dashboard-stack">
-            <div className="dashboard-card sf-card">
-              <Skeleton variant="card" className="h-72 w-full" />
-            </div>
-            <div className="dashboard-split">
+        <div className="dashboard-stack">
+          {biasCard}
+          <div className="dashboard-grid dashboard-grid--two">
+            <div className="dashboard-primary dashboard-stack">
               <div className="dashboard-card sf-card">
-                <Skeleton variant="card" className="h-64 w-full" />
+                <Skeleton variant="card" className="h-72 w-full" />
+              </div>
+              <div className="dashboard-split">
+                <div className="dashboard-card sf-card">
+                  <Skeleton variant="card" className="h-64 w-full" />
+                </div>
+                <div className="dashboard-card sf-card">
+                  <Skeleton variant="card" className="h-64 w-full" />
+                </div>
+              </div>
+            </div>
+            <div className="dashboard-secondary dashboard-stack">
+              <div className="dashboard-card sf-card">
+                <Skeleton variant="card" className="h-60 w-full" />
               </div>
               <div className="dashboard-card sf-card">
-                <Skeleton variant="card" className="h-64 w-full" />
+                <Skeleton variant="card" className="h-60 w-full" />
               </div>
-            </div>
-          </div>
-          <div className="dashboard-secondary dashboard-stack">
-            <div className="dashboard-card sf-card">
-              <Skeleton variant="card" className="h-60 w-full" />
-            </div>
-            <div className="dashboard-card sf-card">
-              <Skeleton variant="card" className="h-60 w-full" />
             </div>
           </div>
         </div>
@@ -269,6 +275,7 @@ export default function DashboardPage() {
     if (error) {
       return (
         <div className="dashboard-stack">
+          {biasCard}
           <ErrorBanner message={error} onRetry={handleRetry} />
           <div className="dashboard-card sf-card">
             <StateView
@@ -285,45 +292,51 @@ export default function DashboardPage() {
 
     if (!hasData) {
       return (
-        <div className="dashboard-grid dashboard-grid--two">
-          <div className="dashboard-primary dashboard-stack">
-            <div className="dashboard-card sf-card">
-              <StateView
-                type="empty"
-                title="No insights yet"
-                description="Run your first chart session to unlock AI bias, flow and volatility context."
-                actionLabel="Open chart"
-                onAction={() => navigate("/chart")}
-              />
+        <div className="dashboard-stack">
+          {biasCard}
+          <div className="dashboard-grid dashboard-grid--two">
+            <div className="dashboard-primary dashboard-stack">
+              <div className="dashboard-card sf-card">
+                <StateView
+                  type="empty"
+                  title="No insights yet"
+                  description="Run your first chart session to unlock AI bias, flow and volatility context."
+                  actionLabel="Open chart"
+                  onAction={() => navigate("/chart")}
+                />
+              </div>
+              {renderHoldingsAndTrades()}
             </div>
-            {renderHoldingsAndTrades()}
-          </div>
-          <div className="dashboard-secondary dashboard-stack">
-            <div className="dashboard-card sf-card">
-              <StateView
-                type="empty"
-                title="No journal entries"
-                description="Log a trade or mindset note to build your streaks."
-                actionLabel="Open journal"
-                onAction={() => navigate("/journal")}
-                compact
-              />
+            <div className="dashboard-secondary dashboard-stack">
+              <div className="dashboard-card sf-card">
+                <StateView
+                  type="empty"
+                  title="No journal entries"
+                  description="Log a trade or mindset note to build your streaks."
+                  actionLabel="Open journal"
+                  onAction={() => navigate("/journal")}
+                  compact
+                />
+              </div>
+              <AlertsSnapshot className="dashboard-card sf-card" />
             </div>
-            <AlertsSnapshot className="dashboard-card sf-card" />
           </div>
         </div>
       );
     }
 
     return (
-      <div className="dashboard-grid dashboard-grid--two">
-        <div className="dashboard-primary dashboard-stack">
-          <InsightTeaser {...dummyInsight} className="dashboard-card sf-card" />
-          {renderHoldingsAndTrades()}
-        </div>
-        <div className="dashboard-secondary dashboard-stack">
-          <JournalSnapshot entries={recentJournalEntries} className="dashboard-card sf-card" />
-          <AlertsSnapshot className="dashboard-card sf-card" />
+      <div className="dashboard-stack">
+        {biasCard}
+        <div className="dashboard-grid dashboard-grid--two">
+          <div className="dashboard-primary dashboard-stack">
+            <InsightTeaser {...dummyInsight} className="dashboard-card sf-card" />
+            {renderHoldingsAndTrades()}
+          </div>
+          <div className="dashboard-secondary dashboard-stack">
+            <JournalSnapshot entries={recentJournalEntries} className="dashboard-card sf-card" />
+            <AlertsSnapshot className="dashboard-card sf-card" />
+          </div>
         </div>
       </div>
     );

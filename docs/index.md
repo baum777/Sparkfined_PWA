@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-27)
+
+- **Daily Bias / Market Intel (WP-012):** Neues Dashboard-Intel-Carding mit getDailyBias-Mock/DTO (`src/api/marketIntelligence.ts`), BiasTag (`src/features/dashboard/BiasTag.tsx`), dem refreshbaren DailyBiasCard UI (`src/features/dashboard/DailyBiasCard.tsx`), und der Einbindung in `src/pages/DashboardPage.tsx`; Checklist-Link: `WP-Polish/WP-012/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2025-12-26)
 
 - **Hero KPI Bar (WP-011):** Sticky KPI rail beneath the dashboard header with tokenized KPICard/KPIBar components (`src/features/dashboard/KPIBar.tsx`, `src/features/dashboard/KPICard.tsx`, `src/features/dashboard/kpi.css`) wired into `src/pages/DashboardPage.tsx`; mobile scroll-snap + desktop sticky offset captured in `WP-Polish/WP-011/checklist.md`.

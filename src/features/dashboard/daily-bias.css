@@ -1,0 +1,255 @@
+.sf-bias-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  padding: calc(var(--sf-space-1) + 2px) var(--sf-space-3);
+  border-radius: var(--sf-radius-lg);
+  border: 1px solid var(--sf-border-1);
+  background: color-mix(in srgb, var(--sf-bg-1) 88%, transparent);
+  color: var(--sf-text-1);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.sf-bias-tag__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 24%, transparent);
+}
+
+.sf-bias-tag--bullish {
+  color: var(--sf-success);
+  border-color: color-mix(in srgb, var(--sf-success) 42%, transparent);
+  background: color-mix(in srgb, var(--sf-success) 14%, transparent);
+}
+
+.sf-bias-tag--bearish {
+  color: var(--sf-danger);
+  border-color: color-mix(in srgb, var(--sf-danger) 42%, transparent);
+  background: color-mix(in srgb, var(--sf-danger) 14%, transparent);
+}
+
+.sf-bias-tag--neutral {
+  color: var(--sf-text-2);
+  border-color: color-mix(in srgb, var(--sf-border-1) 82%, transparent);
+  background: color-mix(in srgb, var(--sf-bg-1) 92%, transparent);
+}
+
+.sf-daily-bias-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-5);
+}
+
+.sf-daily-bias-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sf-space-4);
+  flex-wrap: wrap;
+}
+
+.sf-daily-bias-card__titles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+}
+
+.sf-daily-bias-card__eyebrow {
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--sf-text-3);
+}
+
+.sf-daily-bias-card__title {
+  font-size: clamp(1.5rem, 1.2rem + 0.4vw, 1.85rem);
+  font-weight: 800;
+  color: var(--sf-text-1);
+  letter-spacing: -0.01em;
+}
+
+.sf-daily-bias-card__subtitle {
+  color: var(--sf-text-2);
+  max-width: 720px;
+  font-size: 1rem;
+}
+
+.sf-daily-bias-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-4);
+}
+
+.sf-daily-bias-card__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sf-space-4);
+  flex-wrap: wrap;
+}
+
+.sf-daily-bias-card__bias-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-3);
+  flex-wrap: wrap;
+}
+
+.sf-daily-bias-card__source {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  padding: calc(var(--sf-space-1) + 2px) var(--sf-space-3);
+  border-radius: var(--sf-radius-lg);
+  font-weight: 600;
+  color: var(--sf-text-2);
+  background: color-mix(in srgb, var(--sf-bg-1) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sf-border-1) 74%, transparent);
+}
+
+.sf-daily-bias-card__updated {
+  color: var(--sf-text-3);
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+}
+
+.sf-daily-bias-card__updated--muted {
+  font-size: 0.9rem;
+}
+
+.sf-daily-bias-card__insights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-3);
+}
+
+.sf-daily-bias-card__insights li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--sf-space-3);
+}
+
+.sf-daily-bias-card__bullet {
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--sf-primary);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--sf-primary) 12%, transparent);
+}
+
+.sf-daily-bias-card__insight-text {
+  color: var(--sf-text-1);
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.sf-daily-bias-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--sf-space-4);
+  border-top: 1px solid var(--sf-border-1);
+  padding-top: var(--sf-space-4);
+}
+
+.sf-daily-bias-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  font-weight: 700;
+  color: var(--sf-text-1);
+  text-decoration: none;
+  border-radius: var(--sf-radius-lg);
+  padding: var(--sf-space-2) var(--sf-space-3);
+  border: 1px solid color-mix(in srgb, var(--sf-border-1) 76%, transparent);
+  background: color-mix(in srgb, var(--sf-bg-1) 90%, transparent);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--sf-shadow) 65%, transparent);
+  transition: transform 150ms ease, box-shadow 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+@media (hover: hover) {
+  .sf-daily-bias-card__link:hover {
+    transform: translateY(-1px);
+    color: var(--sf-primary);
+    border-color: color-mix(in srgb, var(--sf-primary) 32%, transparent);
+    box-shadow: 0 16px 40px color-mix(in srgb, var(--sf-shadow) 80%, transparent);
+  }
+}
+
+.sf-daily-bias-card__footer-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sf-space-3);
+  flex-wrap: wrap;
+}
+
+.sf-daily-bias-card__loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-3);
+}
+
+.sf-daily-bias-card__skeleton-tag,
+.sf-daily-bias-card__skeleton-line,
+.sf-daily-bias-card__skeleton-button {
+  border-radius: var(--sf-radius-lg);
+  background: color-mix(in srgb, var(--sf-border-1) 55%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+.sf-daily-bias-card__skeleton-tag {
+  width: 120px;
+  height: 36px;
+}
+
+.sf-daily-bias-card__skeleton-line {
+  width: 100%;
+  height: 14px;
+}
+
+.sf-daily-bias-card__skeleton-line--short {
+  width: 70%;
+}
+
+.sf-daily-bias-card__skeleton-button {
+  width: 120px;
+  height: 40px;
+}
+
+.sf-daily-bias-card__skeleton-tag::after,
+.sf-daily-bias-card__skeleton-line::after,
+.sf-daily-bias-card__skeleton-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--sf-bg-1) 72%, transparent),
+    color-mix(in srgb, var(--sf-bg-0) 96%, transparent),
+    color-mix(in srgb, var(--sf-bg-1) 72%, transparent)
+  );
+  transform: translateX(-100%);
+  animation: sf-bias-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes sf-bias-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
