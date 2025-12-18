@@ -6,6 +6,16 @@
 
 ---
 
+## 2025-12-21
+
+### Updated
+- Bottom navigation now relies solely on `bottom-nav.css` for mobile-only visibility and safe-area padding; `AppShell` defers bottom inset spacing to the shared shell CSS to ensure the bar renders once without desktop padding.
+
+### Noted
+- `pnpm test:e2e` fails locally because Playwright browsers are not installed (`pnpm exec playwright install` required); treating this as pre-existing infrastructure gap rather than a WP-001 regression.
+
+---
+
 ## 2025-12-20
 
 ### Updated

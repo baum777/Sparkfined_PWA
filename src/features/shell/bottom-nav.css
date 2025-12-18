@@ -1,7 +1,26 @@
+.sf-shell {
+  --sf-bottom-nav-height: 72px;
+  --sf-bottom-nav-safe-area: max(12px, env(safe-area-inset-bottom));
+}
+
 .sf-bottom-nav {
   position: fixed;
   inset: auto 0 0 0;
   z-index: 40;
+  min-height: calc(var(--sf-bottom-nav-height) + var(--sf-bottom-nav-safe-area));
+  padding-bottom: var(--sf-bottom-nav-safe-area);
+}
+
+.sf-shell .sf-canvas {
+  padding-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .sf-shell .sf-canvas {
+    padding-bottom: calc(
+      var(--sf-bottom-nav-height) + var(--sf-bottom-nav-safe-area)
+    );
+  }
 }
 
 @media (min-width: 768px) {
