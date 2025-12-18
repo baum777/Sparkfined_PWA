@@ -11,17 +11,22 @@ interface JournalEntry {
 
 interface JournalSnapshotProps {
   entries: JournalEntry[];
+  className?: string;
 }
 
-export default function JournalSnapshot({ entries }: JournalSnapshotProps) {
+export default function JournalSnapshot({ entries, className }: JournalSnapshotProps) {
   const navigate = useNavigate();
 
   const handleNavigate = React.useCallback(() => navigate('/journal'), [navigate]);
 
+  const containerClassName =
+    className ??
+    "rounded-3xl border border-border/70 bg-surface/80 p-4 shadow-card-subtle";
+
   return (
-    <div className="rounded-3xl border border-border/70 bg-surface/80 p-4 shadow-card-subtle" data-testid="dashboard-journal-snapshot">
+    <div className={containerClassName} data-testid="dashboard-journal-snapshot">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h3 className="text-base font-semibold text-text-primary">Recent journal entries</h3>
+        <h3 className="dashboard-section-heading">Recent journal entries</h3>
         <Button variant="ghost" size="sm" className="text-text-secondary hover:text-text-primary" onClick={handleNavigate}>
           Open journal
         </Button>

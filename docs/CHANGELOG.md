@@ -6,6 +6,15 @@
 
 ---
 
+## 2025-12-24
+
+### Added
+- Documented the dashboard foundation delivery (WP-010) in the docs index, covering the new tokenized dashboard layout stylesheet and the wired dashboard components (`src/features/dashboard/dashboard.css`, `src/pages/DashboardPage.tsx`, dashboard cards, KPI strip).
+
+### Updated
+- Highlighted the responsive grid/split helpers and shared horizontal scroll utility now backing the dashboard KPI bar and card layouts.
+
+
 ## 2025-12-23
 
 ### Added

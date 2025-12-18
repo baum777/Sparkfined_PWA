@@ -12,11 +12,12 @@ interface TradeLogListProps {
   quoteCurrency: QuoteCurrency
   onMarkEntry?: () => void
   isMarkEntryDisabled?: boolean
+  className?: string
 }
 
 const MAX_DISPLAY_TRADES = 3
 
-export function TradeLogList({ trades, quoteCurrency, onMarkEntry, isMarkEntryDisabled }: TradeLogListProps) {
+export function TradeLogList({ trades, quoteCurrency, onMarkEntry, isMarkEntryDisabled, className }: TradeLogListProps) {
   const displayedTrades = trades.slice(0, MAX_DISPLAY_TRADES)
   const totalCount = trades.length
 
@@ -29,13 +30,15 @@ export function TradeLogList({ trades, quoteCurrency, onMarkEntry, isMarkEntryDi
     }).format(timestamp)
   }
 
+  const cardClassName = className ?? 'shadow-card-subtle'
+
   return (
-    <Card variant="glass" className="shadow-card-subtle" data-testid="dashboard-tradelog-snapshot">
+    <Card variant="glass" className={cardClassName} data-testid="dashboard-tradelog-snapshot">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-text-tertiary">Trade Log</p>
-            <CardTitle className="text-base">Recent entries</CardTitle>
+            <CardTitle className="dashboard-section-heading">Recent entries</CardTitle>
           </div>
           {totalCount > 0 && (
             <Badge variant="info" data-testid="tradelog-count">

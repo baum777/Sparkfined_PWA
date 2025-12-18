@@ -21,6 +21,7 @@ import { useSettings } from "@/state/settings";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
 import { useWalletHoldings } from "@/hooks/useWalletHoldings";
 import { getMonitoredWallet, WALLET_CHANGED_EVENT } from "@/lib/wallet/monitoredWallet";
+import "@/features/dashboard/dashboard.css";
 
 const dummyInsight = {
   title: "SOL Daily Bias",
@@ -138,7 +139,7 @@ export default function DashboardPage() {
   }, [refresh]);
 
   const renderHoldingsAndTrades = () => (
-    <div className="mt-6 grid gap-6 lg:grid-cols-2">
+    <div className="dashboard-split">
       <HoldingsList
         holdings={holdingsData?.tokens ?? []}
         nativeBalanceLamports={holdingsData?.nativeBalanceLamports ?? null}
@@ -146,12 +147,14 @@ export default function DashboardPage() {
         walletAddress={monitoredWallet}
         error={holdingsError}
         onRetry={refetchHoldings}
+        className="dashboard-card sf-card"
       />
       <TradeLogList
         trades={recentTrades}
         quoteCurrency={settings.quoteCurrency}
         onMarkEntry={handleMarkEntry}
         isMarkEntryDisabled={unconsumedCount === 0}
+        className="dashboard-card sf-card"
       />
     </div>
   );
@@ -176,14 +179,27 @@ export default function DashboardPage() {
   const renderMainContent = () => {
     if (isLoading) {
       return (
-        <div className="grid gap-6 lg:grid-cols-12">
-          <div className="space-y-6 lg:col-span-7 xl:col-span-8">
-            <Skeleton variant="card" className="h-72 w-full" />
-            {renderHoldingsAndTrades()}
+        <div className="dashboard-grid dashboard-grid--two">
+          <div className="dashboard-primary dashboard-stack">
+            <div className="dashboard-card sf-card">
+              <Skeleton variant="card" className="h-72 w-full" />
+            </div>
+            <div className="dashboard-split">
+              <div className="dashboard-card sf-card">
+                <Skeleton variant="card" className="h-64 w-full" />
+              </div>
+              <div className="dashboard-card sf-card">
+                <Skeleton variant="card" className="h-64 w-full" />
+              </div>
+            </div>
           </div>
-          <div className="space-y-6 lg:col-span-5 xl:col-span-4">
-            <Skeleton variant="card" className="h-60 w-full" />
-            <Skeleton variant="card" className="h-60 w-full" />
+          <div className="dashboard-secondary dashboard-stack">
+            <div className="dashboard-card sf-card">
+              <Skeleton variant="card" className="h-60 w-full" />
+            </div>
+            <div className="dashboard-card sf-card">
+              <Skeleton variant="card" className="h-60 w-full" />
+            </div>
           </div>
         </div>
       );
@@ -191,9 +207,9 @@ export default function DashboardPage() {
 
     if (error) {
       return (
-        <div className="space-y-6">
+        <div className="dashboard-stack">
           <ErrorBanner message={error} onRetry={handleRetry} />
-          <div className="card-glass rounded-3xl p-6">
+          <div className="dashboard-card sf-card">
             <StateView
               type="error"
               title="Unable to load dashboard"
@@ -208,9 +224,9 @@ export default function DashboardPage() {
 
     if (!hasData) {
       return (
-        <div className="grid gap-6 lg:grid-cols-12">
-          <div className="space-y-6 lg:col-span-7 xl:col-span-8">
-            <div className="card-elevated rounded-3xl p-6">
+        <div className="dashboard-grid dashboard-grid--two">
+          <div className="dashboard-primary dashboard-stack">
+            <div className="dashboard-card sf-card">
               <StateView
                 type="empty"
                 title="No insights yet"
@@ -221,8 +237,8 @@ export default function DashboardPage() {
             </div>
             {renderHoldingsAndTrades()}
           </div>
-          <div className="space-y-6 lg:col-span-5 xl:col-span-4">
-            <div className="card-glass rounded-3xl p-6">
+          <div className="dashboard-secondary dashboard-stack">
+            <div className="dashboard-card sf-card">
               <StateView
                 type="empty"
                 title="No journal entries"
@@ -232,28 +248,28 @@ export default function DashboardPage() {
                 compact
               />
             </div>
-            <AlertsSnapshot />
+            <AlertsSnapshot className="dashboard-card sf-card" />
           </div>
         </div>
       );
     }
 
     return (
-      <div className="grid gap-6 lg:grid-cols-12">
-        <div className="space-y-6 lg:col-span-7 xl:col-span-8">
-          <InsightTeaser {...dummyInsight} />
+      <div className="dashboard-grid dashboard-grid--two">
+        <div className="dashboard-primary dashboard-stack">
+          <InsightTeaser {...dummyInsight} className="dashboard-card sf-card" />
           {renderHoldingsAndTrades()}
         </div>
-        <div className="space-y-6 lg:col-span-5 xl:col-span-4">
-          <JournalSnapshot entries={recentJournalEntries} />
-          <AlertsSnapshot />
+        <div className="dashboard-secondary dashboard-stack">
+          <JournalSnapshot entries={recentJournalEntries} className="dashboard-card sf-card" />
+          <AlertsSnapshot className="dashboard-card sf-card" />
         </div>
       </div>
     );
   };
 
   return (
-    <div data-testid="dashboard-page">
+    <div className="dashboard-page" data-testid="dashboard-page">
       {/* Note: DashboardShell is the single layout source-of-truth (no legacy Container/PageHeader duplication). */}
       <DashboardShell
         title="Dashboard"

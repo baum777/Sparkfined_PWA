@@ -43,7 +43,7 @@ export default function DashboardKpiStrip({ items }: DashboardKpiStripProps) {
       className="relative -mx-4 overflow-x-auto px-4 py-2 md:mx-0 md:overflow-visible lg:py-0"
       aria-label="Key performance indicators"
     >
-      <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible lg:grid-cols-4">
+      <div className="dashboard-horizontal-scroll snap-x snap-mandatory md:grid md:grid-cols-2 md:gap-4 md:overflow-visible lg:grid-cols-4">
         {items.map((item) => {
           const trend = item.trend ? trendConfig[item.trend] : null;
           return (
