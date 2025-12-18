@@ -35,10 +35,32 @@ Two WPs may be combined into one PR **only if**:
 ---
 
 ## Codex Execution Contract (Applies to every WP)
-### Workflow Optimizations (Recommended)
+## Workflow Optimizations (Recommended)
 - **PR-Guardrail Script:** Add a `pnpm wp:guard` (or pre-push hook) that checks: only allowed WP file targets changed, `./WP-Polish/<WP-ID>/checklist.md` exists, and PR title includes `WP-XXX`.
 - **Done Marker in Working Paper:** Each WP gets `Implemented in PR:` + date/link so “current state check” is deterministic.
 - **Review Snapshots:** Store 1–2 screenshots/GIFs (mobile/desktop) or exact viewport steps under `./WP-Polish/<WP-ID>/` to speed up reviews and make UX changes verifiable.
+- **Definition of Done (DoD) mini-block:** Every WP PR must include a short DoD checklist (A11y basics, relevant loading/empty/error states, mobile+desktop smoke check) to keep reviews consistent.
+- **Ownership map for integration hotspots:** Minimize merge conflicts by treating these as “touch only if required by the WP”: `src/components/layout/AppShell.tsx` (or `MainLayout.tsx`), `src/config/navigation.ts`, global CSS entry points.
+- **Centralize mock data fixtures:** Use a single location for mock API data and fixtures (e.g. `src/api/__mocks__/` or `src/test/fixtures/`) so each WP doesn’t reinvent mock payloads and tests stay stable.
+
+### Definition of Done (Template)
+- [ ] WP acceptance criteria fully satisfied and mapped in PR description
+- [ ] No scope creep (one WP only; non-WP issues moved to backlog)
+- [ ] A11y smoke check (keyboard tabbing, focus-visible, aria-labels where applicable)
+- [ ] UI states handled where relevant (loading / empty / error)
+- [ ] Viewport smoke check: mobile (<768px) + desktop (≥768px)
+- [ ] Verification ran: `pnpm typecheck`, `pnpm lint` (no new warnings), `pnpm test`/`pnpm vitest run` (e2e noted if blocked)
+
+### Ownership Map (Integration Hotspots)
+Treat these files as high-conflict areas; only modify them when the WP explicitly requires integration:
+- `src/components/layout/AppShell.tsx` (or `src/layouts/MainLayout.tsx`)
+- `src/config/navigation.ts`
+- `src/App.tsx` (global providers/imports)
+- `src/styles/theme.css` + `src/styles/ui.css` (tokens/utilities)
+
+### Mock/Fixture Convention
+- Prefer: `src/api/__mocks__/` (API-shaped mocks) and/or `src/test/fixtures/` (test fixtures)
+- If a WP introduces a new API DTO, add a matching mock payload in the central mocks folder.
 
 ### Scope & PR hygiene
 - **One WP per PR** (exceptions only if explicitly marked *“Atomic Pair”* in the WP).
