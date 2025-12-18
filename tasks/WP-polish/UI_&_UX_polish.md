@@ -8,6 +8,32 @@
 
 ---
 
+## Work Package Clusters (Epic planning) — how to execute without scope explosions
+
+We plan WPs in **clusters** (epics) for coherence, but we **deliver as small, reviewable PRs**.
+
+### Cluster map (epics)
+- **Cluster A — Foundation/Shell:** WP-001 → WP-002 → WP-003 → WP-004
+- **Cluster B — Dashboard:** WP-010..WP-016
+- **Cluster C — Journal:** WP-030..WP-035
+- **Cluster D — Chart:** WP-050..WP-056
+- **Cluster E — Alerts:** WP-070..WP-076
+- **Cluster F — Settings:** WP-090..WP-097
+
+### Execution rule
+- **Default:** 1 WP = 1 PR (strict), even within a cluster.
+- PRs inside the same cluster should be **stacked/linear** when possible (clean history, easy bisect).
+
+### Atomic Pair exception (rare)
+Two WPs may be combined into one PR **only if**:
+- the WPs are explicitly marked as **Atomic Pair** in this document, **and**
+- the combined PR remains reviewable (no broad cross-feature changes).
+
+### Review & hygiene
+- If a PR exceeds expected scope (e.g., large unrelated diffs), **split it** before requesting review.
+- Any cross-cutting cleanup belongs in a separate PR, not bundled into a WP delivery.
+---
+
 ## Codex Execution Contract (Applies to every WP)
 
 ### Scope & PR hygiene
