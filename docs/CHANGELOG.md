@@ -6,6 +6,15 @@
 
 ---
 
+## 2025-12-23
+
+### Added
+- Documented the new sticky header bar delivery (WP-004) with responsive desktop/mobile actions, alerts badge, and theme toggle across `src/features/shell/TopBar.tsx`, `src/features/shell/top-bar.css`, and `src/components/layout/AppShell.tsx`.
+
+### Updated
+- Linked the WP-004 checklist location to maintain the polish artifacts trail for the shell cluster.
+
+
 ## 2025-12-22
 
 ### Added

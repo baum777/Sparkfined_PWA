@@ -1,10 +1,10 @@
 import React from "react"
 import { Outlet } from "react-router-dom"
-import { cn } from "@/lib/ui/cn"
-import Topbar from "./Topbar"
-import ActionPanel from "./ActionPanel"
 import BottomNavBar from "@/features/shell/BottomNavBar"
 import Sidebar from "@/features/shell/Sidebar"
+import TopBar from "@/features/shell/TopBar"
+import { cn } from "@/lib/ui/cn"
+import ActionPanel from "./ActionPanel"
 
 const ACTION_PANEL_STORAGE_KEY = "sf.actionPanel.open"
 
@@ -46,7 +46,7 @@ export default function AppShell() {
       </aside>
 
       <header className="sf-topbar">
-        <Topbar
+        <TopBar
           onToggleActionPanel={handleToggleActionPanel}
           isActionPanelOpen={isActionPanelOpen}
           actionPanelToggleRef={toggleButtonRef}

@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-23)
+
+- **Header Top Bar (WP-004):** Sticky shell header now surfaces the current route title with desktop actions for alerts (badge), settings, and the theme toggle, plus a minimal mobile cluster (settings + theme). Implemented at `src/features/shell/TopBar.tsx` with styling in `src/features/shell/top-bar.css` and wired through `src/components/layout/AppShell.tsx`.
+
 ## 📦 Neue Ergänzungen (2025-12-22)
 
 - **Desktop Sidebar (WP-003):** Neue linke Navigationsschiene für ≥768px mit dem kanonischen `NAV_ITEMS`-Ordering, hervorgehobenen aktiven States via `--sf-primary`, angepinnter Settings-Kachel am Fuß und Hover/Focus-Tooltips für den kompakten Rail (`src/features/shell/Sidebar.tsx`, `src/features/shell/sidebar.css`, `src/components/layout/AppShell.tsx`).
