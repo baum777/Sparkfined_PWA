@@ -32,18 +32,20 @@ Two WPs may be combined into one PR **only if**:
 ### Review & hygiene
 - If a PR exceeds expected scope (e.g., large unrelated diffs), **split it** before requesting review.
 - Any cross-cutting cleanup belongs in a separate PR, not bundled into a WP delivery.
+
 ---
 
 ## Codex Execution Contract (Applies to every WP)
-## Workflow Optimizations (Recommended)
+
+### Workflow Optimizations (Recommended)
 - **PR-Guardrail Script:** Add a `pnpm wp:guard` (or pre-push hook) that checks: only allowed WP file targets changed, `./WP-Polish/<WP-ID>/checklist.md` exists, and PR title includes `WP-XXX`.
 - **Done Marker in Working Paper:** Each WP gets `Implemented in PR:` + date/link so “current state check” is deterministic.
 - **Review Snapshots:** Store 1–2 screenshots/GIFs (mobile/desktop) or exact viewport steps under `./WP-Polish/<WP-ID>/` to speed up reviews and make UX changes verifiable.
 - **Definition of Done (DoD) mini-block:** Every WP PR must include a short DoD checklist (A11y basics, relevant loading/empty/error states, mobile+desktop smoke check) to keep reviews consistent.
-- **Ownership map for integration hotspots:** Minimize merge conflicts by treating these as “touch only if required by the WP”: `src/components/layout/AppShell.tsx` (or `MainLayout.tsx`), `src/config/navigation.ts`, global CSS entry points.
+- **Ownership map for integration hotspots:** Minimize merge conflicts by treating these as “touch only if required by the WP”: `src/components/layout/AppShell.tsx` (or `src/layouts/MainLayout.tsx`), `src/config/navigation.ts`, global CSS entry points.
 - **Centralize mock data fixtures:** Use a single location for mock API data and fixtures (e.g. `src/api/__mocks__/` or `src/test/fixtures/`) so each WP doesn’t reinvent mock payloads and tests stay stable.
 
-### Definition of Done (Template)
+#### Definition of Done (Template)
 - [ ] WP acceptance criteria fully satisfied and mapped in PR description
 - [ ] No scope creep (one WP only; non-WP issues moved to backlog)
 - [ ] A11y smoke check (keyboard tabbing, focus-visible, aria-labels where applicable)
@@ -51,14 +53,14 @@ Two WPs may be combined into one PR **only if**:
 - [ ] Viewport smoke check: mobile (<768px) + desktop (≥768px)
 - [ ] Verification ran: `pnpm typecheck`, `pnpm lint` (no new warnings), `pnpm test`/`pnpm vitest run` (e2e noted if blocked)
 
-### Ownership Map (Integration Hotspots)
+#### Ownership Map (Integration Hotspots)
 Treat these files as high-conflict areas; only modify them when the WP explicitly requires integration:
 - `src/components/layout/AppShell.tsx` (or `src/layouts/MainLayout.tsx`)
 - `src/config/navigation.ts`
 - `src/App.tsx` (global providers/imports)
 - `src/styles/theme.css` + `src/styles/ui.css` (tokens/utilities)
 
-### Mock/Fixture Convention
+#### Mock/Fixture Convention
 - Prefer: `src/api/__mocks__/` (API-shaped mocks) and/or `src/test/fixtures/` (test fixtures)
 - If a WP introduces a new API DTO, add a matching mock payload in the central mocks folder.
 
@@ -176,7 +178,8 @@ Use `ui.css` utility classes (WP-002):
 ## WP-001 — Bottom Navigation Bar (Mobile PWA)
 **Status:** Planned  
 **Depends On:** —  
-**Priority:** P0  
+**Priority:** P0
+**Implemented in PR:** —  
 
 ### Goal
 Mobile users get a fixed, safe-area aware bottom tab bar with 5 primary destinations.
@@ -228,7 +231,8 @@ WP-001 may use simple CSS with hard-coded colors **only if WP-002 is not merged 
 ## WP-002 — Theme System (Dark/Light + Tokens)
 **Status:** Planned  
 **Depends On:** —  
-**Priority:** P0  
+**Priority:** P0
+**Implemented in PR:** —  
 
 ### Goal
 Introduce a single theme system with CSS variables, dark default, light optional, persisted selection, and shared UI utilities.
@@ -296,7 +300,8 @@ Light: choose accessible equivalents (no pure-white glare; still high contrast).
 ## WP-003 — Desktop Navigation Sidebar (Rail)
 **Status:** Planned  
 **Depends On:** WP-002  
-**Priority:** P0  
+**Priority:** P0
+**Implemented in PR:** —  
 
 ### Goal
 Desktop users get a fixed left rail with nav icons, active highlight, and a separate settings icon pinned to the bottom.
@@ -343,7 +348,8 @@ MODIFY  src/config/navigation.ts
 ## WP-004 — Header Bar (TopBar)
 **Status:** Planned  
 **Depends On:** WP-002  
-**Priority:** P0  
+**Priority:** P0
+**Implemented in PR:** —  
 
 ### Goal
 A sticky top bar that provides context + quick actions:
@@ -380,7 +386,8 @@ MODIFY  src/layouts/MainLayout.tsx
 ## WP-010 — Dashboard Foundation (Typography, Spacing, Card System)
 **Status:** Planned  
 **Depends On:** WP-001..WP-004  
-**Priority:** P1  
+**Priority:** P1
+**Implemented in PR:** —  
 
 ### Goal
 Introduce dashboard layout primitives: spacing, grid, card base styling, hover states—using theme tokens/utilities.
@@ -417,7 +424,8 @@ CREATE  src/features/dashboard/DashboardLayout.tsx (if needed)
 ## WP-011 — Hero KPI Bar (Sticky, 4–5 KPIs)
 **Status:** Planned  
 **Depends On:** WP-010  
-**Priority:** P1  
+**Priority:** P1
+**Implemented in PR:** —  
 
 ### Goal
 Sticky KPI strip under the header showing key stats; scrollable on mobile, sticky on desktop.
@@ -450,7 +458,8 @@ CREATE  src/features/dashboard/kpi.css
 ## WP-012 — Daily Bias / Market Intel Card
 **Status:** Planned  
 **Depends On:** WP-010  
-**Priority:** P1  
+**Priority:** P1
+**Implemented in PR:** —  
 
 ### Goal
 Full-width card summarizing daily bias + insights with refresh action and stable states.
@@ -484,7 +493,8 @@ CREATE  src/api/marketIntelligence.ts
 ## WP-013 — Holdings / Wallet Snapshot Card
 **Status:** Planned  
 **Depends On:** WP-010  
-**Priority:** P1  
+**Priority:** P1
+**Implemented in PR:** —  
 
 ### Goal
 Wallet holdings table with connected/not-connected states, hover rows, and responsive layout.
@@ -516,7 +526,8 @@ CREATE  src/api/wallet.ts
 ## WP-014 — Recent Trades (Trade Log Card)
 **Status:** Planned  
 **Depends On:** WP-010  
-**Priority:** P1  
+**Priority:** P1
+**Implemented in PR:** —  
 
 ### Goal
 Show recent trades and provide a “Log entry” action. The action is disabled until a BUY signal exists (per Journal V2 pipeline requirement).
@@ -552,7 +563,8 @@ MODIFY  src/features/journal/*                 (only for signal availability wir
 ## WP-015 — Recent Journal Entries + Alerts Overview
 **Status:** Planned  
 **Depends On:** WP-010  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Bottom dashboard section combining recent journal entries and alerts stats.
@@ -584,7 +596,8 @@ MODIFY  src/api/alerts.ts     (create if missing)
 ## WP-016 — Quick Actions (FAB)
 **Status:** Planned  
 **Depends On:** WP-010..WP-015  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Mobile floating action button with quick actions (Log entry, Create alert).
@@ -615,7 +628,8 @@ CREATE  src/features/dashboard/FABMenu.tsx
 ## WP-030 — Journal Foundation (Typography, Spacing, Contrast)
 **Status:** Planned  
 **Depends On:** WP-010  
-**Priority:** P1  
+**Priority:** P1
+**Implemented in PR:** —  
 
 ### Goal
 Journal pages match dashboard typography + spacing while ensuring WCAG AA contrast.
@@ -637,7 +651,8 @@ MODIFY  src/features/journal/JournalCard.tsx
 ## WP-031 — Emotional State (Emojis + Gradient Sliders)
 **Status:** Planned  
 **Depends On:** WP-030  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Emoji selector + confidence slider with gradient track, touch-friendly thumb.
@@ -665,7 +680,8 @@ CREATE  src/features/journal/EmotionalStateCard.tsx
 ## WP-032 — Market Context Accordion (Regime Selector)
 **Status:** Planned  
 **Depends On:** WP-030  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Accordion refactor with desktop dropdown and mobile horizontal regime buttons.
@@ -686,7 +702,8 @@ CREATE  src/features/journal/MarketRegimeSelector.tsx
 ## WP-033 — Trade Thesis (Tags + Screenshot + AI Notes)
 **Status:** Planned  
 **Depends On:** WP-030  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Trade thesis card supports tags, chart screenshot capture, and AI note generation.
@@ -711,7 +728,8 @@ CREATE  src/features/journal/AINotesGenerator.tsx
 ## WP-034 — Mobile Journal (Bottom Sheet + Touch)
 **Status:** Planned  
 **Depends On:** WP-030, WP-031  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Journal UX on mobile: card stacking, large controls, templates in a bottom sheet.
@@ -733,7 +751,8 @@ CREATE  src/shared/components/BottomSheet.tsx
 ## WP-035 — Journal Workflow (Templates + Auto-Save + Validation)
 **Status:** Planned  
 **Depends On:** WP-030..WP-034  
-**Priority:** P1  
+**Priority:** P1
+**Implemented in PR:** —  
 
 ### Goal
 Reliable journaling workflow: autosave, required field validation, template prefill, autocomplete inputs.
@@ -759,7 +778,8 @@ MODIFY  src/features/journal/JournalForm.tsx
 ## WP-050 — Chart Foundation (Layout, Sidebar, TopBar, Toolbar, Bottom Panel)
 **Status:** Planned  
 **Depends On:** WP-002, WP-003  
-**Priority:** P1  
+**Priority:** P1
+**Implemented in PR:** —  
 
 ### Goal
 A stable chart page shell: left sidebar, main chart, right toolbar, bottom panel + sticky top controls.
@@ -799,7 +819,8 @@ CREATE  src/features/chart/chart.css
 ## WP-051 — Main Chart Area (Crosshair, Zoom, Markers)
 **Status:** Planned  
 **Depends On:** WP-050  
-**Priority:** P1  
+**Priority:** P1
+**Implemented in PR:** —  
 
 ### Goal
 Core chart interactions: crosshair, zoom/pan, and journal markers overlay.
@@ -821,7 +842,8 @@ MODIFY  src/api/journalEntries.ts
 ## WP-052 — Right Toolbar (Indicators, Drawings, Alerts)
 **Status:** Planned  
 **Depends On:** WP-050  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Right toolbar groups chart tools with expandable sections.
@@ -844,7 +866,8 @@ CREATE  src/api/alerts.ts
 ## WP-053 — Bottom Panel (Grok Pulse + Journal Notes)
 **Status:** Planned  
 **Depends On:** WP-050  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Bottom panel shows quick AI pulse + inline notes.
@@ -866,7 +889,8 @@ CREATE  src/features/chart/InlineJournalNotes.tsx
 ## WP-054 — Replay & Controls (Speed, Export)
 **Status:** Planned  
 **Depends On:** WP-051, WP-050  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Replay mode controls and export action in top bar.
@@ -886,7 +910,8 @@ CREATE  src/features/chart/replay.ts
 ## WP-055 — Default Chart & Fallback (SOL/USDC)
 **Status:** Planned  
 **Depends On:** WP-050  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Chart opens with a sensible default market and survives missing market data.
@@ -906,7 +931,8 @@ CREATE  src/api/marketData.ts
 ## WP-056 — Mobile Chart UX (Bottom Sheet + Floating Buttons)
 **Status:** Planned  
 **Depends On:** WP-050  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Mobile chart navigation and tool access without clutter.
@@ -928,7 +954,8 @@ CREATE  src/features/chart/MobileChartControls.tsx
 ## WP-070 — Alerts Desktop Layout (Top-Bar, Filters, List)
 **Status:** Planned  
 **Depends On:** WP-002, WP-003, WP-004  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
@@ -946,7 +973,8 @@ CREATE  src/features/alerts/FiltersBar.tsx
 ## WP-071 — Alert Card Design & Actions
 **Status:** Planned  
 **Depends On:** WP-070  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
@@ -963,7 +991,8 @@ MODIFY  src/api/alerts.ts
 ## WP-072 — New Alert Modal/Sheet (Autocomplete + Conditions)
 **Status:** Planned  
 **Depends On:** WP-070  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
@@ -981,7 +1010,8 @@ CREATE  src/features/alerts/SymbolAutocomplete.tsx
 ## WP-073 — Filter System (Status, Type, Symbol, Search)
 **Status:** Planned  
 **Depends On:** WP-070  
-**Priority:** P3  
+**Priority:** P3
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
@@ -998,7 +1028,8 @@ CREATE  src/features/alerts/filtering.ts
 ## WP-074 — Preset Templates & Import
 **Status:** Planned  
 **Depends On:** WP-072  
-**Priority:** P3  
+**Priority:** P3
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
@@ -1013,7 +1044,8 @@ CREATE  src/features/alerts/AlertTemplates.tsx
 ## WP-075 — Mobile Alerts (Scrollable, Swipe Actions)
 **Status:** Planned  
 **Depends On:** WP-070, WP-071  
-**Priority:** P3  
+**Priority:** P3
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
@@ -1030,7 +1062,8 @@ CREATE  src/features/alerts/MobileAlertRow.tsx
 ## WP-076 — Integrations (Chart → Alert, Browser Notifications)
 **Status:** Planned  
 **Depends On:** WP-072  
-**Priority:** P3  
+**Priority:** P3
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
@@ -1049,7 +1082,8 @@ CREATE  src/api/push.ts
 ## WP-090 — Settings Foundation (Layout + Cards)
 **Status:** Planned  
 **Depends On:** WP-002, WP-003, WP-004  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Build the new settings structure (desktop + mobile) with clean cards and top actions.
@@ -1078,7 +1112,8 @@ CREATE  src/features/settings/SettingsCard.tsx
 ## WP-091 — Appearance & General (Theme, Font Size, Cache)
 **Status:** Planned  
 **Depends On:** WP-090  
-**Priority:** P3  
+**Priority:** P3
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
@@ -1095,7 +1130,8 @@ MODIFY         src/features/theme/* (wire theme selection UI)
 ## WP-092 — Token Usage (Only) + Daily Reset at 00:00
 **Status:** Planned  
 **Depends On:** WP-090  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Goal
 Replace “AI Provider & Usage” complexity with a single **Token Usage** card:
@@ -1124,7 +1160,8 @@ MODIFY  src/store/telemetry.ts (or equivalent usage store)
 ## WP-093 — Wallet Monitoring
 **Status:** Planned  
 **Depends On:** WP-090  
-**Priority:** P2  
+**Priority:** P2
+**Implemented in PR:** —  
 
 ### Required UI
 - Monitored Wallet Address (with copy button)
@@ -1147,7 +1184,8 @@ MODIFY  src/store/userSettings.ts
 ## WP-094 — Data Export & Import (JSON/Markdown/Backup)
 **Status:** Planned  
 **Depends On:** WP-090  
-**Priority:** P3  
+**Priority:** P3
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
@@ -1164,7 +1202,8 @@ CREATE  src/features/settings/DataImportCard.tsx
 ## WP-095 — Chart & App Preferences
 **Status:** Planned  
 **Depends On:** WP-090  
-**Priority:** P3  
+**Priority:** P3
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
@@ -1179,7 +1218,8 @@ CREATE  src/features/settings/PreferencesCard.tsx
 ## WP-096 — Danger Zone (Accordion)
 **Status:** Planned  
 **Depends On:** WP-090  
-**Priority:** P3  
+**Priority:** P3
+**Implemented in PR:** —  
 
 ### Goal
 Destructive actions are grouped under a collapsible accordion to keep settings clean.
@@ -1199,7 +1239,8 @@ CREATE  src/features/settings/DangerZoneAccordion.tsx
 ## WP-097 — Mobile Settings (Accordion + Responsive)
 **Status:** Planned  
 **Depends On:** WP-090..WP-096  
-**Priority:** P3  
+**Priority:** P3
+**Implemented in PR:** —  
 
 ### File targets
 ```txt
