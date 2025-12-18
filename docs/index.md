@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-26)
+
+- **Hero KPI Bar (WP-011):** Sticky KPI rail beneath the dashboard header with tokenized KPICard/KPIBar components (`src/features/dashboard/KPIBar.tsx`, `src/features/dashboard/KPICard.tsx`, `src/features/dashboard/kpi.css`) wired into `src/pages/DashboardPage.tsx`; mobile scroll-snap + desktop sticky offset captured in `WP-Polish/WP-011/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2025-12-24)
 
 - **Dashboard Foundation (WP-010):** Neue Dashboard-Primitives (`src/features/dashboard/dashboard.css`) für tokenisierte Kartenflächen, konsistente Typografie und responsive Grids/Splits wurden in `src/pages/DashboardPage.tsx` verdrahtet; KPI-Bar, Holdings/Trade/Journal/Alerts-Karten respektieren nun die gemeinsamen Layout-/Scroll-Helfer.

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import DashboardKpiStrip from "@/components/dashboard/DashboardKpiStrip";
 import { LogEntryOverlayPanel } from "@/components/dashboard/LogEntryOverlayPanel";
 import InsightTeaser from "@/components/dashboard/InsightTeaser";
 import JournalSnapshot from "@/components/dashboard/JournalSnapshot";
@@ -12,6 +11,7 @@ import ErrorBanner from "@/components/ui/ErrorBanner";
 import { Skeleton } from "@/components/ui/Skeleton";
 import Button from "@/components/ui/Button";
 import StateView from "@/components/ui/StateView";
+import KPIBar, { type KPIDeltaDirection, type KPIItem } from "@/features/dashboard/KPIBar";
 import { useJournalStore } from "@/store/journalStore";
 import { useAlertsStore } from "@/store/alertsStore";
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from "@/lib/dashboard/calculateKPIs";
@@ -21,6 +21,7 @@ import { useSettings } from "@/state/settings";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
 import { useWalletHoldings } from "@/hooks/useWalletHoldings";
 import { getMonitoredWallet, WALLET_CHANGED_EVENT } from "@/lib/wallet/monitoredWallet";
+import { Activity, Bell, FileText, Target, TrendingUp } from "@/lib/icons";
 import "@/features/dashboard/dashboard.css";
 
 const dummyInsight = {
@@ -76,26 +77,86 @@ export default function DashboardPage() {
     setIsLoading(false);
   };
 
-  const kpiItems = useMemo(() => {
+  const kpiItems = useMemo<KPIItem[]>(() => {
     const armedAlertsCount = alerts.filter((alert) => alert.status === "armed").length;
     const netPnLValue = calculateNetPnL(journalEntries);
     const winRateValue = calculateWinRate(journalEntries, 30);
     const streakValue = calculateJournalStreak(journalEntries);
+    const tradesTracked = tradeEntries.length;
+    const inboxCount = Array.isArray(inboxEvents) ? inboxEvents.length : 0;
+    const reviewCount = Number.isFinite(unconsumedCount) ? unconsumedCount : 0;
 
-    const netTrend: "up" | "down" | "flat" =
+    const netTrend: KPIDeltaDirection =
       netPnLValue === "N/A" || netPnLValue === "0%"
         ? "flat"
         : netPnLValue.startsWith("-")
           ? "down"
           : "up";
 
+    const winRateTrend: KPIDeltaDirection =
+      winRateValue === "N/A"
+        ? "flat"
+        : Number.parseInt(winRateValue, 10) >= 50
+          ? "up"
+          : "down";
+
+    const alertsTrend: KPIDeltaDirection = armedAlertsCount > 0 ? "up" : "flat";
+    const streakTrend: KPIDeltaDirection = streakValue === "0 days" ? "flat" : "up";
+    const inboxTrend: KPIDeltaDirection = isInboxLoading ? "flat" : reviewCount > 0 ? "up" : "flat";
+
     return [
-      { label: "Net P&L", value: netPnLValue, trend: netTrend },
-      { label: "Win Rate", value: winRateValue, trend: "flat" as const },
-      { label: "Alerts Armed", value: String(armedAlertsCount), trend: "up" as const },
-      { label: "Journal Streak", value: streakValue, trend: "up" as const },
+      {
+        label: "Net P&L",
+        value: netPnLValue,
+        delta: {
+          value: netPnLValue === "N/A" ? "Awaiting trades" : netPnLValue,
+          direction: netTrend,
+          srLabel: "Net profitability",
+        },
+        icon: <TrendingUp size={18} />,
+      },
+      {
+        label: "Win Rate",
+        value: winRateValue,
+        delta: {
+          value: "30d window",
+          direction: winRateTrend,
+          srLabel: "Win rate momentum",
+        },
+        icon: <Target size={18} />,
+      },
+      {
+        label: "Alerts Armed",
+        value: String(armedAlertsCount),
+        delta: {
+          value: reviewCount > 0 ? `${reviewCount} to review` : "Standing by",
+          direction: alertsTrend,
+          srLabel: "Alerts readiness",
+        },
+        icon: <Bell size={18} />,
+      },
+      {
+        label: "Journal Streak",
+        value: streakValue,
+        delta: {
+          value: hasData ? "Keep it going" : "Start logging",
+          direction: streakTrend,
+          srLabel: "Journal consistency",
+        },
+        icon: <FileText size={18} />,
+      },
+      {
+        label: "Trade Inbox",
+        value: String(tradesTracked),
+        delta: {
+          value: isInboxLoading ? "Syncing..." : `${inboxCount} new`,
+          direction: inboxTrend,
+          srLabel: "Trade events queued",
+        },
+        icon: <Activity size={18} />,
+      },
     ];
-  }, [alerts, journalEntries]);
+  }, [alerts, hasData, inboxEvents, isInboxLoading, journalEntries, tradeEntries.length, unconsumedCount]);
 
   useEffect(() => {
     let mounted = true;
@@ -275,7 +336,7 @@ export default function DashboardPage() {
         title="Dashboard"
         description="Command surface for your net risk, streaks, and live intelligence."
         meta={`${journalEntries.length} journal entries · ${alerts.length} alerts`}
-        kpiStrip={<DashboardKpiStrip items={kpiItems} />}
+        kpiStrip={<KPIBar items={kpiItems} data-testid="dashboard-kpi-bar" />}
         actions={
           <Button
             variant="secondary"
