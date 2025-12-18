@@ -6,6 +6,14 @@
 
 ---
 
+## 2025-12-30
+
+### Added
+- Documented WP-015 dashboard footer widgets combining `getRecentJournalEntries`/`getAlertsOverview` typed mock fallbacks with the new `RecentEntriesSection` (responsive grid/scroll) and `AlertsOverviewWidget` stats card; checklist link: `WP-Polish/WP-015/checklist.md`.
+
+### Updated
+- Indexed the dashboard page wiring for the new recent entries + alerts overview row in `src/pages/DashboardPage.tsx`.
+
 ## 2025-12-29
 
 ### Added
