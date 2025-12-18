@@ -1,0 +1,161 @@
+.sf-kpi-bar {
+  --sf-kpi-offset: calc(60px + var(--sf-space-2));
+  position: sticky;
+  top: var(--sf-kpi-offset);
+  z-index: 12;
+  width: 100%;
+  background: color-mix(in srgb, var(--sf-bg-0) 90%, transparent);
+  backdrop-filter: blur(16px);
+  padding-block: var(--sf-space-2);
+  margin-bottom: var(--sf-space-2);
+}
+
+.sf-kpi-bar__track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 1fr);
+  gap: var(--sf-space-4);
+  overflow-x: auto;
+  padding: var(--sf-space-2) calc(var(--sf-space-2) + env(safe-area-inset-right))
+    calc(var(--sf-space-2) + env(safe-area-inset-bottom))
+    calc(var(--sf-space-2) + env(safe-area-inset-left));
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--sf-space-2);
+  -webkit-overflow-scrolling: touch;
+}
+
+.sf-kpi-bar__track > .sf-kpi-card {
+  scroll-snap-align: start;
+}
+
+.sf-kpi-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--sf-space-3);
+  padding: var(--sf-space-4);
+  min-width: min(260px, 80vw);
+  min-height: 128px;
+  border-radius: var(--sf-radius-lg);
+  background: color-mix(in srgb, var(--sf-bg-2) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sf-border-1) 80%, transparent);
+  box-shadow: 0 16px 48px color-mix(in srgb, var(--sf-shadow) 85%, transparent);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+@media (hover: hover) {
+  .sf-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 56px color-mix(in srgb, var(--sf-shadow) 95%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sf-kpi-card {
+    transition: none;
+  }
+
+  .sf-kpi-card:hover {
+    transform: none;
+  }
+}
+
+.sf-kpi-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sf-space-3);
+}
+
+.sf-kpi-card__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  min-height: 44px;
+  color: var(--sf-text-2);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.sf-kpi-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--sf-bg-1) 75%, transparent);
+  color: var(--sf-text-1);
+  border: 1px solid color-mix(in srgb, var(--sf-border-1) 80%, transparent);
+}
+
+.sf-kpi-card__label-text {
+  white-space: nowrap;
+}
+
+.sf-kpi-card__value {
+  font-size: clamp(1.75rem, 1.4rem + 0.6vw, 2.25rem);
+  font-weight: 800;
+  color: var(--sf-text-1);
+  letter-spacing: -0.01em;
+}
+
+.sf-kpi-card__delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid var(--sf-border-1);
+  background: color-mix(in srgb, var(--sf-bg-1) 80%, transparent);
+}
+
+.sf-kpi-card__delta-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.sf-kpi-card__delta-value {
+  display: inline-flex;
+  align-items: center;
+}
+
+.sf-kpi-card__delta--up {
+  color: var(--sf-success);
+  border-color: color-mix(in srgb, var(--sf-success) 42%, transparent);
+  background: color-mix(in srgb, var(--sf-success) 16%, transparent);
+}
+
+.sf-kpi-card__delta--down {
+  color: var(--sf-danger);
+  border-color: color-mix(in srgb, var(--sf-danger) 42%, transparent);
+  background: color-mix(in srgb, var(--sf-danger) 16%, transparent);
+}
+
+.sf-kpi-card__delta--flat {
+  color: var(--sf-text-3);
+  border-color: color-mix(in srgb, var(--sf-border-1) 80%, transparent);
+  background: color-mix(in srgb, var(--sf-bg-1) 82%, transparent);
+}
+
+@media (min-width: 768px) {
+  .sf-kpi-bar {
+    --sf-kpi-offset: calc(64px + var(--sf-space-2));
+    padding-block: var(--sf-space-3);
+  }
+
+  .sf-kpi-bar__track {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    overflow: visible;
+    padding: 0;
+  }
+
+  .sf-kpi-bar__track > .sf-kpi-card {
+    scroll-snap-align: unset;
+  }
+}

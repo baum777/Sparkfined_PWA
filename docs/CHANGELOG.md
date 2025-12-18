@@ -6,6 +6,15 @@
 
 ---
 
+## 2025-12-26
+
+### Added
+- Recorded WP-011 Hero KPI Bar delivery with sticky KPI rail, tokenized cards, and responsive scroll behavior across `src/features/dashboard/KPIBar.tsx`, `src/features/dashboard/KPICard.tsx`, `src/features/dashboard/kpi.css`, and `src/pages/DashboardPage.tsx`.
+- Linked the WP-011 checklist artifact at `WP-Polish/WP-011/checklist.md` for task traceability.
+
+### Updated
+- Indexed the dashboard documentation entry to reflect the new KPI hero bar, placeholder KPI data, and desktop/mobile layout expectations.
+
 ## 2025-12-24
 
 ### Added
