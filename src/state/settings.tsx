@@ -2,6 +2,8 @@ import React from 'react'
 import { getJSON, setJSON } from '@/lib/safeStorage'
 import { isQuoteCurrency, type QuoteCurrency } from '@/types/currency'
 
+export type ThemeMode = 'light' | 'dark' | 'system'
+
 export type Settings = {
   snapDefault: boolean
   replaySpeed: 1 | 2 | 4 | 8 | 10
@@ -11,6 +13,7 @@ export type Settings = {
   defaultBalance?: number
   defaultPlaybookId?: string
   quoteCurrency: QuoteCurrency
+  themeMode: ThemeMode
 }
 
 export const SETTINGS_STORAGE_KEY = 'sparkfined.settings.v1'
@@ -23,19 +26,30 @@ export const DEFAULT_SETTINGS: Settings = {
   defaultBalance: 1000,
   defaultPlaybookId: 'bal-15',
   quoteCurrency: 'USD',
+  themeMode: 'dark',
 }
 
-type StoredSettings = Settings & { theme?: string }
+type StoredSettings = Settings & { theme?: string; themeMode?: ThemeMode }
+
+const isThemeMode = (value: unknown): value is ThemeMode =>
+  value === 'light' || value === 'dark' || value === 'system'
 
 function read(): Settings {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { theme: _legacyTheme, ...settings } = getJSON<StoredSettings>(
+  const { theme: legacyTheme, themeMode, ...settings } = getJSON<StoredSettings>(
     SETTINGS_STORAGE_KEY,
     DEFAULT_SETTINGS,
   )
+
+  const resolvedTheme: ThemeMode = isThemeMode(themeMode)
+    ? themeMode
+    : isThemeMode(legacyTheme)
+      ? legacyTheme
+      : DEFAULT_SETTINGS.themeMode
+
   return {
     ...DEFAULT_SETTINGS,
     ...settings,
+    themeMode: resolvedTheme,
     quoteCurrency: isQuoteCurrency(settings.quoteCurrency)
       ? settings.quoteCurrency
       : DEFAULT_SETTINGS.quoteCurrency,

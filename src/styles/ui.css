@@ -1,0 +1,43 @@
+:root {
+  --sf-space-2: 8px;
+  --sf-space-3: 12px;
+  --sf-space-4: 16px;
+  --sf-space-6: 24px;
+  --sf-space-8: 32px;
+}
+
+.sf-gap-2 { gap: var(--sf-space-2); }
+.sf-gap-3 { gap: var(--sf-space-3); }
+.sf-gap-4 { gap: var(--sf-space-4); }
+.sf-gap-6 { gap: var(--sf-space-6); }
+.sf-gap-8 { gap: var(--sf-space-8); }
+
+.sf-pad-4 { padding: var(--sf-space-4); }
+.sf-pad-6 { padding: var(--sf-space-6); }
+
+.sf-card {
+  background-color: var(--sf-bg-2);
+  color: var(--sf-text-1);
+  border: 1px solid var(--sf-border-1);
+  border-radius: var(--sf-radius-lg);
+  box-shadow: 0 16px 48px var(--sf-shadow);
+}
+
+.sf-surface {
+  background-color: var(--sf-bg-1);
+  color: var(--sf-text-1);
+  border: 1px solid var(--sf-border-1);
+  border-radius: var(--sf-radius-md);
+}
+
+.sf-focus-ring {
+  outline: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.sf-focus-ring:focus-visible {
+  border-color: var(--sf-primary);
+  box-shadow: 0 0 0 2px var(--sf-primary),
+    0 0 0 6px color-mix(in srgb, var(--sf-primary) 35%, transparent);
+}
+

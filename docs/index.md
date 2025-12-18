@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-21)
+
+- **Theme System (WP-002):** Dunkelmodus als Standard mit neuem `ThemeProvider`/`useTheme` unter `src/features/theme/`, Persistenz über den Settings-Store und das Legacy-LocalStorage-Flag. Globale Token-Definitionen liegen in `src/styles/theme.css`, Utilities (Card, Spacing, Focus-Ring) in `src/styles/ui.css` und werden in `src/App.tsx` eingebunden.
+
 ## 📦 Neue Ergänzungen (2025-12-20)
 
 - **Working Paper Relocation:** Das UI & UX Polish Working Paper liegt jetzt kanonisch unter `tasks/WP-polish/UI_&_UX_polish.md`; im Repo-Root bleibt eine Stub-Datei für bestehende Bookmarks, und das neue Ordner-Target `WP-Polish/` ist für PR-Artefakte vorbereitet.
