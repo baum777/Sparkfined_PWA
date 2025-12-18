@@ -2,9 +2,9 @@ import React from "react"
 import { Outlet } from "react-router-dom"
 import { cn } from "@/lib/ui/cn"
 import Topbar from "./Topbar"
-import Rail from "./Rail"
 import ActionPanel from "./ActionPanel"
 import BottomNavBar from "@/features/shell/BottomNavBar"
+import Sidebar from "@/features/shell/Sidebar"
 
 const ACTION_PANEL_STORAGE_KEY = "sf.actionPanel.open"
 
@@ -14,7 +14,6 @@ export default function AppShell() {
     const stored = window.localStorage.getItem(ACTION_PANEL_STORAGE_KEY)
     return stored ? stored === "true" : false
   })
-  const [isRailExpanded, setIsRailExpanded] = React.useState(false)
   const toggleButtonRef = React.useRef<HTMLButtonElement>(null)
 
   React.useEffect(() => {
@@ -34,20 +33,18 @@ export default function AppShell() {
     setIsActionPanelOpen((prev) => !prev)
   }, [])
 
-  const handleToggleRail = React.useCallback(() => {
-    setIsRailExpanded((prev) => !prev)
-  }, [])
-
   return (
     <div
       className={cn(
         "sf-shell",
         !isActionPanelOpen && "sf-shell-action-closed",
-        isRailExpanded && "sf-shell-rail-expanded",
       )}
       data-action-panel-open={isActionPanelOpen}
-      data-rail-expanded={isRailExpanded}
     >
+      <aside className="sf-rail sf-rail--sidebar">
+        <Sidebar />
+      </aside>
+
       <header className="sf-topbar">
         <Topbar
           onToggleActionPanel={handleToggleActionPanel}
@@ -55,10 +52,6 @@ export default function AppShell() {
           actionPanelToggleRef={toggleButtonRef}
         />
       </header>
-
-      <aside className="sf-rail" data-expanded={isRailExpanded}>
-        <Rail isExpanded={isRailExpanded} onToggleExpand={handleToggleRail} />
-      </aside>
 
       <main id="main-content" tabIndex={-1} className={cn("sf-canvas")}>
         <Outlet />
