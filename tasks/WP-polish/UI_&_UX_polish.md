@@ -35,6 +35,10 @@ Two WPs may be combined into one PR **only if**:
 ---
 
 ## Codex Execution Contract (Applies to every WP)
+### Workflow Optimizations (Recommended)
+- **PR-Guardrail Script:** Add a `pnpm wp:guard` (or pre-push hook) that checks: only allowed WP file targets changed, `./WP-Polish/<WP-ID>/checklist.md` exists, and PR title includes `WP-XXX`.
+- **Done Marker in Working Paper:** Each WP gets `Implemented in PR:` + date/link so “current state check” is deterministic.
+- **Review Snapshots:** Store 1–2 screenshots/GIFs (mobile/desktop) or exact viewport steps under `./WP-Polish/<WP-ID>/` to speed up reviews and make UX changes verifiable.
 
 ### Scope & PR hygiene
 - **One WP per PR** (exceptions only if explicitly marked *“Atomic Pair”* in the WP).
