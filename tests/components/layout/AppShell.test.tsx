@@ -4,18 +4,24 @@ import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { MemoryRouter, Route, Routes } from "react-router-dom"
 import AppShell from "@/components/layout/AppShell"
+import { SettingsProvider } from "@/state/settings"
+import { ThemeProvider } from "@/features/theme/ThemeContext"
 
 function renderShell(pathname = "/dashboard") {
   return render(
     <MemoryRouter initialEntries={[{ pathname }]}>
-      <Routes>
-        <Route element={<AppShell />}>
-          <Route path="/dashboard" element={<div>Dashboard Content</div>} />
-          <Route path="/chart" element={<div>Chart Page</div>} />
-          <Route path="/journal" element={<div>Journal Page</div>} />
-          <Route path="/watchlist" element={<div>Watchlist Page</div>} />
-        </Route>
-      </Routes>
+      <SettingsProvider>
+        <ThemeProvider>
+          <Routes>
+            <Route element={<AppShell />}>
+              <Route path="/dashboard" element={<div>Dashboard Content</div>} />
+              <Route path="/chart" element={<div>Chart Page</div>} />
+              <Route path="/journal" element={<div>Journal Page</div>} />
+              <Route path="/watchlist" element={<div>Watchlist Page</div>} />
+            </Route>
+          </Routes>
+        </ThemeProvider>
+      </SettingsProvider>
     </MemoryRouter>
   )
 }
@@ -29,10 +35,15 @@ describe("AppShell", () => {
     const user = userEvent.setup()
     renderShell()
 
-    expect(screen.getByText("Sparkfined")).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Global search" })).toBeInTheDocument()
+    expect(screen.getByLabelText("Current page")).toHaveTextContent("Dashboard")
+    const themeButtons = screen.getAllByRole("button", {
+      name: /switch to (light|dark) theme/i,
+    })
+    expect(themeButtons.length).toBeGreaterThan(0)
+    const settingsLinks = screen.getAllByRole("link", { name: "Settings" })
+    expect(settingsLinks.length).toBeGreaterThan(0)
 
-    const toggle = screen.getByRole("button", { name: "Toggle panel" })
+    const toggle = screen.getByRole("button", { name: "Toggle action panel" })
     expect(toggle).toHaveAttribute("aria-expanded", "false")
     expect(screen.queryByText("Inspector")).not.toBeInTheDocument()
 
@@ -70,7 +81,7 @@ describe("AppShell", () => {
     const user = userEvent.setup()
     renderShell("/journal")
 
-    const toggle = screen.getByRole("button", { name: "Toggle panel" })
+    const toggle = screen.getByRole("button", { name: "Toggle action panel" })
     await user.click(toggle)
 
     expect(await screen.findByText("Journal tools")).toBeInTheDocument()
@@ -81,7 +92,7 @@ describe("AppShell", () => {
     const user = userEvent.setup()
     renderShell()
 
-    const toggle = screen.getByRole("button", { name: "Toggle panel" })
+    const toggle = screen.getByRole("button", { name: "Toggle action panel" })
 
     await user.click(toggle)
     expect(toggle).toHaveAttribute("aria-expanded", "true")
