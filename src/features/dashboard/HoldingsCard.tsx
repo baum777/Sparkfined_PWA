@@ -36,14 +36,28 @@ const formatChange = (value?: number): string => {
   return fmtPct(value);
 };
 
+const getHoldingDisplayName = (holding: HoldingDTO): string | null => {
+  const maybeName = (holding as unknown as { name?: unknown }).name;
+  if (typeof maybeName === "string" && maybeName.trim().length > 0) return maybeName.trim();
+  return null;
+};
+
+const getHoldingIconUrl = (holding: HoldingDTO): string | null => {
+  const maybeIconUrl = (holding as unknown as { iconUrl?: unknown }).iconUrl;
+  if (typeof maybeIconUrl === "string" && maybeIconUrl.trim().length > 0) return maybeIconUrl.trim();
+  return null;
+};
+
 export default function HoldingsCard({ className }: HoldingsCardProps) {
   const navigate = useNavigate();
+
   const [walletAddress, setWalletAddress] = useState<string | null>(() => getMonitoredWallet());
   const [{ status, holdings, error }, setState] = useState<HoldingsState>({
     status: walletAddress ? "loading" : "idle",
     holdings: [],
     error: null,
   });
+
   const isMountedRef = useRef(true);
 
   const refreshHoldings = useCallback(async () => {
@@ -61,20 +75,28 @@ export default function HoldingsCard({ className }: HoldingsCardProps) {
     try {
       const result = await getHoldings(walletAddress);
       if (!isMountedRef.current) return;
-      setState({ status: "success", holdings: result, error: null });
+
+      // Defensive: filter out invalid rows (should already be sanitized in API layer).
+      const safeHoldings = Array.isArray(result) ? result.filter(Boolean) : [];
+      setState({ status: "success", holdings: safeHoldings, error: null });
     } catch (refreshError) {
       if (!isMountedRef.current) return;
+
       const fallbackMessage =
         refreshError instanceof Error && refreshError.message.trim().length > 0
           ? refreshError.message
           : "Unable to load holdings right now.";
+
       setState({ status: "error", holdings: [], error: fallbackMessage });
     }
   }, [walletAddress]);
 
   useEffect(() => {
     isMountedRef.current = true;
-    const handleWalletChange = () => setWalletAddress(getMonitoredWallet());
+
+    const handleWalletChange = () => {
+      setWalletAddress(getMonitoredWallet());
+    };
 
     window.addEventListener("storage", handleWalletChange);
     window.addEventListener(WALLET_CHANGED_EVENT, handleWalletChange);
@@ -90,14 +112,14 @@ export default function HoldingsCard({ className }: HoldingsCardProps) {
     void refreshHoldings();
   }, [refreshHoldings]);
 
-  const isNotConnected = useMemo(() => !walletAddress, [walletAddress]);
+  const isNotConnected = !walletAddress;
   const isLoading = status === "loading";
   const isError = status === "error";
   const hasHoldings = holdings.length > 0;
-  const displayHoldings = useMemo(
-    () => [...holdings].sort((a, b) => b.valueUsd - a.valueUsd),
-    [holdings]
-  );
+
+  const displayHoldings = useMemo(() => {
+    return [...holdings].sort((a, b) => (b.valueUsd ?? 0) - (a.valueUsd ?? 0));
+  }, [holdings]);
 
   const handleRowClick = useCallback(
     (symbol: string) => {
@@ -178,14 +200,18 @@ export default function HoldingsCard({ className }: HoldingsCardProps) {
         {!isNotConnected && !isLoading && !isError && hasHoldings ? (
           <div className="sf-holdings-card__table" role="list" aria-label="Wallet holdings">
             <div className="sf-holdings-card__head">
-              <span>Symbol</span>
+              <span>Asset</span>
               <span>Amount</span>
               <span>Value</span>
               <span>Change</span>
             </div>
+
             <div className="sf-holdings-card__rows">
               {displayHoldings.map((holding, index) => {
                 const changeTone = getChangeTone(holding.changePct24h);
+                const name = getHoldingDisplayName(holding);
+                const iconUrl = getHoldingIconUrl(holding);
+
                 return (
                   <button
                     key={`${holding.symbol}-${index}`}
@@ -194,17 +220,46 @@ export default function HoldingsCard({ className }: HoldingsCardProps) {
                     onClick={() => handleRowClick(holding.symbol)}
                   >
                     <div className="sf-holdings-card__cell sf-holdings-card__cell--symbol">
-                      <span className="sf-holdings-card__meta-label">Symbol</span>
-                      <span className="sf-holdings-card__symbol">{holding.symbol}</span>
+                      <span className="sf-holdings-card__meta-label">Asset</span>
+
+                      <div className="sf-holdings-card__asset">
+                        <div className="sf-holdings-card__icon" aria-hidden="true">
+                          {iconUrl ? (
+                            <img
+                              src={iconUrl}
+                              alt=""
+                              loading="lazy"
+                              className="sf-holdings-card__icon-img"
+                              onError={(e) => {
+                                // Hide broken image; keep placeholder via CSS.
+                                (e.currentTarget as HTMLImageElement).style.display = "none";
+                              }}
+                            />
+                          ) : null}
+                          {!iconUrl ? (
+                            <span className="sf-holdings-card__icon-fallback">
+                              {holding.symbol?.slice(0, 1) ?? "—"}
+                            </span>
+                          ) : null}
+                        </div>
+
+                        <div className="sf-holdings-card__asset-text">
+                          <span className="sf-holdings-card__symbol">{holding.symbol}</span>
+                          {name ? <span className="sf-holdings-card__name">{name}</span> : null}
+                        </div>
+                      </div>
                     </div>
+
                     <div className="sf-holdings-card__cell sf-holdings-card__cell--amount">
                       <span className="sf-holdings-card__meta-label">Amount</span>
                       <span className="sf-holdings-card__value">{fmtNum(holding.amount)}</span>
                     </div>
+
                     <div className="sf-holdings-card__cell sf-holdings-card__cell--value">
                       <span className="sf-holdings-card__meta-label">Value</span>
                       <span className="sf-holdings-card__value">{fmtUsd(holding.valueUsd)}</span>
                     </div>
+
                     <div className="sf-holdings-card__cell sf-holdings-card__cell--change">
                       <span className="sf-holdings-card__meta-label">Change</span>
                       <span
