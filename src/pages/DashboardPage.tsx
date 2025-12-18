@@ -13,6 +13,8 @@ import KPIBar, { type KPIDeltaDirection, type KPIItem } from "@/features/dashboa
 import DailyBiasCard from "@/features/dashboard/DailyBiasCard";
 import HoldingsCard from "@/features/dashboard/HoldingsCard";
 import TradeLogCard from "@/features/dashboard/TradeLogCard";
+import RecentEntriesSection from "@/features/dashboard/RecentEntriesSection";
+import AlertsOverviewWidget from "@/features/dashboard/AlertsOverviewWidget";
 import { useJournalStore } from "@/store/journalStore";
 import { useAlertsStore } from "@/store/alertsStore";
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from "@/lib/dashboard/calculateKPIs";
@@ -308,6 +310,17 @@ export default function DashboardPage() {
     );
   };
 
+  const renderBottomSections = () => (
+    <div className="dashboard-grid dashboard-grid--two">
+      <div className="dashboard-primary">
+        <RecentEntriesSection />
+      </div>
+      <div className="dashboard-secondary">
+        <AlertsOverviewWidget />
+      </div>
+    </div>
+  );
+
   return (
     <div className="dashboard-page" data-testid="dashboard-page">
       {/* Note: DashboardShell is the single layout source-of-truth (no legacy Container/PageHeader duplication). */}
@@ -335,6 +348,7 @@ export default function DashboardPage() {
         }
       >
         {renderMainContent()}
+        {renderBottomSections()}
       </DashboardShell>
       <LogEntryOverlayPanel
         isOpen={isLogOverlayOpen}

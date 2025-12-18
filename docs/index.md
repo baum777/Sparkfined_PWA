@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-30)
+
+- **Recent Entries + Alerts Overview (WP-015):** Bottom dashboard section combining `RecentEntriesSection` (responsive grid/horizontal scroll with loading/error/empty states, `src/features/dashboard/RecentEntriesSection.tsx`, `src/features/dashboard/recent-entries.css`) and `AlertsOverviewWidget` (armed/triggered/paused stats with CTA, `src/features/dashboard/AlertsOverviewWidget.tsx`, `src/features/dashboard/alerts-overview.css`) backed by typed mock APIs `getRecentJournalEntries`/`getAlertsOverview`, wired into `src/pages/DashboardPage.tsx`; Checklist-Link: `WP-Polish/WP-015/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2025-12-29)
 
 - **Recent Trades (WP-014):** Neues `getRecentTrades`-DTO mit deterministischem Mock (`src/api/journalEntries.ts`), tokenisierte `TradeLogCard`/`TradeLogEntry` mit Loading/Error/Empty-Zuständen und Load-more, BUY-Signal-abhängiger "Log entry"-CTA über `useLogEntryAvailability` (`src/features/journal/useLogEntryAvailability.ts`) und Overlay-Öffnung im Dashboard (`src/pages/DashboardPage.tsx`); Checklist-Link: `WP-Polish/WP-014/checklist.md`.
