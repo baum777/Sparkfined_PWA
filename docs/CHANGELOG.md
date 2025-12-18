@@ -6,6 +6,14 @@
 
 ---
 
+## 2025-12-29
+
+### Added
+- Documented WP-014 Recent Trades card delivery covering the typed `TradeLogItemDTO` + `getRecentTrades` mock fallback (`src/api/journalEntries.ts`), tokenized `TradeLogCard`/`TradeLogEntry` components with loading/error/empty states and load-more control, and the BUY-signal gated log-entry CTA; checklist link: `WP-Polish/WP-014/checklist.md`.
+
+### Updated
+- Indexed the dashboard docs to include the Recent Trades wiring in `src/features/dashboard/TradeLogCard.tsx`, `src/features/dashboard/trade-log.css`, `src/pages/DashboardPage.tsx`, and the BUY signal bridge `src/features/journal/useLogEntryAvailability.ts`.
+
 ## 2025-12-28
 
 ### Added
