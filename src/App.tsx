@@ -6,8 +6,10 @@ import RoutesRoot from './routes/RoutesRoot'
 import MissingConfigBanner from './components/MissingConfigBanner'
 import OfflineIndicator from './components/pwa/OfflineIndicator'
 import UpdateBanner from './components/UpdateBanner'
+import './styles/theme.css'
+import './styles/ui.css'
 import './styles/App.css'
-import { ThemeProvider } from '@/lib/theme/theme-provider'
+import { ThemeProvider } from '@/features/theme/ThemeContext'
 import { checkAlerts, notifyAlertTriggered } from '@/lib/alerts/triggerEngine'
 import { useAlertsStore } from '@/store/alertsStore'
 import { ToastProvider } from '@/components/ui/Toast'
@@ -62,8 +64,8 @@ function App() {
   return (
     <>
       <TelemetryProvider>
-        <ThemeProvider>
-          <SettingsProvider>
+        <SettingsProvider>
+          <ThemeProvider>
             <AIProviderState>
               <ToastProvider>
               {/* Missing Config Banner */}
@@ -84,8 +86,8 @@ function App() {
               <RoutesRoot />
               </ToastProvider>
             </AIProviderState>
-          </SettingsProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </SettingsProvider>
       </TelemetryProvider>
     </>
   )
