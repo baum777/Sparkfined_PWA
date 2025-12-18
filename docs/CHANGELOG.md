@@ -6,6 +6,14 @@
 
 ---
 
+## 2025-12-28
+
+### Added
+- Documented WP-013 Holdings / Wallet Snapshot card delivery, covering the typed `HoldingDTO` + `getHoldings` mock fallback (`src/api/wallet.ts`), the dashboard HoldingsCard states (not-connected/loading/error/empty/loaded), and the checklist link at `WP-Polish/WP-013/checklist.md`.
+
+### Updated
+- Docs index now references the holdings snapshot card wiring in `src/features/dashboard/HoldingsCard.tsx`, `src/features/dashboard/holdings-card.css`, and `src/pages/DashboardPage.tsx`.
+
 ## 2025-12-27
 
 ### Added

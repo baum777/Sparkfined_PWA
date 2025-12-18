@@ -1,224 +1,229 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useWalletStore } from '@/store/walletStore';
-import { getHoldings, HoldingDTO } from '@/api/wallet';
-import { RefreshCw, Wallet, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Button from "@/components/ui/Button";
+import StateView from "@/components/ui/StateView";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { getHoldings, type HoldingDTO } from "@/api/wallet";
+import { fmtNum, fmtPct, fmtUsd } from "@/lib/format";
+import { WALLET_CHANGED_EVENT, getMonitoredWallet } from "@/lib/wallet/monitoredWallet";
+import { cn } from "@/lib/ui/cn";
+import "./holdings-card.css";
 
-export const HoldingsCard = () => {
-  const activeWallets = useWalletStore((state) => state.wallets.filter(w => w.isActive));
-  const hasConnectedWallet = activeWallets.length > 0;
-  
-  const [holdings, setHoldings] = useState<HoldingDTO[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+type HoldingsStatus = "idle" | "loading" | "success" | "error";
+
+interface HoldingsCardProps {
+  className?: string;
+}
+
+interface HoldingsState {
+  status: HoldingsStatus;
+  holdings: HoldingDTO[];
+  error: string | null;
+}
+
+const truncateWallet = (address: string): string => {
+  if (address.length <= 10) return address;
+  return `${address.slice(0, 6)}…${address.slice(-4)}`;
+};
+
+const getChangeTone = (change?: number): "positive" | "negative" | "neutral" => {
+  if (typeof change !== "number" || Number.isNaN(change) || change === 0) return "neutral";
+  return change > 0 ? "positive" : "negative";
+};
+
+const formatChange = (value?: number): string => {
+  if (typeof value !== "number" || Number.isNaN(value)) return "—";
+  return fmtPct(value);
+};
+
+export default function HoldingsCard({ className }: HoldingsCardProps) {
   const navigate = useNavigate();
+  const [walletAddress, setWalletAddress] = useState<string | null>(() => getMonitoredWallet());
+  const [{ status, holdings, error }, setState] = useState<HoldingsState>({
+    status: walletAddress ? "loading" : "idle",
+    holdings: [],
+    error: null,
+  });
+  const isMountedRef = useRef(true);
 
-  useEffect(() => {
-    if (!hasConnectedWallet) {
-      setHoldings([]);
+  const refreshHoldings = useCallback(async () => {
+    if (!walletAddress) {
+      setState({ status: "idle", holdings: [], error: null });
       return;
     }
 
-    const fetchHoldings = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const primaryWallet = activeWallets[0]?.address;
-        const data = await getHoldings(primaryWallet);
-        setHoldings(data);
-      } catch (err) {
-        setError('Failed to load holdings');
-      } finally {
-        setLoading(false);
-      }
+    setState((prev) => ({
+      status: "loading",
+      holdings: prev.status === "success" ? prev.holdings : [],
+      error: null,
+    }));
+
+    try {
+      const result = await getHoldings(walletAddress);
+      if (!isMountedRef.current) return;
+      setState({ status: "success", holdings: result, error: null });
+    } catch (refreshError) {
+      if (!isMountedRef.current) return;
+      const fallbackMessage =
+        refreshError instanceof Error && refreshError.message.trim().length > 0
+          ? refreshError.message
+          : "Unable to load holdings right now.";
+      setState({ status: "error", holdings: [], error: fallbackMessage });
+    }
+  }, [walletAddress]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    const handleWalletChange = () => setWalletAddress(getMonitoredWallet());
+
+    window.addEventListener("storage", handleWalletChange);
+    window.addEventListener(WALLET_CHANGED_EVENT, handleWalletChange);
+
+    return () => {
+      isMountedRef.current = false;
+      window.removeEventListener("storage", handleWalletChange);
+      window.removeEventListener(WALLET_CHANGED_EVENT, handleWalletChange);
     };
+  }, []);
 
-    fetchHoldings();
-  }, [hasConnectedWallet, activeWallets]);
+  useEffect(() => {
+    void refreshHoldings();
+  }, [refreshHoldings]);
 
-  const handleRowClick = (symbol: string) => {
-    // Navigate to watchlist detail or fallback to watchlist page
-    // Using query param for now as a safe linking strategy if detail route isn't confirmed
-    navigate(`/watchlist?symbol=${symbol}`);
-  };
-
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(val);
-  };
-
-  const formatCrypto = (val: number) => {
-    return new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 4,
-    }).format(val);
-  };
-
-  // Not Connected State
-  if (!hasConnectedWallet) {
-    return (
-      <div className="sf-card p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[320px]">
-        <div className="p-3 bg-surface-raised rounded-full text-text-secondary">
-          <Wallet size={32} />
-        </div>
-        <div>
-          <h3 className="text-lg font-medium text-text-primary mb-1">No Wallet Connected</h3>
-          <p className="text-sm text-text-secondary max-w-[240px]">
-            Connect a Solana wallet to track your holdings and performance.
-          </p>
-        </div>
-        <Link 
-          to="/settings" 
-          className="sf-btn sf-btn-primary"
-        >
-          Connect Wallet
-        </Link>
-      </div>
-    );
-  }
-
-  // Error State
-  if (error) {
-    return (
-      <div className="sf-card p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[320px]">
-        <div className="p-3 bg-danger/10 text-danger rounded-full">
-          <AlertCircle size={32} />
-        </div>
-        <div>
-          <h3 className="text-lg font-medium text-text-primary mb-1">Unable to Load Holdings</h3>
-          <p className="text-sm text-text-secondary">{error}</p>
-        </div>
-        <button 
-          onClick={() => window.location.reload()} 
-          className="sf-btn sf-btn-secondary"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
-  // Loading State
-  if (loading) {
-    return (
-      <div className="sf-card p-6 h-full min-h-[320px] flex flex-col">
-        <div className="flex items-center justify-between mb-6">
-          <div className="h-6 w-32 bg-surface-raised animate-pulse rounded" />
-          <div className="h-8 w-8 bg-surface-raised animate-pulse rounded-full" />
-        </div>
-        <div className="space-y-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex items-center justify-between py-2">
-              <div className="flex items-center space-x-3">
-                <div className="h-8 w-8 bg-surface-raised animate-pulse rounded-full" />
-                <div className="space-y-2">
-                  <div className="h-4 w-16 bg-surface-raised animate-pulse rounded" />
-                  <div className="h-3 w-10 bg-surface-raised animate-pulse rounded" />
-                </div>
-              </div>
-              <div className="space-y-2 text-right">
-                <div className="h-4 w-20 bg-surface-raised animate-pulse rounded" />
-                <div className="h-3 w-12 bg-surface-raised animate-pulse rounded ml-auto" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // Empty State
-  if (holdings.length === 0) {
-    return (
-      <div className="sf-card p-6 flex flex-col items-center justify-center text-center space-y-4 h-full min-h-[320px]">
-        <div className="p-3 bg-surface-raised rounded-full text-text-secondary">
-          <Wallet size={32} />
-        </div>
-        <div>
-          <h3 className="text-lg font-medium text-text-primary mb-1">Wallet Empty</h3>
-          <p className="text-sm text-text-secondary">
-            No holdings found in the connected wallet.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Render List
-  return (
-    <div className="sf-card p-6 h-full min-h-[320px] flex flex-col">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-medium text-text-primary">Holdings</h3>
-        <button 
-          onClick={() => {/* Refresh logic */}}
-          className="text-text-tertiary hover:text-text-primary transition-colors p-1 rounded-md hover:bg-surface-raised"
-          aria-label="Refresh holdings"
-        >
-          <RefreshCw size={16} />
-        </button>
-      </div>
-      
-      <div className="overflow-x-auto -mx-6 px-6 pb-2">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="text-xs text-text-tertiary border-b border-border-1">
-              <th className="pb-2 font-medium pl-2">Asset</th>
-              <th className="pb-2 font-medium text-right">Balance</th>
-              <th className="pb-2 font-medium text-right">Value</th>
-              <th className="pb-2 font-medium text-right pr-2">24h</th>
-            </tr>
-          </thead>
-          <tbody className="text-sm">
-            {holdings.map((holding) => {
-              const isPositive = (holding.changePct24h || 0) >= 0;
-              const isNeutral = holding.changePct24h === 0;
-              
-              return (
-                <tr 
-                  key={holding.symbol}
-                  onClick={() => handleRowClick(holding.symbol)}
-                  className="group cursor-pointer hover:bg-surface-raised/50 transition-colors border-b border-border-1 last:border-0"
-                >
-                  <td className="py-3 pl-2">
-                    <div className="flex items-center space-x-3">
-                      {/* Icon placeholder if no image */}
-                      <div className="w-8 h-8 rounded-full bg-surface-raised flex items-center justify-center text-xs font-bold text-text-secondary">
-                        {holding.symbol[0]}
-                      </div>
-                      <div>
-                        <div className="font-medium text-text-primary">{holding.symbol}</div>
-                        <div className="text-xs text-text-secondary">{holding.name}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-3 text-right text-text-secondary font-mono">
-                    {formatCrypto(holding.amount)}
-                  </td>
-                  <td className="py-3 text-right text-text-primary font-medium font-mono">
-                    {formatCurrency(holding.valueUsd)}
-                  </td>
-                  <td className="py-3 text-right pr-2 font-mono">
-                    <div className={`flex items-center justify-end space-x-1 ${
-                      isNeutral ? 'text-text-secondary' : isPositive ? 'text-success' : 'text-danger'
-                    }`}>
-                      {holding.changePct24h !== undefined && (
-                         <>
-                           {!isNeutral && (isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />)}
-                           <span>{Math.abs(holding.changePct24h).toFixed(2)}%</span>
-                         </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
+  const isNotConnected = useMemo(() => !walletAddress, [walletAddress]);
+  const isLoading = status === "loading";
+  const isError = status === "error";
+  const hasHoldings = holdings.length > 0;
+  const displayHoldings = useMemo(
+    () => [...holdings].sort((a, b) => b.valueUsd - a.valueUsd),
+    [holdings]
   );
-};
+
+  const handleRowClick = useCallback(
+    (symbol: string) => {
+      const destination = symbol ? `/watchlist?asset=${encodeURIComponent(symbol)}` : "/watchlist";
+      navigate(destination);
+    },
+    [navigate]
+  );
+
+  return (
+    <section
+      className={cn("sf-card dashboard-card sf-holdings-card", className)}
+      aria-label="Wallet holdings snapshot"
+      data-testid="dashboard-holdings-card"
+    >
+      <header className="sf-holdings-card__header">
+        <div className="sf-holdings-card__titles">
+          <p className="sf-holdings-card__eyebrow">Wallet</p>
+          <h3 className="sf-holdings-card__title">Holdings</h3>
+          <p className="sf-holdings-card__subtitle">
+            Snapshot of your connected wallet value and token mix.
+          </p>
+        </div>
+        {walletAddress ? (
+          <span className="sf-holdings-card__wallet-pill" title={walletAddress}>
+            {truncateWallet(walletAddress)}
+          </span>
+        ) : null}
+      </header>
+
+      <div className="sf-holdings-card__body">
+        {isNotConnected ? (
+          <div className="sf-holdings-card__state sf-holdings-card__state--info">
+            <div>
+              <p className="sf-holdings-card__state-title">Wallet not connected</p>
+              <p className="sf-holdings-card__state-copy">
+                Connect a wallet in Settings → Wallet Monitoring to see live holdings.
+              </p>
+            </div>
+            <div className="sf-holdings-card__state-actions">
+              <Button variant="secondary" size="sm" onClick={() => navigate("/settings#monitoring")}>
+                Connect wallet
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
+        {isLoading ? (
+          <div className="sf-holdings-card__skeletons" aria-label="Loading holdings">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <Skeleton key={idx} variant="card" className="h-14 w-full" />
+            ))}
+          </div>
+        ) : null}
+
+        {isError ? (
+          <StateView
+            type="error"
+            title="Holdings unavailable"
+            description={error ?? "Unable to load holdings right now."}
+            actionLabel="Retry"
+            onAction={refreshHoldings}
+            compact
+          />
+        ) : null}
+
+        {!isNotConnected && !isLoading && !isError && !hasHoldings ? (
+          <StateView
+            type="empty"
+            title="No holdings yet"
+            description="Once your wallet has balances, they will show up here."
+            actionLabel="Refresh"
+            onAction={refreshHoldings}
+            compact
+          />
+        ) : null}
+
+        {!isNotConnected && !isLoading && !isError && hasHoldings ? (
+          <div className="sf-holdings-card__table" role="list" aria-label="Wallet holdings">
+            <div className="sf-holdings-card__head">
+              <span>Symbol</span>
+              <span>Amount</span>
+              <span>Value</span>
+              <span>Change</span>
+            </div>
+            <div className="sf-holdings-card__rows">
+              {displayHoldings.map((holding, index) => {
+                const changeTone = getChangeTone(holding.changePct24h);
+                return (
+                  <button
+                    key={`${holding.symbol}-${index}`}
+                    type="button"
+                    className="sf-holdings-card__row"
+                    onClick={() => handleRowClick(holding.symbol)}
+                  >
+                    <div className="sf-holdings-card__cell sf-holdings-card__cell--symbol">
+                      <span className="sf-holdings-card__meta-label">Symbol</span>
+                      <span className="sf-holdings-card__symbol">{holding.symbol}</span>
+                    </div>
+                    <div className="sf-holdings-card__cell sf-holdings-card__cell--amount">
+                      <span className="sf-holdings-card__meta-label">Amount</span>
+                      <span className="sf-holdings-card__value">{fmtNum(holding.amount)}</span>
+                    </div>
+                    <div className="sf-holdings-card__cell sf-holdings-card__cell--value">
+                      <span className="sf-holdings-card__meta-label">Value</span>
+                      <span className="sf-holdings-card__value">{fmtUsd(holding.valueUsd)}</span>
+                    </div>
+                    <div className="sf-holdings-card__cell sf-holdings-card__cell--change">
+                      <span className="sf-holdings-card__meta-label">Change</span>
+                      <span
+                        className={cn(
+                          "sf-holdings-card__change",
+                          changeTone === "positive" && "sf-holdings-card__change--positive",
+                          changeTone === "negative" && "sf-holdings-card__change--negative"
+                        )}
+                      >
+                        {formatChange(holding.changePct24h)}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}

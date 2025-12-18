@@ -5,7 +5,6 @@ import { LogEntryOverlayPanel } from "@/components/dashboard/LogEntryOverlayPane
 import InsightTeaser from "@/components/dashboard/InsightTeaser";
 import JournalSnapshot from "@/components/dashboard/JournalSnapshot";
 import AlertsSnapshot from "@/components/dashboard/AlertsSnapshot";
-import { HoldingsList } from "@/components/dashboard/HoldingsList";
 import { TradeLogList } from "@/components/dashboard/TradeLogList";
 import ErrorBanner from "@/components/ui/ErrorBanner";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -13,6 +12,7 @@ import Button from "@/components/ui/Button";
 import StateView from "@/components/ui/StateView";
 import KPIBar, { type KPIDeltaDirection, type KPIItem } from "@/features/dashboard/KPIBar";
 import DailyBiasCard from "@/features/dashboard/DailyBiasCard";
+import HoldingsCard from "@/features/dashboard/HoldingsCard";
 import { useJournalStore } from "@/store/journalStore";
 import { useAlertsStore } from "@/store/alertsStore";
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from "@/lib/dashboard/calculateKPIs";
@@ -20,8 +20,6 @@ import { getAllTrades, type TradeEntry } from "@/lib/db";
 import { useTradeEventInbox, type TradeEventInboxItem } from "@/hooks/useTradeEventInbox";
 import { useSettings } from "@/state/settings";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
-import { useWalletHoldings } from "@/hooks/useWalletHoldings";
-import { getMonitoredWallet, WALLET_CHANGED_EVENT } from "@/lib/wallet/monitoredWallet";
 import { Activity, Bell, FileText, Target, TrendingUp } from "@/lib/icons";
 import "@/features/dashboard/dashboard.css";
 
@@ -44,7 +42,6 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [tradeEntries, setTradeEntries] = useState<TradeEntry[]>([]);
   const [isLogOverlayOpen, setIsLogOverlayOpen] = useState(false);
-  const [monitoredWallet, setMonitoredWallet] = useState<string | null>(() => getMonitoredWallet());
 
   const {
     events: inboxEvents,
@@ -52,24 +49,6 @@ export default function DashboardPage() {
     isLoading: isInboxLoading,
     refresh,
   } = useTradeEventInbox();
-  const {
-    data: holdingsData,
-    status: holdingsStatus,
-    error: holdingsError,
-    refetch: refetchHoldings,
-  } = useWalletHoldings(monitoredWallet);
-
-  useEffect(() => {
-    const handleWalletChange = () => setMonitoredWallet(getMonitoredWallet());
-
-    window.addEventListener("storage", handleWalletChange);
-    window.addEventListener(WALLET_CHANGED_EVENT, handleWalletChange);
-
-    return () => {
-      window.removeEventListener("storage", handleWalletChange);
-      window.removeEventListener(WALLET_CHANGED_EVENT, handleWalletChange);
-    };
-  }, []);
 
   const hasData = journalEntries.length > 0;
 
@@ -202,15 +181,7 @@ export default function DashboardPage() {
 
   const renderHoldingsAndTrades = () => (
     <div className="dashboard-split">
-      <HoldingsList
-        holdings={holdingsData?.tokens ?? []}
-        nativeBalanceLamports={holdingsData?.nativeBalanceLamports ?? null}
-        status={holdingsStatus}
-        walletAddress={monitoredWallet}
-        error={holdingsError}
-        onRetry={refetchHoldings}
-        className="dashboard-card sf-card"
-      />
+      <HoldingsCard className="dashboard-card sf-card" />
       <TradeLogList
         trades={recentTrades}
         quoteCurrency={settings.quoteCurrency}
