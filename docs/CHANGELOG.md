@@ -2,9 +2,18 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-18
+**Last Updated:** 2025-12-27
 
 ---
+
+## 2025-12-27
+
+### Added
+- Documented WP-012 Daily Bias / Market Intel delivery, covering the typed market intelligence DTO + mock fallback (`src/api/marketIntelligence.ts`), the BiasTag/DailyBiasCard UI with loading/error/empty states, and the dashboard wiring in `src/pages/DashboardPage.tsx`.
+- Linked the WP-012 checklist artifact at `WP-Polish/WP-012/checklist.md` for traceability.
+
+### Updated
+- Dashboard docs index now includes the Daily Bias intel card with refresh behavior and timestamp handling.
 
 ## 2025-12-26
 
