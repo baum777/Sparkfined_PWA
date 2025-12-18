@@ -5,7 +5,6 @@ import { LogEntryOverlayPanel } from "@/components/dashboard/LogEntryOverlayPane
 import InsightTeaser from "@/components/dashboard/InsightTeaser";
 import JournalSnapshot from "@/components/dashboard/JournalSnapshot";
 import AlertsSnapshot from "@/components/dashboard/AlertsSnapshot";
-import { TradeLogList } from "@/components/dashboard/TradeLogList";
 import ErrorBanner from "@/components/ui/ErrorBanner";
 import { Skeleton } from "@/components/ui/Skeleton";
 import Button from "@/components/ui/Button";
@@ -13,11 +12,12 @@ import StateView from "@/components/ui/StateView";
 import KPIBar, { type KPIDeltaDirection, type KPIItem } from "@/features/dashboard/KPIBar";
 import DailyBiasCard from "@/features/dashboard/DailyBiasCard";
 import HoldingsCard from "@/features/dashboard/HoldingsCard";
+import TradeLogCard from "@/features/dashboard/TradeLogCard";
 import { useJournalStore } from "@/store/journalStore";
 import { useAlertsStore } from "@/store/alertsStore";
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from "@/lib/dashboard/calculateKPIs";
 import { getAllTrades, type TradeEntry } from "@/lib/db";
-import { useTradeEventInbox, type TradeEventInboxItem } from "@/hooks/useTradeEventInbox";
+import { useLogEntryAvailability, type TradeEventInboxItem } from "@/features/journal/useLogEntryAvailability";
 import { useSettings } from "@/state/settings";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
 import { Activity, Bell, FileText, Target, TrendingUp } from "@/lib/icons";
@@ -45,10 +45,11 @@ export default function DashboardPage() {
 
   const {
     events: inboxEvents,
-    unconsumedCount,
+    pendingCount: unconsumedCount,
     isLoading: isInboxLoading,
+    hasBuySignal,
     refresh,
-  } = useTradeEventInbox();
+  } = useLogEntryAvailability();
 
   const hasData = journalEntries.length > 0;
 
@@ -158,11 +159,6 @@ export default function DashboardPage() {
     };
   }, []);
 
-  const recentTrades = useMemo(
-    () => [...tradeEntries].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)).slice(0, 5),
-    [tradeEntries]
-  );
-
   const recentJournalEntries = useMemo(() => {
     if (!journalEntries.length) {
       return [];
@@ -174,7 +170,7 @@ export default function DashboardPage() {
       .map(({ entry }) => entry);
   }, [journalEntries]);
 
-  const handleMarkEntry = useCallback(() => {
+  const handleOpenLogEntryOverlay = useCallback(() => {
     void refresh();
     setIsLogOverlayOpen(true);
   }, [refresh]);
@@ -182,12 +178,11 @@ export default function DashboardPage() {
   const renderHoldingsAndTrades = () => (
     <div className="dashboard-split">
       <HoldingsCard className="dashboard-card sf-card" />
-      <TradeLogList
-        trades={recentTrades}
-        quoteCurrency={settings.quoteCurrency}
-        onMarkEntry={handleMarkEntry}
-        isMarkEntryDisabled={unconsumedCount === 0}
-        className="dashboard-card sf-card"
+      <TradeLogCard
+        className="dashboard-card"
+        onLogEntry={handleOpenLogEntryOverlay}
+        isLogEntryEnabled={hasBuySignal}
+        logEntryTooltip="Enabled when a BUY signal is detected"
       />
     </div>
   );
@@ -325,11 +320,9 @@ export default function DashboardPage() {
           <Button
             variant="secondary"
             size="sm"
-            onClick={() => {
-              void refresh();
-              setIsLogOverlayOpen(true);
-            }}
-            disabled={unconsumedCount === 0}
+            onClick={handleOpenLogEntryOverlay}
+            disabled={!hasBuySignal}
+            title={!hasBuySignal ? "Enabled when a BUY signal is detected" : undefined}
             data-testid="dashboard-log-entry"
           >
             Log entry

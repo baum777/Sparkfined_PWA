@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-29)
+
+- **Recent Trades (WP-014):** Neues `getRecentTrades`-DTO mit deterministischem Mock (`src/api/journalEntries.ts`), tokenisierte `TradeLogCard`/`TradeLogEntry` mit Loading/Error/Empty-Zuständen und Load-more, BUY-Signal-abhängiger "Log entry"-CTA über `useLogEntryAvailability` (`src/features/journal/useLogEntryAvailability.ts`) und Overlay-Öffnung im Dashboard (`src/pages/DashboardPage.tsx`); Checklist-Link: `WP-Polish/WP-014/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2025-12-28)
 
 - **Holdings Snapshot Card (WP-013):** Neues Wallet-Holdings-API-DTO mit deterministischem Mock (`src/api/wallet.ts`) und eine responsive `HoldingsCard` mit Not-Connected/Loading/Error/Empty/Loaded-Zuständen und Watchlist-Navigation pro Zeile (`src/features/dashboard/HoldingsCard.tsx`, `src/features/dashboard/holdings-card.css`), verdrahtet in `src/pages/DashboardPage.tsx`; Checklist-Link: `WP-Polish/WP-013/checklist.md`.
