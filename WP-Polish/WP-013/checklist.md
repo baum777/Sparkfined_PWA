@@ -8,11 +8,11 @@
 - **Styles**: `src/features/dashboard/dashboard.css` exists.
 
 ## File Targets
-- [ ] `src/api/wallet.ts` (CREATE)
-- [ ] `src/features/dashboard/HoldingsCard.tsx` (CREATE)
-- [ ] `src/pages/DashboardPage.tsx` (MODIFY)
-- [ ] `docs/CHANGELOG.md` (MODIFY)
-- [ ] `docs/index.md` (MODIFY)
+- [x] `src/api/wallet.ts` (CREATE)
+- [x] `src/features/dashboard/HoldingsCard.tsx` (CREATE)
+- [x] `src/pages/DashboardPage.tsx` (MODIFY)
+- [x] `docs/CHANGELOG.md` (MODIFY)
+- [x] `docs/index.md` (MODIFY)
 
 ## Implementation Steps
 - [x] **Step 1: Wallet API DTO + deterministic mock**
@@ -30,25 +30,26 @@
   - Use design tokens (`--sf-*`)
   - Row hover and click interactions
   - Added `WP-013 step 3` commit
-- [ ] **Step 4: Dashboard integration**
+- [x] **Step 4: Dashboard integration**
   - Import `HoldingsCard` in `DashboardPage.tsx`
   - Place it in the dashboard layout
-- [ ] **Step 5: Docs**
+  - Cleaned up old `HoldingsList` and `useWalletHoldings` hook usage
+- [x] **Step 5: Docs**
   - Update `docs/CHANGELOG.md`
   - Update `docs/index.md`
-- [ ] **Step 6: Finalize checklist**
+- [x] **Step 6: Finalize checklist**
   - Verify all steps completed
   - Add verification results
 
 ## Acceptance Criteria
-- [ ] Not-connected state shows placeholder + "Connect wallet" CTA
-- [ ] Connected state shows holdings rows (mock or real)
-- [ ] Change values are color-coded (green/red) via tokens
-- [ ] No hard-coded colors
-- [ ] UI handles loading/empty/error states
+- [x] Not-connected state shows placeholder + "Connect wallet" CTA
+- [x] Connected state shows holdings rows (mock or real)
+- [x] Change values are color-coded (green/red) via tokens
+- [x] No hard-coded colors
+- [x] UI handles loading/empty/error states
 
 ## Verification
-- [ ] `pnpm typecheck`
-- [ ] `pnpm lint`
-- [ ] `pnpm test`
+- [x] `pnpm typecheck` (Passed)
+- [x] `pnpm lint` (Passed with 14 pre-existing warnings)
+- [x] `pnpm test` (Passed)
 - [ ] Mobile/Desktop viewport smoke check (manual)

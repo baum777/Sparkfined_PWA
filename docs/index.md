@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-28)
+
+- **Wallet Holdings (WP-013):** New `HoldingsCard` integration in the Dashboard (`src/features/dashboard/HoldingsCard.tsx`) displaying token balances from the connected wallet. Includes `HoldingDTO`, deterministic mock API (`src/api/wallet.ts`), and full loading/error/empty state handling; wired into `src/pages/DashboardPage.tsx`.
+
 ## 📦 Neue Ergänzungen (2025-12-27)
 
 - **Daily Bias / Market Intel (WP-012):** Neues Dashboard-Intel-Carding mit getDailyBias-Mock/DTO (`src/api/marketIntelligence.ts`), BiasTag (`src/features/dashboard/BiasTag.tsx`), dem refreshbaren DailyBiasCard UI (`src/features/dashboard/DailyBiasCard.tsx`), und der Einbindung in `src/pages/DashboardPage.tsx`; Checklist-Link: `WP-Polish/WP-012/checklist.md`.

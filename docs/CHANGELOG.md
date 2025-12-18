@@ -6,6 +6,15 @@
 
 ---
 
+## 2025-12-28
+
+### Added
+- Documented WP-013 Wallet Holdings delivery, covering the `HoldingDTO` and mock API (`src/api/wallet.ts`), the `HoldingsCard` feature with full state handling (loading/error/empty/connected), and its integration into `src/pages/DashboardPage.tsx`.
+- Linked the WP-013 checklist artifact at `WP-Polish/WP-013/checklist.md` for traceability.
+
+### Updated
+- Dashboard docs index now includes the Holdings card integration, replacing the placeholder list with the new tokenized card.
+
 ## 2025-12-27
 
 ### Added
