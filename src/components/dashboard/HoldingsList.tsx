@@ -10,6 +10,7 @@ interface HoldingsListProps {
   walletAddress: string | null;
   error?: string | null;
   onRetry?: () => void;
+  className?: string;
 }
 
 function formatAmount(amount: number | null, decimals?: number | null): string {
@@ -53,18 +54,23 @@ export function HoldingsList({
   walletAddress,
   error,
   onRetry,
+  className,
 }: HoldingsListProps) {
   const displayHoldings = useMemo(
     () => buildDisplayHoldings(nativeBalanceLamports, holdings),
     [holdings, nativeBalanceLamports]
   );
 
+  const containerClassName =
+    className ??
+    "rounded-3xl border border-border bg-surface/80 p-4 shadow-card-subtle";
+
   return (
-    <div className="rounded-3xl border border-border bg-surface/80 p-4 shadow-card-subtle">
+    <div className={containerClassName}>
       <div className="mb-3 flex items-center justify-between">
         <div>
           <p className="text-xs uppercase tracking-wide text-text-tertiary">Holdings</p>
-          <p className="text-sm font-semibold text-text-primary">Wallet snapshot</p>
+          <p className="dashboard-section-heading">Wallet snapshot</p>
         </div>
         {walletAddress ? (
           <span className="rounded-full bg-surface px-3 py-1 text-[11px] font-semibold text-text-secondary">

@@ -7,6 +7,7 @@ interface InsightTeaserProps {
   bias: 'long' | 'short' | 'neutral';
   confidenceLabel: string;
   summary: string;
+  className?: string;
 }
 
 function buildBulletSummary(summary: string): string[] {
@@ -18,7 +19,7 @@ function buildBulletSummary(summary: string): string[] {
   return sentences.filter(Boolean).slice(0, 3);
 }
 
-export default function InsightTeaser({ title, bias, confidenceLabel, summary }: InsightTeaserProps) {
+export default function InsightTeaser({ title, bias, confidenceLabel, summary, className }: InsightTeaserProps) {
   const navigate = useNavigate();
 
   const bullets = React.useMemo(() => buildBulletSummary(summary), [summary]);
@@ -26,12 +27,14 @@ export default function InsightTeaser({ title, bias, confidenceLabel, summary }:
   const handleViewFullAnalysis = React.useCallback(() => navigate('/analysis'), [navigate]);
   const handleOpenChart = React.useCallback(() => navigate('/chart'), [navigate]);
 
+  const cardClassName = className ?? 'rounded-3xl p-6';
+
   return (
-    <Card variant="elevated" className="rounded-3xl p-6" data-testid="dashboard-bias-hero">
+    <Card variant="elevated" className={cardClassName} data-testid="dashboard-bias-hero">
       <CardHeader className="mb-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
-            <CardTitle className="text-xl">{title}</CardTitle>
+            <CardTitle className="dashboard-section-title">{title}</CardTitle>
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant={bias === 'long' ? 'long' : bias === 'short' ? 'short' : 'info'}>
                 {bias === 'long' ? 'Long' : bias === 'short' ? 'Short' : 'Neutral'}

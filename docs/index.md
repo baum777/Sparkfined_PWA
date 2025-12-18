@@ -30,6 +30,12 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-24)
+
+- **Dashboard Foundation (WP-010):** Neue Dashboard-Primitives (`src/features/dashboard/dashboard.css`) für tokenisierte Kartenflächen, konsistente Typografie und responsive Grids/Splits wurden in `src/pages/DashboardPage.tsx` verdrahtet; KPI-Bar, Holdings/Trade/Journal/Alerts-Karten respektieren nun die gemeinsamen Layout-/Scroll-Helfer.
+
+---
+
 ## 📦 Neue Ergänzungen (2025-12-23)
 
 - **Header Top Bar (WP-004):** Sticky shell header now surfaces the current route title with desktop actions for alerts (badge), settings, and the theme toggle, plus a minimal mobile cluster (settings + theme). Implemented at `src/features/shell/TopBar.tsx` with styling in `src/features/shell/top-bar.css` and wired through `src/components/layout/AppShell.tsx`.

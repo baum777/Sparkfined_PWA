@@ -1,67 +1,69 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { EmptyState } from '@/components/ui/EmptyState';
-import type { Alert } from '@/store/alertsStore';
-import { useAlertsStore } from '@/store/alertsStore';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
+import type { Alert } from "@/store/alertsStore";
+import { useAlertsStore } from "@/store/alertsStore";
 
 const MAX_ITEMS_PER_CATEGORY = 3;
 
-export default function AlertsSnapshot() {
+interface AlertsSnapshotProps {
+  className?: string;
+}
+
+export default function AlertsSnapshot({ className }: AlertsSnapshotProps) {
   const alerts = useAlertsStore((state) => state.alerts);
   const navigate = useNavigate();
 
   const { armedAlerts, triggeredAlerts, armedCount, triggeredCount } = React.useMemo(() => {
     const armed: Alert[] = [];
     const triggered: Alert[] = [];
-    
+
     for (const alert of alerts) {
-      if (alert.status === 'armed' && armed.length < MAX_ITEMS_PER_CATEGORY) {
+      if (alert.status === "armed" && armed.length < MAX_ITEMS_PER_CATEGORY) {
         armed.push(alert);
       }
-      if (alert.status === 'triggered' && triggered.length < MAX_ITEMS_PER_CATEGORY) {
+      if (alert.status === "triggered" && triggered.length < MAX_ITEMS_PER_CATEGORY) {
         triggered.push(alert);
       }
     }
-    
+
     return {
       armedAlerts: armed,
       triggeredAlerts: triggered,
-      armedCount: alerts.filter((a) => a.status === 'armed').length,
-      triggeredCount: alerts.filter((a) => a.status === 'triggered').length,
+      armedCount: alerts.filter((a) => a.status === "armed").length,
+      triggeredCount: alerts.filter((a) => a.status === "triggered").length,
     };
   }, [alerts]);
 
   const hasAlerts = alerts.length > 0;
 
   const handleViewAll = React.useCallback(() => {
-    navigate('/alerts');
+    navigate("/alerts");
   }, [navigate]);
 
   const handleCreateAlert = React.useCallback(() => {
-    navigate('/alerts');
+    navigate("/alerts");
   }, [navigate]);
 
   const handleAlertClick = React.useCallback(
     (alertId: string) => {
       navigate(`/alerts?alert=${alertId}`);
     },
-    [navigate],
+    [navigate]
   );
 
+  const cardClassName = className ?? "bg-surface-subtle";
+
   return (
-    <Card
-      data-testid="dashboard-alerts-snapshot"
-      variant="muted"
-      className="bg-surface-subtle"
-    >
+    <Card data-testid="dashboard-alerts-snapshot" variant="muted" className={cardClassName}>
       <CardHeader className="mb-2">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-text-tertiary">Signals</p>
-            <CardTitle className="text-base">Alerts snapshot</CardTitle>
+            <CardTitle className="dashboard-section-heading">Alerts snapshot</CardTitle>
           </div>
           {hasAlerts && (
             <div className="flex items-center gap-2">
@@ -84,16 +86,10 @@ export default function AlertsSnapshot() {
           {/* Triggered Alerts Section */}
           {triggeredAlerts.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-rose-300">
-                Triggered
-              </p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-rose-300">Triggered</p>
               <div className="space-y-2">
                 {triggeredAlerts.map((alert) => (
-                  <AlertRow
-                    key={alert.id}
-                    alert={alert}
-                    onClick={() => handleAlertClick(alert.id)}
-                  />
+                  <AlertRow key={alert.id} alert={alert} onClick={() => handleAlertClick(alert.id)} />
                 ))}
               </div>
             </div>
@@ -102,16 +98,10 @@ export default function AlertsSnapshot() {
           {/* Armed Alerts Section */}
           {armedAlerts.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">
-                Armed
-              </p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-300">Armed</p>
               <div className="space-y-2">
                 {armedAlerts.map((alert) => (
-                  <AlertRow
-                    key={alert.id}
-                    alert={alert}
-                    onClick={() => handleAlertClick(alert.id)}
-                  />
+                  <AlertRow key={alert.id} alert={alert} onClick={() => handleAlertClick(alert.id)} />
                 ))}
               </div>
             </div>
@@ -131,7 +121,7 @@ export default function AlertsSnapshot() {
             title="No alerts configured"
             description="Create price alerts to monitor key levels and stay ahead of market moves."
             action={{
-              label: 'Create alert',
+              label: "Create alert",
               onClick: handleCreateAlert,
             }}
             compact
@@ -141,20 +131,10 @@ export default function AlertsSnapshot() {
       )}
 
       <CardFooter className="mt-4 flex flex-wrap items-center justify-end gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleViewAll}
-          data-testid="dashboard-alerts-view-all"
-        >
+        <Button variant="ghost" size="sm" onClick={handleViewAll} data-testid="dashboard-alerts-view-all">
           View all
         </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={handleCreateAlert}
-          data-testid="dashboard-alerts-new"
-        >
+        <Button variant="secondary" size="sm" onClick={handleCreateAlert} data-testid="dashboard-alerts-new">
           New alert
         </Button>
       </CardFooter>
@@ -181,7 +161,7 @@ function AlertRow({ alert, onClick }: AlertRowProps) {
           <p className="truncate text-sm font-medium text-text-primary">{alert.symbol}</p>
           <p className="truncate text-xs text-text-secondary">{alert.condition}</p>
         </div>
-        <Badge variant={alert.status === 'triggered' ? 'triggered' : 'armed'} className="flex-shrink-0">
+        <Badge variant={alert.status === "triggered" ? "triggered" : "armed"} className="flex-shrink-0">
           {alert.timeframe}
         </Badge>
       </div>
