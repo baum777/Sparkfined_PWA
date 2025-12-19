@@ -140,28 +140,34 @@ Many traders lose money – not because they have bad charts, but because they:
 
 ---
 
-### 🎯 **7. Navigation & UI – AppShell with Rail & ActionPanel**
+### 🎯 **7. Navigation & UI – AppShell Architecture (planned Q1 2025)**
 
-**What you experience:**
-- **AppShell Architecture:** Modern 3-column structure (Topbar, Rail, Canvas, ActionPanel)
-- **Rail (Icon-First):** Minimal sidebar with 4 main areas – expandable for labels
-  - 📊 Dashboard
-  - ✎ Journal
-  - ⌁ Chart
-  - ★ Watchlist
-- **ActionPanel (Route-Aware):** Context-dependent inspector tools on the right side
-  - Opens/closes via Topbar toggle
-  - Persists status in localStorage
-  - Shows context-dependent tools based on active page
-- **Responsive Design:** Rail collapses on mobile, ActionPanel only on desktop (xl+)
-- **Topbar:** Header with page title and ActionPanel toggle
+**What's planned:**
+- **AppShell Refactor:** Modern 3-column structure currently being implemented (WP-001..004)
+  - **Topbar:** Sticky header with page title, alerts badge, settings, theme toggle
+  - **Rail (Icon-First):** Minimal sidebar (60px collapsed, 240px expanded)
+    - 📊 Dashboard
+    - ✎ Journal
+    - ⌁ Chart
+    - ★ Watchlist
+    - ⚙️  Settings (separate, at bottom)
+  - **Canvas:** Main content area (varies by route)
+  - **ActionPanel (Route-Aware):** Context-dependent inspector tools (desktop xl+ only)
+- **BottomNav (Mobile):** Fixed bottom tabs for <768px with safe-area padding
+- **Responsive Design:** Rail collapses on mobile, ActionPanel desktop-only
 
-**Your benefits:**
+**Current Status (Beta):**
+- Standard React Router navigation with header + sidebar
+- Mobile: Basic navigation works
+- Desktop: Sidebar with main routes
+- 🚧 **AppShell Refactor in progress:** See `./tasks/WP-polish/UI_&_UX_polish.md` (WP-001..004)
+
+**Future benefits:**
 - Minimal distraction through icon-first Rail design
-- More space for content (Rail only 60px collapsed, 240px expanded)
+- More space for content
 - Contextual tools exactly where you need them (ActionPanel)
 - Consistent navigation between desktop and mobile
-- Persistent UI states (panel status is preserved)
+- Persistent UI states (localStorage for panel preferences)
 
 ---
 
@@ -187,17 +193,19 @@ Many traders lose money – not because they have bad charts, but because they:
 
 | Feature | What It Does | Your Benefits | Status |
 |---------|-------------|---------------|---------|
-| **📊 Dashboard** | KPI Strip, Insight Teaser, Journal/Alerts Snapshot, Log Entry Inbox | Central command surface for all metrics | ✅ Live |
+| **📊 Dashboard** | KPI Strip, Market Bias Card, Holdings Snapshot, Recent Trades | Central command surface for all metrics | ✅ Live (Beta) |
 | **📝 Journal** | Behavioral pipeline with Archetype System (Score 0-100), Trade Event Bridge | Instant feedback on your trading patterns | ✅ Live |
-| **📊 Charts** | Canvas-based charts with indicator presets, multi-timeframe | Professional analysis without TradingView subscription | ✅ Live |
+| **📊 Charts** | Multi-timeframe, indicator presets, annotations, replay mode | Professional analysis, works offline | ✅ Live (Beta) |
 | **🔔 Alerts** | Status filter, type filter, URL state sync, detail panel | Structured alert management with direct linking | ✅ Live |
 | **📋 Watchlist** | Session filter, sort modes, detail panel | Session-aware multi-asset tracking | ✅ Live |
 | **🎮 Replay Mode** | Replay historical charts without hindsight bias | Risk-free practice, understand errors, Go Live | ✅ Live |
-| **🎯 Navigation** | AppShell with icon-first Rail, route-aware ActionPanel, Topbar | Minimal distraction, contextual tools | ✅ Live |
+| **🎯 Navigation** | Standard header + sidebar (mobile responsive) | Basic navigation works | ✅ Live (Beta) |
+| **🎨 AppShell Refactor** | Icon-first Rail, route-aware ActionPanel, BottomNav | UI/UX polish with modern architecture | 🚧 Q1 2025 (In Progress) |
 | **🔐 Offline-First** | PWA with IndexedDB (Dexie), works without internet | No API dependency, your data stays local | ✅ Live |
-| **📱 Mobile-Optimized** | Responsive design, touch targets ≥ 44px, collapsible Rail | Trade analysis on smartphone/tablet | ✅ Live |
+| **📱 Mobile-Optimized** | Responsive design, touch targets ≥ 44px | Trade analysis on smartphone/tablet | ✅ Live (being polished) |
 | **📤 Export** | Journal → Markdown, CSV (your data belongs to you) | No vendor lock-ins, full control | ✅ Live |
 | **🎨 StateView Pattern** | Unified Loading/Error/Empty/Offline states | Consistent UX across all features | ✅ Live |
+| **🖊️  Chart Drawing Tools** | Trendlines, Fibonacci, Rectangles | Professional TA like TradingView | 🚧 Q2 2025 |
 | **☁️ Cloud Sync** | Supabase integration for cross-device sync | One journal on all devices | 🚧 Q2 2025 |
 | **🌐 Community Heatmaps** | Anonymized behavioral patterns from community | Learn from other traders' mistakes | 🚧 Q3 2025 |
 | **🔓 Open Source** | MIT license, full code available | Transparency, self-hosting possible | 🚧 Q3 2025 |
@@ -213,9 +221,10 @@ Many traders lose money – not because they have bad charts, but because they:
 - **Why it works:** Score-based system (0-100) shows your development in real-time.
 
 ### **2. Problem: Too many tools, no connection**
-**Solution:** Sparkfined unites Charts + Alerts + Journal + Analysis in one app with AppShell architecture (Rail + ActionPanel).
+**Solution:** Sparkfined unites Charts + Alerts + Journal + Analysis in one app. UI/UX is being modernized (AppShell refactor Q1 2025).
 - **Why it works:** Your context is preserved (no tab-switching, no data fragmentation).
-- **Navigation:** Icon-first Rail with 4 main areas (Dashboard, Journal, Chart, Watchlist) + context-dependent ActionPanel.
+- **Current Navigation:** Standard header + sidebar, works on desktop & mobile.
+- **Planned (Q1 2025):** Icon-first Rail with 4 main areas (Dashboard, Journal, Chart, Watchlist) + context-dependent ActionPanel (see WP-001..004).
 
 ### **3. Problem: Offline dependency with other tools**
 **Solution:** PWA architecture with IndexedDB – works without internet. StateView pattern for offline states.
@@ -256,11 +265,12 @@ Many traders lose money – not because they have bad charts, but because they:
 - **What it means:** All critical user flows are automatically tested
 - **Your advantage:** Features don't break, updates are stable
 
-### **Route-Aware UI (AppShell Architecture)**
-- **What it means:** ActionPanel shows context-dependent tools based on active route (Dashboard vs. Journal vs. Chart)
-- **Your advantage:** Relevant features exactly where you need them
-- **Structure:** Topbar (Header) + Rail (Sidebar) + Canvas (Main Content) + ActionPanel (Inspector)
+### **Route-Aware UI (planned — AppShell Refactor Q1 2025)**
+- **What's planned:** ActionPanel shows context-dependent tools based on active route (Dashboard vs. Journal vs. Chart)
+- **Future advantage:** Relevant features exactly where you need them
+- **Planned structure:** Topbar (Header) + Rail (Sidebar) + Canvas (Main Content) + ActionPanel (Inspector)
 - **Responsive:** Rail collapses on mobile, ActionPanel only on desktop (xl+)
+- **Status:** 🚧 In Planning (see `./tasks/WP-polish/UI_&_UX_polish.md`, WP-001..004)
 
 ---
 

@@ -89,73 +89,117 @@ Local-first storage, no vendor lock-in, works offline, your data stays yours. Yo
 
 ## ✨ Core Features
 
-### 📊 **Charts That Don't Suck**
+### 📊 **Dashboard — Your Command Center**
 
-**Why it matters:** You can't trade what you can't see clearly.
+**Why it matters:** One place to see everything that matters.
 
 ```
-✅ Canvas-based 60fps rendering (smooth as butter)
-✅ 30+ Technical Indicators (RSI, MACD, Bollinger, Volume Profile...)
-✅ Professional Drawing Tools (trendlines, fibonacci, rectangles)
-✅ Multi-Timeframe Analysis (1m to 1W)
-✅ Works Offline (PWA architecture)
-✅ Mobile-Optimized (trade from anywhere)
+✅ KPI Strip (Net P&L, Win Rate, Alert Count, Journal Streak)
+✅ Market Bias Card (AI-powered daily insights)
+✅ Holdings Snapshot (connected wallet tracking)
+✅ Recent Trades (quick access to journal history)
+✅ Quick Actions (FAB for mobile — Log entry, Create alert)
+✅ StateView Pattern (clear loading/error/empty/offline states)
 ```
 
-**No lag. No subscription. Just charts.**
+**Your trading command center in one glance.**
 
 ---
 
-### 🔔 **Alerts That Actually Work**
-
-**Why it matters:** The market never sleeps. But you have to.
-
-```
-✅ Server-Side Evaluation (runs 24/7, not just when app is open)
-✅ Multi-Condition Rules (price + volume + indicator combinations)
-✅ Push Notifications (desktop + mobile)
-✅ Backtest Before Activate (see historical triggers)
-✅ Smart Grouping (avoid notification spam)
-```
-
-**Set it. Forget it. Get notified when it matters.**
-
----
-
-### 📝 **Journal You'll Actually Use**
+### 📝 **Journal — Behavioral Pipeline with Offline-First**
 
 **Why it matters:** Consistent journaling separates profitable traders from those who repeat mistakes.
 
 ```
-✅ One-Click Entry Creation (save trades in 10 seconds)
-✅ AI-Powered Summaries (condense long notes instantly)
-✅ Screenshot OCR (extract text from trading screenshots)
-✅ Emotion Tracking (tag FOMO, Fear, Greed, Revenge)
-✅ Pattern Recognition (AI finds recurring mistakes)
-✅ Export to Markdown (own your data forever)
+✅ Offline-First (IndexedDB via Dexie — works without internet)
+✅ Archetype Scoring System (0-100 behavioral analysis)
+✅ Immediate Insights (AI feedback right after submission)
+✅ Trade Event Integration (Log Entry Inbox → Journal flow)
+✅ Emotional State Tracking (emoji selectors, confidence sliders)
+✅ Market Context (regime selector, thesis tags)
+✅ Export to Markdown/CSV (own your data forever)
+✅ Version Tracking (evolution over time)
 ```
 
 **Log every trade. Especially the painful ones.**
 
 ---
 
-### 🎮 **Trade Replay — Learn From History**
+### 📊 **Charts — Professional Analysis Tools**
 
-**Why it matters:** You can't fix mistakes you don't understand.
+**Why it matters:** You can't trade what you can't see clearly.
 
 ```
-✅ Time-Travel Through Charts (replay any past period)
-✅ Hide Future Data (practice entries without hindsight bias)
-✅ Save Studies (bookmark key moments)
-✅ Compare Setups (what would've happened if...)
-✅ Pattern Practice (train on 1000s of historical candles)
+✅ Multi-Timeframe Analysis (15m, 1h, 4h, 1d)
+✅ Indicator Presets (Scalper, Swing, Position setups)
+✅ Annotations System (journal entries, alerts, pulse signals in chart)
+✅ Replay Mode (time-travel through historical data)
+✅ Works Offline (PWA architecture with cached snapshots)
+✅ Mobile-Optimized (trade analysis anywhere)
+🚧 Drawing Tools (trendlines, fibonacci — Q2 2025)
+🚧 Volume Profile+ (advanced indicators — Q2 2025)
 ```
 
-**The replay mode that backtested traders swear by.**
+**Professional charting without subscription hell.**
 
 ---
 
-### 🎯 **Journey System — From Degen to Master**
+### 🔔 **Alerts — Never Miss a Breakout**
+
+**Why it matters:** The market never sleeps. But you have to.
+
+```
+✅ Status Filters (All, Armed, Triggered, Paused — Pills design)
+✅ Type Filters (Price-above, Price-below)
+✅ URL State Sync (share alerts via ?alert=id)
+✅ 2-Column Layout (list + detail panel, responsive on mobile)
+✅ Quick Actions (Snooze, Edit, Delete with optimistic UI)
+🚧 Multi-Condition Rules (price + volume + indicators — Q2 2025)
+🚧 Push Notifications (desktop + mobile — Q1 2025)
+🚧 Backtest Mode (see historical triggers — Q2 2025)
+```
+
+**Set it. Track it. Get notified.**
+
+---
+
+### 📋 **Watchlist — Session-Based Multi-Asset Tracking**
+
+**Why it matters:** Trade smarter by focusing on the right session.
+
+```
+✅ Session Filters (All, London, NY, Asia)
+✅ Sort Modes (Default, Top Movers, Alphabetical)
+✅ Detail Panel (token info, sentiment teaser, trend data)
+✅ Direct Chart Links (Open Chart, Open Replay)
+✅ Offline Banner (shows cached prices when disconnected)
+```
+
+**Session-aware trading eliminates bad timing.**
+
+---
+
+### 🎯 **Navigation — AppShell with Rail & ActionPanel**
+
+**Why it matters:** Clean UI means less distraction, more focus.
+
+```
+✅ AppShell Architecture (Topbar + Rail + Canvas + ActionPanel)
+✅ Icon-First Rail (60px collapsed, 240px expanded)
+   📊 Dashboard
+   ✎ Journal  
+   ⌁ Chart
+   ★ Watchlist
+✅ Route-Aware ActionPanel (context-dependent inspector tools)
+✅ Responsive Design (Rail collapses on mobile, ActionPanel desktop-only xl+)
+✅ Persistent UI States (localStorage for panel preferences)
+```
+
+**Minimal distraction. Maximum context.**
+
+---
+
+### 🎮 **Journey System — From Degen to Sage**
 
 **Why it matters:** Trading is a craft. Mastery comes from discipline, not luck.
 
@@ -183,7 +227,7 @@ Track your **evolution** through five phases:
 
 **Why it matters:** You can't fix patterns you don't see. AI spots them for you.
 
-Analyze your last 20-50 trades and get **evidence-based insights** in 5 categories:
+Analyze your journal entries and get **evidence-based insights** in 5 categories:
 
 ```
 🔄 BEHAVIOR LOOPS
@@ -208,26 +252,12 @@ Analyze your last 20-50 trades and get **evidence-based insights** in 5 categori
 ```
 
 **How it works:**
-1. Select your last 20-50 journal entries
+1. Select journal entries for analysis
 2. Click "Generate Insights" (~30 seconds)
-3. Get 2-5 concrete insights with **actionable recommendations**
+3. Get concrete insights with **actionable recommendations**
 4. See which trades support each insight (evidence, not guesses)
 
 **AI doesn't tell you *what* to trade. It tells you *how* you're sabotaging yourself.**
-
----
-
-### 📊 Social Preview — See Your Dominant Patterns
-
-**Why it matters:** Patterns become clearer when you see them aggregated.
-
-After generating AI insights, Sparkfined shows you a **heatmap of your behavioral patterns:**
-
-- Which categories appear most often (e.g., "Behavior Loop: 5 insights")
-- Severity breakdown (INFO / WARNING / CRITICAL)
-- Your top 3 areas to improve
-
-**Coming soon:** Community-wide pattern heatmaps — see what mistakes *everyone* is making, not just you.
 
 ---
 
@@ -332,23 +362,30 @@ Most crypto dashboards are built for casual investors checking prices once a day
 
 **Current Status:** `v0.1.0 Beta` — Core features stable, PWA functional, AI integrations live
 
-### 🎯 Q1 2025 — Stability & Growth
+### 🎯 Q1 2025 — UI/UX Polish & Stability
 
 ```
-✅ COMPLETED
+✅ COMPLETED (Foundation)
    ✓ Multi-Tool Prompt System (AI optimization)
    ✓ PWA Offline-Mode Audit (428KB precache)
    ✓ AI Cost Optimization (gpt-4o-mini migration)
+   ✓ Journal V2 with Archetype System & Trade Event Bridge
+   ✓ Alerts with URL State Sync & Detail Panel
+   ✓ Watchlist with Session Filters & Sort Modes
 
-⏳ IN PROGRESS
-   ⚙️  Bundle-Size Optimization (<400KB target)
+⏳ IN PROGRESS (UI/UX Refactor — Working Paper execution)
+   🎨 WP-001..004: AppShell Foundation (BottomNav, Theme, Sidebar, TopBar)
+   📊 WP-010..016: Dashboard Refinement (KPI Bar, Bias Card, Holdings, FAB)
+   📝 WP-030..035: Journal Polish (Emotional State, Context, Mobile UX)
+   📈 WP-050..056: Chart Layout (Sidebar, Toolbar, Bottom Panel, Replay)
+   🔔 WP-070..076: Alerts Completion (Templates, Mobile, Integrations)
+   ⚙️  WP-090..097: Settings Revamp (Token Usage, Wallet, Danger Zone)
    🧪 E2E Test Coverage (15-20 critical flows)
+   ⚙️  Bundle-Size Optimization (<400KB target)
 
-🚀 PLANNED
-   🔐 On-Chain Access Gating (Solana NFT verification)
+🚀 PLANNED (Q1 Late)
    🔔 Real-Time Push Notifications (browser + mobile)
    🔄 Background Sync (offline write queue)
-   📊 Chart Library Evaluation (TradingView vs Lightweight)
 ```
 
 ### 🌟 Q2 2025 — Platform Expansion
@@ -357,7 +394,8 @@ Most crypto dashboards are built for casual investors checking prices once a day
 ☁️  Supabase Migration (cross-device sync)
 📱 Mobile App Wrapper (iOS/Android via Capacitor)
 📈 Advanced TA Indicators (Ichimoku, Keltner, Volume Profile+)
-🎮 Enhanced Replay Mode (annotations, save studies)
+🖊️  Chart Drawing Tools (trendlines, fibonacci, rectangles)
+🎮 Enhanced Replay Mode (save studies, annotations)
 💬 In-App Chat (trader community)
 ```
 
@@ -373,6 +411,22 @@ Most crypto dashboards are built for casual investors checking prices once a day
 ```
 
 **Our Promise:** Build features that matter. No fluff. No token pump. Just tools that make you better.
+
+---
+
+## 📋 UI/UX Polish Status (Detailed)
+
+**Reference:** See `./tasks/WP-polish/UI_&_UX_polish.md` for complete execution spec.
+
+**Cluster Progress:**
+- **Cluster A (Foundation/Shell):** WP-001..004 — ⏳ In Progress
+- **Cluster B (Dashboard):** WP-010..016 — 🚀 Planned
+- **Cluster C (Journal):** WP-030..035 — 🚀 Planned  
+- **Cluster D (Chart):** WP-050..056 — 🚀 Planned
+- **Cluster E (Alerts):** WP-070..076 — 🚀 Planned
+- **Cluster F (Settings):** WP-090..097 — 🚀 Planned
+
+**Execution Model:** 1 WP = 1 PR (strict). Each work package is delivered as a small, reviewable PR. Clusters are for planning coherence only.
 
 ---
 
