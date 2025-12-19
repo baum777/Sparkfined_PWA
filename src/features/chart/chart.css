@@ -178,12 +178,194 @@
   color: var(--sf-text-2);
 }
 
+.sf-chart-panel-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+}
+
 .sf-chart-panel-list {
   display: flex;
   flex-direction: column;
   gap: var(--sf-space-2);
   font-size: 0.85rem;
   color: var(--sf-text-2);
+}
+
+.sf-chart-toolbar__sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-3);
+}
+
+.sf-chart-toolbar__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+}
+
+.sf-chart-toolbar__trigger {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sf-space-3);
+  padding: var(--sf-space-3);
+  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--sf-border-1);
+  background-color: var(--sf-bg-2);
+  text-align: left;
+  color: var(--sf-text-1);
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.sf-chart-toolbar__trigger:hover {
+  background-color: var(--sf-bg-1);
+}
+
+.sf-chart-toolbar__trigger[aria-expanded="true"] {
+  border-color: color-mix(in srgb, var(--sf-primary) 45%, var(--sf-border-1));
+}
+
+.sf-chart-toolbar__trigger-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  color: var(--sf-text-2);
+}
+
+.sf-chart-toolbar__icon {
+  width: 20px;
+  height: 20px;
+}
+
+.sf-chart-toolbar__trigger-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.sf-chart-toolbar__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--sf-text-2);
+  transition: transform 0.2s ease;
+}
+
+.sf-chart-toolbar__chevron svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sf-chart-toolbar__trigger[aria-expanded="true"] .sf-chart-toolbar__chevron {
+  transform: rotate(180deg);
+}
+
+.sf-chart-toolbar__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.2s ease, opacity 0.2s ease;
+}
+
+.sf-chart-toolbar__panel[data-state="open"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.sf-chart-toolbar__panel-inner {
+  overflow: hidden;
+  padding: 0 var(--sf-space-3) var(--sf-space-3);
+}
+
+.sf-chart-toolbar__alerts-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+}
+
+.sf-chart-toolbar__alerts-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sf-space-2);
+}
+
+.sf-chart-toolbar__alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sf-chart-toolbar__alert-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+  padding: var(--sf-space-3);
+  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--sf-border-1);
+  background-color: var(--sf-bg-1);
+}
+
+.sf-chart-toolbar__alert-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sf-chart-toolbar__alert-symbol {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--sf-text-1);
+}
+
+.sf-chart-toolbar__alert-condition {
+  font-size: 0.8rem;
+  color: var(--sf-text-2);
+}
+
+.sf-chart-toolbar__alert-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+}
+
+.sf-chart-toolbar__alert-status--armed {
+  color: var(--sf-success);
+  border-color: color-mix(in srgb, var(--sf-success) 60%, transparent);
+  background-color: color-mix(in srgb, var(--sf-success) 15%, transparent);
+}
+
+.sf-chart-toolbar__alert-status--triggered {
+  color: var(--sf-danger);
+  border-color: color-mix(in srgb, var(--sf-danger) 60%, transparent);
+  background-color: color-mix(in srgb, var(--sf-danger) 15%, transparent);
+}
+
+.sf-chart-toolbar__alert-status--paused {
+  color: var(--sf-warning);
+  border-color: color-mix(in srgb, var(--sf-warning) 60%, transparent);
+  background-color: color-mix(in srgb, var(--sf-warning) 15%, transparent);
+}
+
+.sf-chart-toolbar__alerts-empty {
+  padding: var(--sf-space-3);
+  border-radius: var(--sf-radius-md);
+  border: 1px dashed color-mix(in srgb, var(--sf-border-1) 70%, transparent);
+  background-color: var(--sf-bg-2);
 }
 
 .sf-chart-bottom-wrapper {

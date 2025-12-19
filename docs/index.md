@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-10)
+
+- **Right Toolbar Tool Hub (WP-052):** Chart-Toolbar now uses expandable sections for indicators, drawings, and alerts, with lazy alerts list fetch via `getAlertsList` (`src/api/alerts.ts`), create-alert sheet reuse (`src/components/alerts/AlertCreateDialog.tsx`), and tokenized styling in `src/features/chart/chart.css`, `src/features/chart/ChartToolbar.tsx`, and `src/features/chart/toolbar-sections.tsx`; Checklist-Link: `WP-Polish/WP-052/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-09)
 
 - **Main Chart Area (WP-051):** Chart-Seite mountet `ChartCanvas` mit lazy geladenem `AdvancedChart` (route-only), minimaler URL-Param-Sync für `address/timeframe` sowie Journal-Marker aus Mock-Entries (`src/features/chart/ChartCanvas.tsx`, `src/features/chart/markers.ts`, `src/features/chart/ChartLayout.tsx`); Checklist-Link: `WP-Polish/WP-051/checklist.md`.
