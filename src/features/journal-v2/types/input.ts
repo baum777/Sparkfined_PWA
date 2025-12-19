@@ -31,6 +31,13 @@ export interface TradeContext {
   quoteCurrency: QuoteCurrency
 }
 
+export interface ThesisScreenshotReference {
+  id: string
+  createdAt: number
+  kind: 'chart'
+  previewUrl?: string
+}
+
 export interface JournalRawInput {
   emotionalState: EmotionLabel
   /**
@@ -44,6 +51,9 @@ export interface JournalRawInput {
   reasoning: string
   expectation: string
   selfReflection: string
+  thesisTags: string[]
+  thesisScreenshots: ThesisScreenshotReference[]
+  aiNotes?: string
   createdAt: number
   tradeContext?: TradeContext
 }

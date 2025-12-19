@@ -33,6 +33,8 @@ const sampleInput: JournalRawInput = {
   marketContext: 'trend-up',
   reasoning: 'Momentum setup on strong trend',
   expectation: 'Follow-through into prior highs',
+  thesisTags: [],
+  thesisScreenshots: [],
   selfReflection: 'Avoid chasing late entries',
   createdAt: 1_700_000_100_000,
 }

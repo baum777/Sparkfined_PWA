@@ -15,6 +15,8 @@ const sampleInput: JournalRawInput = {
   marketContext: 'mean-reversion',
   reasoning: 'Fade extended move into liquidity pocket.',
   expectation: 'Snap back to VWAP',
+  thesisTags: [],
+  thesisScreenshots: [],
   selfReflection: 'Respect stop placement',
   createdAt: 1_700_000_200_000,
 }
