@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-05
+
+### Added
+- Documented WP-033 trade thesis enhancements (tags, screenshot stub, AI notes) with checklist link `WP-Polish/WP-033/checklist.md`.
+
+### Updated
+- Journal thesis section now uses `TradeThesisCard`, `TagInput`, `AINotesGenerator`, and stores screenshot references across `src/features/journal-v2/components/JournalInputForm.tsx`, `src/features/journal/TradeThesisCard.tsx`, `src/features/journal/AINotesGenerator.tsx`, `src/features/journal/TagInput.tsx`, and styles in `src/features/journal/journal.css`.
+
 ## 2026-01-04
 
 ### Added

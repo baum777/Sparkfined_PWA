@@ -38,6 +38,9 @@ function mapLegacyToRaw(entry: JournalEntry): JournalRawInput {
     reasoning: entry.thesis ?? '',
     expectation: entry.customTags?.join(', ') ?? '',
     selfReflection: entry.journeyMeta ? `Phase: ${entry.journeyMeta.phase}` : 'Imported from Journal V1',
+    thesisTags: entry.customTags ?? [],
+    thesisScreenshots: [],
+    aiNotes: '',
     createdAt: entry.timestamp ?? entry.createdAt ?? Date.now(),
   }
 }

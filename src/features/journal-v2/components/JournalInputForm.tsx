@@ -1,9 +1,12 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react'
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Textarea } from '@/components/ui'
-import type { JournalRawInput, EmotionLabel, MarketContext, TradeContext } from '../types'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Textarea } from '@/components/ui'
+import type { JournalRawInput, EmotionLabel, MarketContext, ThesisScreenshotReference, TradeContext } from '../types'
 import { cn } from '@/lib/ui/cn'
 import { EmotionalStateCard } from '@/features/journal/EmotionalStateCard'
 import { MarketContextAccordion } from '@/features/journal/MarketContextAccordion'
+import { TradeThesisCard } from '@/features/journal/TradeThesisCard'
+import { TagInput } from '@/features/journal/TagInput'
+import { AINotesGenerator } from '@/features/journal/AINotesGenerator'
 
 const JournalTemplatesSection = React.lazy(() => import('./JournalTemplatesSection'))
 
@@ -31,6 +34,9 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
   const [marketContext, setMarketContext] = useState<MarketContext>('chop')
   const [reasoning, setReasoning] = useState('')
   const [expectation, setExpectation] = useState('')
+  const [thesisTags, setThesisTags] = useState<string[]>([])
+  const [thesisScreenshots, setThesisScreenshots] = useState<ThesisScreenshotReference[]>([])
+  const [aiNotes, setAiNotes] = useState('')
   const [selfReflection, setSelfReflection] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
   const isSubmittingRef = useRef(false)
@@ -69,16 +75,19 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
     try {
       await onSubmit({
         emotionalState,
-        emotionalScore,
-        conviction,
-        patternQuality,
-        marketContext,
-        reasoning,
-        expectation,
-        selfReflection,
-        createdAt,
-        tradeContext,
-      })
+      emotionalScore,
+      conviction,
+      patternQuality,
+      marketContext,
+      reasoning,
+      expectation,
+      thesisTags,
+      thesisScreenshots,
+      aiNotes,
+      selfReflection,
+      createdAt,
+      tradeContext,
+    })
     } finally {
       isSubmittingRef.current = false
     }
@@ -92,6 +101,9 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
     setMarketContext('chop')
     setReasoning('')
     setExpectation('')
+    setThesisTags([])
+    setThesisScreenshots([])
+    setAiNotes('')
     setSelfReflection('')
     onClearTradeContext?.()
   }
@@ -210,34 +222,25 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
 
           {/* Section 3: Thesis (Required) */}
           <section className="space-y-4" data-testid="journal-section-thesis">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-text-primary">3. Trade Thesis</h3>
-              <Badge variant="warning" className="text-[10px]">Required</Badge>
-            </div>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-text-primary">Reasoning</label>
-                <Textarea
-                  value={reasoning}
-                  onChange={(event) => setReasoning(event.target.value)}
-                  placeholder="Setup, catalysts, and risk context. What is your thesis and invalidation?"
-                  data-testid="journal-v2-reasoning"
-                  rows={3}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-text-primary">Expectation</label>
-                <Input
-                  value={expectation}
-                  onChange={(event) => setExpectation(event.target.value)}
-                  placeholder="What outcome are you anticipating?"
-                  data-testid="journal-v2-expectation"
-                />
-              </div>
-            </div>
+            <TradeThesisCard
+              reasoning={reasoning}
+              expectation={expectation}
+              onReasoningChange={setReasoning}
+              onExpectationChange={setExpectation}
+              screenshots={thesisScreenshots}
+              onScreenshotAdd={(reference) => setThesisScreenshots((previous) => [...previous, reference])}
+              onScreenshotRemove={(id) =>
+                setThesisScreenshots((previous) => previous.filter((item) => item.id !== id))
+              }
+            >
+              <TagInput value={thesisTags} onChange={setThesisTags} />
+              <AINotesGenerator
+                tags={thesisTags}
+                thesis={`${reasoning}\n${expectation}`}
+                value={aiNotes}
+                onChange={setAiNotes}
+              />
+            </TradeThesisCard>
           </section>
         </form>
       </CardContent>

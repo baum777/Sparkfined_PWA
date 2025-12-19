@@ -10,6 +10,8 @@ const baseInput: JournalRawInput = {
   marketContext: 'breakout',
   reasoning: 'Capturing breakout retest with clear invalidation.',
   expectation: 'Momentum continuation into daily supply.',
+  thesisTags: [],
+  thesisScreenshots: [],
   selfReflection: 'Stay patient on entries and avoid size creep.',
   createdAt: 1_700_000_000_000,
 }
