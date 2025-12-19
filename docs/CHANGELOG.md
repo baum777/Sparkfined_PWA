@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-11
+
+### Added
+- Documented WP-053 chart bottom panel polish with checklist link `WP-Polish/WP-053/checklist.md`.
+
+### Updated
+- Chart bottom panel now renders Grok Pulse mock insights and inline journal notes with draft persistence, wired via `src/features/chart/ChartBottomPanel.tsx`, `src/features/chart/GrokPulseCard.tsx`, `src/features/chart/InlineJournalNotes.tsx`, tokenized styles in `src/features/chart/chart.css`, and coverage in `tests/components/chart/ChartBottomPanel.test.tsx`.
+
 ## 2026-01-10
 
 ### Added
