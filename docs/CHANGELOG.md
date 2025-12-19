@@ -6,6 +6,15 @@
 
 ---
 
+## 2026-01-07
+
+### Added
+- Documented WP-035 journal workflow reliability (autosave, validation, templates, autocomplete) with checklist link `WP-Polish/WP-035/checklist.md`.
+- Stubbed `NewTradeModal` placeholder for future quick-add entry points under `src/features/journal/NewTradeModal.tsx`.
+
+### Updated
+- Journal V2 form now restores/saves drafts with `useAutoSave` plus inline autosave status, validation on reasoning/expectation, template-triggered saves, and an expectation autocomplete input across `src/features/journal-v2/components/JournalInputForm.tsx`, `src/features/journal/useAutoSave.ts`, `src/features/journal/TradeThesisCard.tsx`, `src/features/journal/TextfieldWithAutocomplete.tsx`, and `src/features/journal-v2/components/JournalTemplatesSection.tsx`.
+
 ## 2026-01-06
 
 ### Added

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Textarea } from '@/components/ui'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Textarea } from '@/components/ui'
 import type { ThesisScreenshotReference } from '@/features/journal-v2/types'
+import { TextfieldWithAutocomplete } from '@/features/journal/TextfieldWithAutocomplete'
 
 export type ScreenshotReference = ThesisScreenshotReference
 
@@ -9,6 +10,10 @@ interface TradeThesisCardProps {
   expectation: string
   onReasoningChange: (value: string) => void
   onExpectationChange: (value: string) => void
+  onReasoningBlur?: () => void
+  onExpectationBlur?: () => void
+  reasoningError?: string | null
+  expectationError?: string | null
   screenshots: ScreenshotReference[]
   onScreenshotAdd: (reference: ScreenshotReference) => void
   onScreenshotRemove: (id: string) => void
@@ -20,6 +25,10 @@ export function TradeThesisCard({
   expectation,
   onReasoningChange,
   onExpectationChange,
+  onReasoningBlur,
+  onExpectationBlur,
+  reasoningError,
+  expectationError,
   screenshots,
   onScreenshotAdd,
   onScreenshotRemove,
@@ -71,21 +80,26 @@ export function TradeThesisCard({
             id="journal-thesis-reasoning"
             value={reasoning}
             onChange={(event) => onReasoningChange(event.target.value)}
+            onBlur={onReasoningBlur}
             placeholder="Setup, catalysts, and risk context. What is your thesis and invalidation?"
             rows={3}
             required
+            aria-invalid={Boolean(reasoningError)}
           />
+          {reasoningError ? <p className="text-xs text-status-danger">{reasoningError}</p> : null}
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-text-primary" htmlFor="journal-thesis-expectation">
-            Expectation
-          </label>
-          <Input
+          <TextfieldWithAutocomplete
             id="journal-thesis-expectation"
+            label="Expectation"
             value={expectation}
-            onChange={(event) => onExpectationChange(event.target.value)}
+            onChange={onExpectationChange}
+            onBlur={onExpectationBlur}
             placeholder="What outcome are you anticipating?"
+            error={expectationError ?? undefined}
+            required
+            dataTestId="journal-expectation-autocomplete"
           />
         </div>
 

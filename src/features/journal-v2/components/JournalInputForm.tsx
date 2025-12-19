@@ -7,10 +7,66 @@ import { MarketContextAccordion } from '@/features/journal/MarketContextAccordio
 import { TradeThesisCard } from '@/features/journal/TradeThesisCard'
 import { TagInput } from '@/features/journal/TagInput'
 import { AINotesGenerator } from '@/features/journal/AINotesGenerator'
+import { useAutoSave } from '@/features/journal/useAutoSave'
 import { applyTemplateToDraft } from '@/components/journal/templates/template-utils'
 import type { JournalTemplateFields, TemplateApplyMode } from '@/components/journal/templates/types'
 
 const JournalTemplatesSection = React.lazy(() => import('./JournalTemplatesSection'))
+
+const JOURNAL_DRAFT_STORAGE_KEY = 'journal-v2-draft'
+
+export type JournalFormDraft = {
+  emotionalState: EmotionLabel
+  emotionalScore: number
+  conviction: number
+  patternQuality: number
+  marketContext: MarketContext
+  reasoning: string
+  expectation: string
+  thesisTags: string[]
+  thesisScreenshots: ThesisScreenshotReference[]
+  aiNotes: string
+  selfReflection: string
+}
+
+type StoredJournalDraft = {
+  draft: JournalFormDraft
+  savedAt: number
+}
+
+const defaultJournalDraft: JournalFormDraft = {
+  emotionalState: 'calm',
+  emotionalScore: 50,
+  conviction: 5,
+  patternQuality: 5,
+  marketContext: 'chop',
+  reasoning: '',
+  expectation: '',
+  thesisTags: [],
+  thesisScreenshots: [],
+  aiNotes: '',
+  selfReflection: '',
+}
+
+function readDraftFromStorage(): StoredJournalDraft | null {
+  if (typeof window === 'undefined') return null
+
+  try {
+    const raw = window.localStorage.getItem(JOURNAL_DRAFT_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as StoredJournalDraft
+    if (!parsed || typeof parsed !== 'object' || !parsed.draft) return null
+    return parsed
+  } catch (error) {
+    console.warn('Unable to parse journal draft', error)
+    return null
+  }
+}
+
+function clearDraftFromStorage() {
+  if (typeof window === 'undefined') return
+  window.localStorage.removeItem(JOURNAL_DRAFT_STORAGE_KEY)
+}
 
 interface JournalInputFormProps {
   onSubmit: (input: JournalRawInput) => Promise<void> | void
@@ -36,17 +92,41 @@ export const JournalInputForm = React.forwardRef<JournalInputFormHandle, Journal
   { onSubmit, isSubmitting, tradeContext, onClearTradeContext }: JournalInputFormProps,
   ref,
 ) {
-  const [emotionalState, setEmotionalState] = useState<EmotionLabel>('calm')
-  const [emotionalScore, setEmotionalScore] = useState(50)
-  const [conviction, setConviction] = useState(5)
-  const [patternQuality, setPatternQuality] = useState(5)
-  const [marketContext, setMarketContext] = useState<MarketContext>('chop')
-  const [reasoning, setReasoning] = useState('')
-  const [expectation, setExpectation] = useState('')
-  const [thesisTags, setThesisTags] = useState<string[]>([])
-  const [thesisScreenshots, setThesisScreenshots] = useState<ThesisScreenshotReference[]>([])
-  const [aiNotes, setAiNotes] = useState('')
-  const [selfReflection, setSelfReflection] = useState('')
+  const initialStoredDraftRef = useRef<StoredJournalDraft | null>(readDraftFromStorage())
+  const [emotionalState, setEmotionalState] = useState<EmotionLabel>(
+    initialStoredDraftRef.current?.draft.emotionalState ?? defaultJournalDraft.emotionalState,
+  )
+  const [emotionalScore, setEmotionalScore] = useState(
+    initialStoredDraftRef.current?.draft.emotionalScore ?? defaultJournalDraft.emotionalScore,
+  )
+  const [conviction, setConviction] = useState(
+    initialStoredDraftRef.current?.draft.conviction ?? defaultJournalDraft.conviction,
+  )
+  const [patternQuality, setPatternQuality] = useState(
+    initialStoredDraftRef.current?.draft.patternQuality ?? defaultJournalDraft.patternQuality,
+  )
+  const [marketContext, setMarketContext] = useState<MarketContext>(
+    initialStoredDraftRef.current?.draft.marketContext ?? defaultJournalDraft.marketContext,
+  )
+  const [reasoning, setReasoning] = useState(initialStoredDraftRef.current?.draft.reasoning ?? defaultJournalDraft.reasoning)
+  const [expectation, setExpectation] = useState(
+    initialStoredDraftRef.current?.draft.expectation ?? defaultJournalDraft.expectation,
+  )
+  const [thesisTags, setThesisTags] = useState<string[]>(
+    initialStoredDraftRef.current?.draft.thesisTags ?? defaultJournalDraft.thesisTags,
+  )
+  const [thesisScreenshots, setThesisScreenshots] = useState<ThesisScreenshotReference[]>(
+    initialStoredDraftRef.current?.draft.thesisScreenshots ?? defaultJournalDraft.thesisScreenshots,
+  )
+  const [aiNotes, setAiNotes] = useState(initialStoredDraftRef.current?.draft.aiNotes ?? defaultJournalDraft.aiNotes)
+  const [selfReflection, setSelfReflection] = useState(
+    initialStoredDraftRef.current?.draft.selfReflection ?? defaultJournalDraft.selfReflection,
+  )
+  const [touchedFields, setTouchedFields] = useState<{ reasoning: boolean; expectation: boolean }>({
+    reasoning: false,
+    expectation: false,
+  })
+  const templateAppliedRef = useRef(false)
   const formRef = useRef<HTMLFormElement>(null)
   const isSubmittingRef = useRef(false)
 
@@ -64,10 +144,65 @@ export const JournalInputForm = React.forwardRef<JournalInputFormHandle, Journal
         setSelfReflection(next.selfReflection)
         setMarketContext(next.marketContext)
         setEmotionalScore(next.emotionalScore)
+        templateAppliedRef.current = true
       },
     }),
     [emotionalScore, expectation, marketContext, reasoning, selfReflection],
   )
+
+  const draftState = useMemo<JournalFormDraft>(
+    () => ({
+      emotionalState,
+      emotionalScore,
+      conviction,
+      patternQuality,
+      marketContext,
+      reasoning,
+      expectation,
+      thesisTags,
+      thesisScreenshots,
+      aiNotes,
+      selfReflection,
+    }),
+    [
+      aiNotes,
+      conviction,
+      emotionalScore,
+      emotionalState,
+      expectation,
+      marketContext,
+      patternQuality,
+      reasoning,
+      selfReflection,
+      thesisScreenshots,
+      thesisTags,
+    ],
+  )
+
+  const { lastSavedAt, isSaving, saveNow } = useAutoSave<JournalFormDraft>({
+    key: JOURNAL_DRAFT_STORAGE_KEY,
+    value: draftState,
+    intervalMs: 30_000,
+    initialSavedAt: initialStoredDraftRef.current?.savedAt ?? null,
+    serialize: (draft, savedAt) => JSON.stringify({ draft, savedAt }),
+    diffSerializer: (draft) => JSON.stringify(draft),
+  })
+
+  useEffect(() => {
+    if (!templateAppliedRef.current) return
+    templateAppliedRef.current = false
+    void saveNow()
+  }, [draftState, saveNow])
+
+  const validationErrors = useMemo(
+    () => ({
+      reasoning: reasoning.trim().length ? null : 'Reasoning is required',
+      expectation: expectation.trim().length ? null : 'Expectation is required',
+    }),
+    [expectation, reasoning],
+  )
+
+  const hasValidationErrors = Object.values(validationErrors).some(Boolean)
 
   useEffect(() => {
     if (!tradeContext) return
@@ -91,8 +226,29 @@ export const JournalInputForm = React.forwardRef<JournalInputFormHandle, Journal
 
   const emotionalZoneLabel = useMemo(() => getEmotionalZoneLabel(emotionalScore), [emotionalScore])
 
+  const autosaveLabel = useMemo(() => {
+    if (isSaving) return 'Saving draft…'
+    if (lastSavedAt) {
+      return `Saved at ${new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(lastSavedAt)}`
+    }
+    return 'Draft will auto-save every 30s'
+  }, [isSaving, lastSavedAt])
+
+  const markReasoningTouched = () => setTouchedFields((previous) => ({ ...previous, reasoning: true }))
+  const markExpectationTouched = () => setTouchedFields((previous) => ({ ...previous, expectation: true }))
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    setTouchedFields({ reasoning: true, expectation: true })
+    if (hasValidationErrors) {
+      return
+    }
 
     // Prevent double-submit
     if (isSubmittingRef.current || isSubmitting) return
@@ -101,45 +257,54 @@ export const JournalInputForm = React.forwardRef<JournalInputFormHandle, Journal
     const createdAt = tradeContext?.timestamp ?? Date.now()
 
     try {
+      await saveNow()
       await onSubmit({
         emotionalState,
-      emotionalScore,
-      conviction,
-      patternQuality,
-      marketContext,
-      reasoning,
-      expectation,
-      thesisTags,
-      thesisScreenshots,
-      aiNotes,
-      selfReflection,
-      createdAt,
-      tradeContext,
-    })
+        emotionalScore,
+        conviction,
+        patternQuality,
+        marketContext,
+        reasoning,
+        expectation,
+        thesisTags,
+        thesisScreenshots,
+        aiNotes,
+        selfReflection,
+        createdAt,
+        tradeContext,
+      })
     } finally {
       isSubmittingRef.current = false
     }
   }
 
   const handleReset = () => {
-    setEmotionalState('calm')
-    setEmotionalScore(50)
-    setConviction(5)
-    setPatternQuality(5)
-    setMarketContext('chop')
-    setReasoning('')
-    setExpectation('')
-    setThesisTags([])
-    setThesisScreenshots([])
-    setAiNotes('')
-    setSelfReflection('')
+    setEmotionalState(defaultJournalDraft.emotionalState)
+    setEmotionalScore(defaultJournalDraft.emotionalScore)
+    setConviction(defaultJournalDraft.conviction)
+    setPatternQuality(defaultJournalDraft.patternQuality)
+    setMarketContext(defaultJournalDraft.marketContext)
+    setReasoning(defaultJournalDraft.reasoning)
+    setExpectation(defaultJournalDraft.expectation)
+    setThesisTags(defaultJournalDraft.thesisTags)
+    setThesisScreenshots(defaultJournalDraft.thesisScreenshots)
+    setAiNotes(defaultJournalDraft.aiNotes)
+    setSelfReflection(defaultJournalDraft.selfReflection)
     onClearTradeContext?.()
+    clearDraftFromStorage()
+    setTouchedFields({ reasoning: false, expectation: false })
   }
 
-  const canSubmit = !isSubmitting && reasoning.trim().length > 0
+  const canSubmit = !isSubmitting && !hasValidationErrors
 
   return (
-    <Card variant="glass" className="relative border-border/70 shadow-card-subtle" data-testid="journal-v2-form">
+    <Card
+      variant="glass"
+      className="relative border-border/70 shadow-card-subtle"
+      data-testid="journal-v2-form"
+      data-autosave-state={isSaving ? 'saving' : 'idle'}
+      data-last-saved-at={lastSavedAt ?? undefined}
+    >
       <CardHeader className="flex flex-col gap-2 pb-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <Badge variant="brand" className="mb-2 uppercase tracking-wide text-xs">Journal</Badge>
@@ -205,6 +370,9 @@ export const JournalInputForm = React.forwardRef<JournalInputFormHandle, Journal
               setMarketContext={setMarketContext}
               emotionalScore={emotionalScore}
               setEmotionalScore={setEmotionalScore}
+              onTemplateApplied={() => {
+                templateAppliedRef.current = true
+              }}
             />
           </React.Suspense>
 
@@ -255,6 +423,10 @@ export const JournalInputForm = React.forwardRef<JournalInputFormHandle, Journal
               expectation={expectation}
               onReasoningChange={setReasoning}
               onExpectationChange={setExpectation}
+              onReasoningBlur={markReasoningTouched}
+              onExpectationBlur={markExpectationTouched}
+              reasoningError={touchedFields.reasoning ? validationErrors.reasoning : null}
+              expectationError={touchedFields.expectation ? validationErrors.expectation : null}
               screenshots={thesisScreenshots}
               onScreenshotAdd={(reference) => setThesisScreenshots((previous) => [...previous, reference])}
               onScreenshotRemove={(id) =>
@@ -275,15 +447,20 @@ export const JournalInputForm = React.forwardRef<JournalInputFormHandle, Journal
 
       {/* Sticky action bar */}
       <div
-        className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-3 rounded-b-2xl border-t border-border/70 bg-surface-elevated/95 px-6 py-4 backdrop-blur"
-        data-testid="journal-action-bar"
-      >
+      className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-3 rounded-b-2xl border-t border-border/70 bg-surface-elevated/95 px-6 py-4 backdrop-blur"
+      data-testid="journal-action-bar"
+    >
+      <div className="flex flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
         <p className="hidden text-xs text-text-tertiary sm:block">
           Entries are stored locally with timestamps.
         </p>
-        <div className="flex flex-1 items-center justify-end gap-2 sm:flex-none">
-          <Button
-            type="button"
+        <p className="text-xs text-text-tertiary" data-testid="journal-autosave-status">
+          {autosaveLabel}
+        </p>
+      </div>
+      <div className="flex flex-1 items-center justify-end gap-2 sm:flex-none">
+        <Button
+          type="button"
             variant="ghost"
             size="sm"
             onClick={handleReset}
