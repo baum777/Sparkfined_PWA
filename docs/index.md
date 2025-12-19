@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-06)
+
+- **Mobile Journal Bottom Sheet (WP-034):** Neues `BottomSheet`-Primitive (`src/shared/components/BottomSheet.tsx`) und ein `TemplateBottomSheet` für mobile Template-Auswahl (`src/features/journal/TemplateBottomSheet.tsx`) triggerbar über die Journal-Insights-Karte (`src/features/journal/JournalCard.tsx`). Templates werden direkt in den aktiven V2-Formularzustand injiziert (`src/features/journal-v2/components/JournalInputForm.tsx`, `src/features/journal/JournalForm.tsx`, `src/pages/JournalPage.tsx`) mit tokenisierten Mobile-Spacings in `src/features/journal/journal.css`; Checklist-Link: `WP-Polish/WP-034/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-05)
 
 - **Trade Thesis (WP-033):** Neue TradeThesisCard mit TagInput, Screenshot-Stubs und AI-Notizen (deterministischer Mock) über `src/features/journal/TradeThesisCard.tsx`, `src/features/journal/TagInput.tsx`, `src/features/journal/AINotesGenerator.tsx`, verdrahtet im V2-Formular `src/features/journal-v2/components/JournalInputForm.tsx` und gestylt in `src/features/journal/journal.css`; Checklist-Link: `WP-Polish/WP-033/checklist.md`.

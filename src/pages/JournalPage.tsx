@@ -1,9 +1,11 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState, ErrorBanner } from "@/components/ui";
 import { ListRow } from "@/components/ui/ListRow";
 import { JournalCard } from "@/features/journal/JournalCard";
 import { JournalForm } from "@/features/journal/JournalForm";
+import type { JournalInputFormHandle } from "@/features/journal-v2/components/JournalInputForm";
+import type { JournalTemplate, TemplateApplyMode } from "@/components/journal/templates/types";
 import "@/features/journal/journal.css";
 import { useJournalV2 } from "@/features/journal-v2/hooks/useJournalV2";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
@@ -26,6 +28,7 @@ function getScoreBadgeVariant(score: number): 'success' | 'warning' | 'danger' {
 export default function JournalPage() {
   const { submit, latestResult, history, isSaving, isLoading, error } = useJournalV2();
   const { tradeContext, clearTradeContext } = useTradeEventJournalBridge();
+  const formRef = useRef<JournalInputFormHandle>(null);
 
   const handleSubmit = useCallback(
     async (input: Parameters<typeof submit>[0]) => {
@@ -35,6 +38,13 @@ export default function JournalPage() {
       }
     },
     [submit, tradeContext, clearTradeContext],
+  );
+
+  const handleTemplateApply = useCallback(
+    (template: JournalTemplate, mode: TemplateApplyMode) => {
+      formRef.current?.applyTemplate(template.fields, mode);
+    },
+    [],
   );
 
   return (
@@ -48,6 +58,7 @@ export default function JournalPage() {
         <div className="journal-shell__grid">
           <div className="journal-shell__section">
             <JournalForm
+              ref={formRef}
               onSubmit={handleSubmit}
               isSubmitting={isSaving}
               tradeContext={tradeContext}
@@ -57,7 +68,7 @@ export default function JournalPage() {
 
           <div className="space-y-4">
             {latestResult ? (
-              <JournalCard result={latestResult} />
+              <JournalCard result={latestResult} onApplyTemplate={handleTemplateApply} />
             ) : (
               <EmptyState
                 illustration="journal"

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react'
+import React, { useMemo, useState, useEffect, useRef, useImperativeHandle } from 'react'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Textarea } from '@/components/ui'
 import type { JournalRawInput, EmotionLabel, MarketContext, ThesisScreenshotReference, TradeContext } from '../types'
 import { cn } from '@/lib/ui/cn'
@@ -7,6 +7,8 @@ import { MarketContextAccordion } from '@/features/journal/MarketContextAccordio
 import { TradeThesisCard } from '@/features/journal/TradeThesisCard'
 import { TagInput } from '@/features/journal/TagInput'
 import { AINotesGenerator } from '@/features/journal/AINotesGenerator'
+import { applyTemplateToDraft } from '@/components/journal/templates/template-utils'
+import type { JournalTemplateFields, TemplateApplyMode } from '@/components/journal/templates/types'
 
 const JournalTemplatesSection = React.lazy(() => import('./JournalTemplatesSection'))
 
@@ -15,6 +17,10 @@ interface JournalInputFormProps {
   isSubmitting?: boolean
   tradeContext?: TradeContext
   onClearTradeContext?: () => void
+}
+
+export interface JournalInputFormHandle {
+  applyTemplate: (fields: JournalTemplateFields, mode: TemplateApplyMode) => void
 }
 
 function getEmotionalZoneLabel(score: number): string {
@@ -26,7 +32,10 @@ function getEmotionalZoneLabel(score: number): string {
   return 'Very optimistic'
 }
 
-export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClearTradeContext }: JournalInputFormProps) {
+export const JournalInputForm = React.forwardRef<JournalInputFormHandle, JournalInputFormProps>(function JournalInputForm(
+  { onSubmit, isSubmitting, tradeContext, onClearTradeContext }: JournalInputFormProps,
+  ref,
+) {
   const [emotionalState, setEmotionalState] = useState<EmotionLabel>('calm')
   const [emotionalScore, setEmotionalScore] = useState(50)
   const [conviction, setConviction] = useState(5)
@@ -40,6 +49,25 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
   const [selfReflection, setSelfReflection] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
   const isSubmittingRef = useRef(false)
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      applyTemplate: (fields, mode) => {
+        const next = applyTemplateToDraft(
+          { reasoning, expectation, selfReflection, marketContext, emotionalScore },
+          fields,
+          mode,
+        )
+        setReasoning(next.reasoning)
+        setExpectation(next.expectation)
+        setSelfReflection(next.selfReflection)
+        setMarketContext(next.marketContext)
+        setEmotionalScore(next.emotionalScore)
+      },
+    }),
+    [emotionalScore, expectation, marketContext, reasoning, selfReflection],
+  )
 
   useEffect(() => {
     if (!tradeContext) return
@@ -278,4 +306,4 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
       </div>
     </Card>
   )
-}
+})

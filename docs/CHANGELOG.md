@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-06
+
+### Added
+- Documented WP-034 mobile journal bottom sheet controls with checklist link `WP-Polish/WP-034/checklist.md`.
+
+### Updated
+- Journal page now surfaces the template bottom sheet + touch-sized controls via `src/shared/components/BottomSheet.tsx`, `src/features/journal/TemplateBottomSheet.tsx`, `src/features/journal/JournalCard.tsx`, `src/features/journal-v2/components/JournalInputForm.tsx`, `src/features/journal/JournalForm.tsx`, `src/pages/JournalPage.tsx`, and tokenized styles in `src/features/journal/journal.css`.
+
 ## 2026-01-05
 
 ### Added
