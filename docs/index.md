@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-08)
+
+- **Chart Foundation Shell (WP-050):** Chart-Seite nutzt jetzt ein eigenes Shell-Layout mit Topbar, Sidebar, Toolbar und Bottom Panel (`src/features/chart/ChartLayout.tsx`, `src/features/chart/ChartTopBar.tsx`, `src/features/chart/ChartSidebar.tsx`, `src/features/chart/ChartToolbar.tsx`, `src/features/chart/ChartBottomPanel.tsx`) sowie tokenisierte Layout-Styles in `src/features/chart/chart.css`; Checklist-Link: `WP-Polish/WP-050/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-07)
 
 - **Journal Workflow (WP-035):** Autosave hook (`src/features/journal/useAutoSave.ts`) with inline status on the V2 form, required reasoning/expectation validation, template-applied drafts that trigger immediate saves, expectation autocomplete input, and a stubbed `NewTradeModal` placeholder; Checklist-Link: `WP-Polish/WP-035/checklist.md`.

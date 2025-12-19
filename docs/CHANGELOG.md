@@ -2,9 +2,17 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2025-12-27
+**Last Updated:** 2026-01-08
 
 ---
+
+## 2026-01-08
+
+### Added
+- Documented WP-050 chart foundation shell with checklist link `WP-Polish/WP-050/checklist.md`.
+
+### Updated
+- Chart route now uses the lightweight shell layout (`ChartLayout`) with top bar, sidebar, toolbar, and bottom panel placeholders, plus tokenized styles in `src/features/chart/chart.css`.
 
 ## 2026-01-07
 
