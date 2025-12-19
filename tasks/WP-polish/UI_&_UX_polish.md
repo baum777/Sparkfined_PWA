@@ -104,6 +104,52 @@ Treat these files as high-conflict areas; only modify them when the WP explicitl
 
 ---
 
+## Execution Rules — Must-have vs. Nice-to-have (for Sparkfined WPs)
+
+This section defines which rules are **non-negotiable** in our repo, and which are **recommended** to improve flow quality without adding bureaucracy.
+
+### Must-have (Non-negotiable)
+- **1 WP = 1 PR/Branch (strict):** keep scope reviewable and bisectable.
+- **Cluster is planning, not delivery:** execute WPs sequentially inside a cluster, but never bundle multiple WPs into one PR (unless explicitly marked *Atomic Pair*).
+- **Dependency gate = hard stop:** do not start a WP if any `Depends On` is incomplete.
+- **Current-state check first:** before editing, scan the repo for existing implementations and integration points to avoid duplicate mounts/drift.
+- **Per-WP checklist doc:** create `./WP-Polish/<WP-ID>/checklist.md` with snapshot, steps, AC, and verification; keep it updated.
+- **Step log discipline:** after each implementation step, check it off and write a short change note + files touched.
+- **Stop-gates (quality):**
+  - If `pnpm typecheck` fails → STOP.
+  - If `pnpm test`/`pnpm vitest run` fails → STOP.
+  - `pnpm lint` must not introduce **new** warnings/errors (pre-existing warnings may remain).
+- **Tokens-only from WP-002 onward:** no hard-coded colors in changed/new code; use `src/styles/theme.css` variables.
+- **Single Source of Truth (Navigation):** routes/labels/icons must come from `src/config/navigation.ts` if navigation is involved.
+- **API resilience rule:** any WP touching `src/api/*` must provide:
+  - typed DTOs
+  - deterministic mock fallback
+  - UI states: loading / empty / error
+
+### Nice-to-have (Recommended)
+- **Step-commit rule:** one commit after each WP step (maximizes rollback/bisect). Use:
+  - `WP-<ID> step <N>: <desc>`
+  - `WP-<ID> docs: update changelog/index`
+  - `WP-<ID>: finalize checklist`
+- **Ownership map for integration hotspots:** treat shell/global entry points as high-conflict; only modify when WP requires:
+  - `src/components/layout/AppShell.tsx` (or `src/layouts/MainLayout.tsx`)
+  - `src/config/navigation.ts`
+  - `src/App.tsx`
+  - `src/styles/theme.css`, `src/styles/ui.css`
+- **Backlog instead of drive-bys:** log unrelated findings in `./WP-Polish/backlog.md` with file paths + short note.
+- **Review snapshots:** store 1–2 screenshots/GIFs or exact viewport steps under `./WP-Polish/<WP-ID>/` when UI changes are significant.
+- **Cluster summary:** maintain `./WP-Polish/Cluster-<X>/summary.md` listing WPs, checklist links, verification outcomes, and open risks.
+
+### Autonomy Mode (Optional, when running clusters without human review)
+When executing a full cluster without intermediate review/merge:
+- still keep **1 WP = 1 branch/PR**
+- enforce the **Stop-gates**
+- maintain a **stacked series** of WP branches
+- add/refresh `./WP-Polish/Cluster-<X>/summary.md` as the “single glance” status report
+
+
+---
+
 ## Canonical Routes & Navigation
 
 ### Routes
