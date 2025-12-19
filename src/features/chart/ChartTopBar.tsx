@@ -1,18 +1,26 @@
 import React from "react"
 import Button from "@/components/ui/Button"
+import type { ChartTimeframe } from "@/domain/chart"
 import { Activity, Download, Filter, Menu, RefreshCw } from "@/lib/icons"
 
-const TIMEFRAMES = ["15m", "1h", "4h", "1d"] as const
-
-type Timeframe = (typeof TIMEFRAMES)[number]
+const SUPPORTED_TIMEFRAMES: ChartTimeframe[] = ["15m", "1h", "4h", "1d"]
 
 export interface ChartTopBarProps {
+  timeframe: ChartTimeframe
+  symbolLabel?: string
+  onTimeframeChange: (next: ChartTimeframe) => void
   onOpenSidebar?: () => void
   onOpenToolbar?: () => void
 }
 
-export default function ChartTopBar({ onOpenSidebar, onOpenToolbar }: ChartTopBarProps) {
-  const [timeframe, setTimeframe] = React.useState<Timeframe>("1h")
+export default function ChartTopBar({
+  timeframe,
+  symbolLabel,
+  onTimeframeChange,
+  onOpenSidebar,
+  onOpenToolbar,
+}: ChartTopBarProps) {
+  const title = symbolLabel ? `${symbolLabel} · ${timeframe}` : `SOL/USDC · ${timeframe}`
 
   return (
     <header className="sf-chart-topbar" role="banner">
@@ -37,20 +45,20 @@ export default function ChartTopBar({ onOpenSidebar, onOpenToolbar }: ChartTopBa
             </button>
           </div>
           <div className="sf-chart-topbar__meta">
-            <span className="sf-chart-topbar__title">SOL/USDC · {timeframe}</span>
+            <span className="sf-chart-topbar__title">{title}</span>
             <span className="sf-chart-topbar__subtitle">Chart foundation (WP-050)</span>
           </div>
         </div>
 
         <div className="sf-chart-topbar__right">
           <div className="sf-chart-timeframe-toggle" role="group" aria-label="Chart timeframe">
-            {TIMEFRAMES.map((option) => (
+            {SUPPORTED_TIMEFRAMES.map((option) => (
               <button
                 key={option}
                 type="button"
                 className="sf-chart-timeframe-button"
                 aria-pressed={timeframe === option}
-                onClick={() => setTimeframe(option)}
+                onClick={() => onTimeframeChange(option)}
               >
                 {option}
               </button>

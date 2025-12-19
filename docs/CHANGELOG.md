@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-09
+
+### Added
+- Documented WP-051 main chart area restoration with checklist link `WP-Polish/WP-051/checklist.md`.
+
+### Updated
+- Chart layout now mounts the lazy chart canvas with URL timeframe sync and mocked journal markers via `src/features/chart/ChartCanvas.tsx`, `src/features/chart/ChartLayout.tsx`, and `src/features/chart/markers.ts`.
+
 ## 2026-01-08
 
 ### Added
