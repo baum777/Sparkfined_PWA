@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-11)
+
+- **Chart Bottom Panel (WP-053):** Bottom-panel tabs now surface a Grok Pulse mock card and inline Journal Notes with local draft persistence keyed by symbol/timeframe, wired in `src/features/chart/ChartBottomPanel.tsx`, `src/features/chart/GrokPulseCard.tsx`, `src/features/chart/InlineJournalNotes.tsx`, plus tokenized styles in `src/features/chart/chart.css`; Checklist-Link: `WP-Polish/WP-053/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-10)
 
 - **Right Toolbar Tool Hub (WP-052):** Chart-Toolbar now uses expandable sections for indicators, drawings, and alerts, with lazy alerts list fetch via `getAlertsList` (`src/api/alerts.ts`), create-alert sheet reuse (`src/components/alerts/AlertCreateDialog.tsx`), and tokenized styling in `src/features/chart/chart.css`, `src/features/chart/ChartToolbar.tsx`, and `src/features/chart/toolbar-sections.tsx`; Checklist-Link: `WP-Polish/WP-052/checklist.md`.

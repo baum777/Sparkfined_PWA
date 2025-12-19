@@ -1,5 +1,8 @@
 import React from "react"
+import { useSearchParams } from "react-router-dom"
 import { ChevronDown, ChevronUp } from "@/lib/icons"
+import GrokPulseCard from "./GrokPulseCard"
+import InlineJournalNotes from "./InlineJournalNotes"
 
 const TABS = [
   { id: "pulse", label: "Grok Pulse" },
@@ -12,6 +15,11 @@ export default function ChartBottomPanel() {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
   const [activeTab, setActiveTab] = React.useState<TabId>("pulse")
   const panelId = React.useId()
+  const [searchParams] = useSearchParams()
+  const symbol = searchParams.get("symbol")
+  const timeframe = searchParams.get("timeframe")
+
+  const tabsId = `${panelId}-tabs`
 
   return (
     <section
@@ -33,26 +41,54 @@ export default function ChartBottomPanel() {
         </button>
       </div>
 
-      <div className="sf-chart-bottom-panel__content" id={panelId}>
-        <div className="sf-chart-bottom-panel__tabs" role="tablist" aria-label="Bottom panel tabs">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === tab.id}
-              className="sf-chart-bottom-panel__tab"
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
+      <div
+        className="sf-chart-bottom-panel__content"
+        id={panelId}
+        hidden={isCollapsed}
+        aria-hidden={isCollapsed}
+      >
+        <div className="sf-chart-bottom-panel__tabs" role="tablist" aria-label="Bottom panel tabs" id={tabsId}>
+          {TABS.map((tab) => {
+            const tabButtonId = `${panelId}-tab-${tab.id}`
+            const tabPanelId = `${panelId}-panel-${tab.id}`
+
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                id={tabButtonId}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                aria-controls={tabPanelId}
+                className="sf-chart-bottom-panel__tab"
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.label}
+              </button>
+            )
+          })}
         </div>
 
-        <div className="sf-chart-bottom-panel__body" role="tabpanel" aria-live="polite">
-          {activeTab === "pulse"
-            ? "Grok Pulse placeholder — sentiment deltas and signals land in WP-053."
-            : "Journal Notes placeholder — inline notes will be wired in WP-053."}
+        <div className="sf-chart-bottom-panel__panels" aria-live="polite">
+          {TABS.map((tab) => {
+            const tabButtonId = `${panelId}-tab-${tab.id}`
+            const tabPanelId = `${panelId}-panel-${tab.id}`
+            const isActive = activeTab === tab.id
+
+            return (
+              <div
+                key={tab.id}
+                id={tabPanelId}
+                role="tabpanel"
+                aria-labelledby={tabButtonId}
+                className="sf-chart-bottom-panel__panel"
+                hidden={!isActive}
+              >
+                {isActive && tab.id === "pulse" ? <GrokPulseCard symbol={symbol} timeframe={timeframe} /> : null}
+                {isActive && tab.id === "notes" ? <InlineJournalNotes symbol={symbol} timeframe={timeframe} /> : null}
+              </div>
+            )
+          })}
         </div>
       </div>
     </section>
