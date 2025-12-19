@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-03
+
+### Added
+- Documented WP-031 emotional state card with emoji selector, gradient confidence slider, and optional advanced sliders; checklist link: `WP-Polish/WP-031/checklist.md`.
+
+### Updated
+- Journal input now uses the new EmotionalStateCard and shared GradientSlider across `src/features/journal/EmojiSelector.tsx`, `src/shared/components/GradientSlider.tsx`, `src/features/journal/EmotionalStateCard.tsx`, `src/features/journal-v2/components/JournalInputForm.tsx`, and `src/features/journal/journal.css`.
+
 ## 2026-01-02
 
 ### Added

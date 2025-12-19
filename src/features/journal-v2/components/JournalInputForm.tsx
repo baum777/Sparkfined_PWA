@@ -3,11 +3,9 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Select,
 import { Collapsible } from '@/components/ui/Collapsible'
 import type { JournalRawInput, EmotionLabel, MarketContext, TradeContext } from '../types'
 import { cn } from '@/lib/ui/cn'
+import { EmotionalStateCard } from '@/features/journal/EmotionalStateCard'
 
 const JournalTemplatesSection = React.lazy(() => import('./JournalTemplatesSection'))
-const EmotionalSlider = React.lazy(() =>
-  import('@/components/journal/EmotionalSlider').then((mod) => ({ default: mod.EmotionalSlider })),
-)
 
 interface JournalInputFormProps {
   onSubmit: (input: JournalRawInput) => Promise<void> | void
@@ -15,15 +13,6 @@ interface JournalInputFormProps {
   tradeContext?: TradeContext
   onClearTradeContext?: () => void
 }
-
-const emotionOptions: Array<{ value: EmotionLabel; label: string }> = [
-  { value: 'calm', label: 'Calm' },
-  { value: 'excitement', label: 'Excitement' },
-  { value: 'greed', label: 'Greed' },
-  { value: 'fear', label: 'Fear' },
-  { value: 'anxiety', label: 'Anxiety' },
-  { value: 'overconfidence', label: 'Overconfidence' },
-]
 
 const contextOptions: Array<{ value: MarketContext; label: string }> = [
   { value: 'breakout', label: 'Breakout' },
@@ -35,16 +24,13 @@ const contextOptions: Array<{ value: MarketContext; label: string }> = [
   { value: 'trend-down', label: 'Trending Down' },
 ]
 
-const sliderClasses =
-  'w-full accent-brand transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-focus'
-
 function getEmotionalZoneLabel(score: number): string {
   const clamped = Math.max(0, Math.min(100, Math.round(score)))
-  if (clamped <= 20) return 'Sehr unsicher'
-  if (clamped <= 40) return 'Unsicher'
+  if (clamped <= 20) return 'Very uncertain'
+  if (clamped <= 40) return 'Uncertain'
   if (clamped <= 60) return 'Neutral'
-  if (clamped <= 80) return 'Optimistisch'
-  return 'Sehr optimistisch'
+  if (clamped <= 80) return 'Optimistic'
+  return 'Very optimistic'
 }
 
 export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClearTradeContext }: JournalInputFormProps) {
@@ -78,18 +64,6 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
       setConviction((value) => Math.max(value, 6))
     }
   }, [tradeContext])
-
-  const convictionLabel = useMemo(() => {
-    if (conviction <= 3) return 'Low'
-    if (conviction <= 6) return 'Medium'
-    return 'High'
-  }, [conviction])
-
-  const patternQualityLabel = useMemo(() => {
-    if (patternQuality <= 3) return 'Weak'
-    if (patternQuality <= 6) return 'OK'
-    return 'Strong'
-  }, [patternQuality])
 
   const emotionalZoneLabel = useMemo(() => getEmotionalZoneLabel(emotionalScore), [emotionalScore])
 
@@ -211,82 +185,19 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
               <Badge variant="warning" className="text-[10px]">Required</Badge>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-text-primary">Current emotion</label>
-                <Select
-                  value={emotionalState}
-                  onChange={(value) => setEmotionalState(value as EmotionLabel)}
-                  options={emotionOptions}
-                  placeholder="Select your current state"
-                  triggerProps={{ 'data-testid': 'journal-v2-emotion' }}
-                />
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm font-medium text-text-primary">
-                  <span>Emotional position</span>
-                  <span className="text-text-secondary">{emotionalZoneLabel}</span>
-                </div>
-                <React.Suspense
-                  fallback={
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={emotionalScore}
-                      onChange={(event) => setEmotionalScore(Number(event.target.value))}
-                      className={sliderClasses}
-                      aria-label="Emotional position (Unsicher bis Optimistisch)"
-                      data-testid="journal-v2-emotional-score"
-                    />
-                  }
-                >
-                  <EmotionalSlider
-                    value={emotionalScore}
-                    onChange={setEmotionalScore}
-                    ariaLabel="Emotional position (Unsicher bis Optimistisch)"
-                    showNeutralMarker
-                    data-testid="journal-v2-emotional-score"
-                  />
-                </React.Suspense>
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm font-medium text-text-primary">
-                  <span>Conviction</span>
-                  <span className="text-text-secondary">{convictionLabel}</span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  value={conviction}
-                  onChange={(event) => setConviction(Number(event.target.value))}
-                  className={sliderClasses}
-                  data-testid="journal-v2-conviction"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm font-medium text-text-primary">
-                  <span>Pattern quality</span>
-                  <span className="text-text-secondary">{patternQualityLabel}</span>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={10}
-                  value={patternQuality}
-                  onChange={(event) => setPatternQuality(Number(event.target.value))}
-                  className={sliderClasses}
-                  data-testid="journal-v2-pattern-quality"
-                />
-              </div>
-            </div>
+            <EmotionalStateCard
+              emotion={emotionalState}
+              onEmotionChange={(value) => setEmotionalState(value)}
+              confidence={emotionalScore}
+              onConfidenceChange={setEmotionalScore}
+              confidenceValueText={`${emotionalZoneLabel} confidence`}
+              conviction={conviction}
+              onConvictionChange={setConviction}
+              patternQuality={patternQuality}
+              onPatternQualityChange={setPatternQuality}
+              showAdvancedDefault={false}
+              className="sf-journal-emotional-card"
+            />
           </section>
 
           {/* Section 2: Context (Optional, collapsible) */}

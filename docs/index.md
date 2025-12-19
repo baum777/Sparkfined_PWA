@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-03)
+
+- **Emotional State (WP-031):** EmojiSelector + GradientSlider-basierte EmotionalStateCard mit Advanced-Toggle für Conviction/Pattern-Slider, eingebunden in `src/features/journal-v2/components/JournalInputForm.tsx` und gestylt über `src/features/journal/journal.css`; Checklist-Link: `WP-Polish/WP-031/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2025-12-31)
 
 - **Quick Actions FAB (WP-016):** Mobile-only Floating Action Button anchored above the BottomNav safe-area via `src/features/dashboard/FAB.tsx`, `src/features/dashboard/FABMenu.tsx`, and `src/features/dashboard/fab.css`, wired in `src/pages/DashboardPage.tsx` to open the trade log overlay (`LogEntryOverlayPanel`) and the alert creation sheet (`AlertCreateDialog`); Checklist-Link: `WP-Polish/WP-016/checklist.md`.
