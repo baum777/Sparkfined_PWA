@@ -139,6 +139,40 @@ This section defines which rules are **non-negotiable** in our repo, and which a
 - **Backlog instead of drive-bys:** log unrelated findings in `./WP-Polish/backlog.md` with file paths + short note.
 - **Review snapshots:** store 1–2 screenshots/GIFs or exact viewport steps under `./WP-Polish/<WP-ID>/` when UI changes are significant.
 - **Cluster summary:** maintain `./WP-Polish/Cluster-<X>/summary.md` listing WPs, checklist links, verification outcomes, and open risks.
+## Bundle Headroom Guardrail (Dashboard + Shell)
+
+To keep the **initial route bundle** under budget and avoid CI size regressions:
+
+### Hard rule: what must stay out of the initial path
+The following must be **lazy-loaded** (route-lazy or Suspense-lazy) and must not be imported by the dashboard shell/skeleton:
+- **Chart / vendor-charts** code (and any chart telemetry)
+- **Dashboard “below-the-fold” widgets**, including:
+  - insights/teasers that are not required for first paint
+  - snapshot cards (alerts/journal/secondary summaries)
+  - optional overlays/sheets (alert creation, log entry overlays)
+  - FAB menu content (the trigger may be initial; the menu content must be lazy)
+- **Export/Import / heavy utilities** (ZIP/markdown/capture/AI helpers): import **on click**, never in the initial module graph.
+
+### Soft rule: what may be initial
+Allowed on the initial path:
+- Shell/layout primitives (AppShell/MainLayout, TopBar, Sidebar/BottomNav)
+- Minimal dashboard layout scaffolding + skeletons
+- Small KPI strip if it’s lightweight and does not pull in heavy dependencies
+- Small typed API DTOs and mock fallbacks (no heavy libs)
+
+### Enforcement (PR expectations)
+- Any PR touching dashboard pages must keep **non-critical widgets** behind `React.lazy` + `Suspense` with a stable-height fallback to avoid layout shift.
+- Avoid barrel exports that accidentally pull lazy modules into the initial graph.
+- If the CI size check gets close to the ceiling (≤10KB headroom), treat the PR as “size-critical” and add a short note in the PR description:
+  - what stayed initial
+  - what remained lazy
+  - check:size before/after
+
+### When CI fails
+Do **not** bypass the size check. Instead, apply the smallest lever first:
+1) Move newly-added UI to Suspense-lazy (below-the-fold)
+2) Move optional actions behind click-based dynamic import
+3) Re-audit icon imports / telemetry / chart adjacency
 
 ### Autonomy Mode (Optional, when running clusters without human review)
 When executing a full cluster without intermediate review/merge:
