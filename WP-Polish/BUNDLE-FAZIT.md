@@ -1,56 +1,54 @@
 # WP Bundle-Size Fazit & Summary
 
-**Datum:** 2025-12-19  
-**Analyse:** 38 Work Packages (13 ✅ / 25 📋)  
-**Status:** 🔴 CRITICAL - Budget-Überschreitung + 66% offene Features
+**Datum:** 2025-12-19
+**Analyse:** 38 Work Packages (routing + core surfaces shipped; backlog in `/WP-Polish/backlog.md`)
+**Status:** 🟡 Stabilisieren – Bundle-Budgets und CI-Guardrails neu gefasst
 
 ---
 
 ## 🎯 Executive Summary (TL;DR)
 
 ### Problem
-- **Aktuell:** 870 KB (+70 KB über Budget von 800 KB) = **109% Auslastung** ❌
-- **Nur 34% der Features implementiert** (13/38 WPs)
-- **66% noch offen** → erwartete +380 KB bei naiver Implementierung
-- **Worst Case:** 1250 KB final (+56% über Budget) 🔴🔴🔴
+- **Aktuell (Baseline vor Quick Wins):** 886 KB JS gesamt (uncompressed) / Precache 3.2 MB – **CI schlägt fehl** (Total-Budget 880 KB) ❌
+- **Metrik-Modell veraltet:** CI schaut auf Summen statt auf relevante Pfade (Initial/Route/Precache)
+- **Charts & Telemetry:** Werden als optionale Routen gebaut, aber Precache + Preloads ziehen sie früh ins Netz
+- **Dokustatus veraltet:** Chart-, Alerts- und Settings-Routen existieren bereits → WPs in Backlog dokumentieren
 
 ### Lösung
-✅ **3-Stufen-Strategie:**
-1. **Quick Wins (1-2h):** Vendor-Charts + Telemetry lazy → **-88 KB**
-2. **Budget-Anpassung:** 800 KB → **1000 KB** (+25%)
-3. **Smart Splitting:** Alle neuen Features on-demand laden → **+140 KB** statt +380 KB
+✅ **3-Stufen-Strategie (aktualisiert):**
+1. **Metriken korrigieren:** Initial JS (Landing), Route JS (Chart) und PWA Precache als primäre Budgets definieren (siehe unten)
+2. **Quick Wins:** Chart-Bibliothek + Telemetry nur auf Chart-Routen laden; Precache auf Shell + Essentials reduzieren
+3. **CI-Gate:** `pnpm run check:size` prüft Initial- und Precache-Budgets, nicht mehr die bloße Summe aller Chunks
 
-### Ergebnis
-- **Initial Bundle:** 892 KB (89% Budget) ✅
-- **On-Demand Chunks:** 360 KB (nur bei Bedarf)
-- **Headroom:** 108 KB (11% Reserve)
-- **Timeline:** 19 Wochen bis Completion
+### Ergebnis-Ziele (post-Quick-Wins)
+- **Initial JS (Landing/Dashboard):** Budget 360 KB (raw) – Fokus auf Entry + Shell
+- **Route JS (Chart):** Budget 240 KB (raw) – vendor-charts + chartTelemetry erst nach Navigation
+- **PWA Precache:** Budget 1.8 MB – nur Shell + kritische Assets, Heavy-Routen via Runtime-Caching
+- **CI:** Check-Skript prüft diese drei Budgets + Kern-Vendor-Grenzen
 
 ---
 
 ## 📊 Zahlen & Fakten
 
-### Aktueller Status (nach 13/38 WPs)
+### Aktueller Status (nach Routing-V2, vor Quick Wins)
 
 | Metrik | Wert | Bewertung |
 |--------|------|-----------|
-| **Bundle Size** | 870 KB | ❌ +9% über Budget |
-| **Gzipped** | 280 KB | ✅ Gute Kompression (32%) |
-| **WP Completion** | 34% (13/38) | 🟡 66% noch offen |
-| **Implemented Features** | Shell (50%), Dashboard (100%), Journal (67%) | 🟡 Mixed |
-| **Pending Features** | Chart (0%), Alerts (0%), Settings (0%) | 🔴 3 komplette Cluster offen |
+| **Initial JS (Landing)** | ~370–400 KB raw (Schätzung aus Preloads + Dashboard-Chunks) | 🟡 Ziel 360 KB |
+| **Route JS (Chart)** | ~220 KB raw (ChartPage + vendor-charts + Telemetry) | ✅ Unter Ziel 240 KB, aber Precache zieht es vor |
+| **PWA Precache** | 3.2 MB | 🔴 Enthält optionale Chart/Replay Assets |
+| **Implementierung** | Dashboard, Journal, Chart, Alerts, Settings Routen vorhanden | ✅ Routen shipped; Restliche WPs → Backlog |
 
-### Bundle-Breakdown (870 KB)
+### Bundle-Breakdown (886 KB total JS, uncompressed)
 
 ```
-vendor-react:     168 KB (19%)  ✅ Core Framework
-vendor-charts:    163 KB (19%)  ⚠️ Kann lazy geladen werden!
-vendor-dexie:      74 KB (9%)   ✅ Core Feature
-DashboardPage:     50 KB (6%)   ⚠️ Widgets können lazy geladen werden
-index (main):      45 KB (5%)   ✅ Akzeptabel
-JournalPage:       34 KB (4%)   ✅ Akzeptabel
-chartTelemetry:    33 KB (4%)   ⚠️ Nur mit Charts laden!
-Other:            303 KB (35%)  ✅ Gut verteilt in 29 Chunks
+vendor-react:     168 KB (core)
+vendor-charts:    163 KB (chart-only, darf nicht pre-cachen)
+vendor-dexie:      74 KB (storage core)
+DashboardPage:     50 KB (landing route)
+index (main):      45 KB (shell)
+chartTelemetry:    33 KB (chart-only)
+Other:            353 KB verteilt (AI provider, journal splits, replay)
 ```
 
 ---
@@ -59,32 +57,31 @@ Other:            303 KB (35%)  ✅ Gut verteilt in 29 Chunks
 
 ### 1. Vendor-Charts Problem (163 KB = 19% des Bundles)
 
-**Aktuell:** Vendor-Charts wird IMMER geladen, auch auf Dashboard/Journal  
-**Problem:** Chart-Library ist 2. größter Bundle-Teil  
-**Impact:** 163 KB gzipped (~52 KB) unnötig bei Start
+**Aktuell:** Chart-Library landet im Precache, obwohl Route-lazy gedacht
+**Problem:** 163 KB gzipped (~52 KB) werden im SW-Install geladen
+**Impact:** Download beim ersten Besuch + größerer Offline-Footprint
 
 **Lösung:**
 ```typescript
 // Charts nur laden wenn Chart-Page geöffnet wird
 const AdvancedChart = lazy(() => import('../components/chart/AdvancedChart'))
+// PWA: vendor-charts* aus Precache ausschließen, per runtime cache laden
 ```
 
-**Ersparnis:** -52 KB gzipped beim Initial Load (-18%)
+**Ersparnis:** -52 KB gzipped beim Initial Load (-18%) + geringerer Precache
 
 ---
 
 ### 2. Chart Telemetry Anti-Pattern (33 KB)
 
-**Aktuell:** Chart-Telemetry wird immer geladen  
-**Problem:** Telemetry ohne Chart nutzlos  
-**Impact:** 33 KB (11 KB gzip) verschwendet
+**Aktuell:** Chart-Telemetry wird als eigener Chunk gebaut, aber noch vor Navigation geprefetched
+**Problem:** Telemetry ohne Chart nutzlos
+**Impact:** 33 KB (11 KB gzip) früh geladen
 
 **Lösung:**
 ```typescript
-// vite.config.ts - mit Charts bundlen
-if (id.includes('/lib/chart/telemetry')) {
-  return 'chunk-chart-telemetry';
-}
+// Telemetry erst mit Chart laden (React.lazy)
+const ChartTelemetryBridge = React.lazy(() => import('@/components/chart/ChartTelemetryBridge'))
 ```
 
 **Ersparnis:** -11 KB gzipped (-4%)
@@ -107,20 +104,11 @@ const RecentEntriesSection = lazy(() => import('../features/dashboard/RecentEntr
 
 ---
 
-### 4. Massive Features Pending (380 KB)
+### 4. Backlog (aktualisiert)
 
-**Problem:** 25 von 38 WPs noch offen, größte Cluster nicht implementiert
+**Status:** Kernrouten sind im Repo vorhanden. Offene Feintuning-/Feature-WPs sind in `/WP-Polish/backlog.md` dokumentiert (kein akuter Chart-/Alerts-Blocker im Bundle mehr).
 
-| Cluster | Tasks | Erwarteter Impact | Risk Level |
-|---------|-------|-------------------|------------|
-| **Chart** | 7/7 offen | +180 KB | 🔴 CRITICAL |
-| **Alerts** | 7/7 offen | +80 KB | 🟡 HIGH |
-| **Settings** | 8/8 offen | +60 KB | 🟢 LOW |
-| **Journal** | 2/6 offen | +40 KB | 🟡 MEDIUM |
-| **Shell** | 2/4 offen | +20 KB | 🟢 LOW |
-| **Total** | **25 Tasks** | **+380 KB** | ⚠️ |
-
-**Ohne Smart Splitting:** 870 + 380 = **1250 KB** (+56% über Budget) 🔴
+**Leitplanken:** Neue Features nur per Route-/Interaction-Lazy laden; Budgets siehe oben (Initial 360 KB, Chart 240 KB, Precache 1.8 MB).
 
 ---
 

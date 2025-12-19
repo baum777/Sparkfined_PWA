@@ -1,23 +1,13 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import { LogEntryOverlayPanel } from "@/components/dashboard/LogEntryOverlayPanel";
-import InsightTeaser from "@/components/dashboard/InsightTeaser";
-import JournalSnapshot from "@/components/dashboard/JournalSnapshot";
-import AlertsSnapshot from "@/components/dashboard/AlertsSnapshot";
 import ErrorBanner from "@/components/ui/ErrorBanner";
 import { Skeleton } from "@/components/ui/Skeleton";
 import Button from "@/components/ui/Button";
 import StateView from "@/components/ui/StateView";
 import KPIBar, { type KPIDeltaDirection, type KPIItem } from "@/features/dashboard/KPIBar";
 import DailyBiasCard from "@/features/dashboard/DailyBiasCard";
-import HoldingsCard from "@/features/dashboard/HoldingsCard";
-import TradeLogCard from "@/features/dashboard/TradeLogCard";
-import RecentEntriesSection from "@/features/dashboard/RecentEntriesSection";
-import AlertsOverviewWidget from "@/features/dashboard/AlertsOverviewWidget";
-import AlertCreateDialog from "@/components/alerts/AlertCreateDialog";
 import FAB from "@/features/dashboard/FAB";
-import FABMenu from "@/features/dashboard/FABMenu";
 import { useJournalStore } from "@/store/journalStore";
 import { useAlertsStore } from "@/store/alertsStore";
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from "@/lib/dashboard/calculateKPIs";
@@ -25,7 +15,11 @@ import { getAllTrades, type TradeEntry } from "@/lib/db";
 import { useLogEntryAvailability, type TradeEventInboxItem } from "@/features/journal/useLogEntryAvailability";
 import { useSettings } from "@/state/settings";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
-import { Activity, Bell, FileText, Target, TrendingUp } from "@/lib/icons";
+import Activity from "lucide-react/dist/esm/icons/activity";
+import Bell from "lucide-react/dist/esm/icons/bell";
+import FileText from "lucide-react/dist/esm/icons/file-text";
+import Target from "lucide-react/dist/esm/icons/target";
+import TrendingUp from "lucide-react/dist/esm/icons/trending-up";
 import "@/features/dashboard/dashboard.css";
 
 const dummyInsight = {
@@ -35,6 +29,20 @@ const dummyInsight = {
   summary:
     "Market structure shows higher lows with strong momentum on intraday timeframes. Watching for pullbacks to re-enter long positions with tight risk management.",
 };
+
+const RecentEntriesSection = lazy(() => import("@/features/dashboard/RecentEntriesSection"));
+const AlertsOverviewWidget = lazy(() => import("@/features/dashboard/AlertsOverviewWidget"));
+const FABMenu = lazy(() => import("@/features/dashboard/FABMenu"));
+const HoldingsCard = lazy(() => import("@/features/dashboard/HoldingsCard"));
+const TradeLogCard = lazy(() => import("@/features/dashboard/TradeLogCard"));
+const InsightTeaser = lazy(() => import("@/components/dashboard/InsightTeaser"));
+const JournalSnapshot = lazy(() => import("@/components/dashboard/JournalSnapshot"));
+const AlertsSnapshot = lazy(() => import("@/components/dashboard/AlertsSnapshot"));
+const AlertCreateDialog = lazy(() => import("@/components/alerts/AlertCreateDialog"));
+const LogEntryOverlayPanel = lazy(async () => {
+  const module = await import("@/components/dashboard/LogEntryOverlayPanel");
+  return { default: module.LogEntryOverlayPanel };
+});
 
 export default function DashboardPage() {
   const journalEntries = useJournalStore((state) => state.entries);
@@ -190,13 +198,29 @@ export default function DashboardPage() {
 
   const renderHoldingsAndTrades = () => (
     <div className="dashboard-split">
-      <HoldingsCard className="dashboard-card sf-card" />
-      <TradeLogCard
-        className="dashboard-card"
-        onLogEntry={handleOpenLogEntryOverlay}
-        isLogEntryEnabled={hasBuySignal}
-        logEntryTooltip="Enabled when a BUY signal is detected"
-      />
+      <Suspense
+        fallback={
+          <div className="dashboard-card sf-card" aria-busy="true">
+            <Skeleton variant="card" className="h-72 w-full" />
+          </div>
+        }
+      >
+        <HoldingsCard className="dashboard-card sf-card" />
+      </Suspense>
+      <Suspense
+        fallback={
+          <div className="dashboard-card sf-card" aria-busy="true">
+            <Skeleton variant="card" className="h-72 w-full" />
+          </div>
+        }
+      >
+        <TradeLogCard
+          className="dashboard-card"
+          onLogEntry={handleOpenLogEntryOverlay}
+          isLogEntryEnabled={hasBuySignal}
+          logEntryTooltip="Enabled when a BUY signal is detected"
+        />
+      </Suspense>
     </div>
   );
 
@@ -297,7 +321,15 @@ export default function DashboardPage() {
                   compact
                 />
               </div>
-              <AlertsSnapshot className="dashboard-card sf-card" />
+              <Suspense
+                fallback={
+                  <div className="dashboard-card sf-card" aria-busy="true">
+                    <Skeleton variant="card" className="h-52 w-full" />
+                  </div>
+                }
+              >
+                <AlertsSnapshot className="dashboard-card sf-card" />
+              </Suspense>
             </div>
           </div>
         </div>
@@ -309,12 +341,36 @@ export default function DashboardPage() {
         {biasCard}
         <div className="dashboard-grid dashboard-grid--two">
           <div className="dashboard-primary dashboard-stack">
-            <InsightTeaser {...dummyInsight} className="dashboard-card sf-card" />
+            <Suspense
+              fallback={
+                <div className="dashboard-card sf-card" aria-busy="true">
+                  <Skeleton variant="card" className="h-48 w-full" />
+                </div>
+              }
+            >
+              <InsightTeaser {...dummyInsight} className="dashboard-card sf-card" />
+            </Suspense>
             {renderHoldingsAndTrades()}
           </div>
           <div className="dashboard-secondary dashboard-stack">
-            <JournalSnapshot entries={recentJournalEntries} className="dashboard-card sf-card" />
-            <AlertsSnapshot className="dashboard-card sf-card" />
+            <Suspense
+              fallback={
+                <div className="dashboard-card sf-card" aria-busy="true">
+                  <Skeleton variant="card" className="h-60 w-full" />
+                </div>
+              }
+            >
+              <JournalSnapshot entries={recentJournalEntries} className="dashboard-card sf-card" />
+            </Suspense>
+            <Suspense
+              fallback={
+                <div className="dashboard-card sf-card" aria-busy="true">
+                  <Skeleton variant="card" className="h-52 w-full" />
+                </div>
+              }
+            >
+              <AlertsSnapshot className="dashboard-card sf-card" />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -322,14 +378,35 @@ export default function DashboardPage() {
   };
 
   const renderBottomSections = () => (
-    <div className="dashboard-grid dashboard-grid--two">
-      <div className="dashboard-primary">
-        <RecentEntriesSection />
+    <Suspense
+      fallback={
+        <div
+          className="dashboard-grid dashboard-grid--two"
+          aria-busy="true"
+          aria-label="Loading dashboard widgets"
+        >
+          <div className="dashboard-primary">
+            <div className="dashboard-card sf-card" aria-hidden>
+              <Skeleton variant="card" className="h-64 w-full" />
+            </div>
+          </div>
+          <div className="dashboard-secondary">
+            <div className="dashboard-card sf-card" aria-hidden>
+              <Skeleton variant="card" className="h-64 w-full" />
+            </div>
+          </div>
+        </div>
+      }
+    >
+      <div className="dashboard-grid dashboard-grid--two">
+        <div className="dashboard-primary">
+          <RecentEntriesSection />
+        </div>
+        <div className="dashboard-secondary">
+          <AlertsOverviewWidget />
+        </div>
       </div>
-      <div className="dashboard-secondary">
-        <AlertsOverviewWidget />
-      </div>
-    </div>
+    </Suspense>
   );
 
   return (
@@ -361,31 +438,83 @@ export default function DashboardPage() {
         {renderMainContent()}
         {renderBottomSections()}
       </DashboardShell>
-      <LogEntryOverlayPanel
-        isOpen={isLogOverlayOpen}
-        onClose={() => setIsLogOverlayOpen(false)}
-        events={inboxEvents}
-        isLoading={isInboxLoading}
-        onSelect={handleJournalTrade}
-      />
+      <Suspense
+        fallback={
+          isLogOverlayOpen ? (
+            <div
+              role="status"
+              aria-live="polite"
+              className="fixed inset-x-0 bottom-0 z-modal flex items-end justify-center bg-surface/60 px-4 pb-8 pt-12 backdrop-blur"
+            >
+              <div className="dashboard-card sf-card" aria-busy="true">
+                <Skeleton variant="card" className="h-64 w-[min(720px,90vw)]" />
+              </div>
+            </div>
+          ) : null
+        }
+      >
+        {isLogOverlayOpen ? (
+          <LogEntryOverlayPanel
+            isOpen={isLogOverlayOpen}
+            onClose={() => setIsLogOverlayOpen(false)}
+            events={inboxEvents}
+            isLoading={isInboxLoading}
+            onSelect={handleJournalTrade}
+          />
+        ) : null}
+      </Suspense>
       <FAB ariaExpanded={isFabMenuOpen} onClick={() => setIsFabMenuOpen((prev) => !prev)} />
-      <FABMenu
-        isOpen={isFabMenuOpen}
-        onClose={closeFabMenu}
-        onLogEntry={() => {
-          closeFabMenu();
-          handleOpenLogEntryOverlay();
-        }}
-        onCreateAlert={() => {
-          closeFabMenu();
-          handleOpenCreateAlert();
-        }}
-      />
-      <AlertCreateDialog
-        isOpen={isCreateAlertOpen}
-        onClose={() => setIsCreateAlertOpen(false)}
-        triggerButton={false}
-      />
+      <Suspense
+        fallback={
+          isFabMenuOpen ? (
+            <div
+              role="status"
+              aria-live="polite"
+              className="fixed bottom-24 right-5 rounded-2xl bg-surface px-4 py-3 text-sm text-text-secondary shadow-card"
+            >
+              Loading quick actions…
+            </div>
+          ) : null
+        }
+      >
+        {isFabMenuOpen ? (
+          <FABMenu
+            isOpen={isFabMenuOpen}
+            onClose={closeFabMenu}
+            onLogEntry={() => {
+              closeFabMenu();
+              handleOpenLogEntryOverlay();
+            }}
+            onCreateAlert={() => {
+              closeFabMenu();
+              handleOpenCreateAlert();
+            }}
+          />
+        ) : null}
+      </Suspense>
+      <Suspense
+        fallback={
+          isCreateAlertOpen ? (
+            <div
+              role="status"
+              aria-live="polite"
+              className="fixed inset-0 z-modal flex items-center justify-center bg-surface/70 backdrop-blur"
+            >
+              <div className="dashboard-card sf-card" aria-busy="true">
+                <Skeleton variant="card" className="h-64 w-[min(560px,92vw)]" />
+              </div>
+            </div>
+          ) : null
+        }
+      >
+        {isCreateAlertOpen ? (
+          <AlertCreateDialog
+            isOpen={isCreateAlertOpen}
+            onClose={() => setIsCreateAlertOpen(false)}
+            triggerButton={false}
+          />
+        ) : null}
+      </Suspense>
     </div>
   );
 }

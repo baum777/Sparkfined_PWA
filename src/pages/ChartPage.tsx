@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import AdvancedChart from '@/components/chart/AdvancedChart'
 import ChartHeaderActions from '@/components/chart/ChartHeaderActions'
 import DashboardShell from '@/components/dashboard/DashboardShell'
 import Button from '@/components/ui/Button'
@@ -18,6 +17,7 @@ import {
   type IndicatorId,
   type IndicatorPresetId,
 } from '@/domain/chart'
+import type { ChartTelemetryPayloads } from '@/domain/telemetry'
 import useOhlcData from '@/hooks/useOhlcData'
 import { useIndicators } from '@/hooks/useIndicators'
 import { useIndicatorSettings } from '@/hooks/useIndicatorSettings'
@@ -32,10 +32,12 @@ import {
   mergeAnnotations,
 } from '@/lib/annotations'
 import { buildReplayUrl } from '@/lib/chartLinks'
-import { useChartTelemetry } from '@/lib/chartTelemetry'
 import type { PulseDeltaEvent } from '@/lib/grokPulse/types'
 import { useChartInteractionMode } from '@/hooks/useChartInteractionMode'
 import { useChartDrawings } from '@/hooks/useChartDrawings'
+import type { ChartTrack } from '@/components/chart/ChartTelemetryBridge'
+const AdvancedChart = React.lazy(() => import('@/components/chart/AdvancedChart'))
+const ChartTelemetryBridge = React.lazy(() => import('@/components/chart/ChartTelemetryBridge'))
 
 const DEFAULT_ASSET = {
   symbol: 'SOLUSDT',
@@ -134,7 +136,16 @@ export default function ChartPage() {
   const createAlertDraft = useAlertsStore((state) => state.createDraftFromChart)
   const journalEntries = useJournalStore((state) => state.entries)
   const createJournalDraft = useJournalStore((state) => state.createDraftFromChart)
-  const { track } = useChartTelemetry()
+  const trackRef = useRef<ChartTrack | null>(null)
+  const setTrack = useCallback((nextTrack: ChartTrack) => {
+    trackRef.current = nextTrack
+  }, [])
+  const trackEvent = useCallback(
+    <N extends keyof ChartTelemetryPayloads>(type: N, payload: ChartTelemetryPayloads[N]) => {
+      trackRef.current?.(type, payload)
+    },
+    []
+  )
   const annotations = useMemo(() => {
     const alertAnnotations = alerts
       .filter((alert) => alert.symbol?.toUpperCase() === asset.symbol.toUpperCase())
@@ -160,10 +171,6 @@ export default function ChartPage() {
     )
   }, [alerts, asset.address, asset.symbol, candles, journalEntries])
 
-  useEffect(() => {
-    track('chart.view_opened', { address: asset.address, timeframe, mode: 'chart' })
-  }, [asset.address, timeframe, track])
-
   const handleTimeframeChange = (next: ChartTimeframe) => {
     setTimeframe(next)
     const nextParams = new URLSearchParams(searchParams)
@@ -181,7 +188,7 @@ export default function ChartPage() {
       symbol: asset.symbol,
       network: asset.network,
     })
-    track('chart.replay_started', { address: asset.address, timeframe })
+    trackEvent('chart.replay_started', { address: asset.address, timeframe })
     navigate(url)
   }
 
@@ -200,13 +207,13 @@ export default function ChartPage() {
 
   const handlePreset = (preset: IndicatorPresetId) => {
     void applyPreset(preset)
-    track('chart.indicator_preset_selected', { presetId: preset, address: asset.address, timeframe })
+    trackEvent('chart.indicator_preset_selected', { presetId: preset, address: asset.address, timeframe })
   }
 
   const handleParamChange = (indicatorId: IndicatorId, key: string, value: number) => {
     if (!Number.isFinite(value) || value <= 0) return
     void updateParamsFor(indicatorId, { [key]: value })
-    track('chart.indicator_param_changed', {
+    trackEvent('chart.indicator_param_changed', {
       indicator: indicatorId,
       key,
       value,
@@ -256,10 +263,10 @@ export default function ChartPage() {
 
   useEffect(() => {
     if (!signalTrackedRef.current && annotations.some((item) => item.kind === 'signal')) {
-      track('chart.pulse_signal_viewed_in_chart', { address: asset.address, timeframe })
+      trackEvent('chart.pulse_signal_viewed_in_chart', { address: asset.address, timeframe })
       signalTrackedRef.current = true
     }
-  }, [annotations, asset.address, timeframe, track])
+  }, [annotations, asset.address, timeframe, trackEvent])
 
   useEffect(() => {
     if (interactionMode === 'view') {
@@ -318,6 +325,14 @@ export default function ChartPage() {
       }
     >
       <div className="space-y-6" data-testid="chart-page">
+        <Suspense fallback={null}>
+          <ChartTelemetryBridge
+            address={asset.address}
+            timeframe={timeframe}
+            mode="chart"
+            onReady={setTrack}
+          />
+        </Suspense>
         {!hasSeenIntro && <ChartIntroBanner onDismiss={dismissIntro} />}
         {!isOnline && (
           <div className="rounded-3xl border border-border/70 bg-surface/80">
@@ -366,7 +381,7 @@ export default function ChartPage() {
                     disabled={indicatorSettingsLoading}
                     onClick={() => {
                       void toggleIndicator(button.key)
-                      track('chart.indicator_toggled', {
+                      trackEvent('chart.indicator_toggled', {
                         indicator: indicatorPayload,
                         active: !isActive,
                         address: asset.address,
@@ -563,46 +578,48 @@ export default function ChartPage() {
           </Card>
         ) : (
           <Card variant="glass" className="space-y-6 rounded-3xl p-4 sm:p-6">
-            <AdvancedChart
-              candles={candles}
-              status={status}
-              source={source}
-              viewState={viewState}
-              error={error}
-              lastUpdatedAt={lastUpdatedAt}
-              indicators={indicators}
-              annotations={annotations}
-              drawings={drawings}
-              drawingsInteractive={interactionMode !== 'view'}
-              drawingMode={interactionMode}
-              selectedDrawingId={selectedDrawingId}
-              onCreateDrawing={handleCreateDrawing}
-              onUpdateDrawing={handleUpdateDrawing}
-              onCancelDrawingDraft={handleCancelDraft}
-              onSelectDrawing={selectDrawing}
-              symbol={asset.symbol}
-              timeframe={timeframe}
-              testId="chart-workspace"
-              onCreateJournalAtPoint={() => {
-                void createJournalDraft(creationContext)
-                track('chart.journal_created_from_chart', { address: asset.address, timeframe })
-              }}
-              onCreateAlertAtPoint={() => {
-                createAlertDraft({ ...creationContext, timeframe })
-                track('chart.alert_created_from_chart', { address: asset.address, timeframe })
-              }}
-              onAnnotationClick={(annotation) => {
-                track('chart.annotation_jump', { address: asset.address, timeframe, kind: annotation.kind })
-                setSearchParams((current) => {
-                  const next = new URLSearchParams(current)
-                  next.set('timeframe', timeframe)
-                  next.set('address', asset.address)
-                  next.set('network', asset.network)
-                  next.set('focus', String(annotation.candleTime))
-                  return next
-                })
-              }}
-            />
+            <Suspense fallback={<SkeletonChartCard />}>
+              <AdvancedChart
+                candles={candles}
+                status={status}
+                source={source}
+                viewState={viewState}
+                error={error}
+                lastUpdatedAt={lastUpdatedAt}
+                indicators={indicators}
+                annotations={annotations}
+                drawings={drawings}
+                drawingsInteractive={interactionMode !== 'view'}
+                drawingMode={interactionMode}
+                selectedDrawingId={selectedDrawingId}
+                onCreateDrawing={handleCreateDrawing}
+                onUpdateDrawing={handleUpdateDrawing}
+                onCancelDrawingDraft={handleCancelDraft}
+                onSelectDrawing={selectDrawing}
+                symbol={asset.symbol}
+                timeframe={timeframe}
+                testId="chart-workspace"
+                onCreateJournalAtPoint={() => {
+                  void createJournalDraft(creationContext)
+                  trackEvent('chart.journal_created_from_chart', { address: asset.address, timeframe })
+                }}
+                onCreateAlertAtPoint={() => {
+                  createAlertDraft({ ...creationContext, timeframe })
+                  trackEvent('chart.alert_created_from_chart', { address: asset.address, timeframe })
+                }}
+                onAnnotationClick={(annotation) => {
+                  trackEvent('chart.annotation_jump', { address: asset.address, timeframe, kind: annotation.kind })
+                  setSearchParams((current) => {
+                    const next = new URLSearchParams(current)
+                    next.set('timeframe', timeframe)
+                    next.set('address', asset.address)
+                    next.set('network', asset.network)
+                    next.set('focus', String(annotation.candleTime))
+                    return next
+                  })
+                }}
+              />
+            </Suspense>
             <ChartLegend />
           </Card>
         )}
