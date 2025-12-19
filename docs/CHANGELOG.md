@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-10
+
+### Added
+- Documented WP-052 right toolbar expansion with checklist link `WP-Polish/WP-052/checklist.md`.
+
+### Updated
+- Chart toolbar now renders expandable indicators, drawings, and alerts sections with typed alert mock wiring in `src/features/chart/ChartToolbar.tsx`, `src/features/chart/toolbar-sections.tsx`, `src/api/alerts.ts`, and tokenized styles in `src/features/chart/chart.css`.
+
 ## 2026-01-09
 
 ### Added
