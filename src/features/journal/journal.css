@@ -240,6 +240,27 @@
   font-weight: 600;
 }
 
+.journal-mobile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-3);
+}
+
+@media (min-width: 1024px) {
+  .journal-mobile-actions {
+    display: none;
+  }
+}
+
+.journal-template-sheet {
+  background: var(--sf-surface-elevated);
+}
+
+.journal-template-sheet [data-testid^="template-apply-mode-"] {
+  border-color: var(--sf-border-1);
+  background: var(--sf-bg-1);
+}
+
 .sf-journal-thesis-tag__remove {
   border: none;
   background: transparent;
