@@ -1,17 +1,19 @@
-import React from 'react'
-import { Badge, Card, CardContent, CardHeader } from '@/components/ui'
-import { MetricCard } from '@/components/ui/MetricCard'
-import type { JournalOutput } from '../types'
+import React from "react"
+import { Badge, Card, CardContent, CardHeader } from "@/components/ui"
+import { MetricCard } from "@/components/ui/MetricCard"
+import { cn } from "@/lib/ui/cn"
+import type { JournalOutput } from "../types"
 
 interface JournalResultViewProps {
   result: JournalOutput
 }
 
 export function JournalResultView({ result }: JournalResultViewProps) {
-  const scoreColor = result.score >= 70 ? 'text-emerald-400' : result.score >= 40 ? 'text-amber-400' : 'text-rose-400'
+  const scoreTone =
+    result.score >= 70 ? "journal-score--positive" : result.score >= 40 ? "journal-score--neutral" : "journal-score--negative"
 
   return (
-    <Card variant="glass" data-testid="journal-v2-result">
+    <Card variant="glass" className="journal-card" data-testid="journal-v2-result">
       {/* Summary strip header */}
       <CardHeader className="pb-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -19,17 +21,17 @@ export function JournalResultView({ result }: JournalResultViewProps) {
             <Badge variant="brand" className="uppercase tracking-wide text-[10px]">
               Archetype
             </Badge>
-            <h2 className="text-2xl font-bold text-text-primary">{result.archetype}</h2>
+            <h2 className="journal-heading font-bold">{result.archetype}</h2>
             {result.emotionalTrend && (
-              <p className="text-sm text-text-secondary">
+              <p className="journal-subtitle">
                 Emotional trend: <span className="font-medium capitalize text-text-primary">{result.emotionalTrend}</span>
               </p>
             )}
           </div>
           <div className="text-right">
-            <p className="text-xs uppercase tracking-wide text-text-tertiary">Score</p>
-            <p className={`text-4xl font-bold ${scoreColor}`}>{result.score.toFixed(0)}</p>
-            <p className="text-xs text-text-tertiary">out of 100</p>
+            <p className="journal-meta">Score</p>
+            <p className={cn("journal-score", scoreTone)}>{result.score.toFixed(0)}</p>
+            <p className="journal-meta">out of 100</p>
           </div>
         </div>
       </CardHeader>
@@ -66,7 +68,7 @@ export function JournalResultView({ result }: JournalResultViewProps) {
         {/* Insights as cards */}
         {result.insights.length > 0 && (
           <div className="space-y-3" data-testid="journal-insights-section">
-            <h3 className="text-sm font-semibold text-text-primary">What next?</h3>
+            <h3 className="journal-heading text-base">What next?</h3>
             <div className="grid gap-2 sm:grid-cols-2">
               {result.insights.slice(0, 4).map((insight, index) => (
                 <InsightCard key={index} insight={insight} />
@@ -81,7 +83,7 @@ export function JournalResultView({ result }: JournalResultViewProps) {
 
 function InsightCard({ insight }: { insight: string }) {
   return (
-    <div className="rounded-xl border border-border/70 bg-surface/60 p-3 transition hover:bg-surface-hover/50">
+    <div className="journal-insight p-3 transition">
       <div className="flex gap-2">
         <span className="mt-0.5 inline-flex h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand" aria-hidden />
         <p className="text-sm text-text-secondary leading-relaxed">{insight}</p>

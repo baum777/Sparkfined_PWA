@@ -68,6 +68,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 - **Desktop Sidebar (WP-003):** Neue linke Navigationsschiene für ≥768px mit dem kanonischen `NAV_ITEMS`-Ordering, hervorgehobenen aktiven States via `--sf-primary`, angepinnter Settings-Kachel am Fuß und Hover/Focus-Tooltips für den kompakten Rail (`src/features/shell/Sidebar.tsx`, `src/features/shell/sidebar.css`, `src/components/layout/AppShell.tsx`).
 
+## 📦 Neue Ergänzungen (2026-01-02)
+
+- **Journal Foundation (WP-030):** Journal-Seite nutzt jetzt einen tokenisierten Shell-Rahmen (`src/features/journal/journal.css`) mit `JournalForm`/`JournalCard`-Wrappern rund um die V2-Komponenten. Score-Töne sind auf `--sf-success/warning/danger` normalisiert, und ein ergänzender Page-Test prüft Shell-Klasse + Score-Styling (`tests/pages/JournalPage.test.tsx`). Checklist-Link: `WP-Polish/WP-030/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2025-12-21)
 
 - **Theme System (WP-002):** Dunkelmodus als Standard mit neuem `ThemeProvider`/`useTheme` unter `src/features/theme/`, Persistenz über den Settings-Store und das Legacy-LocalStorage-Flag. Globale Token-Definitionen liegen in `src/styles/theme.css`, Utilities (Card, Spacing, Focus-Ring) in `src/styles/ui.css` und werden in `src/App.tsx` eingebunden.

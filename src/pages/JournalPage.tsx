@@ -2,8 +2,9 @@ import React, { useCallback } from "react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { Badge, Card, CardContent, CardHeader, CardTitle, EmptyState, ErrorBanner } from "@/components/ui";
 import { ListRow } from "@/components/ui/ListRow";
-import { JournalInputForm } from "@/features/journal-v2/components/JournalInputForm";
-import { JournalResultView } from "@/features/journal-v2/components/JournalResultView";
+import { JournalCard } from "@/features/journal/JournalCard";
+import { JournalForm } from "@/features/journal/JournalForm";
+import "@/features/journal/journal.css";
 import { useJournalV2 } from "@/features/journal-v2/hooks/useJournalV2";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
 
@@ -41,12 +42,12 @@ export default function JournalPage() {
       title="Journal"
       description="Behavioral pipeline with offline persistence and immediate archetype insights."
     >
-      <div className="space-y-4" data-testid="journal-page">
+      <div className="journal-shell" data-testid="journal-page">
         {error ? <ErrorBanner message={error} /> : null}
 
-        <div className="grid gap-6 xl:grid-cols-3 xl:items-start">
-          <div className="xl:col-span-2">
-            <JournalInputForm
+        <div className="journal-shell__grid">
+          <div className="journal-shell__section">
+            <JournalForm
               onSubmit={handleSubmit}
               isSubmitting={isSaving}
               tradeContext={tradeContext}
@@ -56,7 +57,7 @@ export default function JournalPage() {
 
           <div className="space-y-4">
             {latestResult ? (
-              <JournalResultView result={latestResult} />
+              <JournalCard result={latestResult} />
             ) : (
               <EmptyState
                 illustration="journal"

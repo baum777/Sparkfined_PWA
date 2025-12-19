@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-02
+
+### Added
+- Documented WP-030 journal foundation polish covering the new tokenized journal shell (`src/features/journal/journal.css`), wrappers for the v2 form/result components, and the updated journal page test; checklist link: `WP-Polish/WP-030/checklist.md`.
+
+### Updated
+- Indexed the Journal page to consume the new shell grid/layout and tokenized score tones across `src/pages/JournalPage.tsx`, `src/features/journal/JournalForm.tsx`, `src/features/journal/JournalCard.tsx`, and `src/features/journal-v2/components/JournalResultView.tsx`.
+
 ## 2025-12-31
 
 ### Added
