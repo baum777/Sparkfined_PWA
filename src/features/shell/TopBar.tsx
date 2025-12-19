@@ -4,7 +4,8 @@ import { NAV_ITEMS, SETTINGS_NAV_ITEM, isNavItemActive } from "@/config/navigati
 import { cn } from "@/lib/ui/cn"
 import { useTheme } from "@/features/theme/useTheme"
 import { useAlertsStore } from "@/store/alertsStore"
-import { Moon, Sun } from "@/lib/icons"
+import Moon from "lucide-react/dist/esm/icons/moon"
+import Sun from "lucide-react/dist/esm/icons/sun"
 import "./top-bar.css"
 
 interface TopBarProps {
