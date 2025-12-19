@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-04
+
+### Added
+- Documented WP-032 market context accordion with desktop dropdown + mobile pill selector and checklist link `WP-Polish/WP-032/checklist.md`.
+
+### Updated
+- Journal input context section now uses `MarketContextAccordion`/`MarketRegimeSelector` with tokenized styles in `src/features/journal/MarketContextAccordion.tsx`, `src/features/journal/MarketRegimeSelector.tsx`, `src/features/journal/journal.css`, and wiring in `src/features/journal-v2/components/JournalInputForm.tsx`.
+
 ## 2026-01-03
 
 ### Added

@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-04)
+
+- **Market Context Accordion (WP-032):** Neues optionales Marktregime-Accordion mit Desktop-Dropdown und mobilen Horizontal-Pills (`src/features/journal/MarketContextAccordion.tsx`, `src/features/journal/MarketRegimeSelector.tsx`) plus tokenisierte Styles in `src/features/journal/journal.css`, eingebunden in `src/features/journal-v2/components/JournalInputForm.tsx`; Checklist-Link: `WP-Polish/WP-032/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-03)
 
 - **Emotional State (WP-031):** EmojiSelector + GradientSlider-basierte EmotionalStateCard mit Advanced-Toggle für Conviction/Pattern-Slider, eingebunden in `src/features/journal-v2/components/JournalInputForm.tsx` und gestylt über `src/features/journal/journal.css`; Checklist-Link: `WP-Polish/WP-031/checklist.md`.
