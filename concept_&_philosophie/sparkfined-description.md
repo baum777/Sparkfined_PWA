@@ -140,28 +140,34 @@ Viele Trader verlieren Geld – nicht weil sie schlechte Charts haben, sondern w
 
 ---
 
-### 🎯 **7. Navigation & UI – AppShell mit Rail & ActionPanel**
+### 🎯 **7. Navigation & UI – AppShell-Architektur (geplant Q1 2025)**
 
-**Was du erlebst:**
-- **AppShell-Architektur:** Moderne 3-Säulen-Struktur (Topbar, Rail, Canvas, ActionPanel)
-- **Rail (Icon-First):** Minimale Sidebar mit 4 Hauptbereichen – expandierbar für Labels
-  - 📊 Dashboard
-  - ✎ Journal
-  - ⌁ Chart
-  - ★ Watchlist
-- **ActionPanel (Route-Aware):** Kontextabhängige Inspector-Tools auf der rechten Seite
-  - Öffnet/schließt über Topbar-Toggle
-  - Persistiert Status in localStorage
-  - Zeigt kontextabhängige Werkzeuge je nach aktiver Page
-- **Responsive Design:** Rail kollabiert auf Mobile, ActionPanel nur auf Desktop (xl+)
-- **Topbar:** Header mit Page-Title und ActionPanel-Toggle
+**Was geplant ist:**
+- **AppShell-Refactor:** Moderne 3-Säulen-Struktur wird derzeit implementiert (WP-001..004)
+  - **Topbar:** Sticky Header mit Page-Title, Alerts-Badge, Settings, Theme-Toggle
+  - **Rail (Icon-First):** Minimale Sidebar (60px collapsed, 240px expanded)
+    - 📊 Dashboard
+    - ✎ Journal
+    - ⌁ Chart
+    - ★ Watchlist
+    - ⚙️  Settings (separate, am unteren Rand)
+  - **Canvas:** Main Content Area (variabel je nach Route)
+  - **ActionPanel (Route-Aware):** Kontextabhängige Inspector-Tools (nur Desktop xl+)
+- **BottomNav (Mobile):** Fixed Bottom Tabs für <768px mit Safe-Area-Padding
+- **Responsive Design:** Rail kollabiert auf Mobile, ActionPanel Desktop-only
 
-**Dein Nutzen:**
+**Aktueller Status (Beta):**
+- Standard React Router Navigation mit Header + Sidebar
+- Mobile: Basis-Navigation funktioniert
+- Desktop: Sidebar mit Hauptrouten
+- 🚧 **AppShell-Refactor läuft:** Siehe `./tasks/WP-polish/UI_&_UX_polish.md` (WP-001..004)
+
+**Zukünftiger Nutzen:**
 - Minimale Ablenkung durch icon-first Rail-Design
-- Mehr Platz für Content (Rail nur 60px collapsed, 240px expanded)
+- Mehr Platz für Content
 - Kontextuelle Tools genau da, wo du sie brauchst (ActionPanel)
 - Konsistente Navigation zwischen Desktop und Mobile
-- Persistente UI-States (Panel-Status bleibt erhalten)
+- Persistente UI-States (localStorage für Panel-Präferenzen)
 
 ---
 
@@ -187,17 +193,19 @@ Viele Trader verlieren Geld – nicht weil sie schlechte Charts haben, sondern w
 
 | Feature | Was es tut | Dein Nutzen | Status |
 |---------|-----------|-------------|---------|
-| **📊 Dashboard** | KPI-Strip, Insight-Teaser, Journal/Alerts-Snapshot, Log Entry Inbox | Zentrale Command-Oberfläche für alle Metriken | ✅ Live |
+| **📊 Dashboard** | KPI-Strip, Market Bias Card, Holdings-Snapshot, Recent Trades | Zentrale Command-Oberfläche für alle Metriken | ✅ Live (Beta) |
 | **📝 Journal** | Behavioral Pipeline mit Archetype-System (Score 0-100), Trade Event Bridge | Sofortiges Feedback zu deinen Trading-Mustern | ✅ Live |
-| **📊 Charts** | Canvas-basierte Charts mit Indicator-Presets, Multi-Timeframe | Professionelle Analyse ohne TradingView-Abo | ✅ Live |
+| **📊 Charts** | Multi-Timeframe, Indicator-Presets, Annotations, Replay Mode | Professionelle Analyse, funktioniert offline | ✅ Live (Beta) |
 | **🔔 Alerts** | Status-Filter, Type-Filter, URL-State-Sync, Detail-Panel | Strukturierte Alert-Verwaltung mit direktem Linking | ✅ Live |
 | **📋 Watchlist** | Session-Filter, Sort-Modi, Detail-Panel | Session-bewusstes Multi-Asset-Tracking | ✅ Live |
 | **🎮 Replay Mode** | Historische Charts ohne Hindsight-Bias nachspielen | Risikofrei üben, Fehler verstehen, Go Live | ✅ Live |
-| **🎯 Navigation** | AppShell mit Icon-first Rail, Route-aware ActionPanel, Topbar | Minimale Ablenkung, kontextuelle Tools | ✅ Live |
+| **🎯 Navigation** | Standard Header + Sidebar (Mobile responsive) | Basis-Navigation funktioniert | ✅ Live (Beta) |
+| **🎨 AppShell Refactor** | Icon-first Rail, Route-aware ActionPanel, BottomNav | UI/UX Polish mit moderner Architektur | 🚧 Q1 2025 (In Progress) |
 | **🔐 Offline-First** | PWA mit IndexedDB (Dexie), funktioniert ohne Internet | Keine Abhängigkeit von APIs, deine Daten lokal | ✅ Live |
-| **📱 Mobile-Optimiert** | Responsive Design, Touch-Targets ≥ 44px, Collapsible Rail | Trade-Analyse auf Smartphone/Tablet | ✅ Live |
+| **📱 Mobile-Optimiert** | Responsive Design, Touch-Targets ≥ 44px | Trade-Analyse auf Smartphone/Tablet | ✅ Live (wird polished) |
 | **📤 Export** | Journal → Markdown, CSV (deine Daten gehören dir) | Keine Vendor-Lock-ins, volle Kontrolle | ✅ Live |
 | **🎨 StateView Pattern** | Unified Loading/Error/Empty/Offline States | Konsistentes UX über alle Features | ✅ Live |
+| **🖊️  Chart Drawing Tools** | Trendlines, Fibonacci, Rectangles | Professionelle TA wie in TradingView | 🚧 Q2 2025 |
 | **☁️ Cloud-Sync** | Supabase-Integration für Cross-Device-Sync | Ein Journal auf allen Geräten | 🚧 Q2 2025 |
 | **🌐 Community-Heatmaps** | Anonymisierte Verhaltenspatterns der Community | Lerne aus Fehlern anderer Trader | 🚧 Q3 2025 |
 | **🔓 Open Source** | MIT-Lizenz, vollständiger Code verfügbar | Transparenz, Self-Hosting möglich | 🚧 Q3 2025 |
@@ -213,9 +221,10 @@ Viele Trader verlieren Geld – nicht weil sie schlechte Charts haben, sondern w
 - **Warum es funktioniert:** Score-basiertes System (0-100) zeigt deine Entwicklung in Echtzeit.
 
 ### **2. Problem: Zu viele Tools, kein Zusammenhang**
-**Lösung:** Sparkfined vereint Charts + Alerts + Journal + Analysis in einer App mit AppShell-Architektur (Rail + ActionPanel).
+**Lösung:** Sparkfined vereint Charts + Alerts + Journal + Analysis in einer App. UI/UX wird gerade modernisiert (AppShell-Refactor Q1 2025).
 - **Warum es funktioniert:** Dein Context bleibt erhalten (kein Tab-Switching, keine Daten-Fragmentierung).
-- **Navigation:** Icon-first Rail mit 4 Hauptbereichen (Dashboard, Journal, Chart, Watchlist) + kontextabhängiges ActionPanel.
+- **Aktuelle Navigation:** Standard Header + Sidebar, funktioniert auf Desktop & Mobile.
+- **Geplant (Q1 2025):** Icon-first Rail mit 4 Hauptbereichen (Dashboard, Journal, Chart, Watchlist) + kontextabhängiges ActionPanel (siehe WP-001..004).
 
 ### **3. Problem: Offline-Abhängigkeit bei anderen Tools**
 **Lösung:** PWA-Architektur mit IndexedDB – funktioniert ohne Internet. StateView-Pattern für Offline-States.
@@ -256,11 +265,12 @@ Viele Trader verlieren Geld – nicht weil sie schlechte Charts haben, sondern w
 - **Was es bedeutet:** Alle kritischen User-Flows sind automatisch getestet
 - **Dein Vorteil:** Features brechen nicht, Updates sind stabil
 
-### **Route-Aware UI (AppShell-Architektur)**
-- **Was es bedeutet:** ActionPanel zeigt kontextabhängige Tools je nach aktiver Route (Dashboard vs. Journal vs. Chart)
-- **Dein Vorteil:** Relevante Features genau da, wo du sie brauchst
-- **Struktur:** Topbar (Header) + Rail (Sidebar) + Canvas (Main Content) + ActionPanel (Inspector)
+### **Route-Aware UI (geplant — AppShell-Refactor Q1 2025)**
+- **Was geplant ist:** ActionPanel zeigt kontextabhängige Tools je nach aktiver Route (Dashboard vs. Journal vs. Chart)
+- **Zukünftiger Vorteil:** Relevante Features genau da, wo du sie brauchst
+- **Geplante Struktur:** Topbar (Header) + Rail (Sidebar) + Canvas (Main Content) + ActionPanel (Inspector)
 - **Responsive:** Rail kollabiert auf Mobile, ActionPanel nur auf Desktop (xl+)
+- **Status:** 🚧 In Planung (siehe `./tasks/WP-polish/UI_&_UX_polish.md`, WP-001..004)
 
 ---
 
