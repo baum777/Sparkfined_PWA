@@ -6,6 +6,14 @@
 
 ---
 
+## 2025-12-31
+
+### Added
+- Documented WP-016 Quick Actions FAB delivering mobile-only floating action + menu wiring for "Log entry" (reuses `LogEntryOverlayPanel`) and "Create alert" (reuses `AlertCreateDialog`), with checklist artifact `WP-Polish/WP-016/checklist.md`.
+
+### Updated
+- Indexed dashboard quick action mounting across `src/features/dashboard/FAB.tsx`, `src/features/dashboard/FABMenu.tsx`, `src/features/dashboard/fab.css`, and `src/pages/DashboardPage.tsx`.
+
 ## 2025-12-30
 
 ### Added

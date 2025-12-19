@@ -15,6 +15,9 @@ import HoldingsCard from "@/features/dashboard/HoldingsCard";
 import TradeLogCard from "@/features/dashboard/TradeLogCard";
 import RecentEntriesSection from "@/features/dashboard/RecentEntriesSection";
 import AlertsOverviewWidget from "@/features/dashboard/AlertsOverviewWidget";
+import AlertCreateDialog from "@/components/alerts/AlertCreateDialog";
+import FAB from "@/features/dashboard/FAB";
+import FABMenu from "@/features/dashboard/FABMenu";
 import { useJournalStore } from "@/store/journalStore";
 import { useAlertsStore } from "@/store/alertsStore";
 import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from "@/lib/dashboard/calculateKPIs";
@@ -44,6 +47,8 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [tradeEntries, setTradeEntries] = useState<TradeEntry[]>([]);
   const [isLogOverlayOpen, setIsLogOverlayOpen] = useState(false);
+  const [isFabMenuOpen, setIsFabMenuOpen] = useState(false);
+  const [isCreateAlertOpen, setIsCreateAlertOpen] = useState(false);
 
   const {
     events: inboxEvents,
@@ -176,6 +181,12 @@ export default function DashboardPage() {
     void refresh();
     setIsLogOverlayOpen(true);
   }, [refresh]);
+
+  const handleOpenCreateAlert = useCallback(() => {
+    setIsCreateAlertOpen(true);
+  }, []);
+
+  const closeFabMenu = () => setIsFabMenuOpen(false);
 
   const renderHoldingsAndTrades = () => (
     <div className="dashboard-split">
@@ -356,6 +367,24 @@ export default function DashboardPage() {
         events={inboxEvents}
         isLoading={isInboxLoading}
         onSelect={handleJournalTrade}
+      />
+      <FAB ariaExpanded={isFabMenuOpen} onClick={() => setIsFabMenuOpen((prev) => !prev)} />
+      <FABMenu
+        isOpen={isFabMenuOpen}
+        onClose={closeFabMenu}
+        onLogEntry={() => {
+          closeFabMenu();
+          handleOpenLogEntryOverlay();
+        }}
+        onCreateAlert={() => {
+          closeFabMenu();
+          handleOpenCreateAlert();
+        }}
+      />
+      <AlertCreateDialog
+        isOpen={isCreateAlertOpen}
+        onClose={() => setIsCreateAlertOpen(false)}
+        triggerButton={false}
       />
     </div>
   );

@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2025-12-31)
+
+- **Quick Actions FAB (WP-016):** Mobile-only Floating Action Button anchored above the BottomNav safe-area via `src/features/dashboard/FAB.tsx`, `src/features/dashboard/FABMenu.tsx`, and `src/features/dashboard/fab.css`, wired in `src/pages/DashboardPage.tsx` to open the trade log overlay (`LogEntryOverlayPanel`) and the alert creation sheet (`AlertCreateDialog`); Checklist-Link: `WP-Polish/WP-016/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2025-12-30)
 
 - **Recent Entries + Alerts Overview (WP-015):** Bottom dashboard section combining `RecentEntriesSection` (responsive grid/horizontal scroll with loading/error/empty states, `src/features/dashboard/RecentEntriesSection.tsx`, `src/features/dashboard/recent-entries.css`) and `AlertsOverviewWidget` (armed/triggered/paused stats with CTA, `src/features/dashboard/AlertsOverviewWidget.tsx`, `src/features/dashboard/alerts-overview.css`) backed by typed mock APIs `getRecentJournalEntries`/`getAlertsOverview`, wired into `src/pages/DashboardPage.tsx`; Checklist-Link: `WP-Polish/WP-015/checklist.md`.
