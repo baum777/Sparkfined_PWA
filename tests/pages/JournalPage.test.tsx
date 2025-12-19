@@ -19,7 +19,7 @@ const sampleInput: JournalRawInput = {
   createdAt: 1_700_000_200_000,
 }
 
-const mockResult: JournalOutput = runJournalPipeline(sampleInput)
+const mockResult: JournalOutput = { ...runJournalPipeline(sampleInput), score: 82 }
 
 vi.mock('@/features/journal-v2/hooks/useJournalV2', () => ({
   useJournalV2: () => ({
@@ -45,5 +45,19 @@ describe('JournalPage', () => {
     expect(screen.getByTestId('journal-v2-form')).toBeTruthy()
     expect(screen.getByTestId('journal-v2-result')).toBeTruthy()
     expect(screen.getByTestId('journal-v2-history')).toBeTruthy()
+  })
+
+  it('applies journal shell spacing and tokenized score styles', () => {
+    render(
+      <MemoryRouter>
+        <JournalPage />
+      </MemoryRouter>,
+    )
+
+    const shell = screen.getByTestId('journal-page')
+    expect(shell.className).toContain('journal-shell')
+
+    const score = screen.getByText(String(mockResult.score))
+    expect(score.className).toContain('journal-score--positive')
   })
 })
