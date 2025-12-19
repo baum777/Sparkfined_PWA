@@ -15,6 +15,7 @@ type JournalTemplatesSectionProps = {
   setMarketContext: (value: MarketContext) => void
   emotionalScore: number
   setEmotionalScore: (value: number) => void
+  onTemplateApplied?: () => void
 }
 
 export function JournalTemplatesSection({
@@ -28,6 +29,7 @@ export function JournalTemplatesSection({
   setMarketContext,
   emotionalScore,
   setEmotionalScore,
+  onTemplateApplied,
 }: JournalTemplatesSectionProps) {
   const templateState = useJournalTemplates()
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('builtin-neutral')
@@ -49,6 +51,7 @@ export function JournalTemplatesSection({
     setSelfReflection(next.selfReflection)
     setMarketContext(next.marketContext)
     setEmotionalScore(next.emotionalScore)
+    onTemplateApplied?.()
   }
 
   return (
