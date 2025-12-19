@@ -1,4 +1,4 @@
-import React from "react"
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useParams, useNavigate, useSearchParams } from "react-router-dom"
 import ReplayPlayer from "@/components/ReplayPlayer"
 import DashboardShell from "@/components/dashboard/DashboardShell"
@@ -7,11 +7,11 @@ import type { ReplaySession, JournalEntry, ReplayBookmark, SetupTag, EmotionTag 
 import { getSession, addBookmark, deleteBookmark } from "@/lib/ReplayService"
 import { calculatePatternStats, queryEntries } from "@/lib/JournalService"
 import { OhlcReplayEngine } from "@/lib/replay/ohlcReplayEngine"
-import AdvancedChart from "@/components/chart/AdvancedChart"
 import Button from "@/components/ui/Button"
 import StateView from "@/components/ui/StateView"
 import { FilterPills } from "@/components/layout/FilterPills"
 import { DEFAULT_TIMEFRAME, type ChartAnnotation, type ChartMode, type ChartTimeframe } from "@/domain/chart"
+import type { ChartTelemetryPayloads } from "@/domain/telemetry"
 import useOhlcData from "@/hooks/useOhlcData"
 import { useIndicators } from "@/hooks/useIndicators"
 import { useAlertsStore } from "@/store/alertsStore"
@@ -19,7 +19,9 @@ import { useJournalStore } from "@/store/journalStore"
 import { useChartUiStore } from "@/store/chartUiStore"
 import { mapAlertToAnnotation, mapJournalEntryToAnnotation, mergeAnnotations } from "@/lib/annotations"
 import { buildChartUrl } from "@/lib/chartLinks"
-import { useChartTelemetry } from "@/lib/chartTelemetry"
+import type { ChartTrack } from "@/components/chart/ChartTelemetryBridge"
+const AdvancedChart = React.lazy(() => import("@/components/chart/AdvancedChart"))
+const ChartTelemetryBridge = React.lazy(() => import("@/components/chart/ChartTelemetryBridge"))
 
 type ViewMode = "player" | "dashboard"
 
@@ -58,28 +60,37 @@ export default function ReplayPage() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   // State
-  const [viewMode, setViewMode] = React.useState<ViewMode>(sessionId ? "player" : "dashboard")
-  const [session, setSession] = React.useState<ReplaySession | null>(null)
-  const [currentFrame, setCurrentFrame] = React.useState(0)
-  const [isPlaying, setIsPlaying] = React.useState(false)
-  const [speed, setSpeed] = React.useState(1)
-  const [loading, setLoading] = React.useState(false)
-  const [timeframe, setTimeframe] = React.useState<ChartTimeframe>(resolveTimeframe(searchParams.get("timeframe")))
-  const [mode, setMode] = React.useState<ChartMode>("replay")
-  const engineRef = React.useRef<OhlcReplayEngine | null>(null)
+  const [viewMode, setViewMode] = useState<ViewMode>(sessionId ? "player" : "dashboard")
+  const [session, setSession] = useState<ReplaySession | null>(null)
+  const [currentFrame, setCurrentFrame] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [speed, setSpeed] = useState(1)
+  const [loading, setLoading] = useState(false)
+  const [timeframe, setTimeframe] = useState<ChartTimeframe>(resolveTimeframe(searchParams.get("timeframe")))
+  const [mode, setMode] = useState<ChartMode>("replay")
+  const engineRef = useRef<OhlcReplayEngine | null>(null)
 
-  const asset = React.useMemo(
+  const asset = useMemo(
     () => resolveAsset(searchParams.get("symbol"), searchParams.get("address"), searchParams.get("network")),
     [searchParams]
   )
 
   const indicatorConfig = useChartUiStore((state) => state.getConfigFor(asset.address))
   const overlays = indicatorConfig.overlays
-  const { track } = useChartTelemetry()
+  const trackRef = useRef<ChartTrack | null>(null)
+  const setTrack = useCallback((nextTrack: ChartTrack) => {
+    trackRef.current = nextTrack
+  }, [])
+  const trackEvent = useCallback(
+    <N extends keyof ChartTelemetryPayloads>(type: N, payload: ChartTelemetryPayloads[N]) => {
+      trackRef.current?.(type, payload)
+    },
+    []
+  )
 
   // Dashboard state
-  const [entries, setEntries] = React.useState<JournalEntry[]>([])
-  const [patternStats, setPatternStats] = React.useState<any>(null)
+  const [entries, setEntries] = useState<JournalEntry[]>([])
+  const [patternStats, setPatternStats] = useState<any>(null)
 
   const { candles, status, error, source, lastUpdatedAt, viewState, refresh } = useOhlcData({
     address: asset.address,
@@ -92,7 +103,7 @@ export default function ReplayPage() {
   const createAlertDraft = useAlertsStore((state) => state.createDraftFromChart)
   const journalEntries = useJournalStore((state) => state.entries)
   const createJournalDraft = useJournalStore((state) => state.createDraftFromChart)
-  const annotations = React.useMemo(() => {
+  const annotations = useMemo(() => {
     const alertAnnotations = alerts
       .filter((alert) => alert.symbol?.toUpperCase() === asset.symbol.toUpperCase())
       .map(mapAlertToAnnotation)
@@ -101,21 +112,17 @@ export default function ReplayPage() {
   }, [alerts, asset.symbol, journalEntries])
   const hasFrames = candles.length > 0
 
-  const replayViewState = React.useMemo(
+  const replayViewState = useMemo(
     () => ({ ...viewState, mode, currentIndex: currentFrame, playbackSpeed: speed }),
     [currentFrame, mode, speed, viewState]
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     const nextTimeframe = resolveTimeframe(searchParams.get("timeframe"))
     setTimeframe((prev) => (prev === nextTimeframe ? prev : nextTimeframe))
   }, [searchParams])
 
-  React.useEffect(() => {
-    track('chart.view_opened', { address: asset.address, timeframe, mode: 'replay' })
-  }, [asset.address, timeframe, track])
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (!hasFrames) {
       setIsPlaying(false)
       setCurrentFrame(0)
@@ -124,7 +131,7 @@ export default function ReplayPage() {
     }
   }, [candles.length, currentFrame, hasFrames])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!candles.length) {
       engineRef.current?.stop()
       setIsPlaying(false)
@@ -145,28 +152,28 @@ export default function ReplayPage() {
     }
   }, [candles, speed, currentFrame])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (engineRef.current && engineRef.current.status === "playing") {
       engineRef.current.setSpeed(speedToMs(speed))
     }
   }, [speed])
 
   // Load session if sessionId provided
-  React.useEffect(() => {
+  useEffect(() => {
     if (sessionId) {
       loadSession(sessionId)
     }
   }, [sessionId])
 
   // Load dashboard data
-  React.useEffect(() => {
+  useEffect(() => {
     if (viewMode === "dashboard") {
       loadDashboardData()
     }
   }, [viewMode])
 
   // Playback loop
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isPlaying || candles.length === 0) return
 
     engineRef.current?.seek(currentFrame)
@@ -226,11 +233,11 @@ function speedToMs(speed: number): number {
   const handlePlay = () => {
     if (!hasFrames) return
     setIsPlaying(true)
-    track('chart.replay_started', { address: asset.address, timeframe })
+    trackEvent('chart.replay_started', { address: asset.address, timeframe })
   }
   const handlePause = () => {
     setIsPlaying(false)
-    track('chart.replay_stopped', { address: asset.address, timeframe })
+    trackEvent('chart.replay_stopped', { address: asset.address, timeframe })
   }
   const handleSeek = (frame: number) => {
     if (!hasFrames) return
@@ -258,7 +265,7 @@ function speedToMs(speed: number): number {
     setMode("live")
     setCurrentFrame(Math.max(0, candles.length - 1))
     setIsPlaying(false)
-    track('chart.replay_go_live', { address: asset.address, timeframe })
+    trackEvent('chart.replay_go_live', { address: asset.address, timeframe })
   }
 
   const handleJumpToAnnotation = (annotation: ChartAnnotation) => {
@@ -267,7 +274,7 @@ function speedToMs(speed: number): number {
       setMode("replay")
       setCurrentFrame(targetIndex)
       setIsPlaying(false)
-      track('chart.annotation_jump', { address: asset.address, timeframe, kind: annotation.kind })
+      trackEvent('chart.annotation_jump', { address: asset.address, timeframe, kind: annotation.kind })
     }
   }
 
@@ -336,6 +343,14 @@ function speedToMs(speed: number): number {
         }
       >
         <div className="space-y-6">
+          <Suspense fallback={null}>
+            <ChartTelemetryBridge
+              address={asset.address}
+              timeframe={timeframe}
+              mode={mode}
+              onReady={setTrack}
+            />
+          </Suspense>
           {viewMode === "player" ? (
             <>
               <div
@@ -390,42 +405,44 @@ function speedToMs(speed: number): number {
                       </Button>
                     </div>
 
-                    <AdvancedChart
-                      candles={candles}
-                      status={status}
-                      source={source}
-                      viewState={replayViewState}
-                      error={error}
-                      replayLabel={`Replay: ${session.name ?? session.id}`}
-                      lastUpdatedAt={lastUpdatedAt}
-                      indicators={indicators}
-                      annotations={annotations}
-                      symbol={asset.symbol}
-                      timeframe={timeframe}
-                      drawingMode="view"
-                      drawingsInteractive={false}
-                      onCreateJournalAtPoint={() => {
-                        void createJournalDraft({
-                          address: asset.address,
-                          symbol: asset.symbol,
-                          price: candles[candles.length - 1]?.c ?? 0,
-                          time: candles[candles.length - 1]?.t ?? Date.now(),
-                          timeframe,
-                        })
-                        track('chart.journal_created_from_chart', { address: asset.address, timeframe })
-                      }}
-                      onCreateAlertAtPoint={() => {
-                        createAlertDraft({
-                          address: asset.address,
-                          symbol: asset.symbol,
-                          price: candles[candles.length - 1]?.c ?? 0,
-                          time: candles[candles.length - 1]?.t ?? Date.now(),
-                          timeframe,
-                        })
-                        track('chart.alert_created_from_chart', { address: asset.address, timeframe })
-                      }}
-                      onAnnotationClick={(annotation) => handleJumpToAnnotation(annotation)}
-                    />
+                    <Suspense fallback={<div className="py-6 text-center text-sm text-text-secondary">Loading chart…</div>}>
+                      <AdvancedChart
+                        candles={candles}
+                        status={status}
+                        source={source}
+                        viewState={replayViewState}
+                        error={error}
+                        replayLabel={`Replay: ${session.name ?? session.id}`}
+                        lastUpdatedAt={lastUpdatedAt}
+                        indicators={indicators}
+                        annotations={annotations}
+                        symbol={asset.symbol}
+                        timeframe={timeframe}
+                        drawingMode="view"
+                        drawingsInteractive={false}
+                        onCreateJournalAtPoint={() => {
+                          void createJournalDraft({
+                            address: asset.address,
+                            symbol: asset.symbol,
+                            price: candles[candles.length - 1]?.c ?? 0,
+                            time: candles[candles.length - 1]?.t ?? Date.now(),
+                            timeframe,
+                          })
+                          trackEvent('chart.journal_created_from_chart', { address: asset.address, timeframe })
+                        }}
+                        onCreateAlertAtPoint={() => {
+                          createAlertDraft({
+                            address: asset.address,
+                            symbol: asset.symbol,
+                            price: candles[candles.length - 1]?.c ?? 0,
+                            time: candles[candles.length - 1]?.t ?? Date.now(),
+                            timeframe,
+                          })
+                          trackEvent('chart.alert_created_from_chart', { address: asset.address, timeframe })
+                        }}
+                        onAnnotationClick={(annotation) => handleJumpToAnnotation(annotation)}
+                      />
+                    </Suspense>
 
                     {candles.length > 0 && (
                       <p className="text-xs text-text-secondary">

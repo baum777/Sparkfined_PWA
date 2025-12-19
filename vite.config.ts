@@ -33,6 +33,12 @@ export default defineConfig(({ mode }) => ({
         // CRITICAL FIX: Ensure assets are not cached incorrectly
         // Don't cache assets that might change (SW handles versioning via hashes)
         dontCacheBustURLsMatching: /^\/assets\/.*-[a-zA-Z0-9]{8}\.(js|css)$/,
+        globIgnores: [
+          '**/assets/vendor-charts*.js',
+          '**/assets/ChartPage*.js',
+          '**/assets/ReplayPage*.js',
+          '**/assets/chartTelemetry*.js',
+        ],
         runtimeCaching: [
           // Board API - Stale-While-Revalidate (KPIs, Feed)
           {
@@ -111,6 +117,18 @@ export default defineConfig(({ mode }) => ({
               },
             },
           },
+          // Heavy optional route bundles (chart, replay, telemetry)
+          {
+            urlPattern: /assets\/(vendor-charts|ChartPage|ReplayPage|chartTelemetry).*\.js$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'route-optional-assets',
+              expiration: {
+                maxEntries: 12,
+                maxAgeSeconds: 7 * 24 * 60 * 60,
+              },
+            },
+          },
         ],
       },
       devOptions: {
@@ -141,6 +159,18 @@ export default defineConfig(({ mode }) => ({
     sourcemap: true,
     minify: 'esbuild',
     chunkSizeWarningLimit: 900,
+    modulePreload: {
+      resolveDependencies(_url, deps) {
+        // Trim optional/lazy chunks from initial preload to reduce landing payload
+        return deps.filter(
+          (dep) =>
+            !dep.includes('chunk-ai') &&
+            !dep.includes('chunk-journal-templates') &&
+            !dep.includes('chunk-journal-emotional-slider') &&
+            !dep.includes('chartTelemetry')
+        )
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks(id) {

@@ -1,17 +1,15 @@
-import {
-  Activity,
-  Bell,
-  BookmarkPlus,
-  FileText,
-  GraduationCap,
-  Home,
-  RefreshCw,
-  Settings,
-  Sparkles,
-  Star,
-  TrendingUp,
-  type LucideIcon,
-} from "@/lib/icons";
+import type { LucideIcon } from "lucide-react";
+import Activity from "lucide-react/dist/esm/icons/activity";
+import Bell from "lucide-react/dist/esm/icons/bell";
+import BookmarkPlus from "lucide-react/dist/esm/icons/bookmark-plus";
+import FileText from "lucide-react/dist/esm/icons/file-text";
+import GraduationCap from "lucide-react/dist/esm/icons/graduation-cap";
+import Home from "lucide-react/dist/esm/icons/home";
+import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
+import Settings from "lucide-react/dist/esm/icons/settings";
+import Sparkles from "lucide-react/dist/esm/icons/sparkles";
+import Star from "lucide-react/dist/esm/icons/star";
+import TrendingUp from "lucide-react/dist/esm/icons/trending-up";
 
 export interface NavigationItem {
   path: string;

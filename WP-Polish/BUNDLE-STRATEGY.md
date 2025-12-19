@@ -1,7 +1,7 @@
 # WP Bundle-Size Strategy & Budget-Optimierung
 
-**Datum:** 2025-12-19  
-**Status:** CRITICAL - Budget überschritten  
+**Datum:** 2025-12-19
+**Status:** Stabilisierung – Budgets + Guardrails werden modernisiert
 **Owner:** Engineering Team
 
 ---
@@ -10,42 +10,29 @@
 
 | Metrik | Wert | Status |
 |--------|------|--------|
-| **Aktueller Bundle** | 870 KB (280 KB gzip) | ❌ +70 KB über Budget |
-| **Historisches Budget** | 800 KB | ❌ Überschritten (109%) |
-| **WP-Tasks Total** | 38 | 13 ✅ / 25 📋 |
-| **Completion** | 34% | 66% noch offen |
-| **Erwarteter Final (naiv)** | ~1250 KB | ❌ +450 KB (+56%) |
-| **Optimiertes Ziel** | 950 KB | ✅ Mit Smart Splitting |
-| **Empfohlenes Budget** | 1000 KB | ✅ +200 KB (+25%) |
+| **Initial JS (Landing/Dashboard)** | Ziel 360 KB raw | 🟡 Baseline ~370–400 KB → optimieren | 
+| **Route JS (Chart)** | Ziel 240 KB raw | ✅ Baseline ~220 KB (ChartPage + vendor-charts + Telemetry) |
+| **PWA Precache** | Ziel 1.8 MB | 🔴 Baseline 3.2 MB (optional Routen im Precache) |
+| **WP-Tasks Total** | 38 | Kernrouten ausgeliefert; offene Items im Backlog dokumentiert |
+| **Guardrail** | `pnpm run check:size` | Wird auf Initial/Route/Precache umgestellt |
 
 ---
 
 ## 📊 Status Breakdown nach Cluster
 
-### ✅ Implementiert (13/38 = 34%)
+### ✅ Implementiert (aktueller Repo-Stand)
 
-| Cluster | Status | Tasks | Bundle Impact (geschätzt) |
-|---------|--------|-------|---------------------------|
-| **A - Shell** | 🟡 50% | 2/4 ✅ | ~30 KB |
-| **B - Dashboard** | 🟢 100% | 7/7 ✅ | ~115 KB |
-| **C - Journal** | 🟡 67% | 4/6 ✅ | ~75 KB |
-| | | **Total** | **~220 KB** |
+| Cluster | Status | Notizen |
+|---------|--------|---------|
+| **A - Shell** | 🟢 vorhanden | AppShell, Layout, Routing v2 | 
+| **B - Dashboard** | 🟢 vorhanden | Start-/Landing-Route ausgeliefert |
+| **C - Journal** | 🟢 vorhanden | JournalPage + Templates-Lazy | 
+| **D - Chart** | 🟢 vorhanden | ChartPage + ReplayPage (route-lazy) |
+| **E - Alerts** | 🟢 vorhanden | AlertsPage + Trigger Engine | 
+| **F - Settings** | 🟢 vorhanden | SettingsPage als Route |
+| **Backlog** | 📋 | Feintuning & neue WPs → `/WP-Polish/backlog.md` |
 
-**Breakdown implementierter Features:**
-- Shell (WP-003, WP-004): Sidebar + TopBar → ~30 KB
-- Dashboard (WP-010..016): Foundation + 6 Cards → ~115 KB
-- Journal (WP-030..033): Foundation + 3 Features → ~75 KB
-
-### 📋 Offen (25/38 = 66%)
-
-| Cluster | Status | Tasks | Erwarteter Impact |
-|---------|--------|-------|-------------------|
-| **A - Shell** | 🔴 50% | 2/4 📋 | +20 KB |
-| **C - Journal** | 🟡 33% | 2/6 📋 | +40 KB |
-| **D - Chart** | 🔴 0% | 7/7 📋 | +180 KB ⚠️ |
-| **E - Alerts** | 🔴 0% | 7/7 📋 | +80 KB |
-| **F - Settings** | 🔴 0% | 8/8 📋 | +60 KB |
-| | | **Total** | **+380 KB** |
+> Die nachfolgenden Cluster-Tabellen spiegeln den historischen Audit wider. Für aktuelle Prioritäten zählt das Budget-Modell oben (Initial/Chart/Precache) plus Backlog.
 
 ---
 

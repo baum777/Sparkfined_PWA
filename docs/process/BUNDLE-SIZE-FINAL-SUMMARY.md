@@ -2,6 +2,11 @@
 
 ## ✅ PROBLEM GELÖST!
 
+### 2025-12-19 Update
+- Neue Budgets: **Initial JS 360 KB**, **Chart-Route 240 KB**, **PWA Precache 1.8 MB** (raw)
+- `pnpm run check:size` prüft jetzt diese drei Kennzahlen statt der bloßen Summe aller Chunks
+- Chart-/Replay-Bundles werden nicht mehr vorab gecacht; SW cached sie per Runtime, Preloads gefiltert
+
 ### Vorher ❌
 ```
 📊 Total Bundle Size

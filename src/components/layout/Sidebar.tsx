@@ -11,7 +11,7 @@
 
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { ChevronRight } from '@/lib/icons';
+import ChevronRight from 'lucide-react/dist/esm/icons/chevron-right';
 import { getItem, setItem } from '@/lib/safeStorage';
 import { NAV_ITEMS, SECONDARY_NAV_ITEMS, SETTINGS_NAV_ITEM, isNavItemActive } from '@/config/navigation';
 
