@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react'
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Select, Textarea } from '@/components/ui'
-import { Collapsible } from '@/components/ui/Collapsible'
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input, Textarea } from '@/components/ui'
 import type { JournalRawInput, EmotionLabel, MarketContext, TradeContext } from '../types'
 import { cn } from '@/lib/ui/cn'
 import { EmotionalStateCard } from '@/features/journal/EmotionalStateCard'
+import { MarketContextAccordion } from '@/features/journal/MarketContextAccordion'
 
 const JournalTemplatesSection = React.lazy(() => import('./JournalTemplatesSection'))
 
@@ -13,16 +13,6 @@ interface JournalInputFormProps {
   tradeContext?: TradeContext
   onClearTradeContext?: () => void
 }
-
-const contextOptions: Array<{ value: MarketContext; label: string }> = [
-  { value: 'breakout', label: 'Breakout' },
-  { value: 'mean-reversion', label: 'Mean Reversion' },
-  { value: 'chop', label: 'Chop / Range' },
-  { value: 'high-vol', label: 'High Volatility' },
-  { value: 'low-vol', label: 'Low Volatility' },
-  { value: 'trend-up', label: 'Trending Up' },
-  { value: 'trend-down', label: 'Trending Down' },
-]
 
 function getEmotionalZoneLabel(score: number): string {
   const clamped = Math.max(0, Math.min(100, Math.round(score)))
@@ -200,45 +190,23 @@ export function JournalInputForm({ onSubmit, isSubmitting, tradeContext, onClear
             />
           </section>
 
-          {/* Section 2: Context (Optional, collapsible) */}
-          <Collapsible
-            title={
-              <div className="flex items-center gap-2">
-                <span>2. Market Context</span>
-                <Badge variant="outline" className="text-[10px]">Optional</Badge>
-              </div>
-            }
+          {/* Section 2: Context (Optional, accordion) */}
+          <MarketContextAccordion
+            value={marketContext}
+            onChange={(value) => setMarketContext(value)}
             defaultOpen={false}
-            variant="card"
-            className="border-border/50"
           >
-            <div className="space-y-4" data-testid="journal-section-context">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-text-primary">Current market regime</label>
-                <Select
-                  value={marketContext}
-                  onChange={(value) => setMarketContext(value as MarketContext)}
-                  options={contextOptions}
-                  placeholder="Where is the market right now?"
-                  triggerProps={{ 'data-testid': 'journal-v2-market-context' }}
-                />
-                <p className="text-xs text-text-tertiary">
-                  Helps identify patterns in your performance across different conditions.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-text-primary">Self reflection</label>
-                <Textarea
-                  value={selfReflection}
-                  onChange={(event) => setSelfReflection(event.target.value)}
-                  placeholder="What bias or habit should you watch?"
-                  data-testid="journal-v2-reflection"
-                  rows={2}
-                />
-              </div>
+            <div className="space-y-2" data-testid="journal-section-context">
+              <label className="text-sm font-medium text-text-primary">Self reflection</label>
+              <Textarea
+                value={selfReflection}
+                onChange={(event) => setSelfReflection(event.target.value)}
+                placeholder="What bias or habit should you watch?"
+                data-testid="journal-v2-reflection"
+                rows={2}
+              />
             </div>
-          </Collapsible>
+          </MarketContextAccordion>
 
           {/* Section 3: Thesis (Required) */}
           <section className="space-y-4" data-testid="journal-section-thesis">
