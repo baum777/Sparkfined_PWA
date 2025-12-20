@@ -69,6 +69,7 @@ export default function SettingsContent({
         ? "Blocked"
         : "Not enabled"
     : "Unsupported";
+  const showLegacyAISettings = false;
 
   const trimmedWallet = walletAddress.trim();
   const isWalletValid = trimmedWallet.length === 0 ? true : isValidSolanaAddress(trimmedWallet);
@@ -274,62 +275,66 @@ export default function SettingsContent({
         ) : null}
       </SettingsSection>
 
-      <SettingsSection title="AI Provider" id="ai">
-        <p className="mb-3 text-xs text-text-secondary">
-          Configure which AI provider to use for journal analysis and insights.
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="space-y-1">
-            <span className="text-xs text-text-tertiary">Provider</span>
-            <SettingsSelect
-              value={ai.provider}
-              onChange={(e) => setAI({ provider: e.target.value as "anthropic" | "openai" | "xai" })}
-            >
-              <option value="anthropic">Anthropic (Claude)</option>
-              <option value="openai">OpenAI (GPT)</option>
-              <option value="xai">xAI (Grok)</option>
-            </SettingsSelect>
-          </label>
-          <label className="space-y-1">
-            <span className="text-xs text-text-tertiary">Model override (optional)</span>
-            <input
-              className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
-              placeholder="e.g., claude-3-opus"
-              value={ai.model || ""}
-              onChange={(e) => setAI({ model: e.target.value || undefined })}
-            />
-          </label>
-          <label className="space-y-1">
-            <span className="text-xs text-text-tertiary">Max output tokens</span>
-            <input
-              type="number"
-              min={64}
-              max={4000}
-              className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
-              value={ai.maxOutputTokens ?? 800}
-              onChange={(e) => setAI({ maxOutputTokens: Number(e.target.value) })}
-            />
-          </label>
-          <label className="space-y-1">
-            <span className="text-xs text-text-tertiary">Max cost per call (USD)</span>
-            <input
-              type="number"
-              min={0.01}
-              step={0.01}
-              className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
-              value={ai.maxCostUsd ?? 0.15}
-              onChange={(e) => setAI({ maxCostUsd: Number(e.target.value) })}
-            />
-          </label>
-        </div>
-        <p className="mt-2 text-[11px] text-text-tertiary">
-          API keys are stored server-side. Only provider/model preferences are sent with requests.
-        </p>
-      </SettingsSection>
+      {showLegacyAISettings ? (
+        <>
+          <SettingsSection title="AI Provider" id="ai">
+            <p className="mb-3 text-xs text-text-secondary">
+              Configure which AI provider to use for journal analysis and insights.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="space-y-1">
+                <span className="text-xs text-text-tertiary">Provider</span>
+                <SettingsSelect
+                  value={ai.provider}
+                  onChange={(e) => setAI({ provider: e.target.value as "anthropic" | "openai" | "xai" })}
+                >
+                  <option value="anthropic">Anthropic (Claude)</option>
+                  <option value="openai">OpenAI (GPT)</option>
+                  <option value="xai">xAI (Grok)</option>
+                </SettingsSelect>
+              </label>
+              <label className="space-y-1">
+                <span className="text-xs text-text-tertiary">Model override (optional)</span>
+                <input
+                  className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
+                  placeholder="e.g., claude-3-opus"
+                  value={ai.model || ""}
+                  onChange={(e) => setAI({ model: e.target.value || undefined })}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-xs text-text-tertiary">Max output tokens</span>
+                <input
+                  type="number"
+                  min={64}
+                  max={4000}
+                  className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
+                  value={ai.maxOutputTokens ?? 800}
+                  onChange={(e) => setAI({ maxOutputTokens: Number(e.target.value) })}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-xs text-text-tertiary">Max cost per call (USD)</span>
+                <input
+                  type="number"
+                  min={0.01}
+                  step={0.01}
+                  className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
+                  value={ai.maxCostUsd ?? 0.15}
+                  onChange={(e) => setAI({ maxCostUsd: Number(e.target.value) })}
+                />
+              </label>
+            </div>
+            <p className="mt-2 text-[11px] text-text-tertiary">
+              API keys are stored server-side. Only provider/model preferences are sent with requests.
+            </p>
+          </SettingsSection>
 
-      <SettingsSection title="Token Usage" id="tokens">
-        <AIStats />
-      </SettingsSection>
+          <SettingsSection title="Token Usage" id="tokens">
+            <AIStats />
+          </SettingsSection>
+        </>
+      ) : null}
 
       <SettingsSection title="Risk & Playbook Defaults" id="risk">
         <p className="mb-3 text-xs text-text-secondary">Set default values for the Analyze/Ideas playbook.</p>

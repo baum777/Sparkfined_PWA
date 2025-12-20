@@ -2,6 +2,8 @@ import Button from '@/components/ui/Button'
 import { Collapsible } from '@/components/ui/Collapsible'
 import SettingsCard from './SettingsCard'
 import PwaUpdateCard from './PwaUpdateCard'
+import AppearanceCard from './AppearanceCard'
+import TokenUsageCard from './TokenUsageCard'
 import './settings.css'
 
 function PlaceholderList({ items }: { items: string[] }) {
@@ -46,11 +48,15 @@ export default function SettingsPage() {
       </header>
 
       <div className="settings-stack">
+        <AppearanceCard />
+
+        <TokenUsageCard />
+
         <SettingsCard
           title="Profile & preferences"
           subtitle="Configure trading workspace, alerts, and journal preferences."
         >
-          <PlaceholderList items={["Workspace", "Alerts", "Journal", "Appearance", "Shortcuts"]} />
+          <PlaceholderList items={["Workspace", "Alerts", "Journal", "Shortcuts"]} />
         </SettingsCard>
 
         <SettingsCard

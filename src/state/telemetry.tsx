@@ -1,5 +1,6 @@
 import React from "react";
 import { getJSON, setJSON, isStorageAvailable } from "@/lib/safeStorage";
+import { incrementApiCalls, incrementTokens } from "@/features/settings/token-usage";
 
 export type TelemetryFlags = {
   enabled: boolean;         // global on/off
@@ -55,10 +56,18 @@ function readBuffer(): TelemetryEvent[] {
 }
 function writeBuffer(buf: TelemetryEvent[]) {
   if (!isStorageAvailable()) return;
-  try { 
-    sessionStorage.setItem(BUF_KEY, JSON.stringify(buf)); 
+  try {
+    sessionStorage.setItem(BUF_KEY, JSON.stringify(buf));
   } catch (err) {
     console.warn('[telemetry] Failed to write buffer:', err);
+  }
+}
+
+export function recordApiUsage(deltaTokens?: number) {
+  incrementApiCalls();
+
+  if (typeof deltaTokens === "number" && deltaTokens > 0) {
+    incrementTokens(deltaTokens);
   }
 }
 
@@ -76,6 +85,11 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
   const setFlags = (patch: Partial<TelemetryFlags>) => _setFlags(s => ({ ...s, ...patch }));
 
   const enqueue = (ev: TelemetryEvent) => {
+    if (ev.type.startsWith("api.")) {
+      const maybeTokens = typeof ev.attrs?.tokens === "number" ? ev.attrs.tokens : undefined;
+      recordApiUsage(maybeTokens);
+    }
+
     if (!flags.enabled) return;
     if (Math.random() > flags.sampling) return;
     setBuffer(buf => [ev, ...buf].slice(0, 2000));

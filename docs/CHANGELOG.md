@@ -1,8 +1,28 @@
 # Documentation Changelog
 
 **Purpose:** Track all changes to `/docs` structure and content  
-**Owner:** Sparkfined Team  
+**Owner:** Sparkfined Team
 **Last Updated:** 2026-01-16
+
+---
+
+## 2026-01-23
+
+### Added
+- Documented WP-091 appearance controls delivery with checklist link `WP-Polish/WP-091/checklist.md`.
+
+### Updated
+- Settings now include an Appearance card with dark/light/system selection wired to ThemeProvider plus general stub controls (font size select, safe cache-clear action) across `src/features/settings/AppearanceCard.tsx`, `src/features/settings/SettingsPage.tsx`, and `src/features/settings/settings.css`.
+
+---
+
+## 2026-01-24
+
+### Added
+- Documented WP-092 token usage counters with checklist link `WP-Polish/WP-092/checklist.md`.
+
+### Updated
+- Settings now surface a TokenUsageCard showing daily tokens/API calls with Berlin-midnight resets, backed by a local token-usage helper and telemetry hook-in (`src/features/settings/TokenUsageCard.tsx`, `src/features/settings/token-usage.ts`, `src/state/telemetry.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`).
 
 ---
 
