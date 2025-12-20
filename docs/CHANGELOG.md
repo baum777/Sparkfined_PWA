@@ -2,9 +2,17 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2026-01-08
+**Last Updated:** 2026-01-14
 
 ---
+
+## 2026-01-14
+
+### Added
+- Documented WP-056 mobile chart floating controls with checklist link `WP-Polish/WP-056/checklist.md`.
+
+### Updated
+- Chart mobile UI now surfaces floating Sidebar/Tools controls, hides redundant top-bar mobile triggers under 768px, adds safe-area padding for bottom nav overlap, and includes a unit test for mobile controls via `src/features/chart/MobileChartControls.tsx`, `src/features/chart/ChartLayout.tsx`, `src/features/chart/chart.css`, and `tests/components/chart/MobileChartControls.test.tsx`.
 
 ## 2026-01-13
 
