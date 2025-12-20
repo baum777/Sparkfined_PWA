@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-20)
+
+- **Mobile Alerts (WP-075):** Alerts now render a compact MobileAlertRow below 768px with a kebab menu for pause/delete actions, along with mobile-friendly scrolling and safe-area padding tweaks (`src/features/alerts/MobileAlertRow.tsx`, `src/features/alerts/AlertsPage.tsx`, `src/features/alerts/alerts.css`, `tests/components/alerts/MobileAlertRow.test.tsx`). Swipe actions were skipped; actions remain available via the menu. Checklist-Link: `WP-Polish/WP-075/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-19)
 
 - **Alert Templates (WP-074):** New alert sheet now includes deterministic template presets with an apply grid, overwrite confirmation, and stubbed import affordance (`src/features/alerts/AlertTemplates.tsx`, `src/features/alerts/NewAlertSheet.tsx`, `src/features/alerts/alerts.css`, `tests/components/alerts/NewAlertSheet.test.tsx`); Checklist-Link: `WP-Polish/WP-074/checklist.md`.
