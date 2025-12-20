@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-19
+
+### Added
+- Documented WP-074 alert template presets with checklist link `WP-Polish/WP-074/checklist.md`.
+
+### Updated
+- New alert creation now includes deterministic template presets with a templates grid, apply actions, and overwrite confirmation across `src/features/alerts/AlertTemplates.tsx`, `src/features/alerts/NewAlertSheet.tsx`, `src/features/alerts/alerts.css`, and `tests/components/alerts/NewAlertSheet.test.tsx`.
+
 ## 2026-01-18
 
 ### Added

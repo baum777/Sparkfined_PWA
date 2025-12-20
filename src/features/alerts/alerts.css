@@ -234,6 +234,106 @@
   background: color-mix(in srgb, var(--sf-warning) 8%, var(--sf-bg-2));
 }
 
+.sf-alerts-templates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-3);
+  padding: var(--sf-space-4);
+  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--sf-border-1);
+  background: var(--sf-bg-1);
+}
+
+.sf-alerts-templates__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sf-space-3);
+}
+
+.sf-alerts-templates__title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--sf-text-1);
+}
+
+.sf-alerts-templates__subtitle {
+  margin: var(--sf-space-1) 0 0;
+  font-size: 0.85rem;
+  color: var(--sf-text-3);
+}
+
+.sf-alerts-templates__grid {
+  display: grid;
+  gap: var(--sf-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.sf-alerts-templates__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-3);
+  padding: var(--sf-space-3);
+  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--sf-border-1);
+  background: var(--sf-bg-2);
+}
+
+.sf-alerts-templates__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+}
+
+.sf-alerts-templates__card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sf-space-2);
+}
+
+.sf-alerts-templates__card-title {
+  font-weight: 600;
+  color: var(--sf-text-1);
+}
+
+.sf-alerts-templates__card-description {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--sf-text-3);
+}
+
+.sf-alerts-templates__chip {
+  border-radius: var(--sf-radius-sm);
+  border: 1px solid var(--sf-border-1);
+  padding: 2px var(--sf-space-2);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sf-text-2);
+  background: color-mix(in srgb, var(--sf-bg-1) 80%, transparent);
+}
+
+.sf-alerts-templates__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sf-space-2);
+}
+
+.sf-alerts-templates__meta-item {
+  font-size: 0.75rem;
+  color: var(--sf-text-2);
+  padding: 2px var(--sf-space-2);
+  border-radius: var(--sf-radius-sm);
+  background: color-mix(in srgb, var(--sf-bg-1) 70%, transparent);
+}
+
+.sf-alerts-templates__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--sf-text-3);
+}
+
 .sf-alerts-new {
   display: flex;
   flex-direction: column;

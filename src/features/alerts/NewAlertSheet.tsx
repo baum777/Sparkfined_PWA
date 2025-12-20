@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Input, RightSheet, RightSheetFooter, RightSheetSection, Select } from "@/components/ui";
 import { createAlert, type AlertListItem } from "@/api/alerts";
 import type { AlertType } from "@/store/alertsStore";
+import { AlertTemplates, type AlertTemplate } from "@/features/alerts/AlertTemplates";
 import { SymbolAutocomplete } from "@/features/alerts/SymbolAutocomplete";
 
 const ALERT_TYPE_OPTIONS = [
@@ -45,6 +46,15 @@ const getDefaultErrors = (): FormErrors => ({
   threshold: "",
 });
 
+const hasFormChanges = (state: FormState) =>
+  Boolean(
+    state.symbol.trim() ||
+      state.condition.trim() ||
+      state.threshold.trim() ||
+      state.type !== "price-above" ||
+      state.timeframe !== "1h",
+  );
+
 export default function NewAlertSheet({ isOpen, onClose, onCreated }: NewAlertSheetProps) {
   const [formState, setFormState] = React.useState<FormState>(() => getDefaultFormState());
   const [errors, setErrors] = React.useState<FormErrors>(() => getDefaultErrors());
@@ -61,6 +71,22 @@ export default function NewAlertSheet({ isOpen, onClose, onCreated }: NewAlertSh
     onClose();
     resetForm();
   }, [onClose, resetForm]);
+
+  const handleApplyTemplate = (template: AlertTemplate) => {
+    if (hasFormChanges(formState)) {
+      const confirmed = window.confirm(
+        "Applying a template will overwrite your current alert fields. Continue?",
+      );
+      if (!confirmed) return;
+    }
+
+    setFormState((prev) => ({
+      ...prev,
+      ...template.preset,
+    }));
+    setErrors(getDefaultErrors());
+    setSubmissionError(null);
+  };
 
   const handleSubmit = async () => {
     const nextErrors = getDefaultErrors();
@@ -144,6 +170,9 @@ export default function NewAlertSheet({ isOpen, onClose, onCreated }: NewAlertSh
             {submissionError}
           </div>
         ) : null}
+        <RightSheetSection>
+          <AlertTemplates onApply={handleApplyTemplate} />
+        </RightSheetSection>
         <RightSheetSection>
           <SymbolAutocomplete
             value={formState.symbol}
