@@ -2,9 +2,17 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2026-01-15
+**Last Updated:** 2026-01-16
 
 ---
+
+## 2026-01-16
+
+### Added
+- Documented WP-071 alert card design + actions with checklist link `WP-Polish/WP-071/checklist.md`.
+
+### Updated
+- Alerts list now renders AlertCard rows with optimistic pause/resume + delete actions, backed by mockable API endpoints in `src/api/alerts.ts`, UI wiring in `src/features/alerts/AlertsPage.tsx` and `src/features/alerts/AlertCard.tsx`, plus tokenized alert card styling in `src/features/alerts/alerts.css`.
 
 ## 2026-01-15
 

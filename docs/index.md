@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-16)
+
+- **Alert Card Design & Actions (WP-071):** Alerts list now renders a dedicated AlertCard with status pill, condition summary, and pause/resume + delete actions wired to optimistic mock APIs (`src/features/alerts/AlertCard.tsx`, `src/features/alerts/AlertsPage.tsx`, `src/api/alerts.ts`, `src/features/alerts/alerts.css`); Checklist-Link: `WP-Polish/WP-071/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-15)
 
 - **Alerts Desktop Layout (WP-070):** New alerts feature scaffold with tokenized desktop filters + list layout, mock-backed loading/empty/error states, and the route wiring in `src/features/alerts/AlertsPage.tsx`, `src/features/alerts/FiltersBar.tsx`, `src/features/alerts/alerts.css`, and `src/pages/AlertsPage.tsx`; Checklist-Link: `WP-Polish/WP-070/checklist.md`.

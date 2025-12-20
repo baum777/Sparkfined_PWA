@@ -1,19 +1,13 @@
 import React from "react";
-import { getAlertsList, type AlertListItem } from "@/api/alerts";
+import {
+  deleteAlert,
+  getAlertsList,
+  type AlertListItem,
+  updateAlertStatus,
+} from "@/api/alerts";
+import AlertCard from "@/features/alerts/AlertCard";
 import FiltersBar from "@/features/alerts/FiltersBar";
 import "./alerts.css";
-
-const TYPE_LABELS: Record<AlertListItem["type"], string> = {
-  "price-above": "Price above",
-  "price-below": "Price below",
-};
-
-const numberFormatter = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 2,
-});
-
-const formatStatus = (status: AlertListItem["status"]) =>
-  status.replace(/-/g, " ");
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = React.useState<AlertListItem[]>([]);
@@ -21,6 +15,10 @@ export default function AlertsPage() {
     "idle",
   );
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [actionMessage, setActionMessage] = React.useState<string | null>(null);
+  const [pendingActions, setPendingActions] = React.useState<Record<string, "toggle" | "delete">>(
+    {},
+  );
   const isMountedRef = React.useRef(true);
 
   React.useEffect(() => {
@@ -49,6 +47,70 @@ export default function AlertsPage() {
   React.useEffect(() => {
     loadAlerts();
   }, [loadAlerts]);
+
+  const setPendingAction = React.useCallback((id: string, action?: "toggle" | "delete") => {
+    setPendingActions((current) => {
+      if (!action) {
+        const { [id]: removed, ...rest } = current;
+        void removed;
+        return rest;
+      }
+      return { ...current, [id]: action };
+    });
+  }, []);
+
+  const handleToggleStatus = React.useCallback(
+    async (alert: AlertListItem) => {
+      const nextStatus = alert.status === "paused" ? "armed" : "paused";
+      const previousStatus = alert.status;
+      setActionMessage(null);
+      setPendingAction(alert.id, "toggle");
+      setAlerts((current) =>
+        current.map((item) => (item.id === alert.id ? { ...item, status: nextStatus } : item)),
+      );
+
+      try {
+        await updateAlertStatus({ id: alert.id, status: nextStatus });
+      } catch (error) {
+        console.warn("AlertsPage: failed to toggle alert status", error);
+        setAlerts((current) =>
+          current.map((item) =>
+            item.id === alert.id ? { ...item, status: previousStatus } : item,
+          ),
+        );
+        setActionMessage("We couldn't update that alert. Please try again.");
+      } finally {
+        setPendingAction(alert.id);
+      }
+    },
+    [setPendingAction],
+  );
+
+  const handleDelete = React.useCallback(
+    async (alert: AlertListItem) => {
+      const previousIndex = alerts.findIndex((item) => item.id === alert.id);
+      setActionMessage(null);
+      setPendingAction(alert.id, "delete");
+      setAlerts((current) => current.filter((item) => item.id !== alert.id));
+
+      try {
+        await deleteAlert({ id: alert.id });
+      } catch (error) {
+        console.warn("AlertsPage: failed to delete alert", error);
+        setAlerts((current) => {
+          if (current.some((item) => item.id === alert.id)) return current;
+          const next = [...current];
+          const insertIndex = previousIndex < 0 ? next.length : Math.min(previousIndex, next.length);
+          next.splice(insertIndex, 0, alert);
+          return next;
+        });
+        setActionMessage("We couldn't delete that alert. Please try again.");
+      } finally {
+        setPendingAction(alert.id);
+      }
+    },
+    [alerts, setPendingAction],
+  );
 
   const hasAlerts = status === "loaded" && alerts.length > 0;
 
@@ -91,27 +153,23 @@ export default function AlertsPage() {
           </div>
         ) : null}
 
+        {actionMessage ? (
+          <div className="sf-alerts-list__state sf-alerts-list__state--action" role="alert">
+            {actionMessage}
+          </div>
+        ) : null}
+
         {hasAlerts ? (
-          <ul className="sf-alerts-list" aria-label="Alerts list">
+          <ul className="sf-alerts-list" aria-label="Alerts list" data-testid="alerts-list">
             {alerts.map((alert) => (
               <li key={alert.id}>
-                <article className="sf-alerts-list__row" tabIndex={0}>
-                  <div className="sf-alerts-list__row-header">
-                    <span className="sf-alerts-list__symbol">{alert.symbol}</span>
-                    <span
-                      className="sf-alerts-list__status"
-                      aria-label={`Status: ${formatStatus(alert.status)}`}
-                    >
-                      {formatStatus(alert.status)}
-                    </span>
-                  </div>
-                  <div className="sf-alerts-list__condition">{alert.condition}</div>
-                  <div className="sf-alerts-list__meta">
-                    <span>Type: {TYPE_LABELS[alert.type]}</span>
-                    <span>Threshold: {numberFormatter.format(alert.threshold)}</span>
-                    <span>Timeframe: {alert.timeframe}</span>
-                  </div>
-                </article>
+                <AlertCard
+                  alert={alert}
+                  onToggleStatus={handleToggleStatus}
+                  onDelete={handleDelete}
+                  isToggling={pendingActions[alert.id] === "toggle"}
+                  isDeleting={pendingActions[alert.id] === "delete"}
+                />
               </li>
             ))}
           </ul>
