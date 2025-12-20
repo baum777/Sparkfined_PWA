@@ -12,6 +12,25 @@ export type AlertListItem = Pick<
   "id" | "symbol" | "type" | "condition" | "threshold" | "timeframe" | "status"
 >;
 
+export type UpdateAlertStatusInput = {
+  id: string;
+  status: AlertStatus;
+};
+
+export type UpdateAlertStatusResult = {
+  id: string;
+  status: AlertStatus;
+};
+
+export type DeleteAlertInput = {
+  id: string;
+};
+
+export type DeleteAlertResult = {
+  id: string;
+  deleted: boolean;
+};
+
 const MOCK_ALERTS_OVERVIEW: AlertsOverviewDTO = {
   armed: 2,
   triggered: 1,
@@ -50,6 +69,7 @@ const MOCK_ALERTS_LIST: AlertListItem[] = [
 
 const ALERT_STATUSES: AlertStatus[] = ["armed", "triggered", "paused"];
 const ALERT_TYPES: AlertType[] = ["price-above", "price-below"];
+const MOCK_ACTION_FAILURE_IDS = new Set(["chart-eth-sweep"]);
 
 const normalizeCount = (value: unknown): number | null => {
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -145,6 +165,8 @@ const extractAlertsList = (payload: unknown): AlertListItem[] | null => {
   return normalized.length > 0 ? normalized : null;
 };
 
+const shouldMockFailAction = (id: string) => MOCK_ACTION_FAILURE_IDS.has(id);
+
 export async function getAlertsOverview(): Promise<AlertsOverviewDTO> {
   const baseUrl = config?.apiBaseUrl?.trim();
   const endpoint = baseUrl ? `${baseUrl.replace(/\/$/, "")}/alerts/overview` : null;
@@ -189,4 +211,62 @@ export async function getAlertsList(): Promise<AlertListItem[]> {
   }
 
   return [...MOCK_ALERTS_LIST];
+}
+
+export async function updateAlertStatus(
+  input: UpdateAlertStatusInput,
+): Promise<UpdateAlertStatusResult> {
+  const baseUrl = config?.apiBaseUrl?.trim();
+  const endpoint = baseUrl ? `${baseUrl.replace(/\/$/, "")}/alerts/${input.id}` : null;
+
+  if (endpoint && typeof fetch === "function") {
+    try {
+      const response = await fetch(endpoint, {
+        method: "PATCH",
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ status: input.status }),
+      });
+
+      if (response.ok) {
+        const payload = await response.json();
+        const normalized = normalizeAlert(payload);
+        if (normalized) return { id: normalized.id, status: normalized.status };
+        return { id: input.id, status: input.status };
+      }
+    } catch (error) {
+      console.warn("updateAlertStatus: falling back to mock update", error);
+    }
+  }
+
+  if (shouldMockFailAction(input.id)) {
+    throw new Error(`Mock failure toggling alert ${input.id}`);
+  }
+
+  return { id: input.id, status: input.status };
+}
+
+export async function deleteAlert(input: DeleteAlertInput): Promise<DeleteAlertResult> {
+  const baseUrl = config?.apiBaseUrl?.trim();
+  const endpoint = baseUrl ? `${baseUrl.replace(/\/$/, "")}/alerts/${input.id}` : null;
+
+  if (endpoint && typeof fetch === "function") {
+    try {
+      const response = await fetch(endpoint, {
+        method: "DELETE",
+        headers: { Accept: "application/json" },
+      });
+
+      if (response.ok) {
+        return { id: input.id, deleted: true };
+      }
+    } catch (error) {
+      console.warn("deleteAlert: falling back to mock delete", error);
+    }
+  }
+
+  if (shouldMockFailAction(input.id)) {
+    throw new Error(`Mock failure deleting alert ${input.id}`);
+  }
+
+  return { id: input.id, deleted: true };
 }
