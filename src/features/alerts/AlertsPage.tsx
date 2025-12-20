@@ -9,7 +9,15 @@ import { Button } from "@/components/ui";
 import AlertCard from "@/features/alerts/AlertCard";
 import FiltersBar from "@/features/alerts/FiltersBar";
 import NewAlertSheet from "@/features/alerts/NewAlertSheet";
+import { applyAlertFilters, type AlertFilterState } from "@/features/alerts/filtering";
 import "./alerts.css";
+
+const DEFAULT_FILTERS: AlertFilterState = {
+  status: "all",
+  type: "all",
+  query: "",
+  symbol: "",
+};
 
 export default function AlertsPage() {
   const [alerts, setAlerts] = React.useState<AlertListItem[]>([]);
@@ -22,6 +30,7 @@ export default function AlertsPage() {
     {},
   );
   const [isNewAlertOpen, setIsNewAlertOpen] = React.useState(false);
+  const [filters, setFilters] = React.useState<AlertFilterState>(DEFAULT_FILTERS);
   const isMountedRef = React.useRef(true);
 
   React.useEffect(() => {
@@ -121,7 +130,9 @@ export default function AlertsPage() {
     setActionMessage("Alert created and armed.");
   }, []);
 
+  const filteredAlerts = React.useMemo(() => applyAlertFilters(alerts, filters), [alerts, filters]);
   const hasAlerts = status === "loaded" && alerts.length > 0;
+  const hasFilteredAlerts = status === "loaded" && filteredAlerts.length > 0;
 
   return (
     <section className="sf-alerts-page" data-testid="alerts-page">
@@ -144,7 +155,7 @@ export default function AlertsPage() {
         </div>
       </header>
 
-      <FiltersBar />
+      <FiltersBar filters={filters} onChange={setFilters} />
 
       <div className="sf-alerts-page__list">
         {status === "loading" ? (
@@ -172,15 +183,21 @@ export default function AlertsPage() {
           </div>
         ) : null}
 
+        {status === "loaded" && hasAlerts && !hasFilteredAlerts ? (
+          <div className="sf-alerts-list__state" role="status" aria-live="polite">
+            No alerts match your filters.
+          </div>
+        ) : null}
+
         {actionMessage ? (
           <div className="sf-alerts-list__state sf-alerts-list__state--action" role="alert">
             {actionMessage}
           </div>
         ) : null}
 
-        {hasAlerts ? (
+        {hasFilteredAlerts ? (
           <ul className="sf-alerts-list" aria-label="Alerts list" data-testid="alerts-list">
-            {alerts.map((alert) => (
+            {filteredAlerts.map((alert) => (
               <li
                 key={alert.id}
                 data-testid="alerts-list-item"
