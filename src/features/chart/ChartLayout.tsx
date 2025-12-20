@@ -7,6 +7,7 @@ import ChartCanvas from "./ChartCanvas"
 import ChartSidebar from "./ChartSidebar"
 import ChartToolbar from "./ChartToolbar"
 import ChartTopBar from "./ChartTopBar"
+import MobileChartControls from "./MobileChartControls"
 import "./chart.css"
 
 const DEFAULT_ASSET = {
@@ -44,6 +45,10 @@ const resolveAsset = (symbol?: string | null, address?: string | null, network?:
 export default function ChartLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false)
   const [isToolbarOpen, setIsToolbarOpen] = React.useState(false)
+  const [isMobile, setIsMobile] = React.useState(() => {
+    if (typeof window === "undefined") return false
+    return window.matchMedia("(max-width: 767px)").matches
+  })
   const [searchParams, setSearchParams] = useSearchParams()
   const resolveSelection = React.useCallback(
     (params: URLSearchParams) => ({
@@ -63,6 +68,24 @@ export default function ChartLayout() {
     const nextTimeframe = resolveSelection(searchParams).timeframe
     setTimeframe((prev) => (prev === nextTimeframe ? prev : nextTimeframe))
   }, [resolveSelection, searchParams])
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return undefined
+    const mediaQuery = window.matchMedia("(max-width: 767px)")
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsMobile(event.matches)
+    }
+
+    setIsMobile(mediaQuery.matches)
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handleChange)
+      return () => mediaQuery.removeEventListener("change", handleChange)
+    }
+
+    mediaQuery.addListener(handleChange)
+    return () => mediaQuery.removeListener(handleChange)
+  }, [])
 
   React.useEffect(() => {
     const { timeframe: nextTimeframe, asset: nextAsset } = resolveSelection(searchParams)
@@ -104,6 +127,13 @@ export default function ChartLayout() {
         onOpenSidebar={() => setIsSidebarOpen(true)}
         onOpenToolbar={() => setIsToolbarOpen(true)}
       />
+
+      {isMobile ? (
+        <MobileChartControls
+          onOpenSidebar={() => setIsSidebarOpen(true)}
+          onOpenToolbar={() => setIsToolbarOpen(true)}
+        />
+      ) : null}
 
       <div className="sf-chart-body">
         <ChartSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />

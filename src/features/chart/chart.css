@@ -5,6 +5,11 @@
   height: 100%;
   background-color: var(--sf-bg-0);
   color: var(--sf-text-1);
+  --sf-chart-mobile-controls-offset: calc(
+    var(--sf-bottom-nav-height, 72px) +
+      var(--sf-bottom-nav-safe-area, env(safe-area-inset-bottom, 0px)) +
+      var(--sf-space-3)
+  );
 }
 
 .sf-chart-topbar {
@@ -70,6 +75,55 @@
 .sf-chart-icon-button:hover {
   border-color: color-mix(in srgb, var(--sf-border-1) 50%, var(--sf-primary));
   color: var(--sf-text-1);
+}
+
+.sf-chart-mobile-controls {
+  position: fixed;
+  right: var(--sf-space-4);
+  bottom: var(--sf-chart-mobile-controls-offset);
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--sf-space-2);
+  pointer-events: none;
+}
+
+.sf-chart-mobile-controls__button {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sf-space-2);
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 var(--sf-space-3);
+  border-radius: 999px;
+  border: 1px solid var(--sf-border-1);
+  background-color: var(--sf-bg-1);
+  color: var(--sf-text-1);
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 12px 32px var(--sf-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease,
+    background-color 0.2s ease, color 0.2s ease;
+}
+
+.sf-chart-mobile-controls__button:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--sf-border-1) 50%, var(--sf-primary));
+  background-color: var(--sf-bg-2);
+}
+
+.sf-chart-mobile-controls__button:focus-visible {
+  outline: 2px solid var(--sf-primary);
+  outline-offset: 2px;
+}
+
+.sf-chart-mobile-controls__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .sf-chart-topbar__right {
@@ -753,5 +807,25 @@
 @media (max-width: 1023px) {
   .sf-chart-bottom-wrapper {
     padding-bottom: calc(var(--sf-space-4) + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 767px) {
+  .sf-chart-topbar__mobile-actions {
+    display: none;
+  }
+
+  .sf-chart-body {
+    padding-bottom: calc(var(--sf-space-4) + var(--sf-chart-mobile-controls-offset));
+  }
+
+  .sf-chart-bottom-wrapper {
+    padding-bottom: calc(var(--sf-space-4) + var(--sf-chart-mobile-controls-offset));
+  }
+}
+
+@media (min-width: 768px) {
+  .sf-chart-mobile-controls {
+    display: none;
   }
 }
