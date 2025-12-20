@@ -33,6 +33,7 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 ## 📦 Neue Ergänzungen (2026-01-22)
 
 - **Settings Foundation + PWA Update (WP-090):** `/settings` now renders the feature-level SettingsPage with tokenized SettingsCard primitives, refreshed header/actions, and a PWA Update card that checks for waiting service workers, applies skipWaiting updates, and surfaces status states (`src/features/settings/SettingsPage.tsx`, `src/features/settings/SettingsCard.tsx`, `src/features/settings/PwaUpdateCard.tsx`, `src/features/settings/pwa-update.ts`, `src/features/settings/settings.css`, `src/pages/SettingsPage.tsx`); Checklist-Link: `WP-Polish/WP-090/checklist.md`.
+- **Infra – Playwright Preview Reliability:** Standardized E2E prerequisites: `pnpm run e2e:install` bootstraps Chromium (CI adds `--with-deps`), preview runs on `pnpm run e2e:preview` (`0.0.0.0:4173`), and Playwright’s baseURL/webServer now align to that host/port with a startup hint if the preview port is busy.
 
 ## 📦 Neue Ergänzungen (2026-01-21)
 

@@ -13,7 +13,7 @@
     "prebuild": "pnpm run check-env",
     "build:local": "pnpm build",
     "build:ci": "pnpm build:local && pnpm run check:size",
-    "preview": "vite preview",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
     "analyze": "cross-env ANALYZE=true vite build",
     "lighthouse": "npx lighthouse http://localhost:4173 --view --only-categories=performance,pwa,best-practices,accessibility",
     "typecheck": "tsc --noEmit",
@@ -23,6 +23,8 @@
     "test:ci": "vitest run --coverage",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "e2e:install": "pnpm exec playwright install chromium",
+    "e2e:preview": "pnpm preview",
     "ci-check": "pnpm lint && pnpm typecheck && pnpm test:ci && pnpm test:e2e && pnpm build:ci",
     "check:size": "node scripts/check-bundle-size.mjs",
     "check-env": "node scripts/check-env.js"

@@ -115,10 +115,10 @@ jobs:
             ${{ runner.os }}-ms-playwright-
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm run e2e:install -- --with-deps
 
       - name: Run Playwright smoke suite (Loop C focus)
-        run: pnpm exec playwright test --grep "@journal|@alerts|@watchlist"
+        run: pnpm run test:e2e -- --grep "@journal|@alerts|@watchlist"
 
       - name: Upload Playwright report
         if: always()
