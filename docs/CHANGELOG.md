@@ -9,6 +9,13 @@
 ## 2026-01-21
 
 ### Added
+- Documented WP-090 settings foundation delivery with checklist link `WP-Polish/WP-090/checklist.md`.
+
+### Updated
+- Settings route now uses the new feature-level layout with SettingsCard primitives and an in-app PWA update card that checks, applies skipWaiting updates, and surfaces status states (`src/features/settings/SettingsPage.tsx`, `src/features/settings/SettingsCard.tsx`, `src/features/settings/PwaUpdateCard.tsx`, `src/features/settings/pwa-update.ts`, `src/features/settings/settings.css`, `src/pages/SettingsPage.tsx`).
+
+
+### Added
 - Documented WP-076 integrations (chart → alert, browser notifications) with checklist link `WP-Polish/WP-076/checklist.md`.
 
 ### Updated
