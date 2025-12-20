@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-22)
+
+- **Settings Foundation + PWA Update (WP-090):** `/settings` now renders the feature-level SettingsPage with tokenized SettingsCard primitives, refreshed header/actions, and a PWA Update card that checks for waiting service workers, applies skipWaiting updates, and surfaces status states (`src/features/settings/SettingsPage.tsx`, `src/features/settings/SettingsCard.tsx`, `src/features/settings/PwaUpdateCard.tsx`, `src/features/settings/pwa-update.ts`, `src/features/settings/settings.css`, `src/pages/SettingsPage.tsx`); Checklist-Link: `WP-Polish/WP-090/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-21)
 
 - **Integrations (WP-076):** Chart toolbar now links to Alerts with prefilled alert creation via URL params, Alerts page consumes one-shot prefill to auto-open the new alert sheet, `NewAlertSheet` accepts external prefill values, and Settings includes a browser notification permission card backed by a push API stub (`src/features/chart/toolbar-sections.tsx`, `src/features/alerts/AlertsPage.tsx`, `src/features/alerts/NewAlertSheet.tsx`, `src/features/alerts/prefill.ts`, `src/api/push.ts`, `src/pages/SettingsContent.tsx`, `tests/components/alerts/NewAlertSheet.test.tsx`, `tests/lib/push.test.ts`); Checklist-Link: `WP-Polish/WP-076/checklist.md`.
