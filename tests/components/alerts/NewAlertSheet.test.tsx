@@ -17,4 +17,37 @@ describe("NewAlertSheet", () => {
     expect(screen.getByText("Threshold must be a valid number.")).toBeInTheDocument();
     expect(onCreated).not.toHaveBeenCalled();
   });
+
+  it("applies a template to prefill the alert form", async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    render(<NewAlertSheet isOpen onClose={vi.fn()} />);
+
+    await user.click(screen.getByTestId("alert-template-apply-breakout-above"));
+
+    expect(screen.getByTestId("alert-symbol-input")).toHaveValue("BTCUSDT");
+    expect(screen.getByTestId("alert-threshold-input")).toHaveValue(45000);
+    expect(screen.getByTestId("alert-condition-input")).toHaveValue(
+      "Alert when price closes above the breakout level.",
+    );
+    expect(confirmSpy).not.toHaveBeenCalled();
+
+    confirmSpy.mockRestore();
+  });
+
+  it("confirms before overwriting existing values", async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+
+    render(<NewAlertSheet isOpen onClose={vi.fn()} />);
+
+    await user.type(screen.getByTestId("alert-symbol-input"), "DOGEUSDT");
+    await user.click(screen.getByTestId("alert-template-apply-breakout-above"));
+
+    expect(confirmSpy).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId("alert-symbol-input")).toHaveValue("DOGEUSDT");
+
+    confirmSpy.mockRestore();
+  });
 });
