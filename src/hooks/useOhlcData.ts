@@ -9,7 +9,8 @@ import type {
   OhlcCandle,
 } from '@/domain/chart'
 import { getChartSnapshot, isSnapshotFresh, pruneOldChartSnapshots, putChartSnapshot } from '@/db/chartSnapshots'
-import { fetchTokenCandles } from '@/lib/priceAdapter'
+import type { CandleDTO } from '@/api/marketData'
+import { getCandles } from '@/api/marketData'
 
 export type ChartDataSource = 'cache' | 'network'
 
@@ -48,14 +49,14 @@ function createDefaultViewState(timeframe: ChartTimeframe, mode: ChartMode = 'li
   }
 }
 
-function mapCandles(raw: { time: number; open: number; high: number; low: number; close: number; volume?: number }[]): OhlcCandle[] {
+function mapCandles(raw: CandleDTO[]): OhlcCandle[] {
   return raw.map((candle) => ({
-    t: candle.time * 1000,
-    o: candle.open,
-    h: candle.high,
-    l: candle.low,
-    c: candle.close,
-    v: candle.volume,
+    t: candle.t * 1000,
+    o: candle.o,
+    h: candle.h,
+    l: candle.l,
+    c: candle.c,
+    v: candle.v,
   }))
 }
 
@@ -122,7 +123,7 @@ export function useOhlcData({
     setState((prev) => ({ ...prev, status: 'loading', error: undefined }))
 
     try {
-      const candles = await fetchTokenCandles(network, address)
+      const candles = await getCandles({ address, symbol, timeframe, network })
       const mapped = mapCandles(candles)
       const snapshot: Omit<BoardChartSnapshot, 'id'> = {
         address,

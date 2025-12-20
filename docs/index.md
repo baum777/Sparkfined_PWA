@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-13)
+
+- **Default Chart + Fallback (WP-055):** Chart route now resolves missing symbol/timeframe to SOL/USDC + 1h, routes candle loading through the typed `marketData` client with deterministic mock fallback, and surfaces retry actions for empty/error chart states (`src/api/marketData.ts`, `src/features/chart/ChartLayout.tsx`, `src/features/chart/ChartCanvas.tsx`, `src/hooks/useOhlcData.ts`); Checklist-Link: `WP-Polish/WP-055/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-12)
 
 - **Replay Controls + Export (WP-054):** Chart top bar now includes a replay toggle, speed controls, and an interaction-lazy export action that downloads a JSON stub (symbol/timeframe/replay state) via `src/features/chart/ChartTopBar.tsx`, `src/features/chart/replay.ts`, `src/features/chart/chartExport.ts`, plus tokenized styles in `src/features/chart/chart.css`; Checklist-Link: `WP-Polish/WP-054/checklist.md`.

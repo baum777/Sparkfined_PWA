@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-13
+
+### Added
+- Documented WP-055 chart default market + fallback states with checklist link `WP-Polish/WP-055/checklist.md`.
+
+### Updated
+- Chart default resolution now falls back to SOL/USDC + 1h when URL params are missing, candle fetching routes through the typed `marketData` client with deterministic mock fallback, and chart empty/error states expose a retry action in `src/features/chart/ChartLayout.tsx`, `src/features/chart/ChartCanvas.tsx`, `src/hooks/useOhlcData.ts`, and `src/api/marketData.ts`.
+
 ## 2026-01-12
 
 ### Added
