@@ -8,7 +8,7 @@ import {
   isSnapshotFresh,
   pruneOldChartSnapshots,
 } from '@/db/chartSnapshots'
-import { fetchTokenCandles } from '@/lib/priceAdapter'
+import { getCandles } from '@/api/marketData'
 
 vi.mock('@/db/chartSnapshots', () => ({
   getChartSnapshot: vi.fn(),
@@ -17,8 +17,8 @@ vi.mock('@/db/chartSnapshots', () => ({
   pruneOldChartSnapshots: vi.fn(),
 }))
 
-vi.mock('@/lib/priceAdapter', () => ({
-  fetchTokenCandles: vi.fn(),
+vi.mock('@/api/marketData', () => ({
+  getCandles: vi.fn(),
 }))
 
 const mockSnapshot = (overrides?: Partial<BoardChartSnapshot>): BoardChartSnapshot => ({
@@ -61,14 +61,14 @@ describe('useOhlcData', () => {
     await waitFor(() => expect(result.current.status).toBe('success'))
     expect(result.current.source).toBe('cache')
     expect(result.current.hasData).toBe(true)
-    expect(fetchTokenCandles).not.toHaveBeenCalled()
+    expect(getCandles).not.toHaveBeenCalled()
   })
 
   it('fetches network when no snapshot and stores it', async () => {
     vi.mocked(getChartSnapshot).mockResolvedValueOnce(undefined)
     vi.mocked(isSnapshotFresh).mockReturnValue(false)
-    vi.mocked(fetchTokenCandles).mockResolvedValueOnce([
-      { time: 1, open: 1, high: 2, low: 0.5, close: 1.5, volume: 10 },
+    vi.mocked(getCandles).mockResolvedValueOnce([
+      { t: 1, o: 1, h: 2, l: 0.5, c: 1.5, v: 10 },
     ])
 
     const { result } = renderHook(() =>
@@ -84,7 +84,7 @@ describe('useOhlcData', () => {
   it('marks no-data when fetch succeeds with empty payload', async () => {
     vi.mocked(getChartSnapshot).mockResolvedValueOnce(undefined)
     vi.mocked(isSnapshotFresh).mockReturnValue(false)
-    vi.mocked(fetchTokenCandles).mockResolvedValueOnce([])
+    vi.mocked(getCandles).mockResolvedValueOnce([])
 
     const { result } = renderHook(() =>
       useOhlcData({ address: 'addr', symbol: 'SYM', timeframe: '15m', network: 'solana' })
@@ -99,7 +99,7 @@ describe('useOhlcData', () => {
     const snapshot = mockSnapshot({ metadata: { ...mockSnapshot().metadata, lastFetchedAt: Date.now() - 10_000 } })
     vi.mocked(getChartSnapshot).mockResolvedValueOnce(snapshot)
     vi.mocked(isSnapshotFresh).mockReturnValue(false)
-    vi.mocked(fetchTokenCandles).mockRejectedValueOnce(new Error('network down'))
+    vi.mocked(getCandles).mockRejectedValueOnce(new Error('network down'))
 
     const { result } = renderHook(() =>
       useOhlcData({ address: 'addr', symbol: 'SYM', timeframe: '15m', network: 'solana' })
@@ -114,7 +114,7 @@ describe('useOhlcData', () => {
     const snapshot = mockSnapshot({ ohlc: [], metadata: { ...mockSnapshot().metadata, lastFetchedAt: Date.now() - 10_000 } })
     vi.mocked(getChartSnapshot).mockResolvedValueOnce(snapshot)
     vi.mocked(isSnapshotFresh).mockReturnValue(false)
-    vi.mocked(fetchTokenCandles).mockRejectedValueOnce(new Error('network down'))
+    vi.mocked(getCandles).mockRejectedValueOnce(new Error('network down'))
 
     const { result } = renderHook(() =>
       useOhlcData({ address: 'addr', symbol: 'SYM', timeframe: '15m', network: 'solana' })
