@@ -1,0 +1,184 @@
+.sf-alerts-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-6);
+  padding: var(--sf-space-6);
+  color: var(--sf-text-1);
+}
+
+.sf-alerts-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sf-space-4);
+  flex-wrap: wrap;
+}
+
+.sf-alerts-page__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 1.2rem + 0.6vw, 2rem);
+  font-weight: 700;
+  color: var(--sf-text-1);
+}
+
+.sf-alerts-page__subtitle {
+  margin: var(--sf-space-2) 0 0;
+  color: var(--sf-text-3);
+  font-size: 0.95rem;
+}
+
+.sf-alerts-page__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sf-space-4);
+  padding: var(--sf-space-4);
+  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--sf-border-1);
+  background: var(--sf-bg-1);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--sf-shadow) 65%, transparent);
+}
+
+.sf-alerts-filters__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+  min-width: 200px;
+}
+
+.sf-alerts-filters__label {
+  font-size: 0.85rem;
+  color: var(--sf-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.sf-alerts-filters__segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--sf-space-2);
+}
+
+.sf-alerts-filters__button {
+  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--sf-border-1);
+  background: var(--sf-bg-2);
+  color: var(--sf-text-2);
+  padding: calc(var(--sf-space-2) / 2) var(--sf-space-3);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.sf-alerts-filters__button[aria-pressed='true'] {
+  border-color: var(--sf-primary);
+  color: var(--sf-text-1);
+  background: color-mix(in srgb, var(--sf-primary) 16%, var(--sf-bg-2));
+}
+
+.sf-alerts-filters__select,
+.sf-alerts-filters__input {
+  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--sf-border-1);
+  background: var(--sf-bg-2);
+  color: var(--sf-text-1);
+  padding: calc(var(--sf-space-2) / 2) var(--sf-space-3);
+  font-size: 0.95rem;
+}
+
+.sf-alerts-filters__input::placeholder {
+  color: var(--sf-text-3);
+}
+
+.sf-alerts-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-3);
+}
+
+.sf-alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-3);
+}
+
+.sf-alerts-list__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sf-space-2);
+  padding: var(--sf-space-4);
+  border-radius: var(--sf-radius-md);
+  border: 1px solid var(--sf-border-1);
+  background: var(--sf-bg-1);
+  text-align: left;
+}
+
+.sf-alerts-list__row:focus-visible {
+  outline: none;
+  border-color: var(--sf-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sf-primary) 35%, transparent);
+}
+
+.sf-alerts-list__row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sf-space-3);
+}
+
+.sf-alerts-list__symbol {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--sf-text-1);
+}
+
+.sf-alerts-list__status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  padding: 2px var(--sf-space-2);
+  border-radius: var(--sf-radius-sm);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sf-text-2);
+  background: color-mix(in srgb, var(--sf-bg-2) 80%, transparent);
+  border: 1px solid var(--sf-border-1);
+}
+
+.sf-alerts-list__condition {
+  color: var(--sf-text-2);
+  font-size: 0.95rem;
+}
+
+.sf-alerts-list__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sf-space-3);
+  color: var(--sf-text-3);
+  font-size: 0.85rem;
+}
+
+.sf-alerts-list__state {
+  border-radius: var(--sf-radius-md);
+  border: 1px dashed var(--sf-border-1);
+  padding: var(--sf-space-6);
+  background: color-mix(in srgb, var(--sf-bg-2) 70%, transparent);
+  color: var(--sf-text-2);
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .sf-alerts-page {
+    padding: var(--sf-space-4);
+  }
+
+  .sf-alerts-page__filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sf-alerts-filters__group {
+    min-width: auto;
+  }
+}

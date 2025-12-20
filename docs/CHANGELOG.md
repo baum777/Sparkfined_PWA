@@ -2,9 +2,17 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2026-01-14
+**Last Updated:** 2026-01-15
 
 ---
+
+## 2026-01-15
+
+### Added
+- Documented WP-070 alerts desktop layout scaffold with checklist link `WP-Polish/WP-070/checklist.md`.
+
+### Updated
+- Alerts route now mounts the feature-level alerts layout scaffold with tokenized filters and mock-backed list states via `src/features/alerts/AlertsPage.tsx`, `src/features/alerts/FiltersBar.tsx`, `src/features/alerts/alerts.css`, and `src/pages/AlertsPage.tsx`.
 
 ## 2026-01-14
 

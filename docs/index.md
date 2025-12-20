@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-15)
+
+- **Alerts Desktop Layout (WP-070):** New alerts feature scaffold with tokenized desktop filters + list layout, mock-backed loading/empty/error states, and the route wiring in `src/features/alerts/AlertsPage.tsx`, `src/features/alerts/FiltersBar.tsx`, `src/features/alerts/alerts.css`, and `src/pages/AlertsPage.tsx`; Checklist-Link: `WP-Polish/WP-070/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-14)
 
 - **Mobile Chart UX Controls (WP-056):** Mobile chart route now exposes floating “Sidebar”/“Tools” actions that open the existing BottomSheet/RightSheet surfaces, hides redundant top-bar mobile triggers under 768px, and pads the chart layout against bottom-nav safe-area overlap (`src/features/chart/MobileChartControls.tsx`, `src/features/chart/ChartLayout.tsx`, `src/features/chart/chart.css`, `tests/components/chart/MobileChartControls.test.tsx`); Checklist-Link: `WP-Polish/WP-056/checklist.md`.
