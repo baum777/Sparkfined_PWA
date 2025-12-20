@@ -7,6 +7,7 @@ import {
 } from "@/api/alerts";
 import { Button } from "@/components/ui";
 import AlertCard from "@/features/alerts/AlertCard";
+import MobileAlertRow from "@/features/alerts/MobileAlertRow";
 import FiltersBar from "@/features/alerts/FiltersBar";
 import NewAlertSheet from "@/features/alerts/NewAlertSheet";
 import { applyAlertFilters, type AlertFilterState } from "@/features/alerts/filtering";
@@ -29,6 +30,10 @@ export default function AlertsPage() {
   const [pendingActions, setPendingActions] = React.useState<Record<string, "toggle" | "delete">>(
     {},
   );
+  const [isMobile, setIsMobile] = React.useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 767px)").matches;
+  });
   const [isNewAlertOpen, setIsNewAlertOpen] = React.useState(false);
   const [filters, setFilters] = React.useState<AlertFilterState>(DEFAULT_FILTERS);
   const isMountedRef = React.useRef(true);
@@ -37,6 +42,24 @@ export default function AlertsPage() {
     return () => {
       isMountedRef.current = false;
     };
+  }, []);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const handleChange = (event: MediaQueryListEvent) => {
+      setIsMobile(event.matches);
+    };
+
+    setIsMobile(mediaQuery.matches);
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
   }, []);
 
   const loadAlerts = React.useCallback(async () => {
@@ -133,6 +156,7 @@ export default function AlertsPage() {
   const filteredAlerts = React.useMemo(() => applyAlertFilters(alerts, filters), [alerts, filters]);
   const hasAlerts = status === "loaded" && alerts.length > 0;
   const hasFilteredAlerts = status === "loaded" && filteredAlerts.length > 0;
+  const AlertItem = isMobile ? MobileAlertRow : AlertCard;
 
   return (
     <section className="sf-alerts-page" data-testid="alerts-page">
@@ -196,7 +220,11 @@ export default function AlertsPage() {
         ) : null}
 
         {hasFilteredAlerts ? (
-          <ul className="sf-alerts-list" aria-label="Alerts list" data-testid="alerts-list">
+          <ul
+            className={`sf-alerts-list${isMobile ? " sf-alerts-list--mobile" : ""}`}
+            aria-label="Alerts list"
+            data-testid="alerts-list"
+          >
             {filteredAlerts.map((alert) => (
               <li
                 key={alert.id}
@@ -205,7 +233,7 @@ export default function AlertsPage() {
                 data-alert-status={alert.status}
                 data-alert-type={alert.type}
               >
-                <AlertCard
+                <AlertItem
                   alert={alert}
                   onToggleStatus={handleToggleStatus}
                   onDelete={handleDelete}

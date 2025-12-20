@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-20
+
+### Added
+- Documented WP-075 mobile alerts polish with checklist link `WP-Polish/WP-075/checklist.md`.
+
+### Updated
+- Alerts now use a compact MobileAlertRow on <768px with a kebab menu for pause/delete actions, plus tokenized mobile scrolling and safe-area padding updates in `src/features/alerts/MobileAlertRow.tsx`, `src/features/alerts/AlertsPage.tsx`, `src/features/alerts/alerts.css`, and `tests/components/alerts/MobileAlertRow.test.tsx`. Swipe actions were skipped; actions remain accessible from the menu.
+
 ## 2026-01-19
 
 ### Added
