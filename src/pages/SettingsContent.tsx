@@ -22,6 +22,7 @@ import { Collapsible } from "@/components/ui/Collapsible";
 import { Modal } from "@/components/ui/Modal";
 import { useOnboardingStore } from "@/store/onboardingStore";
 import { useTheme, type ThemeMode } from "@/lib/theme/useTheme";
+import { getPermission, isNotificationsSupported, requestPermission } from "@/api/push";
 
 interface SettingsContentProps {
   showHeading?: boolean;
@@ -56,6 +57,18 @@ export default function SettingsContent({
     lastChecked: string;
     seenTransactions: number;
   } | null>(null);
+  const notificationsSupported = isNotificationsSupported();
+  const [notificationPermission, setNotificationPermission] = React.useState<NotificationPermission>(() =>
+    getPermission(),
+  );
+  const [notificationMessage, setNotificationMessage] = React.useState<string | null>(null);
+  const notificationStatusLabel = notificationsSupported
+    ? notificationPermission === "granted"
+      ? "Enabled"
+      : notificationPermission === "denied"
+        ? "Blocked"
+        : "Not enabled"
+    : "Unsupported";
 
   const trimmedWallet = walletAddress.trim();
   const isWalletValid = trimmedWallet.length === 0 ? true : isValidSolanaAddress(trimmedWallet);
@@ -111,6 +124,24 @@ export default function SettingsContent({
     localStorage.setItem("sparkfined.grok.auto", enabled ? "true" : "false");
   };
 
+  const handleEnableNotifications = async () => {
+    setNotificationMessage(null);
+    const nextPermission = await requestPermission();
+    setNotificationPermission(nextPermission);
+
+    if (nextPermission === "granted") {
+      setNotificationMessage("Browser notifications enabled. We'll use this for alert triggers.");
+      return;
+    }
+
+    if (nextPermission === "denied") {
+      setNotificationMessage("Notifications are blocked. Enable them in your browser settings.");
+      return;
+    }
+
+    setNotificationMessage("Permission dismissed. You can enable notifications any time.");
+  };
+
   const handleFactoryReset = () => {
     Object.keys(KEYS).forEach((ns) => clearNs(ns as NamespaceKey));
     setConfirmAction(null);
@@ -163,6 +194,39 @@ export default function SettingsContent({
         <SettingsRow label="Show mini-map">
           <SettingsToggle checked={settings.showMinimap} onChange={(v) => setSettings({ showMinimap: v })} />
         </SettingsRow>
+      </SettingsSection>
+
+      <SettingsSection title="Notifications" id="notifications">
+        <p className="mb-3 text-xs text-text-secondary">
+          Enable browser notifications for alert triggers. Push delivery is stubbed in this build.
+        </p>
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm text-text-primary">Browser notifications</p>
+              <p className="text-xs text-text-tertiary">Status: {notificationStatusLabel}</p>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleEnableNotifications}
+              disabled={!notificationsSupported || notificationPermission === "granted"}
+            >
+              Enable Browser Notifications
+            </Button>
+          </div>
+          {!notificationsSupported ? (
+            <p className="text-xs text-text-tertiary">
+              Notifications are not supported in this browser.
+            </p>
+          ) : null}
+          {notificationPermission === "denied" ? (
+            <p className="text-xs text-rose-400">
+              Notifications are blocked. Update your browser settings to re-enable.
+            </p>
+          ) : null}
+          {notificationMessage ? <p className="text-xs text-text-secondary">{notificationMessage}</p> : null}
+        </div>
       </SettingsSection>
 
       <SettingsSection title="Connected Wallets" id="wallets">

@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import NewAlertSheet from "@/features/alerts/NewAlertSheet";
 
@@ -49,5 +49,29 @@ describe("NewAlertSheet", () => {
     expect(screen.getByTestId("alert-symbol-input")).toHaveValue("DOGEUSDT");
 
     confirmSpy.mockRestore();
+  });
+
+  it("prefills fields when external values are provided", async () => {
+    render(
+      <NewAlertSheet
+        isOpen
+        onClose={vi.fn()}
+        prefill={{
+          symbol: "SOL/USDC",
+          type: "price-below",
+          condition: "Alert when price dips below the trigger.",
+          threshold: "120",
+          timeframe: "4h",
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("alert-symbol-input")).toHaveValue("SOL/USDC");
+      expect(screen.getByTestId("alert-threshold-input")).toHaveValue(120);
+      expect(screen.getByTestId("alert-condition-input")).toHaveValue(
+        "Alert when price dips below the trigger.",
+      );
+    });
   });
 });

@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-21
+
+### Added
+- Documented WP-076 integrations (chart → alert, browser notifications) with checklist link `WP-Polish/WP-076/checklist.md`.
+
+### Updated
+- Chart toolbar now deep-links to the Alerts page with URL-prefilled alert fields, Alerts page consumes one-shot prefill params to auto-open `NewAlertSheet`, `NewAlertSheet` accepts external prefill values, and Settings includes a browser notification permission control plus push API stub in `src/features/chart/toolbar-sections.tsx`, `src/features/alerts/AlertsPage.tsx`, `src/features/alerts/NewAlertSheet.tsx`, `src/features/alerts/prefill.ts`, `src/api/push.ts`, `src/pages/SettingsContent.tsx`, `tests/components/alerts/NewAlertSheet.test.tsx`, and `tests/lib/push.test.ts`.
+
 ## 2026-01-20
 
 ### Added

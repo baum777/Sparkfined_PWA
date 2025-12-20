@@ -5,12 +5,17 @@ import {
   type AlertListItem,
   updateAlertStatus,
 } from "@/api/alerts";
+import {
+  parseAlertPrefillSearchParams,
+  stripAlertPrefillSearchParams,
+} from "@/features/alerts/prefill";
 import { Button } from "@/components/ui";
 import AlertCard from "@/features/alerts/AlertCard";
 import MobileAlertRow from "@/features/alerts/MobileAlertRow";
 import FiltersBar from "@/features/alerts/FiltersBar";
 import NewAlertSheet from "@/features/alerts/NewAlertSheet";
 import { applyAlertFilters, type AlertFilterState } from "@/features/alerts/filtering";
+import { useSearchParams } from "react-router-dom";
 import "./alerts.css";
 
 const DEFAULT_FILTERS: AlertFilterState = {
@@ -21,6 +26,7 @@ const DEFAULT_FILTERS: AlertFilterState = {
 };
 
 export default function AlertsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [alerts, setAlerts] = React.useState<AlertListItem[]>([]);
   const [status, setStatus] = React.useState<"idle" | "loading" | "loaded" | "error">(
     "idle",
@@ -37,6 +43,12 @@ export default function AlertsPage() {
   const [isNewAlertOpen, setIsNewAlertOpen] = React.useState(false);
   const [filters, setFilters] = React.useState<AlertFilterState>(DEFAULT_FILTERS);
   const isMountedRef = React.useRef(true);
+  const hasConsumedPrefill = React.useRef(false);
+
+  const prefill = React.useMemo(
+    () => parseAlertPrefillSearchParams(searchParams),
+    [searchParams],
+  );
 
   React.useEffect(() => {
     return () => {
@@ -82,6 +94,14 @@ export default function AlertsPage() {
   React.useEffect(() => {
     loadAlerts();
   }, [loadAlerts]);
+
+  React.useEffect(() => {
+    if (!prefill || hasConsumedPrefill.current) return;
+    setIsNewAlertOpen(true);
+    hasConsumedPrefill.current = true;
+    const nextParams = stripAlertPrefillSearchParams(searchParams);
+    setSearchParams(nextParams, { replace: true });
+  }, [prefill, searchParams, setSearchParams]);
 
   const setPendingAction = React.useCallback((id: string, action?: "toggle" | "delete") => {
     setPendingActions((current) => {
@@ -250,6 +270,7 @@ export default function AlertsPage() {
         isOpen={isNewAlertOpen}
         onClose={() => setIsNewAlertOpen(false)}
         onCreated={handleAlertCreated}
+        prefill={prefill}
       />
     </section>
   );
