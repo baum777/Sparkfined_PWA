@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-12)
+
+- **Replay Controls + Export (WP-054):** Chart top bar now includes a replay toggle, speed controls, and an interaction-lazy export action that downloads a JSON stub (symbol/timeframe/replay state) via `src/features/chart/ChartTopBar.tsx`, `src/features/chart/replay.ts`, `src/features/chart/chartExport.ts`, plus tokenized styles in `src/features/chart/chart.css`; Checklist-Link: `WP-Polish/WP-054/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-11)
 
 - **Chart Bottom Panel (WP-053):** Bottom-panel tabs now surface a Grok Pulse mock card and inline Journal Notes with local draft persistence keyed by symbol/timeframe, wired in `src/features/chart/ChartBottomPanel.tsx`, `src/features/chart/GrokPulseCard.tsx`, `src/features/chart/InlineJournalNotes.tsx`, plus tokenized styles in `src/features/chart/chart.css`; Checklist-Link: `WP-Polish/WP-053/checklist.md`.

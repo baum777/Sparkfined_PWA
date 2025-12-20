@@ -79,6 +79,92 @@
   gap: var(--sf-space-3);
 }
 
+.sf-chart-replay-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sf-space-2);
+}
+
+.sf-chart-replay-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-2);
+  border: 1px solid var(--sf-border-1);
+  background-color: var(--sf-bg-2);
+  color: var(--sf-text-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.sf-chart-replay-toggle[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--sf-border-1) 40%, var(--sf-primary));
+  background-color: var(--sf-bg-1);
+  color: var(--sf-text-1);
+}
+
+.sf-chart-replay-toggle:focus-visible {
+  outline: 2px solid var(--sf-primary);
+  outline-offset: 2px;
+}
+
+.sf-chart-replay-speed {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sf-space-1);
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--sf-border-1);
+  background-color: var(--sf-bg-2);
+}
+
+.sf-chart-replay-speed-button {
+  border: none;
+  background: transparent;
+  color: var(--sf-text-3);
+  font-size: 0.8rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sf-chart-replay-speed-button[aria-pressed="true"] {
+  background-color: var(--sf-bg-1);
+  color: var(--sf-text-1);
+}
+
+.sf-chart-replay-speed-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.sf-chart-replay-speed-button:focus-visible {
+  outline: 2px solid var(--sf-primary);
+  outline-offset: 2px;
+}
+
+.sf-chart-replay-indicator {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--sf-text-2);
+  background-color: var(--sf-bg-2);
+  border: 1px solid var(--sf-border-1);
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.sf-chart-export-status {
+  font-size: 0.75rem;
+  color: var(--sf-text-2);
+  min-height: 1rem;
+}
+
 .sf-chart-timeframe-toggle {
   display: inline-flex;
   align-items: center;

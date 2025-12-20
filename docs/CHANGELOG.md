@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-12
+
+### Added
+- Documented WP-054 chart replay controls and export action with checklist link `WP-Polish/WP-054/checklist.md`.
+
+### Updated
+- Chart top bar now includes replay toggle/speed controls and an interaction-lazy export action that downloads a JSON stub (symbol/timeframe/replay state), wired via `src/features/chart/ChartTopBar.tsx`, `src/features/chart/replay.ts`, `src/features/chart/chartExport.ts`, and tokenized styles in `src/features/chart/chart.css`, with coverage in `tests/lib/replay.test.ts` and `tests/lib/chartExport.test.ts`.
+
 ## 2026-01-11
 
 ### Added
