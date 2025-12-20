@@ -22,6 +22,16 @@ export type UpdateAlertStatusResult = {
   status: AlertStatus;
 };
 
+export type CreateAlertInput = {
+  symbol: string;
+  type: AlertType;
+  condition: string;
+  threshold: number;
+  timeframe: string;
+};
+
+export type CreateAlertResult = AlertListItem;
+
 export type DeleteAlertInput = {
   id: string;
 };
@@ -70,6 +80,8 @@ const MOCK_ALERTS_LIST: AlertListItem[] = [
 const ALERT_STATUSES: AlertStatus[] = ["armed", "triggered", "paused"];
 const ALERT_TYPES: AlertType[] = ["price-above", "price-below"];
 const MOCK_ACTION_FAILURE_IDS = new Set(["chart-eth-sweep"]);
+let mockAlertsList = [...MOCK_ALERTS_LIST];
+let mockAlertCounter = MOCK_ALERTS_LIST.length;
 
 const normalizeCount = (value: unknown): number | null => {
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -150,6 +162,27 @@ const normalizeAlert = (value: unknown): AlertListItem | null => {
   };
 };
 
+const normalizeCreateAlertInput = (value: CreateAlertInput): CreateAlertInput | null => {
+  if (!value || typeof value !== "object") return null;
+  const symbol = normalizeString(value.symbol)?.toUpperCase();
+  const type = normalizeType(value.type);
+  const condition = normalizeString(value.condition);
+  const threshold = normalizeNumber(value.threshold);
+  const timeframe = normalizeString(value.timeframe);
+
+  if (!symbol || !type || !condition || threshold === null || !timeframe) {
+    return null;
+  }
+
+  return {
+    symbol,
+    type,
+    condition,
+    threshold,
+    timeframe,
+  };
+};
+
 const extractAlertsList = (payload: unknown): AlertListItem[] | null => {
   if (!payload) return null;
   const rawList = Array.isArray(payload)
@@ -166,6 +199,11 @@ const extractAlertsList = (payload: unknown): AlertListItem[] | null => {
 };
 
 const shouldMockFailAction = (id: string) => MOCK_ACTION_FAILURE_IDS.has(id);
+
+const buildMockAlertId = (symbol: string) => {
+  mockAlertCounter += 1;
+  return `manual-${symbol.toLowerCase()}-${mockAlertCounter}`;
+};
 
 export async function getAlertsOverview(): Promise<AlertsOverviewDTO> {
   const baseUrl = config?.apiBaseUrl?.trim();
@@ -210,7 +248,49 @@ export async function getAlertsList(): Promise<AlertListItem[]> {
     }
   }
 
-  return [...MOCK_ALERTS_LIST];
+  return [...mockAlertsList];
+}
+
+export async function createAlert(input: CreateAlertInput): Promise<CreateAlertResult> {
+  const baseUrl = config?.apiBaseUrl?.trim();
+  const endpoint = baseUrl ? `${baseUrl.replace(/\/$/, "")}/alerts` : null;
+  const normalizedInput = normalizeCreateAlertInput(input);
+
+  if (!normalizedInput) {
+    throw new Error("createAlert: invalid alert payload");
+  }
+
+  if (endpoint && typeof fetch === "function") {
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify(normalizedInput),
+      });
+
+      if (response.ok) {
+        const payload = await response.json();
+        const normalized = normalizeAlert(payload);
+        if (normalized) return normalized;
+      }
+    } catch (error) {
+      console.warn("createAlert: falling back to mock create", error);
+    }
+  }
+
+  const created: AlertListItem = {
+    id: buildMockAlertId(normalizedInput.symbol),
+    symbol: normalizedInput.symbol,
+    type: normalizedInput.type,
+    condition: normalizedInput.condition,
+    threshold: normalizedInput.threshold,
+    timeframe: normalizedInput.timeframe,
+    status: "armed",
+  };
+
+  mockAlertsList = [created, ...mockAlertsList];
+
+  return created;
 }
 
 export async function updateAlertStatus(
@@ -242,6 +322,10 @@ export async function updateAlertStatus(
     throw new Error(`Mock failure toggling alert ${input.id}`);
   }
 
+  mockAlertsList = mockAlertsList.map((alert) =>
+    alert.id === input.id ? { ...alert, status: input.status } : alert,
+  );
+
   return { id: input.id, status: input.status };
 }
 
@@ -267,6 +351,8 @@ export async function deleteAlert(input: DeleteAlertInput): Promise<DeleteAlertR
   if (shouldMockFailAction(input.id)) {
     throw new Error(`Mock failure deleting alert ${input.id}`);
   }
+
+  mockAlertsList = mockAlertsList.filter((alert) => alert.id !== input.id);
 
   return { id: input.id, deleted: true };
 }

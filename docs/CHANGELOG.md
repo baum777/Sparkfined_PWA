@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-17
+
+### Added
+- Documented WP-072 new alert sheet delivery with checklist link `WP-Polish/WP-072/checklist.md`.
+
+### Updated
+- Alerts now ship a new alert creation sheet with symbol autocomplete, condition builder fields, inline validation, and mock-backed create endpoint updates across `src/features/alerts/NewAlertSheet.tsx`, `src/features/alerts/SymbolAutocomplete.tsx`, `src/features/alerts/AlertsPage.tsx`, `src/api/alerts.ts`, and `src/features/alerts/alerts.css`.
+
 ## 2026-01-16
 
 ### Added

@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-17)
+
+- **New Alert Sheet (WP-072):** Alerts page now opens a dedicated new alert sheet with symbol autocomplete, threshold/direction builder, inline validation, and mock-backed create support across `src/features/alerts/NewAlertSheet.tsx`, `src/features/alerts/SymbolAutocomplete.tsx`, `src/features/alerts/AlertsPage.tsx`, `src/api/alerts.ts`, and `src/features/alerts/alerts.css`; Checklist-Link: `WP-Polish/WP-072/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-16)
 
 - **Alert Card Design & Actions (WP-071):** Alerts list now renders a dedicated AlertCard with status pill, condition summary, and pause/resume + delete actions wired to optimistic mock APIs (`src/features/alerts/AlertCard.tsx`, `src/features/alerts/AlertsPage.tsx`, `src/api/alerts.ts`, `src/features/alerts/alerts.css`); Checklist-Link: `WP-Polish/WP-071/checklist.md`.

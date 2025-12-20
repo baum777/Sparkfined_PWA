@@ -5,8 +5,10 @@ import {
   type AlertListItem,
   updateAlertStatus,
 } from "@/api/alerts";
+import { Button } from "@/components/ui";
 import AlertCard from "@/features/alerts/AlertCard";
 import FiltersBar from "@/features/alerts/FiltersBar";
+import NewAlertSheet from "@/features/alerts/NewAlertSheet";
 import "./alerts.css";
 
 export default function AlertsPage() {
@@ -19,6 +21,7 @@ export default function AlertsPage() {
   const [pendingActions, setPendingActions] = React.useState<Record<string, "toggle" | "delete">>(
     {},
   );
+  const [isNewAlertOpen, setIsNewAlertOpen] = React.useState(false);
   const isMountedRef = React.useRef(true);
 
   React.useEffect(() => {
@@ -112,6 +115,12 @@ export default function AlertsPage() {
     [alerts, setPendingAction],
   );
 
+  const handleAlertCreated = React.useCallback((created: AlertListItem) => {
+    setAlerts((current) => [created, ...current]);
+    setStatus("loaded");
+    setActionMessage("Alert created and armed.");
+  }, []);
+
   const hasAlerts = status === "loaded" && alerts.length > 0;
 
   return (
@@ -122,6 +131,16 @@ export default function AlertsPage() {
           <p className="sf-alerts-page__subtitle">
             Monitor price levels, conditions, and automated triggers.
           </p>
+        </div>
+        <div className="sf-alerts-page__actions">
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={() => setIsNewAlertOpen(true)}
+            data-testid="alerts-new-alert-button"
+          >
+            New alert
+          </Button>
         </div>
       </header>
 
@@ -162,7 +181,13 @@ export default function AlertsPage() {
         {hasAlerts ? (
           <ul className="sf-alerts-list" aria-label="Alerts list" data-testid="alerts-list">
             {alerts.map((alert) => (
-              <li key={alert.id}>
+              <li
+                key={alert.id}
+                data-testid="alerts-list-item"
+                data-alert-id={alert.id}
+                data-alert-status={alert.status}
+                data-alert-type={alert.type}
+              >
                 <AlertCard
                   alert={alert}
                   onToggleStatus={handleToggleStatus}
@@ -175,6 +200,12 @@ export default function AlertsPage() {
           </ul>
         ) : null}
       </div>
+
+      <NewAlertSheet
+        isOpen={isNewAlertOpen}
+        onClose={() => setIsNewAlertOpen(false)}
+        onCreated={handleAlertCreated}
+      />
     </section>
   );
 }
