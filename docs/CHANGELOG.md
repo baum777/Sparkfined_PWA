@@ -6,7 +6,17 @@
 
 ---
 
+## 2026-01-22
+
+### Updated
+- Documented Playwright/preview hardening: new `pnpm run e2e:install` browser bootstrap, standardized preview host/port (`pnpm run e2e:preview` on `0.0.0.0:4173`), and CI smoke tests now reuse the scripts and surface a startup hint if preview binding fails.
+
+### Context
+- Stabilize E2E prerequisites locally and in CI so Playwright can consistently reach the production preview server before running tests.
+
+
 ## 2026-01-21
+
 
 ### Added
 - Documented WP-090 settings foundation delivery with checklist link `WP-Polish/WP-090/checklist.md`.
