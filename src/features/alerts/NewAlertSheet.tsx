@@ -4,6 +4,7 @@ import { createAlert, type AlertListItem } from "@/api/alerts";
 import type { AlertType } from "@/store/alertsStore";
 import { AlertTemplates, type AlertTemplate } from "@/features/alerts/AlertTemplates";
 import { SymbolAutocomplete } from "@/features/alerts/SymbolAutocomplete";
+import type { AlertPrefillValues } from "@/features/alerts/prefill";
 
 const ALERT_TYPE_OPTIONS = [
   { value: "price-above", label: "Price goes above" },
@@ -30,6 +31,7 @@ type NewAlertSheetProps = {
   isOpen: boolean;
   onClose: () => void;
   onCreated?: (alert: AlertListItem) => void;
+  prefill?: AlertPrefillValues | null;
 };
 
 const getDefaultFormState = (): FormState => ({
@@ -46,6 +48,14 @@ const getDefaultErrors = (): FormErrors => ({
   threshold: "",
 });
 
+const buildPrefillState = (prefill: AlertPrefillValues): Partial<FormState> => ({
+  ...(prefill.symbol ? { symbol: prefill.symbol } : {}),
+  ...(prefill.type ? { type: prefill.type } : {}),
+  ...(prefill.condition ? { condition: prefill.condition } : {}),
+  ...(prefill.threshold ? { threshold: prefill.threshold } : {}),
+  ...(prefill.timeframe ? { timeframe: prefill.timeframe } : {}),
+});
+
 const hasFormChanges = (state: FormState) =>
   Boolean(
     state.symbol.trim() ||
@@ -53,13 +63,14 @@ const hasFormChanges = (state: FormState) =>
       state.threshold.trim() ||
       state.type !== "price-above" ||
       state.timeframe !== "1h",
-  );
+);
 
-export default function NewAlertSheet({ isOpen, onClose, onCreated }: NewAlertSheetProps) {
+export default function NewAlertSheet({ isOpen, onClose, onCreated, prefill }: NewAlertSheetProps) {
   const [formState, setFormState] = React.useState<FormState>(() => getDefaultFormState());
   const [errors, setErrors] = React.useState<FormErrors>(() => getDefaultErrors());
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submissionError, setSubmissionError] = React.useState<string | null>(null);
+  const lastPrefillRef = React.useRef<string | null>(null);
 
   const resetForm = React.useCallback(() => {
     setFormState(getDefaultFormState());
@@ -71,6 +82,27 @@ export default function NewAlertSheet({ isOpen, onClose, onCreated }: NewAlertSh
     onClose();
     resetForm();
   }, [onClose, resetForm]);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      lastPrefillRef.current = null;
+    }
+  }, [isOpen]);
+
+  React.useEffect(() => {
+    if (!isOpen || !prefill) return;
+    const prefillKey = JSON.stringify(prefill);
+    if (prefillKey === lastPrefillRef.current) return;
+    if (hasFormChanges(formState)) return;
+
+    lastPrefillRef.current = prefillKey;
+    setFormState((prev) => ({
+      ...prev,
+      ...buildPrefillState(prefill),
+    }));
+    setErrors(getDefaultErrors());
+    setSubmissionError(null);
+  }, [formState, isOpen, prefill]);
 
   const handleApplyTemplate = (template: AlertTemplate) => {
     if (hasFormChanges(formState)) {

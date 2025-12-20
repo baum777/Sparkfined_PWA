@@ -1,9 +1,9 @@
 import React from "react"
 import { getAlertsList, type AlertListItem } from "@/api/alerts"
-import AlertCreateDialog from "@/components/alerts/AlertCreateDialog"
+import { buildAlertPrefillSearchParams } from "@/features/alerts/prefill"
 import Button from "@/components/ui/Button"
 import { cn } from "@/lib/ui/cn"
-import { Link } from "react-router-dom"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 
 export type ChartToolbarSectionId = "indicators" | "drawings" | "alerts"
 
@@ -110,8 +110,22 @@ const formatAlertStatus = (status: AlertListItem["status"]) => {
 const AlertsPanel = ({ isExpanded }: { isExpanded: boolean }) => {
   const [alerts, setAlerts] = React.useState<AlertListItem[]>([])
   const [state, setState] = React.useState<AlertsPanelState>("idle")
-  const [isCreateOpen, setIsCreateOpen] = React.useState(false)
   const hasLoaded = React.useRef(false)
+  const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+
+  const symbol = searchParams.get("symbol")?.trim() || undefined
+  const timeframe = searchParams.get("timeframe")?.trim() || undefined
+
+  const handleCreateAlert = React.useCallback(() => {
+    const params = buildAlertPrefillSearchParams({
+      symbol,
+      timeframe,
+      type: "price-above",
+      condition: "Alert when price closes above the threshold.",
+    })
+    navigate({ pathname: "/alerts", search: `?${params.toString()}` })
+  }, [navigate, symbol, timeframe])
 
   React.useEffect(() => {
     if (!isExpanded || hasLoaded.current) return
@@ -143,13 +157,12 @@ const AlertsPanel = ({ isExpanded }: { isExpanded: boolean }) => {
       <div className="sf-chart-toolbar__alerts-header">
         <p className="sf-chart-panel-subtext">Create + manage triggers (WP-052).</p>
         <div className="sf-chart-toolbar__alerts-actions">
-          <Button size="sm" variant="primary" onClick={() => setIsCreateOpen(true)}>
+          <Button size="sm" variant="primary" onClick={handleCreateAlert}>
             Create alert
           </Button>
           <Link to="/alerts" className="btn btn-ghost btn-sm" aria-label="Open alerts manager">
             Open alerts
           </Link>
-          <AlertCreateDialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} triggerButton={false} />
         </div>
       </div>
 
