@@ -141,6 +141,200 @@
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--sf-border-1) 70%, transparent);
 }
 
+.appearance-section {
+  display: grid;
+  gap: var(--sf-space-5);
+}
+
+.appearance-theme {
+  display: grid;
+  gap: var(--sf-space-4);
+  align-items: start;
+}
+
+.appearance-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.appearance-kicker {
+  margin: 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--sf-text-3);
+}
+
+.appearance-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 750;
+  color: var(--sf-text-1);
+}
+
+.appearance-description {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--sf-text-2);
+}
+
+.appearance-theme-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--sf-space-3);
+  padding: var(--sf-space-3);
+  border: 1px solid var(--sf-border-1);
+  border-radius: var(--sf-radius-md);
+  background-color: var(--sf-bg-1);
+}
+
+.appearance-theme-button {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: var(--sf-space-3);
+  border: 1px solid var(--sf-border-1);
+  border-radius: var(--sf-radius-md);
+  background-color: var(--sf-bg-2);
+  color: var(--sf-text-1);
+  text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.appearance-theme-button[data-active='true'] {
+  border-color: color-mix(in srgb, var(--sf-primary) 45%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sf-primary) 35%, transparent);
+}
+
+.appearance-theme-button:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--sf-border-1) 70%, transparent);
+}
+
+.appearance-theme-label {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.appearance-theme-helper {
+  font-size: 0.9rem;
+  color: var(--sf-text-2);
+}
+
+.appearance-system-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--sf-text-3);
+}
+
+.appearance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--sf-space-3);
+}
+
+.appearance-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sf-space-3);
+  padding: var(--sf-space-3);
+  border: 1px solid var(--sf-border-1);
+  border-radius: var(--sf-radius-md);
+  background-color: var(--sf-bg-1);
+}
+
+.appearance-control__text {
+  display: grid;
+  gap: 4px;
+}
+
+.appearance-control__label {
+  font-weight: 700;
+  color: var(--sf-text-1);
+}
+
+.appearance-control__description {
+  color: var(--sf-text-2);
+  font-size: 0.95rem;
+}
+
+.appearance-select {
+  min-width: 140px;
+  padding: 10px 12px;
+  border-radius: var(--sf-radius-sm);
+  border: 1px solid var(--sf-border-1);
+  background-color: var(--sf-bg-2);
+  color: var(--sf-text-1);
+  font-weight: 600;
+}
+
+.appearance-cache-status {
+  margin: 0;
+  flex-basis: 100%;
+  font-size: 0.9rem;
+  color: var(--sf-text-3);
+}
+
+.usage-card {
+  display: grid;
+  gap: var(--sf-space-4);
+}
+
+.usage-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--sf-space-3);
+}
+
+.usage-stat {
+  padding: var(--sf-space-4);
+  border: 1px solid var(--sf-border-1);
+  border-radius: var(--sf-radius-md);
+  background-color: var(--sf-bg-1);
+  display: grid;
+  gap: 6px;
+}
+
+.usage-label {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--sf-text-2);
+}
+
+.usage-value {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--sf-text-1);
+  letter-spacing: -0.01em;
+}
+
+.usage-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sf-space-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sf-space-3);
+  border-radius: var(--sf-radius-md);
+  background-color: var(--sf-bg-1);
+  border: 1px dashed color-mix(in srgb, var(--sf-border-1) 90%, transparent);
+}
+
+.usage-reset {
+  margin: 0;
+  color: var(--sf-text-2);
+  font-size: 0.95rem;
+}
+
+.usage-date {
+  margin: 0;
+  color: var(--sf-text-3);
+  font-size: 0.9rem;
+}
+
 .settings-danger-title {
   display: flex;
   align-items: center;

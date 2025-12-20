@@ -30,6 +30,14 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-24)
+
+- **Token Usage (WP-092):** Settings now show a TokenUsageCard with daily tokens/API calls, a Berlin-midnight reset helper, and telemetry hook-ins for API events (`src/features/settings/token-usage.ts`, `src/features/settings/TokenUsageCard.tsx`, `src/state/telemetry.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`). Checklist-Link: `WP-Polish/WP-092/checklist.md`.
+
+## 📦 Neue Ergänzungen (2026-01-23)
+
+- **Appearance & General (WP-091):** Settings now include an Appearance card with dark/light/system selection tied to ThemeProvider, plus stubbed font size and guarded cache clear controls (`src/features/settings/AppearanceCard.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`). Checklist-Link: `WP-Polish/WP-091/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-22)
 
 - **Settings Foundation + PWA Update (WP-090):** `/settings` now renders the feature-level SettingsPage with tokenized SettingsCard primitives, refreshed header/actions, and a PWA Update card that checks for waiting service workers, applies skipWaiting updates, and surfaces status states (`src/features/settings/SettingsPage.tsx`, `src/features/settings/SettingsCard.tsx`, `src/features/settings/PwaUpdateCard.tsx`, `src/features/settings/pwa-update.ts`, `src/features/settings/settings.css`, `src/pages/SettingsPage.tsx`); Checklist-Link: `WP-Polish/WP-090/checklist.md`.
