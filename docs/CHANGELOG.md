@@ -6,6 +6,14 @@
 
 ---
 
+## 2026-01-18
+
+### Added
+- Documented WP-073 alert filter system delivery with checklist link `WP-Polish/WP-073/checklist.md`.
+
+### Updated
+- Alerts filtering now applies status/type/symbol search with debounced FiltersBar controls, a pure filtering helper, filtered empty state messaging, and unit coverage across `src/features/alerts/FiltersBar.tsx`, `src/features/alerts/filtering.ts`, `src/features/alerts/AlertsPage.tsx`, and `tests/components/alerts/AlertsFiltering.test.tsx`.
+
 ## 2026-01-17
 
 ### Added

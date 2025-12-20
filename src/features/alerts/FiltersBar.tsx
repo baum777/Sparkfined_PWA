@@ -1,27 +1,44 @@
 import React from "react";
+import type { AlertFilterState, AlertFilterStatus, AlertFilterType } from "@/features/alerts/filtering";
 
-const STATUS_OPTIONS = [
+const STATUS_OPTIONS: Array<{ value: AlertFilterStatus; label: string }> = [
   { value: "all", label: "All" },
   { value: "armed", label: "Armed" },
   { value: "paused", label: "Paused" },
   { value: "triggered", label: "Triggered" },
-] as const;
+];
 
-type StatusOption = (typeof STATUS_OPTIONS)[number]["value"];
-
-type TypeOption = "all" | "price-above" | "price-below" | "volatility";
-
-const TYPE_OPTIONS: Array<{ value: TypeOption; label: string }> = [
+const TYPE_OPTIONS: Array<{ value: AlertFilterType; label: string }> = [
   { value: "all", label: "All types" },
   { value: "price-above", label: "Price above" },
   { value: "price-below", label: "Price below" },
-  { value: "volatility", label: "Volatility spike" },
 ];
 
-export default function FiltersBar() {
-  const [status, setStatus] = React.useState<StatusOption>("all");
-  const [type, setType] = React.useState<TypeOption>("all");
-  const [symbolQuery, setSymbolQuery] = React.useState("");
+const DEBOUNCE_MS = 200;
+
+type FiltersBarProps = {
+  filters: AlertFilterState;
+  onChange: (next: AlertFilterState) => void;
+};
+
+export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
+  const [localQuery, setLocalQuery] = React.useState(filters.query);
+
+  React.useEffect(() => {
+    setLocalQuery(filters.query);
+  }, [filters.query]);
+
+  React.useEffect(() => {
+    const handle = window.setTimeout(() => {
+      if (localQuery !== filters.query) {
+        onChange({ ...filters, query: localQuery });
+      }
+    }, DEBOUNCE_MS);
+
+    return () => {
+      window.clearTimeout(handle);
+    };
+  }, [filters, localQuery, onChange]);
 
   return (
     <div className="sf-alerts-page__filters" role="region" aria-label="Alert filters">
@@ -33,8 +50,8 @@ export default function FiltersBar() {
               key={option.value}
               type="button"
               className="sf-alerts-filters__button sf-focus-ring"
-              aria-pressed={status === option.value}
-              onClick={() => setStatus(option.value)}
+              aria-pressed={filters.status === option.value}
+              onClick={() => onChange({ ...filters, status: option.value })}
             >
               {option.label}
             </button>
@@ -49,8 +66,8 @@ export default function FiltersBar() {
         <select
           id="alerts-type"
           className="sf-alerts-filters__select sf-focus-ring"
-          value={type}
-          onChange={(event) => setType(event.target.value as TypeOption)}
+          value={filters.type}
+          onChange={(event) => onChange({ ...filters, type: event.target.value as AlertFilterType })}
         >
           {TYPE_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -69,8 +86,9 @@ export default function FiltersBar() {
           className="sf-alerts-filters__input sf-focus-ring"
           type="search"
           placeholder="Search symbol"
-          value={symbolQuery}
-          onChange={(event) => setSymbolQuery(event.target.value)}
+          value={localQuery}
+          onChange={(event) => setLocalQuery(event.target.value)}
+          aria-label="Search by symbol"
         />
       </div>
     </div>

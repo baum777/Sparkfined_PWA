@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-18)
+
+- **Alerts Filter System (WP-073):** Alerts page now filters by status/type/symbol with a debounced search input, a pure filtering helper, and updated empty states (`src/features/alerts/FiltersBar.tsx`, `src/features/alerts/filtering.ts`, `src/features/alerts/AlertsPage.tsx`, `tests/components/alerts/AlertsFiltering.test.tsx`); Checklist-Link: `WP-Polish/WP-073/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-17)
 
 - **New Alert Sheet (WP-072):** Alerts page now opens a dedicated new alert sheet with symbol autocomplete, threshold/direction builder, inline validation, and mock-backed create support across `src/features/alerts/NewAlertSheet.tsx`, `src/features/alerts/SymbolAutocomplete.tsx`, `src/features/alerts/AlertsPage.tsx`, `src/api/alerts.ts`, and `src/features/alerts/alerts.css`; Checklist-Link: `WP-Polish/WP-072/checklist.md`.
