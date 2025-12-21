@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-01-23)
+
+- **Token Usage Governance (WP-092):** Europe/Berlin-reset token usage store with daily budgets, a TokenLock enforcement wrapper that returns demo output when locks are denied, and a Settings Token Usage card showing budgets, call counts, and reset time (`src/lib/usage/tokenUsage.ts`, `src/lib/ai/withTokenLockOrMock.ts`, `src/features/settings/TokenUsageCard.tsx`). Usage (tokens + apiCalls) is committed only after a successful TokenLock acquisition and real-call completion; demo results never increment counters. Checklist-Link: `WP-Polish/WP-092/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-22)
 
 - **Settings Foundation + PWA Update (WP-090):** `/settings` now renders the feature-level SettingsPage with tokenized SettingsCard primitives, refreshed header/actions, and a PWA Update card that checks for waiting service workers, applies skipWaiting updates, and surfaces status states (`src/features/settings/SettingsPage.tsx`, `src/features/settings/SettingsCard.tsx`, `src/features/settings/PwaUpdateCard.tsx`, `src/features/settings/pwa-update.ts`, `src/features/settings/settings.css`, `src/pages/SettingsPage.tsx`); Checklist-Link: `WP-Polish/WP-090/checklist.md`.

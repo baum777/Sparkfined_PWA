@@ -1,6 +1,7 @@
-import Button from '@/components/ui/Button'
+import { Button } from '@/components/ui'
 import { Collapsible } from '@/components/ui/Collapsible'
 import SettingsCard from './SettingsCard'
+import TokenUsageCard from './TokenUsageCard'
 import PwaUpdateCard from './PwaUpdateCard'
 import './settings.css'
 
@@ -46,6 +47,8 @@ export default function SettingsPage() {
       </header>
 
       <div className="settings-stack">
+        <TokenUsageCard />
+
         <SettingsCard
           title="Profile & preferences"
           subtitle="Configure trading workspace, alerts, and journal preferences."

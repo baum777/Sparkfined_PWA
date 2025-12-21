@@ -6,6 +6,15 @@
 
 ---
 
+## 2026-01-22
+
+### Added
+- Documented WP-092 Token Usage governance with a Europe/Berlin daily reset store, TokenLock wrapper, and Settings Token Usage card; checklist at `WP-Polish/WP-092/checklist.md`.
+
+### Updated
+- AI calls are now gated by `withTokenLockOrMock`, enforcing per-request output caps, daily budgets, and demo-mode fallbacks when a lock is denied. Usage (tokens + apiCalls) is committed **only after a successful TokenLock acquisition and real-call completion**; demo/mock paths never increment counters. Settings show token usage, call counts, budgets, and reset time, and documentation reflects the new governance model.
+- Verification: `pnpm typecheck`, `pnpm lint` (warnings pre-existing), `pnpm vitest run`, `pnpm build`, `pnpm check:size`; `pnpm test:e2e` failed because Playwright browsers are not installed in the container (`pnpm exec playwright install` needed).
+
 ## 2026-01-21
 
 ### Added
