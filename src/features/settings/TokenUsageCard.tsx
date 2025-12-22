@@ -1,21 +1,21 @@
 import React from 'react'
 import Button from '@/components/ui/Button'
 import SettingsCard from './SettingsCard'
-import { resetIfNewDay, type UsageSnapshot } from './token-usage'
+import { readUsage, resetUsageForToday, type UsageSnapshot } from './token-usage'
 
 function formatNumber(value: number) {
   return value.toLocaleString()
 }
 
 export default function TokenUsageCard() {
-  const [usage, setUsage] = React.useState<UsageSnapshot>(() => resetIfNewDay())
+  const [usage, setUsage] = React.useState<UsageSnapshot>(() => readUsage())
 
   React.useEffect(() => {
-    setUsage(resetIfNewDay())
+    setUsage(readUsage())
   }, [])
 
   const handleManualReset = () => {
-    const snapshot = resetIfNewDay()
+    const snapshot = resetUsageForToday()
     setUsage(snapshot)
   }
 

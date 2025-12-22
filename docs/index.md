@@ -32,7 +32,7 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ## 📦 Neue Ergänzungen (2026-01-24)
 
-- **Token Usage (WP-092):** Settings now show a TokenUsageCard with daily tokens/API calls, a Berlin-midnight reset helper, and telemetry hook-ins for API events (`src/features/settings/token-usage.ts`, `src/features/settings/TokenUsageCard.tsx`, `src/state/telemetry.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`). Checklist-Link: `WP-Polish/WP-092/checklist.md`.
+- **Token Usage (WP-092):** Settings now show a TokenUsageCard with daily tokens/API calls, a Berlin-midnight reset helper, and lock-guarded counters that commit only after real TokenLock calls (`src/features/settings/token-usage.ts`, `src/lib/ai/withTokenLockOrMock.ts`, `src/lib/aiClient.ts`, `src/features/settings/TokenUsageCard.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`); telemetry no longer increments usage. Checklist-Link: `WP-Polish/WP-092/checklist.md`.
 
 ## 📦 Neue Ergänzungen (2026-01-23)
 

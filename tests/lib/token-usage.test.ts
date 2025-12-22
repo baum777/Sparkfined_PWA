@@ -1,10 +1,10 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
 import {
   getBerlinDateKey,
-  incrementApiCalls,
-  incrementTokens,
-  loadUsage,
-  resetIfNewDay,
+  commitUsageAfterRealCall,
+  maybeResetUsage,
+  readUsage,
+  resetUsageForToday,
   type UsageSnapshot,
 } from '@/features/settings/token-usage'
 
@@ -61,25 +61,32 @@ describe('token-usage helper', () => {
     setSnapshot({ dateKey: '2024-04-30', tokens: 120, apiCalls: 8 })
 
     vi.setSystemTime(new Date('2024-05-01T06:00:00Z'))
-    const snapshot = resetIfNewDay()
+    const snapshot = maybeResetUsage()
 
     expect(snapshot.dateKey).toBe('2024-05-01')
     expect(snapshot.tokens).toBe(0)
     expect(snapshot.apiCalls).toBe(0)
-    expect(loadUsage()).toEqual(snapshot)
+    expect(readUsage()).toEqual(snapshot)
   })
 
-  it('increments tokens and api calls on the current day', () => {
-    const first = incrementApiCalls()
+  it('commits usage only when a real call completes', () => {
+    const first = commitUsageAfterRealCall({ tokensUsed: 250, apiCallsDelta: 1 })
+    expect(first.tokens).toBe(250)
     expect(first.apiCalls).toBe(1)
-    expect(first.tokens).toBe(0)
 
-    const second = incrementTokens(250)
-    expect(second.tokens).toBe(250)
-    expect(second.apiCalls).toBe(1)
+    const second = commitUsageAfterRealCall({ tokensUsed: 0, apiCallsDelta: 0 })
+    expect(second).toEqual(first)
 
-    const third = incrementApiCalls(2)
+    const third = commitUsageAfterRealCall({ tokensUsed: 50, apiCallsDelta: 2 })
+    expect(third.tokens).toBe(300)
     expect(third.apiCalls).toBe(3)
-    expect(third.tokens).toBe(250)
+  })
+
+  it('forces a same-day reset when requested', () => {
+    commitUsageAfterRealCall({ tokensUsed: 75, apiCallsDelta: 1 })
+
+    const snapshot = resetUsageForToday()
+    expect(snapshot.tokens).toBe(0)
+    expect(snapshot.apiCalls).toBe(0)
   })
 })

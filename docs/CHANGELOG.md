@@ -22,7 +22,7 @@
 - Documented WP-092 token usage counters with checklist link `WP-Polish/WP-092/checklist.md`.
 
 ### Updated
-- Settings now surface a TokenUsageCard showing daily tokens/API calls with Berlin-midnight resets, backed by a local token-usage helper and telemetry hook-in (`src/features/settings/TokenUsageCard.tsx`, `src/features/settings/token-usage.ts`, `src/state/telemetry.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`).
+- Settings now surface a TokenUsageCard showing daily tokens/API calls with Berlin-midnight resets, backed by a lock-guarded usage helper that only commits after real calls (`src/features/settings/token-usage.ts`, `src/lib/ai/withTokenLockOrMock.ts`, `src/lib/aiClient.ts`, `src/features/settings/TokenUsageCard.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`); telemetry no longer mutates the counters.
 
 ---
 
