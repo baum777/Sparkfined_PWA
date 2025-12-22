@@ -22,7 +22,7 @@
 - Documented WP-092 token usage counters with checklist link `WP-Polish/WP-092/checklist.md`.
 
 ### Updated
-- Settings now surface a TokenUsageCard showing daily tokens/API calls with Berlin-midnight resets, backed by a lock-guarded usage helper that only commits after real calls (`src/features/settings/token-usage.ts`, `src/lib/ai/withTokenLockOrMock.ts`, `src/lib/aiClient.ts`, `src/features/settings/TokenUsageCard.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`); telemetry no longer mutates the counters.
+- Settings now surface a TokenUsageCard showing daily tokens/API calls with Berlin-midnight resets, 80/95% budget warnings, and a per-request output cap note. Counters are governed by `withTokenLockOrMock` as the single source of truth and commit only after successful TokenLock + real calls (demo paths never increment; telemetry is read-only) across `src/features/settings/token-usage.ts`, `src/lib/ai/withTokenLockOrMock.ts`, `src/lib/aiClient.ts`, `src/features/settings/TokenUsageCard.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`. E2E remains blocked locally until Playwright browsers are installed (`pnpm exec playwright install chromium`).
 
 ---
 

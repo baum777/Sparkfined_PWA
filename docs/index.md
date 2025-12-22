@@ -32,7 +32,7 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ## 📦 Neue Ergänzungen (2026-01-24)
 
-- **Token Usage (WP-092):** Settings now show a TokenUsageCard with daily tokens/API calls, a Berlin-midnight reset helper, and lock-guarded counters that commit only after real TokenLock calls (`src/features/settings/token-usage.ts`, `src/lib/ai/withTokenLockOrMock.ts`, `src/lib/aiClient.ts`, `src/features/settings/TokenUsageCard.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`); telemetry no longer increments usage. Checklist-Link: `WP-Polish/WP-092/checklist.md`.
+- **Token Usage (WP-092):** Settings now show a TokenUsageCard with daily tokens/API calls, Berlin-midnight resets, 80/95% budget warnings, and a per-request output cap note. Counters are governed by `withTokenLockOrMock` as the single source of truth and commit only after successful TokenLock + real calls (demo paths never increment; telemetry is read-only) across `src/features/settings/token-usage.ts`, `src/lib/ai/withTokenLockOrMock.ts`, `src/lib/aiClient.ts`, `src/features/settings/TokenUsageCard.tsx`, `src/features/settings/SettingsPage.tsx`, `src/features/settings/settings.css`. Checklist-Link: `WP-Polish/WP-092/checklist.md`. E2E remains blocked locally until Playwright browsers are installed (`pnpm exec playwright install chromium`).
 
 ## 📦 Neue Ergänzungen (2026-01-23)
 
