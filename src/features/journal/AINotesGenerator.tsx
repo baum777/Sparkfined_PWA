@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Textarea } from '@/components/ui'
+import { generateJournalNotes } from '@/lib/ai/journalNotes'
 
 interface AINotesGeneratorProps {
   tags: string[]
@@ -8,22 +9,16 @@ interface AINotesGeneratorProps {
   onChange: (nextNotes: string) => void
 }
 
-function deterministicNotes(thesis: string, tags: string[]): string {
-  const normalizedTags = tags.length ? tags.join(', ') : 'no tags captured'
-  const thesisExcerpt = thesis.trim().length ? thesis.trim().slice(0, 160) : 'No thesis text provided.'
+type GenerationMode = 'idle' | 'real' | 'demo'
 
-  return [
-    'AI Notes (mocked)',
-    `Tags observed: ${normalizedTags}.`,
-    `Thesis summary: ${thesisExcerpt}${thesis.length > 160 ? '…' : ''}`,
-    'Next steps: validate risk, confirm invalidate criteria, and journal outcome after execution.',
-  ].join('\n')
-}
+const DEMO_NOTE = 'Example/Demo result (no API call counted)'
 
 export function AINotesGenerator({ tags, thesis, value, onChange }: AINotesGeneratorProps) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notes, setNotes] = useState(value ?? '')
+  const [mode, setMode] = useState<GenerationMode>('idle')
+  const [bannerNote, setBannerNote] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     setNotes(value ?? '')
@@ -32,16 +27,18 @@ export function AINotesGenerator({ tags, thesis, value, onChange }: AINotesGener
   const handleGenerate = async () => {
     setIsGenerating(true)
     setError(null)
+    setBannerNote(undefined)
 
     try {
       if (!thesis.trim()) {
         throw new Error('Enter thesis text before generating AI notes.')
       }
 
-      const generated = deterministicNotes(thesis, tags)
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      setNotes(generated)
-      onChange(generated)
+      const { result, mode: resultMode, note } = await generateJournalNotes({ thesis, tags })
+      setNotes(result)
+      setMode(resultMode)
+      setBannerNote(resultMode === 'demo' ? note ?? DEMO_NOTE : undefined)
+      onChange(result)
     } catch (generationError) {
       console.error('AI notes generation failed', generationError)
       setError('AI notes generator is offline; showing deterministic mock. Please retry after updating thesis.')
@@ -54,13 +51,23 @@ export function AINotesGenerator({ tags, thesis, value, onChange }: AINotesGener
     <div className="sf-journal-thesis-ai" data-testid="journal-ai-generator">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-text-primary">AI notes (mock)</p>
-          <p className="text-xs text-text-tertiary">Local deterministic output; no external requests are made.</p>
+          <p className="text-sm font-medium text-text-primary">{mode === 'demo' ? 'AI notes (demo)' : 'AI notes'}</p>
+          <p className="text-xs text-text-tertiary">
+            {bannerNote && mode === 'demo'
+              ? bannerNote
+              : 'Generates a concise summary of your thesis and tags.'}
+          </p>
         </div>
         <Button type="button" variant="secondary" size="sm" loading={isGenerating} onClick={handleGenerate}>
           {isGenerating ? 'Generating…' : 'Generate AI notes'}
         </Button>
       </div>
+
+      {mode === 'demo' && bannerNote ? (
+        <div className="mt-2 rounded border border-warning-500 bg-warning-900/30 px-3 py-2 text-xs text-warning-100">
+          {bannerNote}
+        </div>
+      ) : null}
 
       {error ? (
         <div className="sf-journal-thesis-ai__error" role="alert">
