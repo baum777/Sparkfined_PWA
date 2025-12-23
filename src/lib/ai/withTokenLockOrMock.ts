@@ -39,6 +39,7 @@ export type TokenLockResult<T> = {
   result: T
   usageSnapshot?: UsageSnapshot
   reason?: DemoContext['reason']
+  note?: string
 }
 
 const clampMaxTokens = (requested: number | undefined, cap: number) => {
@@ -67,7 +68,7 @@ export async function withTokenLockOrMock<T>({
   if (remainingCalls <= 0 || plannedTokens > remainingTokens) {
     const reason: DemoContext['reason'] = remainingCalls <= 0 ? 'api-call-budget-exceeded' : 'token-budget-exceeded'
     const result = await doDemoCall({ reason, remainingTokens, usage })
-    return { mode: 'demo', result, reason }
+    return { mode: 'demo', result, reason, usageSnapshot: usage, note: 'Example/Demo result (no API call counted)' }
   }
 
   const real = await doRealCall({ maxOutputTokens: cappedMaxTokens, usage })
