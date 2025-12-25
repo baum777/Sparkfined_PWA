@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-02-10)
+
+- **Appearance Settings (WP-091):** SettingsPage besitzt jetzt eine AppearanceCard mit System/Dark/Light-Auswahl, persistiert über das bestehende Settings/Theme-Store-Setup, inklusive Vorschau und tokenisiertem Styling. Checklist-Link: `WP-Polish/WP-091/checklist.md`.
+
 ## 📦 Neue Ergänzungen (2026-01-23)
 
 - **Token Usage Governance (WP-092):** Europe/Berlin-reset token usage store with daily budgets, a TokenLock enforcement wrapper that returns demo output when locks are denied, and a Settings Token Usage card showing budgets, call counts, and reset time (`src/lib/usage/tokenUsage.ts`, `src/lib/ai/withTokenLockOrMock.ts`, `src/features/settings/TokenUsageCard.tsx`). Usage (tokens + apiCalls) is committed only after a successful TokenLock acquisition and real-call completion; demo results never increment counters. Checklist-Link: `WP-Polish/WP-092/checklist.md`.

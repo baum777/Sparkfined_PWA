@@ -2,9 +2,19 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2026-02-05
+**Last Updated:** 2026-02-10
 
 ---
+
+## 2026-02-10
+
+### Added
+- Dokumentiert WP-091 Appearance Settings mit AppearanceCard, Theme-Persistenz-Helpern und Checklist-Link `WP-Polish/WP-091/checklist.md`.
+
+### Updated
+- SettingsPage enthält jetzt eine AppearanceCard mit System/Dark/Light-Auswahl, persistenter Speicherung über das bestehende Setting-/Theme-Store-Setup, Vorschauflächen auf WP-002-Tokens und getrennter Theme-Helfer (`src/lib/theme/theme.ts`).
+- Theme-Helfer sind mit Unit-Tests zur Auflösung, DOM-Anwendung und Persistenz hinterlegt.
+- Verification: `pnpm typecheck`, `pnpm lint` (bestehende Warnungen), `pnpm test -- --reporter=basic`; `pnpm test:e2e` scheitert, weil Playwright-Browser im Container fehlen (`pnpm exec playwright install`).
 
 ## 2026-02-05
 
