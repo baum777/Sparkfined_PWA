@@ -8,13 +8,17 @@ import DataImportCard from '@/features/settings/DataImportCard'
 describe('DataExportCard', () => {
   beforeEach(() => {
     if (!('createObjectURL' in URL)) {
-      // @ts-expect-error jsdom augmentation for tests
-      URL.createObjectURL = vi.fn()
+      Object.defineProperty(URL, 'createObjectURL', {
+        writable: true,
+        value: vi.fn(() => 'blob:mock'),
+      })
     }
 
     if (!('revokeObjectURL' in URL)) {
-      // @ts-expect-error jsdom augmentation for tests
-      URL.revokeObjectURL = vi.fn()
+      Object.defineProperty(URL, 'revokeObjectURL', {
+        writable: true,
+        value: vi.fn(),
+      })
     }
 
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:mock')
@@ -46,9 +50,7 @@ describe('DataImportCard', () => {
     const input = screen.getByTestId('import-input')
     const file = new File([JSON.stringify({ summary: {}, payload: {} })], 'backup.json', {
       type: 'application/json',
-    })
-    // jsdom's File polyfill is missing `.text()`
-    // @ts-expect-error augmentation for test
+    }) as File & { text: () => Promise<string> }
     file.text = async () => JSON.stringify({ summary: {}, payload: {} })
 
     await user.upload(input, file)
@@ -63,8 +65,9 @@ describe('DataImportCard', () => {
     render(<DataImportCard />)
 
     const input = screen.getByTestId('import-input')
-    const file = new File([JSON.stringify({ invalid: true })], 'broken.json', { type: 'application/json' })
-    // @ts-expect-error augmentation for test
+    const file = new File([JSON.stringify({ invalid: true })], 'broken.json', {
+      type: 'application/json',
+    }) as File & { text: () => Promise<string> }
     file.text = async () => JSON.stringify({ invalid: true })
 
     await user.upload(input, file)
