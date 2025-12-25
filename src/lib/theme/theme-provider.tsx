@@ -1,7 +1,12 @@
+export { ThemeContext, ThemeProvider } from '@/features/theme/ThemeContext'
 export {
-  ThemeContext,
-  ThemeProvider,
+  applyThemeAttributes,
+  isThemeMode,
+  persistThemePreference,
+  readStoredTheme,
+  resolveTheme,
   THEME_STORAGE_KEY,
-} from '@/features/theme/ThemeContext'
+} from './theme'
 
-export type { ThemeContextValue, ThemeMode, ResolvedTheme } from '@/features/theme/ThemeContext'
+export type { ThemeContextValue, ThemeMode } from '@/features/theme/ThemeContext'
+export type { ResolvedTheme } from './theme'

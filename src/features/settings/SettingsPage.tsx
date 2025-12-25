@@ -3,6 +3,7 @@ import { Collapsible } from '@/components/ui/Collapsible'
 import SettingsCard from './SettingsCard'
 import TokenUsageCard from './TokenUsageCard'
 import PwaUpdateCard from './PwaUpdateCard'
+import AppearanceCard from './AppearanceCard'
 import './settings.css'
 
 type PillItem = {
@@ -94,6 +95,10 @@ export default function SettingsPage() {
         </div>
 
         <div role="listitem">
+          <AppearanceCard />
+        </div>
+
+        <div role="listitem">
           <SettingsCard
             title="Workspace & preferences"
             subtitle="Organize how Sparkfined behaves across devices."
@@ -103,7 +108,6 @@ export default function SettingsPage() {
               items={[
                 { title: 'Workspace layouts', description: 'Dashboard, chart shell, and journal defaults.' },
                 { title: 'Alerts & notifications', description: 'Thresholds, quiet hours, and device routing.' },
-                { title: 'Appearance & theme', description: 'Theme toggles and typography scale presets.' },
               ]}
             />
           </SettingsCard>

@@ -28,6 +28,8 @@ export { default as Share2 } from 'lucide-react/dist/esm/icons/share-2';
 export { default as Copy } from 'lucide-react/dist/esm/icons/copy';
 export { default as Edit3 } from 'lucide-react/dist/esm/icons/edit-3';
 export { default as Trash2 } from 'lucide-react/dist/esm/icons/trash-2';
+export { default as SunMoon } from 'lucide-react/dist/esm/icons/sun-moon';
+export { default as Laptop2 } from 'lucide-react/dist/esm/icons/laptop-2';
 export { default as Save } from 'lucide-react/dist/esm/icons/save';
 
 // States
