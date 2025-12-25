@@ -1,11 +1,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { NAV_ITEMS, isNavItemActive } from "@/config/navigation";
+import { NAV_ITEMS, SETTINGS_NAV_ITEM, isNavItemActive } from "@/config/navigation";
 import { cn } from "@/lib/ui/cn";
 import "./bottom-nav.css";
 
 export default function BottomNavBar() {
   const { pathname } = useLocation();
+  const navItems = [...NAV_ITEMS, SETTINGS_NAV_ITEM];
 
   return (
     <nav
@@ -15,8 +16,8 @@ export default function BottomNavBar() {
       aria-label="Main navigation"
     >
       <div className="mx-auto max-w-7xl px-3 py-1.5">
-        <div className="grid grid-cols-5 gap-1.5">
-          {NAV_ITEMS.map((item) => {
+        <div className="grid grid-cols-6 gap-1.5">
+          {navItems.map((item) => {
             const { path, label, Icon, testId, tourId } = item;
             const isActive = isNavItemActive(pathname, item);
 

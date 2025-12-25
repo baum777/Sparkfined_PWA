@@ -1,13 +1,13 @@
 export type UpdateStatus = 'idle' | 'checking' | 'available' | 'updating' | 'updated' | 'error'
 
-interface UpdateCapability {
+export interface UpdateCapability {
   supported: boolean
   registration: ServiceWorkerRegistration | null
   waiting: boolean
   reason?: string
 }
 
-interface UpdateCheckResult {
+export interface UpdateCheckResult {
   registration: ServiceWorkerRegistration
   waiting: boolean
 }
@@ -92,7 +92,6 @@ export async function checkForUpdate(): Promise<UpdateCheckResult> {
   }
 
   await registration.update()
-
   const waiting = registration.waiting ? true : await waitForWaitingState(registration)
   return { registration, waiting }
 }
