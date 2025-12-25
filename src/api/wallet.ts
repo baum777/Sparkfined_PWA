@@ -1,4 +1,5 @@
 import { config } from "@/lib/config";
+import { normalizeSolanaAddress, validateSolanaAddress } from "@/lib/validation/address";
 
 export interface HoldingDTO {
   symbol: string;
@@ -99,4 +100,31 @@ export async function getHoldings(walletAddress?: string): Promise<HoldingDTO[]>
   }
 
   return MOCK_HOLDINGS.map((holding) => ({ ...holding }));
+}
+
+export interface WalletMonitoringStatus {
+  address: string;
+  enabled: boolean;
+  lastHeartbeat: number | null;
+  nextCheckSeconds: number;
+}
+
+export async function getWalletMonitoringStatus(address?: string): Promise<WalletMonitoringStatus> {
+  const normalized = normalizeSolanaAddress(address ?? "");
+
+  if (!normalized || !validateSolanaAddress(normalized)) {
+    return {
+      address: "",
+      enabled: false,
+      lastHeartbeat: null,
+      nextCheckSeconds: 0,
+    };
+  }
+
+  return {
+    address: normalized,
+    enabled: true,
+    lastHeartbeat: Date.now() - 45_000,
+    nextCheckSeconds: 90,
+  };
 }

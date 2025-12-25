@@ -1,9 +1,13 @@
 import { Button } from '@/components/ui'
-import { Collapsible } from '@/components/ui/Collapsible'
 import SettingsCard from './SettingsCard'
 import TokenUsageCard from './TokenUsageCard'
 import PwaUpdateCard from './PwaUpdateCard'
 import AppearanceCard from './AppearanceCard'
+import WalletMonitoringCard from './WalletMonitoringCard'
+import DataExportCard from './DataExportCard'
+import DataImportCard from './DataImportCard'
+import PreferencesCard from './PreferencesCard'
+import DangerZoneAccordion from './DangerZoneAccordion'
 import './settings.css'
 
 type PillItem = {
@@ -95,7 +99,15 @@ export default function SettingsPage() {
         </div>
 
         <div role="listitem">
+          <WalletMonitoringCard />
+        </div>
+
+        <div role="listitem">
           <AppearanceCard />
+        </div>
+
+        <div role="listitem">
+          <PreferencesCard />
         </div>
 
         <div role="listitem">
@@ -114,22 +126,11 @@ export default function SettingsPage() {
         </div>
 
         <div role="listitem">
-          <SettingsCard
-            title="Data safety & backups"
-            subtitle="Back up exports, recovery codes, and cache controls."
-            actions={<Button size="sm">Export snapshot</Button>}
-          >
-            <PlaceholderList
-              items={[
-                { title: 'Backup destinations', description: 'Local export and cloud sync connectors.', badge: 'Soon' },
-                { title: 'Recovery codes', description: 'Generate and verify recovery kits for journal data.' },
-                {
-                  title: 'Cache controls',
-                  description: 'Clear offline cache, revoke device sessions, or force data refresh.',
-                },
-              ]}
-            />
-          </SettingsCard>
+          <DataExportCard />
+        </div>
+
+        <div role="listitem">
+          <DataImportCard />
         </div>
 
         <div role="listitem">
@@ -137,26 +138,7 @@ export default function SettingsPage() {
         </div>
 
         <div role="listitem">
-          <SettingsCard
-            title="Danger Zone"
-            subtitle="Factory reset, cache clears, and destructive controls are grouped here."
-          >
-            <Collapsible
-              title={
-                <div className="settings-danger-title">
-                  <span>Destructive actions</span>
-                  <span className="settings-danger-pill">Locked</span>
-                </div>
-              }
-              defaultOpen={false}
-              variant="card"
-              className="settings-danger"
-            >
-              <p className="settings-danger-copy">
-                Accordion behavior ships in WP-096. This placeholder reserves layout space for destructive controls.
-              </p>
-            </Collapsible>
-          </SettingsCard>
+          <DangerZoneAccordion />
         </div>
       </div>
     </div>

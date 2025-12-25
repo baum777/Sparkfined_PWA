@@ -19,6 +19,7 @@ describe('withTokenLockOrMock', () => {
 
   it('returns demo mode without incrementing usage when lock is denied', async () => {
     recordApiCall({ tokensUsed: 95, now: NOW });
+    const before = readUsage(NOW);
 
     const response = await withTokenLockOrMock<string>({
       kind: 'demo-path',
@@ -34,8 +35,8 @@ describe('withTokenLockOrMock', () => {
     expect(response.note).toContain('Example/Demo');
 
     const usage = readUsage(NOW);
-    expect(usage.tokensUsedToday).toBe(95);
-    expect(usage.apiCallsToday).toBe(1);
+    expect(usage.tokensUsedToday).toBe(before.tokensUsedToday);
+    expect(usage.apiCallsToday).toBe(before.apiCallsToday);
   });
 
   it('does not increment usage when starting in demo mode with empty counters', async () => {
@@ -78,6 +79,21 @@ describe('withTokenLockOrMock', () => {
 
     const usage = readUsage(NOW);
     expect(usage.tokensUsedToday).toBe(12);
+    expect(usage.apiCallsToday).toBe(1);
+  });
+
+  it('falls back to reserved tokens when the real call does not return usage', async () => {
+    await withTokenLockOrMock<string>({
+      kind: 'real-reserved',
+      estimatedTokens: 15,
+      maxOutputTokens: 40,
+      doRealCall: vi.fn().mockResolvedValue({ result: 'real-output' }),
+      mockResult: () => 'demo-output',
+      now: NOW,
+    });
+
+    const usage = readUsage(NOW);
+    expect(usage.tokensUsedToday).toBe(15);
     expect(usage.apiCallsToday).toBe(1);
   });
 
