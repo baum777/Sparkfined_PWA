@@ -1,33 +1,30 @@
-# WP-092 Checklist — Token Usage + TokenLock + Limits
+# WP-092 Checklist — Token Usage + TokenLock Governance
 
 ## Steps
-- [x] Add checklist and documentation placeholders
-- [x] Implement token usage store with Europe/Berlin daily reset
-- [x] Add TokenLock enforcement wrapper and tests
-- [x] Gate AI actions behind TokenLock with demo-mode UX
-- [x] Add Settings token usage card and limits display
-- [x] Finalize docs and verification outputs
+- [x] Align checklist with governance hard rules and daily reset contract
+- [x] Harden TokenLock wrapper + tests so usage commits only on real calls after lock
+- [x] Finalize Token Usage card (budgets, caps, warnings, reset messaging)
+- [x] Update docs and record verification outcomes
 
 ## Acceptance Criteria
 - [x] Real API calls execute only after acquiring a TokenLock
-- [x] apiCallsToday increments only after a successful lock and call
-- [x] Without TokenLock, actions return demo/mock output without incrementing usage
-- [x] Demo/mock paths never commit usage (covered by unit tests)
-- [x] Daily reset occurs at 00:00 Europe/Berlin based on local day key
-- [x] Per-request output token cap is enforced by clamping
-- [x] Daily budgets block lock acquisition when exceeded; warning thresholds surface at 80% and 95%
-- [x] Warning thresholds fixed at 80% and 95%; demo note is consistent
-- [x] Settings show token usage card; no provider/model override UI exposed
-- [x] Documentation updated for WP-092
+- [x] Usage (tokens + apiCalls) increments **once** after a successful lock + real call completion; failures do not commit
+- [x] Demo/mock paths (including lock denials) return "Example/Demo result (no API call counted)" and never change usage
+- [x] Daily budgets include token + optional API-call caps; warning thresholds fixed at 80% and 95%
+- [x] Per-request output token cap is clamped/enforced for real calls
+- [x] Daily reset occurs at 00:00 Europe/Berlin with reset messaging in UI
+- [x] Settings Token Usage card shows totals, budgets, cap detail, and 80%/95% banners; no provider/model/cost UI is visible
+- [x] Governance hard rules upheld (telemetry and demo paths do not mutate usage; only `withTokenLockOrMock` commits usage)
+- [x] Documentation updated with hard rule reminder and E2E install note
 
 ## Verification
-- [x] pnpm typecheck
-- [x] pnpm lint
-- [x] pnpm vitest run
-- [x] pnpm build
-- [x] pnpm check:size
-- [ ] pnpm test:e2e *(only if Playwright available; otherwise mark BLOCKED with reason)*
+- [ ] pnpm typecheck
+- [ ] pnpm lint
+- [ ] pnpm vitest run
+- [ ] pnpm build
+- [ ] pnpm check:size
+- [ ] pnpm test:e2e *(run if possible; otherwise mark BLOCKED with reason and include `pnpm exec playwright install chromium`)*
 
 ## E2E Status
 - [ ] Playwright available → tests executed
-- [x] BLOCKED → Playwright browsers missing in container (`pnpm exec playwright install` required)
+- [ ] BLOCKED → Playwright browsers missing in container (`pnpm exec playwright install chromium` required)

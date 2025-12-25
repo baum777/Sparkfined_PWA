@@ -34,9 +34,14 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 - **Appearance Settings (WP-091):** SettingsPage besitzt jetzt eine AppearanceCard mit System/Dark/Light-Auswahl, persistiert über das bestehende Settings/Theme-Store-Setup, inklusive Vorschau und tokenisiertem Styling. Checklist-Link: `WP-Polish/WP-091/checklist.md`.
 
-## 📦 Neue Ergänzungen (2026-01-23)
+## 📦 Neue Ergänzungen (2026-02-11)
 
-- **Token Usage Governance (WP-092):** Europe/Berlin-reset token usage store with daily budgets, a TokenLock enforcement wrapper that returns demo output when locks are denied, and a Settings Token Usage card showing budgets, call counts, and reset time (`src/lib/usage/tokenUsage.ts`, `src/lib/ai/withTokenLockOrMock.ts`, `src/features/settings/TokenUsageCard.tsx`). Usage (tokens + apiCalls) is committed only after a successful TokenLock acquisition and real-call completion; demo results never increment counters. Checklist-Link: `WP-Polish/WP-092/checklist.md`.
+- **Token Usage Governance (WP-092):** Daily Europe/Berlin resets with token + optional API-call budgets, fixed 80%/95% warning thresholds, and a per-request output cap surfaced in Settings (`src/lib/usage/tokenUsage.ts`, `src/lib/ai/withTokenLockOrMock.ts`, `src/features/settings/TokenUsageCard.tsx`). Token usage and apiCalls commit **only** after a successful TokenLock acquisition and real-call completion; lock denials return "Example/Demo" output without touching counters. Checklist-Link: `WP-Polish/WP-092/checklist.md`.
+- **Wallet Monitoring (WP-093):** Settings now include a WalletMonitoringCard with address input + copy control, enable/disable toggle, mock heartbeat summary, and persisted preferences in `src/store/userSettings.ts`; monitoring status is stubbed via `getWalletMonitoringStatus` in `src/api/wallet.ts`, with RTL + store coverage. Checklist-Link: `WP-Polish/WP-093/checklist.md`.
+- **Data Export & Import (WP-094):** Adds DataExportCard and DataImportCard to Settings with JSON/Markdown/backup stubs, local download helpers, and client-side validation for Sparkfined backup files; includes RTL coverage for export/import flows. Checklist-Link: `WP-Polish/WP-094/checklist.md`.
+- **Chart & App Preferences (WP-095):** PreferencesCard adds chart style radio options and app-level toggles (confirmations, watchlist sync) persisted via `src/store/userSettings.ts`, with RTL + store coverage. Checklist-Link: `WP-Polish/WP-095/checklist.md`.
+- **Danger Zone (WP-096):** New DangerZoneAccordion keeps destructive controls collapsed by default, requires a two-step confirmation, and surfaces mocked status messaging (`src/features/settings/DangerZoneAccordion.tsx`). Checklist-Link: `WP-Polish/WP-096/checklist.md`.
+- **Mobile Settings (WP-097):** Responsive tuning for Settings (single-column stacks on mobile, expanded touch targets ≥44px) plus a mobile layout sanity test. Checklist-Link: `WP-Polish/WP-097/checklist.md`.
 
 ## 📦 Neue Ergänzungen (2026-02-05)
 

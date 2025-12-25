@@ -2,9 +2,22 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2026-02-10
+**Last Updated:** 2026-02-11
 
 ---
+
+## 2026-02-11
+
+### Added
+- Documented WP-093 Wallet Monitoring card with copy-to-clipboard control, enable/disable toggle, mock heartbeat summary, and persisted settings in `src/store/userSettings.ts` plus helper in `src/api/wallet.ts`. Includes RTL + store coverage; checklist at `WP-Polish/WP-093/checklist.md`.
+- Documented WP-094 data export/import cards with JSON/Markdown/backup stubs, client-side validation messaging, and component tests; checklist at `WP-Polish/WP-094/checklist.md`.
+- Documented WP-095 chart/app preferences with persisted chart style + confirmation/watchlist toggles and RTL/store coverage; checklist at `WP-Polish/WP-095/checklist.md`.
+- Documented WP-096 Danger Zone accordion with collapsed default, two-step confirmations, and mock-only destructive controls; checklist at `WP-Polish/WP-096/checklist.md`.
+- Documented WP-097 mobile settings responsiveness (single-column stacking, larger touch targets) with a mobile layout smoke test; checklist at `WP-Polish/WP-097/checklist.md`.
+
+### Updated
+- Refreshed WP-092 documentation to highlight Europe/Berlin daily resets, fixed 80%/95% warning thresholds, optional API-call budgets, and the enforced per-request output cap surfaced in Settings. Governance note reiterates that usage counters (tokens + apiCalls) commit only after successful TokenLock acquisition and real-call completion, while lock denials return demo output without mutations.
+- Verification: pending for this batch; run `pnpm typecheck`, `pnpm lint`, `pnpm vitest run`, `pnpm build`, `pnpm check:size`; E2E blocked unless Playwright browsers are installed (`pnpm exec playwright install chromium`).
 
 ## 2026-02-10
 

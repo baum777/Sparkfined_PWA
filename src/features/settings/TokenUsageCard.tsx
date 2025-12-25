@@ -11,10 +11,10 @@ function UsageMeter({
 }: {
   label: string
   value: number
-  total: number
+  total?: number | null
   status: 'normal' | 'warning' | 'critical'
 }) {
-  const ratio = total > 0 ? Math.min(1, value / total) : 0
+  const ratio = total && total > 0 ? Math.min(1, value / total) : 0
   const barColor =
     status === 'critical'
       ? 'var(--sf-danger)'
@@ -22,12 +22,14 @@ function UsageMeter({
         ? 'var(--sf-warning)'
         : 'var(--sf-primary)'
 
+  const totalLabel = total && total > 0 ? total.toLocaleString() : '—'
+
   return (
     <div className="settings-usage-stat">
       <div className="settings-usage-label">{label}</div>
       <div className="settings-usage-value">
         <span>{value.toLocaleString()}</span>
-        <span className="settings-usage-total">/ {total > 0 ? total.toLocaleString() : '—'}</span>
+        <span className="settings-usage-total">/ {totalLabel}</span>
       </div>
       <div className="settings-usage-meter" aria-label={`${label} usage`}>
         <div
@@ -55,6 +57,19 @@ export default function TokenUsageCard() {
   const [usage, setUsage] = useState<TokenUsageState>(() => readUsage())
   const [budgets, setBudgetsState] = useState<TokenBudgets>(() => getBudgets())
 
+  const callBudget = budgets.dailyApiCallBudget ?? null
+  const lastResetLabel = useMemo(() => {
+    const lastResetDate = new Date(usage.lastResetAt)
+    return new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Berlin',
+      hour: '2-digit',
+      minute: '2-digit',
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(lastResetDate)
+  }, [usage.lastResetAt])
+
   const tokenWarnLevels = useMemo(
     () => ({ warn80: budgets.warn80, warn95: budgets.warn95 }),
     [budgets.warn80, budgets.warn95],
@@ -67,6 +82,16 @@ export default function TokenUsageCard() {
       warn95: Math.floor(budgets.dailyApiCallBudget * 0.95),
     }
   }, [budgets.dailyApiCallBudget])
+
+  const tokenPercent = useMemo(() => {
+    if (budgets.dailyTokenBudget <= 0) return 0
+    return Math.round((usage.tokensUsedToday / budgets.dailyTokenBudget) * 100)
+  }, [budgets.dailyTokenBudget, usage.tokensUsedToday])
+
+  const apiPercent = useMemo(() => {
+    if (!callBudget || callBudget <= 0) return 0
+    return Math.round((usage.apiCallsToday / callBudget) * 100)
+  }, [callBudget, usage.apiCallsToday])
 
   const refresh = useCallback(() => {
     setUsage(readUsage())
@@ -84,11 +109,11 @@ export default function TokenUsageCard() {
   }, [tokenWarnLevels.warn80, tokenWarnLevels.warn95, usage.tokensUsedToday])
 
   const callStatus: 'normal' | 'warning' | 'critical' = useMemo(() => {
-    if (!apiWarnLevels) return 'normal'
+    if (!apiWarnLevels || !callBudget) return 'normal'
     if (usage.apiCallsToday >= apiWarnLevels.warn95) return 'critical'
     if (usage.apiCallsToday >= apiWarnLevels.warn80) return 'warning'
     return 'normal'
-  }, [apiWarnLevels, usage.apiCallsToday])
+  }, [apiWarnLevels, callBudget, usage.apiCallsToday])
 
   return (
     <SettingsCard title="Token Usage / Limits" subtitle="Resets at 00:00 Europe/Berlin">
@@ -102,7 +127,7 @@ export default function TokenUsageCard() {
         <UsageMeter
           label="API calls today"
           value={usage.apiCallsToday}
-          total={budgets.dailyApiCallBudget ?? 0}
+          total={callBudget}
           status={callStatus}
         />
         <div className="settings-usage-meta">
@@ -114,21 +139,24 @@ export default function TokenUsageCard() {
       {tokenStatus !== 'normal' ? (
         <WarningBanner
           tone={tokenStatus === 'critical' ? 'critical' : 'warning'}
-          message={`Token usage at ${Math.round((usage.tokensUsedToday / budgets.dailyTokenBudget) * 100)}% of the daily budget.`}
+          message={`Token usage at ${tokenPercent}% of the daily budget.`}
         />
       ) : null}
 
-      {budgets.dailyApiCallBudget && callStatus !== 'normal' && apiWarnLevels ? (
+      {callBudget && callStatus !== 'normal' && apiWarnLevels ? (
         <WarningBanner
           tone={callStatus === 'critical' ? 'critical' : 'warning'}
-          message={`API calls at ${Math.round((usage.apiCallsToday / budgets.dailyApiCallBudget) * 100)}% of the daily budget.`}
+          message={`API calls at ${apiPercent}% of the daily budget.`}
         />
       ) : null}
 
       <div className="settings-usage-footer">
         <div>
-          <p className="settings-usage-reset">Daily counters reset at 00:00 Europe/Berlin.</p>
-          <p className="settings-usage-reset">Warning thresholds at 80% and 95% (non-blocking).</p>
+          <p className="settings-usage-reset">Daily counters reset at 00:00 Europe/Berlin (last reset {lastResetLabel}).</p>
+          <p className="settings-usage-reset">
+            Budgets: {budgets.dailyTokenBudget.toLocaleString()} tokens/day · {callBudget ? `${callBudget} API calls/day` : 'API call budget not set'}.
+          </p>
+          <p className="settings-usage-reset">Warning thresholds fixed at 80% and 95%. Per-request output is capped.</p>
         </div>
         <Button size="sm" variant="secondary" onClick={refresh} aria-label="Refresh token usage">
           Refresh usage

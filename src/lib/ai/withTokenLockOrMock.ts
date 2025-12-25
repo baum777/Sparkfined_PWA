@@ -40,8 +40,12 @@ export async function withTokenLockOrMock<T>(params: WithTokenLockOrMockParams<T
   const realResponse = await doRealCall({ maxOutputTokens: cappedMaxOutputTokens });
   const tokensUsed = Math.max(
     0,
-    Math.min(realResponse.tokensUsed ?? lockAttempt.reservedTokens ?? estimatedTokens, lockAttempt.budgets.perRequestOutputTokenCap),
+    Math.min(
+      realResponse.tokensUsed ?? lockAttempt.reservedTokens ?? estimatedTokens,
+      lockAttempt.budgets.perRequestOutputTokenCap,
+    ),
   );
+
   recordApiCall({ tokensUsed, now });
 
   return {
