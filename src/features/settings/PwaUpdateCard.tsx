@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Button from '@/components/ui/Button'
+import { applyUpdate, checkForUpdate, getUpdateCapability, type UpdateStatus } from '@/lib/pwa/update'
 import SettingsCard from './SettingsCard'
-import { applyUpdate, checkForUpdate, getUpdateCapability, type UpdateStatus } from './pwa-update'
 import './settings.css'
 
 type StatusMessage = {
@@ -10,11 +10,26 @@ type StatusMessage = {
 }
 
 const STATUS_COPY: Record<UpdateStatus, StatusMessage> = {
-  idle: { label: 'Idle', description: 'Check for updates to ensure you have the latest release.' },
-  checking: { label: 'Checking', description: 'Looking for a new service worker version…' },
-  available: { label: 'Update available', description: 'A new version is ready. Apply to reload with the latest assets.' },
-  updating: { label: 'Updating', description: 'Applying update. The app will reload when ready.' },
-  updated: { label: 'Updated', description: "You're on the latest version." },
+  idle: {
+    label: 'Idle',
+    description: 'Check for updates to ensure you have the latest service worker.',
+  },
+  checking: {
+    label: 'Checking',
+    description: 'Looking for a new release and registering the waiting worker…',
+  },
+  available: {
+    label: 'Update available',
+    description: 'A new worker is waiting. Apply to skip waiting and reload with fresh assets.',
+  },
+  updating: {
+    label: 'Updating',
+    description: 'Applying skipWaiting and reloading once activation completes.',
+  },
+  updated: {
+    label: 'Updated',
+    description: "You're on the latest version. No action needed.",
+  },
   error: { label: 'Error', description: 'Update check failed. Try again.' },
 }
 
@@ -24,6 +39,7 @@ export default function PwaUpdateCard() {
   const [error, setError] = useState<string | null>(null)
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null)
   const [supported, setSupported] = useState(true)
+  const [lastChecked, setLastChecked] = useState<string | null>(null)
 
   useEffect(() => {
     let mounted = true
@@ -33,6 +49,7 @@ export default function PwaUpdateCard() {
         if (!mounted) return
         setSupported(capability.supported)
         setRegistration(capability.registration)
+
         if (!capability.supported) {
           setStatus('error')
           setError(capability.reason ?? 'Service worker updates are unavailable on this device.')
@@ -78,6 +95,7 @@ export default function PwaUpdateCard() {
     try {
       const result = await checkForUpdate()
       setRegistration(result.registration)
+      setLastChecked(new Date().toLocaleTimeString())
 
       if (result.waiting) {
         setStatus('available')
@@ -86,7 +104,7 @@ export default function PwaUpdateCard() {
       }
 
       setStatus('updated')
-      setMessage("You're on the latest version.")
+      setMessage(STATUS_COPY.updated.description)
     } catch (err) {
       setStatus('error')
       setError(err instanceof Error ? err.message : 'Failed to check for updates')
@@ -105,7 +123,7 @@ export default function PwaUpdateCard() {
 
       if (!registrationToUse || (!registrationToUse.waiting && !capability.waiting)) {
         setStatus('updated')
-        setMessage("You're on the latest version.")
+        setMessage(STATUS_COPY.updated.description)
         return
       }
 
@@ -179,7 +197,9 @@ export default function PwaUpdateCard() {
               Refresh status
             </Button>
           </div>
-          <p className="pwa-update__hint">Updates apply instantly; the app will reload after activation.</p>
+          <p className="pwa-update__hint" aria-live="polite">
+            {lastChecked ? `Last checked at ${lastChecked}. ` : ''}Updates apply instantly; the app will reload after activation.
+          </p>
         </div>
       </div>
     </SettingsCard>

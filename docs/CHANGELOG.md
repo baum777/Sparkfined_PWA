@@ -2,9 +2,18 @@
 
 **Purpose:** Track all changes to `/docs` structure and content  
 **Owner:** Sparkfined Team  
-**Last Updated:** 2026-01-16
+**Last Updated:** 2026-02-05
 
 ---
+
+## 2026-02-05
+
+### Added
+- Dokumentiert WP-090 Settings-Restructure mit neuem Header/Subheader/Actions-Layout, tokenisiertem Card-Stack (Workspace, Data Safety, Token Usage), PWA-Update-Card und Bottom-Navigation-Eintrag für `/settings`; Checklist-Link `WP-Polish/WP-090/checklist.md`.
+
+### Updated
+- PWA-Update-Helfer wurde nach `src/lib/pwa/update.ts` verschoben und steuert Idle/Checking/Available/Updating/Updated/Error-States inklusive skipWaiting/Reload-Flow; SettingsPage nutzt die neue Kartenstruktur und die mobile BottomNav bindet die Settings-Seite ein.
+- Verification: `pnpm typecheck`, `pnpm lint` (bestehende Warnungen), `pnpm vitest run --reporter=basic`, `pnpm build`, `pnpm run check:size` (Budget-Warnungen akzeptiert), `pnpm test:e2e` fehlgeschlagen, weil Playwright-Browser im Container fehlen (`pnpm exec playwright install`).
 
 ## 2026-01-22
 
