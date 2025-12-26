@@ -149,6 +149,6 @@ tabs:
       - root/docs/UI_STYLE_GUIDE.md
       - root/docs/DESIGN_TOKENS_STYLEGUIDE_DE.md
       - root/docs/RESPONSIVE_GUIDELINES.md
-    status: todo
+    status: drafted
     notes: ""
 
