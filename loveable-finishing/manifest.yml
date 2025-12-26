@@ -136,7 +136,7 @@ tabs:
     primary_paths:
       - root/src/pages/LessonsPage.tsx
       - root/src/components/signals/LessonCard.tsx
-    status: todo
+    status: drafted
     notes: ""
 
   - name: Showcase
