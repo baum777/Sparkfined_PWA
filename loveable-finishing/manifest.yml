@@ -58,7 +58,7 @@ tabs:
       - root/src/components/analysis/*
       - root/src/store/chartUiStore.ts
       - root/src/lib/chart/*
-    status: todo
+    status: drafted
     notes: ""
 
   - name: Watchlist
