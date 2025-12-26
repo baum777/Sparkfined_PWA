@@ -105,7 +105,7 @@ tabs:
       - root/src/pages/SignalsPage.tsx
       - root/src/components/signals/*
       - root/src/hooks/useSignals.ts
-    status: drafted
+    status: ready_for_loveable
     notes: ""
 
   - name: Oracle
