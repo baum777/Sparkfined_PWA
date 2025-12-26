@@ -82,7 +82,7 @@ tabs:
       - root/src/components/alerts/*
       - root/src/store/alertsStore.ts
       - root/src/lib/alerts/triggerEngine.ts
-    status: drafted
+    status: ready_for_loveable
     notes: ""
 
   - name: Settings
@@ -136,7 +136,7 @@ tabs:
     primary_paths:
       - root/src/pages/LessonsPage.tsx
       - root/src/components/signals/LessonCard.tsx
-    status: drafted
+    status: ready_for_loveable
     notes: ""
 
   - name: Showcase
@@ -149,6 +149,6 @@ tabs:
       - root/docs/UI_STYLE_GUIDE.md
       - root/docs/DESIGN_TOKENS_STYLEGUIDE_DE.md
       - root/docs/RESPONSIVE_GUIDELINES.md
-    status: drafted
+    status: ready_for_loveable
     notes: ""
 
