@@ -37,6 +37,35 @@ const getStorage = () => {
   }
 };
 
+const safeGetItem = (storage: Storage, key: string): string | null => {
+  try {
+    return storage.getItem(key);
+  } catch (error) {
+    return null;
+  }
+};
+
+const safeSetItem = (storage: Storage, key: string, value: string) => {
+  try {
+    storage.setItem(key, value);
+  } catch (error) {
+    // Swallow quota/private-mode errors; token usage should never crash the UI.
+  }
+};
+
+export const isTokenUsageStorageAvailable = (): boolean => {
+  const storage = getStorage();
+  if (!storage) return false;
+  try {
+    const probeKey = '__sf_token_usage_probe__';
+    storage.setItem(probeKey, '1');
+    storage.removeItem(probeKey);
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
 export const getBerlinDayKey = (now: Date = new Date()): string => {
   const formatter = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Europe/Berlin',
@@ -78,21 +107,21 @@ export const readUsage = (now: Date = new Date()): TokenUsageState => {
     return createDefaultState(now);
   }
 
-  const raw = storage.getItem(USAGE_STORAGE_KEY);
+  const raw = safeGetItem(storage, USAGE_STORAGE_KEY);
   if (!raw) {
     const initial = createDefaultState(now);
-    storage.setItem(USAGE_STORAGE_KEY, JSON.stringify(initial));
+    safeSetItem(storage, USAGE_STORAGE_KEY, JSON.stringify(initial));
     return initial;
   }
 
   try {
     const parsed = JSON.parse(raw) as TokenUsageState;
     const reset = maybeResetUsage(parsed, now);
-    storage.setItem(USAGE_STORAGE_KEY, JSON.stringify(reset));
+    safeSetItem(storage, USAGE_STORAGE_KEY, JSON.stringify(reset));
     return reset;
   } catch (error) {
     const fallback = createDefaultState(now);
-    storage.setItem(USAGE_STORAGE_KEY, JSON.stringify(fallback));
+    safeSetItem(storage, USAGE_STORAGE_KEY, JSON.stringify(fallback));
     return fallback;
   }
 };
@@ -109,7 +138,7 @@ export const recordApiCall = ({ tokensUsed, now = new Date() }: { tokensUsed: nu
   };
 
   if (storage) {
-    storage.setItem(USAGE_STORAGE_KEY, JSON.stringify(updated));
+    safeSetItem(storage, USAGE_STORAGE_KEY, JSON.stringify(updated));
   }
 
   return updated;
@@ -119,7 +148,7 @@ export const getBudgets = (): TokenBudgets => {
   const storage = getStorage();
   if (!storage) return defaultBudgets;
 
-  const raw = storage.getItem(BUDGETS_STORAGE_KEY);
+  const raw = safeGetItem(storage, BUDGETS_STORAGE_KEY);
   if (!raw) return defaultBudgets;
 
   try {
@@ -153,7 +182,7 @@ export const setBudgets = (budgets: Partial<TokenBudgets>): TokenBudgets => {
   };
 
   if (storage) {
-    storage.setItem(BUDGETS_STORAGE_KEY, JSON.stringify(normalized));
+    safeSetItem(storage, BUDGETS_STORAGE_KEY, JSON.stringify(normalized));
   }
 
   return normalized;

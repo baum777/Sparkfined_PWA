@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Input } from '@/components/ui'
 import { CheckCircle2, Copy, Shield, Wifi } from '@/lib/icons'
 import { getWalletMonitoringStatus, type WalletMonitoringStatus } from '@/api/wallet'
@@ -18,6 +18,7 @@ export default function WalletMonitoringCard() {
   const { walletMonitoring, setWalletMonitoringAddress, setWalletMonitoringEnabled } =
     useUserSettingsStore()
   const [copyLabel, setCopyLabel] = useState('Copy address')
+  const copyTimeoutRef = useRef<number | null>(null)
   const [status, setStatus] = useState<WalletMonitoringStatus | null>(null)
   const [statusError, setStatusError] = useState<string | null>(null)
 
@@ -53,17 +54,42 @@ export default function WalletMonitoringCard() {
     }
   }, [trimmedAddress, walletMonitoring.enabled])
 
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        window.clearTimeout(copyTimeoutRef.current)
+        copyTimeoutRef.current = null
+      }
+    }
+  }, [])
+
+  const scheduleCopyLabelReset = () => {
+    if (copyTimeoutRef.current) {
+      window.clearTimeout(copyTimeoutRef.current)
+    }
+
+    copyTimeoutRef.current = window.setTimeout(() => {
+      setCopyLabel('Copy address')
+      copyTimeoutRef.current = null
+    }, 1200)
+  }
+
   const handleCopy = async () => {
     if (!trimmedAddress) return
 
     try {
-      await navigator?.clipboard?.writeText(trimmedAddress)
+      const clipboard = navigator?.clipboard
+      if (!clipboard?.writeText) {
+        throw new Error('Clipboard API unavailable')
+      }
+
+      await clipboard.writeText(trimmedAddress)
       setCopyLabel('Copied!')
-      setTimeout(() => setCopyLabel('Copy address'), 1200)
+      scheduleCopyLabelReset()
     } catch (error) {
       console.warn('Clipboard copy failed', error)
       setCopyLabel('Copy failed')
-      setTimeout(() => setCopyLabel('Copy address'), 1200)
+      scheduleCopyLabelReset()
     }
   }
 

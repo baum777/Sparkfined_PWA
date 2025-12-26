@@ -23,6 +23,14 @@ describe('tokenUsage', () => {
     expect(getBerlinDayKey(summerLateUtc)).toBe('2024-07-02');
   });
 
+  it('handles DST spring forward without changing the Berlin day key', () => {
+    const beforeDst = new Date('2024-03-31T00:59:59Z');
+    const afterDst = new Date('2024-03-31T01:00:01Z');
+
+    expect(getBerlinDayKey(beforeDst)).toBe('2024-03-31');
+    expect(getBerlinDayKey(afterDst)).toBe('2024-03-31');
+  });
+
   it('resets counters when the Berlin day key changes', () => {
     const beforeMidnight: TokenUsageState = {
       dayKey: getBerlinDayKey(new Date('2024-01-01T22:30:00Z')),
@@ -52,6 +60,14 @@ describe('tokenUsage', () => {
     const persisted = readUsage(now);
     expect(persisted.tokensUsedToday).toBe(120);
     expect(persisted.apiCallsToday).toBe(1);
+  });
+
+  it('clamps negative token usage to zero when recording', () => {
+    const now = new Date('2024-01-02T12:00:00Z');
+    const updated = recordApiCall({ tokensUsed: -50, now });
+
+    expect(updated.tokensUsedToday).toBe(0);
+    expect(updated.apiCallsToday).toBe(1);
   });
 
   it('provides default budgets and allows overrides', () => {

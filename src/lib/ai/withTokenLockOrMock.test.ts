@@ -131,6 +131,24 @@ describe('withTokenLockOrMock', () => {
     expect(callSpy).toHaveBeenCalledWith({ maxOutputTokens: 50 });
   });
 
+  it('does not inflate usage when the per-request cap is very high', async () => {
+    setBudgets({ perRequestOutputTokenCap: 9999, dailyTokenBudget: 20000 });
+
+    const response = await withTokenLockOrMock<string>({
+      kind: 'high-cap-real',
+      estimatedTokens: 4000,
+      maxOutputTokens: 8000,
+      doRealCall: vi.fn().mockResolvedValue({ result: 'real-output', tokensUsed: 12 }),
+      mockResult: () => 'demo-output',
+      now: NOW,
+    });
+
+    const usage = readUsage(NOW);
+    expect(response.mode).toBe('real');
+    expect(usage.tokensUsedToday).toBe(12);
+    expect(usage.apiCallsToday).toBe(1);
+  });
+
   it('blocks once the daily call budget is exceeded', async () => {
     const todayKey = getBerlinDayKey(NOW);
     localStorage.setItem(

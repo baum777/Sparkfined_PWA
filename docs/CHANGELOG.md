@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-02-12
+
+### Added
+- WP-092–097 Quickfix: cleaned up clipboard timeout handling in the WalletMonitoringCard, auto-expiring DangerZone confirmations, defensive export/download cleanup, and a visible warning when token-usage storage is unavailable. Added DST spring-forward coverage, negative token clamp checks, high-cap accounting guardrails, and more robust RTL selectors for settings cards.
+
+### Verification
+- `pnpm typecheck`
+- `pnpm lint`
+- `pnpm vitest run`
+- `pnpm build`
+- Playwright E2E still blocked without installed browsers (`pnpm exec playwright install chromium`).
+
 ## 2026-02-11
 
 ### Added
