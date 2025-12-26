@@ -95,7 +95,7 @@ tabs:
       - root/src/components/settings/*
       - root/src/store/userSettings.ts
       - root/src/lib/export/*
-    status: todo
+    status: drafted
     notes: ""
 
   - name: Signals
