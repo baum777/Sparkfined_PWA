@@ -58,7 +58,7 @@ tabs:
       - root/src/components/analysis/*
       - root/src/store/chartUiStore.ts
       - root/src/lib/chart/*
-    status: drafted
+    status: ready_for_loveable
     notes: ""
 
   - name: Watchlist
@@ -70,7 +70,7 @@ tabs:
       - root/src/features/market/watchlistData.ts
       - root/src/store/watchlistStore.ts
       - root/src/hooks/useWalletHoldings.ts
-    status: drafted
+    status: ready_for_loveable
     notes: ""
 
   - name: Alerts
