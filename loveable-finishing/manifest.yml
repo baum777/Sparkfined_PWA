@@ -1,0 +1,154 @@
+repo: Sparkfined_PWA
+
+priorities:
+  - conversion_usability
+  - performance
+  - visual_consistency
+
+source_of_truth:
+  navigation: root/src/config/navigation.ts
+  routes: root/src/routes/RoutesRoot.tsx
+  cluster_map: root/FRONTEND_UI_CONTEXT_CLUSTER_MAP.md
+
+groups:
+  - 00-cluster-map
+  - 10-tabs
+  - 20-ui-primitives-shared
+  - 30-shell-navigation
+  - 40-global-styling-theming
+  - 50-ux-docs-a11y
+  - 60-events-telemetry
+  - 70-user-interaction-tests
+  - 80-assets-branding
+
+tabs:
+  - name: Dashboard
+    slug: dashboard
+    route: /dashboard
+    primary_paths:
+      - root/src/pages/DashboardPage.tsx
+      - root/src/features/dashboard/*
+      - root/src/components/dashboard/*
+      - root/src/components/board/*
+    status: drafted
+    notes: Current UI documented; polish suggestions pending approval.
+
+  - name: Journal
+    slug: journal
+    route: /journal
+    primary_paths:
+      - root/src/pages/JournalPage.tsx
+      - root/src/features/journal/*
+      - root/src/features/journal-v2/components/*
+      - root/src/components/journal/*
+      - root/src/store/journalStore.ts
+      - root/src/lib/journal/*
+    status: todo
+    notes: Core “degen → mastery” loop; rich CRUD + templates + insights.
+
+  - name: Chart
+    slug: chart
+    route: /chart
+    primary_paths:
+      - root/src/pages/ChartPage.tsx
+      - root/src/pages/AnalysisPage.tsx
+      - root/src/features/chart/*
+      - root/src/features/analysis/*
+      - root/src/components/chart/*
+      - root/src/components/analysis/*
+      - root/src/store/chartUiStore.ts
+      - root/src/lib/chart/*
+    status: todo
+    notes: Performance-sensitive; drawing tools, indicators, replay integrations.
+
+  - name: Watchlist
+    slug: watchlist
+    route: /watchlist
+    primary_paths:
+      - root/src/pages/WatchlistPage.tsx
+      - root/src/components/watchlist/*
+      - root/src/features/market/watchlistData.ts
+      - root/src/store/watchlistStore.ts
+      - root/src/hooks/useWalletHoldings.ts
+    status: todo
+    notes: Sorting/filtering + offline flows; table ergonomics matter.
+
+  - name: Alerts
+    slug: alerts
+    route: /alerts
+    primary_paths:
+      - root/src/pages/AlertsPage.tsx
+      - root/src/features/alerts/*
+      - root/src/components/alerts/*
+      - root/src/store/alertsStore.ts
+      - root/src/lib/alerts/triggerEngine.ts
+    status: todo
+    notes: High conversion via “set & trust”; forms and validation are key.
+
+  - name: Settings
+    slug: settings
+    route: /settings
+    primary_paths:
+      - root/src/pages/SettingsPage.tsx
+      - root/src/pages/SettingsContent.tsx
+      - root/src/features/settings/*
+      - root/src/components/settings/*
+      - root/src/store/userSettings.ts
+      - root/src/lib/export/*
+    status: todo
+    notes: Preference clarity + export/import + danger zone; reduce error risk.
+
+  - name: Signals
+    slug: signals
+    route: /signals
+    primary_paths:
+      - root/src/pages/SignalsPage.tsx
+      - root/src/components/signals/*
+      - root/src/hooks/useSignals.ts
+    status: todo
+    notes: Secondary learning surface; feedback UX should feel lightweight.
+
+  - name: Oracle
+    slug: oracle
+    route: /oracle
+    primary_paths:
+      - root/src/pages/OraclePage.tsx
+      - root/src/components/oracle/*
+      - root/src/store/oracleStore.ts
+    status: todo
+    notes: Secondary; ensure trust + clarity; filtering ergonomics.
+
+  - name: Replay
+    slug: replay
+    route: /replay
+    primary_paths:
+      - root/src/pages/ReplayPage.tsx
+      - root/src/components/ReplayModal.tsx
+      - root/src/components/ReplayPlayer.tsx
+      - root/src/features/chart/replay.ts
+      - root/src/lib/replay/ohlcReplayEngine.ts
+    status: todo
+    notes: Performance + timeline controls; avoid heavy redraws.
+
+  - name: Learning
+    slug: lessons
+    route: /lessons
+    primary_paths:
+      - root/src/pages/LessonsPage.tsx
+      - root/src/components/signals/LessonCard.tsx
+    status: todo
+    notes: Mostly content navigation; information scent and progression cues.
+
+  - name: Showcase
+    slug: showcase
+    route: /icons
+    primary_paths:
+      - root/src/pages/IconShowcase.tsx
+      - root/src/pages/StyleShowcasePage.tsx
+      - root/src/pages/UXShowcasePage.tsx
+      - root/docs/UI_STYLE_GUIDE.md
+      - root/docs/DESIGN_TOKENS_STYLEGUIDE_DE.md
+      - root/docs/RESPONSIVE_GUIDELINES.md
+    status: todo
+    notes: Dev-only design system surfaces (/styles, /ux in DEV); keep stable.
+
