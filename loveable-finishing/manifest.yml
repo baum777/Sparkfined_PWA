@@ -30,7 +30,7 @@ tabs:
       - root/src/features/dashboard/*
       - root/src/components/dashboard/*
       - root/src/components/board/*
-    status: todo
+    status: ready_for_loveable
     notes: ""
 
   - name: Journal
