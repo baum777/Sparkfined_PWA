@@ -43,7 +43,7 @@ tabs:
       - root/src/components/journal/*
       - root/src/store/journalStore.ts
       - root/src/lib/journal/*
-    status: drafted
+    status: ready_for_loveable
     notes: ""
 
   - name: Chart
