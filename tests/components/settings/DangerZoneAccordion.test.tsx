@@ -23,11 +23,12 @@ describe('DangerZoneAccordion', () => {
 
     await user.click(screen.getByRole('button', { name: /Destructive actions/i }))
 
-    const actionRow = screen.getAllByRole('listitem')[0]!
-    const actionButton = within(actionRow).getByRole('button', { name: /Prepare/i })
+    const actionRow = screen.getByText(/Factory reset workspace/i).closest('[role="listitem"]')
+    expect(actionRow).toBeTruthy()
+    const actionButton = within(actionRow as HTMLElement).getByRole('button', { name: /Prepare/i })
     await user.click(actionButton)
     expect(actionButton).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByText(/Click the highlighted action again to confirm/i)).toBeInTheDocument()
+    expect(screen.getByText(/Click again within 5 seconds to confirm/i)).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Confirm/i }))
     expect(screen.getByText(/acknowledged/)).toBeInTheDocument()

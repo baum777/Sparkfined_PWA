@@ -17,13 +17,13 @@
 - [x] UI clearly indicates enabled/disabled state
 
 ## Verification
-- [ ] pnpm typecheck
-- [ ] pnpm lint
-- [ ] pnpm vitest run
-- [ ] pnpm build
+- [x] pnpm typecheck
+- [x] pnpm lint
+- [x] pnpm vitest run
+- [x] pnpm build
 - [ ] pnpm check:size
 - [ ] pnpm test:e2e *(run if possible; otherwise mark BLOCKED with reason and include `pnpm exec playwright install chromium`)*
 
 ## E2E Status
 - [ ] Playwright available → tests executed
-- [ ] BLOCKED → Playwright browsers missing in container (`pnpm exec playwright install chromium` required)
+- [x] BLOCKED → Playwright browsers missing in container (`pnpm exec playwright install chromium` required)

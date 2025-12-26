@@ -30,6 +30,10 @@ Archivierte Originale liegen unter `docs/archive/raw/2025-11-12/`. Weitere unver
 
 ---
 
+## 📦 Neue Ergänzungen (2026-02-12)
+
+- **WP-092–097 Quickfix:** Timeouts now clean up on WalletMonitoringCard unmount and DangerZone confirmations auto-expire; DataExportCard defensively revokes object URLs on failure; TokenUsageCard surfaces a storage-unavailable warning while `tokenUsage` guards around SSR/private-mode access. Added DST spring-forward + negative token clamp tests, high-cap accounting coverage for `withTokenLockOrMock`, and more robust RTL selectors for settings cards.
+
 ## 📦 Neue Ergänzungen (2026-02-10)
 
 - **Appearance Settings (WP-091):** SettingsPage besitzt jetzt eine AppearanceCard mit System/Dark/Light-Auswahl, persistiert über das bestehende Settings/Theme-Store-Setup, inklusive Vorschau und tokenisiertem Styling. Checklist-Link: `WP-Polish/WP-091/checklist.md`.

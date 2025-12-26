@@ -36,13 +36,24 @@ const createMarkdown = (summary: ExportSummary) => {
 }
 
 const downloadFile = (content: string, filename: string, mime: string) => {
-  const blob = new Blob([content], { type: mime })
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
-  anchor.href = url
-  anchor.download = filename
-  anchor.click()
-  URL.revokeObjectURL(url)
+  let url: string | null = null
+
+  try {
+    const blob = new Blob([content], { type: mime })
+    url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = filename
+    anchor.click()
+    return true
+  } catch (error) {
+    console.error('Download failed:', error)
+    return false
+  } finally {
+    if (url) {
+      URL.revokeObjectURL(url)
+    }
+  }
 }
 
 export default function DataExportCard() {
@@ -56,19 +67,19 @@ export default function DataExportCard() {
     }
 
     if (format === 'json') {
-      downloadFile(JSON.stringify(payload, null, 2), 'sparkfined-backup.json', 'application/json')
-      setMessage('Exported mock JSON backup to sparkfined-backup.json')
+      const ok = downloadFile(JSON.stringify(payload, null, 2), 'sparkfined-backup.json', 'application/json')
+      setMessage(ok ? 'Exported mock JSON backup to sparkfined-backup.json' : 'Export failed. Check browser download settings.')
       return
     }
 
     if (format === 'markdown') {
-      downloadFile(createMarkdown(summary), 'sparkfined-backup.md', 'text/markdown')
-      setMessage('Exported markdown summary to sparkfined-backup.md')
+      const ok = downloadFile(createMarkdown(summary), 'sparkfined-backup.md', 'text/markdown')
+      setMessage(ok ? 'Exported markdown summary to sparkfined-backup.md' : 'Export failed. Check browser download settings.')
       return
     }
 
-    downloadFile(JSON.stringify(payload), 'sparkfined-backup.zip', 'application/zip')
-    setMessage('Created lightweight backup stub (zip placeholder).')
+    const ok = downloadFile(JSON.stringify(payload), 'sparkfined-backup.zip', 'application/zip')
+    setMessage(ok ? 'Created lightweight backup stub (zip placeholder).' : 'Export failed. Check browser download settings.')
   }
 
   return (

@@ -22,7 +22,7 @@ describe('PreferencesCard', () => {
     const user = userEvent.setup()
     render(<PreferencesCard />)
 
-    const minimalButton = screen.getAllByRole('listitem')[1]!
+    const minimalButton = screen.getByText(/minimal chart/i).closest('button')!
 
     await user.click(minimalButton)
 

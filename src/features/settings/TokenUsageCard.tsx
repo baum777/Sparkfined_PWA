@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui'
-import { getBudgets, readUsage, TokenBudgets, TokenUsageState } from '@/lib/usage/tokenUsage'
+import {
+  getBudgets,
+  isTokenUsageStorageAvailable,
+  readUsage,
+  TokenBudgets,
+  TokenUsageState,
+} from '@/lib/usage/tokenUsage'
 import SettingsCard from './SettingsCard'
 
 function UsageMeter({
@@ -56,6 +62,7 @@ function WarningBanner({ message, tone }: { message: string; tone: 'warning' | '
 export default function TokenUsageCard() {
   const [usage, setUsage] = useState<TokenUsageState>(() => readUsage())
   const [budgets, setBudgetsState] = useState<TokenBudgets>(() => getBudgets())
+  const storageAvailable = useMemo(() => isTokenUsageStorageAvailable(), [])
 
   const callBudget = budgets.dailyApiCallBudget ?? null
   const lastResetLabel = useMemo(() => {
@@ -135,6 +142,12 @@ export default function TokenUsageCard() {
           <p className="settings-usage-meta__value">{budgets.perRequestOutputTokenCap.toLocaleString()} tokens</p>
         </div>
       </div>
+
+      {!storageAvailable ? (
+        <div className="settings-usage-banner settings-usage-banner--warning" role="alert">
+          Local storage is unavailable; usage counters will reset when you refresh.
+        </div>
+      ) : null}
 
       {tokenStatus !== 'normal' ? (
         <WarningBanner

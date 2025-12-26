@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui'
 import { Collapsible } from '@/components/ui/Collapsible'
 import { AlertTriangle, RefreshCw, Trash2 } from '@/lib/icons'
@@ -22,15 +22,40 @@ export default function DangerZoneAccordion() {
   const [confirming, setConfirming] = useState<string | null>(null)
   const [message, setMessage] = useState<string>('Dangerous actions are gated behind confirmation.')
 
+  const confirmTimeoutRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (confirmTimeoutRef.current) {
+        window.clearTimeout(confirmTimeoutRef.current)
+        confirmTimeoutRef.current = null
+      }
+    }
+  }, [])
+
   const handleAction = (id: string) => {
     if (confirming === id) {
       setConfirming(null)
       setMessage(`Action "${id}" acknowledged (stub only; no data mutated).`)
+      if (confirmTimeoutRef.current) {
+        window.clearTimeout(confirmTimeoutRef.current)
+        confirmTimeoutRef.current = null
+      }
       return
     }
 
     setConfirming(id)
-    setMessage('Click the highlighted action again to confirm.')
+    setMessage('Click again within 5 seconds to confirm.')
+
+    if (confirmTimeoutRef.current) {
+      window.clearTimeout(confirmTimeoutRef.current)
+    }
+
+    confirmTimeoutRef.current = window.setTimeout(() => {
+      setConfirming(null)
+      setMessage('Confirmation expired. Click "Prepare" again to try again.')
+      confirmTimeoutRef.current = null
+    }, 5000)
   }
 
   return (
