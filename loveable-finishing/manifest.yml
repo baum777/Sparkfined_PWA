@@ -115,7 +115,7 @@ tabs:
       - root/src/pages/OraclePage.tsx
       - root/src/components/oracle/*
       - root/src/store/oracleStore.ts
-    status: drafted
+    status: ready_for_loveable
     notes: ""
 
   - name: Replay
