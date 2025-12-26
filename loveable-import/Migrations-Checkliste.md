@@ -9,6 +9,7 @@
 
 ---
 
+
 ## 0) Guardrails (HARTE REGELN)
 - [ ] Protected Paths niemals überschreiben (siehe 03_ui_replace_scope.md).
 - [ ] src/config/navigation.ts & src/routes/RoutesRoot.tsx = Source of Truth (nur minimal anpassen, nicht ersetzen).
