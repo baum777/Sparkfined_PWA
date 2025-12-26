@@ -19,4 +19,12 @@ This workspace is the control center for “loveable finishing” on Sparkfined:
 - Start with [`manifest.yml`](manifest.yml) to see tabs, statuses, and allowed-path scoping.
 - For each tab, write `00-current-ui.md`, then propose ≤50 words of polish in chat, then (after approval) write `01/02`.
 - Keep prompts atomic and constrained to **Allowed paths** to minimize risk and keep diffs controllable.
+- Treat each Loveable prompt as a small, reviewable change (no refactors, no drive-by cleanup).
+
+### Constraints (non-negotiable)
+
+- **Atomic prompts**: one intent per prompt; small diffs.
+- **Allowed paths**: every prompt must list strict `Allowed paths` and stay inside them.
+- **No unrelated diffs**: no formatting-only churn, no opportunistic cleanup.
+- **During setup/docs**: do not edit outside `loveable-finishing/**`.
 

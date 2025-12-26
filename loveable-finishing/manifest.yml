@@ -30,8 +30,8 @@ tabs:
       - root/src/features/dashboard/*
       - root/src/components/dashboard/*
       - root/src/components/board/*
-    status: drafted
-    notes: Current UI documented; polish suggestions pending approval.
+    status: todo
+    notes: ""
 
   - name: Journal
     slug: journal
@@ -44,7 +44,7 @@ tabs:
       - root/src/store/journalStore.ts
       - root/src/lib/journal/*
     status: todo
-    notes: Core “degen → mastery” loop; rich CRUD + templates + insights.
+    notes: ""
 
   - name: Chart
     slug: chart
@@ -59,7 +59,7 @@ tabs:
       - root/src/store/chartUiStore.ts
       - root/src/lib/chart/*
     status: todo
-    notes: Performance-sensitive; drawing tools, indicators, replay integrations.
+    notes: ""
 
   - name: Watchlist
     slug: watchlist
@@ -71,7 +71,7 @@ tabs:
       - root/src/store/watchlistStore.ts
       - root/src/hooks/useWalletHoldings.ts
     status: todo
-    notes: Sorting/filtering + offline flows; table ergonomics matter.
+    notes: ""
 
   - name: Alerts
     slug: alerts
@@ -83,7 +83,7 @@ tabs:
       - root/src/store/alertsStore.ts
       - root/src/lib/alerts/triggerEngine.ts
     status: todo
-    notes: High conversion via “set & trust”; forms and validation are key.
+    notes: ""
 
   - name: Settings
     slug: settings
@@ -96,7 +96,7 @@ tabs:
       - root/src/store/userSettings.ts
       - root/src/lib/export/*
     status: todo
-    notes: Preference clarity + export/import + danger zone; reduce error risk.
+    notes: ""
 
   - name: Signals
     slug: signals
@@ -106,7 +106,7 @@ tabs:
       - root/src/components/signals/*
       - root/src/hooks/useSignals.ts
     status: todo
-    notes: Secondary learning surface; feedback UX should feel lightweight.
+    notes: ""
 
   - name: Oracle
     slug: oracle
@@ -116,7 +116,7 @@ tabs:
       - root/src/components/oracle/*
       - root/src/store/oracleStore.ts
     status: todo
-    notes: Secondary; ensure trust + clarity; filtering ergonomics.
+    notes: ""
 
   - name: Replay
     slug: replay
@@ -128,7 +128,7 @@ tabs:
       - root/src/features/chart/replay.ts
       - root/src/lib/replay/ohlcReplayEngine.ts
     status: todo
-    notes: Performance + timeline controls; avoid heavy redraws.
+    notes: ""
 
   - name: Learning
     slug: lessons
@@ -137,7 +137,7 @@ tabs:
       - root/src/pages/LessonsPage.tsx
       - root/src/components/signals/LessonCard.tsx
     status: todo
-    notes: Mostly content navigation; information scent and progression cues.
+    notes: ""
 
   - name: Showcase
     slug: showcase
@@ -150,5 +150,5 @@ tabs:
       - root/docs/DESIGN_TOKENS_STYLEGUIDE_DE.md
       - root/docs/RESPONSIVE_GUIDELINES.md
     status: todo
-    notes: Dev-only design system surfaces (/styles, /ux in DEV); keep stable.
+    notes: ""
 
