@@ -43,7 +43,7 @@ tabs:
       - root/src/components/journal/*
       - root/src/store/journalStore.ts
       - root/src/lib/journal/*
-    status: todo
+    status: drafted
     notes: ""
 
   - name: Chart
