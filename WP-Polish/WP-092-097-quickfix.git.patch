@@ -1,0 +1,1975 @@
+--- a/src/features/settings/WalletMonitoringCard.tsx
++++ b/src/features/settings/WalletMonitoringCard.tsx
+@@ -1,134 +1,160 @@
+-import { useEffect, useMemo, useState } from 'react'
+-import { Button, Input } from '@/components/ui'
+-import { CheckCircle2, Copy, Shield, Wifi } from '@/lib/icons'
+-import { getWalletMonitoringStatus, type WalletMonitoringStatus } from '@/api/wallet'
+-import SettingsCard from './SettingsCard'
+-import { useUserSettingsStore } from '@/store/userSettings'
+-
+-function StatusPill({ enabled }: { enabled: boolean }) {
+-  const toneClass = enabled ? 'settings-pill--success' : 'settings-pill--muted'
+-  return (
+-    <span className={`settings-pill ${toneClass}`} aria-live="polite">
+-      <Shield size={16} aria-hidden /> {enabled ? 'Monitoring enabled' : 'Monitoring disabled'}
+-    </span>
+-  )
+-}
+-
+-export default function WalletMonitoringCard() {
+-  const { walletMonitoring, setWalletMonitoringAddress, setWalletMonitoringEnabled } =
+-    useUserSettingsStore()
+-  const [copyLabel, setCopyLabel] = useState('Copy address')
+-  const [status, setStatus] = useState<WalletMonitoringStatus | null>(null)
+-  const [statusError, setStatusError] = useState<string | null>(null)
+-
+-  const trimmedAddress = walletMonitoring.address.trim()
+-
+-  useEffect(() => {
+-    let cancelled = false
+-
+-    if (!walletMonitoring.enabled || !trimmedAddress) {
+-      setStatus(null)
+-      setStatusError(null)
+-      return () => {
+-        cancelled = true
+-      }
+-    }
+-
+-    getWalletMonitoringStatus(trimmedAddress)
+-      .then((result) => {
+-        if (!cancelled) {
+-          setStatus(result)
+-          setStatusError(null)
+-        }
+-      })
+-      .catch(() => {
+-        if (!cancelled) {
+-          setStatus(null)
+-          setStatusError('Unable to fetch monitoring heartbeat (mock).')
+-        }
+-      })
+-
+-    return () => {
+-      cancelled = true
+-    }
+-  }, [trimmedAddress, walletMonitoring.enabled])
+-
+-  const handleCopy = async () => {
+-    if (!trimmedAddress) return
+-
+-    try {
+-      await navigator?.clipboard?.writeText(trimmedAddress)
+-      setCopyLabel('Copied!')
+-      setTimeout(() => setCopyLabel('Copy address'), 1200)
+-    } catch (error) {
+-      console.warn('Clipboard copy failed', error)
+-      setCopyLabel('Copy failed')
+-      setTimeout(() => setCopyLabel('Copy address'), 1200)
+-    }
+-  }
+-
+-  const monitoringSummary = useMemo(() => {
+-    if (!status || !walletMonitoring.enabled) return 'Monitoring is ready once you enable it.'
+-    const heartbeat = status.lastHeartbeat
+-      ? new Date(status.lastHeartbeat).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+-      : '—'
+-    return `Last heartbeat ${heartbeat}; next check in ~${status.nextCheckSeconds}s.`
+-  }, [status, walletMonitoring.enabled])
+-
+-  return (
+-    <SettingsCard
+-      title="Wallet monitoring"
+-      subtitle="Track a primary wallet for new activity. Local mock only—no provider keys required."
+-      actions={<StatusPill enabled={walletMonitoring.enabled} />}
+-    >
+-      <div className="settings-monitoring-grid">
+-        <div className="settings-monitoring-input">
+-          <Input
+-            label="Monitored wallet address"
+-            value={walletMonitoring.address}
+-            onChange={(event) => setWalletMonitoringAddress(event.target.value)}
+-            placeholder="Enter Solana address"
+-            mono
+-            data-testid="wallet-monitoring-address"
+-          />
+-        </div>
+-
+-        <div className="settings-monitoring-actions">
+-          <Button
+-            variant="secondary"
+-            size="sm"
+-            onClick={handleCopy}
+-            disabled={!trimmedAddress}
+-            leftIcon={<Copy size={16} aria-hidden />}
+-            aria-label="Copy monitored wallet address"
+-          >
+-            {copyLabel}
+-          </Button>
+-
+-          <Button
+-            variant={walletMonitoring.enabled ? 'ghost' : 'primary'}
+-            size="sm"
+-            onClick={() => setWalletMonitoringEnabled(!walletMonitoring.enabled)}
+-            disabled={!trimmedAddress}
+-            leftIcon={walletMonitoring.enabled ? <Wifi size={16} aria-hidden /> : <CheckCircle2 size={16} aria-hidden />}
+-            aria-pressed={walletMonitoring.enabled}
+-            aria-label={walletMonitoring.enabled ? 'Disable wallet monitoring' : 'Enable wallet monitoring'}
+-          >
+-            {walletMonitoring.enabled ? 'Disable monitoring' : 'Enable monitoring'}
+-          </Button>
+-        </div>
+-      </div>
+-
+-      <div className="settings-monitoring-status" role="status">
+-        <div className="settings-monitoring-status__icon" aria-hidden>
+-          <Wifi size={18} />
+-        </div>
+-        <div className="settings-monitoring-status__meta">
+-          <p className="settings-monitoring-status__headline">{walletMonitoring.enabled ? 'Monitoring active' : 'Monitoring off'}</p>
+-          <p className="settings-monitoring-status__copy">{monitoringSummary}</p>
+-          {statusError ? <p className="settings-monitoring-status__error">{statusError}</p> : null}
+-        </div>
+-      </div>
+-    </SettingsCard>
+-  )
+-}
++import { useEffect, useMemo, useRef, useState } from 'react'
++import { Button, Input } from '@/components/ui'
++import { CheckCircle2, Copy, Shield, Wifi } from '@/lib/icons'
++import { getWalletMonitoringStatus, type WalletMonitoringStatus } from '@/api/wallet'
++import SettingsCard from './SettingsCard'
++import { useUserSettingsStore } from '@/store/userSettings'
++
++function StatusPill({ enabled }: { enabled: boolean }) {
++  const toneClass = enabled ? 'settings-pill--success' : 'settings-pill--muted'
++  return (
++    <span className={`settings-pill ${toneClass}`} aria-live="polite">
++      <Shield size={16} aria-hidden /> {enabled ? 'Monitoring enabled' : 'Monitoring disabled'}
++    </span>
++  )
++}
++
++export default function WalletMonitoringCard() {
++  const { walletMonitoring, setWalletMonitoringAddress, setWalletMonitoringEnabled } =
++    useUserSettingsStore()
++  const [copyLabel, setCopyLabel] = useState('Copy address')
++  const copyTimeoutRef = useRef<number | null>(null)
++  const [status, setStatus] = useState<WalletMonitoringStatus | null>(null)
++  const [statusError, setStatusError] = useState<string | null>(null)
++
++  const trimmedAddress = walletMonitoring.address.trim()
++
++  useEffect(() => {
++    let cancelled = false
++
++    if (!walletMonitoring.enabled || !trimmedAddress) {
++      setStatus(null)
++      setStatusError(null)
++      return () => {
++        cancelled = true
++      }
++    }
++
++    getWalletMonitoringStatus(trimmedAddress)
++      .then((result) => {
++        if (!cancelled) {
++          setStatus(result)
++          setStatusError(null)
++        }
++      })
++      .catch(() => {
++        if (!cancelled) {
++          setStatus(null)
++          setStatusError('Unable to fetch monitoring heartbeat (mock).')
++        }
++      })
++
++    return () => {
++      cancelled = true
++    }
++  }, [trimmedAddress, walletMonitoring.enabled])
++
++  useEffect(() => {
++    return () => {
++      if (copyTimeoutRef.current) {
++        window.clearTimeout(copyTimeoutRef.current)
++        copyTimeoutRef.current = null
++      }
++    }
++  }, [])
++
++  const scheduleCopyLabelReset = () => {
++    if (copyTimeoutRef.current) {
++      window.clearTimeout(copyTimeoutRef.current)
++    }
++
++    copyTimeoutRef.current = window.setTimeout(() => {
++      setCopyLabel('Copy address')
++      copyTimeoutRef.current = null
++    }, 1200)
++  }
++
++  const handleCopy = async () => {
++    if (!trimmedAddress) return
++
++    try {
++      const clipboard = navigator?.clipboard
++      if (!clipboard?.writeText) {
++        throw new Error('Clipboard API unavailable')
++      }
++
++      await clipboard.writeText(trimmedAddress)
++      setCopyLabel('Copied!')
++      scheduleCopyLabelReset()
++    } catch (error) {
++      console.warn('Clipboard copy failed', error)
++      setCopyLabel('Copy failed')
++      scheduleCopyLabelReset()
++    }
++  }
++
++  const monitoringSummary = useMemo(() => {
++    if (!status || !walletMonitoring.enabled) return 'Monitoring is ready once you enable it.'
++    const heartbeat = status.lastHeartbeat
++      ? new Date(status.lastHeartbeat).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
++      : '—'
++    return `Last heartbeat ${heartbeat}; next check in ~${status.nextCheckSeconds}s.`
++  }, [status, walletMonitoring.enabled])
++
++  return (
++    <SettingsCard
++      title="Wallet monitoring"
++      subtitle="Track a primary wallet for new activity. Local mock only—no provider keys required."
++      actions={<StatusPill enabled={walletMonitoring.enabled} />}
++    >
++      <div className="settings-monitoring-grid">
++        <div className="settings-monitoring-input">
++          <Input
++            label="Monitored wallet address"
++            value={walletMonitoring.address}
++            onChange={(event) => setWalletMonitoringAddress(event.target.value)}
++            placeholder="Enter Solana address"
++            mono
++            data-testid="wallet-monitoring-address"
++          />
++        </div>
++
++        <div className="settings-monitoring-actions">
++          <Button
++            variant="secondary"
++            size="sm"
++            onClick={handleCopy}
++            disabled={!trimmedAddress}
++            leftIcon={<Copy size={16} aria-hidden />}
++            aria-label="Copy monitored wallet address"
++          >
++            {copyLabel}
++          </Button>
++
++          <Button
++            variant={walletMonitoring.enabled ? 'ghost' : 'primary'}
++            size="sm"
++            onClick={() => setWalletMonitoringEnabled(!walletMonitoring.enabled)}
++            disabled={!trimmedAddress}
++            leftIcon={walletMonitoring.enabled ? <Wifi size={16} aria-hidden /> : <CheckCircle2 size={16} aria-hidden />}
++            aria-pressed={walletMonitoring.enabled}
++            aria-label={walletMonitoring.enabled ? 'Disable wallet monitoring' : 'Enable wallet monitoring'}
++          >
++            {walletMonitoring.enabled ? 'Disable monitoring' : 'Enable monitoring'}
++          </Button>
++        </div>
++      </div>
++
++      <div className="settings-monitoring-status" role="status">
++        <div className="settings-monitoring-status__icon" aria-hidden>
++          <Wifi size={18} />
++        </div>
++        <div className="settings-monitoring-status__meta">
++          <p className="settings-monitoring-status__headline">{walletMonitoring.enabled ? 'Monitoring active' : 'Monitoring off'}</p>
++          <p className="settings-monitoring-status__copy">{monitoringSummary}</p>
++          {statusError ? <p className="settings-monitoring-status__error">{statusError}</p> : null}
++        </div>
++      </div>
++    </SettingsCard>
++  )
++}
+--- a/src/features/settings/DangerZoneAccordion.tsx
++++ b/src/features/settings/DangerZoneAccordion.tsx
+@@ -1,78 +1,103 @@
+-import { useState } from 'react'
+-import { Button } from '@/components/ui'
+-import { Collapsible } from '@/components/ui/Collapsible'
+-import { AlertTriangle, RefreshCw, Trash2 } from '@/lib/icons'
+-
+-const actions = [
+-  {
+-    id: 'factory-reset',
+-    label: 'Factory reset workspace',
+-    description: 'Clears local settings, cache, and mock data. No remote calls are made.',
+-    icon: <Trash2 size={18} aria-hidden />,
+-  },
+-  {
+-    id: 'clear-cache',
+-    label: 'Clear offline cache',
+-    description: 'Removes cached assets and forces a full reload on next visit.',
+-    icon: <RefreshCw size={18} aria-hidden />,
+-  },
+-]
+-
+-export default function DangerZoneAccordion() {
+-  const [confirming, setConfirming] = useState<string | null>(null)
+-  const [message, setMessage] = useState<string>('Dangerous actions are gated behind confirmation.')
+-
+-  const handleAction = (id: string) => {
+-    if (confirming === id) {
+-      setConfirming(null)
+-      setMessage(`Action "${id}" acknowledged (stub only; no data mutated).`)
+-      return
+-    }
+-
+-    setConfirming(id)
+-    setMessage('Click the highlighted action again to confirm.')
+-  }
+-
+-  return (
+-    <Collapsible
+-      title={
+-        <div className="settings-danger-title">
+-          <span>Destructive actions</span>
+-          <span className="settings-danger-pill">Use with caution</span>
+-        </div>
+-      }
+-      defaultOpen={false}
+-      variant="card"
+-      className="settings-danger"
+-    >
+-      <div className="settings-danger-copy">{message}</div>
+-      <div className="settings-danger-actions" role="list">
+-        {actions.map((action) => {
+-          const isConfirming = confirming === action.id
+-          return (
+-            <div key={action.id} className="settings-danger-row" role="listitem">
+-              <div className="settings-danger-icon" aria-hidden>
+-                {action.icon}
+-              </div>
+-              <div className="settings-danger-meta">
+-                <p className="settings-danger-label">{action.label}</p>
+-                <p className="settings-danger-description">{action.description}</p>
+-              </div>
+-              <Button
+-                variant={isConfirming ? 'destructive' : 'outline'}
+-                size="sm"
+-                aria-pressed={isConfirming}
+-                onClick={() => handleAction(action.id)}
+-              >
+-                {isConfirming ? 'Confirm' : 'Prepare'}
+-              </Button>
+-            </div>
+-          )
+-        })}
+-      </div>
+-      <div className="settings-danger-hint">
+-        <AlertTriangle size={16} aria-hidden /> These controls are mocked; no real data is deleted.
+-      </div>
+-    </Collapsible>
+-  )
+-}
++import { useEffect, useRef, useState } from 'react'
++import { Button } from '@/components/ui'
++import { Collapsible } from '@/components/ui/Collapsible'
++import { AlertTriangle, RefreshCw, Trash2 } from '@/lib/icons'
++
++const actions = [
++  {
++    id: 'factory-reset',
++    label: 'Factory reset workspace',
++    description: 'Clears local settings, cache, and mock data. No remote calls are made.',
++    icon: <Trash2 size={18} aria-hidden />,
++  },
++  {
++    id: 'clear-cache',
++    label: 'Clear offline cache',
++    description: 'Removes cached assets and forces a full reload on next visit.',
++    icon: <RefreshCw size={18} aria-hidden />,
++  },
++]
++
++export default function DangerZoneAccordion() {
++  const [confirming, setConfirming] = useState<string | null>(null)
++  const [message, setMessage] = useState<string>('Dangerous actions are gated behind confirmation.')
++
++  const confirmTimeoutRef = useRef<number | null>(null)
++
++  useEffect(() => {
++    return () => {
++      if (confirmTimeoutRef.current) {
++        window.clearTimeout(confirmTimeoutRef.current)
++        confirmTimeoutRef.current = null
++      }
++    }
++  }, [])
++
++  const handleAction = (id: string) => {
++    if (confirming === id) {
++      setConfirming(null)
++      setMessage(`Action "${id}" acknowledged (stub only; no data mutated).`)
++      if (confirmTimeoutRef.current) {
++        window.clearTimeout(confirmTimeoutRef.current)
++        confirmTimeoutRef.current = null
++      }
++      return
++    }
++
++    setConfirming(id)
++    setMessage('Click again within 5 seconds to confirm.')
++
++    if (confirmTimeoutRef.current) {
++      window.clearTimeout(confirmTimeoutRef.current)
++    }
++
++    confirmTimeoutRef.current = window.setTimeout(() => {
++      setConfirming(null)
++      setMessage('Confirmation expired. Click "Prepare" again to try again.')
++      confirmTimeoutRef.current = null
++    }, 5000)
++  }
++
++  return (
++    <Collapsible
++      title={
++        <div className="settings-danger-title">
++          <span>Destructive actions</span>
++          <span className="settings-danger-pill">Use with caution</span>
++        </div>
++      }
++      defaultOpen={false}
++      variant="card"
++      className="settings-danger"
++    >
++      <div className="settings-danger-copy">{message}</div>
++      <div className="settings-danger-actions" role="list">
++        {actions.map((action) => {
++          const isConfirming = confirming === action.id
++          return (
++            <div key={action.id} className="settings-danger-row" role="listitem">
++              <div className="settings-danger-icon" aria-hidden>
++                {action.icon}
++              </div>
++              <div className="settings-danger-meta">
++                <p className="settings-danger-label">{action.label}</p>
++                <p className="settings-danger-description">{action.description}</p>
++              </div>
++              <Button
++                variant={isConfirming ? 'destructive' : 'outline'}
++                size="sm"
++                aria-pressed={isConfirming}
++                onClick={() => handleAction(action.id)}
++              >
++                {isConfirming ? 'Confirm' : 'Prepare'}
++              </Button>
++            </div>
++          )
++        })}
++      </div>
++      <div className="settings-danger-hint">
++        <AlertTriangle size={16} aria-hidden /> These controls are mocked; no real data is deleted.
++      </div>
++    </Collapsible>
++  )
++}
+--- a/src/features/settings/DataExportCard.tsx
++++ b/src/features/settings/DataExportCard.tsx
+@@ -1,142 +1,152 @@
+-import { useMemo, useState } from 'react'
+-import { Button } from '@/components/ui'
+-import { Download, FileCheck } from '@/lib/icons'
+-import SettingsCard from './SettingsCard'
+-
+-type ExportFormat = 'json' | 'markdown' | 'backup'
+-
+-type ExportSummary = {
+-  version: string
+-  generatedAt: string
+-  journalEntries: number
+-  alerts: number
+-  watchlist: number
+-}
+-
+-const buildSummary = (): ExportSummary => ({
+-  version: '0.1.0',
+-  generatedAt: new Date().toISOString(),
+-  journalEntries: 0,
+-  alerts: 0,
+-  watchlist: 0,
+-})
+-
+-const createMarkdown = (summary: ExportSummary) => {
+-  return [
+-    '# Sparkfined Backup',
+-    `Generated: ${summary.generatedAt}`,
+-    '',
+-    '## Counts',
+-    `- Journal entries: ${summary.journalEntries}`,
+-    `- Alerts: ${summary.alerts}`,
+-    `- Watchlist items: ${summary.watchlist}`,
+-    '',
+-    '_Mock export placeholder — replace with real data feed when backend is connected._',
+-  ].join('\n')
+-}
+-
+-const downloadFile = (content: string, filename: string, mime: string) => {
+-  const blob = new Blob([content], { type: mime })
+-  const url = URL.createObjectURL(blob)
+-  const anchor = document.createElement('a')
+-  anchor.href = url
+-  anchor.download = filename
+-  anchor.click()
+-  URL.revokeObjectURL(url)
+-}
+-
+-export default function DataExportCard() {
+-  const [message, setMessage] = useState<string>('No exports yet.')
+-  const summary = useMemo(() => buildSummary(), [])
+-
+-  const handleExport = (format: ExportFormat) => {
+-    const payload = {
+-      summary,
+-      payload: { note: 'Mock export — replace with real data stream' },
+-    }
+-
+-    if (format === 'json') {
+-      downloadFile(JSON.stringify(payload, null, 2), 'sparkfined-backup.json', 'application/json')
+-      setMessage('Exported mock JSON backup to sparkfined-backup.json')
+-      return
+-    }
+-
+-    if (format === 'markdown') {
+-      downloadFile(createMarkdown(summary), 'sparkfined-backup.md', 'text/markdown')
+-      setMessage('Exported markdown summary to sparkfined-backup.md')
+-      return
+-    }
+-
+-    downloadFile(JSON.stringify(payload), 'sparkfined-backup.zip', 'application/zip')
+-    setMessage('Created lightweight backup stub (zip placeholder).')
+-  }
+-
+-  return (
+-    <SettingsCard
+-      title="Data export"
+-      subtitle="Download a portable backup stub while backend connectors are offline."
+-      actions={
+-        <span className="settings-pill settings-pill--muted" aria-live="polite">
+-          <FileCheck size={16} aria-hidden /> {summary.version}
+-        </span>
+-      }
+-    >
+-      <div className="settings-export-grid">
+-        <div>
+-          <p className="settings-export-copy">Download a local snapshot in your preferred format.</p>
+-          <div className="settings-export-actions">
+-            <Button
+-              variant="primary"
+-              size="sm"
+-              onClick={() => handleExport('json')}
+-              leftIcon={<Download size={16} aria-hidden />}
+-              aria-label="Export mock data as JSON"
+-            >
+-              Export JSON
+-            </Button>
+-            <Button
+-              variant="secondary"
+-              size="sm"
+-              onClick={() => handleExport('markdown')}
+-              leftIcon={<Download size={16} aria-hidden />}
+-              aria-label="Export mock data as Markdown"
+-            >
+-              Export Markdown
+-            </Button>
+-            <Button
+-              variant="ghost"
+-              size="sm"
+-              onClick={() => handleExport('backup')}
+-              leftIcon={<Download size={16} aria-hidden />}
+-              aria-label="Export backup stub"
+-            >
+-              Backup stub
+-            </Button>
+-          </div>
+-        </div>
+-        <div className="settings-export-summary" aria-live="polite" data-testid="export-summary">
+-          <p className="settings-export-title">Snapshot summary</p>
+-          <dl>
+-            <div className="settings-export-row">
+-              <dt>Generated</dt>
+-              <dd>{new Date(summary.generatedAt).toLocaleString()}</dd>
+-            </div>
+-            <div className="settings-export-row">
+-              <dt>Journal entries</dt>
+-              <dd>{summary.journalEntries}</dd>
+-            </div>
+-            <div className="settings-export-row">
+-              <dt>Alerts</dt>
+-              <dd>{summary.alerts}</dd>
+-            </div>
+-            <div className="settings-export-row">
+-              <dt>Watchlist items</dt>
+-              <dd>{summary.watchlist}</dd>
+-            </div>
+-          </dl>
+-          <p className="settings-export-footnote">{message}</p>
+-        </div>
+-      </div>
+-    </SettingsCard>
+-  )
+-}
++import { useMemo, useState } from 'react'
++import { Button } from '@/components/ui'
++import { Download, FileCheck } from '@/lib/icons'
++import SettingsCard from './SettingsCard'
++
++type ExportFormat = 'json' | 'markdown' | 'backup'
++
++type ExportSummary = {
++  version: string
++  generatedAt: string
++  journalEntries: number
++  alerts: number
++  watchlist: number
++}
++
++const buildSummary = (): ExportSummary => ({
++  version: '0.1.0',
++  generatedAt: new Date().toISOString(),
++  journalEntries: 0,
++  alerts: 0,
++  watchlist: 0,
++})
++
++const createMarkdown = (summary: ExportSummary) => {
++  return [
++    '# Sparkfined Backup',
++    `Generated: ${summary.generatedAt}`,
++    '',
++    '## Counts',
++    `- Journal entries: ${summary.journalEntries}`,
++    `- Alerts: ${summary.alerts}`,
++    `- Watchlist items: ${summary.watchlist}`,
++    '',
++    '_Mock export placeholder — replace with real data feed when backend is connected._',
++  ].join('\n')
++}
++
++const downloadFile = (content: string, filename: string, mime: string): boolean => {
++  try {
++    const blob = new Blob([content], { type: mime })
++    const url = URL.createObjectURL(blob)
++    try {
++      const anchor = document.createElement('a')
++      anchor.href = url
++      anchor.download = filename
++      anchor.rel = 'noopener'
++      anchor.click()
++      return true
++    } finally {
++      URL.revokeObjectURL(url)
++    }
++  } catch (error) {
++    console.error('Download failed:', error)
++    return false
++  }
++}
++
++export default function DataExportCard() {
++  const [message, setMessage] = useState<string>('No exports yet.')
++  const summary = useMemo(() => buildSummary(), [])
++
++  const handleExport = (format: ExportFormat) => {
++    const payload = {
++      summary,
++      payload: { note: 'Mock export — replace with real data stream' },
++    }
++
++    if (format === 'json') {
++      const ok = downloadFile(JSON.stringify(payload, null, 2), 'sparkfined-backup.json', 'application/json')
++      setMessage(ok ? 'Exported mock JSON backup to sparkfined-backup.json' : 'Export failed. Check browser download settings.')
++      return
++    }
++
++    if (format === 'markdown') {
++      const ok = downloadFile(createMarkdown(summary), 'sparkfined-backup.md', 'text/markdown')
++      setMessage(ok ? 'Exported markdown summary to sparkfined-backup.md' : 'Export failed. Check browser download settings.')
++      return
++    }
++
++    const ok = downloadFile(JSON.stringify(payload), 'sparkfined-backup.zip', 'application/zip')
++    setMessage(ok ? 'Created lightweight backup stub (zip placeholder).' : 'Export failed. Check browser download settings.')
++  }
++
++  return (
++    <SettingsCard
++      title="Data export"
++      subtitle="Download a portable backup stub while backend connectors are offline."
++      actions={
++        <span className="settings-pill settings-pill--muted" aria-live="polite">
++          <FileCheck size={16} aria-hidden /> {summary.version}
++        </span>
++      }
++    >
++      <div className="settings-export-grid">
++        <div>
++          <p className="settings-export-copy">Download a local snapshot in your preferred format.</p>
++          <div className="settings-export-actions">
++            <Button
++              variant="primary"
++              size="sm"
++              onClick={() => handleExport('json')}
++              leftIcon={<Download size={16} aria-hidden />}
++              aria-label="Export mock data as JSON"
++            >
++              Export JSON
++            </Button>
++            <Button
++              variant="secondary"
++              size="sm"
++              onClick={() => handleExport('markdown')}
++              leftIcon={<Download size={16} aria-hidden />}
++              aria-label="Export mock data as Markdown"
++            >
++              Export Markdown
++            </Button>
++            <Button
++              variant="ghost"
++              size="sm"
++              onClick={() => handleExport('backup')}
++              leftIcon={<Download size={16} aria-hidden />}
++              aria-label="Export backup stub"
++            >
++              Backup stub
++            </Button>
++          </div>
++        </div>
++        <div className="settings-export-summary" aria-live="polite" data-testid="export-summary">
++          <p className="settings-export-title">Snapshot summary</p>
++          <dl>
++            <div className="settings-export-row">
++              <dt>Generated</dt>
++              <dd>{new Date(summary.generatedAt).toLocaleString()}</dd>
++            </div>
++            <div className="settings-export-row">
++              <dt>Journal entries</dt>
++              <dd>{summary.journalEntries}</dd>
++            </div>
++            <div className="settings-export-row">
++              <dt>Alerts</dt>
++              <dd>{summary.alerts}</dd>
++            </div>
++            <div className="settings-export-row">
++              <dt>Watchlist items</dt>
++              <dd>{summary.watchlist}</dd>
++            </div>
++          </dl>
++          <p className="settings-export-footnote">{message}</p>
++        </div>
++      </div>
++    </SettingsCard>
++  )
++}
+--- a/src/lib/usage/tokenUsage.ts
++++ b/src/lib/usage/tokenUsage.ts
+@@ -1,160 +1,189 @@
+-export interface TokenUsageState {
+-  dayKey: string;
+-  tokensUsedToday: number;
+-  apiCallsToday: number;
+-  lastResetAt: string;
+-}
+-
+-export interface TokenBudgets {
+-  dailyTokenBudget: number;
+-  dailyApiCallBudget?: number;
+-  warn80: number;
+-  warn95: number;
+-  perRequestOutputTokenCap: number;
+-}
+-
+-const USAGE_STORAGE_KEY = 'sf-token-usage';
+-const BUDGETS_STORAGE_KEY = 'sf-token-budgets';
+-
+-const DEFAULT_TOKEN_BUDGET = 20000;
+-const DEFAULT_API_CALL_BUDGET = 50;
+-const DEFAULT_PER_REQUEST_OUTPUT_CAP = 500;
+-
+-const defaultBudgets: TokenBudgets = {
+-  dailyTokenBudget: DEFAULT_TOKEN_BUDGET,
+-  dailyApiCallBudget: DEFAULT_API_CALL_BUDGET,
+-  warn80: Math.floor(DEFAULT_TOKEN_BUDGET * 0.8),
+-  warn95: Math.floor(DEFAULT_TOKEN_BUDGET * 0.95),
+-  perRequestOutputTokenCap: DEFAULT_PER_REQUEST_OUTPUT_CAP,
+-};
+-
+-const getStorage = () => {
+-  if (typeof globalThis === 'undefined') return undefined;
+-  try {
+-    return globalThis.localStorage;
+-  } catch (error) {
+-    return undefined;
+-  }
+-};
+-
+-export const getBerlinDayKey = (now: Date = new Date()): string => {
+-  const formatter = new Intl.DateTimeFormat('en-CA', {
+-    timeZone: 'Europe/Berlin',
+-    year: 'numeric',
+-    month: '2-digit',
+-    day: '2-digit',
+-  });
+-
+-  return formatter.format(now);
+-};
+-
+-const createDefaultState = (now: Date = new Date()): TokenUsageState => {
+-  const dayKey = getBerlinDayKey(now);
+-  return {
+-    dayKey,
+-    tokensUsedToday: 0,
+-    apiCallsToday: 0,
+-    lastResetAt: now.toISOString(),
+-  };
+-};
+-
+-export const maybeResetUsage = (state: TokenUsageState, now: Date = new Date()): TokenUsageState => {
+-  const currentDayKey = getBerlinDayKey(now);
+-  if (state.dayKey === currentDayKey) {
+-    return state;
+-  }
+-
+-  return {
+-    dayKey: currentDayKey,
+-    tokensUsedToday: 0,
+-    apiCallsToday: 0,
+-    lastResetAt: now.toISOString(),
+-  };
+-};
+-
+-export const readUsage = (now: Date = new Date()): TokenUsageState => {
+-  const storage = getStorage();
+-  if (!storage) {
+-    return createDefaultState(now);
+-  }
+-
+-  const raw = storage.getItem(USAGE_STORAGE_KEY);
+-  if (!raw) {
+-    const initial = createDefaultState(now);
+-    storage.setItem(USAGE_STORAGE_KEY, JSON.stringify(initial));
+-    return initial;
+-  }
+-
+-  try {
+-    const parsed = JSON.parse(raw) as TokenUsageState;
+-    const reset = maybeResetUsage(parsed, now);
+-    storage.setItem(USAGE_STORAGE_KEY, JSON.stringify(reset));
+-    return reset;
+-  } catch (error) {
+-    const fallback = createDefaultState(now);
+-    storage.setItem(USAGE_STORAGE_KEY, JSON.stringify(fallback));
+-    return fallback;
+-  }
+-};
+-
+-export const recordApiCall = ({ tokensUsed, now = new Date() }: { tokensUsed: number; now?: Date }): TokenUsageState => {
+-  const storage = getStorage();
+-  const current = readUsage(now);
+-
+-  const updated: TokenUsageState = {
+-    ...current,
+-    tokensUsedToday: current.tokensUsedToday + Math.max(0, tokensUsed),
+-    apiCallsToday: current.apiCallsToday + 1,
+-    lastResetAt: current.lastResetAt,
+-  };
+-
+-  if (storage) {
+-    storage.setItem(USAGE_STORAGE_KEY, JSON.stringify(updated));
+-  }
+-
+-  return updated;
+-};
+-
+-export const getBudgets = (): TokenBudgets => {
+-  const storage = getStorage();
+-  if (!storage) return defaultBudgets;
+-
+-  const raw = storage.getItem(BUDGETS_STORAGE_KEY);
+-  if (!raw) return defaultBudgets;
+-
+-  try {
+-    const parsed = JSON.parse(raw) as TokenBudgets;
+-    return {
+-      dailyTokenBudget: parsed.dailyTokenBudget ?? defaultBudgets.dailyTokenBudget,
+-      dailyApiCallBudget: parsed.dailyApiCallBudget ?? defaultBudgets.dailyApiCallBudget,
+-      perRequestOutputTokenCap: parsed.perRequestOutputTokenCap ?? defaultBudgets.perRequestOutputTokenCap,
+-      warn80: parsed.warn80 ?? Math.floor((parsed.dailyTokenBudget ?? defaultBudgets.dailyTokenBudget) * 0.8),
+-      warn95: parsed.warn95 ?? Math.floor((parsed.dailyTokenBudget ?? defaultBudgets.dailyTokenBudget) * 0.95),
+-    };
+-  } catch (error) {
+-    return defaultBudgets;
+-  }
+-};
+-
+-export const setBudgets = (budgets: Partial<TokenBudgets>): TokenBudgets => {
+-  const storage = getStorage();
+-  const existing = getBudgets();
+-  const merged: TokenBudgets = {
+-    ...existing,
+-    ...budgets,
+-  };
+-
+-  const normalized: TokenBudgets = {
+-    dailyTokenBudget: merged.dailyTokenBudget,
+-    dailyApiCallBudget: merged.dailyApiCallBudget,
+-    perRequestOutputTokenCap: merged.perRequestOutputTokenCap,
+-    warn80: budgets.warn80 ?? Math.floor(merged.dailyTokenBudget * 0.8),
+-    warn95: budgets.warn95 ?? Math.floor(merged.dailyTokenBudget * 0.95),
+-  };
+-
+-  if (storage) {
+-    storage.setItem(BUDGETS_STORAGE_KEY, JSON.stringify(normalized));
+-  }
+-
+-  return normalized;
+-};
++export interface TokenUsageState {
++  dayKey: string;
++  tokensUsedToday: number;
++  apiCallsToday: number;
++  lastResetAt: string;
++}
++
++export interface TokenBudgets {
++  dailyTokenBudget: number;
++  dailyApiCallBudget?: number;
++  warn80: number;
++  warn95: number;
++  perRequestOutputTokenCap: number;
++}
++
++const USAGE_STORAGE_KEY = 'sf-token-usage';
++const BUDGETS_STORAGE_KEY = 'sf-token-budgets';
++
++const DEFAULT_TOKEN_BUDGET = 20000;
++const DEFAULT_API_CALL_BUDGET = 50;
++const DEFAULT_PER_REQUEST_OUTPUT_CAP = 500;
++
++const defaultBudgets: TokenBudgets = {
++  dailyTokenBudget: DEFAULT_TOKEN_BUDGET,
++  dailyApiCallBudget: DEFAULT_API_CALL_BUDGET,
++  warn80: Math.floor(DEFAULT_TOKEN_BUDGET * 0.8),
++  warn95: Math.floor(DEFAULT_TOKEN_BUDGET * 0.95),
++  perRequestOutputTokenCap: DEFAULT_PER_REQUEST_OUTPUT_CAP,
++};
++
++const getStorage = () => {
++  if (typeof globalThis === 'undefined') return undefined;
++  try {
++    return globalThis.localStorage;
++  } catch (error) {
++    return undefined;
++  }
++};
++
++const safeGetItem = (storage: Storage, key: string): string | null => {
++  try {
++    return storage.getItem(key);
++  } catch (error) {
++    return null;
++  }
++};
++
++const safeSetItem = (storage: Storage, key: string, value: string) => {
++  try {
++    storage.setItem(key, value);
++  } catch (error) {
++    // Swallow quota/private-mode errors; token usage should never crash the UI.
++  }
++};
++
++export const isTokenUsageStorageAvailable = (): boolean => {
++  const storage = getStorage();
++  if (!storage) return false;
++  try {
++    const probeKey = '__sf_token_usage_probe__';
++    storage.setItem(probeKey, '1');
++    storage.removeItem(probeKey);
++    return true;
++  } catch (error) {
++    return false;
++  }
++};
++
++export const getBerlinDayKey = (now: Date = new Date()): string => {
++  const formatter = new Intl.DateTimeFormat('en-CA', {
++    timeZone: 'Europe/Berlin',
++    year: 'numeric',
++    month: '2-digit',
++    day: '2-digit',
++  });
++
++  return formatter.format(now);
++};
++
++const createDefaultState = (now: Date = new Date()): TokenUsageState => {
++  const dayKey = getBerlinDayKey(now);
++  return {
++    dayKey,
++    tokensUsedToday: 0,
++    apiCallsToday: 0,
++    lastResetAt: now.toISOString(),
++  };
++};
++
++export const maybeResetUsage = (state: TokenUsageState, now: Date = new Date()): TokenUsageState => {
++  const currentDayKey = getBerlinDayKey(now);
++  if (state.dayKey === currentDayKey) {
++    return state;
++  }
++
++  return {
++    dayKey: currentDayKey,
++    tokensUsedToday: 0,
++    apiCallsToday: 0,
++    lastResetAt: now.toISOString(),
++  };
++};
++
++export const readUsage = (now: Date = new Date()): TokenUsageState => {
++  const storage = getStorage();
++  if (!storage) {
++    return createDefaultState(now);
++  }
++
++  const raw = safeGetItem(storage, USAGE_STORAGE_KEY);
++  if (!raw) {
++    const initial = createDefaultState(now);
++    safeSetItem(storage, USAGE_STORAGE_KEY, JSON.stringify(initial));
++    return initial;
++  }
++
++  try {
++    const parsed = JSON.parse(raw) as TokenUsageState;
++    const reset = maybeResetUsage(parsed, now);
++    safeSetItem(storage, USAGE_STORAGE_KEY, JSON.stringify(reset));
++    return reset;
++  } catch (error) {
++    const fallback = createDefaultState(now);
++    safeSetItem(storage, USAGE_STORAGE_KEY, JSON.stringify(fallback));
++    return fallback;
++  }
++};
++
++export const recordApiCall = ({ tokensUsed, now = new Date() }: { tokensUsed: number; now?: Date }): TokenUsageState => {
++  const storage = getStorage();
++  const current = readUsage(now);
++
++  const updated: TokenUsageState = {
++    ...current,
++    tokensUsedToday: current.tokensUsedToday + Math.max(0, tokensUsed),
++    apiCallsToday: current.apiCallsToday + 1,
++    lastResetAt: current.lastResetAt,
++  };
++
++  if (storage) {
++    safeSetItem(storage, USAGE_STORAGE_KEY, JSON.stringify(updated));
++  }
++
++  return updated;
++};
++
++export const getBudgets = (): TokenBudgets => {
++  const storage = getStorage();
++  if (!storage) return defaultBudgets;
++
++  const raw = safeGetItem(storage, BUDGETS_STORAGE_KEY);
++  if (!raw) return defaultBudgets;
++
++  try {
++    const parsed = JSON.parse(raw) as TokenBudgets;
++    return {
++      dailyTokenBudget: parsed.dailyTokenBudget ?? defaultBudgets.dailyTokenBudget,
++      dailyApiCallBudget: parsed.dailyApiCallBudget ?? defaultBudgets.dailyApiCallBudget,
++      perRequestOutputTokenCap: parsed.perRequestOutputTokenCap ?? defaultBudgets.perRequestOutputTokenCap,
++      warn80: parsed.warn80 ?? Math.floor((parsed.dailyTokenBudget ?? defaultBudgets.dailyTokenBudget) * 0.8),
++      warn95: parsed.warn95 ?? Math.floor((parsed.dailyTokenBudget ?? defaultBudgets.dailyTokenBudget) * 0.95),
++    };
++  } catch (error) {
++    return defaultBudgets;
++  }
++};
++
++export const setBudgets = (budgets: Partial<TokenBudgets>): TokenBudgets => {
++  const storage = getStorage();
++  const existing = getBudgets();
++  const merged: TokenBudgets = {
++    ...existing,
++    ...budgets,
++  };
++
++  const normalized: TokenBudgets = {
++    dailyTokenBudget: merged.dailyTokenBudget,
++    dailyApiCallBudget: merged.dailyApiCallBudget,
++    perRequestOutputTokenCap: merged.perRequestOutputTokenCap,
++    warn80: budgets.warn80 ?? Math.floor(merged.dailyTokenBudget * 0.8),
++    warn95: budgets.warn95 ?? Math.floor(merged.dailyTokenBudget * 0.95),
++  };
++
++  if (storage) {
++    safeSetItem(storage, BUDGETS_STORAGE_KEY, JSON.stringify(normalized));
++  }
++
++  return normalized;
++};
+--- a/src/features/settings/TokenUsageCard.tsx
++++ b/src/features/settings/TokenUsageCard.tsx
+@@ -1,167 +1,182 @@
+-import { useCallback, useEffect, useMemo, useState } from 'react'
+-import { Button } from '@/components/ui'
+-import { getBudgets, readUsage, TokenBudgets, TokenUsageState } from '@/lib/usage/tokenUsage'
+-import SettingsCard from './SettingsCard'
+-
+-function UsageMeter({
+-  label,
+-  value,
+-  total,
+-  status,
+-}: {
+-  label: string
+-  value: number
+-  total?: number | null
+-  status: 'normal' | 'warning' | 'critical'
+-}) {
+-  const ratio = total && total > 0 ? Math.min(1, value / total) : 0
+-  const barColor =
+-    status === 'critical'
+-      ? 'var(--sf-danger)'
+-      : status === 'warning'
+-        ? 'var(--sf-warning)'
+-        : 'var(--sf-primary)'
+-
+-  const totalLabel = total && total > 0 ? total.toLocaleString() : '—'
+-
+-  return (
+-    <div className="settings-usage-stat">
+-      <div className="settings-usage-label">{label}</div>
+-      <div className="settings-usage-value">
+-        <span>{value.toLocaleString()}</span>
+-        <span className="settings-usage-total">/ {totalLabel}</span>
+-      </div>
+-      <div className="settings-usage-meter" aria-label={`${label} usage`}>
+-        <div
+-          className="settings-usage-meter__bar"
+-          style={{ width: `${ratio * 100}%`, backgroundColor: barColor }}
+-          role="presentation"
+-        />
+-      </div>
+-    </div>
+-  )
+-}
+-
+-function WarningBanner({ message, tone }: { message: string; tone: 'warning' | 'critical' }) {
+-  return (
+-    <div
+-      className={`settings-usage-banner ${tone === 'critical' ? 'settings-usage-banner--critical' : 'settings-usage-banner--warning'}`}
+-      role="status"
+-    >
+-      {message}
+-    </div>
+-  )
+-}
+-
+-export default function TokenUsageCard() {
+-  const [usage, setUsage] = useState<TokenUsageState>(() => readUsage())
+-  const [budgets, setBudgetsState] = useState<TokenBudgets>(() => getBudgets())
+-
+-  const callBudget = budgets.dailyApiCallBudget ?? null
+-  const lastResetLabel = useMemo(() => {
+-    const lastResetDate = new Date(usage.lastResetAt)
+-    return new Intl.DateTimeFormat('en-GB', {
+-      timeZone: 'Europe/Berlin',
+-      hour: '2-digit',
+-      minute: '2-digit',
+-      day: '2-digit',
+-      month: '2-digit',
+-      year: 'numeric',
+-    }).format(lastResetDate)
+-  }, [usage.lastResetAt])
+-
+-  const tokenWarnLevels = useMemo(
+-    () => ({ warn80: budgets.warn80, warn95: budgets.warn95 }),
+-    [budgets.warn80, budgets.warn95],
+-  )
+-
+-  const apiWarnLevels = useMemo(() => {
+-    if (!budgets.dailyApiCallBudget) return null
+-    return {
+-      warn80: Math.floor(budgets.dailyApiCallBudget * 0.8),
+-      warn95: Math.floor(budgets.dailyApiCallBudget * 0.95),
+-    }
+-  }, [budgets.dailyApiCallBudget])
+-
+-  const tokenPercent = useMemo(() => {
+-    if (budgets.dailyTokenBudget <= 0) return 0
+-    return Math.round((usage.tokensUsedToday / budgets.dailyTokenBudget) * 100)
+-  }, [budgets.dailyTokenBudget, usage.tokensUsedToday])
+-
+-  const apiPercent = useMemo(() => {
+-    if (!callBudget || callBudget <= 0) return 0
+-    return Math.round((usage.apiCallsToday / callBudget) * 100)
+-  }, [callBudget, usage.apiCallsToday])
+-
+-  const refresh = useCallback(() => {
+-    setUsage(readUsage())
+-    setBudgetsState(getBudgets())
+-  }, [])
+-
+-  useEffect(() => {
+-    refresh()
+-  }, [refresh])
+-
+-  const tokenStatus: 'normal' | 'warning' | 'critical' = useMemo(() => {
+-    if (usage.tokensUsedToday >= tokenWarnLevels.warn95) return 'critical'
+-    if (usage.tokensUsedToday >= tokenWarnLevels.warn80) return 'warning'
+-    return 'normal'
+-  }, [tokenWarnLevels.warn80, tokenWarnLevels.warn95, usage.tokensUsedToday])
+-
+-  const callStatus: 'normal' | 'warning' | 'critical' = useMemo(() => {
+-    if (!apiWarnLevels || !callBudget) return 'normal'
+-    if (usage.apiCallsToday >= apiWarnLevels.warn95) return 'critical'
+-    if (usage.apiCallsToday >= apiWarnLevels.warn80) return 'warning'
+-    return 'normal'
+-  }, [apiWarnLevels, callBudget, usage.apiCallsToday])
+-
+-  return (
+-    <SettingsCard title="Token Usage / Limits" subtitle="Resets at 00:00 Europe/Berlin">
+-      <div className="settings-usage-grid">
+-        <UsageMeter
+-          label="Tokens used today"
+-          value={usage.tokensUsedToday}
+-          total={budgets.dailyTokenBudget}
+-          status={tokenStatus}
+-        />
+-        <UsageMeter
+-          label="API calls today"
+-          value={usage.apiCallsToday}
+-          total={callBudget}
+-          status={callStatus}
+-        />
+-        <div className="settings-usage-meta">
+-          <p className="settings-usage-meta__label">Per-request output cap</p>
+-          <p className="settings-usage-meta__value">{budgets.perRequestOutputTokenCap.toLocaleString()} tokens</p>
+-        </div>
+-      </div>
+-
+-      {tokenStatus !== 'normal' ? (
+-        <WarningBanner
+-          tone={tokenStatus === 'critical' ? 'critical' : 'warning'}
+-          message={`Token usage at ${tokenPercent}% of the daily budget.`}
+-        />
+-      ) : null}
+-
+-      {callBudget && callStatus !== 'normal' && apiWarnLevels ? (
+-        <WarningBanner
+-          tone={callStatus === 'critical' ? 'critical' : 'warning'}
+-          message={`API calls at ${apiPercent}% of the daily budget.`}
+-        />
+-      ) : null}
+-
+-      <div className="settings-usage-footer">
+-        <div>
+-          <p className="settings-usage-reset">Daily counters reset at 00:00 Europe/Berlin (last reset {lastResetLabel}).</p>
+-          <p className="settings-usage-reset">
+-            Budgets: {budgets.dailyTokenBudget.toLocaleString()} tokens/day · {callBudget ? `${callBudget} API calls/day` : 'API call budget not set'}.
+-          </p>
+-          <p className="settings-usage-reset">Warning thresholds fixed at 80% and 95%. Per-request output is capped.</p>
+-        </div>
+-        <Button size="sm" variant="secondary" onClick={refresh} aria-label="Refresh token usage">
+-          Refresh usage
+-        </Button>
+-      </div>
+-    </SettingsCard>
+-  )
+-}
++import { useCallback, useEffect, useMemo, useState } from 'react'
++import { Button } from '@/components/ui'
++import {
++  getBudgets,
++  isTokenUsageStorageAvailable,
++  readUsage,
++  TokenBudgets,
++  TokenUsageState,
++} from '@/lib/usage/tokenUsage'
++import SettingsCard from './SettingsCard'
++
++function UsageMeter({
++  label,
++  value,
++  total,
++  status,
++}: {
++  label: string
++  value: number
++  total?: number | null
++  status: 'normal' | 'warning' | 'critical'
++}) {
++  const ratio = total && total > 0 ? Math.min(1, value / total) : 0
++  const barColor =
++    status === 'critical'
++      ? 'var(--sf-danger)'
++      : status === 'warning'
++        ? 'var(--sf-warning)'
++        : 'var(--sf-primary)'
++
++  const totalLabel = total && total > 0 ? total.toLocaleString() : '—'
++
++  return (
++    <div className="settings-usage-stat">
++      <div className="settings-usage-label">{label}</div>
++      <div className="settings-usage-value">
++        <span>{value.toLocaleString()}</span>
++        <span className="settings-usage-total">/ {totalLabel}</span>
++      </div>
++      <div className="settings-usage-meter" aria-label={`${label} usage`}>
++        <div
++          className="settings-usage-meter__bar"
++          style={{ width: `${ratio * 100}%`, backgroundColor: barColor }}
++          role="presentation"
++        />
++      </div>
++    </div>
++  )
++}
++
++function WarningBanner({ message, tone }: { message: string; tone: 'warning' | 'critical' }) {
++  return (
++    <div
++      className={`settings-usage-banner ${tone === 'critical' ? 'settings-usage-banner--critical' : 'settings-usage-banner--warning'}`}
++      role="status"
++    >
++      {message}
++    </div>
++  )
++}
++
++export default function TokenUsageCard() {
++  const [usage, setUsage] = useState<TokenUsageState>(() => readUsage())
++  const [budgets, setBudgetsState] = useState<TokenBudgets>(() => getBudgets())
++  const [storageUnavailable, setStorageUnavailable] = useState<boolean>(() => !isTokenUsageStorageAvailable())
++
++  const callBudget = budgets.dailyApiCallBudget ?? null
++  const lastResetLabel = useMemo(() => {
++    const lastResetDate = new Date(usage.lastResetAt)
++    return new Intl.DateTimeFormat('en-GB', {
++      timeZone: 'Europe/Berlin',
++      hour: '2-digit',
++      minute: '2-digit',
++      day: '2-digit',
++      month: '2-digit',
++      year: 'numeric',
++    }).format(lastResetDate)
++  }, [usage.lastResetAt])
++
++  const tokenWarnLevels = useMemo(
++    () => ({ warn80: budgets.warn80, warn95: budgets.warn95 }),
++    [budgets.warn80, budgets.warn95],
++  )
++
++  const apiWarnLevels = useMemo(() => {
++    if (!budgets.dailyApiCallBudget) return null
++    return {
++      warn80: Math.floor(budgets.dailyApiCallBudget * 0.8),
++      warn95: Math.floor(budgets.dailyApiCallBudget * 0.95),
++    }
++  }, [budgets.dailyApiCallBudget])
++
++  const tokenPercent = useMemo(() => {
++    if (budgets.dailyTokenBudget <= 0) return 0
++    return Math.round((usage.tokensUsedToday / budgets.dailyTokenBudget) * 100)
++  }, [budgets.dailyTokenBudget, usage.tokensUsedToday])
++
++  const apiPercent = useMemo(() => {
++    if (!callBudget || callBudget <= 0) return 0
++    return Math.round((usage.apiCallsToday / callBudget) * 100)
++  }, [callBudget, usage.apiCallsToday])
++
++  const refresh = useCallback(() => {
++    setStorageUnavailable(!isTokenUsageStorageAvailable())
++    setUsage(readUsage())
++    setBudgetsState(getBudgets())
++  }, [])
++
++  useEffect(() => {
++    refresh()
++  }, [refresh])
++
++  const tokenStatus: 'normal' | 'warning' | 'critical' = useMemo(() => {
++    if (usage.tokensUsedToday >= tokenWarnLevels.warn95) return 'critical'
++    if (usage.tokensUsedToday >= tokenWarnLevels.warn80) return 'warning'
++    return 'normal'
++  }, [tokenWarnLevels.warn80, tokenWarnLevels.warn95, usage.tokensUsedToday])
++
++  const callStatus: 'normal' | 'warning' | 'critical' = useMemo(() => {
++    if (!apiWarnLevels || !callBudget) return 'normal'
++    if (usage.apiCallsToday >= apiWarnLevels.warn95) return 'critical'
++    if (usage.apiCallsToday >= apiWarnLevels.warn80) return 'warning'
++    return 'normal'
++  }, [apiWarnLevels, callBudget, usage.apiCallsToday])
++
++  return (
++    <SettingsCard title="Token Usage / Limits" subtitle="Resets at 00:00 Europe/Berlin">
++      <div className="settings-usage-grid">
++        <UsageMeter
++          label="Tokens used today"
++          value={usage.tokensUsedToday}
++          total={budgets.dailyTokenBudget}
++          status={tokenStatus}
++        />
++        <UsageMeter
++          label="API calls today"
++          value={usage.apiCallsToday}
++          total={callBudget}
++          status={callStatus}
++        />
++        <div className="settings-usage-meta">
++          <p className="settings-usage-meta__label">Per-request output cap</p>
++          <p className="settings-usage-meta__value">{budgets.perRequestOutputTokenCap.toLocaleString()} tokens</p>
++        </div>
++      </div>
++
++      {tokenStatus !== 'normal' ? (
++        <WarningBanner
++          tone={tokenStatus === 'critical' ? 'critical' : 'warning'}
++          message={`Token usage at ${tokenPercent}% of the daily budget.`}
++        />
++      ) : null}
++
++      {callBudget && callStatus !== 'normal' && apiWarnLevels ? (
++        <WarningBanner
++          tone={callStatus === 'critical' ? 'critical' : 'warning'}
++          message={`API calls at ${apiPercent}% of the daily budget.`}
++        />
++      ) : null}
++
++      {storageUnavailable ? (
++        <WarningBanner
++          tone="warning"
++          message="Storage unavailable. Token usage will not persist across sessions (private mode / SSR / disabled storage)."
++        />
++      ) : null}
++
++      <div className="settings-usage-footer">
++        <div>
++          <p className="settings-usage-reset">Daily counters reset at 00:00 Europe/Berlin (last reset {lastResetLabel}).</p>
++          <p className="settings-usage-reset">
++            Budgets: {budgets.dailyTokenBudget.toLocaleString()} tokens/day · {callBudget ? `${callBudget} API calls/day` : 'API call budget not set'}.
++          </p>
++          <p className="settings-usage-reset">Warning thresholds fixed at 80% and 95%. Per-request output is capped.</p>
++        </div>
++        <Button size="sm" variant="secondary" onClick={refresh} aria-label="Refresh token usage">
++          Refresh usage
++        </Button>
++      </div>
++    </SettingsCard>
++  )
++}
+--- a/src/lib/usage/tokenUsage.test.ts
++++ b/src/lib/usage/tokenUsage.test.ts
+@@ -1,72 +1,89 @@
+-import { describe, expect, beforeEach, it } from 'vitest';
+-
+-import {
+-  TokenUsageState,
+-  getBerlinDayKey,
+-  maybeResetUsage,
+-  readUsage,
+-  recordApiCall,
+-  getBudgets,
+-  setBudgets,
+-} from './tokenUsage';
+-
+-describe('tokenUsage', () => {
+-  beforeEach(() => {
+-    localStorage.clear();
+-  });
+-
+-  it('computes Berlin day key using Europe/Berlin timezone', () => {
+-    const winterEveningUtc = new Date('2024-01-01T22:30:00Z');
+-    const summerLateUtc = new Date('2024-07-01T22:30:00Z');
+-
+-    expect(getBerlinDayKey(winterEveningUtc)).toBe('2024-01-01');
+-    expect(getBerlinDayKey(summerLateUtc)).toBe('2024-07-02');
+-  });
+-
+-  it('resets counters when the Berlin day key changes', () => {
+-    const beforeMidnight: TokenUsageState = {
+-      dayKey: getBerlinDayKey(new Date('2024-01-01T22:30:00Z')),
+-      tokensUsedToday: 500,
+-      apiCallsToday: 3,
+-      lastResetAt: new Date('2024-01-01T22:30:00Z').toISOString(),
+-    };
+-
+-    const afterMidnight = maybeResetUsage(beforeMidnight, new Date('2024-01-01T23:10:00Z'));
+-
+-    expect(afterMidnight.dayKey).toBe(getBerlinDayKey(new Date('2024-01-01T23:10:00Z')));
+-    expect(afterMidnight.tokensUsedToday).toBe(0);
+-    expect(afterMidnight.apiCallsToday).toBe(0);
+-  });
+-
+-  it('records api calls and token usage when invoked', () => {
+-    const now = new Date('2024-01-02T10:00:00Z');
+-    const initial = readUsage(now);
+-    expect(initial.tokensUsedToday).toBe(0);
+-    expect(initial.apiCallsToday).toBe(0);
+-
+-    const updated = recordApiCall({ tokensUsed: 120, now });
+-
+-    expect(updated.tokensUsedToday).toBe(120);
+-    expect(updated.apiCallsToday).toBe(1);
+-
+-    const persisted = readUsage(now);
+-    expect(persisted.tokensUsedToday).toBe(120);
+-    expect(persisted.apiCallsToday).toBe(1);
+-  });
+-
+-  it('provides default budgets and allows overrides', () => {
+-    const defaults = getBudgets();
+-
+-    expect(defaults.dailyTokenBudget).toBeGreaterThan(0);
+-    expect(defaults.warn80).toBe(Math.floor(defaults.dailyTokenBudget * 0.8));
+-    expect(defaults.warn95).toBe(Math.floor(defaults.dailyTokenBudget * 0.95));
+-    expect(defaults.perRequestOutputTokenCap).toBeGreaterThan(0);
+-
+-    const updated = setBudgets({ dailyTokenBudget: 1000, perRequestOutputTokenCap: 200 });
+-
+-    expect(updated.dailyTokenBudget).toBe(1000);
+-    expect(updated.warn80).toBe(800);
+-    expect(updated.warn95).toBe(950);
+-    expect(updated.perRequestOutputTokenCap).toBe(200);
+-  });
+-});
++import { describe, expect, beforeEach, it } from 'vitest';
++
++import {
++  TokenUsageState,
++  getBerlinDayKey,
++  maybeResetUsage,
++  readUsage,
++  recordApiCall,
++  getBudgets,
++  setBudgets,
++} from './tokenUsage';
++
++describe('tokenUsage', () => {
++  beforeEach(() => {
++    localStorage.clear();
++  });
++
++  it('computes Berlin day key using Europe/Berlin timezone', () => {
++    const winterEveningUtc = new Date('2024-01-01T22:30:00Z');
++    const summerLateUtc = new Date('2024-07-01T22:30:00Z');
++
++    expect(getBerlinDayKey(winterEveningUtc)).toBe('2024-01-01');
++    expect(getBerlinDayKey(summerLateUtc)).toBe('2024-07-02');
++  });
++
++  it('keeps the same day key across DST spring-forward transition in Berlin', () => {
++    // DST starts in Berlin on 2024-03-31: 02:00 -> 03:00 local time.
++    const beforeDstJumpUtc = new Date('2024-03-31T00:59:59Z'); // 01:59:59 Berlin
++    const afterDstJumpUtc = new Date('2024-03-31T01:00:01Z');  // 03:00:01 Berlin
++
++    expect(getBerlinDayKey(beforeDstJumpUtc)).toBe('2024-03-31');
++    expect(getBerlinDayKey(afterDstJumpUtc)).toBe('2024-03-31');
++  });
++
++  it('resets counters when the Berlin day key changes', () => {
++    const beforeMidnight: TokenUsageState = {
++      dayKey: getBerlinDayKey(new Date('2024-01-01T22:30:00Z')),
++      tokensUsedToday: 500,
++      apiCallsToday: 3,
++      lastResetAt: new Date('2024-01-01T22:30:00Z').toISOString(),
++    };
++
++    const afterMidnight = maybeResetUsage(beforeMidnight, new Date('2024-01-01T23:10:00Z'));
++
++    expect(afterMidnight.dayKey).toBe(getBerlinDayKey(new Date('2024-01-01T23:10:00Z')));
++    expect(afterMidnight.tokensUsedToday).toBe(0);
++    expect(afterMidnight.apiCallsToday).toBe(0);
++  });
++
++  it('records api calls and token usage when invoked', () => {
++    const now = new Date('2024-01-02T10:00:00Z');
++    const initial = readUsage(now);
++    expect(initial.tokensUsedToday).toBe(0);
++    expect(initial.apiCallsToday).toBe(0);
++
++    const updated = recordApiCall({ tokensUsed: 120, now });
++
++    expect(updated.tokensUsedToday).toBe(120);
++    expect(updated.apiCallsToday).toBe(1);
++
++    const persisted = readUsage(now);
++    expect(persisted.tokensUsedToday).toBe(120);
++    expect(persisted.apiCallsToday).toBe(1);
++  });
++
++  it('clamps negative token usage deltas to 0', () => {
++    const now = new Date('2024-01-02T10:00:00Z');
++    const updated = recordApiCall({ tokensUsed: -50, now });
++
++    expect(updated.tokensUsedToday).toBe(0);
++    expect(updated.apiCallsToday).toBe(1);
++  });
++
++  it('provides default budgets and allows overrides', () => {
++    const defaults = getBudgets();
++
++    expect(defaults.dailyTokenBudget).toBeGreaterThan(0);
++    expect(defaults.warn80).toBe(Math.floor(defaults.dailyTokenBudget * 0.8));
++    expect(defaults.warn95).toBe(Math.floor(defaults.dailyTokenBudget * 0.95));
++    expect(defaults.perRequestOutputTokenCap).toBeGreaterThan(0);
++
++    const updated = setBudgets({ dailyTokenBudget: 1000, perRequestOutputTokenCap: 200 });
++
++    expect(updated.dailyTokenBudget).toBe(1000);
++    expect(updated.warn80).toBe(800);
++    expect(updated.warn95).toBe(950);
++    expect(updated.perRequestOutputTokenCap).toBe(200);
++  });
++});
+--- a/src/lib/ai/withTokenLockOrMock.test.ts
++++ b/src/lib/ai/withTokenLockOrMock.test.ts
+@@ -1,154 +1,172 @@
+-import { beforeEach, describe, expect, it, vi } from 'vitest';
+-
+-import { getBerlinDayKey, readUsage, setBudgets, recordApiCall } from '../usage/tokenUsage';
+-import { withTokenLockOrMock } from './withTokenLockOrMock';
+-
+-const NOW = new Date('2024-02-01T10:00:00Z');
+-
+-describe('withTokenLockOrMock', () => {
+-  beforeEach(() => {
+-    localStorage.clear();
+-    setBudgets({
+-      dailyTokenBudget: 100,
+-      dailyApiCallBudget: 5,
+-      perRequestOutputTokenCap: 50,
+-      warn80: 80,
+-      warn95: 95,
+-    });
+-  });
+-
+-  it('returns demo mode without incrementing usage when lock is denied', async () => {
+-    recordApiCall({ tokensUsed: 95, now: NOW });
+-    const before = readUsage(NOW);
+-
+-    const response = await withTokenLockOrMock<string>({
+-      kind: 'demo-path',
+-      estimatedTokens: 20,
+-      maxOutputTokens: 200,
+-      doRealCall: vi.fn(),
+-      mockResult: () => 'demo-output',
+-      now: NOW,
+-    });
+-
+-    expect(response.mode).toBe('demo');
+-    expect(response.result).toBe('demo-output');
+-    expect(response.note).toContain('Example/Demo');
+-
+-    const usage = readUsage(NOW);
+-    expect(usage.tokensUsedToday).toBe(before.tokensUsedToday);
+-    expect(usage.apiCallsToday).toBe(before.apiCallsToday);
+-  });
+-
+-  it('does not increment usage when starting in demo mode with empty counters', async () => {
+-    setBudgets({
+-      dailyTokenBudget: 0,
+-      dailyApiCallBudget: 0,
+-    });
+-
+-    const response = await withTokenLockOrMock<string>({
+-      kind: 'demo-empty',
+-      estimatedTokens: 200,
+-      maxOutputTokens: 200,
+-      doRealCall: vi.fn(),
+-      mockResult: () => 'demo-output',
+-      now: NOW,
+-    });
+-
+-    expect(response.mode).toBe('demo');
+-    expect(response.note).toContain('Example/Demo result (no API call counted)');
+-    const usage = readUsage(NOW);
+-    expect(usage.tokensUsedToday).toBe(0);
+-    expect(usage.apiCallsToday).toBe(0);
+-  });
+-
+-  it('runs real call and increments usage when lock is acquired', async () => {
+-    const realCall = vi.fn().mockResolvedValue({ result: 'real-output', tokensUsed: 12 });
+-
+-    const response = await withTokenLockOrMock<string>({
+-      kind: 'real-path',
+-      estimatedTokens: 10,
+-      maxOutputTokens: 40,
+-      doRealCall: realCall,
+-      mockResult: () => 'demo-output',
+-      now: NOW,
+-    });
+-
+-    expect(response.mode).toBe('real');
+-    expect(response.result).toBe('real-output');
+-    expect(response.note).toBeUndefined();
+-
+-    const usage = readUsage(NOW);
+-    expect(usage.tokensUsedToday).toBe(12);
+-    expect(usage.apiCallsToday).toBe(1);
+-  });
+-
+-  it('falls back to reserved tokens when the real call does not return usage', async () => {
+-    await withTokenLockOrMock<string>({
+-      kind: 'real-reserved',
+-      estimatedTokens: 15,
+-      maxOutputTokens: 40,
+-      doRealCall: vi.fn().mockResolvedValue({ result: 'real-output' }),
+-      mockResult: () => 'demo-output',
+-      now: NOW,
+-    });
+-
+-    const usage = readUsage(NOW);
+-    expect(usage.tokensUsedToday).toBe(15);
+-    expect(usage.apiCallsToday).toBe(1);
+-  });
+-
+-  it('does not commit usage when the real call throws', async () => {
+-    const realCall = vi.fn().mockRejectedValue(new Error('fail'));
+-
+-    await expect(
+-      withTokenLockOrMock<string>({
+-        kind: 'real-error',
+-        estimatedTokens: 10,
+-        maxOutputTokens: 40,
+-        doRealCall: realCall,
+-        mockResult: () => 'demo-output',
+-        now: NOW,
+-      }),
+-    ).rejects.toThrow('fail');
+-
+-    const usage = readUsage(NOW);
+-    expect(usage.tokensUsedToday).toBe(0);
+-    expect(usage.apiCallsToday).toBe(0);
+-  });
+-
+-  it('clamps maxOutputTokens using the per-request cap', async () => {
+-    const callSpy = vi.fn().mockResolvedValue({ result: 'real-output', tokensUsed: 5 });
+-
+-    await withTokenLockOrMock<string>({
+-      kind: 'cap-path',
+-      estimatedTokens: 10,
+-      maxOutputTokens: 120,
+-      doRealCall: callSpy,
+-      mockResult: () => 'demo-output',
+-      now: NOW,
+-    });
+-
+-    expect(callSpy).toHaveBeenCalledWith({ maxOutputTokens: 50 });
+-  });
+-
+-  it('blocks once the daily call budget is exceeded', async () => {
+-    const todayKey = getBerlinDayKey(NOW);
+-    localStorage.setItem(
+-      'sf-token-usage',
+-      JSON.stringify({ dayKey: todayKey, tokensUsedToday: 20, apiCallsToday: 5, lastResetAt: NOW.toISOString() }),
+-    );
+-
+-    const response = await withTokenLockOrMock<string>({
+-      kind: 'call-budget',
+-      estimatedTokens: 5,
+-      maxOutputTokens: 10,
+-      doRealCall: vi.fn(),
+-      mockResult: () => 'demo-output',
+-      now: NOW,
+-    });
+-
+-    expect(response.mode).toBe('demo');
+-    const usage = readUsage(NOW);
+-    expect(usage.apiCallsToday).toBe(5);
+-  });
+-});
++import { beforeEach, describe, expect, it, vi } from 'vitest';
++
++import { getBerlinDayKey, readUsage, setBudgets, recordApiCall } from '../usage/tokenUsage';
++import { withTokenLockOrMock } from './withTokenLockOrMock';
++
++const NOW = new Date('2024-02-01T10:00:00Z');
++
++describe('withTokenLockOrMock', () => {
++  beforeEach(() => {
++    localStorage.clear();
++    setBudgets({
++      dailyTokenBudget: 100,
++      dailyApiCallBudget: 5,
++      perRequestOutputTokenCap: 50,
++      warn80: 80,
++      warn95: 95,
++    });
++  });
++
++  it('returns demo mode without incrementing usage when lock is denied', async () => {
++    recordApiCall({ tokensUsed: 95, now: NOW });
++    const before = readUsage(NOW);
++
++    const response = await withTokenLockOrMock<string>({
++      kind: 'demo-path',
++      estimatedTokens: 20,
++      maxOutputTokens: 200,
++      doRealCall: vi.fn(),
++      mockResult: () => 'demo-output',
++      now: NOW,
++    });
++
++    expect(response.mode).toBe('demo');
++    expect(response.result).toBe('demo-output');
++    expect(response.note).toContain('Example/Demo');
++
++    const usage = readUsage(NOW);
++    expect(usage.tokensUsedToday).toBe(before.tokensUsedToday);
++    expect(usage.apiCallsToday).toBe(before.apiCallsToday);
++  });
++
++  it('does not increment usage when starting in demo mode with empty counters', async () => {
++    setBudgets({
++      dailyTokenBudget: 0,
++      dailyApiCallBudget: 0,
++    });
++
++    const response = await withTokenLockOrMock<string>({
++      kind: 'demo-empty',
++      estimatedTokens: 200,
++      maxOutputTokens: 200,
++      doRealCall: vi.fn(),
++      mockResult: () => 'demo-output',
++      now: NOW,
++    });
++
++    expect(response.mode).toBe('demo');
++    expect(response.note).toContain('Example/Demo result (no API call counted)');
++    const usage = readUsage(NOW);
++    expect(usage.tokensUsedToday).toBe(0);
++    expect(usage.apiCallsToday).toBe(0);
++  });
++
++  it('runs real call and increments usage when lock is acquired', async () => {
++    const realCall = vi.fn().mockResolvedValue({ result: 'real-output', tokensUsed: 12 });
++
++    const response = await withTokenLockOrMock<string>({
++      kind: 'real-path',
++      estimatedTokens: 10,
++      maxOutputTokens: 40,
++      doRealCall: realCall,
++      mockResult: () => 'demo-output',
++      now: NOW,
++    });
++
++    expect(response.mode).toBe('real');
++    expect(response.result).toBe('real-output');
++    expect(response.note).toBeUndefined();
++
++    const usage = readUsage(NOW);
++    expect(usage.tokensUsedToday).toBe(12);
++    expect(usage.apiCallsToday).toBe(1);
++  });
++
++  it('falls back to reserved tokens when the real call does not return usage', async () => {
++    await withTokenLockOrMock<string>({
++      kind: 'real-reserved',
++      estimatedTokens: 15,
++      maxOutputTokens: 40,
++      doRealCall: vi.fn().mockResolvedValue({ result: 'real-output' }),
++      mockResult: () => 'demo-output',
++      now: NOW,
++    });
++
++    const usage = readUsage(NOW);
++    expect(usage.tokensUsedToday).toBe(15);
++    expect(usage.apiCallsToday).toBe(1);
++  });
++
++  it('does not commit usage when the real call throws', async () => {
++    const realCall = vi.fn().mockRejectedValue(new Error('fail'));
++
++    await expect(
++      withTokenLockOrMock<string>({
++        kind: 'real-error',
++        estimatedTokens: 10,
++        maxOutputTokens: 40,
++        doRealCall: realCall,
++        mockResult: () => 'demo-output',
++        now: NOW,
++      }),
++    ).rejects.toThrow('fail');
++
++    const usage = readUsage(NOW);
++    expect(usage.tokensUsedToday).toBe(0);
++    expect(usage.apiCallsToday).toBe(0);
++  });
++
++  it('clamps maxOutputTokens using the per-request cap', async () => {
++    const callSpy = vi.fn().mockResolvedValue({ result: 'real-output', tokensUsed: 5 });
++
++    await withTokenLockOrMock<string>({
++      kind: 'cap-path',
++      estimatedTokens: 10,
++      maxOutputTokens: 120,
++      doRealCall: callSpy,
++      mockResult: () => 'demo-output',
++      now: NOW,
++    });
++
++    expect(callSpy).toHaveBeenCalledWith({ maxOutputTokens: 50 });
++  });
++
++  it('does not inflate tokensUsed when the per-request cap is far above the estimate', async () => {
++    setBudgets({ perRequestOutputTokenCap: 1000 });
++    const realCall = vi.fn().mockResolvedValue({ result: 'real-output', tokensUsed: 45 });
++
++    await withTokenLockOrMock<string>({
++      kind: 'cap-not-inflate',
++      estimatedTokens: 50,
++      maxOutputTokens: 200,
++      doRealCall: realCall,
++      mockResult: () => 'demo-output',
++      now: NOW,
++    });
++
++    const usage = readUsage(NOW);
++    expect(usage.tokensUsedToday).toBe(45);
++    expect(usage.apiCallsToday).toBe(1);
++  });
++
++  it('blocks once the daily call budget is exceeded', async () => {
++    const todayKey = getBerlinDayKey(NOW);
++    localStorage.setItem(
++      'sf-token-usage',
++      JSON.stringify({ dayKey: todayKey, tokensUsedToday: 20, apiCallsToday: 5, lastResetAt: NOW.toISOString() }),
++    );
++
++    const response = await withTokenLockOrMock<string>({
++      kind: 'call-budget',
++      estimatedTokens: 5,
++      maxOutputTokens: 10,
++      doRealCall: vi.fn(),
++      mockResult: () => 'demo-output',
++      now: NOW,
++    });
++
++    expect(response.mode).toBe('demo');
++    const usage = readUsage(NOW);
++    expect(usage.apiCallsToday).toBe(5);
++  });
++});
