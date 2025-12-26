@@ -82,7 +82,7 @@ tabs:
       - root/src/components/alerts/*
       - root/src/store/alertsStore.ts
       - root/src/lib/alerts/triggerEngine.ts
-    status: todo
+    status: drafted
     notes: ""
 
   - name: Settings
