@@ -127,7 +127,7 @@ tabs:
       - root/src/components/ReplayPlayer.tsx
       - root/src/features/chart/replay.ts
       - root/src/lib/replay/ohlcReplayEngine.ts
-    status: drafted
+    status: ready_for_loveable
     notes: ""
 
   - name: Learning
