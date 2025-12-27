@@ -174,36 +174,15 @@ export default function NewAlertSheet({ isOpen, onClose, onCreated, prefill }: N
       title="New alert"
       subtitle="Set a symbol, trigger direction, and threshold to watch."
       size="lg"
-      className="max-h-[calc(100vh-4rem)] overflow-hidden"
+      className="flex max-h-[600px] flex-col overflow-hidden"
     >
-      <div className="flex min-h-0 flex-col" data-testid="alert-create-dialog">
-        <div className="sf-alerts-new min-h-0 flex-1 overflow-y-auto pr-1" data-testid="alert-create-form">
+      <div className="flex min-h-0 flex-1 flex-col" data-testid="alert-create-dialog">
+        <div className="sf-alerts-new min-h-0 flex-1 overflow-y-auto px-1" data-testid="alert-create-form">
           {submissionError ? (
             <div className="sf-alerts-new__error" role="alert">
               {submissionError}
             </div>
           ) : null}
-
-          <div className="mb-5 flex flex-wrap items-center justify-end gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={closeSheet}
-              disabled={isSubmitting}
-              data-testid="alert-cancel-button"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={handleSubmit}
-              loading={isSubmitting}
-              data-testid="alert-submit-button"
-            >
-              Save alert
-            </Button>
-          </div>
 
           <div className="space-y-6">
             <div>
@@ -281,6 +260,27 @@ export default function NewAlertSheet({ isOpen, onClose, onCreated, prefill }: N
                 triggerProps={{ "data-testid": "alert-timeframe-select", "aria-label": "Timeframe" }}
               />
             </label>
+
+            <div className="mt-6 flex flex-wrap items-center justify-end gap-3 border-t border-border bg-surface-elevated pt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={closeSheet}
+                disabled={isSubmitting}
+                data-testid="alert-cancel-button"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleSubmit}
+                loading={isSubmitting}
+                data-testid="alert-submit-button"
+              >
+                Save alert
+              </Button>
+            </div>
           </div>
         </div>
       </div>

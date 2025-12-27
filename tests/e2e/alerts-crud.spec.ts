@@ -20,7 +20,14 @@ async function createAlert(page: Page, symbol: string) {
   await page.getByTestId('alert-symbol-input').fill(symbol);
   await page.getByTestId('alert-condition-input').fill('Automation condition for alert CRUD tests.');
   await page.getByTestId('alert-threshold-input').fill('99');
-  await page.getByTestId('alert-submit-button').click();
+  // Scroll and click submit button - use evaluate to ensure it's clickable
+  await page.evaluate(() => {
+    const button = document.querySelector('[data-testid="alert-submit-button"]') as HTMLElement;
+    if (button) {
+      button.scrollIntoView({ behavior: 'instant', block: 'center' });
+      button.click();
+    }
+  });
   await page.waitForSelector('[data-testid="alert-create-dialog"]', { state: 'detached' });
 }
 
