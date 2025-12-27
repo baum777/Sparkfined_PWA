@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from './fixtures/baseTest';
+import type { Page } from '@playwright/test';
 
 const DASHBOARD_URL = '/dashboard-v2';
 const ALERTS_URL = '/alerts';

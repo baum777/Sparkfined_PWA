@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from './fixtures/baseTest';
+import type { Page } from '@playwright/test';
 import { visitWatchlist } from './fixtures/navigation';
 const candlePayload = JSON.stringify(
   Array.from({ length: 25 }, (_, index) => ({

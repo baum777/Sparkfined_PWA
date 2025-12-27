@@ -1,6 +1,6 @@
 // Placeholder E2E for drawing selection once Playwright browsers are available.
 // Currently skipped due to missing browser binaries in the environment.
-import { test } from '@playwright/test'
+import { test } from './fixtures/baseTest'
 
 test.describe.skip('chart drawing selection (e2e)', () => {
   // blocked by Playwright browser availability (Chromium download forbidden in CI sandbox)

@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from './fixtures/baseTest';
+import type { Page } from '@playwright/test';
 
 const CHART_URL = '/chart-v2';
 const candlePayload = JSON.stringify(
