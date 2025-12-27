@@ -36,18 +36,19 @@ export default function OraclePage() {
     counts,
     todayInsight,
     readingStreak,
-    markAsRead,
     refresh,
     todayReport,
     reports,
     isLoading,
     error,
     lastFetchTimestamp,
+    markAsRead,
   } = useOracle();
 
   const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
   const [rewardMessage, setRewardMessage] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<string>('All');
+  const [insightsOpen, setInsightsOpen] = useState(false);
 
   // Filter reports by theme
   const filteredReports = useMemo(() => {
@@ -243,21 +244,6 @@ export default function OraclePage() {
         }
       >
         <div className="space-y-6">
-          <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-subtle text-brand">
-                <Sparkles size={18} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-text-primary">AI-powered daily context</p>
-                <p className="text-sm text-text-secondary">
-                  Review today’s report, log it, and build your streak.
-                </p>
-              </div>
-            </div>
-            <OracleFilters filter={filter} onFilterChange={setFilter} counts={counts} />
-          </section>
-
           {rewardMessage ? (
             <div
               className="card-glow animate-fade-in rounded-3xl border border-brand/40 bg-brand/5 p-4"
@@ -271,23 +257,58 @@ export default function OraclePage() {
             </div>
           ) : null}
 
-          {todayInsight ? <OracleTodayTakeaway insight={todayInsight} /> : null}
-          <OracleRewardBanner streak={readingStreak} />
+          {/* Loveable-additive Insights (kept visually separated; legacy blocks remain unchanged below). */}
+          <section
+            className="card rounded-3xl border border-border bg-surface/60 p-6"
+            data-testid="oracle-insight-section"
+          >
+            <details
+              className="group"
+              data-testid="oracle-insight-disclosure"
+              onToggle={(event) => setInsightsOpen((event.currentTarget as HTMLDetailsElement).open)}
+            >
+              <summary
+                className="flex cursor-pointer list-none items-center justify-between gap-4"
+                data-testid="oracle-insight-disclosure-summary"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-subtle text-brand">
+                    <Sparkles size={18} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-text-primary">Insights (optional)</p>
+                    <p className="text-sm text-text-secondary">
+                      Loveable-style feed layered on top of the legacy Oracle report.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs text-text-tertiary">Toggle</span>
+              </summary>
 
-          {insights.length === 0 ? (
-            <OracleEmptyState filter={filter} />
-          ) : (
-            <section className="space-y-4">
-              {insights.map((insight) => (
-                <OracleInsightCard
-                  key={insight.id}
-                  insight={insight}
-                  onMarkAsRead={markAsRead}
-                  canMarkAsRead={Boolean(todayReport && insight.id === todayReport.date && !todayReport.read)}
-                />
-              ))}
-            </section>
-          )}
+              {insightsOpen ? (
+                <div className="mt-4 space-y-4">
+                  <OracleFilters filter={filter} onFilterChange={setFilter} counts={counts} />
+                  {todayInsight ? <OracleTodayTakeaway insight={todayInsight} /> : null}
+                  <OracleRewardBanner streak={readingStreak} />
+
+                  {insights.length === 0 ? (
+                    <OracleEmptyState filter={filter} />
+                  ) : (
+                    <section className="space-y-4" data-testid="oracle-insight-feed">
+                      {insights.map((insight) => (
+                        <OracleInsightCard
+                          key={insight.id}
+                          insight={insight}
+                          onMarkAsRead={markAsRead}
+                          canMarkAsRead={Boolean(todayReport && insight.id === todayReport.date && !todayReport.read)}
+                        />
+                      ))}
+                    </section>
+                  )}
+                </div>
+              ) : null}
+            </details>
+          </section>
 
           {renderReportSection()}
 

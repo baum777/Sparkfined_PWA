@@ -75,8 +75,12 @@ async function fulfillWithOhlc(route: Route, basePrice: number) {
  * and provide deterministic fixtures so UI logic behaves predictably.
  */
 export async function stubNoisyAPIs(page: Page): Promise<void> {
+  // Use context-level routing so requests from service workers/background
+  // tasks are also intercepted (page.route() may miss those in some cases).
+  const context = page.context();
+
   // Stub telemetry - not needed for functional tests
-  await page.route('**/api/telemetry', (route) =>
+  await context.route('**/api/telemetry', (route) =>
     route.fulfill({
       status: 204,
       body: '',
@@ -84,19 +88,19 @@ export async function stubNoisyAPIs(page: Page): Promise<void> {
   );
 
   // Stub Moralis proxy with deterministic OHLC data
-  await page.route('**/api/moralis/**', (route) => {
+  await context.route('**/api/moralis/**', (route) => {
     const basePrice = resolveBaselineFromRequest(route.request().url());
     return fulfillWithOhlc(route, basePrice);
   });
 
   // Stub DexPaprika upstream to avoid hitting the live API in CI
-  await page.route('https://api.dexpaprika.com/**', (route) => {
+  await context.route('https://api.dexpaprika.com/**', (route) => {
     const basePrice = resolveBaselineFromRequest(route.request().url());
     return fulfillWithOhlc(route, basePrice);
   });
 
   // Stub other data APIs that might cause noise
-  await page.route('**/api/data/**', (route) =>
+  await context.route('**/api/data/**', (route) =>
     route.continue().catch(() =>
       route.fulfill({
         status: 200,
@@ -107,7 +111,7 @@ export async function stubNoisyAPIs(page: Page): Promise<void> {
   );
 
   // Stub /api/prices endpoint with deterministic data
-  await page.route('**/api/prices**', (route) => {
+  await context.route('**/api/prices**', (route) => {
     const url = route.request().url();
     const parsed = new URL(url);
     const symbol = parsed.searchParams.get('symbol') || 'BTCUSDT';

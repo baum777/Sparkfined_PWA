@@ -15,7 +15,7 @@ export default function OracleEmptyState({ filter }: OracleEmptyStateProps) {
   }
 
   return (
-    <Card data-testid="oracle-empty-state">
+    <Card data-testid="oracle-insight-empty-state">
       <CardContent className="items-center justify-center gap-3 py-12 text-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-subtle text-text-tertiary">
           <Sparkles size={20} />

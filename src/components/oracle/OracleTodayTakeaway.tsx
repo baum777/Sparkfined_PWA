@@ -12,7 +12,7 @@ export default function OracleTodayTakeaway({ insight }: OracleTodayTakeawayProp
     <Card
       variant="bordered"
       className="border-brand/30 bg-brand/5"
-      data-testid="oracle-today-takeaway"
+      data-testid="oracle-insight-today-takeaway"
     >
       <CardContent className="gap-0 p-4">
         <div className="flex items-start gap-3">

@@ -24,7 +24,7 @@ export default function OracleRewardBanner({ streak }: OracleRewardBannerProps) 
     <Card
       variant="bordered"
       className="border-border-moderate bg-surface-subtle"
-      data-testid="oracle-reward-banner"
+      data-testid="oracle-insight-reward-banner"
     >
       <CardContent className="p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -43,7 +43,7 @@ export default function OracleRewardBanner({ streak }: OracleRewardBannerProps) 
             variant="outline"
             size="sm"
             onClick={() => navigate('/journal')}
-            data-testid="oracle-view-journal"
+            data-testid="oracle-insight-view-journal"
           >
             View Journal
           </Button>

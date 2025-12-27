@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from './fixtures/baseTest';
+import { stubReplayMarketOhlc } from './api-stubs';
 
 test.describe('Replay Lab', () => {
   test.beforeEach(async ({ page }) => {
@@ -23,24 +24,8 @@ test.describe('Replay Lab', () => {
       return Promise.all(deletions);
     });
 
-    // CRITICAL: Mock OHLC API endpoint to enable replay tests
-    await page.route('**/api/market/ohlc**', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          symbol: 'SOL',
-          timeframe: '1h',
-          data: [
-            { time: 1701388800, open: 95, high: 98, low: 94, close: 97, volume: 1000 },
-            { time: 1701392400, open: 97, high: 102, low: 96, close: 101, volume: 1200 },
-            { time: 1701396000, open: 101, high: 105, low: 100, close: 103, volume: 1100 },
-            { time: 1701399600, open: 103, high: 106, low: 101, close: 104, volume: 1300 },
-            { time: 1701403200, open: 104, high: 108, low: 103, close: 107, volume: 1400 }
-          ]
-        })
-      });
-    });
+    // Centralized stub (no bespoke /api workarounds in spec)
+    await stubReplayMarketOhlc(page);
   });
 
   test('loads replay session with mocked OHLC data', async ({ page }) => {

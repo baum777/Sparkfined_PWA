@@ -4,7 +4,8 @@
  * Tests for Oracle page functionality.
  */
 
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from './fixtures/baseTest';
+import type { Page } from '@playwright/test';
 
 const ORACLE_URL = '/oracle';
 
