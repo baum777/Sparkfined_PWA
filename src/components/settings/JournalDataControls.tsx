@@ -7,6 +7,7 @@ import {
   handleJournalImport,
 } from '@/lib/export/journalExportService'
 import type { ImportOptions } from '@/lib/export/exportTypes'
+import { Telemetry } from '@/lib/TelemetryService'
 
 export function JournalDataControls(): JSX.Element {
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
@@ -25,6 +26,11 @@ export function JournalDataControls(): JSX.Element {
     try {
       const result = await handleJournalImport(file, { mode: importMode })
       setMessage(`Import successful: ${result.imported} entries, ${result.skipped} skipped.`)
+      Telemetry.log('ui.settings.import_completed', 1, {
+        imported: result.imported,
+        skipped: result.skipped,
+        mode: importMode,
+      })
     } catch (err) {
       const reason = err instanceof Error ? err.message : 'Import failed'
       setError(reason)
@@ -43,7 +49,10 @@ export function JournalDataControls(): JSX.Element {
         <Button
           size="sm"
           variant="secondary"
-          onClick={() => downloadJournalAsJSON()}
+          onClick={() => {
+            Telemetry.log('ui.settings.export_started', 1, { export: 'journal_json' })
+            downloadJournalAsJSON()
+          }}
           data-testid="export-journal-json"
         >
           Export Journal (JSON)
@@ -51,7 +60,10 @@ export function JournalDataControls(): JSX.Element {
         <Button
           size="sm"
           variant="secondary"
-          onClick={() => downloadJournalAsMarkdown()}
+          onClick={() => {
+            Telemetry.log('ui.settings.export_started', 1, { export: 'journal_markdown' })
+            downloadJournalAsMarkdown()
+          }}
           data-testid="export-journal-markdown"
         >
           Export Journal (Markdown)
@@ -59,7 +71,10 @@ export function JournalDataControls(): JSX.Element {
         <Button
           size="sm"
           variant="secondary"
-          onClick={() => downloadAllAppData()}
+          onClick={() => {
+            Telemetry.log('ui.settings.export_started', 1, { export: 'app_backup' })
+            downloadAllAppData()
+          }}
           data-testid="export-app-data"
         >
           Export All App Data

@@ -3,6 +3,7 @@ import { JournalTemplatePicker } from '@/components/journal/templates/JournalTem
 import { applyTemplateToDraft } from '@/components/journal/templates/template-utils'
 import { useJournalTemplates } from '@/components/journal/templates/useJournalTemplates'
 import type { MarketContext } from '@/features/journal-v2/types'
+import type { JournalTemplateFields, TemplateApplyMode } from '@/components/journal/templates/types'
 
 type JournalTemplatesSectionProps = {
   reasoning: string
@@ -15,7 +16,8 @@ type JournalTemplatesSectionProps = {
   setMarketContext: (value: MarketContext) => void
   emotionalScore: number
   setEmotionalScore: (value: number) => void
-  onTemplateApplied?: () => void
+  onTemplateApplied?: (templateId: string, mode: Exclude<TemplateApplyMode, 'suggest'>) => void
+  onSuggestTemplate?: (fields: JournalTemplateFields, templateId: string) => void
 }
 
 export function JournalTemplatesSection({
@@ -30,6 +32,7 @@ export function JournalTemplatesSection({
   emotionalScore,
   setEmotionalScore,
   onTemplateApplied,
+  onSuggestTemplate,
 }: JournalTemplatesSectionProps) {
   const templateState = useJournalTemplates()
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('builtin-neutral')
@@ -39,8 +42,12 @@ export function JournalTemplatesSection({
     [selectedTemplateId, templateState.templates],
   )
 
-  const handleApplyTemplate = (mode: 'fill-empty' | 'overwrite-all') => {
+  const handleApplyTemplate = (mode: TemplateApplyMode) => {
     if (!selectedTemplate) return
+    if (mode === 'suggest') {
+      onSuggestTemplate?.(selectedTemplate.fields, selectedTemplate.id)
+      return
+    }
     const next = applyTemplateToDraft(
       { reasoning, expectation, selfReflection, marketContext, emotionalScore },
       selectedTemplate.fields,
@@ -51,7 +58,7 @@ export function JournalTemplatesSection({
     setSelfReflection(next.selfReflection)
     setMarketContext(next.marketContext)
     setEmotionalScore(next.emotionalScore)
-    onTemplateApplied?.()
+    onTemplateApplied?.(selectedTemplate.id, mode)
   }
 
   return (

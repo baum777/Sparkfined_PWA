@@ -6,6 +6,7 @@ import { useTelemetry } from "../state/telemetry";
 import { useAISettings } from "../state/ai";
 import { useAIContext } from "../state/aiContext";
 import { getWalletMonitor, startWalletMonitoring, stopWalletMonitoring } from "../lib/walletMonitor";
+import { Telemetry } from "@/lib/TelemetryService";
 import {
   getMonitoredWallet,
   getWalletMonitoringEnabled,
@@ -16,6 +17,7 @@ import { isValidSolanaAddress } from "@/lib/wallet/address";
 import JournalDataControls from "@/components/settings/JournalDataControls";
 import { QuoteCurrencySelect } from "@/components/settings/QuoteCurrencySelect";
 import ConnectedWalletsPanel from "@/components/settings/ConnectedWalletsPanel";
+import { Settings as SettingsIcon } from "@/lib/icons";
 import Button from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Collapsible } from "@/components/ui/Collapsible";
@@ -46,6 +48,7 @@ export default function SettingsContent({
     label: string;
     action: () => void;
   } | null>(null);
+  const [confirmText, setConfirmText] = React.useState("");
 
   // Wallet monitoring state (single source-of-truth persisted via setMonitoredWallet).
   const [walletAddress, setWalletAddress] = React.useState(() => getMonitoredWallet() ?? "");
@@ -126,6 +129,10 @@ export default function SettingsContent({
 
   const handleEnableNotifications = async () => {
     setNotificationMessage(null);
+    Telemetry.log("ui.settings.notification_permission_requested", 1, {
+      supported: notificationsSupported,
+      previousPermission: notificationPermission,
+    });
     const nextPermission = await requestPermission();
     setNotificationPermission(nextPermission);
 
@@ -145,22 +152,55 @@ export default function SettingsContent({
   const handleFactoryReset = () => {
     Object.keys(KEYS).forEach((ns) => clearNs(ns as NamespaceKey));
     setConfirmAction(null);
+    setConfirmText("");
     setMsg("All app data cleared. Please reload the page.");
+    Telemetry.log("ui.settings.factory_reset", 1);
   };
 
   const handleClearNamespace = (ns: NamespaceKey) => {
     clearNs(ns);
     setConfirmAction(null);
+    setConfirmText("");
     setMsg(`${ns} cleared successfully.`);
   };
 
+  React.useEffect(() => {
+    setConfirmText("");
+  }, [confirmAction?.type, confirmAction?.label]);
+
+  const requiresTypedConfirm = confirmAction?.type === "factory-reset";
+  const typedConfirmPhrase = "RESET";
+  const typedConfirmMatches = !requiresTypedConfirm || confirmText.trim().toUpperCase() === typedConfirmPhrase;
+
   return (
     <div className={wrapperClassName}>
-      {showHeading ? <h1 className="mb-6 text-xl font-semibold text-text-primary">Settings</h1> : null}
+      {showHeading ? (
+        <div className="flex items-center gap-3" data-testid="settings-page">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface-subtle">
+            <SettingsIcon className="h-5 w-5 text-text-tertiary" aria-hidden />
+          </div>
+          <div>
+            <h1 className="text-xl font-semibold text-text-primary">Settings</h1>
+            <p className="text-sm text-text-secondary">Manage your preferences, diagnostics, and backups.</p>
+          </div>
+        </div>
+      ) : null}
 
-      <SettingsSection title="Appearance" id="appearance">
+      <SettingsSection
+        title="Appearance"
+        description="Customize how Sparkfined looks and formats currency."
+        id="appearance"
+        priority
+      >
         <SettingsRow label="Theme">
-          <SettingsSelect value={theme} onChange={(e) => setTheme(e.target.value as ThemeMode)}>
+          <SettingsSelect
+            value={theme}
+            onChange={(e) => {
+              const next = e.target.value as ThemeMode;
+              setTheme(next);
+              Telemetry.log("ui.settings.theme_changed", 1, { theme: next });
+            }}
+          >
             <option value="system">System</option>
             <option value="dark">Dark</option>
             <option value="light">Light</option>
@@ -169,7 +209,7 @@ export default function SettingsContent({
         <QuoteCurrencySelect />
       </SettingsSection>
 
-      <SettingsSection title="Chart Preferences" id="chart">
+      <SettingsSection title="Chart Preferences" description="Defaults for snap, replay, and overlays." id="chart">
         <SettingsRow label="Snap to OHLC (default)">
           <SettingsToggle checked={settings.snapDefault} onChange={(v) => setSettings({ snapDefault: v })} />
         </SettingsRow>
@@ -196,7 +236,7 @@ export default function SettingsContent({
         </SettingsRow>
       </SettingsSection>
 
-      <SettingsSection title="Notifications" id="notifications">
+      <SettingsSection title="Notifications" description="Browser permission status and request flow." id="notifications">
         <p className="mb-3 text-xs text-text-secondary">
           Enable browser notifications for alert triggers. Push delivery is stubbed in this build.
         </p>
@@ -229,11 +269,15 @@ export default function SettingsContent({
         </div>
       </SettingsSection>
 
-      <SettingsSection title="Connected Wallets" id="wallets">
+      <SettingsSection title="Connected Wallets" description="Trading wallets stored locally (Solana)." id="wallets">
         <ConnectedWalletsPanel />
       </SettingsSection>
 
-      <SettingsSection title="Wallet Monitoring" id="monitoring">
+      <SettingsSection
+        title="Wallet Monitoring"
+        description="Monitor a wallet for automatic trade detection and journaling hints."
+        id="monitoring"
+      >
         <p className="mb-3 text-xs text-text-secondary">
           Monitor your wallet for automatic trade detection and journal entry suggestions.
         </p>
@@ -274,59 +318,6 @@ export default function SettingsContent({
         ) : null}
       </SettingsSection>
 
-      <SettingsSection title="AI Provider" id="ai">
-        <p className="mb-3 text-xs text-text-secondary">
-          Configure which AI provider to use for journal analysis and insights.
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="space-y-1">
-            <span className="text-xs text-text-tertiary">Provider</span>
-            <SettingsSelect
-              value={ai.provider}
-              onChange={(e) => setAI({ provider: e.target.value as "anthropic" | "openai" | "xai" })}
-            >
-              <option value="anthropic">Anthropic (Claude)</option>
-              <option value="openai">OpenAI (GPT)</option>
-              <option value="xai">xAI (Grok)</option>
-            </SettingsSelect>
-          </label>
-          <label className="space-y-1">
-            <span className="text-xs text-text-tertiary">Model override (optional)</span>
-            <input
-              className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
-              placeholder="e.g., claude-3-opus"
-              value={ai.model || ""}
-              onChange={(e) => setAI({ model: e.target.value || undefined })}
-            />
-          </label>
-          <label className="space-y-1">
-            <span className="text-xs text-text-tertiary">Max output tokens</span>
-            <input
-              type="number"
-              min={64}
-              max={4000}
-              className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
-              value={ai.maxOutputTokens ?? 800}
-              onChange={(e) => setAI({ maxOutputTokens: Number(e.target.value) })}
-            />
-          </label>
-          <label className="space-y-1">
-            <span className="text-xs text-text-tertiary">Max cost per call (USD)</span>
-            <input
-              type="number"
-              min={0.01}
-              step={0.01}
-              className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
-              value={ai.maxCostUsd ?? 0.15}
-              onChange={(e) => setAI({ maxCostUsd: Number(e.target.value) })}
-            />
-          </label>
-        </div>
-        <p className="mt-2 text-[11px] text-text-tertiary">
-          API keys are stored server-side. Only provider/model preferences are sent with requests.
-        </p>
-      </SettingsSection>
-
       <SettingsSection title="Token Usage" id="tokens">
         <AIStats />
       </SettingsSection>
@@ -363,8 +354,62 @@ export default function SettingsContent({
         <JournalDataControls />
       </SettingsSection>
 
-      <Collapsible title="Advanced & Diagnostics" defaultOpen={false} variant="card" className="mt-4">
+      <Collapsible title="Advanced & Diagnostics" defaultOpen={false} variant="card">
         <div className="space-y-6">
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-text-primary">AI Provider</h4>
+            <p className="text-xs text-text-secondary">
+              Configure which AI provider to use for journal analysis and insights.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="space-y-1">
+                <span className="text-xs text-text-tertiary">Provider</span>
+                <SettingsSelect
+                  value={ai.provider}
+                  onChange={(e) => setAI({ provider: e.target.value as "anthropic" | "openai" | "xai" })}
+                >
+                  <option value="anthropic">Anthropic (Claude)</option>
+                  <option value="openai">OpenAI (GPT)</option>
+                  <option value="xai">xAI (Grok)</option>
+                </SettingsSelect>
+              </label>
+              <label className="space-y-1">
+                <span className="text-xs text-text-tertiary">Model override (optional)</span>
+                <input
+                  className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
+                  placeholder="e.g., claude-3-opus"
+                  value={ai.model || ""}
+                  onChange={(e) => setAI({ model: e.target.value || undefined })}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-xs text-text-tertiary">Max output tokens</span>
+                <input
+                  type="number"
+                  min={64}
+                  max={4000}
+                  className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
+                  value={ai.maxOutputTokens ?? 800}
+                  onChange={(e) => setAI({ maxOutputTokens: Number(e.target.value) })}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-xs text-text-tertiary">Max cost per call (USD)</span>
+                <input
+                  type="number"
+                  min={0.01}
+                  step={0.01}
+                  className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
+                  value={ai.maxCostUsd ?? 0.15}
+                  onChange={(e) => setAI({ maxCostUsd: Number(e.target.value) })}
+                />
+              </label>
+            </div>
+            <p className="text-[11px] text-text-tertiary">
+              API keys are stored server-side. Only provider/model preferences are sent with requests.
+            </p>
+          </div>
+
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-text-primary">Telemetry</h4>
             <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
@@ -476,7 +521,7 @@ export default function SettingsContent({
         </div>
       </Collapsible>
 
-      <SettingsSection title="Danger Zone" id="danger" variant="danger">
+      <SettingsSection title="Danger Zone" description="Destructive actions that cannot be undone." id="danger" variant="danger">
         <p className="mb-3 text-xs text-text-secondary">These actions are destructive and cannot be undone.</p>
         <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
           {Object.entries(KEYS).map(([ns]) => (
@@ -525,11 +570,31 @@ export default function SettingsContent({
               ? "This will delete all app data including journal entries, alerts, and preferences."
               : `This will clear the ${confirmAction?.label.replace("Clear ", "")} data.`}
           </p>
+          {requiresTypedConfirm ? (
+            <div className="space-y-2">
+              <p className="text-xs text-text-secondary">
+                Type <span className="font-semibold text-text-primary">{typedConfirmPhrase}</span> to enable the reset button.
+              </p>
+              <input
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                className="w-full rounded-lg border border-border bg-surface-elevated px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand/40"
+                placeholder={typedConfirmPhrase}
+                autoComplete="off"
+              />
+            </div>
+          ) : null}
           <div className="flex items-center justify-end gap-3">
             <Button variant="ghost" size="sm" onClick={() => setConfirmAction(null)}>
               Cancel
             </Button>
-            <Button variant="destructive" size="sm" onClick={() => confirmAction?.action()}>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => confirmAction?.action()}
+              disabled={!typedConfirmMatches}
+            >
               {confirmAction?.label}
             </Button>
           </div>
@@ -541,23 +606,33 @@ export default function SettingsContent({
 
 function SettingsSection({
   title,
+  description,
   id,
   variant,
+  priority,
   children,
 }: {
   title: string;
+  description?: string;
   id: string;
   variant?: "danger";
+  priority?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <Card
       variant={variant === "danger" ? "bordered" : "default"}
-      className={`mt-4 ${variant === "danger" ? "border-rose-400/40" : ""}`}
+      className={[
+        priority ? "ring-1 ring-brand/20" : "",
+        variant === "danger" ? "border-rose-400/40" : "",
+      ].join(" ")}
       id={id}
     >
       <CardHeader className="pb-3">
-        <CardTitle className={`text-base ${variant === "danger" ? "text-rose-400" : ""}`}>{title}</CardTitle>
+        <div className="space-y-1">
+          <CardTitle className={`text-base ${variant === "danger" ? "text-rose-400" : ""}`}>{title}</CardTitle>
+          {description ? <p className="text-xs text-text-secondary">{description}</p> : null}
+        </div>
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>

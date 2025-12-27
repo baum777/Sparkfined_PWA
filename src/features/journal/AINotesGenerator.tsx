@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Textarea } from '@/components/ui'
 import { generateJournalNotes } from '@/lib/ai/journalNotes'
+import { Telemetry } from '@/lib/TelemetryService'
 
 interface AINotesGeneratorProps {
   tags: string[]
@@ -39,6 +40,7 @@ export function AINotesGenerator({ tags, thesis, value, onChange }: AINotesGener
       setMode(resultMode)
       setBannerNote(resultMode === 'demo' ? note ?? DEMO_NOTE : undefined)
       onChange(result)
+      Telemetry.log('ui.journal.ai_notes_generated', 1, { mode: resultMode })
     } catch (generationError) {
       console.error('AI notes generation failed', generationError)
       setError('AI notes generator is offline; showing deterministic mock. Please retry after updating thesis.')

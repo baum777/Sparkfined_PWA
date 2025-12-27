@@ -90,16 +90,16 @@ These events exist in protected Sparkfined paths that will **not** be touched du
 
 | Event | Trigger UI | Old Path | New Path | Status | Notes |
 |-------|-----------|----------|----------|--------|-------|
-| `ui.journal.created` | Journal entry created | `src/features/journal/JournalForm.tsx` (submit) | `src/features/journal/components/TradeEntryForm.tsx` | ✅ | Wire in `useTradesStoreAdapter`: `uiLog('ui.journal.created', 1, { direction })` |
-| `ui.journal.updated` | Journal entry updated | `src/features/journal/JournalForm.tsx` (save edits) | `src/features/journal/components/TradeEntryForm.tsx` | ✅ | Wire in `useTradesStoreAdapter`: `uiLog('ui.journal.updated', 1)` |
-| `ui.journal.deleted` | Journal entry deleted | `src/components/journal/JournalList.tsx` (delete action) | (inline in Journal page) | ✅ | Wire in `useTradesStoreAdapter`: `uiLog('ui.journal.deleted', 1)` |
-| `ui.journal.template_applied` | Template applied to entry | `src/components/journal/templates/JournalTemplatePicker.tsx` | `src/features/journal/components/TemplateSelector.tsx` | ✅ | Wire in `useTemplatesAdapter`: `uiLog('ui.journal.template_applied', 1, { templateId, mode })` |
-| `ui.journal.template_saved` | User saves custom template | `src/components/journal/templates/TemplateManagerSheet.tsx` | N/A | ⚠️ | **Missing in Loveable**: Template save not in Loveable UI. Add to TemplateSelector or defer. |
-| `ui.journal.ai_notes_generated` | AI notes generation completed | `src/features/journal/AINotesGenerator.tsx` | `src/components/journal/AiNotesStatus.tsx` | ✅ | Wire in `useAiNotesAdapter`: `uiLog('ui.journal.ai_notes_generated', 1)` |
-| `ui.journal.entry_opened` | Journal entry detail opened | `src/components/journal/JournalDetailPanel.tsx` | (inline in Journal page list) | ✅ | Add `uiLog('ui.journal.entry_opened', 1)` on item click |
-| `ui.journal.filter_applied` | Filter applied to journal list | `src/components/journal/JournalHeaderActions.tsx` | (inline in Journal page) | ⚠️ | **Missing in Loveable**: Filter UI not in Loveable Journal page. Defer or add. |
+| `ui.journal.created` | Journal entry created (Run Journal) | `src/pages/JournalPage.tsx` (submit via `useJournalV2`) | `src/features/journal-v2/hooks/useJournalV2.ts` | ✅ | Logged after successful persist: `Telemetry.log('ui.journal.created', 1, { journalVersion: 2, hasTradeContext })`. |
+| `ui.journal.updated` | Journal entry updated | N/A | N/A | ⚠️ | Journal V2 flow currently has no edit/update action exposed. Hook needed when edit/overwrite of a persisted entry is added. |
+| `ui.journal.deleted` | Journal entry deleted | N/A | N/A | ⚠️ | Journal V2 flow currently has no delete action exposed. Hook needed if/when history supports deletion. |
+| `ui.journal.template_applied` | Template applied to current draft | `src/components/journal/templates/*` | `src/features/journal-v2/components/JournalInputForm.tsx` | ✅ | Logged when merge/overwrite is confirmed: `Telemetry.log('ui.journal.template_applied', 1, { templateId, mode })`. |
+| `ui.journal.template_saved` | User saves custom template | `src/components/journal/templates/TemplateManagerSheet.tsx` | `src/components/journal/templates/TemplateManagerSheet.tsx` | ✅ | Logged on create/update: `Telemetry.log('ui.journal.template_saved', 1, { templateId, action })`. |
+| `ui.journal.ai_notes_generated` | AI notes generation completed | `src/features/journal/AINotesGenerator.tsx` | `src/features/journal/AINotesGenerator.tsx` | ✅ | Logged on success: `Telemetry.log('ui.journal.ai_notes_generated', 1, { mode })`. |
+| `ui.journal.entry_opened` | Journal entry detail opened | N/A | N/A | ⚠️ | Journal V2 history rows are currently non-interactive. Hook needed if history becomes clickable/selectable. |
+| `ui.journal.filter_applied` | Filter applied to journal list | N/A | N/A | ⚠️ | Journal V2 page has no filter UI. Hook needed if filters are introduced. |
 
-**Implementation**: Wire events in `useTradesStoreAdapter`, `useTemplatesAdapter`, and Journal page component.
+**Implementation**: Events are wired directly via `Telemetry.log()` in Journal V2 components/hooks (no Loveable store adapters used).
 
 ---
 
@@ -191,13 +191,13 @@ These events exist in protected Sparkfined paths that will **not** be touched du
 
 | Event | Trigger UI | Old Path | New Path | Status | Notes |
 |-------|-----------|----------|----------|--------|-------|
-| `ui.settings.theme_changed` | Theme toggled (light/dark/system) | `src/features/theme/useTheme.ts` | `src/components/settings/ThemeToggle.tsx` | ✅ | Wire in `useThemeAdapter`: `uiLog('ui.settings.theme_changed', 1, { theme })` |
-| `ui.settings.language_changed` | Language changed | `src/features/settings/PreferencesCard.tsx` | `src/components/settings/SettingsSection.tsx` | ✅ | Wire to settings adapter: `uiLog('ui.settings.language_changed', 1, { language })` |
-| `ui.settings.export_started` | Data export initiated | `src/features/settings/DataExportCard.tsx` | `src/components/settings/DataExportImport.tsx` | ✅ | Add `uiLog('ui.settings.export_started', 1)` on export button click |
-| `ui.settings.import_completed` | Data import completed | `src/features/settings/DataImportCard.tsx` | `src/components/settings/DataExportImport.tsx` | ✅ | Add `uiLog('ui.settings.import_completed', 1, { itemsCount })` on import success |
-| `ui.settings.factory_reset` | Factory reset executed | `src/features/settings/DangerZoneAccordion.tsx` | `src/components/settings/FactoryReset.tsx` | ✅ | Add `uiLog('ui.settings.factory_reset', 1)` on reset confirm |
-| `ui.settings.notification_permission_requested` | Notification permission requested | `src/components/alerts/NotificationsPermissionButton.tsx` | N/A | ⚠️ | **Missing in Loveable**: Notification permission UI not in Loveable Settings. Add to SettingsSection or defer. |
-| `ui.settings.telemetry_exported` | Telemetry data exported | N/A | `src/components/settings/SettingsSection.tsx` | ✅ | Add `uiLog('ui.settings.telemetry_exported', 1)` on telemetry export button click |
+| `ui.settings.theme_changed` | Theme changed | `src/pages/SettingsContent.tsx` (Theme select) | `src/pages/SettingsContent.tsx` | ✅ | Logged on selection change: `Telemetry.log('ui.settings.theme_changed', 1, { theme })`. |
+| `ui.settings.language_changed` | Language changed | N/A | N/A | ⚠️ | No language setting is currently exposed in Sparkfined Settings UI. Hook needed if language is added. |
+| `ui.settings.export_started` | Data export initiated | `src/components/settings/JournalDataControls.tsx` (export buttons) | `src/components/settings/JournalDataControls.tsx` | ✅ | Logged for JSON/Markdown/full backup exports: `Telemetry.log('ui.settings.export_started', 1, { export })`. |
+| `ui.settings.import_completed` | Data import completed | `src/components/settings/JournalDataControls.tsx` (import success) | `src/components/settings/JournalDataControls.tsx` | ✅ | Logged after successful import: `Telemetry.log('ui.settings.import_completed', 1, { imported, skipped, mode })`. |
+| `ui.settings.factory_reset` | Factory reset executed | `src/pages/SettingsContent.tsx` (Danger Zone confirm) | `src/pages/SettingsContent.tsx` | ✅ | Logged after executing factory reset: `Telemetry.log('ui.settings.factory_reset', 1)`. |
+| `ui.settings.notification_permission_requested` | Notification permission requested | `src/pages/SettingsContent.tsx` (Enable Browser Notifications) | `src/pages/SettingsContent.tsx` | ✅ | Logged before requesting permission: `Telemetry.log('ui.settings.notification_permission_requested', 1, { supported, previousPermission })`. |
+| `ui.settings.telemetry_exported` | Telemetry data exported | N/A | N/A | ⚠️ | No explicit telemetry export action exists in current Settings UI (only queue send). Add export UI if required. |
 
 **Implementation**: Wire events in `useThemeAdapter`, `useSettingsAdapter`, and Settings page components.
 
