@@ -5,7 +5,6 @@ import BookmarkPlus from "lucide-react/dist/esm/icons/bookmark-plus";
 import FileText from "lucide-react/dist/esm/icons/file-text";
 import GraduationCap from "lucide-react/dist/esm/icons/graduation-cap";
 import Home from "lucide-react/dist/esm/icons/home";
-import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
 import Settings from "lucide-react/dist/esm/icons/settings";
 import Sparkles from "lucide-react/dist/esm/icons/sparkles";
 import Star from "lucide-react/dist/esm/icons/star";
@@ -43,7 +42,8 @@ export const NAV_ITEMS: NavigationItem[] = [
     Icon: TrendingUp,
     testId: "nav-chart",
     tourId: "chart-link",
-    aliases: ["/chart-v2", "/analysis", "/analysis-v2", "/analyze"],
+    // Replay is a chart mode and should highlight the Chart tab (route alias).
+    aliases: ["/chart-v2", "/analysis", "/analysis-v2", "/analyze", "/replay"],
   },
   {
     path: "/watchlist",
@@ -85,14 +85,8 @@ export const SECONDARY_NAV_ITEMS: NavigationItem[] = [
     testId: "nav-oracle",
   },
   {
-    path: "/replay",
-    label: "Replay",
-    Icon: RefreshCw,
-    testId: "nav-replay",
-  },
-  {
     path: "/lessons",
-    label: "Learning",
+    label: "Learn",
     Icon: GraduationCap,
     testId: "nav-lessons",
   },

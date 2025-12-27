@@ -73,8 +73,9 @@ export function TemplateBottomSheet({ isOpen, onClose, onApply, defaultMode = "f
         <div className="flex flex-wrap gap-2" role="group" aria-label="Template apply mode">
           {(
             [
-              { value: "fill-empty" as TemplateApplyMode, label: "Fill empty fields", helper: "Keep existing text" },
-              { value: "overwrite-all" as TemplateApplyMode, label: "Overwrite all", helper: "Replace current draft" },
+              { value: "suggest" as TemplateApplyMode, label: "Suggest", helper: "Preview changes first" },
+              { value: "fill-empty" as TemplateApplyMode, label: "Merge", helper: "Fill empty only" },
+              { value: "overwrite-all" as TemplateApplyMode, label: "Overwrite", helper: "Replace current draft" },
             ] as const
           ).map((option) => (
             <button

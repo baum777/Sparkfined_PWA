@@ -33,5 +33,13 @@ export type JournalTemplate = {
   updatedAt: number
 }
 
-export type TemplateApplyMode = 'fill-empty' | 'overwrite-all'
+/**
+ * Template apply modes for the Journal V2 capture form.
+ *
+ * NOTE: Keep these values stable (they are used as persisted/UI identifiers).
+ * - fill-empty: "Merge" (non-destructive)
+ * - overwrite-all: "Overwrite" (destructive)
+ * - suggest: preview suggestions without mutating the draft
+ */
+export type TemplateApplyMode = 'fill-empty' | 'overwrite-all' | 'suggest'
 

@@ -1,21 +1,16 @@
 import React from "react";
 import {
-  deleteAlert,
-  getAlertsList,
-  type AlertListItem,
-  updateAlertStatus,
-} from "@/api/alerts";
-import {
   parseAlertPrefillSearchParams,
   stripAlertPrefillSearchParams,
 } from "@/features/alerts/prefill";
 import { Button } from "@/components/ui";
 import AlertCard from "@/features/alerts/AlertCard";
-import MobileAlertRow from "@/features/alerts/MobileAlertRow";
 import FiltersBar from "@/features/alerts/FiltersBar";
 import NewAlertSheet from "@/features/alerts/NewAlertSheet";
 import { applyAlertFilters, type AlertFilterState } from "@/features/alerts/filtering";
 import { useSearchParams } from "react-router-dom";
+import { useAlertsStore } from "@/store/alertsStore";
+import AlertsDetailPanel from "@/components/alerts/AlertsDetailPanel";
 import "./alerts.css";
 
 const DEFAULT_FILTERS: AlertFilterState = {
@@ -27,34 +22,21 @@ const DEFAULT_FILTERS: AlertFilterState = {
 
 export default function AlertsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [alerts, setAlerts] = React.useState<AlertListItem[]>([]);
-  const [status, setStatus] = React.useState<"idle" | "loading" | "loaded" | "error">(
-    "idle",
-  );
-  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const [actionMessage, setActionMessage] = React.useState<string | null>(null);
-  const [pendingActions, setPendingActions] = React.useState<Record<string, "toggle" | "delete">>(
-    {},
-  );
+  const alerts = useAlertsStore((state) => state.alerts);
+  const updateAlert = useAlertsStore((state) => state.updateAlert);
+  const deleteAlert = useAlertsStore((state) => state.deleteAlert);
   const [isMobile, setIsMobile] = React.useState(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 767px)").matches;
   });
   const [isNewAlertOpen, setIsNewAlertOpen] = React.useState(false);
   const [filters, setFilters] = React.useState<AlertFilterState>(DEFAULT_FILTERS);
-  const isMountedRef = React.useRef(true);
   const hasConsumedPrefill = React.useRef(false);
 
   const prefill = React.useMemo(
     () => parseAlertPrefillSearchParams(searchParams),
     [searchParams],
   );
-
-  React.useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
 
   React.useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -74,26 +56,11 @@ export default function AlertsPage() {
     return () => mediaQuery.removeListener(handleChange);
   }, []);
 
-  const loadAlerts = React.useCallback(async () => {
-    setStatus("loading");
-    setErrorMessage(null);
-
-    try {
-      const list = await getAlertsList();
-      if (!isMountedRef.current) return;
-      setAlerts(list);
-      setStatus("loaded");
-    } catch (error) {
-      if (!isMountedRef.current) return;
-      console.warn("AlertsPage: failed to load alerts", error);
-      setStatus("error");
-      setErrorMessage("We couldn't load alerts just yet. Please try again.");
-    }
-  }, []);
-
-  React.useEffect(() => {
-    loadAlerts();
-  }, [loadAlerts]);
+  const selectedAlertId = searchParams.get("alert");
+  const selectedAlert = React.useMemo(
+    () => (selectedAlertId ? alerts.find((alert) => alert.id === selectedAlertId) : undefined),
+    [alerts, selectedAlertId],
+  );
 
   React.useEffect(() => {
     if (!prefill || hasConsumedPrefill.current) return;
@@ -103,80 +70,57 @@ export default function AlertsPage() {
     setSearchParams(nextParams, { replace: true });
   }, [prefill, searchParams, setSearchParams]);
 
-  const setPendingAction = React.useCallback((id: string, action?: "toggle" | "delete") => {
-    setPendingActions((current) => {
-      if (!action) {
-        const { [id]: removed, ...rest } = current;
-        void removed;
-        return rest;
-      }
-      return { ...current, [id]: action };
-    });
-  }, []);
-
   const handleToggleStatus = React.useCallback(
-    async (alert: AlertListItem) => {
+    async (alert: { id: string; status: string }) => {
       const nextStatus = alert.status === "paused" ? "armed" : "paused";
-      const previousStatus = alert.status;
-      setActionMessage(null);
-      setPendingAction(alert.id, "toggle");
-      setAlerts((current) =>
-        current.map((item) => (item.id === alert.id ? { ...item, status: nextStatus } : item)),
-      );
-
-      try {
-        await updateAlertStatus({ id: alert.id, status: nextStatus });
-      } catch (error) {
-        console.warn("AlertsPage: failed to toggle alert status", error);
-        setAlerts((current) =>
-          current.map((item) =>
-            item.id === alert.id ? { ...item, status: previousStatus } : item,
-          ),
-        );
-        setActionMessage("We couldn't update that alert. Please try again.");
-      } finally {
-        setPendingAction(alert.id);
-      }
+      updateAlert(alert.id, { status: nextStatus as any });
     },
-    [setPendingAction],
+    [updateAlert],
   );
 
   const handleDelete = React.useCallback(
-    async (alert: AlertListItem) => {
-      const previousIndex = alerts.findIndex((item) => item.id === alert.id);
-      setActionMessage(null);
-      setPendingAction(alert.id, "delete");
-      setAlerts((current) => current.filter((item) => item.id !== alert.id));
-
-      try {
-        await deleteAlert({ id: alert.id });
-      } catch (error) {
-        console.warn("AlertsPage: failed to delete alert", error);
-        setAlerts((current) => {
-          if (current.some((item) => item.id === alert.id)) return current;
-          const next = [...current];
-          const insertIndex = previousIndex < 0 ? next.length : Math.min(previousIndex, next.length);
-          next.splice(insertIndex, 0, alert);
-          return next;
-        });
-        setActionMessage("We couldn't delete that alert. Please try again.");
-      } finally {
-        setPendingAction(alert.id);
-      }
+    async (alert: { id: string }) => {
+      deleteAlert(alert.id);
     },
-    [alerts, setPendingAction],
+    [deleteAlert],
   );
 
-  const handleAlertCreated = React.useCallback((created: AlertListItem) => {
-    setAlerts((current) => [created, ...current]);
-    setStatus("loaded");
-    setActionMessage("Alert created and armed.");
-  }, []);
+  const listItems = React.useMemo(
+    () =>
+      alerts.map((alert) => ({
+        id: alert.id,
+        symbol: alert.symbol,
+        type: alert.type,
+        condition: alert.condition,
+        threshold: alert.threshold,
+        timeframe: alert.timeframe,
+        status: alert.status,
+      })),
+    [alerts],
+  );
 
-  const filteredAlerts = React.useMemo(() => applyAlertFilters(alerts, filters), [alerts, filters]);
-  const hasAlerts = status === "loaded" && alerts.length > 0;
-  const hasFilteredAlerts = status === "loaded" && filteredAlerts.length > 0;
-  const AlertItem = isMobile ? MobileAlertRow : AlertCard;
+  const filteredAlerts = React.useMemo(() => applyAlertFilters(listItems, filters), [listItems, filters]);
+  const hasAlerts = alerts.length > 0;
+  const hasFilteredAlerts = filteredAlerts.length > 0;
+
+  const handleSelectAlert = React.useCallback(
+    (id: string) => {
+      const next = new URLSearchParams(searchParams);
+      next.set("alert", id);
+      setSearchParams(next);
+    },
+    [searchParams, setSearchParams],
+  );
+
+  const handleAlertDeleted = React.useCallback(
+    (id: string) => {
+      if (selectedAlertId !== id) return;
+      const next = new URLSearchParams(searchParams);
+      next.delete("alert");
+      setSearchParams(next);
+    },
+    [searchParams, selectedAlertId, setSearchParams],
+  );
 
   return (
     <section className="sf-alerts-page" data-testid="alerts-page">
@@ -201,75 +145,51 @@ export default function AlertsPage() {
 
       <FiltersBar filters={filters} onChange={setFilters} />
 
-      <div className="sf-alerts-page__list">
-        {status === "loading" ? (
-          <div className="sf-alerts-list__state" role="status" aria-live="polite">
-            Loading alerts…
-          </div>
-        ) : null}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+        <div className="sf-alerts-page__list">
+          {!hasAlerts ? (
+            <div className="sf-alerts-list__state" role="status" aria-live="polite">
+              No alerts yet. Create one from the dashboard or chart tools.
+            </div>
+          ) : null}
 
-        {status === "error" ? (
-          <div className="sf-alerts-list__state" role="alert">
-            <p>{errorMessage}</p>
-            <button
-              type="button"
-              className="sf-alerts-filters__button sf-focus-ring"
-              onClick={loadAlerts}
+          {hasAlerts && !hasFilteredAlerts ? (
+            <div className="sf-alerts-list__state" role="status" aria-live="polite" data-testid="alerts-empty-state">
+              No alerts match your filters.
+            </div>
+          ) : null}
+
+          {hasFilteredAlerts ? (
+            <ul
+              className={`sf-alerts-list${isMobile ? " sf-alerts-list--mobile" : ""}`}
+              aria-label="Alerts list"
+              data-testid="alerts-list"
             >
-              Retry loading
-            </button>
-          </div>
-        ) : null}
+              {filteredAlerts.map((alert) => (
+                <li
+                  key={alert.id}
+                  data-testid="alerts-list-item"
+                  data-alert-id={alert.id}
+                  data-alert-status={alert.status}
+                  data-alert-type={alert.type}
+                  onClick={() => handleSelectAlert(alert.id)}
+                >
+                  <AlertCard alert={alert} onToggleStatus={handleToggleStatus} onDelete={handleDelete} />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
 
-        {status === "loaded" && !hasAlerts ? (
-          <div className="sf-alerts-list__state" role="status" aria-live="polite">
-            No alerts yet. Create one from the dashboard or chart tools.
-          </div>
-        ) : null}
-
-        {status === "loaded" && hasAlerts && !hasFilteredAlerts ? (
-          <div className="sf-alerts-list__state" role="status" aria-live="polite">
-            No alerts match your filters.
-          </div>
-        ) : null}
-
-        {actionMessage ? (
-          <div className="sf-alerts-list__state sf-alerts-list__state--action" role="alert">
-            {actionMessage}
-          </div>
-        ) : null}
-
-        {hasFilteredAlerts ? (
-          <ul
-            className={`sf-alerts-list${isMobile ? " sf-alerts-list--mobile" : ""}`}
-            aria-label="Alerts list"
-            data-testid="alerts-list"
-          >
-            {filteredAlerts.map((alert) => (
-              <li
-                key={alert.id}
-                data-testid="alerts-list-item"
-                data-alert-id={alert.id}
-                data-alert-status={alert.status}
-                data-alert-type={alert.type}
-              >
-                <AlertItem
-                  alert={alert}
-                  onToggleStatus={handleToggleStatus}
-                  onDelete={handleDelete}
-                  isToggling={pendingActions[alert.id] === "toggle"}
-                  isDeleting={pendingActions[alert.id] === "delete"}
-                />
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <aside>
+          <AlertsDetailPanel alert={selectedAlert} onAlertDeleted={handleAlertDeleted} />
+        </aside>
       </div>
 
       <NewAlertSheet
         isOpen={isNewAlertOpen}
         onClose={() => setIsNewAlertOpen(false)}
-        onCreated={handleAlertCreated}
+        onCreated={(id) => handleSelectAlert(id)}
         prefill={prefill}
       />
     </section>

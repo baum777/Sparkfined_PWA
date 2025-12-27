@@ -6,6 +6,7 @@ import { getJournalEntries, saveJournalEntry } from '../db'
 import { createShadowTradeLogFromPipeline } from '../services/shadowTradeLog'
 import { confirmTradeFromContext } from '../services/confirmTradeFromContext'
 import { useSettings } from '@/state/settings'
+import { Telemetry } from '@/lib/TelemetryService'
 
 interface UseJournalV2Result {
   submit: (input: JournalRawInput) => Promise<JournalOutput>
@@ -95,6 +96,10 @@ export function useJournalV2(): UseJournalV2Result {
 
       setHistory((previous) => [{ ...persistedEntry, id }, ...previous])
       setLatestResult(output)
+      Telemetry.log('ui.journal.created', 1, {
+        journalVersion: 2,
+        hasTradeContext: Boolean(normalizedInput.tradeContext),
+      })
 
       return output
     } catch (err) {

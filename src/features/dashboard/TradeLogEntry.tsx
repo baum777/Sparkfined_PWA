@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { TradeLogItemDTO } from "@/api/journalEntries";
+import { Telemetry } from "@/lib/TelemetryService";
 import "./trade-log.css";
 
 interface TradeLogEntryProps {
@@ -49,6 +50,9 @@ export function TradeLogEntry({ trade }: TradeLogEntryProps) {
       className={`trade-log-entry ${accentClass}`}
       data-testid="trade-log-entry"
       aria-label={`Open journal entry for ${trade.symbol}`}
+      onClick={() => {
+        Telemetry.log("ui.dashboard.trade_clicked", 1, { symbol: trade.symbol, tradeId: trade.id });
+      }}
     >
       <span className="trade-log-entry__accent" aria-hidden />
       <div className="trade-log-entry__body">

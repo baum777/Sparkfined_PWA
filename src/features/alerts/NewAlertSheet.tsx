@@ -1,7 +1,8 @@
 import React from "react";
-import { Button, Input, RightSheet, RightSheetFooter, RightSheetSection, Select } from "@/components/ui";
-import { createAlert, type AlertListItem } from "@/api/alerts";
+import { Button, Input, Select } from "@/components/ui";
+import Modal from "@/components/ui/Modal";
 import type { AlertType } from "@/store/alertsStore";
+import { useAlertsStore } from "@/store/alertsStore";
 import { AlertTemplates, type AlertTemplate } from "@/features/alerts/AlertTemplates";
 import { SymbolAutocomplete } from "@/features/alerts/SymbolAutocomplete";
 import type { AlertPrefillValues } from "@/features/alerts/prefill";
@@ -30,7 +31,7 @@ type FormErrors = {
 type NewAlertSheetProps = {
   isOpen: boolean;
   onClose: () => void;
-  onCreated?: (alert: AlertListItem) => void;
+  onCreated?: (alertId: string) => void;
   prefill?: AlertPrefillValues | null;
 };
 
@@ -66,6 +67,7 @@ const hasFormChanges = (state: FormState) =>
 );
 
 export default function NewAlertSheet({ isOpen, onClose, onCreated, prefill }: NewAlertSheetProps) {
+  const createAlert = useAlertsStore((state) => state.createAlert);
   const [formState, setFormState] = React.useState<FormState>(() => getDefaultFormState());
   const [errors, setErrors] = React.useState<FormErrors>(() => getDefaultErrors());
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -120,7 +122,7 @@ export default function NewAlertSheet({ isOpen, onClose, onCreated, prefill }: N
     setSubmissionError(null);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const nextErrors = getDefaultErrors();
     const normalizedSymbol = formState.symbol.trim().toUpperCase();
     const normalizedCondition = formState.condition.trim();
@@ -148,14 +150,14 @@ export default function NewAlertSheet({ isOpen, onClose, onCreated, prefill }: N
     setSubmissionError(null);
 
     try {
-      const created = await createAlert({
+      const created = createAlert({
         symbol: normalizedSymbol,
         type: formState.type,
         condition: normalizedCondition,
         threshold: parsedThreshold,
         timeframe: formState.timeframe,
       });
-      onCreated?.(created);
+      onCreated?.(created.id);
       closeSheet();
     } catch (error) {
       console.warn("NewAlertSheet: failed to create alert", error);
@@ -166,123 +168,122 @@ export default function NewAlertSheet({ isOpen, onClose, onCreated, prefill }: N
   };
 
   return (
-    <RightSheet
+    <Modal
       isOpen={isOpen}
       onClose={closeSheet}
       title="New alert"
       subtitle="Set a symbol, trigger direction, and threshold to watch."
-      width="md"
-      data-testid="alert-create-dialog"
-      footer={
-        <RightSheetFooter>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={closeSheet}
-            disabled={isSubmitting}
-            data-testid="alert-cancel-button"
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handleSubmit}
-            loading={isSubmitting}
-            data-testid="alert-submit-button"
-          >
-            Save alert
-          </Button>
-        </RightSheetFooter>
-      }
+      size="lg"
+      className="flex max-h-[600px] flex-col overflow-hidden"
     >
-      <div className="sf-alerts-new" data-testid="alert-create-form">
-        {submissionError ? (
-          <div className="sf-alerts-new__error" role="alert">
-            {submissionError}
-          </div>
-        ) : null}
-        <RightSheetSection>
-          <AlertTemplates onApply={handleApplyTemplate} />
-        </RightSheetSection>
-        <RightSheetSection>
-          <SymbolAutocomplete
-            value={formState.symbol}
-            onChange={(value) => setFormState((prev) => ({ ...prev, symbol: value }))}
-            label="Symbol"
-            placeholder="BTCUSDT"
-            error={errors.symbol}
-            required
-            dataTestId="alert-symbol-input"
-          />
-        </RightSheetSection>
+      <div className="flex min-h-0 flex-1 flex-col" data-testid="alert-create-dialog">
+        <div className="sf-alerts-new min-h-0 flex-1 overflow-y-auto px-1" data-testid="alert-create-form">
+          {submissionError ? (
+            <div className="sf-alerts-new__error" role="alert">
+              {submissionError}
+            </div>
+          ) : null}
 
-        <RightSheetSection>
-          <div className="sf-alerts-new__builder">
-            <div className="sf-alerts-new__builder-header">
-              <div>
-                <span className="sf-alerts-new__builder-title">Condition builder</span>
-                <p className="sf-alerts-new__builder-help">
-                  Choose the direction and threshold for your price alert.
-                </p>
+          <div className="space-y-6">
+            <div>
+              <AlertTemplates onApply={handleApplyTemplate} />
+            </div>
+
+            <div>
+              <SymbolAutocomplete
+                value={formState.symbol}
+                onChange={(value) => setFormState((prev) => ({ ...prev, symbol: value }))}
+                label="Symbol"
+                placeholder="BTCUSDT"
+                error={errors.symbol}
+                required
+                dataTestId="alert-symbol-input"
+              />
+            </div>
+
+            <div className="sf-alerts-new__builder">
+              <div className="sf-alerts-new__builder-header">
+                <div>
+                  <span className="sf-alerts-new__builder-title">Condition builder</span>
+                  <p className="sf-alerts-new__builder-help">
+                    Choose the direction and threshold for your price alert.
+                  </p>
+                </div>
+              </div>
+              <div className="sf-alerts-new__builder-row">
+                <div className="sf-alerts-new__builder-field">
+                  <span className="sf-alerts-new__builder-label">Direction</span>
+                  <Select
+                    options={ALERT_TYPE_OPTIONS.map((option) => ({
+                      value: option.value,
+                      label: option.label,
+                    }))}
+                    value={formState.type}
+                    onChange={(value) => setFormState((prev) => ({ ...prev, type: value as AlertType }))}
+                    triggerProps={{ "data-testid": "alert-type-select", "aria-label": "Direction" }}
+                  />
+                </div>
+                <div className="sf-alerts-new__builder-field">
+                  <span className="sf-alerts-new__builder-label">Threshold</span>
+                  <Input
+                    type="number"
+                    step="any"
+                    value={formState.threshold}
+                    onChange={(event) => setFormState((prev) => ({ ...prev, threshold: event.target.value }))}
+                    placeholder="42500"
+                    data-testid="alert-threshold-input"
+                    error={errors.threshold}
+                    errorTestId="alert-threshold-error"
+                  />
+                </div>
               </div>
             </div>
-            <div className="sf-alerts-new__builder-row">
-              <div className="sf-alerts-new__builder-field">
-                <span className="sf-alerts-new__builder-label">Direction</span>
-                <Select
-                  options={ALERT_TYPE_OPTIONS.map((option) => ({
-                    value: option.value,
-                    label: option.label,
-                  }))}
-                  value={formState.type}
-                  onChange={(value) => setFormState((prev) => ({ ...prev, type: value as AlertType }))}
-                  triggerProps={{ "data-testid": "alert-type-select", "aria-label": "Direction" }}
-                />
-              </div>
-              <div className="sf-alerts-new__builder-field">
-                <span className="sf-alerts-new__builder-label">Threshold</span>
-                <Input
-                  type="number"
-                  step="any"
-                  value={formState.threshold}
-                  onChange={(event) => setFormState((prev) => ({ ...prev, threshold: event.target.value }))}
-                  placeholder="42500"
-                  data-testid="alert-threshold-input"
-                  error={errors.threshold}
-                  errorTestId="alert-threshold-error"
-                />
-              </div>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-text-primary">Condition details</span>
+              <Input
+                value={formState.condition}
+                onChange={(event) => setFormState((prev) => ({ ...prev, condition: event.target.value }))}
+                placeholder="Alert when price closes above threshold"
+                data-testid="alert-condition-input"
+                error={errors.condition}
+                errorTestId="alert-condition-error"
+              />
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-text-primary">Timeframe</span>
+              <Select
+                options={TIMEFRAME_OPTIONS.map((value) => ({ value, label: value.toUpperCase() }))}
+                value={formState.timeframe}
+                onChange={(value) => setFormState((prev) => ({ ...prev, timeframe: value }))}
+                triggerProps={{ "data-testid": "alert-timeframe-select", "aria-label": "Timeframe" }}
+              />
+            </label>
+
+            <div className="mt-6 flex flex-wrap items-center justify-end gap-3 border-t border-border bg-surface-elevated pt-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={closeSheet}
+                disabled={isSubmitting}
+                data-testid="alert-cancel-button"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleSubmit}
+                loading={isSubmitting}
+                data-testid="alert-submit-button"
+              >
+                Save alert
+              </Button>
             </div>
           </div>
-        </RightSheetSection>
-
-        <RightSheetSection>
-          <label className="block space-y-2">
-            <span className="text-sm font-medium text-text-primary">Condition details</span>
-            <Input
-              value={formState.condition}
-              onChange={(event) => setFormState((prev) => ({ ...prev, condition: event.target.value }))}
-              placeholder="Alert when price closes above threshold"
-              data-testid="alert-condition-input"
-              error={errors.condition}
-              errorTestId="alert-condition-error"
-            />
-          </label>
-        </RightSheetSection>
-
-        <RightSheetSection>
-          <label className="block space-y-2">
-            <span className="text-sm font-medium text-text-primary">Timeframe</span>
-            <Select
-              options={TIMEFRAME_OPTIONS.map((value) => ({ value, label: value.toUpperCase() }))}
-              value={formState.timeframe}
-              onChange={(value) => setFormState((prev) => ({ ...prev, timeframe: value }))}
-              triggerProps={{ "data-testid": "alert-timeframe-select", "aria-label": "Timeframe" }}
-            />
-          </label>
-        </RightSheetSection>
+        </div>
       </div>
-    </RightSheet>
-  );
+    </Modal>
+  )
 }

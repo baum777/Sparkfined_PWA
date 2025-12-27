@@ -14,6 +14,8 @@ export default [
       "*.config.ts",
       "scripts/**",
       "docs/**",
+      // Migration workspace (Loveable sources are not part of Sparkfined TS project)
+      "loveable-import/_incoming/**",
       "middleware.ts"
     ]
   },

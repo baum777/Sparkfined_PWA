@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import FiltersBar from "@/features/alerts/FiltersBar";
 import { applyAlertFilters, type AlertFilterState } from "@/features/alerts/filtering";
 import type { AlertListItem } from "@/api/alerts";
@@ -72,8 +72,7 @@ describe("applyAlertFilters", () => {
 });
 
 describe("FiltersBar", () => {
-  it("debounces search updates", () => {
-    vi.useFakeTimers();
+  it("updates search query deterministically", () => {
     const onChange = vi.fn();
 
     render(<FiltersBar filters={baseFilters} onChange={onChange} />);
@@ -81,13 +80,7 @@ describe("FiltersBar", () => {
     const input = screen.getByLabelText(/symbol search/i);
     fireEvent.change(input, { target: { value: "btc" } });
 
-    expect(onChange).not.toHaveBeenCalled();
-
-    act(() => {
-      vi.advanceTimersByTime(200);
-    });
-
+    expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ query: "btc" }));
-    vi.useRealTimers();
   });
 });

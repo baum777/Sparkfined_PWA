@@ -14,32 +14,12 @@ const TYPE_OPTIONS: Array<{ value: AlertFilterType; label: string }> = [
   { value: "price-below", label: "Price below" },
 ];
 
-const DEBOUNCE_MS = 200;
-
 type FiltersBarProps = {
   filters: AlertFilterState;
   onChange: (next: AlertFilterState) => void;
 };
 
 export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
-  const [localQuery, setLocalQuery] = React.useState(filters.query);
-
-  React.useEffect(() => {
-    setLocalQuery(filters.query);
-  }, [filters.query]);
-
-  React.useEffect(() => {
-    const handle = window.setTimeout(() => {
-      if (localQuery !== filters.query) {
-        onChange({ ...filters, query: localQuery });
-      }
-    }, DEBOUNCE_MS);
-
-    return () => {
-      window.clearTimeout(handle);
-    };
-  }, [filters, localQuery, onChange]);
-
   return (
     <div className="sf-alerts-page__filters" role="region" aria-label="Alert filters">
       <fieldset className="sf-alerts-filters__group">
@@ -51,6 +31,7 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
               type="button"
               className="sf-alerts-filters__button sf-focus-ring"
               aria-pressed={filters.status === option.value}
+              data-testid={`alerts-status-filter-${option.value}`}
               onClick={() => onChange({ ...filters, status: option.value })}
             >
               {option.label}
@@ -59,23 +40,23 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
         </div>
       </fieldset>
 
-      <div className="sf-alerts-filters__group">
-        <label className="sf-alerts-filters__label" htmlFor="alerts-type">
-          Type
-        </label>
-        <select
-          id="alerts-type"
-          className="sf-alerts-filters__select sf-focus-ring"
-          value={filters.type}
-          onChange={(event) => onChange({ ...filters, type: event.target.value as AlertFilterType })}
-        >
+      <fieldset className="sf-alerts-filters__group">
+        <legend className="sf-alerts-filters__label">Type</legend>
+        <div className="sf-alerts-filters__segmented" role="group" aria-label="Alert type">
           {TYPE_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
+            <button
+              key={option.value}
+              type="button"
+              className="sf-alerts-filters__button sf-focus-ring"
+              aria-pressed={filters.type === option.value}
+              data-testid={`alerts-type-filter-${option.value}`}
+              onClick={() => onChange({ ...filters, type: option.value })}
+            >
               {option.label}
-            </option>
+            </button>
           ))}
-        </select>
-      </div>
+        </div>
+      </fieldset>
 
       <div className="sf-alerts-filters__group">
         <label className="sf-alerts-filters__label" htmlFor="alerts-symbol">
@@ -86,9 +67,10 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
           className="sf-alerts-filters__input sf-focus-ring"
           type="search"
           placeholder="Search symbol"
-          value={localQuery}
-          onChange={(event) => setLocalQuery(event.target.value)}
+          value={filters.query}
+          onChange={(event) => onChange({ ...filters, query: event.target.value })}
           aria-label="Search by symbol"
+          data-testid="alerts-symbol-filter"
         />
       </div>
     </div>

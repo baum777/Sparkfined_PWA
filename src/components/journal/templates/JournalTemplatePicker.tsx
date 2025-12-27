@@ -32,6 +32,7 @@ export function JournalTemplatePicker({
   className,
 }: JournalTemplatePickerProps) {
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [applyMode, setApplyMode] = useState<TemplateApplyMode>('fill-empty')
 
   const selected = useMemo(
     () => templates.find((t) => t.id === selectedId) ?? templates[0],
@@ -41,6 +42,16 @@ export function JournalTemplatePicker({
   const options = useMemo(
     () => templates.map((t) => ({ value: t.id, label: `${t.name}${t.kind === 'builtin' ? '' : ' (Custom)'}` })),
     [templates],
+  )
+
+  const applyModeOptions = useMemo(
+    () =>
+      ([
+        { value: 'fill-empty' as const, label: 'Merge (fill empty)' },
+        { value: 'overwrite-all' as const, label: 'Overwrite' },
+        { value: 'suggest' as const, label: 'Suggest (preview)' },
+      ] satisfies Array<{ value: TemplateApplyMode; label: string }>),
+    [],
   )
 
   return (
@@ -67,10 +78,20 @@ export function JournalTemplatePicker({
             />
             {error ? <p className="mt-2 text-xs text-status-armed-text">{error}</p> : null}
           </div>
+          <div className="sm:w-[220px]">
+            <Select
+              value={applyMode}
+              onChange={(value) => setApplyMode(value as TemplateApplyMode)}
+              options={applyModeOptions}
+              placeholder="Apply mode…"
+              triggerProps={{ 'data-testid': 'journal-template-apply-mode' }}
+              disabled={isLoading}
+            />
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={() => onApply('fill-empty')}
+              onClick={() => onApply(applyMode)}
               disabled={!selected}
               data-testid="journal-template-apply"
             >

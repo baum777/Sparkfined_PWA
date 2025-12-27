@@ -42,7 +42,7 @@ export default function JournalPage() {
 
   const handleTemplateApply = useCallback(
     (template: JournalTemplate, mode: TemplateApplyMode) => {
-      formRef.current?.applyTemplate(template.fields, mode);
+      formRef.current?.applyTemplate(template.fields, mode, template.id);
     },
     [],
   );

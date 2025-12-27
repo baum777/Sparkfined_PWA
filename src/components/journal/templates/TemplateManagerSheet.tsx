@@ -4,6 +4,7 @@ import { EmotionalSlider } from '@/components/journal/EmotionalSlider'
 import { ModalConfirm } from '@/components/ui/ModalConfirm'
 import type { MarketContext } from '@/features/journal-v2/types'
 import type { JournalTemplate, JournalTemplateFields, JournalTemplateId, TemplateApplyMode } from './types'
+import { Telemetry } from '@/lib/TelemetryService'
 
 const MARKET_CONTEXT_OPTIONS: Array<{ value: MarketContext; label: string }> = [
   { value: 'breakout', label: 'Breakout' },
@@ -69,11 +70,14 @@ export function TemplateManagerSheet({
       <Button variant="secondary" onClick={onClose}>
         Close
       </Button>
+      <Button variant="outline" onClick={() => onApply('suggest')} disabled={!selected}>
+        Suggest (preview)
+      </Button>
       <Button variant="outline" onClick={() => onApply('fill-empty')} disabled={!selected}>
-        Apply (fill empty)
+        Merge (fill empty)
       </Button>
       <Button variant="destructive" onClick={() => onApply('overwrite-all')} disabled={!selected}>
-        Overwrite all & apply
+        Overwrite & apply
       </Button>
     </RightSheetFooter>
   )
@@ -91,6 +95,7 @@ export function TemplateManagerSheet({
         },
       })
       onSelect(created.id)
+      Telemetry.log('ui.journal.template_saved', 1, { templateId: created.id, action: 'create' })
     } finally {
       setIsSaving(false)
     }
@@ -116,6 +121,7 @@ export function TemplateManagerSheet({
         name: draftName,
         fields: draftFields,
       })
+      Telemetry.log('ui.journal.template_saved', 1, { templateId: selected.id, action: 'update' })
     } finally {
       setIsSaving(false)
     }
