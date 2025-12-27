@@ -164,8 +164,8 @@ These events exist in protected Sparkfined paths that will **not** be touched du
 
 | Event | Trigger UI | Old Path | New Path | Status | Notes |
 |-------|-----------|----------|----------|--------|-------|
-| `ui.oracle.insight_opened` | Oracle insight opened | `src/pages/OraclePage.tsx` (view analysis) | `src/components/oracle/OracleInsightCard.tsx` | ✅ | Wired via `Telemetry.log('ui.oracle.insight_opened', 1, { insightId })` when "View full analysis" is opened |
-| `ui.oracle.filter_changed` | Oracle filter changed (All/New/Read) | N/A | `src/features/oracle/useOracle.ts` + `src/components/oracle/OracleFilters.tsx` | ✅ | Wired via `Telemetry.log('ui.oracle.filter_changed', 1, { filter })` on filter change |
+| `ui.oracle.insight_opened` | Oracle insight opened | `src/pages/OraclePage.tsx` (view analysis) | `src/components/oracle/OracleInsightCard.tsx` | ✅ | **NEW EVENT NAME**: No existing repo constant/standard event enum found for Oracle UI events (unlike `AdvancedInsightEvents`). Kept as string literal (matches current `ui.*` usage elsewhere). Wired via `Telemetry.log('ui.oracle.insight_opened', 1, { insightId })` when "View full analysis" is opened. |
+| `ui.oracle.filter_changed` | Oracle filter changed (All/New/Read) | N/A | `src/features/oracle/useOracle.ts` + `src/components/oracle/OracleFilters.tsx` | ✅ | **NEW EVENT NAME**: No existing repo constant/standard event enum found for Oracle UI events. Kept as string literal (matches current `ui.*` usage elsewhere). Wired via `Telemetry.log('ui.oracle.filter_changed', 1, { filter })` on filter change. |
 | `ui.oracle.reward_claimed` | Oracle reward claimed (gamification) | N/A | N/A | ⚠️ | Sparkfined rewards are auto-granted on "Mark as Read" (protected `oracleStore`); no explicit "claim" UI exists in Loveable-style Oracle |
 | `ui.oracle.insight_shared` | Oracle insight shared | N/A | (defer) | ⚠️ | **Missing**: Share functionality not in Loveable or Sparkfined. Defer to post-migration. |
 
