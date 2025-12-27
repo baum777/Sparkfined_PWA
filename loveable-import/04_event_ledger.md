@@ -76,13 +76,13 @@ These events exist in protected Sparkfined paths that will **not** be touched du
 
 | Event | Trigger UI | Old Path | New Path | Status | Notes |
 |-------|-----------|----------|----------|--------|-------|
-| `ui.dashboard.loaded` | Dashboard page loaded | (implicit in page mount) | `src/pages/Dashboard.tsx` (Loveable) | ✅ | Add `uiLog('ui.dashboard.loaded', 1)` in Dashboard page `useEffect` |
-| `ui.dashboard.quick_action_clicked` | Quick action button clicked | `src/components/board/QuickActions.tsx` | `src/components/dashboard/QuickActionsCard.tsx` | ✅ | Wire to adapter: `uiLog('ui.dashboard.quick_action_clicked', 1, { action })` |
-| `ui.dashboard.kpi_clicked` | KPI tile clicked (navigate to detail) | `src/components/board/KPITile.tsx` | `src/components/dashboard/DailySnapshotCard.tsx` | ✅ | Wire to adapter: `uiLog('ui.dashboard.kpi_clicked', 1, { kpi })` |
-| `ui.dashboard.holding_clicked` | Holdings item clicked | `src/components/dashboard/HoldingsList.tsx` | `src/components/dashboard/HoldingsCard.tsx` | ✅ | Wire to adapter: `uiLog('ui.dashboard.holding_clicked', 1, { symbol })` |
-| `ui.dashboard.trade_clicked` | Recent trade item clicked | `src/components/dashboard/TradeLogList.tsx` | `src/components/dashboard/LastTradesCard.tsx` | ✅ | Wire to adapter: `uiLog('ui.dashboard.trade_clicked', 1)` → navigate to journal |
+| `ui.dashboard.loaded` | Dashboard page loaded | (implicit in page mount) | `src/pages/DashboardPage.tsx` | ⚠️ | **Missing event constant**: repo has no `TelemetryEvents`/domain constant for this event. Currently logged as string literal `Telemetry.log('ui.dashboard.loaded', 1)`. If you want a constant, follow `AdvancedInsightEvents` pattern (create `DashboardEvents.LOADED` in `src/features/dashboard/*`) or centralize in `src/domain/telemetry.ts`. |
+| `ui.dashboard.quick_action_clicked` | Log entry / Create alert quick actions | `src/components/board/QuickActions.tsx` | `src/pages/DashboardPage.tsx` | ⚠️ | **Missing event constant**: currently logged as string literal in `handleOpenLogEntryOverlay()` / `handleOpenCreateAlert()` with `{ action }` metadata. |
+| `ui.dashboard.kpi_clicked` | KPI tile clicked (navigate to detail) | `src/components/board/KPITile.tsx` | `src/pages/DashboardPage.tsx` + `src/features/dashboard/KPIBar.tsx` | ⚠️ | **Missing event constant**: currently logged as string literal in `handleKpiClick()` with `{ kpi: item.label }`. |
+| `ui.dashboard.holding_clicked` | Holdings row clicked | `src/components/dashboard/HoldingsList.tsx` | `src/features/dashboard/HoldingsCard.tsx` | ⚠️ | **Missing event constant**: currently logged as string literal before navigating with `{ symbol }`. |
+| `ui.dashboard.trade_clicked` | Recent trade item clicked | `src/components/dashboard/TradeLogList.tsx` | `src/features/dashboard/TradeLogEntry.tsx` | ⚠️ | **Missing event constant**: currently logged as string literal on click with `{ symbol, tradeId }`. |
 
-**Implementation**: Add telemetry calls in `useDashboardStatsAdapter` and Dashboard component event handlers.
+**Implementation**: Telemetry is wired directly in Dashboard page + dashboard components (no changes to protected telemetry service).
 
 ---
 

@@ -7,6 +7,7 @@ import { getHoldings, type HoldingDTO } from "@/api/wallet";
 import { fmtNum, fmtPct, fmtUsd } from "@/lib/format";
 import { WALLET_CHANGED_EVENT, getMonitoredWallet } from "@/lib/wallet/monitoredWallet";
 import { cn } from "@/lib/ui/cn";
+import { Telemetry } from "@/lib/TelemetryService";
 import "./holdings-card.css";
 
 type HoldingsStatus = "idle" | "loading" | "success" | "error";
@@ -123,6 +124,7 @@ export default function HoldingsCard({ className }: HoldingsCardProps) {
 
   const handleRowClick = useCallback(
     (symbol: string) => {
+      Telemetry.log("ui.dashboard.holding_clicked", 1, { symbol });
       const destination = symbol ? `/watchlist?asset=${encodeURIComponent(symbol)}` : "/watchlist";
       navigate(destination);
     },

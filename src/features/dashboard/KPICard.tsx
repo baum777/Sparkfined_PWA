@@ -4,6 +4,7 @@ import type { KPIItem } from "./KPIBar";
 
 interface KPICardProps {
   item: KPIItem;
+  onClick?: () => void;
 }
 
 const deltaIcon = {
@@ -12,7 +13,7 @@ const deltaIcon = {
   flat: <Minus className="sf-kpi-card__delta-icon" aria-hidden />,
 } as const;
 
-export default function KPICard({ item }: KPICardProps) {
+export default function KPICard({ item, onClick }: KPICardProps) {
   const { label, value, delta, icon } = item;
   const direction = delta?.direction ?? "flat";
   const deltaLabel =
@@ -23,12 +24,22 @@ export default function KPICard({ item }: KPICardProps) {
         ? "Negative change"
         : "No change");
 
+  const isInteractive = typeof onClick === "function";
+
   return (
     <article
       className="sf-kpi-card sf-card sf-focus-ring"
       aria-label={`${label} KPI`}
-      role="group"
+      role={isInteractive ? "button" : "group"}
       tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(event) => {
+        if (!isInteractive) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onClick();
+        }
+      }}
     >
       <div className="sf-kpi-card__header">
         <div className="sf-kpi-card__label" aria-label={label}>

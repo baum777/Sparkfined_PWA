@@ -20,11 +20,12 @@ export interface KPIItem {
 
 interface KPIBarProps {
   items: KPIItem[];
+  onItemClick?: (item: KPIItem) => void;
   className?: string;
   "data-testid"?: string;
 }
 
-export default function KPIBar({ items, className, "data-testid": dataTestId }: KPIBarProps) {
+export default function KPIBar({ items, onItemClick, className, "data-testid": dataTestId }: KPIBarProps) {
   if (!items?.length) {
     return null;
   }
@@ -33,7 +34,7 @@ export default function KPIBar({ items, className, "data-testid": dataTestId }: 
     <section className={cn("sf-kpi-bar", className)} aria-label="Key performance indicators" data-testid={dataTestId}>
       <div className="sf-kpi-bar__track">
         {items.map((item) => (
-          <KPICard key={item.label} item={item} />
+          <KPICard key={item.label} item={item} onClick={onItemClick ? () => onItemClick(item) : undefined} />
         ))}
       </div>
     </section>

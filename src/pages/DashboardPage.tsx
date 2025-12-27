@@ -1,25 +1,22 @@
-import React, { Suspense, lazy, useCallback, useEffect, useMemo, useState } from "react";
+import React, { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import ErrorBanner from "@/components/ui/ErrorBanner";
 import { Skeleton } from "@/components/ui/Skeleton";
 import Button from "@/components/ui/Button";
 import StateView from "@/components/ui/StateView";
-import KPIBar, { type KPIDeltaDirection, type KPIItem } from "@/features/dashboard/KPIBar";
+import KPIBar, { type KPIItem } from "@/features/dashboard/KPIBar";
 import DailyBiasCard from "@/features/dashboard/DailyBiasCard";
 import FAB from "@/features/dashboard/FAB";
 import { useJournalStore } from "@/store/journalStore";
 import { useAlertsStore } from "@/store/alertsStore";
-import { calculateJournalStreak, calculateNetPnL, calculateWinRate, getEntryDate } from "@/lib/dashboard/calculateKPIs";
-import { getAllTrades, type TradeEntry } from "@/lib/db";
 import { useLogEntryAvailability, type TradeEventInboxItem } from "@/features/journal/useLogEntryAvailability";
 import { useSettings } from "@/state/settings";
 import { useTradeEventJournalBridge } from "@/store/tradeEventJournalBridge";
-import Activity from "lucide-react/dist/esm/icons/activity";
-import Bell from "lucide-react/dist/esm/icons/bell";
-import FileText from "lucide-react/dist/esm/icons/file-text";
-import Target from "lucide-react/dist/esm/icons/target";
-import TrendingUp from "lucide-react/dist/esm/icons/trending-up";
+import { Telemetry } from "@/lib/TelemetryService";
+import { useDashboardTradeEntriesAdapter } from "@/features/dashboard/adapters/useDashboardTradeEntriesAdapter";
+import { useDashboardKpiItemsAdapter } from "@/features/dashboard/adapters/useDashboardKpiItemsAdapter";
+import { useDashboardRecentJournalEntriesAdapter } from "@/features/dashboard/adapters/useDashboardRecentJournalEntriesAdapter";
 import "@/features/dashboard/dashboard.css";
 
 const dummyInsight = {
@@ -51,12 +48,12 @@ export default function DashboardPage() {
   const { setTradeContext } = useTradeEventJournalBridge();
   const navigate = useNavigate();
 
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tradeEntries, setTradeEntries] = useState<TradeEntry[]>([]);
   const [isLogOverlayOpen, setIsLogOverlayOpen] = useState(false);
   const [isFabMenuOpen, setIsFabMenuOpen] = useState(false);
   const [isCreateAlertOpen, setIsCreateAlertOpen] = useState(false);
+
+  const { tradeEntries, isLoading } = useDashboardTradeEntriesAdapter();
 
   const {
     events: inboxEvents,
@@ -68,129 +65,34 @@ export default function DashboardPage() {
 
   const hasData = journalEntries.length > 0;
 
-  const handleRetry = () => {
-    setError(null);
-    setIsLoading(false);
-  };
-
-  const kpiItems = useMemo<KPIItem[]>(() => {
-    const armedAlertsCount = alerts.filter((alert) => alert.status === "armed").length;
-    const netPnLValue = calculateNetPnL(journalEntries);
-    const winRateValue = calculateWinRate(journalEntries, 30);
-    const streakValue = calculateJournalStreak(journalEntries);
-    const tradesTracked = tradeEntries.length;
-    const inboxCount = Array.isArray(inboxEvents) ? inboxEvents.length : 0;
-    const reviewCount = Number.isFinite(unconsumedCount) ? unconsumedCount : 0;
-
-    const netTrend: KPIDeltaDirection =
-      netPnLValue === "N/A" || netPnLValue === "0%"
-        ? "flat"
-        : netPnLValue.startsWith("-")
-          ? "down"
-          : "up";
-
-    const winRateTrend: KPIDeltaDirection =
-      winRateValue === "N/A"
-        ? "flat"
-        : Number.parseInt(winRateValue, 10) >= 50
-          ? "up"
-          : "down";
-
-    const alertsTrend: KPIDeltaDirection = armedAlertsCount > 0 ? "up" : "flat";
-    const streakTrend: KPIDeltaDirection = streakValue === "0 days" ? "flat" : "up";
-    const inboxTrend: KPIDeltaDirection = isInboxLoading ? "flat" : reviewCount > 0 ? "up" : "flat";
-
-    return [
-      {
-        label: "Net P&L",
-        value: netPnLValue,
-        delta: {
-          value: netPnLValue === "N/A" ? "Awaiting trades" : netPnLValue,
-          direction: netTrend,
-          srLabel: "Net profitability",
-        },
-        icon: <TrendingUp size={18} />,
-      },
-      {
-        label: "Win Rate",
-        value: winRateValue,
-        delta: {
-          value: "30d window",
-          direction: winRateTrend,
-          srLabel: "Win rate momentum",
-        },
-        icon: <Target size={18} />,
-      },
-      {
-        label: "Alerts Armed",
-        value: String(armedAlertsCount),
-        delta: {
-          value: reviewCount > 0 ? `${reviewCount} to review` : "Standing by",
-          direction: alertsTrend,
-          srLabel: "Alerts readiness",
-        },
-        icon: <Bell size={18} />,
-      },
-      {
-        label: "Journal Streak",
-        value: streakValue,
-        delta: {
-          value: hasData ? "Keep it going" : "Start logging",
-          direction: streakTrend,
-          srLabel: "Journal consistency",
-        },
-        icon: <FileText size={18} />,
-      },
-      {
-        label: "Trade Inbox",
-        value: String(tradesTracked),
-        delta: {
-          value: isInboxLoading ? "Syncing..." : `${inboxCount} new`,
-          direction: inboxTrend,
-          srLabel: "Trade events queued",
-        },
-        icon: <Activity size={18} />,
-      },
-    ];
-  }, [alerts, hasData, inboxEvents, isInboxLoading, journalEntries, tradeEntries.length, unconsumedCount]);
-
   useEffect(() => {
-    let mounted = true;
-    setIsLoading(true);
-
-    void (async () => {
-      try {
-        const entries = await getAllTrades();
-        if (mounted) setTradeEntries(entries);
-      } catch {
-        if (mounted) setTradeEntries([]);
-      } finally {
-        if (mounted) setIsLoading(false);
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
+    Telemetry.log("ui.dashboard.loaded", 1);
   }, []);
 
-  const recentJournalEntries = useMemo(() => {
-    if (!journalEntries.length) {
-      return [];
-    }
-    return [...journalEntries]
-      .map((entry) => ({ entry, timestamp: getEntryDate(entry)?.getTime() ?? 0 }))
-      .sort((a, b) => b.timestamp - a.timestamp)
-      .slice(0, 3)
-      .map(({ entry }) => entry);
-  }, [journalEntries]);
+  const handleRetry = () => {
+    setError(null);
+  };
+
+  const kpiItems = useDashboardKpiItemsAdapter({
+    journalEntries,
+    alerts,
+    tradeEntries,
+    inboxEvents,
+    unconsumedCount,
+    isInboxLoading,
+    hasData,
+  });
+
+  const recentJournalEntries = useDashboardRecentJournalEntriesAdapter(journalEntries, 3);
 
   const handleOpenLogEntryOverlay = useCallback(() => {
+    Telemetry.log("ui.dashboard.quick_action_clicked", 1, { action: "log-entry" });
     void refresh();
     setIsLogOverlayOpen(true);
   }, [refresh]);
 
   const handleOpenCreateAlert = useCallback(() => {
+    Telemetry.log("ui.dashboard.quick_action_clicked", 1, { action: "create-alert" });
     setIsCreateAlertOpen(true);
   }, []);
 
@@ -240,6 +142,22 @@ export default function DashboardPage() {
     setIsLogOverlayOpen(false);
     navigate("/journal");
   };
+
+  const handleKpiClick = useCallback(
+    (item: KPIItem) => {
+      Telemetry.log("ui.dashboard.kpi_clicked", 1, { kpi: item.label });
+      if (item.label === "Alerts Armed") {
+        navigate("/alerts");
+        return;
+      }
+      if (item.label === "Trade Inbox") {
+        handleOpenLogEntryOverlay();
+        return;
+      }
+      navigate("/journal");
+    },
+    [handleOpenLogEntryOverlay, navigate]
+  );
 
   const renderMainContent = () => {
     const biasCard = <DailyBiasCard className="dashboard-card sf-card" />;
@@ -416,7 +334,7 @@ export default function DashboardPage() {
         title="Dashboard"
         description="Command surface for your net risk, streaks, and live intelligence."
         meta={`${journalEntries.length} journal entries · ${alerts.length} alerts`}
-        kpiStrip={<KPIBar items={kpiItems} data-testid="dashboard-kpi-bar" />}
+        kpiStrip={<KPIBar items={kpiItems} onItemClick={handleKpiClick} data-testid="dashboard-kpi-bar" />}
         actions={
           <Button
             variant="secondary"
