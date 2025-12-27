@@ -15,47 +15,39 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import DashboardShell from '@/components/dashboard/DashboardShell';
-import { useOracleStore } from '@/store/oracleStore';
+import { useOracle } from '@/features/oracle';
 import { RefreshCw, CheckCircle2, Sparkles } from '@/lib/icons';
 import OracleHistoryChart from '@/components/oracle/OracleHistoryChart';
 import OracleThemeFilter from '@/components/oracle/OracleThemeFilter';
 import OracleHistoryList from '@/components/oracle/OracleHistoryList';
+import OracleFilters from '@/components/oracle/OracleFilters';
+import OracleTodayTakeaway from '@/components/oracle/OracleTodayTakeaway';
+import OracleRewardBanner from '@/components/oracle/OracleRewardBanner';
+import OracleInsightCard from '@/components/oracle/OracleInsightCard';
+import OracleEmptyState from '@/components/oracle/OracleEmptyState';
 import Button from '@/components/ui/Button';
 import StateView from '@/components/ui/StateView';
 
 export default function OraclePage() {
-  const todayReport = useOracleStore((state) => state.todayReport);
-  const reports = useOracleStore((state) => state.reports);
-  const isLoading = useOracleStore((state) => state.isLoading);
-  const error = useOracleStore((state) => state.error);
-  const lastFetchTimestamp = useOracleStore((state) => state.lastFetchTimestamp);
-  const loadTodayReport = useOracleStore((state) => state.loadTodayReport);
-  const loadHistory = useOracleStore((state) => state.loadHistory);
-  const markTodayAsRead = useOracleStore((state) => state.markTodayAsRead);
+  const {
+    insights,
+    filter,
+    setFilter,
+    counts,
+    todayInsight,
+    readingStreak,
+    markAsRead,
+    refresh,
+    todayReport,
+    reports,
+    isLoading,
+    error,
+    lastFetchTimestamp,
+  } = useOracle();
 
   const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
   const [rewardMessage, setRewardMessage] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<string>('All');
-
-  // Load today's report and history on mount
-  useEffect(() => {
-    let isMounted = true;
-
-    const load = async () => {
-      if (isMounted) {
-        await Promise.all([
-          loadTodayReport(),
-          loadHistory(30),
-        ]);
-      }
-    };
-
-    void load();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [loadTodayReport, loadHistory]);
 
   // Filter reports by theme
   const filteredReports = useMemo(() => {
@@ -77,7 +69,7 @@ export default function OraclePage() {
   }, [rewardMessage]);
 
   const handleRefresh = async () => {
-    await loadTodayReport({ forceRefresh: true });
+    await refresh();
   };
 
   const handleMarkAsRead = async () => {
@@ -88,7 +80,7 @@ export default function OraclePage() {
     setIsMarkingAsRead(true);
     
     try {
-      await markTodayAsRead();
+      await markAsRead(todayReport.date);
       setRewardMessage('🎉 +50 XP earned! Oracle streak increased.');
     } catch (err) {
       console.error('[OraclePage] Failed to mark as read:', err);
@@ -244,13 +236,28 @@ export default function OraclePage() {
                 data-testid="oracle-mark-read-button"
                 leftIcon={<CheckCircle2 size={14} />}
               >
-                {isMarkingAsRead ? 'Saving' : 'Mark as read'}
+                {isMarkingAsRead ? 'Saving' : 'Mark as Read'}
               </Button>
             ) : null}
           </div>
         }
       >
         <div className="space-y-6">
+          <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-subtle text-brand">
+                <Sparkles size={18} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-text-primary">AI-powered daily context</p>
+                <p className="text-sm text-text-secondary">
+                  Review today’s report, log it, and build your streak.
+                </p>
+              </div>
+            </div>
+            <OracleFilters filter={filter} onFilterChange={setFilter} counts={counts} />
+          </section>
+
           {rewardMessage ? (
             <div
               className="card-glow animate-fade-in rounded-3xl border border-brand/40 bg-brand/5 p-4"
@@ -263,6 +270,24 @@ export default function OraclePage() {
               </div>
             </div>
           ) : null}
+
+          {todayInsight ? <OracleTodayTakeaway insight={todayInsight} /> : null}
+          <OracleRewardBanner streak={readingStreak} />
+
+          {insights.length === 0 ? (
+            <OracleEmptyState filter={filter} />
+          ) : (
+            <section className="space-y-4">
+              {insights.map((insight) => (
+                <OracleInsightCard
+                  key={insight.id}
+                  insight={insight}
+                  onMarkAsRead={markAsRead}
+                  canMarkAsRead={Boolean(todayReport && insight.id === todayReport.date && !todayReport.read)}
+                />
+              ))}
+            </section>
+          )}
 
           {renderReportSection()}
 
