@@ -88,7 +88,7 @@ export function RightSheet({
       <div
         ref={sheetRef}
         className={cn(
-          "relative flex h-full flex-col border-l border-border bg-surface-elevated shadow-2xl",
+          "relative flex h-screen max-h-screen flex-col border-l border-border bg-surface-elevated shadow-2xl",
           "animate-slide-in-right",
           widthClasses[width],
           className
@@ -124,13 +124,15 @@ export function RightSheet({
           flex column. Without it, tall content can push the footer out of the
           viewport (Playwright then reports footer buttons as "outside of the viewport").
           
-          We render the footer *inside* the scroll container so it can always be
-          scrolled into view, even on smaller viewports.
+          The footer is sticky at the bottom of the scroll container, ensuring it's
+          always visible and accessible (critical for Playwright tests at 1280x720).
         */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5 text-text-primary">
-          {children}
+        <div className="relative min-h-0 flex-1 overflow-y-auto">
+          <div className="px-6 py-5 text-text-primary">
+            {children}
+          </div>
           {footer ? (
-            <div className="mt-6 border-t border-border bg-surface-elevated/95 py-4 backdrop-blur">
+            <div className="sticky bottom-0 border-t border-border bg-surface-elevated px-6 py-4 backdrop-blur">
               {footer}
             </div>
           ) : null}

@@ -102,7 +102,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-modal flex items-center justify-center bg-bg-overlay/80 px-4 py-8 backdrop-blur-sm"
+      className="fixed inset-0 z-modal flex items-start justify-center overflow-y-auto bg-bg-overlay/80 px-4 py-8 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? titleId : undefined}
@@ -113,7 +113,6 @@ export function Modal({
         ref={contentRef}
         className={cn(
           'w-full rounded-2xl border border-border-moderate bg-surface-elevated p-6 shadow-2xl',
-          'animate-scale-in',
           sizeClasses[size],
           className
         )}
@@ -147,7 +146,7 @@ export function Modal({
         )}
 
         {/* Body */}
-        <div className="text-text-primary">{children}</div>
+        <div className="min-h-0 flex-1 text-text-primary">{children}</div>
       </div>
     </div>,
     portalTarget
