@@ -20,29 +20,18 @@ import { RefreshCw, CheckCircle2, Sparkles } from '@/lib/icons';
 import OracleHistoryChart from '@/components/oracle/OracleHistoryChart';
 import OracleThemeFilter from '@/components/oracle/OracleThemeFilter';
 import OracleHistoryList from '@/components/oracle/OracleHistoryList';
-import OracleFilters from '@/components/oracle/OracleFilters';
-import OracleTodayTakeaway from '@/components/oracle/OracleTodayTakeaway';
-import OracleRewardBanner from '@/components/oracle/OracleRewardBanner';
-import OracleInsightCard from '@/components/oracle/OracleInsightCard';
-import OracleEmptyState from '@/components/oracle/OracleEmptyState';
 import Button from '@/components/ui/Button';
 import StateView from '@/components/ui/StateView';
 
 export default function OraclePage() {
   const {
-    insights,
-    filter,
-    setFilter,
-    counts,
-    todayInsight,
-    readingStreak,
-    markAsRead,
     refresh,
     todayReport,
     reports,
     isLoading,
     error,
     lastFetchTimestamp,
+    markAsRead,
   } = useOracle();
 
   const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
@@ -236,28 +225,13 @@ export default function OraclePage() {
                 data-testid="oracle-mark-read-button"
                 leftIcon={<CheckCircle2 size={14} />}
               >
-                {isMarkingAsRead ? 'Saving' : 'Mark as Read'}
+                {isMarkingAsRead ? 'Saving' : 'Mark as read'}
               </Button>
             ) : null}
           </div>
         }
       >
         <div className="space-y-6">
-          <section className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-subtle text-brand">
-                <Sparkles size={18} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-text-primary">AI-powered daily context</p>
-                <p className="text-sm text-text-secondary">
-                  Review today’s report, log it, and build your streak.
-                </p>
-              </div>
-            </div>
-            <OracleFilters filter={filter} onFilterChange={setFilter} counts={counts} />
-          </section>
-
           {rewardMessage ? (
             <div
               className="card-glow animate-fade-in rounded-3xl border border-brand/40 bg-brand/5 p-4"
@@ -270,24 +244,6 @@ export default function OraclePage() {
               </div>
             </div>
           ) : null}
-
-          {todayInsight ? <OracleTodayTakeaway insight={todayInsight} /> : null}
-          <OracleRewardBanner streak={readingStreak} />
-
-          {insights.length === 0 ? (
-            <OracleEmptyState filter={filter} />
-          ) : (
-            <section className="space-y-4">
-              {insights.map((insight) => (
-                <OracleInsightCard
-                  key={insight.id}
-                  insight={insight}
-                  onMarkAsRead={markAsRead}
-                  canMarkAsRead={Boolean(todayReport && insight.id === todayReport.date && !todayReport.read)}
-                />
-              ))}
-            </section>
-          )}
 
           {renderReportSection()}
 

@@ -81,7 +81,7 @@ export default function OracleHistoryChart({ reports }: OracleHistoryChartProps)
   return (
     <div className="rounded-3xl border border-border bg-surface p-6">
       <h2 className="mb-6 text-lg font-semibold text-text-primary">
-        Score History (30 Days)
+        Oracle Score History (30 Days)
       </h2>
       
       <div className="relative">
