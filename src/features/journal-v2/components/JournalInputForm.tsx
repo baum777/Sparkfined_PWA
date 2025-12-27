@@ -8,6 +8,7 @@ import { TradeThesisCard } from '@/features/journal/TradeThesisCard'
 import { TagInput } from '@/features/journal/TagInput'
 import { AINotesGenerator } from '@/features/journal/AINotesGenerator'
 import { useAutoSave } from '@/features/journal/useAutoSave'
+import { Telemetry } from '@/lib/TelemetryService'
 import { applyTemplateToDraft } from '@/components/journal/templates/template-utils'
 import type { JournalTemplateFields, TemplateApplyMode } from '@/components/journal/templates/types'
 
@@ -76,7 +77,7 @@ interface JournalInputFormProps {
 }
 
 export interface JournalInputFormHandle {
-  applyTemplate: (fields: JournalTemplateFields, mode: TemplateApplyMode) => void
+  applyTemplate: (fields: JournalTemplateFields, mode: TemplateApplyMode, templateId?: string) => void
 }
 
 function getEmotionalZoneLabel(score: number): string {
@@ -127,27 +128,42 @@ export const JournalInputForm = React.forwardRef<JournalInputFormHandle, Journal
     expectation: false,
   })
   const templateAppliedRef = useRef(false)
+  const [pendingTemplate, setPendingTemplate] = useState<{ fields: JournalTemplateFields; templateId?: string } | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const isSubmittingRef = useRef(false)
+
+  const openTemplateSuggestion = (fields: JournalTemplateFields, templateId?: string) => {
+    setPendingTemplate({ fields, templateId })
+  }
+
+  const applyTemplate = (fields: JournalTemplateFields, mode: Exclude<TemplateApplyMode, 'suggest'>, templateId?: string) => {
+    const next = applyTemplateToDraft(
+      { reasoning, expectation, selfReflection, marketContext, emotionalScore },
+      fields,
+      mode,
+    )
+    setReasoning(next.reasoning)
+    setExpectation(next.expectation)
+    setSelfReflection(next.selfReflection)
+    setMarketContext(next.marketContext)
+    setEmotionalScore(next.emotionalScore)
+    templateAppliedRef.current = true
+    setPendingTemplate(null)
+    Telemetry.log('ui.journal.template_applied', 1, { templateId, mode })
+  }
 
   useImperativeHandle(
     ref,
     () => ({
-      applyTemplate: (fields, mode) => {
-        const next = applyTemplateToDraft(
-          { reasoning, expectation, selfReflection, marketContext, emotionalScore },
-          fields,
-          mode,
-        )
-        setReasoning(next.reasoning)
-        setExpectation(next.expectation)
-        setSelfReflection(next.selfReflection)
-        setMarketContext(next.marketContext)
-        setEmotionalScore(next.emotionalScore)
-        templateAppliedRef.current = true
+      applyTemplate: (fields, mode, templateId) => {
+        if (mode === 'suggest') {
+          openTemplateSuggestion(fields, templateId)
+          return
+        }
+        applyTemplate(fields, mode, templateId)
       },
     }),
-    [emotionalScore, expectation, marketContext, reasoning, selfReflection],
+    [applyTemplate, emotionalScore, expectation, marketContext, reasoning, selfReflection],
   )
 
   const draftState = useMemo<JournalFormDraft>(
@@ -370,11 +386,61 @@ export const JournalInputForm = React.forwardRef<JournalInputFormHandle, Journal
               setMarketContext={setMarketContext}
               emotionalScore={emotionalScore}
               setEmotionalScore={setEmotionalScore}
-              onTemplateApplied={() => {
+              onTemplateApplied={(templateId, mode) => {
                 templateAppliedRef.current = true
+                Telemetry.log('ui.journal.template_applied', 1, { templateId, mode })
               }}
+              onSuggestTemplate={(fields, templateId) => openTemplateSuggestion(fields, templateId)}
             />
           </React.Suspense>
+
+          {pendingTemplate ? (
+            <div
+              className="rounded-2xl border border-border/70 bg-surface/60 p-4 shadow-card-subtle"
+              data-testid="journal-template-suggestions"
+              role="status"
+              aria-label="Template suggestions"
+            >
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs uppercase tracking-wide text-text-tertiary">Template suggestion</p>
+                  <p className="text-sm font-semibold text-text-primary">Preview ready</p>
+                  <p className="text-xs text-text-secondary">
+                    Review then apply as merge or overwrite. This won’t change your draft until you confirm.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyTemplate(pendingTemplate.fields, 'fill-empty', pendingTemplate.templateId)}
+                    data-testid="journal-template-suggest-merge"
+                  >
+                    Merge
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => applyTemplate(pendingTemplate.fields, 'overwrite-all', pendingTemplate.templateId)}
+                    data-testid="journal-template-suggest-overwrite"
+                  >
+                    Overwrite
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPendingTemplate(null)}
+                    data-testid="journal-template-suggest-dismiss"
+                  >
+                    Dismiss
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           {/* Section 1: State (Required, always visible) */}
           <section className="space-y-4" data-testid="journal-section-state">
