@@ -6,7 +6,6 @@ import AppShell from "@/components/layout/AppShell";
 
 // Route-level code splitting (reduziert initial bundle)
 const LandingPage = lazy(() => import("../pages/LandingPage"));
-const ReplayPage = lazy(() => import("../pages/ReplayPage"));
 const NotificationsPage = lazy(() => import("../pages/NotificationsPage"));
 const SignalsPage = lazy(() => import("../pages/SignalsPage"));
 const LessonsPage = lazy(() => import("../pages/LessonsPage"));
@@ -68,8 +67,9 @@ export default function RoutesRoot() {
             <Route path="/journal" element={<JournalPage />} />
             <Route path="/watchlist" element={<WatchlistPage />} />
             <Route path="/alerts" element={<AlertsPage />} />
-            <Route path="/replay" element={<ReplayPage />} />
-            <Route path="/replay/:sessionId" element={<ReplayPage />} />
+            {/* Replay is a Chart mode: mount ChartPage in replay state (Chart tab stays active). */}
+            <Route path="/replay" element={<ChartPage mode="replay" />} />
+            <Route path="/replay/:sessionId" element={<ChartPage mode="replay" />} />
             {/* TODO(Product): Decide whether NotificationsPage should stay, be removed, or be re-added to navigation */}
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/signals" element={<SignalsPage />} />

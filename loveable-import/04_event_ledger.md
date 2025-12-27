@@ -15,8 +15,14 @@
 ## Ledger
 | Event | Trigger UI | Old Path | New Path | Status | Notes |
 |---|---|---|---|---|---|
-| TelemetryEvents.JOURNAL_SAVE_MS | Submit Journal | src/... | src/... | ☐ |  |
-| ... | ... | ... | ... | ☐ |  |
+| `market.provider.used` | Market provider chain resolves | `src/lib/data/marketOrchestrator.ts` | `src/lib/data/marketOrchestrator.ts` | ✅ | Preserved (no migration touch) |
+| `ui.advanced_insight.opened` | Advanced Insight opened | `src/features/analysis/advancedInsightTelemetry.ts` | `src/features/analysis/advancedInsightTelemetry.ts` | ✅ | Preserved (no migration touch) |
+| `ui.advanced_insight.tab_switched` | Advanced Insight tab switched | `src/features/analysis/advancedInsightTelemetry.ts` | `src/features/analysis/advancedInsightTelemetry.ts` | ✅ | Preserved (no migration touch) |
+| `ui.advanced_insight.field_overridden` | Advanced Insight field override | `src/features/analysis/advancedInsightTelemetry.ts` | `src/features/analysis/advancedInsightTelemetry.ts` | ✅ | Preserved (no migration touch) |
+| `ui.advanced_insight.saved` | Advanced Insight saved | `src/features/analysis/advancedInsightTelemetry.ts` | `src/features/analysis/advancedInsightTelemetry.ts` | ✅ | Preserved (no migration touch) |
+| `ui.advanced_insight.reset` | Advanced Insight reset field | `src/features/analysis/advancedInsightTelemetry.ts` | `src/features/analysis/advancedInsightTelemetry.ts` | ✅ | Preserved (no migration touch) |
+| `ui.advanced_insight.reset_all` | Advanced Insight reset all | `src/features/analysis/advancedInsightTelemetry.ts` | `src/features/analysis/advancedInsightTelemetry.ts` | ✅ | Preserved (no migration touch) |
+| `ui.advanced_insight.unlock_clicked` | Advanced Insight unlock CTA | `src/features/analysis/advancedInsightTelemetry.ts` | `src/features/analysis/advancedInsightTelemetry.ts` | ✅ | Preserved (no migration touch) |
 
 Legend:
 ✅ wired

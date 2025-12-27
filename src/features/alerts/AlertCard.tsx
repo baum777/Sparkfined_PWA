@@ -57,7 +57,10 @@ export default function AlertCard({
         <button
           type="button"
           className="sf-alert-card__action sf-focus-ring"
-          onClick={() => onToggleStatus(alert)}
+          onClick={(event) => {
+            event.stopPropagation();
+            onToggleStatus(alert);
+          }}
           disabled={isBusy}
           data-testid={`alert-action-toggle-${alert.id}`}
           aria-label={`${toggleLabel} alert for ${alert.symbol}`}
@@ -67,7 +70,10 @@ export default function AlertCard({
         <button
           type="button"
           className="sf-alert-card__action sf-alert-card__action--danger sf-focus-ring"
-          onClick={() => onDelete(alert)}
+          onClick={(event) => {
+            event.stopPropagation();
+            onDelete(alert);
+          }}
           disabled={isBusy}
           data-testid={`alert-action-delete-${alert.id}`}
           aria-label={`Delete alert for ${alert.symbol}`}

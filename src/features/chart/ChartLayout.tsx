@@ -119,7 +119,7 @@ export default function ChartLayout() {
   )
 
   return (
-    <section className="sf-chart-layout" aria-label="Chart workspace">
+    <section className="sf-chart-layout" aria-label="Chart workspace" data-testid="chart-page">
       <ChartTopBar
         timeframe={timeframe}
         symbolLabel={asset.symbol}
