@@ -20,11 +20,22 @@ import { RefreshCw, CheckCircle2, Sparkles } from '@/lib/icons';
 import OracleHistoryChart from '@/components/oracle/OracleHistoryChart';
 import OracleThemeFilter from '@/components/oracle/OracleThemeFilter';
 import OracleHistoryList from '@/components/oracle/OracleHistoryList';
+import OracleFilters from '@/components/oracle/OracleFilters';
+import OracleTodayTakeaway from '@/components/oracle/OracleTodayTakeaway';
+import OracleRewardBanner from '@/components/oracle/OracleRewardBanner';
+import OracleInsightCard from '@/components/oracle/OracleInsightCard';
+import OracleEmptyState from '@/components/oracle/OracleEmptyState';
 import Button from '@/components/ui/Button';
 import StateView from '@/components/ui/StateView';
 
 export default function OraclePage() {
   const {
+    insights,
+    filter,
+    setFilter,
+    counts,
+    todayInsight,
+    readingStreak,
     refresh,
     todayReport,
     reports,
@@ -37,6 +48,7 @@ export default function OraclePage() {
   const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
   const [rewardMessage, setRewardMessage] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<string>('All');
+  const [insightsOpen, setInsightsOpen] = useState(false);
 
   // Filter reports by theme
   const filteredReports = useMemo(() => {
@@ -225,7 +237,7 @@ export default function OraclePage() {
                 data-testid="oracle-mark-read-button"
                 leftIcon={<CheckCircle2 size={14} />}
               >
-                {isMarkingAsRead ? 'Saving' : 'Mark as read'}
+                {isMarkingAsRead ? 'Saving' : 'Mark as Read'}
               </Button>
             ) : null}
           </div>
@@ -244,6 +256,59 @@ export default function OraclePage() {
               </div>
             </div>
           ) : null}
+
+          {/* Loveable-additive Insights (kept visually separated; legacy blocks remain unchanged below). */}
+          <section
+            className="card rounded-3xl border border-border bg-surface/60 p-6"
+            data-testid="oracle-insight-section"
+          >
+            <details
+              className="group"
+              data-testid="oracle-insight-disclosure"
+              onToggle={(event) => setInsightsOpen((event.currentTarget as HTMLDetailsElement).open)}
+            >
+              <summary
+                className="flex cursor-pointer list-none items-center justify-between gap-4"
+                data-testid="oracle-insight-disclosure-summary"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-subtle text-brand">
+                    <Sparkles size={18} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-text-primary">Insights (optional)</p>
+                    <p className="text-sm text-text-secondary">
+                      Loveable-style feed layered on top of the legacy Oracle report.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-xs text-text-tertiary">Toggle</span>
+              </summary>
+
+              {insightsOpen ? (
+                <div className="mt-4 space-y-4">
+                  <OracleFilters filter={filter} onFilterChange={setFilter} counts={counts} />
+                  {todayInsight ? <OracleTodayTakeaway insight={todayInsight} /> : null}
+                  <OracleRewardBanner streak={readingStreak} />
+
+                  {insights.length === 0 ? (
+                    <OracleEmptyState filter={filter} />
+                  ) : (
+                    <section className="space-y-4" data-testid="oracle-insight-feed">
+                      {insights.map((insight) => (
+                        <OracleInsightCard
+                          key={insight.id}
+                          insight={insight}
+                          onMarkAsRead={markAsRead}
+                          canMarkAsRead={Boolean(todayReport && insight.id === todayReport.date && !todayReport.read)}
+                        />
+                      ))}
+                    </section>
+                  )}
+                </div>
+              ) : null}
+            </details>
+          </section>
 
           {renderReportSection()}
 

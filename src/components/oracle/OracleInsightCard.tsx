@@ -77,14 +77,14 @@ export default function OracleInsightCard({ insight, onMarkAsRead, canMarkAsRead
                   variant="outline"
                   size="sm"
                   onClick={() => onMarkAsRead(insight.id)}
-                  data-testid={`oracle-mark-read-${insight.id}`}
+                  data-testid={`oracle-insight-mark-read-${insight.id}`}
                   leftIcon={<Check size={14} />}
                 >
                   Mark as Read
                 </Button>
               </span>
             </Tooltip>
-            <span className="text-xs text-text-tertiary" data-testid="oracle-mark-read-hint">
+            <span className="text-xs text-text-tertiary" data-testid="oracle-insight-mark-read-hint">
               Logs to journal & builds streak
             </span>
           </div>
