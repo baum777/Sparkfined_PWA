@@ -164,12 +164,12 @@ These events exist in protected Sparkfined paths that will **not** be touched du
 
 | Event | Trigger UI | Old Path | New Path | Status | Notes |
 |-------|-----------|----------|----------|--------|-------|
-| `ui.oracle.insight_opened` | Oracle insight opened | `src/pages/OraclePage.tsx` (insight click) | `src/components/oracle/OracleInsightCard.tsx` | ✅ | Add `uiLog('ui.oracle.insight_opened', 1, { insightId })` on card click |
-| `ui.oracle.filter_changed` | Oracle theme filter changed | `src/components/oracle/OracleThemeFilter.tsx` | `src/components/oracle/OracleFilters.tsx` | ✅ | Wire in `useOracleAdapter`: `uiLog('ui.oracle.filter_changed', 1, { filter })` |
-| `ui.oracle.reward_claimed` | Oracle reward claimed (gamification) | N/A | `src/components/oracle/OracleRewardBanner.tsx` | ✅ | Add `uiLog('ui.oracle.reward_claimed', 1)` on claim button click |
+| `ui.oracle.insight_opened` | Oracle insight opened | `src/pages/OraclePage.tsx` (view analysis) | `src/components/oracle/OracleInsightCard.tsx` | ✅ | Wired via `Telemetry.log('ui.oracle.insight_opened', 1, { insightId })` when "View full analysis" is opened |
+| `ui.oracle.filter_changed` | Oracle filter changed (All/New/Read) | N/A | `src/features/oracle/useOracle.ts` + `src/components/oracle/OracleFilters.tsx` | ✅ | Wired via `Telemetry.log('ui.oracle.filter_changed', 1, { filter })` on filter change |
+| `ui.oracle.reward_claimed` | Oracle reward claimed (gamification) | N/A | N/A | ⚠️ | Sparkfined rewards are auto-granted on "Mark as Read" (protected `oracleStore`); no explicit "claim" UI exists in Loveable-style Oracle |
 | `ui.oracle.insight_shared` | Oracle insight shared | N/A | (defer) | ⚠️ | **Missing**: Share functionality not in Loveable or Sparkfined. Defer to post-migration. |
 
-**Implementation**: Wire events in `useOracleAdapter` and Oracle page component.
+**Implementation**: Wire events in `src/features/oracle/useOracle.ts` and Oracle UI components (`src/components/oracle/*`).
 
 ---
 
