@@ -76,11 +76,11 @@ These events exist in protected Sparkfined paths that will **not** be touched du
 
 | Event | Trigger UI | Old Path | New Path | Status | Notes |
 |-------|-----------|----------|----------|--------|-------|
-| `ui.dashboard.loaded` | Dashboard page loaded | (implicit in page mount) | `src/pages/Dashboard.tsx` (Loveable) | ✅ | Add `uiLog('ui.dashboard.loaded', 1)` in Dashboard page `useEffect` |
-| `ui.dashboard.quick_action_clicked` | Quick action button clicked | `src/components/board/QuickActions.tsx` | `src/components/dashboard/QuickActionsCard.tsx` | ✅ | Wire to adapter: `uiLog('ui.dashboard.quick_action_clicked', 1, { action })` |
-| `ui.dashboard.kpi_clicked` | KPI tile clicked (navigate to detail) | `src/components/board/KPITile.tsx` | `src/components/dashboard/DailySnapshotCard.tsx` | ✅ | Wire to adapter: `uiLog('ui.dashboard.kpi_clicked', 1, { kpi })` |
-| `ui.dashboard.holding_clicked` | Holdings item clicked | `src/components/dashboard/HoldingsList.tsx` | `src/components/dashboard/HoldingsCard.tsx` | ✅ | Wire to adapter: `uiLog('ui.dashboard.holding_clicked', 1, { symbol })` |
-| `ui.dashboard.trade_clicked` | Recent trade item clicked | `src/components/dashboard/TradeLogList.tsx` | `src/components/dashboard/LastTradesCard.tsx` | ✅ | Wire to adapter: `uiLog('ui.dashboard.trade_clicked', 1)` → navigate to journal |
+| `ui.dashboard.loaded` | Dashboard page loaded | (implicit in page mount) | `src/pages/DashboardPage.tsx` | ⚠️ | **Missing event constant / hook**: Sparkfined uses `Telemetry.log()` with `TelemetryEvents` constants, but no existing dashboard UI event name is present. Cannot add without inventing event names. |
+| `ui.dashboard.quick_action_clicked` | Quick action button clicked | `src/components/board/QuickActions.tsx` | N/A | ⚠️ | **Missing in Sparkfined Dashboard**: No equivalent Loveable Quick Actions card is wired in Sparkfined DashboardPage; no existing telemetry event name/constant found. |
+| `ui.dashboard.kpi_clicked` | KPI tile clicked (navigate to detail) | `src/components/board/KPITile.tsx` | N/A | ⚠️ | **Missing event constant / hook**: KPI strip has no click navigation in current Sparkfined dashboard; no event constant found. |
+| `ui.dashboard.holding_clicked` | Holdings item clicked | `src/components/dashboard/HoldingsList.tsx` | `src/features/dashboard/HoldingsCard.tsx` | ⚠️ | **Missing telemetry hook**: Holdings rows navigate to watchlist, but no `Telemetry.log()` event exists for this interaction. |
+| `ui.dashboard.trade_clicked` | Recent trade item clicked | `src/features/dashboard/TradeLogEntry.tsx` | `src/features/dashboard/TradeLogCard.tsx` | ⚠️ | **Missing telemetry hook**: Trades list interactions do not log via `Telemetry.log()`; no existing event constant found. |
 
 **Implementation**: Add telemetry calls in `useDashboardStatsAdapter` and Dashboard component event handlers.
 

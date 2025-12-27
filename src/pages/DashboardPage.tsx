@@ -196,32 +196,33 @@ export default function DashboardPage() {
 
   const closeFabMenu = () => setIsFabMenuOpen(false);
 
-  const renderHoldingsAndTrades = () => (
-    <div className="dashboard-split">
-      <Suspense
-        fallback={
-          <div className="dashboard-card sf-card" aria-busy="true">
-            <Skeleton variant="card" className="h-72 w-full" />
-          </div>
-        }
-      >
-        <HoldingsCard className="dashboard-card sf-card" />
-      </Suspense>
-      <Suspense
-        fallback={
-          <div className="dashboard-card sf-card" aria-busy="true">
-            <Skeleton variant="card" className="h-72 w-full" />
-          </div>
-        }
-      >
-        <TradeLogCard
-          className="dashboard-card"
-          onLogEntry={handleOpenLogEntryOverlay}
-          isLogEntryEnabled={hasBuySignal}
-          logEntryTooltip="Enabled when a BUY signal is detected"
-        />
-      </Suspense>
-    </div>
+  const renderHoldingsCard = () => (
+    <Suspense
+      fallback={
+        <div className="dashboard-card sf-card" aria-busy="true">
+          <Skeleton variant="card" className="h-72 w-full" />
+        </div>
+      }
+    >
+      <HoldingsCard className="dashboard-card sf-card" />
+    </Suspense>
+  );
+
+  const renderTradeLogCard = () => (
+    <Suspense
+      fallback={
+        <div className="dashboard-card sf-card" aria-busy="true">
+          <Skeleton variant="card" className="h-72 w-full" />
+        </div>
+      }
+    >
+      <TradeLogCard
+        className="dashboard-card"
+        onLogEntry={handleOpenLogEntryOverlay}
+        isLogEntryEnabled={hasBuySignal}
+        logEntryTooltip="Enabled when a BUY signal is detected"
+      />
+    </Suspense>
   );
 
   const handleJournalTrade = (event: TradeEventInboxItem) => {
@@ -242,35 +243,51 @@ export default function DashboardPage() {
   };
 
   const renderMainContent = () => {
-    const biasCard = <DailyBiasCard className="dashboard-card sf-card" />;
+    const leftColumn = (
+      <div className="dashboard-stack">
+        <DailyBiasCard className="dashboard-card sf-card" />
+        {renderHoldingsCard()}
+        {renderTradeLogCard()}
+      </div>
+    );
+
+    const rightColumn = (
+      <div className="dashboard-stack">
+        <Suspense
+          fallback={
+            <div className="dashboard-card sf-card" aria-busy="true">
+              <Skeleton variant="card" className="h-48 w-full" />
+            </div>
+          }
+        >
+          <InsightTeaser {...dummyInsight} className="dashboard-card sf-card" />
+        </Suspense>
+        <Suspense
+          fallback={
+            <div className="dashboard-card sf-card" aria-busy="true">
+              <Skeleton variant="card" className="h-60 w-full" />
+            </div>
+          }
+        >
+          <JournalSnapshot entries={recentJournalEntries} className="dashboard-card sf-card" />
+        </Suspense>
+        <Suspense
+          fallback={
+            <div className="dashboard-card sf-card" aria-busy="true">
+              <Skeleton variant="card" className="h-52 w-full" />
+            </div>
+          }
+        >
+          <AlertsSnapshot className="dashboard-card sf-card" />
+        </Suspense>
+      </div>
+    );
 
     if (isLoading) {
       return (
-        <div className="dashboard-stack">
-          {biasCard}
-          <div className="dashboard-grid dashboard-grid--two">
-            <div className="dashboard-primary dashboard-stack">
-              <div className="dashboard-card sf-card">
-                <Skeleton variant="card" className="h-72 w-full" />
-              </div>
-              <div className="dashboard-split">
-                <div className="dashboard-card sf-card">
-                  <Skeleton variant="card" className="h-64 w-full" />
-                </div>
-                <div className="dashboard-card sf-card">
-                  <Skeleton variant="card" className="h-64 w-full" />
-                </div>
-              </div>
-            </div>
-            <div className="dashboard-secondary dashboard-stack">
-              <div className="dashboard-card sf-card">
-                <Skeleton variant="card" className="h-60 w-full" />
-              </div>
-              <div className="dashboard-card sf-card">
-                <Skeleton variant="card" className="h-60 w-full" />
-              </div>
-            </div>
-          </div>
+        <div className="dashboard-grid dashboard-grid--two">
+          <div className="dashboard-primary dashboard-stack">{leftColumn}</div>
+          <div className="dashboard-secondary dashboard-stack">{rightColumn}</div>
         </div>
       );
     }
@@ -278,7 +295,6 @@ export default function DashboardPage() {
     if (error) {
       return (
         <div className="dashboard-stack">
-          {biasCard}
           <ErrorBanner message={error} onRetry={handleRetry} />
           <div className="dashboard-card sf-card">
             <StateView
@@ -289,90 +305,50 @@ export default function DashboardPage() {
               onAction={handleRetry}
             />
           </div>
+          <div className="dashboard-grid dashboard-grid--two">
+            <div className="dashboard-primary dashboard-stack">{leftColumn}</div>
+            <div className="dashboard-secondary dashboard-stack">{rightColumn}</div>
+          </div>
         </div>
       );
     }
 
     if (!hasData) {
       return (
-        <div className="dashboard-stack">
-          {biasCard}
-          <div className="dashboard-grid dashboard-grid--two">
-            <div className="dashboard-primary dashboard-stack">
-              <div className="dashboard-card sf-card">
-                <StateView
-                  type="empty"
-                  title="No insights yet"
-                  description="Run your first chart session to unlock AI bias, flow and volatility context."
-                  actionLabel="Open chart"
-                  onAction={() => navigate("/chart")}
-                />
-              </div>
-              {renderHoldingsAndTrades()}
+        <div className="dashboard-grid dashboard-grid--two">
+          <div className="dashboard-primary dashboard-stack">
+            <div className="dashboard-card sf-card">
+              <StateView
+                type="empty"
+                title="No insights yet"
+                description="Run your first chart session to unlock AI bias, flow and volatility context."
+                actionLabel="Open chart"
+                onAction={() => navigate("/chart")}
+              />
             </div>
-            <div className="dashboard-secondary dashboard-stack">
-              <div className="dashboard-card sf-card">
-                <StateView
-                  type="empty"
-                  title="No journal entries"
-                  description="Log a trade or mindset note to build your streaks."
-                  actionLabel="Open journal"
-                  onAction={() => navigate("/journal")}
-                  compact
-                />
-              </div>
-              <Suspense
-                fallback={
-                  <div className="dashboard-card sf-card" aria-busy="true">
-                    <Skeleton variant="card" className="h-52 w-full" />
-                  </div>
-                }
-              >
-                <AlertsSnapshot className="dashboard-card sf-card" />
-              </Suspense>
+            {leftColumn}
+          </div>
+          <div className="dashboard-secondary dashboard-stack">
+            <div className="dashboard-card sf-card">
+              <StateView
+                type="empty"
+                title="No journal entries"
+                description="Log a trade or mindset note to build your streaks."
+                actionLabel="Open journal"
+                onAction={() => navigate("/journal")}
+                compact
+              />
             </div>
+            {rightColumn}
           </div>
         </div>
       );
     }
 
     return (
-      <div className="dashboard-stack">
-        {biasCard}
-        <div className="dashboard-grid dashboard-grid--two">
-          <div className="dashboard-primary dashboard-stack">
-            <Suspense
-              fallback={
-                <div className="dashboard-card sf-card" aria-busy="true">
-                  <Skeleton variant="card" className="h-48 w-full" />
-                </div>
-              }
-            >
-              <InsightTeaser {...dummyInsight} className="dashboard-card sf-card" />
-            </Suspense>
-            {renderHoldingsAndTrades()}
-          </div>
-          <div className="dashboard-secondary dashboard-stack">
-            <Suspense
-              fallback={
-                <div className="dashboard-card sf-card" aria-busy="true">
-                  <Skeleton variant="card" className="h-60 w-full" />
-                </div>
-              }
-            >
-              <JournalSnapshot entries={recentJournalEntries} className="dashboard-card sf-card" />
-            </Suspense>
-            <Suspense
-              fallback={
-                <div className="dashboard-card sf-card" aria-busy="true">
-                  <Skeleton variant="card" className="h-52 w-full" />
-                </div>
-              }
-            >
-              <AlertsSnapshot className="dashboard-card sf-card" />
-            </Suspense>
-          </div>
-        </div>
+      <div className="dashboard-grid dashboard-grid--two">
+        <div className="dashboard-primary dashboard-stack">{leftColumn}</div>
+        <div className="dashboard-secondary dashboard-stack">{rightColumn}</div>
       </div>
     );
   };
