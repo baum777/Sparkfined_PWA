@@ -191,13 +191,13 @@ These events exist in protected Sparkfined paths that will **not** be touched du
 
 | Event | Trigger UI | Old Path | New Path | Status | Notes |
 |-------|-----------|----------|----------|--------|-------|
-| `ui.settings.theme_changed` | Theme toggled (light/dark/system) | `src/features/theme/useTheme.ts` | `src/components/settings/ThemeToggle.tsx` | ✅ | Wire in `useThemeAdapter`: `uiLog('ui.settings.theme_changed', 1, { theme })` |
-| `ui.settings.language_changed` | Language changed | `src/features/settings/PreferencesCard.tsx` | `src/components/settings/SettingsSection.tsx` | ✅ | Wire to settings adapter: `uiLog('ui.settings.language_changed', 1, { language })` |
-| `ui.settings.export_started` | Data export initiated | `src/features/settings/DataExportCard.tsx` | `src/components/settings/DataExportImport.tsx` | ✅ | Add `uiLog('ui.settings.export_started', 1)` on export button click |
-| `ui.settings.import_completed` | Data import completed | `src/features/settings/DataImportCard.tsx` | `src/components/settings/DataExportImport.tsx` | ✅ | Add `uiLog('ui.settings.import_completed', 1, { itemsCount })` on import success |
-| `ui.settings.factory_reset` | Factory reset executed | `src/features/settings/DangerZoneAccordion.tsx` | `src/components/settings/FactoryReset.tsx` | ✅ | Add `uiLog('ui.settings.factory_reset', 1)` on reset confirm |
-| `ui.settings.notification_permission_requested` | Notification permission requested | `src/components/alerts/NotificationsPermissionButton.tsx` | N/A | ⚠️ | **Missing in Loveable**: Notification permission UI not in Loveable Settings. Add to SettingsSection or defer. |
-| `ui.settings.telemetry_exported` | Telemetry data exported | N/A | `src/components/settings/SettingsSection.tsx` | ✅ | Add `uiLog('ui.settings.telemetry_exported', 1)` on telemetry export button click |
+| `ui.settings.theme_changed` | Theme changed | `src/pages/SettingsContent.tsx` (Theme select) | `src/pages/SettingsContent.tsx` | ✅ | Logged on selection change: `Telemetry.log('ui.settings.theme_changed', 1, { theme })`. |
+| `ui.settings.language_changed` | Language changed | N/A | N/A | ⚠️ | No language setting is currently exposed in Sparkfined Settings UI. Hook needed if language is added. |
+| `ui.settings.export_started` | Data export initiated | `src/components/settings/JournalDataControls.tsx` (export buttons) | `src/components/settings/JournalDataControls.tsx` | ✅ | Logged for JSON/Markdown/full backup exports: `Telemetry.log('ui.settings.export_started', 1, { export })`. |
+| `ui.settings.import_completed` | Data import completed | `src/components/settings/JournalDataControls.tsx` (import success) | `src/components/settings/JournalDataControls.tsx` | ✅ | Logged after successful import: `Telemetry.log('ui.settings.import_completed', 1, { imported, skipped, mode })`. |
+| `ui.settings.factory_reset` | Factory reset executed | `src/pages/SettingsContent.tsx` (Danger Zone confirm) | `src/pages/SettingsContent.tsx` | ✅ | Logged after executing factory reset: `Telemetry.log('ui.settings.factory_reset', 1)`. |
+| `ui.settings.notification_permission_requested` | Notification permission requested | `src/pages/SettingsContent.tsx` (Enable Browser Notifications) | `src/pages/SettingsContent.tsx` | ✅ | Logged before requesting permission: `Telemetry.log('ui.settings.notification_permission_requested', 1, { supported, previousPermission })`. |
+| `ui.settings.telemetry_exported` | Telemetry data exported | N/A | N/A | ⚠️ | No explicit telemetry export action exists in current Settings UI (only queue send). Add export UI if required. |
 
 **Implementation**: Wire events in `useThemeAdapter`, `useSettingsAdapter`, and Settings page components.
 
