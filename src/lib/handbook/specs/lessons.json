@@ -1,0 +1,187 @@
+{
+  "id": "lessons",
+  "route": "/lessons",
+  "title": "Learn",
+  "purpose": "Master trading concepts through structured lessons — unlock new skills as you progress.",
+  "prerequisites": [],
+  "flows": [
+    {
+      "id": "browse-lessons",
+      "title": "Browse Available Lessons",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "view-categories",
+          "title": "View Categories",
+          "userAction": "Browse lesson cards on the page",
+          "systemBehavior": "Shows lessons grouped by topic and difficulty",
+          "outcome": "Find relevant learning content"
+        },
+        {
+          "id": "filter-difficulty",
+          "title": "Filter by Difficulty",
+          "userAction": "Click Beginner, Intermediate, or Advanced",
+          "systemBehavior": "Filters to show matching lessons",
+          "outcome": "See lessons at your level"
+        },
+        {
+          "id": "check-progress",
+          "title": "Check Progress",
+          "userAction": "Look for progress indicators on cards",
+          "systemBehavior": "Shows completion % and unlock status",
+          "outcome": "Track your learning journey"
+        }
+      ]
+    },
+    {
+      "id": "complete-lesson",
+      "title": "Complete a Lesson",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "open-lesson",
+          "title": "Open Lesson",
+          "userAction": "Click on a lesson card",
+          "systemBehavior": "Opens lesson content with sections",
+          "outcome": "Ready to learn"
+        },
+        {
+          "id": "read-content",
+          "title": "Read Content",
+          "userAction": "Read through the lesson material",
+          "systemBehavior": "Tracks your scroll progress",
+          "outcome": "Knowledge absorbed"
+        },
+        {
+          "id": "complete-exercise",
+          "title": "Complete Exercise (If Any)",
+          "userAction": "Follow the practice instructions",
+          "systemBehavior": "Validates your answers or actions",
+          "outcome": "Applied learning"
+        },
+        {
+          "id": "take-quiz",
+          "title": "Take Quiz (If Any)",
+          "userAction": "Answer quiz questions",
+          "systemBehavior": "Checks answers and shows results",
+          "outcome": "Understanding verified"
+        },
+        {
+          "id": "mark-complete",
+          "title": "Mark Complete",
+          "userAction": "Click 'Complete' or finish quiz",
+          "systemBehavior": "Updates progress, awards XP, may unlock new content",
+          "outcome": "Lesson completed, XP earned"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Lesson has a practice trade",
+          "steps": [
+            {
+              "id": "open-replay",
+              "title": "Open Practice Replay",
+              "userAction": "Click 'Practice in Replay'",
+              "systemBehavior": "Opens chart replay with lesson context",
+              "outcome": "Apply concepts in simulated environment",
+              "cta": { "label": "Open Replay", "action": "nav:/chart/replay" }
+            }
+          ]
+        },
+        {
+          "when": "Need to revisit",
+          "steps": [
+            {
+              "id": "bookmark",
+              "title": "Bookmark Section",
+              "userAction": "Click bookmark icon",
+              "systemBehavior": "Saves for quick access later",
+              "outcome": "Easy to find again"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unlock-content",
+      "title": "Unlock New Content",
+      "level": "advanced",
+      "steps": [
+        {
+          "id": "check-requirements",
+          "title": "Check Requirements",
+          "userAction": "Click on a locked lesson",
+          "systemBehavior": "Shows prerequisites needed",
+          "outcome": "Know what to complete first"
+        },
+        {
+          "id": "complete-prereqs",
+          "title": "Complete Prerequisites",
+          "userAction": "Finish the required lessons",
+          "systemBehavior": "Tracks completion status",
+          "outcome": "Progress toward unlock"
+        },
+        {
+          "id": "claim-unlock",
+          "title": "Unlock New Lesson",
+          "userAction": "Return to locked lesson",
+          "systemBehavior": "Now available to open",
+          "outcome": "New content accessible"
+        }
+      ]
+    },
+    {
+      "id": "track-mastery",
+      "title": "Track Your Mastery",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "view-xp",
+          "title": "View XP Progress",
+          "userAction": "Check the XP bar at top",
+          "systemBehavior": "Shows current XP and level",
+          "outcome": "See overall progress"
+        },
+        {
+          "id": "view-achievements",
+          "title": "View Achievements",
+          "userAction": "Click on your profile/achievements",
+          "systemBehavior": "Shows earned badges and milestones",
+          "outcome": "Celebrate your progress"
+        }
+      ]
+    }
+  ],
+  "shortcuts": [
+    { "keys": "?", "action": "Toggle this handbook panel" },
+    { "keys": "→", "action": "Next section in lesson" },
+    { "keys": "←", "action": "Previous section in lesson" },
+    { "keys": "Esc", "action": "Exit lesson view" }
+  ],
+  "pitfalls": [
+    {
+      "problem": "Lesson locked",
+      "fix": "Complete prerequisite lessons shown on the lock icon tooltip"
+    },
+    {
+      "problem": "Quiz answers not saving",
+      "fix": "Ensure you click Submit after answering. Progress saves automatically."
+    },
+    {
+      "problem": "XP not updating",
+      "fix": "XP is awarded on lesson completion. Finish the full lesson to earn XP."
+    },
+    {
+      "problem": "Can't find a topic",
+      "fix": "Use the search bar or check different difficulty levels"
+    }
+  ],
+  "glossary": [
+    { "term": "XP", "meaning": "Experience points earned by completing lessons and practicing" },
+    { "term": "Level", "meaning": "Your overall mastery tier based on accumulated XP" },
+    { "term": "Unlock", "meaning": "Gaining access to new content by meeting prerequisites" },
+    { "term": "Prerequisite", "meaning": "A lesson that must be completed before accessing another" },
+    { "term": "Badge", "meaning": "Achievement earned for milestones (e.g., first trade logged)" },
+    { "term": "Practice Trade", "meaning": "Simulated trading exercise using chart replay" }
+  ]
+}

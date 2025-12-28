@@ -1,59 +1,52 @@
-/**
- * Badge - Migrated to Design System
- *
- * Uses Design System tokens (already using sentiment colors, now with better styling)
- */
-import React from 'react'
-import { cn } from '@/lib/ui/cn'
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
-export type BadgeVariant =
-  | 'default'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'outline'
-  | 'brand'
-  | 'armed'
-  | 'triggered'
-  | 'paused'
-  | 'long'
-  | 'short'
-  | 'info'
+import { cn } from "@/lib/utils";
 
-interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: BadgeVariant
-  live?: boolean // Add live pulse effect
+const badgeVariants = cva(
+  "inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-brand/60",
+  {
+    variants: {
+      variant: {
+        // Default - brand colored
+        default: 
+          "border border-brand/30 bg-brand/10 text-brand",
+        // Secondary - subtle surface
+        secondary: 
+          "border border-border-sf-moderate bg-surface-subtle text-text-secondary",
+        // Outline - just border
+        outline: 
+          "border border-border-sf-moderate bg-transparent text-text-primary",
+        
+        // Trading sentiment variants
+        bull: 
+          "border border-sentiment-bull-border bg-sentiment-bull-bg text-sentiment-bull",
+        bear: 
+          "border border-sentiment-bear-border bg-sentiment-bear-bg text-sentiment-bear",
+        neutral: 
+          "border border-sentiment-neutral-border bg-sentiment-neutral-bg text-warning",
+        
+        // System state variants
+        success: 
+          "border border-sentiment-bull-border bg-sentiment-bull-bg text-sentiment-bull",
+        destructive: 
+          "border border-sentiment-bear-border bg-sentiment-bear-bg text-sentiment-bear",
+        warning: 
+          "border border-sentiment-neutral-border bg-sentiment-neutral-bg text-warning",
+        info: 
+          "border border-info/30 bg-info/10 text-info",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  },
+);
+
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return <div className={cn(badgeVariants({ variant }), className)} {...props} />;
 }
 
-const variantClasses: Record<BadgeVariant, string> = {
-  default: 'bg-surface-subtle text-text-secondary border-border-moderate',
-  success: 'bg-sentiment-bull-bg text-sentiment-bull border-sentiment-bull-border',
-  warning: 'bg-sentiment-neutral-bg text-amber-200 border-sentiment-neutral-border',
-  danger: 'bg-sentiment-bear-bg text-sentiment-bear border-sentiment-bear-border',
-  outline: 'bg-transparent text-text-secondary border-border-moderate',
-  brand: 'bg-brand/10 text-brand border-brand/30',
-  armed: 'bg-amber-500/10 text-amber-100 border-amber-400/40',
-  triggered: 'bg-emerald-500/10 text-emerald-100 border-emerald-400/40',
-  paused: 'bg-sky-500/10 text-sky-100 border-sky-400/40',
-  long: 'bg-emerald-500/10 text-emerald-100 border-emerald-400/40',
-  short: 'bg-rose-500/10 text-rose-100 border-rose-400/40',
-  info: 'bg-surface-subtle text-text-primary border-border/80',
-}
-
-export function Badge({ variant = 'default', live = false, className, children, ...props }: BadgeProps) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide transition-all',
-        variantClasses[variant],
-        live && 'pulse-live', // Design System live animation
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </span>
-  )
-}
-
-export default Badge
+export { Badge, badgeVariants };

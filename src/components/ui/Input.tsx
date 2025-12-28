@@ -1,99 +1,52 @@
-/**
- * Input - Migrated to Design System
- *
- * Uses Design System .input class from src/styles/index.css
- */
-import React from 'react'
-import { cn } from '@/lib/ui/cn'
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string
-  error?: string
-  helperText?: string
-  hint?: string // Backward compatibility alias for helperText
-  leftIcon?: React.ReactNode
-  rightIcon?: React.ReactNode
-  mono?: boolean
-  errorId?: string
-  errorTestId?: string
-}
+import { cn } from "@/lib/utils";
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
+const inputVariants = cva(
+  "flex w-full rounded-xl text-text-primary placeholder:text-text-tertiary transition-all duration-150 outline-none file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-text-primary disabled:cursor-not-allowed disabled:opacity-50",
   {
-    label,
-    error,
-    helperText,
-    hint,
-    leftIcon,
-    rightIcon,
-    mono = false,
-    errorId,
-    errorTestId,
-    className,
-    id,
-    ...props
+    variants: {
+      variant: {
+        // Default input with Sparkfined styling
+        default: 
+          "bg-surface-subtle border border-border-sf-moderate focus:border-brand focus:ring-2 focus:ring-brand/40 focus:shadow-glow-accent",
+        // Ghost input - minimal styling
+        ghost: 
+          "bg-transparent border-transparent focus:bg-surface-subtle focus:border-border-sf-moderate",
+        // Filled input - solid background
+        filled:
+          "bg-surface border border-transparent focus:border-brand focus:ring-2 focus:ring-brand/40",
+      },
+      inputSize: {
+        default: "h-12 px-4 text-sm",
+        sm: "h-9 px-3 text-xs",
+        lg: "h-14 px-5 text-base",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      inputSize: "default",
+    },
+  }
+);
+
+export interface InputProps
+  extends Omit<React.ComponentProps<"input">, "size">,
+    VariantProps<typeof inputVariants> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, variant, inputSize, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(inputVariants({ variant, inputSize }), className)}
+        ref={ref}
+        {...props}
+      />
+    );
   },
-  ref
-) {
-  const generatedId = React.useId()
-  const inputId = id ?? generatedId
-  const helperTextValue = helperText ?? hint
-  const computedErrorId = error ? errorId ?? `${inputId}-error` : undefined
-  const helperId = !error && helperTextValue ? `${inputId}-helper` : undefined
+);
+Input.displayName = "Input";
 
-  return (
-    <div className="w-full">
-      {label ? (
-        <label htmlFor={inputId} className="mb-2 block text-sm font-medium text-text-secondary">
-          {label}
-        </label>
-      ) : null}
-
-      <div className="relative">
-        {leftIcon ? (
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-text-tertiary">{leftIcon}</span>
-        ) : null}
-
-        <input
-          id={inputId}
-          ref={ref}
-          aria-invalid={Boolean(error)}
-          aria-describedby={computedErrorId ?? helperId}
-          className={cn(
-            'input', // Design System input class
-            error && 'border-danger focus:ring-danger/40',
-            leftIcon && 'pl-11',
-            rightIcon && 'pr-11',
-            mono && 'font-mono tabular-nums',
-            className
-          )}
-          {...props}
-        />
-
-        {rightIcon ? (
-          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-text-tertiary">{rightIcon}</span>
-        ) : null}
-      </div>
-
-      {error ? (
-        <p
-          id={computedErrorId}
-          className="mt-1 flex items-center gap-1 text-xs text-danger"
-          role="alert"
-          data-testid={errorTestId}
-        >
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-danger" aria-hidden />
-          {error}
-        </p>
-      ) : null}
-
-      {!error && helperTextValue ? (
-        <p id={helperId} className="mt-1 text-xs text-text-tertiary">
-          {helperTextValue}
-        </p>
-      ) : null}
-    </div>
-  )
-})
-
-export default Input
+export { Input, inputVariants };

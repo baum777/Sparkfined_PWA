@@ -1,0 +1,278 @@
+{
+  "metadata": {
+    "generatedAt": "2025-01-27T00:00:00Z",
+    "source": "Codebase analysis",
+    "version": "1.0.0"
+  },
+  "tabs": [
+    {
+      "tabId": "dashboard",
+      "label": "Dashboard",
+      "order": 1,
+      "category": "primary",
+      "routes": ["/dashboard", "/board"],
+      "aliases": ["/dashboard-v2"],
+      "component": "DashboardPage",
+      "componentPath": "src/pages/DashboardPage.tsx",
+      "navConfig": {
+        "path": "/dashboard",
+        "testId": "nav-dashboard",
+        "tourId": "board-link",
+        "icon": "Home"
+      },
+      "status": "done",
+      "features": {
+        "hasKPIStrip": true,
+        "hasFAB": true,
+        "hasLogEntryCTA": true,
+        "hasAlertCreateEntry": true,
+        "hasHoldingsCard": true,
+        "hasTradeLogCard": true,
+        "hasDailyBiasCard": true
+      }
+    },
+    {
+      "tabId": "journal",
+      "label": "Journal",
+      "order": 2,
+      "category": "primary",
+      "routes": ["/journal"],
+      "aliases": ["/journal-v2"],
+      "component": "JournalPage",
+      "componentPath": "src/pages/JournalPage.tsx",
+      "navConfig": {
+        "path": "/journal",
+        "testId": "nav-journal",
+        "tourId": "journal-link",
+        "icon": "FileText"
+      },
+      "status": "done",
+      "features": {
+        "hasV2Layout": true,
+        "hasInputColumn": true,
+        "hasOutputColumn": true,
+        "hasAutosave": true,
+        "hasTemplates": true,
+        "hasAIInsights": true
+      }
+    },
+    {
+      "tabId": "lessons",
+      "label": "Learn",
+      "order": 3,
+      "category": "primary",
+      "routes": ["/lessons"],
+      "aliases": [],
+      "component": "LessonsPage",
+      "componentPath": "src/pages/LessonsPage.tsx",
+      "navConfig": {
+        "path": "/lessons",
+        "testId": "nav-lessons",
+        "icon": "GraduationCap",
+        "category": "secondary"
+      },
+      "status": "done",
+      "features": {
+        "hasLessonList": true,
+        "hasFilters": true,
+        "hasProgress": false,
+        "hasQuizzes": false
+      },
+      "note": "Route ist /lessons, aber loveable-import zeigt /learn als Soll"
+    },
+    {
+      "tabId": "chart",
+      "label": "Chart",
+      "order": 4,
+      "category": "primary",
+      "routes": ["/chart"],
+      "aliases": ["/chart-v2", "/analysis", "/analysis-v2", "/analyze"],
+      "component": "ChartPage",
+      "componentPath": "src/pages/ChartPage.tsx",
+      "navConfig": {
+        "path": "/chart",
+        "testId": "nav-chart",
+        "tourId": "chart-link",
+        "icon": "TrendingUp"
+      },
+      "status": "done",
+      "features": {
+        "hasReplayMode": true,
+        "hasIndicators": true,
+        "hasDrawings": true,
+        "hasBottomPanel": false,
+        "hasGrokPulse": false
+      }
+    },
+    {
+      "tabId": "alerts",
+      "label": "Alerts",
+      "order": 5,
+      "category": "primary",
+      "routes": ["/alerts"],
+      "aliases": ["/alerts-v2"],
+      "component": "AlertsPage",
+      "componentPath": "src/features/alerts/AlertsPage.tsx",
+      "navConfig": {
+        "path": "/alerts",
+        "testId": "nav-alerts",
+        "tourId": "notifications-link",
+        "icon": "Bell"
+      },
+      "status": "done",
+      "features": {
+        "hasList": true,
+        "hasFilters": true,
+        "hasCreateFlow": true,
+        "hasURLPrefill": true,
+        "hasStableTestIds": true
+      }
+    },
+    {
+      "tabId": "settings",
+      "label": "Settings",
+      "order": 6,
+      "category": "primary",
+      "routes": ["/settings"],
+      "aliases": ["/settings-v2"],
+      "component": "SettingsPage",
+      "componentPath": "src/pages/SettingsPage.tsx",
+      "navConfig": {
+        "path": "/settings",
+        "testId": "nav-settings",
+        "tourId": "settings-link",
+        "icon": "Settings"
+      },
+      "status": "done",
+      "features": {
+        "hasAppearance": true,
+        "hasWalletManagement": true,
+        "hasExport": true,
+        "hasDangerZone": true
+      }
+    },
+    {
+      "tabId": "watchlist",
+      "label": "Watchlist",
+      "order": 7,
+      "category": "secondary",
+      "routes": ["/watchlist"],
+      "aliases": ["/watchlist-v2"],
+      "component": "WatchlistPage",
+      "componentPath": "src/pages/WatchlistPage.tsx",
+      "navConfig": {
+        "path": "/watchlist",
+        "testId": "nav-watchlist",
+        "icon": "BookmarkPlus",
+        "category": "secondary"
+      },
+      "status": "done",
+      "features": {
+        "hasTable": true,
+        "hasDetailPanel": true,
+        "hasFilters": true,
+        "hasSort": true,
+        "hasChartCTA": true
+      }
+    },
+    {
+      "tabId": "oracle",
+      "label": "Oracle",
+      "order": 8,
+      "category": "secondary",
+      "routes": ["/oracle"],
+      "aliases": [],
+      "component": "OraclePage",
+      "componentPath": "src/pages/OraclePage.tsx",
+      "navConfig": {
+        "path": "/oracle",
+        "testId": "nav-oracle",
+        "icon": "Sparkles",
+        "category": "secondary"
+      },
+      "status": "done",
+      "features": {
+        "hasDailyReport": true,
+        "hasThemeFilter": true,
+        "hasHistoryChart": true,
+        "hasRewardBanner": true
+      }
+    },
+    {
+      "tabId": "replay",
+      "label": "Replay",
+      "order": null,
+      "category": "mode",
+      "routes": ["/replay", "/replay/:sessionId"],
+      "aliases": [],
+      "component": "ChartPage",
+      "componentPath": "src/pages/ChartPage.tsx",
+      "navConfig": null,
+      "status": "done",
+      "features": {
+        "isChartMode": true,
+        "hasSessionId": true
+      },
+      "note": "Kein eigener Tab, sondern Chart-Mode via Route-Alias"
+    },
+    {
+      "tabId": "signals",
+      "label": "Signals",
+      "order": null,
+      "category": "dev",
+      "routes": ["/signals"],
+      "aliases": [],
+      "component": "SignalsPage",
+      "componentPath": "src/pages/SignalsPage.tsx",
+      "navConfig": {
+        "path": "/signals",
+        "testId": "nav-signals",
+        "icon": "Activity",
+        "category": "secondary"
+      },
+      "status": "partial",
+      "note": "Dev-only, nicht in Primary/Secondary Nav"
+    },
+    {
+      "tabId": "showcase",
+      "label": "Showcase",
+      "order": null,
+      "category": "dev",
+      "routes": ["/icons"],
+      "aliases": [],
+      "component": "IconShowcase",
+      "componentPath": "src/pages/IconShowcase.tsx",
+      "navConfig": {
+        "path": "/icons",
+        "testId": "nav-showcase",
+        "icon": "Star",
+        "category": "secondary"
+      },
+      "status": "dev",
+      "note": "Dev-only showcase"
+    }
+  ],
+  "navigation": {
+    "primary": [
+      "dashboard",
+      "journal",
+      "chart",
+      "watchlist",
+      "alerts"
+    ],
+    "secondary": [
+      "signals",
+      "oracle",
+      "lessons",
+      "showcase"
+    ],
+    "settings": "settings"
+  },
+  "routing": {
+    "source": "src/routes/RoutesRoot.tsx",
+    "hasAppShell": true,
+    "hasLegacyRedirects": true,
+    "hasReplayAlias": true
+  }
+}
+

@@ -1,0 +1,703 @@
+{
+  "metadata": {
+    "generatedAt": "2025-01-27T00:00:00Z",
+    "version": "1.0.0",
+    "note": "Data fetching uses Zustand stores + direct API calls, not React Query"
+  },
+  "tabs": [
+    {
+      "tabId": "dashboard",
+      "nav": {
+        "entry": "src/config/navigation.ts",
+        "key": "nav-dashboard",
+        "order": 1,
+        "activeState": "isNavItemActive() checks pathname + aliases",
+        "deepLink": "/dashboard?kpi=alerts",
+        "refresh": "Page refresh preserves state via Zustand persistence",
+        "guards": null
+      },
+      "routes": {
+        "definition": "src/routes/RoutesRoot.tsx",
+        "path": "/dashboard",
+        "aliases": ["/board", "/dashboard-v2"],
+        "component": "DashboardPage",
+        "params": null,
+        "redirects": ["/ → /dashboard"]
+      },
+      "api": {
+        "endpoints": [
+          "/api/board/kpis",
+          "/api/board/feed",
+          "/api/market/token"
+        ],
+        "queryKeys": null,
+        "mutations": null,
+        "cache": "Zustand stores with persistence",
+        "invalidation": "Manual refresh via store actions",
+        "auth": "No auth required",
+        "loading": "isLoading state in stores",
+        "error": "error state in stores",
+        "empty": "hasData checks + EmptyState components"
+      },
+      "wallet": {
+        "connectors": null,
+        "chainIds": null,
+        "connect": null,
+        "disconnect": null,
+        "accountState": null,
+        "chainGating": null,
+        "switchChain": null,
+        "rejectionHandling": null
+      },
+      "onchain": {
+        "chains": null,
+        "contracts": null,
+        "addresses": null,
+        "abis": null,
+        "reads": null,
+        "writes": null,
+        "events": null,
+        "refresh": null
+      },
+      "guards": {
+        "flags": null,
+        "roles": null
+      },
+      "tests": {
+        "testIds": [
+          "dashboard-page",
+          "dashboard-kpi-bar",
+          "dashboard-log-entry"
+        ],
+        "mocks": "tests/mocks/",
+        "e2e": "tests/e2e/dashboard/*.spec.ts",
+        "smokeChecklist": [
+          "Click nav → loads",
+          "Deep-link → preserves state",
+          "Refresh → state persists",
+          "KPI click → navigates",
+          "FAB → opens menu",
+          "Log entry CTA → opens overlay"
+        ]
+      }
+    },
+    {
+      "tabId": "journal",
+      "nav": {
+        "entry": "src/config/navigation.ts",
+        "key": "nav-journal",
+        "order": 2,
+        "activeState": "isNavItemActive()",
+        "deepLink": "/journal?entry=123",
+        "refresh": "State persists via IndexedDB",
+        "guards": null
+      },
+      "routes": {
+        "definition": "src/routes/RoutesRoot.tsx",
+        "path": "/journal",
+        "aliases": ["/journal-v2"],
+        "component": "JournalPage",
+        "params": null,
+        "redirects": ["/journal/v2 → /journal"]
+      },
+      "api": {
+        "endpoints": [
+          "/api/journal/entry",
+          "/api/ai/insights"
+        ],
+        "queryKeys": null,
+        "mutations": [
+          "createEntry",
+          "updateEntry",
+          "deleteEntry"
+        ],
+        "cache": "IndexedDB via Dexie",
+        "invalidation": "Store actions trigger refresh",
+        "auth": "No auth required",
+        "loading": "isSaving, isLoading in useJournalV2",
+        "error": "error state in hook",
+        "empty": "EmptyState component + history.length check"
+      },
+      "wallet": {
+        "connectors": null,
+        "chainIds": null,
+        "connect": null,
+        "disconnect": null,
+        "accountState": null,
+        "chainGating": null,
+        "switchChain": null,
+        "rejectionHandling": null
+      },
+      "onchain": {
+        "chains": null,
+        "contracts": null,
+        "addresses": null,
+        "abis": null,
+        "reads": null,
+        "writes": null,
+        "events": null,
+        "refresh": null
+      },
+      "guards": {
+        "flags": null,
+        "roles": null
+      },
+      "tests": {
+        "testIds": [
+          "journal-page",
+          "journal-v2-history",
+          "journal-history-row"
+        ],
+        "mocks": "tests/mocks/journal.ts",
+        "e2e": "tests/e2e/journal/*.spec.ts",
+        "smokeChecklist": [
+          "Create entry → saves",
+          "Autosave → debounced",
+          "Template apply → fills form",
+          "Submit → shows result",
+          "History → shows latest 5"
+        ]
+      }
+    },
+    {
+      "tabId": "lessons",
+      "nav": {
+        "entry": "src/config/navigation.ts",
+        "key": "nav-lessons",
+        "order": null,
+        "activeState": "isNavItemActive()",
+        "deepLink": "/lessons?category=technical",
+        "refresh": "State persists",
+        "guards": null,
+        "note": "Currently in SECONDARY_NAV_ITEMS, should be PRIMARY"
+      },
+      "routes": {
+        "definition": "src/routes/RoutesRoot.tsx",
+        "path": "/lessons",
+        "aliases": [],
+        "component": "LessonsPage",
+        "params": null,
+        "redirects": [],
+        "note": "Loveable-import shows /learn, but soll is /lessons"
+      },
+      "api": {
+        "endpoints": [
+          "/api/lessons",
+          "/api/lessons/progress"
+        ],
+        "queryKeys": null,
+        "mutations": [
+          "markLessonComplete"
+        ],
+        "cache": "Static/API",
+        "invalidation": "Manual refresh",
+        "auth": "No auth required",
+        "loading": "loading state in useLessons",
+        "error": "error state",
+        "empty": "lessons-empty-state component"
+      },
+      "wallet": {
+        "connectors": null,
+        "chainIds": null,
+        "connect": null,
+        "disconnect": null,
+        "accountState": null,
+        "chainGating": null,
+        "switchChain": null,
+        "rejectionHandling": null
+      },
+      "onchain": {
+        "chains": null,
+        "contracts": null,
+        "addresses": null,
+        "abis": null,
+        "reads": null,
+        "writes": null,
+        "events": null,
+        "refresh": null
+      },
+      "guards": {
+        "flags": null,
+        "roles": null
+      },
+      "tests": {
+        "testIds": [
+          "lessons-page",
+          "lessons-empty-state",
+          "btn-reset-filters",
+          "lessons-min-score"
+        ],
+        "mocks": null,
+        "e2e": null,
+        "smokeChecklist": [
+          "Load → shows lessons",
+          "Filter → updates list",
+          "Min score → filters",
+          "Reset → clears filters"
+        ]
+      }
+    },
+    {
+      "tabId": "chart",
+      "nav": {
+        "entry": "src/config/navigation.ts",
+        "key": "nav-chart",
+        "order": 4,
+        "activeState": "isNavItemActive() includes /replay",
+        "deepLink": "/chart?symbol=BTC&timeframe=1h",
+        "refresh": "State in chartUiStore",
+        "guards": null
+      },
+      "routes": {
+        "definition": "src/routes/RoutesRoot.tsx",
+        "path": "/chart",
+        "aliases": [
+          "/chart-v2",
+          "/analysis",
+          "/analysis-v2",
+          "/analyze",
+          "/replay",
+          "/replay/:sessionId"
+        ],
+        "component": "ChartPage",
+        "params": {
+          "mode": "chart | replay",
+          "sessionId": "optional for replay"
+        },
+        "redirects": [
+          "/analyze → /chart",
+          "/analysis → /chart"
+        ]
+      },
+      "api": {
+        "endpoints": [
+          "/api/data/ohlc",
+          "/api/moralis/token",
+          "/api/grok-pulse/context"
+        ],
+        "queryKeys": null,
+        "mutations": null,
+        "cache": "Multi-provider fallback (CoinGecko → CoinCap → Moralis)",
+        "invalidation": "Manual refresh + polling",
+        "auth": "No auth required",
+        "loading": "Loading states per provider",
+        "error": "Error handling with fallback",
+        "empty": "Empty chart state"
+      },
+      "wallet": {
+        "connectors": null,
+        "chainIds": null,
+        "connect": null,
+        "disconnect": null,
+        "accountState": null,
+        "chainGating": null,
+        "switchChain": null,
+        "rejectionHandling": null
+      },
+      "onchain": {
+        "chains": ["solana", "ethereum"],
+        "contracts": null,
+        "addresses": "Token addresses from market data",
+        "abis": null,
+        "reads": "Token metadata, decimals",
+        "writes": null,
+        "events": null,
+        "refresh": "Manual + polling"
+      },
+      "guards": {
+        "flags": null,
+        "roles": null
+      },
+      "tests": {
+        "testIds": [
+          "chart-page",
+          "chart-canvas"
+        ],
+        "mocks": "tests/mocks/chart.ts",
+        "e2e": "tests/e2e/chart/*.spec.ts",
+        "smokeChecklist": [
+          "Load → shows chart",
+          "Replay mode → sets state",
+          "Timeframe change → updates",
+          "Indicator add → shows",
+          "Deep-link → loads symbol"
+        ]
+      }
+    },
+    {
+      "tabId": "alerts",
+      "nav": {
+        "entry": "src/config/navigation.ts",
+        "key": "nav-alerts",
+        "order": 5,
+        "activeState": "isNavItemActive()",
+        "deepLink": "/alerts?alert=123&prefill=symbol=BTC&threshold=50000",
+        "refresh": "State in alertsStore",
+        "guards": null
+      },
+      "routes": {
+        "definition": "src/routes/RoutesRoot.tsx",
+        "path": "/alerts",
+        "aliases": ["/alerts-v2"],
+        "component": "AlertsPage",
+        "params": {
+          "alert": "selected alert ID",
+          "prefill": "prefill params"
+        },
+        "redirects": []
+      },
+      "api": {
+        "endpoints": [
+          "/api/alerts/create",
+          "/api/alerts/update",
+          "/api/alerts/delete"
+        ],
+        "queryKeys": null,
+        "mutations": [
+          "createAlert",
+          "updateAlert",
+          "deleteAlert",
+          "toggleStatus"
+        ],
+        "cache": "alertsStore (Zustand + IndexedDB)",
+        "invalidation": "Store actions",
+        "auth": "No auth required",
+        "loading": "Loading states in store",
+        "error": "Error handling",
+        "empty": "alerts-empty-state component"
+      },
+      "wallet": {
+        "connectors": null,
+        "chainIds": null,
+        "connect": null,
+        "disconnect": null,
+        "accountState": null,
+        "chainGating": null,
+        "switchChain": null,
+        "rejectionHandling": null
+      },
+      "onchain": {
+        "chains": null,
+        "contracts": null,
+        "addresses": null,
+        "abis": null,
+        "reads": null,
+        "writes": null,
+        "events": null,
+        "refresh": null,
+        "note": "Optional onchain triggers not implemented"
+      },
+      "guards": {
+        "flags": null,
+        "roles": null
+      },
+      "tests": {
+        "testIds": [
+          "alerts-page",
+          "alerts-list",
+          "alerts-list-item",
+          "alerts-new-alert-button",
+          "alerts-empty-state"
+        ],
+        "mocks": "tests/mocks/alerts.ts",
+        "e2e": "tests/e2e/alerts/*.spec.ts",
+        "smokeChecklist": [
+          "Create alert → saves",
+          "URL prefill → fills form",
+          "Toggle status → updates",
+          "Delete → removes",
+          "Filter → updates list"
+        ]
+      }
+    },
+    {
+      "tabId": "settings",
+      "nav": {
+        "entry": "src/config/navigation.ts",
+        "key": "nav-settings",
+        "order": 6,
+        "activeState": "isNavItemActive()",
+        "deepLink": "/settings?section=wallets",
+        "refresh": "State persists",
+        "guards": null
+      },
+      "routes": {
+        "definition": "src/routes/RoutesRoot.tsx",
+        "path": "/settings",
+        "aliases": ["/settings-v2"],
+        "component": "SettingsPage",
+        "params": null,
+        "redirects": []
+      },
+      "api": {
+        "endpoints": [
+          "/api/settings/export",
+          "/api/wallet/connect",
+          "/api/wallet/disconnect"
+        ],
+        "queryKeys": null,
+        "mutations": [
+          "updateSettings",
+          "exportData",
+          "resetSettings"
+        ],
+        "cache": "LocalStorage + IndexedDB",
+        "invalidation": "Manual",
+        "auth": "No auth required",
+        "loading": "Loading states",
+        "error": "Error handling",
+        "empty": null
+      },
+      "wallet": {
+        "connectors": [
+          "Solana Wallet Adapter",
+          "Phantom",
+          "Solflare",
+          "Backpack"
+        ],
+        "chainIds": ["solana"],
+        "connect": "walletStore.connectWallet()",
+        "disconnect": "walletStore.disconnectWallet()",
+        "accountState": "walletStore.getActiveWallets()",
+        "chainGating": "Not implemented",
+        "switchChain": "Not implemented",
+        "rejectionHandling": "Basic error handling"
+      },
+      "onchain": {
+        "chains": ["solana"],
+        "contracts": null,
+        "addresses": "Connected wallet addresses",
+        "abis": null,
+        "reads": "Wallet balance, transactions",
+        "writes": null,
+        "events": "Wallet transaction events",
+        "refresh": "Manual + webhook"
+      },
+      "guards": {
+        "flags": null,
+        "roles": null
+      },
+      "tests": {
+        "testIds": [
+          "settings-page"
+        ],
+        "mocks": null,
+        "e2e": "tests/e2e/settings/*.spec.ts",
+        "smokeChecklist": [
+          "Load → shows sections",
+          "Update setting → saves",
+          "Connect wallet → adds",
+          "Export → downloads",
+          "Reset → confirms"
+        ]
+      }
+    },
+    {
+      "tabId": "watchlist",
+      "nav": {
+        "entry": "src/config/navigation.ts",
+        "key": "nav-watchlist",
+        "order": 7,
+        "activeState": "isNavItemActive()",
+        "deepLink": "/watchlist?symbol=BTC",
+        "refresh": "State in watchlistStore",
+        "guards": null
+      },
+      "routes": {
+        "definition": "src/routes/RoutesRoot.tsx",
+        "path": "/watchlist",
+        "aliases": ["/watchlist-v2"],
+        "component": "WatchlistPage",
+        "params": null,
+        "redirects": []
+      },
+      "api": {
+        "endpoints": [
+          "/api/market/token",
+          "/api/data/ohlc"
+        ],
+        "queryKeys": null,
+        "mutations": null,
+        "cache": "watchlistStore + price polling",
+        "invalidation": "Polling + manual refresh",
+        "auth": "No auth required",
+        "loading": "isLoading in store",
+        "error": "error state",
+        "empty": "EmptyState component"
+      },
+      "wallet": {
+        "connectors": null,
+        "chainIds": null,
+        "connect": null,
+        "disconnect": null,
+        "accountState": null,
+        "chainGating": null,
+        "switchChain": null,
+        "rejectionHandling": null
+      },
+      "onchain": {
+        "chains": ["solana", "ethereum"],
+        "contracts": null,
+        "addresses": "Token addresses",
+        "abis": null,
+        "reads": "Token prices, metadata",
+        "writes": null,
+        "events": null,
+        "refresh": "Polling"
+      },
+      "guards": {
+        "flags": null,
+        "roles": null
+      },
+      "tests": {
+        "testIds": [
+          "watchlist-page",
+          "watchlist-session-filter-All",
+          "watchlist-sort-toggle"
+        ],
+        "mocks": null,
+        "e2e": null,
+        "smokeChecklist": [
+          "Load → shows assets",
+          "Select → shows detail",
+          "Filter → updates list",
+          "Sort → reorders",
+          "Open chart → navigates"
+        ]
+      }
+    },
+    {
+      "tabId": "oracle",
+      "nav": {
+        "entry": "src/config/navigation.ts",
+        "key": "nav-oracle",
+        "order": 8,
+        "activeState": "isNavItemActive()",
+        "deepLink": "/oracle?theme=macro",
+        "refresh": "State in oracleStore",
+        "guards": null
+      },
+      "routes": {
+        "definition": "src/routes/RoutesRoot.tsx",
+        "path": "/oracle",
+        "aliases": [],
+        "component": "OraclePage",
+        "params": null,
+        "redirects": []
+      },
+      "api": {
+        "endpoints": [
+          "/api/oracle/report",
+          "/api/oracle/history"
+        ],
+        "queryKeys": null,
+        "mutations": [
+          "markAsRead"
+        ],
+        "cache": "oracleStore",
+        "invalidation": "Daily refresh at 09:00 UTC",
+        "auth": "No auth required",
+        "loading": "isLoading state",
+        "error": "error state",
+        "empty": "OracleEmptyState component"
+      },
+      "wallet": {
+        "connectors": null,
+        "chainIds": null,
+        "connect": null,
+        "disconnect": null,
+        "accountState": null,
+        "chainGating": null,
+        "switchChain": null,
+        "rejectionHandling": null
+      },
+      "onchain": {
+        "chains": null,
+        "contracts": null,
+        "addresses": null,
+        "abis": null,
+        "reads": null,
+        "writes": null,
+        "events": null,
+        "refresh": "Daily at 09:00 UTC"
+      },
+      "guards": {
+        "flags": null,
+        "roles": null
+      },
+      "tests": {
+        "testIds": [
+          "oracle-page",
+          "oracle-refresh-button",
+          "oracle-mark-read-button",
+          "oracle-pre"
+        ],
+        "mocks": null,
+        "e2e": null,
+        "smokeChecklist": [
+          "Load → shows report",
+          "Refresh → updates",
+          "Mark as read → saves",
+          "Theme filter → filters",
+          "History chart → shows"
+        ]
+      }
+    }
+  ],
+  "replay": {
+    "isTab": false,
+    "isMode": true,
+    "route": "/replay",
+    "component": "ChartPage",
+    "mode": "replay",
+    "note": "Correctly implemented as Chart mode, not separate tab"
+  },
+  "staticChecks": {
+    "sollTabsInNav": {
+      "status": "partial",
+      "issues": [
+        "Lessons is in Secondary Nav but should be Primary (order 3)"
+      ]
+    },
+    "replayIsAlias": {
+      "status": "correct",
+      "details": "Replay is correctly implemented as Chart mode"
+    },
+    "lessonsRoute": {
+      "status": "mismatch",
+      "details": "Route is /lessons (correct), but loveable-import shows /learn",
+      "recommendation": "Add /learn → /lessons redirect for compatibility"
+    },
+    "apiLoadingErrorEmpty": {
+      "status": "partial",
+      "issues": [
+        "Most tabs have Loading/Error/Empty handling",
+        "Some could be more consistent"
+      ]
+    },
+    "walletGating": {
+      "status": "partial",
+      "issues": [
+        "Wallet connection exists in Settings",
+        "Chain gating not implemented",
+        "Wrong network handling not implemented",
+        "Rejection handling is basic"
+      ]
+    },
+    "onchainHandling": {
+      "status": "partial",
+      "issues": [
+        "Address registry exists per chain",
+        "ABI usage not consistent",
+        "BigInt/decimals handling needs verification",
+        "TX lifecycle UI not comprehensive"
+      ]
+    },
+    "alertsPrefill": {
+      "status": "correct",
+      "details": "URL prefill parsing exists and works",
+      "testIds": "Stable data-testid patterns present"
+    }
+  }
+}
+

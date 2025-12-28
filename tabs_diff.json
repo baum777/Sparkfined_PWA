@@ -1,0 +1,352 @@
+{
+  "metadata": {
+    "generatedAt": "2025-01-27T00:00:00Z",
+    "version": "1.0.0"
+  },
+  "summary": {
+    "totalSollTabs": 8,
+    "matched": 6,
+    "mismatched": 1,
+    "missing": 1,
+    "extra": 2
+  },
+  "diffs": [
+    {
+      "tabId": "dashboard",
+      "status": "match",
+      "severity": "none",
+      "details": {
+        "route": "match",
+        "nav": "match",
+        "order": "match",
+        "category": "match",
+        "uiMustHaves": {
+          "score": 0.9,
+          "missing": ["Bottom Panel Tabs (Grok Pulse + Journal Notes)"],
+          "present": [
+            "Header + Meta + CTA",
+            "KPI Strip",
+            "Daily Bias Card",
+            "Holdings Card",
+            "Trade Log Card",
+            "FAB + Quick Actions",
+            "Alert Create Entry Point"
+          ]
+        },
+        "wiring": {
+          "score": 0.85,
+          "issues": [
+            "Refresh invalidation could be more granular",
+            "CTA flows are implemented but could be more seamless"
+          ]
+        }
+      },
+      "recommendations": [
+        "Add Bottom Panel Tabs for Grok Pulse integration",
+        "Improve refresh invalidation granularity"
+      ]
+    },
+    {
+      "tabId": "journal",
+      "status": "match",
+      "severity": "none",
+      "details": {
+        "route": "match",
+        "nav": "match",
+        "order": "match",
+        "category": "match",
+        "uiMustHaves": {
+          "score": 0.95,
+          "missing": [],
+          "present": [
+            "V2 Layout",
+            "Input Column with required fields",
+            "Templates support",
+            "AI notes",
+            "Output Column with Archetype + Score",
+            "History"
+          ]
+        },
+        "wiring": {
+          "score": 0.9,
+          "issues": [
+            "Autosave contract needs verification",
+            "Error recovery could be more robust"
+          ]
+        }
+      },
+      "recommendations": [
+        "Verify autosave debounce and persistence contract",
+        "Add comprehensive error recovery"
+      ]
+    },
+    {
+      "tabId": "lessons",
+      "status": "mismatch",
+      "severity": "medium",
+      "details": {
+        "route": "mismatch",
+        "routeIst": "/lessons",
+        "routeSoll": "/lessons",
+        "routeLoveableImport": "/learn",
+        "nav": "mismatch",
+        "navIst": "secondary",
+        "navSoll": "primary",
+        "order": "mismatch",
+        "orderIst": null,
+        "orderSoll": 3,
+        "category": "mismatch",
+        "categoryIst": "secondary",
+        "categorySoll": "primary",
+        "uiMustHaves": {
+          "score": 0.7,
+          "missing": [
+            "Progress tracking",
+            "Quizzes",
+            "AI summaries"
+          ],
+          "present": [
+            "Module list",
+            "Lesson viewer",
+            "Filters"
+          ]
+        },
+        "wiring": {
+          "score": 0.6,
+          "issues": [
+            "Progress persistence not implemented",
+            "Offline behavior unclear"
+          ]
+        }
+      },
+      "recommendations": [
+        "Move Lessons to Primary Nav (order 3)",
+        "Add /learn → /lessons redirect for compatibility",
+        "Implement progress tracking",
+        "Add offline lesson caching"
+      ]
+    },
+    {
+      "tabId": "chart",
+      "status": "match",
+      "severity": "low",
+      "details": {
+        "route": "match",
+        "nav": "match",
+        "order": "match",
+        "category": "match",
+        "uiMustHaves": {
+          "score": 0.8,
+          "missing": [
+            "Bottom Panel Tabs (Grok Pulse + Journal Notes)"
+          ],
+          "present": [
+            "TopBar with timeframes",
+            "Replay mode",
+            "Indicators",
+            "Drawings",
+            "Canvas + markers"
+          ]
+        },
+        "wiring": {
+          "score": 0.85,
+          "issues": [
+            "Replay route handling correct but state init could be more robust",
+            "Bottom Panel Tabs missing"
+          ]
+        }
+      },
+      "recommendations": [
+        "Add Bottom Panel Tabs for Grok Pulse and Journal Notes",
+        "Improve replay state initialization robustness"
+      ]
+    },
+    {
+      "tabId": "alerts",
+      "status": "match",
+      "severity": "none",
+      "details": {
+        "route": "match",
+        "nav": "match",
+        "order": "match",
+        "category": "match",
+        "uiMustHaves": {
+          "score": 0.95,
+          "missing": [],
+          "present": [
+            "List + filters",
+            "Create flow",
+            "Empty states",
+            "URL-prefill",
+            "Stable testids"
+          ]
+        },
+        "wiring": {
+          "score": 0.9,
+          "issues": [
+            "Onchain triggers not implemented (optional)",
+            "Prefill parsing works but could be more robust"
+          ]
+        }
+      },
+      "recommendations": [
+        "Consider adding onchain triggers (optional)",
+        "Improve prefill parsing robustness"
+      ]
+    },
+    {
+      "tabId": "settings",
+      "status": "match",
+      "severity": "none",
+      "details": {
+        "route": "match",
+        "nav": "match",
+        "order": "match",
+        "category": "match",
+        "uiMustHaves": {
+          "score": 0.9,
+          "missing": [],
+          "present": [
+            "Appearance",
+            "Chart prefs",
+            "Notifications",
+            "Connected Wallets",
+            "Export/Backup",
+            "Danger Zone"
+          ]
+        },
+        "wiring": {
+          "score": 0.85,
+          "issues": [
+            "Some sections may need verification",
+            "Export endpoints need testing"
+          ]
+        }
+      },
+      "recommendations": [
+        "Verify all settings sections are complete",
+        "Test export endpoints thoroughly"
+      ]
+    },
+    {
+      "tabId": "watchlist",
+      "status": "match",
+      "severity": "none",
+      "details": {
+        "route": "match",
+        "nav": "match",
+        "order": "match",
+        "category": "match",
+        "uiMustHaves": {
+          "score": 1.0,
+          "missing": [],
+          "present": [
+            "Assets list/table",
+            "Detail panel",
+            "Open chart CTA",
+            "Sort/filter"
+          ]
+        },
+        "wiring": {
+          "score": 0.9,
+          "issues": [
+            "Price source could be more robust",
+            "Navigation to chart works correctly"
+          ]
+        }
+      },
+      "recommendations": [
+        "Improve price source fallback chain",
+        "All good otherwise"
+      ]
+    },
+    {
+      "tabId": "oracle",
+      "status": "match",
+      "severity": "none",
+      "details": {
+        "route": "match",
+        "nav": "match",
+        "order": "match",
+        "category": "match",
+        "uiMustHaves": {
+          "score": 0.95,
+          "missing": [],
+          "present": [
+            "Reward banner",
+            "Full report block",
+            "Theme filter",
+            "History chart",
+            "History list"
+          ]
+        },
+        "wiring": {
+          "score": 0.9,
+          "issues": [
+            "Data pipeline works but could be more efficient",
+            "Pagination could be improved"
+          ]
+        }
+      },
+      "recommendations": [
+        "Optimize data pipeline",
+        "Improve pagination UX"
+      ]
+    }
+  ],
+  "extraTabs": [
+    {
+      "tabId": "signals",
+      "status": "extra",
+      "severity": "low",
+      "note": "Dev-only tab, not in Primary/Secondary spec",
+      "recommendation": "Keep as dev-only, no action needed"
+    },
+    {
+      "tabId": "showcase",
+      "status": "extra",
+      "severity": "low",
+      "note": "Dev-only showcase, not in Primary/Secondary spec",
+      "recommendation": "Keep as dev-only, no action needed"
+    }
+  ],
+  "replayCheck": {
+    "status": "correct",
+    "details": "Replay is correctly implemented as Chart mode, not a separate tab",
+    "route": "/replay",
+    "behavior": "Sets ChartPage mode='replay', Chart tab stays active"
+  },
+  "topIssues": [
+    {
+      "tabId": "lessons",
+      "issue": "Lessons is in Secondary Nav but should be Primary (order 3)",
+      "severity": "medium",
+      "priority": 1
+    },
+    {
+      "tabId": "lessons",
+      "issue": "Route mismatch: loveable-import shows /learn, soll is /lessons",
+      "severity": "medium",
+      "priority": 2
+    },
+    {
+      "tabId": "chart",
+      "issue": "Missing Bottom Panel Tabs (Grok Pulse + Journal Notes)",
+      "severity": "low",
+      "priority": 3
+    },
+    {
+      "tabId": "dashboard",
+      "issue": "Missing Bottom Panel Tabs (Grok Pulse + Journal Notes)",
+      "severity": "low",
+      "priority": 4
+    },
+    {
+      "tabId": "lessons",
+      "issue": "Progress tracking not implemented",
+      "severity": "low",
+      "priority": 5
+    }
+  ]
+}
+

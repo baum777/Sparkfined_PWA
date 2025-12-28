@@ -1,0 +1,230 @@
+{
+  "id": "alerts",
+  "route": "/alerts",
+  "title": "Alerts",
+  "purpose": "Set price alerts to never miss a trading opportunity or exit signal.",
+  "prerequisites": [],
+  "flows": [
+    {
+      "id": "create-alert",
+      "title": "Create Price Alert",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "open-quick-create",
+          "title": "Open Quick Create",
+          "userAction": "Click '+ New Alert' button",
+          "systemBehavior": "Opens alert creation form",
+          "outcome": "Ready to set alert conditions",
+          "cta": { "label": "New Alert", "action": "open:modal/new-alert" }
+        },
+        {
+          "id": "enter-symbol",
+          "title": "Enter Token Symbol",
+          "userAction": "Type token symbol (e.g., BTC, ETH, SOL)",
+          "systemBehavior": "Validates and shows current price",
+          "outcome": "Token identified"
+        },
+        {
+          "id": "set-condition",
+          "title": "Set Condition",
+          "userAction": "Choose 'Price above' or 'Price below'",
+          "systemBehavior": "Sets alert direction",
+          "outcome": "Trigger direction defined"
+        },
+        {
+          "id": "set-price",
+          "title": "Set Target Price",
+          "userAction": "Enter the price level to trigger alert",
+          "systemBehavior": "Validates price is reachable",
+          "outcome": "Target price set"
+        },
+        {
+          "id": "save-alert",
+          "title": "Create Alert",
+          "userAction": "Click 'Create' button",
+          "systemBehavior": "Alert becomes active immediately",
+          "outcome": "You'll be notified when triggered"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Want to set multiple alerts",
+          "steps": [
+            {
+              "id": "add-another",
+              "title": "Add Another Alert",
+              "userAction": "Form clears, add next alert",
+              "systemBehavior": "Previous alert saved, form ready",
+              "outcome": "Multiple alerts set quickly"
+            }
+          ]
+        },
+        {
+          "when": "Setting alert from chart",
+          "steps": [
+            {
+              "id": "right-click-chart",
+              "title": "Right-Click on Chart",
+              "userAction": "Right-click at desired price level",
+              "systemBehavior": "Opens context menu with 'Set Alert'",
+              "outcome": "Alert pre-filled with token and price",
+              "cta": { "label": "Open Chart", "action": "nav:/chart" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manage-alerts",
+      "title": "Manage Your Alerts",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "view-list",
+          "title": "View Alert List",
+          "userAction": "Browse the alerts on the page",
+          "systemBehavior": "Shows all alerts with status badges",
+          "outcome": "See all your price triggers"
+        },
+        {
+          "id": "filter-alerts",
+          "title": "Filter Alerts",
+          "userAction": "Use filter buttons (All, Active, Triggered)",
+          "systemBehavior": "Filters the visible alerts",
+          "outcome": "Focus on relevant alerts"
+        },
+        {
+          "id": "check-status",
+          "title": "Check Alert Status",
+          "userAction": "Look at status badge on each card",
+          "systemBehavior": "Shows Active, Triggered, or Expired",
+          "outcome": "Know which alerts need attention"
+        }
+      ]
+    },
+    {
+      "id": "edit-alert",
+      "title": "Edit Alert",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "click-alert",
+          "title": "Click on Alert Card",
+          "userAction": "Click the alert you want to edit",
+          "systemBehavior": "Opens edit form with current values",
+          "outcome": "Ready to modify"
+        },
+        {
+          "id": "change-values",
+          "title": "Change Values",
+          "userAction": "Update condition, price, or other settings",
+          "systemBehavior": "Validates new values",
+          "outcome": "Changes staged"
+        },
+        {
+          "id": "save-changes",
+          "title": "Save Changes",
+          "userAction": "Click 'Save' or 'Update'",
+          "systemBehavior": "Alert updated with new values",
+          "outcome": "Alert modified"
+        }
+      ]
+    },
+    {
+      "id": "delete-alert",
+      "title": "Delete Alert",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "find-delete",
+          "title": "Find Delete Option",
+          "userAction": "Click trash icon or swipe left (mobile)",
+          "systemBehavior": "Shows delete confirmation",
+          "outcome": "Confirm deletion prompt"
+        },
+        {
+          "id": "confirm-delete",
+          "title": "Confirm Deletion",
+          "userAction": "Click 'Delete' in confirmation dialog",
+          "systemBehavior": "Alert permanently removed",
+          "outcome": "Alert deleted"
+        }
+      ]
+    },
+    {
+      "id": "handle-triggered",
+      "title": "Handle Triggered Alert",
+      "level": "advanced",
+      "steps": [
+        {
+          "id": "receive-notification",
+          "title": "Receive Notification",
+          "userAction": "See alert notification (push/in-app)",
+          "systemBehavior": "Shows token, price, and trigger info",
+          "outcome": "Know price hit your level"
+        },
+        {
+          "id": "open-chart",
+          "title": "Open Chart",
+          "userAction": "Click on notification or 'View Chart'",
+          "systemBehavior": "Opens chart at trigger time",
+          "outcome": "See the price action",
+          "cta": { "label": "Open Chart", "action": "nav:/chart" }
+        },
+        {
+          "id": "take-action",
+          "title": "Take Action",
+          "userAction": "Decide to trade or set new alert",
+          "systemBehavior": "Ready for your decision",
+          "outcome": "Informed trading decision"
+        },
+        {
+          "id": "log-trade",
+          "title": "Log Trade (Optional)",
+          "userAction": "If you traded, log it in journal",
+          "systemBehavior": "Opens journal with context",
+          "outcome": "Trade documented",
+          "cta": { "label": "New Entry", "action": "open:modal/journal-entry" }
+        }
+      ]
+    }
+  ],
+  "shortcuts": [
+    { "keys": "?", "action": "Toggle this handbook panel" },
+    { "keys": "N", "action": "New alert" },
+    { "keys": "Del", "action": "Delete selected alert" },
+    { "keys": "Esc", "action": "Close modal/dialog" }
+  ],
+  "pitfalls": [
+    {
+      "problem": "Alert not triggering",
+      "fix": "Ensure notifications are enabled in your browser/device settings",
+      "cta": { "label": "Check Settings", "action": "nav:/settings" }
+    },
+    {
+      "problem": "Too many notifications",
+      "fix": "Review and consolidate overlapping alerts or delete triggered ones"
+    },
+    {
+      "problem": "Alert triggered but missed it",
+      "fix": "Check the 'Triggered' filter to see all past triggers with timestamps"
+    },
+    {
+      "problem": "Can't set price below current",
+      "fix": "Use 'Price below' condition for alerts below current price"
+    },
+    {
+      "problem": "Alert expired",
+      "fix": "Alerts expire after 30 days by default. Create a new one with your desired settings."
+    }
+  ],
+  "glossary": [
+    { "term": "Trigger", "meaning": "When price meets alert conditions and notification is sent" },
+    { "term": "Active", "meaning": "Alert is monitoring price and ready to trigger" },
+    { "term": "Triggered", "meaning": "Alert fired because price hit the target" },
+    { "term": "Expired", "meaning": "Alert reached its end date without triggering" },
+    { "term": "Condition", "meaning": "The rule for triggering: 'Price above' or 'Price below'" },
+    { "term": "Target Price", "meaning": "The specific price level that triggers the alert" }
+  ]
+}

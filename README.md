@@ -15,20 +15,39 @@
 ## ⚡ Quick Start
 
 ```bash
-# 1. Open the app (no signup required)
-https://sparkfined.vercel.app
+# 1. Clone & Setup
+git clone <repo-url>
+cd sparkfined-pwa
+pnpm install
 
-# 2. Install as PWA (optional)
-Click "Install" in browser menu → Add to Home Screen
+# 2. Config
+cp .env.example .env.local
+# Add your RPC URL (optional for dev, defaults to mainnet public)
 
-# 3. Start using immediately
-✅ View charts (BTC, ETH, SOL...)
-✅ Set your first alert
-✅ Log your first trade
-✅ Generate AI insights after 10+ entries
+# 3. Run
+pnpm dev
 ```
 
-**3 seconds to start. 0 barriers. 100% free core features.**
+## 🛠️ Tech Stack
+
+### Frontend
+- **React 18.3** + **Vite 5.4**
+- **TypeScript 5.8**
+- **TailwindCSS 3.4**
+- **Zustand** (State)
+- **Dexie** (Offline DB)
+- **Solana Wallet Adapter**
+
+### Quality Gates
+- **Typecheck:** `pnpm typecheck`
+- **Lint:** `pnpm lint`
+- **Tests:** `pnpm test` (Unit) + `pnpm test:e2e` (Playwright)
+
+## ⚠️ Known Limitations
+- **Market Data:** Uses public CoinGecko API (rate-limited). Connect custom API key in `src/lib/api/market.ts` for production.
+- **RPC:** Default public RPC may be slow. Set `VITE_SOLANA_RPC_URL` for better performance.
+- **Mobile:** PWA installable, but push notifications require service worker configuration (in progress).
+
 
 ---
 

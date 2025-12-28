@@ -1,223 +1,97 @@
-/* Design Tokens – Sparkfined PWA Board */
+/* SPARKFINED DESIGN SYSTEM — CSS TOKENS
+   RGB channel tokens for Tailwind alpha support: rgb(var(--token) / <alpha-value>)
+*/
 
-:root {
-  color-scheme: dark;
+:root,
+:root[data-theme="dark"] {
+  /* Brand */
+  --color-brand: 15 179 76;          /* #0fb34c */
+  --color-brand-hover: 5 150 105;    /* #059669 */
+  --color-accent: 0 255 102;         /* #00ff66 */
 
-  /* Alias layer system for terminal UI */
-  --surface-0: var(--color-bg);
-  --surface-1: var(--color-surface);
-  --surface-2: var(--color-surface-subtle);
-  --surface-3: var(--color-surface-elevated);
-
-  --text-0: var(--color-text-primary);
-  --text-1: var(--color-text-secondary);
-  --text-2: var(--color-text-tertiary);
-
-  --border-0: var(--color-border);
-  --border-1: var(--color-border-contrast);
-
-  --brand: var(--color-brand);
-  --brand-2: var(--color-accent);
-
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-
-  /**
-   * Color tokens store raw RGB channel values.
-   * Always consume them via rgb(var(--token) / alpha).
-   */
-  /* Brand & Accent */
-  --color-brand: 15 179 76;            /* primary brand */
-  --color-brand-hover: 5 150 105;      /* brand hover */
-  --color-accent: 0 255 102;           /* neon accent */
-  --color-cyan: 6 182 212;             /* cyan accent */
-
-  /* Background & Surface */
-  --color-bg: 10 10 10;                /* base background */
-  --color-bg-elevated: 11 11 19;       /* overlay gradient stop */
-  --color-bg-overlay: 5 5 5;           /* modal scrim */
-
-  --color-surface: 24 24 27;           /* base surface */
-  --color-surface-subtle: 19 19 22;    /* subtle surface */
-  --color-surface-elevated: 28 28 30;  /* elevated surface */
-  --color-surface-hover: 39 39 42;     /* hover surface */
-  --color-surface-850: 28 28 30;       /* legacy compat */
-  --color-surface-skeleton: 255 255 255; /* reused with 0.05 alpha */
+  /* Background + Surfaces */
+  --color-root: 10 10 10;            /* #0a0a0a */
+  --color-elevated: 11 11 19;        /* #0b0b13 */
+  --color-surface: 24 24 27;         /* #18181b */
+  --color-surface-subtle: 19 19 22;  /* #131316 */
+  --color-surface-elevated: 28 28 30;/* #1c1c1e */
+  --color-surface-hover: 39 39 42;   /* #27272a */
 
   /* Text */
-  --color-text-primary: 244 244 245;   /* bright text */
-  --color-text-secondary: 161 161 170; /* muted text */
-  --color-text-tertiary: 113 113 122;  /* helper text */
+  --color-text-primary: 244 244 245;   /* #f4f4f5 */
+  --color-text-secondary: 161 161 170; /* #a1a1aa */
+  --color-text-tertiary: 113 113 122;  /* #71717a */
 
   /* Borders */
-  --color-border: 39 39 42;            /* default border */
-  --color-border-contrast: 255 255 255;/* used with opacity */
+  --color-border-default: 39 39 42;    /* #27272a */
   --color-border-accent: 15 179 76;    /* brand */
-  --color-border-focus: 16 185 129;    /* emerald-500 */
+  --color-border-focus: 16 185 129;    /* emerald */
 
-  /* Interactive states */
-  --color-interactive-base: 255 255 255;
+  /* Trading sentiment + system states */
+  --color-bull: 16 185 129;            /* #10b981 */
+  --color-bear: 244 63 94;             /* #f43f5e */
+  --color-bear-border: 251 113 133;    /* for border alpha */
+  --color-neutral: 245 158 11;         /* #f59e0b */
+  --color-neutral-border: 251 191 36;  /* for border alpha */
+  --color-info: 6 182 212;             /* #06b6d4 */
 
-  /* Semantics */
-  --color-success: 16 185 129;
-  --color-danger: 244 63 94;
-  --color-info: 6 182 212;
-  --color-warn: 245 158 11;
-  --color-emerald: 16 185 129;        /* legacy alias */
-
-  --color-sentiment-bull: 16 185 129;
-  --color-sentiment-bear: 244 63 94;
-  --color-sentiment-neutral: 245 158 11;
-
-  --color-status-armed: 252 211 77;
-  --color-status-triggered: 110 231 183;
-  --color-status-snoozed: 125 211 252;
-
-  /* Spacing Scale */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
-
-  /* Layering */
-  --layer-bg-0: var(--surface-0);
-  --layer-bg-1: var(--surface-1);
-  --layer-bg-2: var(--surface-2);
-
-  /* Text Levels */
-  --layer-text-0: var(--text-0);
-  --layer-text-1: var(--text-1);
-  --layer-text-2: var(--text-2);
-
-  /* Semantic aliases */
-  --semantic-accent: var(--color-accent);
-  --semantic-danger: var(--color-danger);
-  --semantic-warning: var(--color-warn);
-  --semantic-success: var(--color-success);
-
-  /* --- Layout primitives --- */
-  
-  /* ✅ SPACING: Use Tailwind utilities (p-4, gap-6, space-y-8, etc.)
-   * No custom spacing tokens needed – Tailwind's 8px grid handles all cases
-   * 
-   * Migration guide:
-   * - var(--space-1) → class="p-1" (4px)
-   * - var(--space-2) → class="p-2" (8px)
-   * - var(--space-4) → class="p-4" (16px)
-   * - var(--space-6) → class="p-6" (24px)
-   * - var(--space-8) → class="p-8" (32px)
-   */
-
-  /* Border Radius */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 9999px;
-
-  /* Shadows */
+  /* Shadows + glows */
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08);
   --shadow-md: 0 4px 8px rgba(0,0,0,0.16), 0 2px 4px rgba(0,0,0,0.08);
   --shadow-lg: 0 10px 20px rgba(0,0,0,0.20), 0 4px 8px rgba(0,0,0,0.12);
   --shadow-xl: 0 20px 25px rgba(0,0,0,0.25);
+  --glow-accent: 0 0 10px rgba(0,255,102,0.22);
+  --glow-brand: 0 0 12px rgba(15,179,76,0.18);
+  --glow-cyan: 0 0 8px rgba(0,229,255,0.20);
 
-  /* Glows */
-  --glow-accent: 0 0 12px rgba(0, 255, 102, 0.22);
-  --glow-brand: 0 0 12px rgba(15, 179, 76, 0.24);
-  --glow-cyan: 0 0 10px rgba(6, 182, 212, 0.2);
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-full: 9999px;
+}
 
-  /* Typography */
-  --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-
-  /* Font Sizes (use Tailwind text-* classes in components) */
-  --text-xs: 0.75rem;   /* 12px */
-  --text-sm: 0.875rem;  /* 14px */
-  --text-base: 1rem;    /* 16px */
-  --text-lg: 1.125rem;  /* 18px */
-  --text-xl: 1.25rem;   /* 20px */
-  --text-2xl: 1.5rem;   /* 24px */
-
-  /* Line Heights (Tailwind leading-* classes preferred) */
-  --leading-xs: 1.5;    /* ✅ Improved from 1.33 */
-  --leading-sm: 1.5;    /* ✅ Improved from 1.43 */
-  --leading-base: 1.6;  /* ✅ Improved from 1.5 */
-  --leading-lg: 1.6;    /* ✅ Improved from 1.56 */
-  --leading-xl: 1.5;    /* ✅ Improved from 1.4 */
-  --leading-2xl: 1.4;   /* ✅ Improved from 1.33 */
-
-  /* Font Weights */
-  --weight-regular: 400;
-  --weight-medium: 500;
-  --weight-semibold: 600;
-
-  /* Motion */
-  --duration-micro: 75ms;
-  --duration-short: 150ms;
-  --duration-medium: 250ms;
-  --duration-long: 350ms;
-  --duration-fast: 140ms;
-  --duration-base: 180ms;
-  --duration-slow: 220ms;
-
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+:root[data-theme="oled"] {
+  --color-root: 0 0 0; /* pure black for OLED */
+  --color-elevated: 0 0 0;
+  --color-surface: 10 10 10;
+  --color-surface-subtle: 5 5 5;
+  --color-surface-elevated: 15 15 15;
 }
 
 :root[data-theme="light"] {
-  color-scheme: light;
+  /* Brand stays the same */
+  --color-brand: 15 179 76;
+  --color-brand-hover: 5 150 105;
+  --color-accent: 0 200 80;
 
-  --color-bg: 248 250 252;              /* light background */
-  --color-bg-elevated: 241 245 249;     /* light overlay */
-  --color-bg-overlay: 226 232 240;      /* light scrim */
+  /* Background + Surfaces (inverted) */
+  --color-root: 250 250 250;
+  --color-elevated: 255 255 255;
+  --color-surface: 245 245 245;
+  --color-surface-subtle: 250 250 250;
+  --color-surface-elevated: 255 255 255;
+  --color-surface-hover: 240 240 240;
 
-  --color-surface: 255 255 255;
-  --color-surface-subtle: 248 250 252;
-  --color-surface-elevated: 237 242 247;
-  --color-surface-hover: 229 231 235;
-  --color-surface-850: 232 234 239;
-  --color-surface-skeleton: 15 23 42;   /* dark ink w/ low alpha */
+  /* Text (inverted) */
+  --color-text-primary: 24 24 27;
+  --color-text-secondary: 82 82 91;
+  --color-text-tertiary: 113 113 122;
 
-  --color-text-primary: 15 23 42;       /* dark mode text */
-  --color-text-secondary: 71 85 105;    /* muted dark text */
-  --color-text-tertiary: 100 116 139;   /* helper dark text */
+  /* Borders */
+  --color-border-default: 228 228 231;
+  --color-border-accent: 15 179 76;
+  --color-border-focus: 16 185 129;
 
-  --color-border: 203 213 225;          /* light border */
-  --color-border-contrast: 15 23 42;
-  --color-interactive-base: 15 23 42;
-}
-
-/* === Layout-Stil Toggle === */
-[data-layout="sharp"] {
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.18);
-  --shadow-md: 0 2px 4px rgba(0,0,0,0.24);
-  --shadow-lg: 0 4px 8px rgba(0,0,0,0.32);
-}
-
-/* === OLED-Modus Toggle (dark-only) === */
-:root:not([data-theme="light"]) body[data-oled="true"] {
-  --color-bg: 0 0 0;
-  --color-bg-elevated: 0 0 0;
-  --color-bg-overlay: 0 0 0;
-  --color-surface: 8 8 8;
-  --color-surface-subtle: 10 10 10;
-  --color-surface-elevated: 12 12 12;
-  --color-surface-hover: 18 18 18;
-  --color-border: 30 30 30;
-}
-
-/* === Reduce Motion === */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+  /* Shadows (lighter for light mode) */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 8px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 20px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.12);
+  --glow-accent: 0 0 10px rgba(0,200,80,0.15);
+  --glow-brand: 0 0 12px rgba(15,179,76,0.12);
+  --glow-cyan: 0 0 8px rgba(0,180,200,0.15);
 }

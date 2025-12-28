@@ -1,96 +1,82 @@
-/**
- * Card - Migrated to Design System
- *
- * Uses Design System card classes (.card, .card-glass, .card-interactive, etc.) from src/styles/index.css
- *
- * Usage:
- * ```tsx
- * <Card>
- *   <CardHeader>
- *     <CardTitle>Session stats</CardTitle>
- *     <CardDescription>Last 24h performance</CardDescription>
- *   </CardHeader>
- *   <CardContent>…</CardContent>
- * </Card>
- *
- * <Card interactive onClick={handleClick}>
- *   <CardContent>Interactive surface</CardContent>
- * </Card>
- * ```
- */
-import React from 'react'
-import { cn } from '@/lib/ui/cn'
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
-export type CardVariant = 'default' | 'muted' | 'interactive' | 'glass' | 'elevated' | 'bordered' | 'glow'
+import { cn } from "@/lib/utils";
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: CardVariant
-  interactive?: boolean
-}
-
-// Map component variants to Design System card classes
-const variantClasses: Record<CardVariant, string> = {
-  default: 'card',
-  muted: 'card bg-surface-subtle',
-  interactive: 'card-interactive',
-  glass: 'card-glass',
-  elevated: 'card-elevated',
-  bordered: 'card-bordered',
-  glow: 'card-glow',
-}
-
-export const Card = React.forwardRef<HTMLDivElement, CardProps>(function Card(
-  { variant = 'default', className, interactive, onClick, onKeyDown, tabIndex, ...props },
-  ref
-) {
-  const isInteractive = interactive ?? typeof onClick === 'function'
-  
-  // If explicitly interactive but not interactive variant, use card-interactive
-  const cardClass = isInteractive && variant === 'default' ? 'card-interactive' : variantClasses[variant]
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    onKeyDown?.(event)
-    if (!isInteractive || event.defaultPrevented) return
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      onClick?.(event as unknown as React.MouseEvent<HTMLDivElement, MouseEvent>)
-    }
+const cardVariants = cva(
+  "rounded-2xl border text-text-primary transition-all duration-150",
+  {
+    variants: {
+      variant: {
+        // Default card - subtle surface
+        default: "bg-surface border-border-sf-subtle shadow-card-subtle",
+        // Elevated card - slightly lifted
+        elevated: "bg-surface-elevated border-border-sf-subtle shadow-md",
+        // Interactive card - hover effects with glow
+        interactive: 
+          "bg-surface border-border-sf-subtle shadow-card-subtle hover:border-brand/30 hover:shadow-glow hover:-translate-y-0.5 cursor-pointer",
+        // Glass card - translucent
+        glass: "bg-surface/60 backdrop-blur-sm border-border-sf-moderate",
+        // Ghost card - minimal styling
+        ghost: "bg-transparent border-transparent",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
   }
+);
 
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        cardClass,
-        className
-      )}
-      tabIndex={isInteractive ? tabIndex ?? 0 : tabIndex}
-      role={isInteractive ? 'button' : props.role}
-      onKeyDown={handleKeyDown}
-      onClick={onClick}
-      {...props}
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant, ...props }, ref) => (
+    <div 
+      ref={ref} 
+      className={cn(cardVariants({ variant }), className)} 
+      {...props} 
     />
   )
-})
+);
+Card.displayName = "Card";
 
-export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('mb-4 flex flex-col gap-1', className)} {...props} />
-}
+const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("flex flex-col space-y-1.5 p-4", className)} {...props} />
+  ),
+);
+CardHeader.displayName = "CardHeader";
 
-export function CardTitle({ className, children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={cn('text-lg font-semibold text-text-primary', className)} {...props}>{children}</h3>
-}
+const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => (
+    <h3 
+      ref={ref} 
+      className={cn("text-lg font-semibold leading-none tracking-tight text-text-primary", className)} 
+      {...props} 
+    />
+  ),
+);
+CardTitle.displayName = "CardTitle";
 
-export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn('text-sm text-text-secondary', className)} {...props} />
-}
+const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, ...props }, ref) => (
+    <p ref={ref} className={cn("text-sm text-text-secondary", className)} {...props} />
+  ),
+);
+CardDescription.displayName = "CardDescription";
 
-export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('flex flex-col gap-3 text-sm text-text-secondary', className)} {...props} />
-}
+const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => <div ref={ref} className={cn("p-4 pt-0", className)} {...props} />,
+);
+CardContent.displayName = "CardContent";
 
-export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('mt-6 flex items-center justify-between gap-3', className)} {...props} />
-}
+const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("flex items-center p-4 pt-0", className)} {...props} />
+  ),
+);
+CardFooter.displayName = "CardFooter";
 
-export default Card
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, cardVariants };

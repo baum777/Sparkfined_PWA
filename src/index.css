@@ -1,0 +1,235 @@
+@import "./styles/tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SPARKFINED DESIGN SYSTEM
+   Dark-mode-first trading UI with information-dense Bloomberg-style layout.
+   All colors use CSS tokens - NO hardcoded hex values in components.
+*/
+
+@layer base {
+  /* Legacy shadcn tokens mapped to Sparkfined system */
+  :root {
+    /* Light theme fallback */
+    --background: 0 0% 98%;
+    --foreground: 220 20% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+
+    --primary: 151 76% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 10%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 151 100% 50%;
+    --accent-foreground: 220 20% 10%;
+
+    --destructive: 350 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 220 20% 10%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 151 76% 38%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 220 16% 98%;
+    --sidebar-foreground: 220 10% 30%;
+    --sidebar-primary: 151 76% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 94%;
+    --sidebar-accent-foreground: 220 20% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 151 76% 38%;
+  }
+
+  .dark {
+    /* Dark theme (default for trading app) */
+    --background: 240 6% 4%;
+    --foreground: 0 0% 96%;
+
+    --card: 240 5% 9%;
+    --card-foreground: 0 0% 96%;
+
+    --popover: 240 5% 9%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary: 151 76% 38%;
+    --primary-foreground: 0 0% 4%;
+
+    --secondary: 240 5% 14%;
+    --secondary-foreground: 0 0% 96%;
+
+    --muted: 240 5% 14%;
+    --muted-foreground: 240 4% 46%;
+
+    --accent: 151 100% 50%;
+    --accent-foreground: 0 0% 4%;
+
+    --destructive: 350 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 4%;
+
+    --border: 240 5% 16%;
+    --input: 240 5% 16%;
+    --ring: 151 76% 38%;
+
+    --sidebar-background: 240 5% 6%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 151 76% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 5% 12%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 240 5% 12%;
+    --sidebar-ring: 151 76% 38%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-root text-text-primary antialiased;
+  }
+
+  /* Typography scale */
+  h1 {
+    @apply text-3xl font-semibold tracking-tight text-text-primary;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold tracking-tight text-text-primary;
+  }
+
+  h3 {
+    @apply text-xl font-medium text-text-primary;
+  }
+
+  h4 {
+    @apply text-lg font-medium text-text-primary;
+  }
+
+  p {
+    @apply text-text-secondary;
+  }
+
+  /* Mono numbers for trading */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* Card recipes */
+  .card-default {
+    @apply rounded-2xl border border-border-sf-subtle bg-surface shadow-card-subtle;
+  }
+
+  .card-interactive {
+    @apply rounded-2xl border border-border-sf-subtle bg-surface shadow-card-subtle
+           hover:border-brand/30 hover:shadow-glow
+           transition-all duration-150 hover:-translate-y-0.5;
+  }
+
+  /* Button recipes */
+  .btn-primary {
+    @apply h-11 px-4 py-2.5 rounded-xl font-medium text-black
+           bg-brand hover:bg-brand-hover
+           shadow-glow-brand transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-brand/60;
+  }
+
+  .btn-secondary {
+    @apply h-11 px-4 py-2.5 rounded-xl font-medium
+           bg-surface-subtle text-text-primary
+           border border-border-sf-moderate
+           hover:bg-surface-hover hover:border-brand
+           transition-all duration-150
+           focus:outline-none focus:ring-2 focus:ring-brand/60;
+  }
+
+  /* Input recipes */
+  .input-base {
+    @apply h-12 w-full px-4 rounded-xl
+           bg-surface-subtle text-text-primary placeholder:text-text-tertiary
+           border border-border-sf-moderate
+           focus:border-brand focus:ring-2 focus:ring-brand/40
+           focus:shadow-glow-accent outline-none;
+  }
+
+  /* Badge recipes */
+  .badge-bull {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5
+           text-[11px] font-semibold uppercase tracking-wide
+           text-sentiment-bull border border-sentiment-bull-border bg-sentiment-bull-bg;
+  }
+
+  .badge-bear {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5
+           text-[11px] font-semibold uppercase tracking-wide
+           text-sentiment-bear border border-sentiment-bear-border bg-sentiment-bear-bg;
+  }
+
+  .badge-neutral {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5
+           text-[11px] font-semibold uppercase tracking-wide
+           text-sentiment-neutral border border-sentiment-neutral-border bg-sentiment-neutral-bg;
+  }
+
+  /* Navigation recipes */
+  .nav-header {
+    @apply sticky top-0 h-16 bg-surface-elevated/80 backdrop-blur-xl
+           border-b border-border-sf-subtle z-50;
+  }
+
+  .nav-mobile-bottom {
+    @apply fixed bottom-0 h-14 bg-surface/95 backdrop-blur-sm
+           border-t border-border-sf;
+  }
+
+  /* Table recipes */
+  .table-wrapper {
+    @apply overflow-x-auto rounded-2xl border border-border-sf bg-surface;
+  }
+
+  .table-header {
+    @apply border-b border-border-sf bg-surface-subtle;
+  }
+
+  .table-row-hover {
+    @apply hover:bg-surface-hover;
+  }
+}
+
+@layer utilities {
+  /* Spacing grid helpers (8px base) */
+  .gap-grid-1 { gap: 8px; }
+  .gap-grid-2 { gap: 16px; }
+  .gap-grid-3 { gap: 24px; }
+  .p-grid-1 { padding: 8px; }
+  .p-grid-2 { padding: 16px; }
+  .p-grid-3 { padding: 24px; }
+}

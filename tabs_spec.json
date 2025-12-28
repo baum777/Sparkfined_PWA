@@ -1,0 +1,245 @@
+{
+  "metadata": {
+    "generatedAt": "2025-01-27T00:00:00Z",
+    "source": "loveable-import + verdrahtung.md",
+    "version": "1.0.0"
+  },
+  "sollArchitecture": {
+    "primaryTabs": [
+      "dashboard",
+      "journal",
+      "lessons",
+      "chart",
+      "alerts",
+      "settings"
+    ],
+    "secondaryTabs": [
+      "watchlist",
+      "oracle"
+    ],
+    "replayRule": "Kein eigener Tab; /replay ist Route-Alias → setzt Chart Replay Mode"
+  },
+  "tabs": [
+    {
+      "tabId": "dashboard",
+      "label": "Dashboard",
+      "order": 1,
+      "category": "primary",
+      "route": "/dashboard",
+      "mustHaves": {
+        "ui": [
+          "Header + Meta + CTA 'Log entry'",
+          "KPI Strip (5 KPIs)",
+          "Daily Bias Card",
+          "Holdings Card",
+          "Trade Log Card",
+          "Secondary Cards",
+          "Bottom Grid",
+          "FAB + Quick Actions + Overlay",
+          "Alert Create Entry Point"
+        ],
+        "wiring": {
+          "dataSources": [
+            "KPI: API/onchain",
+            "Holdings: API/onchain",
+            "Trades: API/onchain"
+          ],
+          "refresh": "Invalidation on trade events",
+          "ctaFlows": [
+            "Log entry → Journal with trade context",
+            "Create alert → Alert creation dialog"
+          ]
+        }
+      },
+      "source": "loveable-import/_incoming/src/pages/Dashboard.tsx"
+    },
+    {
+      "tabId": "journal",
+      "label": "Journal",
+      "order": 2,
+      "category": "primary",
+      "route": "/journal",
+      "mustHaves": {
+        "ui": [
+          "V2 Layout (Input Column + Output Column)",
+          "Input Column: Emotional State (required), Thesis (required), Templates (overwrite/merge/suggest), AI notes, Sticky Action Bar",
+          "Output Column: Archetype + Score, 2×2 Metrics, Insights Cards, History (latest 5)"
+        ],
+        "wiring": {
+          "contract": {
+            "validation": "Required fields enforced",
+            "autosave": "Debounced autosave with persistence",
+            "errorRecovery": "Error recovery on save failure"
+          },
+          "dataSources": [
+            "Templates: Static/API",
+            "AI Insights: AI API",
+            "History: IndexedDB"
+          ]
+        }
+      },
+      "source": "loveable-import/_incoming/src/pages/Journal.tsx"
+    },
+    {
+      "tabId": "lessons",
+      "label": "Learn",
+      "order": 3,
+      "category": "primary",
+      "route": "/lessons",
+      "note": "Soll-Route ist /lessons (nicht /learn). loveable-import zeigt /learn, aber verdrahtung.md bestätigt /lessons",
+      "mustHaves": {
+        "ui": [
+          "Module list + progress",
+          "Lesson viewer (markdown/json)",
+          "Optional: quizzes, AI summaries"
+        ],
+        "wiring": {
+          "contentSource": "API/static",
+          "progressPersistence": "API/wallet",
+          "offlineBehavior": "Cached lessons available offline"
+        }
+      },
+      "source": "loveable-import/_incoming/src/pages/Learn.tsx"
+    },
+    {
+      "tabId": "chart",
+      "label": "Chart",
+      "order": 4,
+      "category": "primary",
+      "route": "/chart",
+      "mustHaves": {
+        "ui": [
+          "TopBar: timeframes, replay, export, mobile actions",
+          "Sidebar: markets, sessions",
+          "Toolbar: indicators, drawings, alerts",
+          "Bottom Panel Tabs: Grok Pulse + Journal Notes",
+          "Canvas + markers"
+        ],
+        "wiring": {
+          "replay": {
+            "routeHandling": "/replay alias → Chart replay state",
+            "stateInit": "Replay state initialization",
+            "urlParams": "Session ID, time range",
+            "backForward": "Browser back/forward support"
+          },
+          "dataSources": [
+            "OHLC: Multi-provider fallback",
+            "Indicators: Calculated client-side",
+            "Grok Pulse: AI API"
+          ]
+        }
+      },
+      "source": "loveable-import/_incoming/src/pages/Chart.tsx"
+    },
+    {
+      "tabId": "alerts",
+      "label": "Alerts",
+      "order": 5,
+      "category": "primary",
+      "route": "/alerts",
+      "mustHaves": {
+        "ui": [
+          "List + filters",
+          "Create flow (ideal: RightSheet)",
+          "Empty states with CTA",
+          "URL-prefill semantics",
+          "Stable testids"
+        ],
+        "wiring": {
+          "apis": [
+            "Create/update/delete APIs",
+            "Optional: onchain triggers"
+          ],
+          "prefillParsing": "URL params → form state",
+          "selectors": "Deterministic data-testid patterns"
+        }
+      },
+      "source": "loveable-import/_incoming/src/pages/Alerts.tsx"
+    },
+    {
+      "tabId": "settings",
+      "label": "Settings",
+      "order": 6,
+      "category": "primary",
+      "route": "/settings",
+      "mustHaves": {
+        "ui": [
+          "Appearance",
+          "Chart prefs",
+          "Notifications",
+          "Connected Wallets",
+          "Monitoring",
+          "Token Usage",
+          "Risk Defaults",
+          "Export/Backup",
+          "Advanced/Diagnostics",
+          "Danger Zone (typed RESET)"
+        ],
+        "wiring": {
+          "prefsStorage": "LocalStorage/IndexedDB",
+          "walletManagement": "Wallet connect/disconnect",
+          "exportEndpoints": "Data export APIs",
+          "safeguards": "Dangerous actions confirmation"
+        }
+      },
+      "source": "loveable-import/_incoming/src/pages/SettingsPage.tsx"
+    },
+    {
+      "tabId": "watchlist",
+      "label": "Watchlist",
+      "order": 7,
+      "category": "secondary",
+      "route": "/watchlist",
+      "mustHaves": {
+        "ui": [
+          "Assets list/table",
+          "Selection → detail panel (split/sheet)",
+          "Open chart CTA",
+          "Sort/filter (if available)"
+        ],
+        "wiring": {
+          "pricesSource": "API/onchain/oracle",
+          "navigation": "Chart with correct params"
+        }
+      },
+      "source": "loveable-import/_incoming/src/pages/Watchlist.tsx"
+    },
+    {
+      "tabId": "oracle",
+      "label": "Oracle",
+      "order": 8,
+      "category": "secondary",
+      "route": "/oracle",
+      "mustHaves": {
+        "ui": [
+          "Reward banner (if exists)",
+          "Full report block (oracle-pre)",
+          "Theme filter + history chart + list",
+          "Optional: Loveable insights (if policy allows)"
+        ],
+        "wiring": {
+          "dataPipeline": "Oracle data pipeline",
+          "pagination": "History pagination",
+          "chartSeries": "Chart series source"
+        }
+      },
+      "source": "loveable-import/_incoming/src/pages/Oracle.tsx"
+    }
+  ],
+  "replaySpec": {
+    "isTab": false,
+    "isMode": true,
+    "route": "/replay",
+    "behavior": "Sets Chart replay state, Chart tab stays active"
+  },
+  "routeMismatches": [
+    {
+      "tab": "lessons",
+      "loveableImport": "/learn",
+      "soll": "/lessons",
+      "severity": "medium",
+      "recommendation": "Keep /lessons, add /learn → /lessons redirect if needed for compatibility"
+    }
+  ]
+}
+

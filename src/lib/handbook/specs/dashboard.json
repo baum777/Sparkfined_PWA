@@ -1,0 +1,207 @@
+{
+  "id": "dashboard",
+  "route": "/",
+  "title": "Dashboard",
+  "purpose": "Your daily trading command center — see KPIs, recent trades, and quick actions at a glance.",
+  "prerequisites": [
+    {
+      "id": "wallet",
+      "label": "Connect a wallet",
+      "gate": "walletConnected",
+      "hint": "Connect your wallet to see holdings and sync trades",
+      "cta": { "label": "Connect Wallet", "action": "open:modal/connect-wallet" }
+    },
+    {
+      "id": "entries",
+      "label": "Log your first trade",
+      "gate": "hasEntries",
+      "hint": "Start journaling to see your performance metrics",
+      "cta": { "label": "New Entry", "action": "open:modal/journal-entry" }
+    }
+  ],
+  "flows": [
+    {
+      "id": "daily-review",
+      "title": "Daily Review Routine",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "check-kpis",
+          "title": "Check KPIs",
+          "userAction": "Glance at the KPI strip at the top",
+          "systemBehavior": "Displays today's PnL, win rate, and open positions",
+          "outcome": "Quick pulse on portfolio health"
+        },
+        {
+          "id": "review-daily-bias",
+          "title": "Review Daily Bias",
+          "userAction": "Check the Daily Bias card",
+          "systemBehavior": "Shows your pre-market bias and how it played out",
+          "outcome": "Validate or learn from your market read"
+        },
+        {
+          "id": "review-trades",
+          "title": "Review Recent Trades",
+          "userAction": "Scroll to Last Trades card",
+          "systemBehavior": "Shows last 5 trades with PnL badges",
+          "outcome": "Spot any missed journal entries",
+          "cta": { "label": "View All", "action": "nav:/journal?view=logbook" }
+        },
+        {
+          "id": "check-alerts",
+          "title": "Check Active Alerts",
+          "userAction": "View Alerts Snapshot card",
+          "systemBehavior": "Lists triggered and pending alerts",
+          "outcome": "Stay informed on price triggers",
+          "cta": { "label": "Manage Alerts", "action": "nav:/alerts" }
+        }
+      ],
+      "branches": [
+        {
+          "when": "You see unjourned trades",
+          "steps": [
+            {
+              "id": "quick-log",
+              "title": "Quick Log Trade",
+              "userAction": "Click on the trade in Last Trades",
+              "systemBehavior": "Opens quick log modal with pre-filled data",
+              "outcome": "Add notes and emotion to the trade",
+              "cta": { "label": "Open Journal", "action": "nav:/journal?view=pending" }
+            }
+          ]
+        },
+        {
+          "when": "An alert was triggered",
+          "steps": [
+            {
+              "id": "review-alert",
+              "title": "Review Triggered Alert",
+              "userAction": "Click on the triggered alert notification",
+              "systemBehavior": "Opens chart at the trigger point",
+              "outcome": "Evaluate if action is needed",
+              "cta": { "label": "View Chart", "action": "nav:/chart" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quick-journal",
+      "title": "Quick Journal Entry",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "open-modal",
+          "title": "Open Entry Form",
+          "userAction": "Click 'New Entry' or use the FAB",
+          "systemBehavior": "Opens journal entry modal",
+          "outcome": "Ready to document your trade",
+          "cta": { "label": "New Entry", "action": "open:modal/journal-entry" }
+        },
+        {
+          "id": "fill-emotion",
+          "title": "Select Emotional State",
+          "userAction": "Choose how you felt during the trade",
+          "systemBehavior": "Tags entry for pattern analysis",
+          "outcome": "Emotional awareness tracked"
+        },
+        {
+          "id": "add-notes",
+          "title": "Add Quick Notes",
+          "userAction": "Type your thesis and observations",
+          "systemBehavior": "Saves with the trade entry",
+          "outcome": "Context preserved for future review"
+        },
+        {
+          "id": "save",
+          "title": "Save Entry",
+          "userAction": "Click Save",
+          "systemBehavior": "Entry added to journal",
+          "outcome": "Trade documented for mastery"
+        }
+      ]
+    },
+    {
+      "id": "create-alert",
+      "title": "Create Price Alert",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "open-alert",
+          "title": "Open Alert Creator",
+          "userAction": "Click '+ Alert' from Quick Actions",
+          "systemBehavior": "Opens alert creation form",
+          "outcome": "Ready to set conditions",
+          "cta": { "label": "New Alert", "action": "open:modal/new-alert" }
+        },
+        {
+          "id": "set-price",
+          "title": "Set Target Price",
+          "userAction": "Enter token, condition, and price",
+          "systemBehavior": "Validates and previews alert",
+          "outcome": "Alert configured"
+        },
+        {
+          "id": "confirm",
+          "title": "Confirm Alert",
+          "userAction": "Click Create",
+          "systemBehavior": "Alert becomes active",
+          "outcome": "You'll be notified when triggered"
+        }
+      ]
+    },
+    {
+      "id": "mastery-check",
+      "title": "Check Mastery Progress",
+      "level": "advanced",
+      "steps": [
+        {
+          "id": "view-progress",
+          "title": "View Progress Card",
+          "userAction": "Check the Mastery Progress card",
+          "systemBehavior": "Shows XP, level, and next milestone",
+          "outcome": "See how far you've come"
+        },
+        {
+          "id": "learn-more",
+          "title": "Continue Learning",
+          "userAction": "Click on suggested lesson",
+          "systemBehavior": "Navigates to Learn page",
+          "outcome": "Unlock new skills",
+          "cta": { "label": "Go to Learn", "action": "nav:/lessons" }
+        }
+      ]
+    }
+  ],
+  "shortcuts": [
+    { "keys": "?", "action": "Toggle this handbook panel" },
+    { "keys": "J", "action": "Open Journal" },
+    { "keys": "C", "action": "Open Chart" },
+    { "keys": "A", "action": "Open Alerts" },
+    { "keys": "N", "action": "New journal entry" }
+  ],
+  "pitfalls": [
+    {
+      "problem": "KPIs show $0 or empty",
+      "fix": "Connect a wallet and ensure you have tracked trades in the journal",
+      "cta": { "label": "Connect Wallet", "action": "open:modal/connect-wallet" }
+    },
+    {
+      "problem": "Holdings not updating",
+      "fix": "Check if wallet is still connected in Settings → Connected Wallets",
+      "cta": { "label": "Check Settings", "action": "nav:/settings" }
+    },
+    {
+      "problem": "Recent trades empty",
+      "fix": "Start logging trades manually or connect a wallet for auto-capture",
+      "cta": { "label": "New Entry", "action": "open:modal/journal-entry" }
+    }
+  ],
+  "glossary": [
+    { "term": "PnL", "meaning": "Profit and Loss — the net gain or loss from your trades" },
+    { "term": "Win Rate", "meaning": "Percentage of trades that were profitable" },
+    { "term": "KPI", "meaning": "Key Performance Indicator — a measurable value showing trading performance" },
+    { "term": "FAB", "meaning": "Floating Action Button — the quick access button in the corner" },
+    { "term": "Daily Bias", "meaning": "Your pre-market expectation of market direction (bullish/bearish/neutral)" }
+  ]
+}

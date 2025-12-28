@@ -1,0 +1,203 @@
+{
+  "id": "watchlist",
+  "route": "/watchlist",
+  "title": "Watchlist",
+  "purpose": "Track tokens you're interested in — monitor prices and trends at a glance.",
+  "prerequisites": [],
+  "flows": [
+    {
+      "id": "add-token",
+      "title": "Add Token to Watchlist",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "open-add",
+          "title": "Open Quick Add",
+          "userAction": "Click '+ Add Token' button",
+          "systemBehavior": "Opens token search input",
+          "outcome": "Ready to search for tokens"
+        },
+        {
+          "id": "search",
+          "title": "Search Token",
+          "userAction": "Type token name, symbol, or paste contract address",
+          "systemBehavior": "Shows matching results with price preview",
+          "outcome": "Find the token you want"
+        },
+        {
+          "id": "select",
+          "title": "Select Token",
+          "userAction": "Click on the token from results",
+          "systemBehavior": "Token added to your watchlist",
+          "outcome": "Now tracking this token"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Token not found by name",
+          "steps": [
+            {
+              "id": "paste-address",
+              "title": "Paste Contract Address",
+              "userAction": "Paste the full contract address",
+              "systemBehavior": "Looks up token by address",
+              "outcome": "Token identified and added"
+            }
+          ]
+        },
+        {
+          "when": "Adding from chart",
+          "steps": [
+            {
+              "id": "star-from-chart",
+              "title": "Star from Chart",
+              "userAction": "Click star icon while viewing chart",
+              "systemBehavior": "Adds current token to watchlist",
+              "outcome": "Quick add without leaving chart",
+              "cta": { "label": "Open Chart", "action": "nav:/chart" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "monitor-prices",
+      "title": "Monitor Prices",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "view-cards",
+          "title": "View Token Cards",
+          "userAction": "Browse your watchlist",
+          "systemBehavior": "Shows cards with price, 24h change, and trend",
+          "outcome": "Quick overview of all tokens"
+        },
+        {
+          "id": "check-trend",
+          "title": "Check Trend Indicator",
+          "userAction": "Look at the trend pill on each card",
+          "systemBehavior": "Shows bullish (green), bearish (red), or neutral",
+          "outcome": "Quick sentiment gauge"
+        },
+        {
+          "id": "sort-list",
+          "title": "Sort List",
+          "userAction": "Click column headers or sort dropdown",
+          "systemBehavior": "Reorders by price change, volume, etc.",
+          "outcome": "Find top movers quickly"
+        }
+      ]
+    },
+    {
+      "id": "view-details",
+      "title": "View Token Details",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "click-token",
+          "title": "Click Token Card",
+          "userAction": "Click on any watchlist token",
+          "systemBehavior": "Opens detail panel with mini chart",
+          "outcome": "See price, volume, and key stats"
+        },
+        {
+          "id": "view-stats",
+          "title": "View Statistics",
+          "userAction": "Check the stats section",
+          "systemBehavior": "Shows market cap, volume, holders",
+          "outcome": "Fundamental data at a glance"
+        },
+        {
+          "id": "open-chart",
+          "title": "Open Full Chart",
+          "userAction": "Click 'Open Chart' button",
+          "systemBehavior": "Navigates to Chart page with token loaded",
+          "outcome": "Ready for detailed analysis",
+          "cta": { "label": "Open Chart", "action": "nav:/chart" }
+        },
+        {
+          "id": "set-alert",
+          "title": "Set Alert",
+          "userAction": "Click 'Set Alert' button",
+          "systemBehavior": "Opens alert form pre-filled with token",
+          "outcome": "Quick alert setup",
+          "cta": { "label": "New Alert", "action": "open:modal/new-alert" }
+        }
+      ]
+    },
+    {
+      "id": "remove-token",
+      "title": "Remove from Watchlist",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "find-remove",
+          "title": "Find Remove Option",
+          "userAction": "Hover over card and click X, or swipe left (mobile)",
+          "systemBehavior": "Shows remove confirmation",
+          "outcome": "Ready to remove"
+        },
+        {
+          "id": "confirm",
+          "title": "Confirm Removal",
+          "userAction": "Click confirm or complete swipe",
+          "systemBehavior": "Token removed from watchlist",
+          "outcome": "Watchlist cleaned up"
+        }
+      ]
+    },
+    {
+      "id": "organize-watchlist",
+      "title": "Organize Watchlist",
+      "level": "advanced",
+      "steps": [
+        {
+          "id": "drag-reorder",
+          "title": "Drag to Reorder",
+          "userAction": "Drag token cards to new position",
+          "systemBehavior": "Reorders your watchlist",
+          "outcome": "Priority tokens at top"
+        },
+        {
+          "id": "create-group",
+          "title": "Create Group (Optional)",
+          "userAction": "Click 'New Group' and name it",
+          "systemBehavior": "Creates a category for tokens",
+          "outcome": "Organized by theme (e.g., DeFi, Memes)"
+        }
+      ]
+    }
+  ],
+  "shortcuts": [
+    { "keys": "?", "action": "Toggle this handbook panel" },
+    { "keys": "/", "action": "Focus search input" },
+    { "keys": "A", "action": "Add new token" },
+    { "keys": "Enter", "action": "Open selected token details" }
+  ],
+  "pitfalls": [
+    {
+      "problem": "Token not found",
+      "fix": "Try pasting the full contract address instead of searching by name"
+    },
+    {
+      "problem": "Price not updating",
+      "fix": "Check your internet connection. Prices refresh every few seconds."
+    },
+    {
+      "problem": "Watchlist too long",
+      "fix": "Use groups to organize or remove tokens you're no longer tracking"
+    },
+    {
+      "problem": "Wrong token added",
+      "fix": "Many tokens share names. Verify the contract address matches the real token."
+    }
+  ],
+  "glossary": [
+    { "term": "Watchlist", "meaning": "Your curated list of tokens to monitor" },
+    { "term": "Trend", "meaning": "The general direction of price movement (bullish/bearish/neutral)" },
+    { "term": "24h Change", "meaning": "Price change percentage over the last 24 hours" },
+    { "term": "Volume", "meaning": "Total trading volume in a time period" },
+    { "term": "Market Cap", "meaning": "Total value of all tokens in circulation (price × supply)" },
+    { "term": "Contract Address", "meaning": "The unique blockchain identifier for a token" }
+  ]
+}

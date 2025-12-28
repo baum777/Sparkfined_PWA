@@ -1,0 +1,60 @@
+import { useLocation } from "react-router-dom";
+import { NavLink } from "@/components/NavLink";
+import { primaryNavItems } from "@/config/navigation";
+import { cn } from "@/lib/utils";
+
+function isNavItemActive(item: typeof primaryNavItems[0], pathname: string): boolean {
+  if (item.activeRoutes) {
+    return item.activeRoutes.includes(pathname);
+  }
+  return pathname === item.path;
+}
+
+export function MobileBottomNav() {
+  const location = useLocation();
+
+  return (
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border-sf-subtle bg-surface/95 backdrop-blur-sm md:hidden"
+      data-testid="mobile-bottom-nav"
+      role="navigation"
+      aria-label="Primary navigation"
+    >
+      <div className="flex h-16 items-center justify-around px-2">
+        {primaryNavItems.map((item) => {
+          const isActive = isNavItemActive(item, location.pathname);
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              data-testid={`${item.testId}-mobile`}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-2 text-xs transition-all duration-150",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60",
+                isActive
+                  ? "text-brand"
+                  : "text-text-tertiary hover:text-text-primary"
+              )}
+            >
+              <div className={cn(
+                "relative flex items-center justify-center",
+                isActive && "after:absolute after:-bottom-1 after:h-0.5 after:w-4 after:rounded-full after:bg-brand after:shadow-glow-accent"
+              )}>
+                <item.icon className={cn(
+                  "h-5 w-5 transition-all duration-150",
+                  isActive ? "text-brand drop-shadow-[0_0_6px_rgba(15,179,76,0.5)]" : ""
+                )} />
+              </div>
+              <span className={cn(
+                "truncate font-medium",
+                isActive ? "text-brand" : ""
+              )}>
+                {item.title}
+              </span>
+            </NavLink>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}

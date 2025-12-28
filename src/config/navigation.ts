@@ -1,110 +1,83 @@
-import type { LucideIcon } from "lucide-react";
-import Activity from "lucide-react/dist/esm/icons/activity";
-import Bell from "lucide-react/dist/esm/icons/bell";
-import BookmarkPlus from "lucide-react/dist/esm/icons/bookmark-plus";
-import FileText from "lucide-react/dist/esm/icons/file-text";
-import GraduationCap from "lucide-react/dist/esm/icons/graduation-cap";
-import Home from "lucide-react/dist/esm/icons/home";
-import Settings from "lucide-react/dist/esm/icons/settings";
-import Sparkles from "lucide-react/dist/esm/icons/sparkles";
-import Star from "lucide-react/dist/esm/icons/star";
-import TrendingUp from "lucide-react/dist/esm/icons/trending-up";
+import { 
+  LayoutDashboard, 
+  BookOpen, 
+  GraduationCap, 
+  LineChart, 
+  Bell, 
+  Settings,
+  Eye,
+  Sparkles,
+  HelpCircle,
+} from "lucide-react";
 
-export interface NavigationItem {
+export interface NavItem {
+  title: string;
   path: string;
-  label: string;
-  Icon: LucideIcon;
-  testId?: string;
-  tourId?: string;
-  aliases?: string[];
+  icon: React.ComponentType<{ className?: string }>;
+  testId: string;
+  /** Routes that should also highlight this nav item as active */
+  activeRoutes?: string[];
 }
 
-export const NAV_ITEMS: NavigationItem[] = [
+export const primaryNavItems: NavItem[] = [
   {
-    path: "/dashboard",
-    label: "Dashboard",
-    Icon: Home,
+    title: "Dashboard",
+    path: "/",
+    icon: LayoutDashboard,
     testId: "nav-dashboard",
-    tourId: "board-link",
-    aliases: ["/dashboard-v2", "/board"],
   },
   {
+    title: "Journal",
     path: "/journal",
-    label: "Journal",
-    Icon: FileText,
+    icon: BookOpen,
     testId: "nav-journal",
-    tourId: "journal-link",
-    aliases: ["/journal-v2"],
   },
   {
+    title: "Learn",
+    path: "/lessons",
+    icon: GraduationCap,
+    testId: "nav-learn",
+  },
+  {
+    title: "Chart",
     path: "/chart",
-    label: "Chart",
-    Icon: TrendingUp,
+    icon: LineChart,
     testId: "nav-chart",
-    tourId: "chart-link",
-    // Replay is a chart mode and should highlight the Chart tab (route alias).
-    aliases: ["/chart-v2", "/analysis", "/analysis-v2", "/analyze", "/replay"],
+    activeRoutes: ["/chart", "/chart/replay", "/replay"],
   },
   {
-    path: "/watchlist",
-    label: "Watchlist",
-    Icon: BookmarkPlus,
-    testId: "nav-watchlist",
-    aliases: ["/watchlist-v2"],
-  },
-  {
+    title: "Alerts",
     path: "/alerts",
-    label: "Alerts",
-    Icon: Bell,
+    icon: Bell,
     testId: "nav-alerts",
-    tourId: "notifications-link",
-    aliases: ["/alerts-v2"],
+  },
+  {
+    title: "Settings",
+    path: "/settings",
+    icon: Settings,
+    testId: "nav-settings",
   },
 ];
 
-export const SETTINGS_NAV_ITEM: NavigationItem = {
-  path: "/settings",
-  label: "Settings",
-  Icon: Settings,
-  testId: "nav-settings",
-  tourId: "settings-link",
-  aliases: ["/settings-v2"],
-};
+const showHandbook = import.meta.env.VITE_ENABLE_DEV_NAV === 'true';
 
-export const SECONDARY_NAV_ITEMS: NavigationItem[] = [
+export const secondaryNavItems: NavItem[] = [
   {
-    path: "/signals",
-    label: "Signals",
-    Icon: Activity,
-    testId: "nav-signals",
+    title: "Watchlist",
+    path: "/watchlist",
+    icon: Eye,
+    testId: "nav-watchlist",
   },
   {
+    title: "Oracle",
     path: "/oracle",
-    label: "Oracle",
-    Icon: Sparkles,
+    icon: Sparkles,
     testId: "nav-oracle",
   },
-  {
-    path: "/lessons",
-    label: "Learn",
-    Icon: GraduationCap,
-    testId: "nav-lessons",
-  },
-  {
-    path: "/icons",
-    label: "Showcase",
-    Icon: Star,
-    testId: "nav-showcase",
-  },
+  ...(showHandbook ? [{
+    title: "Handbook",
+    path: "/handbook",
+    icon: HelpCircle,
+    testId: "nav-handbook",
+  }] : []),
 ];
-
-export const isNavItemActive = (pathname: string, item: NavigationItem) => {
-  const normalizedPath =
-    pathname !== "/" && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
-  const candidates = [item.path, ...(item.aliases ?? [])];
-
-  return candidates.some(
-    (candidate) =>
-      normalizedPath === candidate || normalizedPath.startsWith(`${candidate}/`),
-  );
-};

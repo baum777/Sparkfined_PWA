@@ -1,0 +1,188 @@
+{
+  "id": "oracle",
+  "route": "/oracle",
+  "title": "Oracle",
+  "purpose": "AI-powered insights and pattern recognition from your trading data.",
+  "prerequisites": [
+    {
+      "id": "has-entries",
+      "label": "Log some trades first",
+      "gate": "hasEntries",
+      "hint": "Oracle needs at least 5 journal entries to generate insights",
+      "cta": { "label": "Open Journal", "action": "nav:/journal" }
+    }
+  ],
+  "flows": [
+    {
+      "id": "view-insights",
+      "title": "View AI Insights",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "browse-cards",
+          "title": "Browse Insight Cards",
+          "userAction": "Scroll through insight cards on the page",
+          "systemBehavior": "Shows AI-generated patterns and observations",
+          "outcome": "Discover trading patterns you might have missed"
+        },
+        {
+          "id": "check-today",
+          "title": "Check Today's Takeaway",
+          "userAction": "Read the highlighted takeaway at top",
+          "systemBehavior": "Shows the most relevant insight for today",
+          "outcome": "Quick actionable advice"
+        },
+        {
+          "id": "read-detail",
+          "title": "Read Full Insight",
+          "userAction": "Click on an insight card to expand",
+          "systemBehavior": "Shows full explanation with data backing",
+          "outcome": "Understand the insight deeply"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Insight references specific trades",
+          "steps": [
+            {
+              "id": "view-trades",
+              "title": "View Related Trades",
+              "userAction": "Click 'View Trades' link in insight",
+              "systemBehavior": "Opens journal filtered to those trades",
+              "outcome": "See the data behind the pattern",
+              "cta": { "label": "View Journal", "action": "nav:/journal?view=logbook" }
+            }
+          ]
+        },
+        {
+          "when": "Insight suggests action",
+          "steps": [
+            {
+              "id": "take-action",
+              "title": "Take Suggested Action",
+              "userAction": "Click the action button on insight",
+              "systemBehavior": "Opens relevant feature or creates reminder",
+              "outcome": "Act on the insight immediately"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "filter-insights",
+      "title": "Filter & Search Insights",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "select-category",
+          "title": "Select Category",
+          "userAction": "Click category filter (Patterns, Emotions, Performance)",
+          "systemBehavior": "Shows only insights in that category",
+          "outcome": "Focus on specific insight types"
+        },
+        {
+          "id": "set-date-range",
+          "title": "Set Date Range",
+          "userAction": "Choose time period (Last 7 days, 30 days, etc.)",
+          "systemBehavior": "Filters insights to selected period",
+          "outcome": "See insights from specific timeframe"
+        },
+        {
+          "id": "search",
+          "title": "Search Insights",
+          "userAction": "Type keywords in search bar",
+          "systemBehavior": "Finds insights mentioning those terms",
+          "outcome": "Quick access to relevant insights"
+        }
+      ]
+    },
+    {
+      "id": "request-analysis",
+      "title": "Request Custom Analysis",
+      "level": "advanced",
+      "steps": [
+        {
+          "id": "open-request",
+          "title": "Open Analysis Request",
+          "userAction": "Click 'Request Analysis' button",
+          "systemBehavior": "Opens analysis request form",
+          "outcome": "Ready to ask a specific question"
+        },
+        {
+          "id": "describe-question",
+          "title": "Describe Your Question",
+          "userAction": "Type what you want to understand about your trading",
+          "systemBehavior": "AI processes your journal data",
+          "outcome": "Custom insight generated"
+        },
+        {
+          "id": "view-result",
+          "title": "View Analysis Result",
+          "userAction": "Read the generated analysis",
+          "systemBehavior": "Shows answer with supporting data",
+          "outcome": "Personalized trading insight"
+        }
+      ]
+    },
+    {
+      "id": "earn-rewards",
+      "title": "Earn Oracle Rewards",
+      "level": "advanced",
+      "steps": [
+        {
+          "id": "check-banner",
+          "title": "Check Reward Banner",
+          "userAction": "Look at the reward progress banner",
+          "systemBehavior": "Shows progress toward next reward",
+          "outcome": "Know how close you are"
+        },
+        {
+          "id": "complete-actions",
+          "title": "Complete Required Actions",
+          "userAction": "Log trades, review insights, complete lessons",
+          "systemBehavior": "Tracks your activity toward reward",
+          "outcome": "Progress toward unlock"
+        },
+        {
+          "id": "claim-reward",
+          "title": "Claim Reward",
+          "userAction": "Click 'Claim' when available",
+          "systemBehavior": "Unlocks premium insight or feature",
+          "outcome": "Bonus content unlocked"
+        }
+      ]
+    }
+  ],
+  "shortcuts": [
+    { "keys": "?", "action": "Toggle this handbook panel" },
+    { "keys": "R", "action": "Refresh insights" },
+    { "keys": "Enter", "action": "Expand selected insight" }
+  ],
+  "pitfalls": [
+    {
+      "problem": "No insights showing",
+      "fix": "Log at least 5 trades with emotional state and notes for best results",
+      "cta": { "label": "Open Journal", "action": "nav:/journal" }
+    },
+    {
+      "problem": "Insights seem generic",
+      "fix": "Add more detail to your journal entries — thesis, emotions, and outcomes help AI find patterns"
+    },
+    {
+      "problem": "Old insights not updating",
+      "fix": "Oracle refreshes weekly. Click 'Refresh' to manually trigger new analysis."
+    },
+    {
+      "problem": "Can't understand an insight",
+      "fix": "Click 'Explain More' or view the supporting trades to see the data"
+    }
+  ],
+  "glossary": [
+    { "term": "Insight", "meaning": "An AI-generated observation about your trading patterns or behavior" },
+    { "term": "Pattern", "meaning": "A recurring behavior or outcome detected across multiple trades" },
+    { "term": "Takeaway", "meaning": "The key actionable advice summarized from an insight" },
+    { "term": "Emotional Pattern", "meaning": "How your emotions correlate with trade outcomes" },
+    { "term": "Win Rate by Emotion", "meaning": "Your success rate when trading in different emotional states" },
+    { "term": "Custom Analysis", "meaning": "On-demand AI analysis based on your specific question" }
+  ]
+}

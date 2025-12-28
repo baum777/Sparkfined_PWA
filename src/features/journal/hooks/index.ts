@@ -1,0 +1,1 @@
+export { useQuickLog } from "./useQuickLog";

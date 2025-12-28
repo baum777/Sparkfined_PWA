@@ -1,0 +1,290 @@
+{
+  "id": "journal",
+  "route": "/journal",
+  "title": "Journal",
+  "purpose": "Log, review, and learn from every trade — the core of your mastery journey.",
+  "prerequisites": [],
+  "flows": [
+    {
+      "id": "log-trade",
+      "title": "Log a New Trade",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "open-form",
+          "title": "Open Entry Form",
+          "userAction": "Click 'Journal Entry' button in header",
+          "systemBehavior": "Opens the journal entry modal with all sections",
+          "outcome": "Ready to document your trade",
+          "cta": { "label": "New Entry", "action": "open:modal/journal-entry" }
+        },
+        {
+          "id": "select-template",
+          "title": "Choose Template (Optional)",
+          "userAction": "Select a template from the dropdown",
+          "systemBehavior": "Pre-fills form with template defaults",
+          "outcome": "Faster entry with consistent structure"
+        },
+        {
+          "id": "fill-basics",
+          "title": "Fill Basic Info",
+          "userAction": "Enter token, entry price, size",
+          "systemBehavior": "Validates inputs and calculates position value",
+          "outcome": "Core trade data captured"
+        },
+        {
+          "id": "set-emotion",
+          "title": "Set Emotional State",
+          "userAction": "Click on emotion card that matches your feeling",
+          "systemBehavior": "Tags entry with emotion for pattern analysis",
+          "outcome": "Emotional awareness tracked"
+        },
+        {
+          "id": "set-confidence",
+          "title": "Set Confidence Level",
+          "userAction": "Adjust the confidence slider",
+          "systemBehavior": "Records your conviction level",
+          "outcome": "Can later compare confidence vs outcomes"
+        },
+        {
+          "id": "add-thesis",
+          "title": "Add Your Thesis",
+          "userAction": "Describe why you took this trade",
+          "systemBehavior": "Saves narrative with rich text support",
+          "outcome": "Decision rationale documented"
+        },
+        {
+          "id": "add-screenshot",
+          "title": "Attach Chart Screenshot",
+          "userAction": "Click upload or paste image",
+          "systemBehavior": "Stores image with the entry",
+          "outcome": "Visual context preserved"
+        },
+        {
+          "id": "generate-ai",
+          "title": "Generate AI Notes (Optional)",
+          "userAction": "Click 'Generate AI Notes'",
+          "systemBehavior": "AI analyzes your entry and suggests insights",
+          "outcome": "Additional perspective on your trade"
+        },
+        {
+          "id": "save-entry",
+          "title": "Save Entry",
+          "userAction": "Click 'Save Entry'",
+          "systemBehavior": "Entry saved to confirmed list",
+          "outcome": "Trade logged successfully"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Trade has multiple exits (scaling out)",
+          "steps": [
+            {
+              "id": "partial-exit",
+              "title": "Log Partial Exit",
+              "userAction": "Add exit with partial size",
+              "systemBehavior": "Calculates partial PnL, keeps position open",
+              "outcome": "Partial profit/loss tracked"
+            },
+            {
+              "id": "final-exit",
+              "title": "Log Final Exit",
+              "userAction": "Add remaining position exit",
+              "systemBehavior": "Marks position as closed, calculates total PnL",
+              "outcome": "Full trade cycle complete"
+            }
+          ]
+        },
+        {
+          "when": "Want to save as template for reuse",
+          "steps": [
+            {
+              "id": "create-template",
+              "title": "Create Template",
+              "userAction": "Click 'Save as Template'",
+              "systemBehavior": "Opens template naming dialog",
+              "outcome": "Reusable template created"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "review-pending",
+      "title": "Review Pending Entries",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "switch-tab",
+          "title": "Switch to Pending Tab",
+          "userAction": "Click 'Pending' tab",
+          "systemBehavior": "Shows all auto-captured entries awaiting review",
+          "outcome": "See trades needing attention",
+          "cta": { "label": "View Pending", "action": "open:panel/journal-pending" }
+        },
+        {
+          "id": "expand-entry",
+          "title": "Expand Entry Details",
+          "userAction": "Click on a pending entry card",
+          "systemBehavior": "Shows extended sections (market context, tx timeline)",
+          "outcome": "Full trade context visible"
+        },
+        {
+          "id": "add-notes",
+          "title": "Add Notes & Emotion",
+          "userAction": "Fill in your thesis and select emotion",
+          "systemBehavior": "Enriches the auto-captured data",
+          "outcome": "Entry ready for confirmation"
+        },
+        {
+          "id": "confirm-entry",
+          "title": "Confirm Entry",
+          "userAction": "Click 'Confirm' or 'Save'",
+          "systemBehavior": "Moves entry to confirmed journal",
+          "outcome": "Trade fully documented"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Entry is a duplicate or mistake",
+          "steps": [
+            {
+              "id": "skip-entry",
+              "title": "Skip Entry",
+              "userAction": "Click 'Skip' or 'Archive'",
+              "systemBehavior": "Moves to archived without journaling",
+              "outcome": "Cleaned up your pending queue"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "analyze-history",
+      "title": "Analyze Trade History",
+      "level": "advanced",
+      "steps": [
+        {
+          "id": "open-logbook",
+          "title": "Open Logbook View",
+          "userAction": "Switch to Logbook tab",
+          "systemBehavior": "Shows filterable list of all archived trades",
+          "outcome": "Full history accessible",
+          "cta": { "label": "View Logbook", "action": "open:panel/journal-logbook" }
+        },
+        {
+          "id": "filter-by-date",
+          "title": "Filter by Date Range",
+          "userAction": "Set start and end dates",
+          "systemBehavior": "Filters trades to selected period",
+          "outcome": "Focus on specific timeframe"
+        },
+        {
+          "id": "filter-by-token",
+          "title": "Filter by Token",
+          "userAction": "Search or select token",
+          "systemBehavior": "Shows only trades for that token",
+          "outcome": "Analyze performance per asset"
+        },
+        {
+          "id": "filter-by-emotion",
+          "title": "Filter by Emotion",
+          "userAction": "Select emotion tag",
+          "systemBehavior": "Shows trades with that emotional state",
+          "outcome": "Discover emotional patterns"
+        },
+        {
+          "id": "view-stats",
+          "title": "View Aggregated Stats",
+          "userAction": "Check the summary bar",
+          "systemBehavior": "Shows total PnL, win rate for filtered trades",
+          "outcome": "Quick performance snapshot"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Found a pattern to learn from",
+          "steps": [
+            {
+              "id": "export-note",
+              "title": "Export to Oracle",
+              "userAction": "Click 'Send to Oracle'",
+              "systemBehavior": "Creates an insight based on the pattern",
+              "outcome": "Pattern saved for AI analysis",
+              "cta": { "label": "View Oracle", "action": "nav:/oracle" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "view-confirmed",
+      "title": "View Confirmed Entries",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "browse-journal",
+          "title": "Browse Journal Tab",
+          "userAction": "Stay on or switch to Journal tab",
+          "systemBehavior": "Shows confirmed entries with emotion badges",
+          "outcome": "See your documented trades"
+        },
+        {
+          "id": "click-entry",
+          "title": "View Entry Details",
+          "userAction": "Click on any entry",
+          "systemBehavior": "Opens detail modal with full data",
+          "outcome": "Review your past reasoning and outcome"
+        },
+        {
+          "id": "replay-trade",
+          "title": "Replay Trade (Optional)",
+          "userAction": "Click 'Replay' button",
+          "systemBehavior": "Opens chart at entry time",
+          "outcome": "See exactly what the chart looked like",
+          "cta": { "label": "Open Replay", "action": "nav:/chart/replay" }
+        }
+      ]
+    }
+  ],
+  "shortcuts": [
+    { "keys": "?", "action": "Toggle this handbook panel" },
+    { "keys": "N", "action": "New journal entry" },
+    { "keys": "P", "action": "Switch to Pending tab" },
+    { "keys": "L", "action": "Switch to Logbook tab" },
+    { "keys": "Esc", "action": "Close modal/sheet" },
+    { "keys": "⌘+Z", "action": "Undo last change in form" }
+  ],
+  "pitfalls": [
+    {
+      "problem": "Entry not saving",
+      "fix": "Ensure required fields (emotional state) are filled before saving"
+    },
+    {
+      "problem": "Can't find old trade",
+      "fix": "Use the Logbook tab with date and token filters to search history",
+      "cta": { "label": "Open Logbook", "action": "open:panel/journal-logbook" }
+    },
+    {
+      "problem": "PnL showing wrong",
+      "fix": "Check if exit price and size are correctly entered — partial exits affect calculations"
+    },
+    {
+      "problem": "Pending queue too long",
+      "fix": "Use bulk actions to skip or archive multiple entries at once"
+    },
+    {
+      "problem": "Template not applying",
+      "fix": "Templates only set default values — you can still modify everything after applying"
+    }
+  ],
+  "glossary": [
+    { "term": "Pending", "meaning": "Auto-captured trades awaiting your notes and confirmation" },
+    { "term": "Confirmed", "meaning": "Trades you've reviewed and documented with full details" },
+    { "term": "Archived", "meaning": "Historical trades in the logbook (includes skipped entries)" },
+    { "term": "Thesis", "meaning": "Your reasoning and analysis for entering a trade" },
+    { "term": "Emotional State", "meaning": "How you felt when making trading decisions (FOMO, confident, fearful, etc.)" },
+    { "term": "Template", "meaning": "A saved configuration of default values for faster entry" },
+    { "term": "Partial Exit", "meaning": "Closing part of a position while keeping the rest open" }
+  ]
+}

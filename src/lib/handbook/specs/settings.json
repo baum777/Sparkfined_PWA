@@ -1,0 +1,260 @@
+{
+  "id": "settings",
+  "route": "/settings",
+  "title": "Settings",
+  "purpose": "Configure your trading environment — wallets, notifications, chart preferences, and data management.",
+  "prerequisites": [],
+  "flows": [
+    {
+      "id": "connect-wallet",
+      "title": "Connect Wallet",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "find-section",
+          "title": "Find Connected Wallets",
+          "userAction": "Scroll to 'Connected Wallets' section",
+          "systemBehavior": "Shows wallet connection UI",
+          "outcome": "Ready to connect"
+        },
+        {
+          "id": "click-connect",
+          "title": "Click Connect",
+          "userAction": "Click 'Connect Wallet' button",
+          "systemBehavior": "Opens wallet selection dialog",
+          "outcome": "Choose wallet type",
+          "cta": { "label": "Connect Wallet", "action": "open:modal/connect-wallet" }
+        },
+        {
+          "id": "select-wallet",
+          "title": "Select Wallet",
+          "userAction": "Choose wallet type (Phantom, Solflare, etc.)",
+          "systemBehavior": "Initiates connection with wallet extension",
+          "outcome": "Wallet connection in progress"
+        },
+        {
+          "id": "approve-connection",
+          "title": "Approve Connection",
+          "userAction": "Approve in your wallet extension",
+          "systemBehavior": "Wallet linked to your account",
+          "outcome": "Wallet connected successfully"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Wallet not installed",
+          "steps": [
+            {
+              "id": "install-wallet",
+              "title": "Install Wallet Extension",
+              "userAction": "Click 'Install' link for your wallet",
+              "systemBehavior": "Opens wallet extension store page",
+              "outcome": "Install, then return to connect"
+            }
+          ]
+        },
+        {
+          "when": "Want to add multiple wallets",
+          "steps": [
+            {
+              "id": "add-another",
+              "title": "Add Another Wallet",
+              "userAction": "Click 'Add Wallet' again",
+              "systemBehavior": "Opens selection for additional wallet",
+              "outcome": "Multiple wallets tracked"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "configure-notifications",
+      "title": "Configure Notifications",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "open-notifications",
+          "title": "Open Notifications Section",
+          "userAction": "Click on 'Notifications' section",
+          "systemBehavior": "Expands notification settings",
+          "outcome": "See all notification options"
+        },
+        {
+          "id": "toggle-types",
+          "title": "Toggle Notification Types",
+          "userAction": "Enable/disable each notification type",
+          "systemBehavior": "Saves preferences immediately",
+          "outcome": "Notifications customized"
+        },
+        {
+          "id": "set-channels",
+          "title": "Set Notification Channels",
+          "userAction": "Choose push, email, or in-app for each type",
+          "systemBehavior": "Updates delivery preferences",
+          "outcome": "Notifications delivered your way"
+        }
+      ]
+    },
+    {
+      "id": "chart-preferences",
+      "title": "Set Chart Preferences",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "open-chart-prefs",
+          "title": "Open Chart Preferences",
+          "userAction": "Click 'Chart' section",
+          "systemBehavior": "Shows chart customization options",
+          "outcome": "Ready to customize"
+        },
+        {
+          "id": "set-default-tf",
+          "title": "Set Default Timeframe",
+          "userAction": "Select your preferred default timeframe",
+          "systemBehavior": "Charts open with this timeframe",
+          "outcome": "Faster chart workflow"
+        },
+        {
+          "id": "choose-theme",
+          "title": "Choose Chart Theme",
+          "userAction": "Select candle colors and style",
+          "systemBehavior": "Applies visual preferences",
+          "outcome": "Chart looks how you like"
+        }
+      ]
+    },
+    {
+      "id": "journal-settings",
+      "title": "Configure Journal Settings",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "open-journal-settings",
+          "title": "Open Journal Data Section",
+          "userAction": "Click 'Journal Data' section",
+          "systemBehavior": "Shows journal configuration",
+          "outcome": "See data capture options"
+        },
+        {
+          "id": "select-preset",
+          "title": "Select Data Preset",
+          "userAction": "Choose Minimal, Default, or Maximum",
+          "systemBehavior": "Adjusts what data is captured per entry",
+          "outcome": "Balance between detail and simplicity"
+        },
+        {
+          "id": "customize-timeframes",
+          "title": "Customize Timeframes",
+          "userAction": "Add or remove market context timeframes",
+          "systemBehavior": "Updates what timeframes are analyzed",
+          "outcome": "Relevant context captured"
+        }
+      ]
+    },
+    {
+      "id": "export-data",
+      "title": "Export Your Data",
+      "level": "advanced",
+      "steps": [
+        {
+          "id": "find-export",
+          "title": "Find Data Export",
+          "userAction": "Scroll to 'Data Export' section",
+          "systemBehavior": "Shows export options",
+          "outcome": "Ready to backup data"
+        },
+        {
+          "id": "select-format",
+          "title": "Select Export Format",
+          "userAction": "Choose JSON or CSV",
+          "systemBehavior": "Prepares data in selected format",
+          "outcome": "Format selected"
+        },
+        {
+          "id": "download",
+          "title": "Download Backup",
+          "userAction": "Click 'Export' button",
+          "systemBehavior": "Generates and downloads file",
+          "outcome": "Data safely backed up"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Want to import data",
+          "steps": [
+            {
+              "id": "import-data",
+              "title": "Import Data",
+              "userAction": "Click 'Import' and select file",
+              "systemBehavior": "Validates and imports data",
+              "outcome": "Data restored or migrated"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "factory-reset",
+      "title": "Factory Reset",
+      "level": "advanced",
+      "steps": [
+        {
+          "id": "find-reset",
+          "title": "Find Factory Reset",
+          "userAction": "Scroll to 'Danger Zone' section",
+          "systemBehavior": "Shows reset options",
+          "outcome": "Reset options visible"
+        },
+        {
+          "id": "click-reset",
+          "title": "Click Reset",
+          "userAction": "Click 'Factory Reset' button",
+          "systemBehavior": "Shows confirmation dialog with warnings",
+          "outcome": "Confirm before proceeding"
+        },
+        {
+          "id": "confirm",
+          "title": "Confirm Reset",
+          "userAction": "Type confirmation text and click confirm",
+          "systemBehavior": "Deletes all data and settings",
+          "outcome": "Fresh start"
+        }
+      ]
+    }
+  ],
+  "shortcuts": [
+    { "keys": "?", "action": "Toggle this handbook panel" },
+    { "keys": "⌘+,", "action": "Open Settings (from any page)" }
+  ],
+  "pitfalls": [
+    {
+      "problem": "Settings not saving",
+      "fix": "Check browser storage permissions and ensure you're not in private mode"
+    },
+    {
+      "problem": "Wallet disconnected unexpectedly",
+      "fix": "Re-connect wallet. Check for browser extension updates or conflicts."
+    },
+    {
+      "problem": "Notifications not working",
+      "fix": "Ensure browser notifications are enabled in system settings",
+      "cta": { "label": "Check Notifications", "action": "scroll:notifications" }
+    },
+    {
+      "problem": "Export file empty or corrupted",
+      "fix": "Try a different format (JSON vs CSV) or check if data exists in journal"
+    },
+    {
+      "problem": "Can't undo factory reset",
+      "fix": "Factory reset is permanent. Always export a backup before resetting."
+    }
+  ],
+  "glossary": [
+    { "term": "RPC", "meaning": "Remote Procedure Call — how the app communicates with blockchain" },
+    { "term": "Export", "meaning": "Download your data as a file for backup or transfer" },
+    { "term": "Import", "meaning": "Upload a data file to restore or migrate settings" },
+    { "term": "Factory Reset", "meaning": "Delete all data and return to fresh install state" },
+    { "term": "Preset", "meaning": "Pre-configured group of settings for quick setup" },
+    { "term": "Channel", "meaning": "How you receive notifications (push, email, in-app)" }
+  ]
+}

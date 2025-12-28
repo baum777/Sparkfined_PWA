@@ -1,96 +1,76 @@
-import React from 'react'
-import { SettingsProvider } from './state/settings'
-import { TelemetryProvider } from './state/telemetry'
-import { AIProviderState } from './state/ai'
-import RoutesRoot from './routes/RoutesRoot'
-import MissingConfigBanner from './components/MissingConfigBanner'
-import OfflineIndicator from './components/pwa/OfflineIndicator'
-import UpdateBanner from './components/UpdateBanner'
-import './styles/theme.css'
-import './styles/ui.css'
-import './styles/App.css'
-import { ThemeProvider } from '@/features/theme/ThemeContext'
-import { checkAlerts, notifyAlertTriggered } from '@/lib/alerts/triggerEngine'
-import { useAlertsStore } from '@/store/alertsStore'
-import { ToastProvider } from '@/components/ui/Toast'
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider } from "next-themes";
+import { AppShell } from "@/features/shell";
+import { HandbookPanelProvider } from "@/hooks/useHandbookPanel";
+import { HandbookSheet, GlobalActionHandler } from "@/components/handbook";
+import Dashboard from "./pages/Dashboard";
+import Journal from "./pages/Journal";
+import Learn from "./pages/Learn";
+import Chart from "./pages/Chart";
+import Alerts from "./pages/Alerts";
+import SettingsPage from "./pages/SettingsPage";
+import Watchlist from "./pages/Watchlist";
+import Oracle from "./pages/Oracle";
+import Replay from "./pages/Replay";
+import Handbook from "./pages/Handbook";
+import NotFound from "./pages/NotFound";
 
-function App() {
-  React.useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
+import { WalletContextProvider } from "@/components/WalletContextProvider";
 
-    let isRunning = false
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { WalletGuard } from "@/components/WalletGuard";
 
-    const runCheck = async () => {
-      if (isRunning) {
-        return
-      }
+const queryClient = new QueryClient();
 
-      isRunning = true
+const App = () => (
+  <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <WalletContextProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <HandbookPanelProvider>
+                <HandbookSheet />
+                <GlobalActionHandler />
+                <Routes>
+                  <Route element={<AppShell />}>
+                    {/* Primary tabs */}
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/journal" element={
+                      <WalletGuard>
+                        <Journal />
+                      </WalletGuard>
+                    } />
+                    <Route path="/lessons" element={<Learn />} />
+                    <Route path="/chart" element={<Chart />} />
+                    <Route path="/chart/replay" element={<Replay />} />
+                    <Route path="/alerts" element={<Alerts />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+                    {/* Secondary tabs (Advanced) */}
+                    <Route path="/watchlist" element={<Watchlist />} />
+                    <Route path="/oracle" element={<Oracle />} />
+                    <Route path="/handbook" element={<Handbook />} />
+                    {/* Legacy /replay redirect to /chart/replay */}
+                    <Route path="/replay" element={<Replay />} />
+                    {/* Alias: /learn redirects to /lessons */}
+                    <Route path="/learn" element={<Learn />} />
+                  </Route>
+                  {/* Catch-all for unknown routes */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </HandbookPanelProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </WalletContextProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  </ThemeProvider>
+);
 
-      try {
-        const { alerts } = useAlertsStore.getState()
-        const armedAlerts = alerts.filter((alert) => alert.status === 'armed')
-
-        if (!armedAlerts.length) {
-          return
-        }
-
-        const triggeredAlerts = await checkAlerts(armedAlerts)
-
-        if (triggeredAlerts.length) {
-          const { updateAlert } = useAlertsStore.getState()
-          triggeredAlerts.forEach(({ alert, price }) => {
-            updateAlert(alert.id, { status: 'triggered' })
-            notifyAlertTriggered(alert, price)
-          })
-        }
-      } catch (error) {
-        console.error('Error while checking alerts', error)
-      } finally {
-        isRunning = false
-      }
-    }
-
-    const intervalId = window.setInterval(runCheck, 60_000)
-    runCheck()
-
-    return () => {
-      window.clearInterval(intervalId)
-    }
-  }, [])
-
-  return (
-    <>
-      <TelemetryProvider>
-        <SettingsProvider>
-          <ThemeProvider>
-            <AIProviderState>
-              <ToastProvider>
-              {/* Missing Config Banner */}
-              <MissingConfigBanner />
-
-              {/* Update + Offline indicators (fixed overlays) */}
-              <UpdateBanner />
-              <OfflineIndicator />
-
-              {/* Skip to main content link (A11y) */}
-              <a
-                href="#main-content"
-                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-emerald-500 focus:px-4 focus:py-2 focus:text-white focus:shadow-lg"
-              >
-                Skip to main content
-              </a>
-
-              <RoutesRoot />
-              </ToastProvider>
-            </AIProviderState>
-          </ThemeProvider>
-        </SettingsProvider>
-      </TelemetryProvider>
-    </>
-  )
-}
-
-export default App
+export default App;

@@ -1,0 +1,699 @@
+
+> sparkfined-pwa@0.1.0 lint C:\workspace\Sparkfined_PWA
+> eslint .
+
+
+C:\workspace\Sparkfined_PWA\api\tx\monitor.test.ts
+  46:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  65:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\ai\analyze-market.ts
+  203:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  219:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\ai\assist.ts
+    6:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  136:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  206:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  302:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  303:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  313:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  317:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  342:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  343:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  354:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\alerts\dispatch.ts
+  18:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\alerts\worker.ts
+  39:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  48:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\backtest.ts
+  28:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  63:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  80:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\board\feed.ts
+  141:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\board\kpis.ts
+  115:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\data\ohlc.ts
+   4:19   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:18   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:53   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:12   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:104  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  63:25   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  64:22   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\grok-pulse\sentiment.ts
+  29:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\ideas\attach-trigger.ts
+  5:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\ideas\close.ts
+  5:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\ideas\export-pack.ts
+  7:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\ideas\index.ts
+   4:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  48:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\journal\index.ts
+  14:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\market\ohlc.ts
+  21:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  68:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\push\subscribe.ts
+  16:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\push\test-send.ts
+  27:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\push\unsubscribe.ts
+  12:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\rules\eval-cron.ts
+   6:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  30:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  48:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  59:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  59:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  96:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  97:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  98:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\rules\eval.ts
+  19:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\rules\index.ts
+  6:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\shortlink.ts
+  12:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  17:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\api_legacy\wallet\webhook.ts
+  84:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  85:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\loveable-import\_incoming\src\components\ui\badge.tsx
+  31:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\loveable-import\_incoming\src\components\ui\button.tsx
+  47:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\loveable-import\_incoming\src\components\ui\command.tsx
+  24:11  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+C:\workspace\Sparkfined_PWA\loveable-import\_incoming\src\components\ui\form.tsx
+  129:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\loveable-import\_incoming\src\components\ui\navigation-menu.tsx
+  111:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\loveable-import\_incoming\src\components\ui\sidebar.tsx
+  636:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\loveable-import\_incoming\src\components\ui\sonner.tsx
+  27:19  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\loveable-import\_incoming\src\components\ui\textarea.tsx
+  5:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+C:\workspace\Sparkfined_PWA\loveable-import\_incoming\src\components\ui\toggle.tsx
+  37:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\ai\ingest\devIngest.ts
+  15:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  17:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\ai\ingest\eventSubscriptions.ts
+  58:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  59:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\app\AppErrorBoundary.tsx
+  26:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\components\JournalBadge.tsx
+  44:6  warning  React Hook React.useEffect has a missing dependency: 'loadTempCount'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\workspace\Sparkfined_PWA\src.legacy\components\PatternDashboard.tsx
+  134:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\components\board\Feed.tsx
+  63:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\components\journal\EmotionalSlider.tsx
+  30:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\components\journal\templates\TemplateManagerSheet.tsx
+  64:6  warning  React Hook React.useEffect has a missing dependency: 'selected'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\workspace\Sparkfined_PWA\src.legacy\components\onboarding\KeyboardShortcuts.tsx
+  63:26  error  React Hook "useRef" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?        react-hooks/rules-of-hooks
+  64:21  error  React Hook "useId" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?         react-hooks/rules-of-hooks
+  65:20  error  React Hook "useFocusTrap" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+C:\workspace\Sparkfined_PWA\src.legacy\components\onboarding\OnboardingWizard.tsx
+  65:24  error  React Hook "React.useCallback" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+C:\workspace\Sparkfined_PWA\src.legacy\components\oracle\OracleHistoryChart.tsx
+  26:9  warning  The 'padding' object makes the dependencies of useMemo Hook (at line 42) change on every render. To fix this, wrap the initialization of 'padding' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+C:\workspace\Sparkfined_PWA\src.legacy\components\ui\KeyboardShortcutsDialog.tsx
+  90:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\components\ui\Toast.tsx
+  34:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\diagnostics\bootguard.ts
+  26:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  27:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:72  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\diagnostics\crash-report.ts
+   53:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   54:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  162:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  163:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  164:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  165:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\features\alerts\AlertTemplates.tsx
+  20:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\features\alerts\AlertsPage.tsx
+  76:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\features\analysis\AdvancedInsightCard.tsx
+   58:6   warning  React Hook useEffect has a missing dependency: 'telemetry'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  195:11  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\features\analysis\__tests__\AdvancedInsightCard.test-double.tsx
+  17:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\features\analysis\advancedInsightStore.ts
+   25:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  146:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  167:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\features\chart\InlineJournalNotes.tsx
+  117:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\features\chart\toolbar-sections.tsx
+   18:7  warning  Fast refresh only works when a file only exports components. Move your component(s) to a separate file  react-refresh/only-export-components
+   31:7  warning  Fast refresh only works when a file only exports components. Move your component(s) to a separate file  react-refresh/only-export-components
+   52:7  warning  Fast refresh only works when a file only exports components. Move your component(s) to a separate file  react-refresh/only-export-components
+   73:7  warning  Fast refresh only works when a file only exports components. Move your component(s) to a separate file  react-refresh/only-export-components
+   84:7  warning  Fast refresh only works when a file only exports components. Move your component(s) to a separate file  react-refresh/only-export-components
+  110:7  warning  Fast refresh only works when a file only exports components. Move your component(s) to a separate file  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\features\journal-v2\components\JournalInputForm.tsx
+  166:5  warning  React Hook useImperativeHandle has unnecessary dependencies: 'emotionalScore', 'expectation', 'marketContext', 'reasoning', and 'selfReflection'. Either exclude them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\workspace\Sparkfined_PWA\src.legacy\features\journal\MarketRegimeSelector.tsx
+  12:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\features\theme\ThemeContext.tsx
+  20:14  warning  Fast refresh only works when a file only exports components. Move your React context(s) to a separate file  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\hooks\useAdvancedInsight.ts
+  110:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\hooks\useBoardFeed.ts
+  116:21  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  135:6   warning  React Hook useEffect has a missing dependency: 'fetchFeed'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\workspace\Sparkfined_PWA\src.legacy\hooks\useBoardKPIs.ts
+  91:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\hooks\useFocusManagement.tsx
+   4:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  47:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  61:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  75:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  97:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\adapters\__tests__\dexpaprikaAdapter.test.ts
+   76:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  143:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  159:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  189:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  209:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  231:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  260:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  275:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  288:87  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  304:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  330:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  354:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\adapters\dexscreenerOHLCAdapter.ts
+  30:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  31:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\adapters\moralisAdapter.ts
+  134:88  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  161:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  174:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  201:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  270:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\aiClient.ts
+  1:108  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:25   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\datastore.ts
+  59:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\db.ts
+  59:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\debug-assets.ts
+   56:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\ideas.ts
+  39:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\journal\auto-capture.ts
+   73:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  329:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\kv.ts
+   7:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:80  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\live\PricePollingService.ts
+  244:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\ocr\ocrService.ts
+  111:39  error  Unnecessary escape character: \(  no-useless-escape
+  126:43  error  Unnecessary escape character: \(  no-useless-escape
+  126:55  error  Unnecessary escape character: \)  no-useless-escape
+  140:43  error  Unnecessary escape character: \(  no-useless-escape
+  140:55  error  Unnecessary escape character: \)  no-useless-escape
+  154:35  error  Unnecessary escape character: \$  no-useless-escape
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\offline-sync.ts
+  32:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  73:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\perf.ts
+   2:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   2:50  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   3:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:50  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:50  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\priceAdapter.ts
+  64:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  76:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  93:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\push.ts
+   25:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\ruleToken.ts
+  3:9  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\templates.ts
+   5:69  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:68  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\theme\theme-provider.tsx
+  3:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  4:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  5:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  6:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  7:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\lib\walletMonitor.ts
+  241:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\main.tsx
+   37:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  146:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  151:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  174:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\pages\AnalysisPage.tsx
+  89:6  warning  React Hook React.useEffect has missing dependencies: 'searchParams' and 'setSearchParams'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\workspace\Sparkfined_PWA\src.legacy\pages\NotificationsPage.tsx
+   24:44   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:51   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:76   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:54   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:79   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:37   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  150:61   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  150:86   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  192:29   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  230:172  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  377:208  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\pages\ReplayPage.tsx
+   93:52  error    Unexpected any. Specify a different type                                                                           @typescript-eslint/no-explicit-any
+  189:6   warning  React Hook useEffect has a missing dependency: 'candles.length'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\workspace\Sparkfined_PWA\src.legacy\sections\ai\useAssist.ts
+  35:106  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\sections\notifications\RuleEditor.tsx
+  16:128  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:114  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:116  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\sections\notifications\RuleWizard.tsx
+   5:68  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+   8:61  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  12:28  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  15:32  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  21:6   warning  React Hook React.useEffect has a missing dependency: 'preset.fields'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  39:94  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  51:86  error    Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\sections\notifications\presets.ts
+  13:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  13:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\sections\notifications\useAlertRules.ts
+  22:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:79  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  58:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  72:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\sections\telemetry\PerfSampler.tsx
+  14:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:65  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\sections\telemetry\TokenOverlay.tsx
+  18:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:64  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:64  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:80  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\state\ai.tsx
+  33:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\state\settings.tsx
+  20:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  77:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\state\telemetry.tsx
+  122:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src.legacy\types\confluence-alerts.ts
+  211:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src.legacy\utils\detectPII.ts
+  22:11  error  Unnecessary escape character: \-  no-useless-escape
+  22:29  error  Unnecessary escape character: \-  no-useless-escape
+  22:43  error  Unnecessary escape character: \-  no-useless-escape
+  25:22  error  Unnecessary escape character: \-  no-useless-escape
+  25:36  error  Unnecessary escape character: \-  no-useless-escape
+  31:13  error  Unnecessary escape character: \-  no-useless-escape
+  31:49  error  Unnecessary escape character: \-  no-useless-escape
+  31:61  error  Unnecessary escape character: \-  no-useless-escape
+  31:79  error  Unnecessary escape character: \-  no-useless-escape
+
+C:\workspace\Sparkfined_PWA\src.legacy\utils\sanitizePII.ts
+  56:11  error  Unnecessary escape character: \-  no-useless-escape
+  56:29  error  Unnecessary escape character: \-  no-useless-escape
+  56:43  error  Unnecessary escape character: \-  no-useless-escape
+  59:22  error  Unnecessary escape character: \-  no-useless-escape
+  59:36  error  Unnecessary escape character: \-  no-useless-escape
+  71:13  error  Unnecessary escape character: \-  no-useless-escape
+  71:49  error  Unnecessary escape character: \-  no-useless-escape
+  71:61  error  Unnecessary escape character: \-  no-useless-escape
+  71:79  error  Unnecessary escape character: \-  no-useless-escape
+
+C:\workspace\Sparkfined_PWA\src\components\ui\badge.tsx
+  52:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src\components\ui\button.tsx
+  62:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src\components\ui\card.tsx
+  82:81  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src\components\ui\command.tsx
+  24:11  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+C:\workspace\Sparkfined_PWA\src\components\ui\form.tsx
+  129:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src\components\ui\input.tsx
+  52:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src\components\ui\navigation-menu.tsx
+  111:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src\components\ui\sidebar.tsx
+  646:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src\components\ui\sonner.tsx
+  27:19  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src\components\ui\textarea.tsx
+  57:20  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src\components\ui\toggle.tsx
+  37:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src\features\journal\journal-entry-extended-logic.test.ts
+  18:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  27:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src\features\journal\journal-entry-extended-logic.ts
+  88:7  error  'updates' is never reassigned. Use 'const' instead  prefer-const
+
+C:\workspace\Sparkfined_PWA\src\features\journal\useJournalStore.ts
+   55:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   58:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   81:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src\features\journal\views\LogbookView.tsx
+  100:7  error  Unexpected lexical declaration in case block  no-case-declarations
+  104:7  error  Unexpected lexical declaration in case block  no-case-declarations
+
+C:\workspace\Sparkfined_PWA\src\hooks\useHandbookPanel.ts
+  34:10  error  React Hook "useHandbookPanelInternal" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+C:\workspace\Sparkfined_PWA\src\lib\api\market.ts
+   12:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   13:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   96:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src\lib\handbook\dispatchHandbookAction.ts
+  60:9  error  Unexpected lexical declaration in case block  no-case-declarations
+  75:9  error  Unexpected lexical declaration in case block  no-case-declarations
+
+C:\workspace\Sparkfined_PWA\src\lib\journal\txTypes.ts
+  20:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\src_pre_mastery\components\ui\badge.tsx
+  31:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src_pre_mastery\components\ui\button.tsx
+  47:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src_pre_mastery\components\ui\command.tsx
+  24:11  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+C:\workspace\Sparkfined_PWA\src_pre_mastery\components\ui\form.tsx
+  129:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src_pre_mastery\components\ui\navigation-menu.tsx
+  111:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src_pre_mastery\components\ui\sidebar.tsx
+  636:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src_pre_mastery\components\ui\sonner.tsx
+  27:19  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\src_pre_mastery\components\ui\textarea.tsx
+  5:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+C:\workspace\Sparkfined_PWA\src_pre_mastery\components\ui\toggle.tsx
+  37:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\workspace\Sparkfined_PWA\tailwind.config.ts
+  144:13  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\workspace\Sparkfined_PWA\tests\api\ai-cost-guards.test.ts
+  228:9  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\api\ideas.contract.test.ts
+  32:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\api\ideas.one-click-packet.test.ts
+  40:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\api\journal.contract.test.ts
+  31:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\api\push-notifications.test.ts
+   87:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  101:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:62  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  127:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  135:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  151:80  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  164:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  166:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  169:82  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  510:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  585:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\api\rules.contract.test.ts
+  31:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\api\rules.eval.test.ts
+  18:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\api\setup.ts
+   59:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   71:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   97:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  137:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  148:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\cases\analyze-bullets-ai\ABA-INTEG-010.test.ts
+  15:68  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:80  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\e2e\alerts\alerts.push.spec.ts
+   8:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  13:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\e2e\fixtures\baseTest.ts
+  17:11  error  React Hook "use" is called in function "page" that is neither a React function component nor a custom React Hook function. React component names must start with an uppercase letter. React Hook names must start with the word "use"  react-hooks/rules-of-hooks
+
+C:\workspace\Sparkfined_PWA\tests\e2e\pwa.spec.ts
+  69:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\grokPulse\grokPulse.api.test.ts
+   83:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\grokPulse\grokPulse.e2e.test.tsx
+  206:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  238:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\mocks\push-manager.ts
+   4:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\unit\ai\backend\orchestrator.test.ts
+   88:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  155:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  173:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  212:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  218:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  240:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  246:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  283:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  289:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  316:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  322:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  378:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  384:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  445:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  451:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\unit\ai\backend\socialHeuristics.test.ts
+  15:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  46:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\unit\annotations.test.ts
+  11:6  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:6  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\unit\chartSnapshots.test.ts
+  29:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\unit\journal.v2-hook.test.tsx
+  45:73  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\unit\market-ohlc-handler.test.ts
+   5:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   9:8   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:8   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  76:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\unit\moralisProxy.handler.test.ts
+  35:66  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  58:10  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  75:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\workspace\Sparkfined_PWA\tests\unit\trade-events.watcher.test.ts
+  42:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 388 problems (327 errors, 61 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+
+ÔÇëELIFECYCLEÔÇë Command failed with exit code 1.

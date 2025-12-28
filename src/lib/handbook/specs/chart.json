@@ -1,0 +1,252 @@
+{
+  "id": "chart",
+  "route": "/chart",
+  "title": "Chart",
+  "purpose": "Analyze price action with professional charting tools and replay historical trades.",
+  "prerequisites": [],
+  "flows": [
+    {
+      "id": "basic-charting",
+      "title": "Basic Charting",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "select-token",
+          "title": "Select Token",
+          "userAction": "Use search bar or click from sidebar list",
+          "systemBehavior": "Loads chart with price data and volume",
+          "outcome": "Chart displays selected token"
+        },
+        {
+          "id": "change-timeframe",
+          "title": "Change Timeframe",
+          "userAction": "Click timeframe buttons (1m, 5m, 15m, 1h, 4h, 1D)",
+          "systemBehavior": "Reloads candles for selected interval",
+          "outcome": "View different time perspectives"
+        },
+        {
+          "id": "zoom-pan",
+          "title": "Zoom & Pan",
+          "userAction": "Scroll to zoom, drag to pan left/right",
+          "systemBehavior": "Adjusts visible range smoothly",
+          "outcome": "Focus on specific price areas"
+        },
+        {
+          "id": "check-price",
+          "title": "Check Current Price",
+          "userAction": "Look at the price display in top bar",
+          "systemBehavior": "Shows live price with 24h change",
+          "outcome": "Know where price is now"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Token not in sidebar",
+          "steps": [
+            {
+              "id": "search-token",
+              "title": "Search for Token",
+              "userAction": "Type token name or paste contract address",
+              "systemBehavior": "Searches and adds to temporary list",
+              "outcome": "Token loaded on chart"
+            },
+            {
+              "id": "add-watchlist",
+              "title": "Add to Watchlist",
+              "userAction": "Click star icon",
+              "systemBehavior": "Saves to your watchlist",
+              "outcome": "Quick access next time",
+              "cta": { "label": "View Watchlist", "action": "nav:/watchlist" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "add-indicators",
+      "title": "Add Technical Indicators",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "open-indicators",
+          "title": "Open Indicators Menu",
+          "userAction": "Click 'Indicators' button in toolbar",
+          "systemBehavior": "Shows list of available indicators",
+          "outcome": "Browse indicator options"
+        },
+        {
+          "id": "select-indicator",
+          "title": "Select Indicator",
+          "userAction": "Click on indicator name (e.g., RSI, MACD)",
+          "systemBehavior": "Adds indicator to chart",
+          "outcome": "Technical analysis enhanced"
+        },
+        {
+          "id": "configure",
+          "title": "Configure Settings",
+          "userAction": "Click gear icon on indicator",
+          "systemBehavior": "Opens settings panel",
+          "outcome": "Customize parameters"
+        }
+      ]
+    },
+    {
+      "id": "draw-tools",
+      "title": "Use Drawing Tools",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "select-tool",
+          "title": "Select Drawing Tool",
+          "userAction": "Click tool icon in toolbar (trendline, horizontal, fib)",
+          "systemBehavior": "Activates drawing mode",
+          "outcome": "Ready to draw on chart"
+        },
+        {
+          "id": "draw",
+          "title": "Draw on Chart",
+          "userAction": "Click and drag to place drawing",
+          "systemBehavior": "Creates the drawing with snap-to-candle",
+          "outcome": "Analysis visualized"
+        },
+        {
+          "id": "adjust",
+          "title": "Adjust Drawing",
+          "userAction": "Click and drag handles",
+          "systemBehavior": "Moves or resizes the drawing",
+          "outcome": "Fine-tuned placement"
+        },
+        {
+          "id": "delete",
+          "title": "Delete Drawing",
+          "userAction": "Select and press Delete or click trash icon",
+          "systemBehavior": "Removes the drawing",
+          "outcome": "Chart cleaned up"
+        }
+      ]
+    },
+    {
+      "id": "replay-mode",
+      "title": "Replay Historical Data",
+      "level": "advanced",
+      "steps": [
+        {
+          "id": "enter-replay",
+          "title": "Enter Replay Mode",
+          "userAction": "Click 'Replay' button in toolbar",
+          "systemBehavior": "Switches to replay controls",
+          "outcome": "Ready to review past price action",
+          "cta": { "label": "Open Replay", "action": "nav:/chart/replay" }
+        },
+        {
+          "id": "set-date",
+          "title": "Set Replay Date",
+          "userAction": "Pick a historical date and time",
+          "systemBehavior": "Loads candles up to that point",
+          "outcome": "Chart shows historical state"
+        },
+        {
+          "id": "play-forward",
+          "title": "Play Forward",
+          "userAction": "Press play to advance candles",
+          "systemBehavior": "Reveals candles one by one at set speed",
+          "outcome": "Simulate real-time trading decisions"
+        },
+        {
+          "id": "step-candle",
+          "title": "Step Through Candles",
+          "userAction": "Use arrow buttons or keyboard arrows",
+          "systemBehavior": "Moves one candle at a time",
+          "outcome": "Precise control over replay"
+        },
+        {
+          "id": "practice-entry",
+          "title": "Practice Entry",
+          "userAction": "Click 'Mark Entry' when you would buy",
+          "systemBehavior": "Records your simulated entry point",
+          "outcome": "Build paper trading skills"
+        }
+      ],
+      "branches": [
+        {
+          "when": "Reviewing a past trade",
+          "steps": [
+            {
+              "id": "load-trade",
+              "title": "Load Trade from Journal",
+              "userAction": "Click 'Load Trade' and select entry",
+              "systemBehavior": "Sets replay to trade entry time",
+              "outcome": "Relive your actual decision",
+              "cta": { "label": "View Journal", "action": "nav:/journal" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "set-alert-from-chart",
+      "title": "Set Alert from Chart",
+      "level": "basic",
+      "steps": [
+        {
+          "id": "right-click",
+          "title": "Right-Click Price Level",
+          "userAction": "Right-click on the price you want to alert",
+          "systemBehavior": "Opens context menu",
+          "outcome": "Quick alert option visible"
+        },
+        {
+          "id": "set-alert",
+          "title": "Set Alert Here",
+          "userAction": "Click 'Set Alert'",
+          "systemBehavior": "Creates alert at that price",
+          "outcome": "Alert active immediately"
+        }
+      ]
+    }
+  ],
+  "shortcuts": [
+    { "keys": "?", "action": "Toggle this handbook panel" },
+    { "keys": "Space", "action": "Play/Pause replay" },
+    { "keys": "←", "action": "Step back one candle" },
+    { "keys": "→", "action": "Step forward one candle" },
+    { "keys": "1-6", "action": "Switch timeframe (1m, 5m, 15m, 1h, 4h, 1D)" },
+    { "keys": "T", "action": "Toggle trendline tool" },
+    { "keys": "H", "action": "Toggle horizontal line tool" },
+    { "keys": "F", "action": "Toggle Fibonacci tool" },
+    { "keys": "Esc", "action": "Cancel current drawing / Exit mode" },
+    { "keys": "Del", "action": "Delete selected drawing" }
+  ],
+  "pitfalls": [
+    {
+      "problem": "Chart not loading",
+      "fix": "Check internet connection and try refreshing. Some tokens may have limited data."
+    },
+    {
+      "problem": "Candles look wrong or gaps",
+      "fix": "Switch to a higher timeframe — lower timeframes may have sparse data for low-volume tokens"
+    },
+    {
+      "problem": "Drawings disappeared",
+      "fix": "Drawings are saved per token. Switch back to the token where you drew them."
+    },
+    {
+      "problem": "Replay not starting",
+      "fix": "Ensure you've selected a date in the past. Replay cannot show future data."
+    },
+    {
+      "problem": "Indicators not calculating",
+      "fix": "Some indicators need minimum candles. Zoom out to load more history."
+    }
+  ],
+  "glossary": [
+    { "term": "Candle", "meaning": "A bar showing open, high, low, close prices for a time period" },
+    { "term": "Timeframe", "meaning": "The duration each candle represents (1m = 1 minute, 1D = 1 day)" },
+    { "term": "Replay", "meaning": "Mode to review historical price action step by step" },
+    { "term": "OHLC", "meaning": "Open, High, Low, Close — the four price points in each candle" },
+    { "term": "Volume", "meaning": "Amount of tokens traded in a time period" },
+    { "term": "RSI", "meaning": "Relative Strength Index — momentum indicator showing overbought/oversold" },
+    { "term": "MACD", "meaning": "Moving Average Convergence Divergence — trend and momentum indicator" },
+    { "term": "Fibonacci", "meaning": "Retracement levels based on Fibonacci ratios (23.6%, 38.2%, 50%, 61.8%)" }
+  ]
+}
