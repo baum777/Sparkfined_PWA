@@ -1,6 +1,6 @@
 import { useSyncExternalStore, useCallback, useEffect } from "react";
 import { notifyContextChange } from "@/lib/handbook/handbookContext";
-import { db } from "@/lib/db/db";
+import { db } from "./journal-db-schema";
 import type {
   AutoCapturedEntry,
   ArchivedEntry,
