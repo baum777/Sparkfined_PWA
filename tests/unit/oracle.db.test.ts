@@ -18,7 +18,7 @@ import {
   markOracleReportAsNotified,
   getAllOracleReports,
   clearAllOracleReports,
-} from '../../src/lib/db-oracle';
+} from '../../src.legacy/lib/db-oracle';
 import type { OracleReport } from '../../src/types/oracle';
 
 // Check if IndexedDB is available (browser environment)

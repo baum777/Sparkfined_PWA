@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import handler, { __clearMoralisProxyCacheForTests } from '../../api/moralis/[...path]'
+import handler, { __clearMoralisProxyCacheForTests } from '../../api_legacy/moralis/[...path]'
 
 describe('api/moralis catch-all', () => {
   const originalFetch = globalThis.fetch

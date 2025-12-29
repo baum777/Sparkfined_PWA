@@ -1,8 +1,8 @@
 export const runtime = "nodejs";
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { Providers } from "../../src/config/providers";
-import { incrementFallback } from "../../src/lib/metrics/providerFallback";
+import { Providers } from "../../src.legacy/config/providers";
+import { incrementFallback } from "../../src.legacy/lib/metrics/providerFallback";
 
 type Ohlc = { t: number; o: number; h: number; l: number; c: number; v?: number };
 
