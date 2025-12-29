@@ -1,7 +1,10 @@
 import { useLocation } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
-import { primaryNavItems } from "@/config/navigation";
+import { primaryNavItems, secondaryNavItems } from "@/config/navigation";
 import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, MoreHorizontal } from "lucide-react";
+import { useState } from "react";
 
 function isNavItemActive(item: typeof primaryNavItems[0], pathname: string): boolean {
   if (item.activeRoutes) {
@@ -12,6 +15,11 @@ function isNavItemActive(item: typeof primaryNavItems[0], pathname: string): boo
 
 export function MobileBottomNav() {
   const location = useLocation();
+  const [open, setOpen] = useState(false);
+
+  // Show first 4 items in bottom bar, rest in drawer
+  const bottomNavItems = primaryNavItems.slice(0, 4);
+  const drawerPrimaryItems = primaryNavItems.slice(4);
 
   return (
     <nav
@@ -21,7 +29,7 @@ export function MobileBottomNav() {
       aria-label="Primary navigation"
     >
       <div className="flex h-16 items-center justify-around px-2">
-        {primaryNavItems.map((item) => {
+        {bottomNavItems.map((item) => {
           const isActive = isNavItemActive(item, location.pathname);
           return (
             <NavLink
@@ -54,6 +62,57 @@ export function MobileBottomNav() {
             </NavLink>
           );
         })}
+
+        {/* More / Menu Trigger */}
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <button
+              className="flex flex-col items-center justify-center gap-1 rounded-xl px-3 py-2 text-xs text-text-tertiary hover:text-text-primary transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
+              data-testid="mobile-menu-trigger"
+            >
+              <MoreHorizontal className="h-5 w-5" />
+              <span className="truncate font-medium">More</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="h-[80vh] rounded-t-[20px] p-0" data-testid="mobile-menu-drawer">
+            <SheetHeader className="p-4 border-b border-border-sf-subtle">
+              <SheetTitle>Menu</SheetTitle>
+            </SheetHeader>
+            <div className="p-4 grid gap-2 overflow-y-auto max-h-[calc(80vh-60px)]">
+              {/* Remaining Primary Items */}
+              {drawerPrimaryItems.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface-hover active:bg-surface-active"
+                >
+                  <item.icon className="h-5 w-5 text-text-secondary" />
+                  <span className="text-text-primary font-medium">{item.title}</span>
+                </NavLink>
+              ))}
+
+              <div className="h-px bg-border-sf-subtle my-2" />
+              
+              <div className="text-xs font-semibold text-text-tertiary uppercase tracking-wider px-3 mb-1">
+                Advanced
+              </div>
+
+              {/* Secondary Items */}
+              {secondaryNavItems.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface-hover active:bg-surface-active"
+                >
+                  <item.icon className="h-5 w-5 text-text-secondary" />
+                  <span className="text-text-primary font-medium">{item.title}</span>
+                </NavLink>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
     </nav>
   );

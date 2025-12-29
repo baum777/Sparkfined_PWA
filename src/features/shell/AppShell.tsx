@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
 import { MobileBottomNav } from "./MobileBottomNav";
+import { OnboardingWizard } from "./OnboardingWizard";
 
 export function AppShell() {
   return (
@@ -15,6 +16,7 @@ export function AppShell() {
             <Outlet />
           </main>
           <MobileBottomNav />
+          <OnboardingWizard />
         </SidebarInset>
       </div>
     </SidebarProvider>
