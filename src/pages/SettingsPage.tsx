@@ -1,11 +1,11 @@
 import { Settings, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   SettingsSection,
   ThemeToggle,
   DataExportImport,
   FactoryReset,
-  SetupCompleteness,
   ChartPrefsSettings,
   NotificationsSettings,
   ConnectedWalletsSettings,
@@ -32,123 +32,129 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Setup completeness cue */}
-      <SetupCompleteness />
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="trading">Trading</TabsTrigger>
+          <TabsTrigger value="data">Data</TabsTrigger>
+          <TabsTrigger value="system">System</TabsTrigger>
+        </TabsList>
 
-      {/* Appearance */}
-      <SettingsSection
-        title="Appearance"
-        description="Customize how the app looks"
-        priority
-        data-testid="settings-section-appearance"
-      >
-        <ThemeToggle />
-      </SettingsSection>
+        {/* General Tab */}
+        <TabsContent value="general" className="space-y-6 mt-6">
+          <SettingsSection
+            title="Appearance"
+            description="Customize how the app looks"
+            priority
+            data-testid="settings-section-appearance"
+          >
+            <ThemeToggle />
+          </SettingsSection>
 
-      {/* Chart Preferences */}
-      <SettingsSection
-        title="Chart preferences"
-        description="Default chart behavior and style"
-        data-testid="settings-section-chart"
-      >
-        <ChartPrefsSettings />
-      </SettingsSection>
+          <SettingsSection
+            title="Notifications"
+            description="Control alerts and reminders"
+            data-testid="settings-section-notifications"
+          >
+            <NotificationsSettings />
+          </SettingsSection>
 
-      {/* Notifications */}
-      <SettingsSection
-        title="Notifications"
-        description="Control alerts and reminders"
-        data-testid="settings-section-notifications"
-      >
-        <NotificationsSettings />
-      </SettingsSection>
+          <SettingsSection
+            title="Token usage"
+            description="Track your AI token consumption"
+            data-testid="settings-section-tokens"
+          >
+            <TokenUsageSettings />
+          </SettingsSection>
+        </TabsContent>
 
-      {/* Connected Wallets */}
-      <SettingsSection
-        title="Connected wallets"
-        description="Manage wallet connections for tracking"
-        data-testid="settings-section-wallets"
-      >
-        <ConnectedWalletsSettings />
-      </SettingsSection>
+        {/* Trading Tab */}
+        <TabsContent value="trading" className="space-y-6 mt-6">
+          <SettingsSection
+            title="Chart preferences"
+            description="Default chart behavior and style"
+            data-testid="settings-section-chart"
+          >
+            <ChartPrefsSettings />
+          </SettingsSection>
 
-      {/* Monitoring */}
-      <SettingsSection
-        title="Monitoring"
-        description="Data refresh and performance settings"
-        data-testid="settings-section-monitoring"
-      >
-        <MonitoringSettings />
-      </SettingsSection>
+          <SettingsSection
+            title="Risk defaults"
+            description="Default risk parameters for trades"
+            data-testid="settings-section-risk"
+          >
+            <RiskDefaultsSettings />
+          </SettingsSection>
 
-      {/* Journal Extended Data */}
-      <SettingsSection
-        title="Journal data"
-        description="Configure auto-captured trade enrichments"
-        data-testid="settings-section-journal"
-      >
-        <JournalDataSettings />
-      </SettingsSection>
+          <SettingsSection
+            title="Connected wallets"
+            description="Manage wallet connections for tracking"
+            data-testid="settings-section-wallets"
+          >
+            <ConnectedWalletsSettings />
+          </SettingsSection>
+        </TabsContent>
 
-      {/* Token Usage */}
-      <SettingsSection
-        title="Token usage"
-        description="Track your AI token consumption"
-        data-testid="settings-section-tokens"
-      >
-        <TokenUsageSettings />
-      </SettingsSection>
+        {/* Data Tab */}
+        <TabsContent value="data" className="space-y-6 mt-6">
+          <SettingsSection
+            title="Journal data"
+            description="Configure auto-captured trade enrichments"
+            data-testid="settings-section-journal"
+          >
+            <JournalDataSettings />
+          </SettingsSection>
 
-      {/* Risk Defaults */}
-      <SettingsSection
-        title="Risk defaults"
-        description="Default risk parameters for trades"
-        data-testid="settings-section-risk"
-      >
-        <RiskDefaultsSettings />
-      </SettingsSection>
+          <SettingsSection
+            title="Monitoring"
+            description="Data refresh and performance settings"
+            data-testid="settings-section-monitoring"
+          >
+            <MonitoringSettings />
+          </SettingsSection>
 
-      {/* Backup & Restore */}
-      <SettingsSection
-        title="Backup & Restore"
-        description="Export your data or restore from a backup"
-        priority
-        data-testid="settings-section-backup"
-      >
-        <DataExportImport />
-      </SettingsSection>
+          <SettingsSection
+            title="Backup & Restore"
+            description="Export your data or restore from a backup"
+            priority
+            data-testid="settings-section-backup"
+          >
+            <DataExportImport />
+          </SettingsSection>
+        </TabsContent>
 
-      {/* Advanced/Diagnostics */}
-      <SettingsSection
-        title="Advanced"
-        description="Diagnostics and developer tools"
-        data-testid="settings-section-advanced"
-      >
-        <AdvancedSettings />
-      </SettingsSection>
+        {/* System Tab */}
+        <TabsContent value="system" className="space-y-6 mt-6">
+          <SettingsSection
+            title="Advanced"
+            description="Diagnostics and developer tools"
+            data-testid="settings-section-advanced"
+          >
+            <AdvancedSettings />
+          </SettingsSection>
 
-      {/* Danger Zone */}
-      <SettingsSection
-        title="Danger zone"
-        description="Irreversible actions"
-        className="border-destructive/30"
-        data-testid="settings-section-danger"
-      >
-        <FactoryReset />
-      </SettingsSection>
+          <div className="pt-4">
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full gap-2 border-border-sf-moderate bg-surface-subtle hover:bg-surface-elevated"
+              data-testid="settings-update-app-btn"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Update app
+            </Button>
+          </div>
 
-      {/* Update App */}
-      <div className="pt-4 pb-8">
-        <Button
-          variant="outline"
-          size="lg"
-          className="w-full gap-2 border-border-sf-moderate bg-surface-subtle hover:bg-surface-elevated"
-          data-testid="settings-update-app-btn"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Update app
-        </Button>
-      </div>
+          <SettingsSection
+            title="Danger zone"
+            description="Irreversible actions"
+            className="border-destructive/30"
+            data-testid="settings-section-danger"
+          >
+            <FactoryReset />
+          </SettingsSection>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

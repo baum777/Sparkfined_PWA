@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
 import { MobileBottomNav } from "./MobileBottomNav";
+import { SetupCompleteness } from "@/components/settings";
 
 export function AppShell() {
   return (
@@ -16,6 +17,7 @@ export function AppShell() {
           </main>
           <MobileBottomNav />
         </SidebarInset>
+        <SetupCompleteness />
       </div>
     </SidebarProvider>
   );

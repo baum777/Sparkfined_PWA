@@ -2,6 +2,7 @@ import { useState } from "react";
 import { BookOpen, Calendar, TrendingUp, TrendingDown, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -116,11 +117,20 @@ const emotionConfig: Record<EmotionTag, { emoji: string; label: string; classNam
 export function ConfirmedView({ entries = MOCK_ENTRIES }: ConfirmedViewProps) {
   const [selectedEntry, setSelectedEntry] = useState<ConfirmedEntry | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [filter, setFilter] = useState<"all" | "long" | "short">("all");
 
   const handleViewDetails = (entry: ConfirmedEntry) => {
     setSelectedEntry(entry);
     setDetailOpen(true);
   };
+
+  const filteredEntries = entries.filter((e) => {
+    if (filter === "all") return true;
+    const isLong = e.txs[0]?.type === "BUY";
+    if (filter === "long") return isLong;
+    if (filter === "short") return !isLong;
+    return true;
+  });
 
   // Empty state
   if (entries.length === 0) {
@@ -143,106 +153,123 @@ export function ConfirmedView({ entries = MOCK_ENTRIES }: ConfirmedViewProps) {
   }
 
   return (
-    <div className="space-y-3" data-testid="confirmed-list">
-      {entries.map((entry) => {
-        const pnl = entry.pnl.realizedUsd + entry.pnl.unrealizedUsd;
-        const pnlPositive = pnl >= 0;
-        const emotion = entry.enrichment.emotion;
-        const emotionInfo = emotion ? emotionConfig[emotion] : null;
+    <div className="space-y-4" data-testid="confirmed-list">
+      {/* Filters */}
+      <Tabs value={filter} onValueChange={(v) => setFilter(v as any)} className="w-full">
+        <TabsList className="h-9">
+            <TabsTrigger value="all" className="text-xs px-3 h-7">All</TabsTrigger>
+            <TabsTrigger value="long" className="text-xs px-3 h-7">Long</TabsTrigger>
+            <TabsTrigger value="short" className="text-xs px-3 h-7">Short</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
-        return (
-          <Card
-            key={entry.id}
-            className="border-border-sf-subtle bg-surface cursor-pointer hover:border-brand/30 transition-all hover:shadow-glow"
-            onClick={() => handleViewDetails(entry)}
-            data-testid="confirmed-entry-card"
-          >
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between gap-3">
-                {/* Left: Token + Meta */}
-                <div className="flex-1 min-w-0">
-                  {/* Token + Emotion */}
-                  <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <span className="font-semibold text-text-primary">
-                      {entry.token.symbol}
-                    </span>
-                    {emotionInfo && (
-                      <Badge
-                        variant="outline"
-                        className={`text-[10px] font-medium ${emotionInfo.className}`}
-                      >
-                        {emotionInfo.emoji} {emotionInfo.label}
-                      </Badge>
-                    )}
-                  </div>
+      <div className="space-y-3">
+        {filteredEntries.length === 0 ? (
+           <div className="py-8 text-center text-sm text-text-tertiary">
+             No {filter} entries found.
+           </div>
+        ) : (
+          filteredEntries.map((entry) => {
+            const pnl = entry.pnl.realizedUsd + entry.pnl.unrealizedUsd;
+            const pnlPositive = pnl >= 0;
+            const emotion = entry.enrichment.emotion;
+            const emotionInfo = emotion ? emotionConfig[emotion] : null;
 
-                  {/* Date */}
-                  <div className="flex items-center gap-2 text-xs text-text-tertiary mb-2">
-                    <Calendar className="h-3 w-3" />
-                    {formatDate(entry.confirmedAt)}
-                  </div>
+            return (
+              <Card
+                key={entry.id}
+                className="border-border-sf-subtle bg-surface cursor-pointer hover:border-brand/30 transition-all hover:shadow-glow"
+                onClick={() => handleViewDetails(entry)}
+                data-testid="confirmed-entry-card"
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    {/* Left: Token + Meta */}
+                    <div className="flex-1 min-w-0">
+                      {/* Token + Emotion */}
+                      <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                        <span className="font-semibold text-text-primary">
+                          {entry.token.symbol}
+                        </span>
+                        {emotionInfo && (
+                          <Badge
+                            variant="outline"
+                            className={`text-[10px] font-medium ${emotionInfo.className}`}
+                          >
+                            {emotionInfo.emoji} {emotionInfo.label}
+                          </Badge>
+                        )}
+                      </div>
 
-                  {/* Notes preview */}
-                  {entry.enrichment.notes && (
-                    <p className="text-sm text-text-secondary line-clamp-2 leading-relaxed">
-                      {entry.enrichment.notes}
-                    </p>
-                  )}
+                      {/* Date */}
+                      <div className="flex items-center gap-2 text-xs text-text-tertiary mb-2">
+                        <Calendar className="h-3 w-3" />
+                        {formatDate(entry.confirmedAt)}
+                      </div>
 
-                  {/* Tags */}
-                  {entry.enrichment.tags && entry.enrichment.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {entry.enrichment.tags.slice(0, 3).map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="secondary"
-                          className="text-[10px] bg-surface-subtle border-border-sf-subtle text-text-tertiary"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                      {entry.enrichment.tags.length > 3 && (
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] bg-surface-subtle border-border-sf-subtle text-text-tertiary"
-                        >
-                          +{entry.enrichment.tags.length - 3}
-                        </Badge>
+                      {/* Notes preview */}
+                      {entry.enrichment.notes && (
+                        <p className="text-sm text-text-secondary line-clamp-2 leading-relaxed">
+                          {entry.enrichment.notes}
+                        </p>
+                      )}
+
+                      {/* Tags */}
+                      {entry.enrichment.tags && entry.enrichment.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {entry.enrichment.tags.slice(0, 3).map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant="secondary"
+                              className="text-[10px] bg-surface-subtle border-border-sf-subtle text-text-tertiary"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                          {entry.enrichment.tags.length > 3 && (
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] bg-surface-subtle border-border-sf-subtle text-text-tertiary"
+                            >
+                              +{entry.enrichment.tags.length - 3}
+                            </Badge>
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
 
-                {/* Right: PnL + Arrow */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="text-right">
-                    <div
-                      className={`flex items-center justify-end gap-1 font-mono font-medium ${
-                        pnlPositive ? "text-sentiment-bull" : "text-sentiment-bear"
-                      }`}
-                    >
-                      {pnlPositive ? (
-                        <TrendingUp className="h-4 w-4" />
-                      ) : (
-                        <TrendingDown className="h-4 w-4" />
-                      )}
-                      {formatUsd(pnl)}
-                    </div>
-                    <div
-                      className={`text-xs font-mono ${
-                        pnlPositive ? "text-sentiment-bull/70" : "text-sentiment-bear/70"
-                      }`}
-                    >
-                      {formatPct(entry.pnl.pct)}
+                    {/* Right: PnL + Arrow */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="text-right">
+                        <div
+                          className={`flex items-center justify-end gap-1 font-mono font-medium ${
+                            pnlPositive ? "text-sentiment-bull" : "text-sentiment-bear"
+                          }`}
+                        >
+                          {pnlPositive ? (
+                            <TrendingUp className="h-4 w-4" />
+                          ) : (
+                            <TrendingDown className="h-4 w-4" />
+                          )}
+                          {formatUsd(pnl)}
+                        </div>
+                        <div
+                          className={`text-xs font-mono ${
+                            pnlPositive ? "text-sentiment-bull/70" : "text-sentiment-bear/70"
+                          }`}
+                        >
+                          {formatPct(entry.pnl.pct)}
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-text-tertiary" />
                     </div>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-text-tertiary" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
+      </div>
 
       {/* Detail Modal */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
