@@ -5,7 +5,7 @@ import {
   getReplayStatusLabel,
   setReplaySpeed,
   toggleReplay,
-} from "@/features/chart/replay"
+} from "../../src.legacy/features/chart/replay"
 
 describe("replay helpers", () => {
   it("toggles replay enabled state", () => {

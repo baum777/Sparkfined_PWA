@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
+import react from '@vitejs/plugin-react-swc'
 import path from 'path'
 
 const stdoutColumns = typeof process.stdout?.columns === 'number' ? process.stdout.columns : undefined
