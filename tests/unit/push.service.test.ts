@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
-import { pushClient } from '../../src/lib/push';
-import { usePushQueueStore } from '../../src/store/pushQueueStore';
+import { pushClient } from '../../src.legacy/lib/push';
+import { usePushQueueStore } from '../../src.legacy/store/pushQueueStore';
 import { MockPushManager, installServiceWorkerMock, mockNotificationPermission } from '../mocks/push-manager';
 
 const VAPID = 'BKxTtVd0ZJ9d9y1DMzWqOw5kh6gcdfe1h7L8xJQ8x0kQnZSWm2LC36JzYAgqjs3OZc2gTThxjeRGna43GgLlJxw';

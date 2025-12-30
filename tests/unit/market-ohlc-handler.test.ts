@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import handler from '../../api/market/ohlc';
-import { getFallbackCounters, resetFallbackCounters } from '../../src/lib/metrics/providerFallback';
+import handler from '../../api_legacy/market/ohlc';
+import { getFallbackCounters, resetFallbackCounters } from '../../src.legacy/lib/metrics/providerFallback';
 
 function createReq(overrides: Partial<any> = {}) {
   return {

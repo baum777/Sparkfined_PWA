@@ -155,7 +155,7 @@ export function ConfirmedView({ entries = MOCK_ENTRIES }: ConfirmedViewProps) {
   return (
     <div className="space-y-4" data-testid="confirmed-list">
       {/* Filter Tabs */}
-      <Tabs value={filter} onValueChange={(v) => setFilter(v as any)} className="w-full">
+      <Tabs value={filter} onValueChange={(v) => setFilter(v as "all" | "long" | "short")} className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-surface-subtle border border-border-sf-subtle rounded-lg p-1 h-9">
           <TabsTrigger value="all" className="text-xs rounded-md data-[state=active]:bg-surface data-[state=active]:text-text-primary data-[state=active]:shadow-sm">All</TabsTrigger>
           <TabsTrigger value="long" className="text-xs rounded-md data-[state=active]:bg-surface data-[state=active]:text-text-primary data-[state=active]:shadow-sm">Long</TabsTrigger>
